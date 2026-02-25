@@ -255,13 +255,11 @@ def plot_blind_window(
     ax.set_xlim(zlo, zhi)
     ax.set_xlabel("mass [GeV]")
     ax.set_ylabel("counts / bin")
-    title = f"{ds.label}: blind-window fit, m={mass*1000:.1f} MeV"
+    title = f"{ds.label}: blind-window fit @ m={mass*1000:.1f} MeV"
     if title_extra:
         title += f" {title_extra}"
-    _set_title_above(ax, title, pad=8.0)
-    ax.legend(loc="upper left", fontsize=8, frameon=True)
-    _set_title_above(ax, f"{ds.label} — blind window @ m={mass*1000:.1f} MeV {title_extra}".strip())
-    ax.legend(loc="best", frameon=True)
+    ax.set_title(title, fontsize=10, pad=6.0, loc="center")
+    ax.legend(loc="best", fontsize=7, frameon=True)
     _grid(ax)
     plt.tight_layout()
     plt.savefig(outpath, dpi=220)
@@ -548,14 +546,15 @@ def plot_analytic_p0(
         sigma_lines: Z-score reference lines to draw (default [3, 5])
     """
     if sigma_lines is None:
-        sigma_lines = [3, 5]
+        sigma_lines = [3.0]
 
     masses = df["mass_GeV"].to_numpy(float)
-    p0_local = df["p0_analytic"].to_numpy(float)
+    p0_local = np.clip(df["p0_analytic"].to_numpy(float), 1e-300, 1.0)
 
     fig, ax = plt.subplots(figsize=(10, 4))
     ax.plot(masses, p0_local, label="Local p0 (analytic LRT)")
 
+    p0_global = None
     if apply_lee:
         if neff is None:
             neff = float(len(masses))
@@ -563,16 +562,24 @@ def plot_analytic_p0(
             _p_global_from_local(float(p), Neff=neff, method=lee_method)
             for p in p0_local
         ], float)
+        p0_global = np.clip(p0_global, 1e-300, 1.0)
         ax.plot(masses, p0_global, "--", label=f"Global p0 (N_eff={neff:.1f})")
 
-    for z in (sigma_lines or []):
+    z_local = np.asarray([_z_from_p_one_sided(float(p)) for p in p0_local], float)
+    z_global = np.asarray([_z_from_p_one_sided(float(p)) for p in p0_global], float) if p0_global is not None else np.array([0.0])
+    z_peak = float(np.nanmax(np.concatenate([z_local, z_global]))) if (z_local.size or z_global.size) else 0.0
+    z_floor = max(3.0, z_peak)
+
+    sig_ref = sorted(set(float(z) for z in (sigma_lines or [3.0]) if float(z) <= z_floor + 1e-12))
+    for z in sig_ref:
         p_ref = _p_from_z_one_sided(float(z))
         ax.axhline(p_ref, color="k", ls=":", lw=0.8, label=f"{z:.0f}σ")
 
     ax.set_yscale("log")
-    ax.invert_yaxis()
+    p_floor = max(_p_from_z_one_sided(z_floor), 1e-300)
+    ax.set_ylim(p_floor, 1.0)
     ax.set_xlabel("m (GeV)")
-    ax.set_ylabel("p0 (one-sided)")
+    ax.set_ylabel("p-value (one-sided)")
     _set_title_above(ax, title or "Local p0 vs mass")
     ax.legend(loc="best")
     _grid(ax)
@@ -622,6 +629,8 @@ def plot_Z_local_global(
     else:
         raise ValueError("DataFrame must have 'Z_analytic' or 'p0_analytic' column")
 
+    Z_local = np.clip(np.asarray(Z_local, float), 0.0, None)
+
     fig, ax = plt.subplots(figsize=(10, 4))
     ax.plot(masses, Z_local, label="Local Z")
 
@@ -633,7 +642,7 @@ def plot_Z_local_global(
             _p_global_from_local(float(p), Neff=neff, method=lee_method)
             for p in p_local
         ], float)
-        Z_global = np.asarray([_z_from_p_one_sided(float(p)) for p in p_global], float)
+        Z_global = np.clip(np.asarray([_z_from_p_one_sided(float(p)) for p in p_global], float), 0.0, None)
         ax.plot(masses, Z_global, "--", label=f"Global Z (N_eff={neff:.1f})")
         _add_info_box(ax, f"N_eff = {neff:.1f}\nmethod: {lee_method}", loc="upper right")
 
@@ -641,6 +650,8 @@ def plot_Z_local_global(
         ax.axhline(float(z), color="k", ls=":", lw=0.8, label=f"{z:.0f}σ")
 
     ax.axhline(0, color="k", lw=0.5)
+    zmax = max(3.2, float(np.nanmax(Z_local)) * 1.15 if np.isfinite(np.nanmax(Z_local)) else 3.2)
+    ax.set_ylim(0.0, zmax)
     ax.set_xlabel("m (GeV)")
     ax.set_ylabel("Z (Gaussian significance)")
     _set_title_above(ax, title or "Local/global significance vs mass")
