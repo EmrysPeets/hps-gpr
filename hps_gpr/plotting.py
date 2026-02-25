@@ -210,6 +210,7 @@ def plot_blind_window(
     *,
     A_up: Optional[float] = None,
     A_hat: Optional[float] = None,
+
     A_show: Optional[float] = None,
     title_extra: str = "",
     zoom_half_sigma: float = 0.5,
@@ -261,9 +262,6 @@ def plot_blind_window(
         title += f" {title_extra}"
     ax.set_title(title, fontsize=10, pad=6.0, loc="center")
     ax.legend(loc="best", fontsize=7, frameon=True)
-
-
-
 
 
 
