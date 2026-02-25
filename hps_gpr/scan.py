@@ -110,6 +110,14 @@ def run_scan(
     diag_every_n = getattr(config, "scan_diagnostic_plot_every_n", None)
     do_combined = bool(getattr(config, "do_combined", False))
 
+    # Apply publication-style plotting defaults once for the full scan.
+    if bool(getattr(config, "save_plots", False)):
+        try:
+            from .plotting import set_plot_style
+            set_plot_style("paper")
+        except Exception:
+            pass
+
     def _process_one_mass(m: float) -> Tuple[List[dict], List[dict]]:
         """Process a single mass point. Returns (rows_single, rows_comb)."""
         rows_s: List[dict] = []
@@ -152,16 +160,13 @@ def run_scan(
                     plot_full_range(
                         ds, float(m), pred,
                         os.path.join(ds_dir, "fit_full.png"),
+                        A_show=res.A_up,
                     )
                     plot_blind_window(
-                        ds, float(m), pred, res.A_up,
-                        os.path.join(ds_dir, "blind_ul.png"),
-                        title_extra="(UL overlay)",
-                    )
-                    plot_blind_window(
-                        ds, float(m), pred, res.A_hat,
-                        os.path.join(ds_dir, "blind_ahat.png"),
-                        title_extra="(Ahat overlay)",
+                        ds, float(m), pred,
+                        os.path.join(ds_dir, "blind_fit.png"),
+                        A_up=res.A_up,
+                        A_hat=res.A_hat,
                     )
                     plot_s_over_b(
                         ds, float(m), pred, res.A_up,
@@ -202,6 +207,15 @@ def run_scan(
                     "sigma_A": float(res.sigma_A),
                     "extract_success": bool(res.extract_success),
                     "visibility": "observed" if compute_obs else "expected_only",
+                    "kernel_str": str(getattr(pred, "kernel_str", "")),
+                    "ls_lo": float(getattr(pred, "ls_lo", float("nan"))),
+                    "ls_hi": float(getattr(pred, "ls_hi", float("nan"))),
+                    "ls_init": float(getattr(pred, "ls_init", float("nan"))),
+                    "ls_opt": float(getattr(pred, "ls_opt", float("nan"))),
+                    "sigma_x": float(getattr(pred, "sigma_x", float("nan"))),
+                    "const_opt": float(getattr(pred, "const_opt", float("nan"))),
+                    "lml": float(getattr(pred, "lml", float("nan"))),
+                    "n_train": int(getattr(pred, "n_train", 0)),
                 })
 
             except Exception as e:
@@ -305,12 +319,24 @@ def run_scan(
         rows_single.extend(rs)
         rows_comb.extend(rc)
 
-    df_single = (
-        pd.DataFrame(rows_single)
-        .sort_values(["dataset", "mass_GeV"])
-        .reset_index(drop=True)
-    )
-    df_comb = pd.DataFrame(rows_comb).sort_values(["mass_GeV"]).reset_index(drop=True)
+    df_single = pd.DataFrame(rows_single)
+    if {"dataset", "mass_GeV"}.issubset(df_single.columns):
+        df_single = df_single.sort_values(["dataset", "mass_GeV"]).reset_index(drop=True)
+
+    if len(df_single) and {"ls_lo", "ls_hi", "ls_opt", "sigma_x", "sigma_val"}.issubset(df_single.columns):
+        sx = df_single["sigma_x"].to_numpy(float)
+        sg = df_single["sigma_val"].to_numpy(float)
+        with np.errstate(invalid="ignore", divide="ignore"):
+            df_single["ls_lo_over_sigma_x"] = df_single["ls_lo"].to_numpy(float) / sx
+            df_single["ls_hi_over_sigma_x"] = df_single["ls_hi"].to_numpy(float) / sx
+            df_single["ls_opt_over_sigma_x"] = df_single["ls_opt"].to_numpy(float) / sx
+            df_single["ls_lo_over_sigma"] = df_single["ls_lo"].to_numpy(float) / sg
+            df_single["ls_hi_over_sigma"] = df_single["ls_hi"].to_numpy(float) / sg
+            df_single["ls_opt_over_sigma"] = df_single["ls_opt"].to_numpy(float) / sg
+
+    df_comb = pd.DataFrame(rows_comb)
+    if "mass_GeV" in df_comb.columns:
+        df_comb = df_comb.sort_values(["mass_GeV"]).reset_index(drop=True)
 
     single_path = os.path.join(config.output_dir, "results_single.csv")
     comb_path = os.path.join(config.output_dir, "results_combined.csv")
