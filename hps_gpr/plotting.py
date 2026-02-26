@@ -210,10 +210,7 @@ def plot_blind_window(
     *,
     A_up: Optional[float] = None,
     A_hat: Optional[float] = None,
-<<<<<<< HEAD
 
-=======
->>>>>>> origin/emrys/validation_workflow
     A_show: Optional[float] = None,
     title_extra: str = "",
     zoom_half_sigma: float = 0.5,
@@ -229,7 +226,7 @@ def plot_blind_window(
     y_full = np.asarray(pred.y_full, float)
     mu_full = np.asarray(pred.mu_full, float)
     edges_full = np.asarray(pred.edges_full, float)
-<<<<<<< HEAD
+
 
     zlo = float(pred.blind[0] - float(zoom_half_sigma) * pred.sigma_val)
     zhi = float(pred.blind[1] + float(zoom_half_sigma) * pred.sigma_val)
@@ -275,43 +272,43 @@ def plot_blind_window(
 
 
 
-=======
 
-    zlo = float(pred.blind[0] - float(zoom_half_sigma) * pred.sigma_val)
-    zhi = float(pred.blind[1] + float(zoom_half_sigma) * pred.sigma_val)
-    m_zoom = (x_full >= zlo) & (x_full <= zhi)
 
-    w_full = build_template(edges_full, mass, pred.sigma_val)
 
-    fig, ax = plt.subplots(figsize=(8.6, 5.0))
-    yz = y_full[m_zoom]
-    ax.errorbar(
-        x_full[m_zoom], yz, yerr=np.sqrt(np.clip(yz, 1.0, None)),
-        fmt="o", ms=2.8, lw=0.9, color="black", label="Data", zorder=3,
-    )
-    ax.plot(x_full[m_zoom], mu_full[m_zoom], color="C0", lw=1.5, label="GPR mean", zorder=4)
 
-    if A_hat is not None and np.isfinite(A_hat):
-        ax.plot(
-            x_full[m_zoom], (mu_full + float(A_hat) * w_full)[m_zoom],
-            color="C2", lw=1.4, label=rf"$\mu + \hat{{A}}w$ ($\hat{{A}}={float(A_hat):.2g}$)", zorder=5,
-        )
-    if A_up is not None and np.isfinite(A_up):
-        ax.plot(
-            x_full[m_zoom], (mu_full + float(A_up) * w_full)[m_zoom],
-            "--", color="C3", lw=1.4, label=rf"$\mu + A_{{up}}w$ ($A_{{up}}={float(A_up):.2g}$)", zorder=6,
-        )
 
-    _shade_blind_window(ax, pred.blind, blind_train=getattr(pred, "blind_train", None))
-    ax.set_xlim(zlo, zhi)
-    ax.set_xlabel("mass [GeV]")
-    ax.set_ylabel("counts / bin")
-    title = f"{ds.label}: blind-window fit @ m={mass*1000:.1f} MeV"
-    if title_extra:
-        title += f" {title_extra}"
-    ax.set_title(title, fontsize=10, pad=6.0, loc="center")
-    ax.legend(loc="best", fontsize=7, frameon=True)
->>>>>>> origin/emrys/validation_workflow
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     _grid(ax)
     plt.tight_layout()
     plt.savefig(outpath, dpi=220)

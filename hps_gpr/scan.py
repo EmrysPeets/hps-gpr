@@ -157,10 +157,6 @@ def run_scan(
                 ds_list_here.append(ds)
 
                 if config.save_plots and compute_obs:
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/emrys/validation_workflow
                     try:
                         plot_full_range(
                             ds, float(m), pred,
@@ -180,11 +176,6 @@ def run_scan(
                     except Exception as pe:
                         if config.debug_print:
                             print(f"[WARN] plot failure for {ds.key} @ {float(m):.4f} GeV: {pe}")
-<<<<<<< HEAD
-
-
-=======
->>>>>>> origin/emrys/validation_workflow
 
                 if config.save_fit_json:
                     _write_json(
