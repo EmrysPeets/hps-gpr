@@ -1,7 +1,8 @@
 #!/bin/bash
 #SBATCH --job-name=hps2015_10k
 #SBATCH --array=0-119
-#SBATCH --partition=shared
+#SBATCH --account hps:hps-prod
+#SBATCH --partition=milano
 #SBATCH --time=24:00:00
 #SBATCH --mem=8G
 #SBATCH --output=/sdf/scratch/hps/epeets/output/logs/%A_%a.out
