@@ -1,11 +1,11 @@
 #!/bin/bash
 #SBATCH --job-name=hps2015_bands_10k
-#SBATCH --account hps:hps-prod
-#SBATCH --partition milano
+#SBATCH --partition=milano
 #SBATCH --time=24:00:00
 #SBATCH --mem=8G
-#SBATCH --output=/sdf/scratch/hps/epeets/output/logs/%j.out
-#SBATCH --error=/sdf/scratch/hps/epeets/output/logs/%j.err
+#SBATCH --output=logs/%j.out
+#SBATCH --error=logs/%j.err
+#SBATCH --account=hps:hps-prod
 
 mkdir -p logs
 
