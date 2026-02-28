@@ -1,7 +1,7 @@
 #!/bin/bash
 # Submit 126 individual SLURM jobs for hps-gpr scan
-N_TASKS=126
-JOB_SCRIPT="/sdf/home/e/epeets/src/hps-gpr/submit_2015_bands_10k.slurm"
+N_TASKS=111
+JOB_SCRIPT="/sdf/home/e/epeets/src/hps-gpr/submit_2015_bands_10k_2.slurm"
 
 mkdir -p logs
 
