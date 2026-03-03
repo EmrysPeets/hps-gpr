@@ -265,7 +265,13 @@ def inject(config, dataset, masses, strengths, n_toys, output_dir):
 
     from .config import load_config
     from .dataset import make_datasets
-    from .injection import run_injection_extraction_toys, summarize_injection_grid, combine_injection_toy_tables
+    from .injection import (
+        run_injection_extraction_toys,
+        summarize_injection_grid,
+        combine_injection_toy_tables,
+        _combined_mass_support_summary,
+        format_combined_mass_support_summary,
+    )
     from .plotting import (
         ensure_dir,
         plot_linearity,
@@ -313,7 +319,20 @@ def inject(config, dataset, masses, strengths, n_toys, output_dir):
                 strengths_mode=strengths_mode,
             )
 
-        df_comb_toys = combine_injection_toy_tables(df_map)
+        mass_policy = str(getattr(cfg, "inj_combined_mass_policy", "intersection")).strip().lower()
+        min_n_contrib = int(getattr(cfg, "inj_combined_min_n_contrib", 2))
+        support = _combined_mass_support_summary(
+            df_map,
+            mass_policy=mass_policy,
+            min_n_contrib=min_n_contrib,
+        )
+        print(format_combined_mass_support_summary(support))
+
+        df_comb_toys = combine_injection_toy_tables(
+            df_map,
+            mass_policy=mass_policy,
+            min_n_contrib=min_n_contrib,
+        )
         if not df_comb_toys.empty:
             comb_toys_path = os.path.join(outdir, "inj_extract_toys_combined.csv")
             df_comb_toys.to_csv(comb_toys_path, index=False)
@@ -694,7 +713,7 @@ def inject_plot(input_dir, output_dir, dataset, write_merged_toys):
     import glob
     import pandas as pd
 
-    from .injection import summarize_injection_grid
+    from .injection import summarize_injection_grid, combine_injection_toy_tables, _combined_mass_support_summary, format_combined_mass_support_summary
     from .plotting import (
         ensure_dir,
         plot_linearity,
@@ -703,6 +722,8 @@ def inject_plot(input_dir, output_dir, dataset, write_merged_toys):
         plot_coverage,
         plot_injection_heatmap,
         plot_z_calibration_residual,
+        plot_pull_histogram_by_mass,
+        plot_pull_vs_mass,
     )
 
     ds_filter = {str(d).strip() for d in (dataset or []) if str(d).strip()}
@@ -741,6 +762,10 @@ def inject_plot(input_dir, output_dir, dataset, write_merged_toys):
 
     all_summaries = []
     all_toys = []
+    toy_merged = {}
+    mass_policy = "intersection"
+    min_n_contrib = 2
+
     for ds, frames in sorted(by_dataset.items()):
         dft = pd.concat(frames, ignore_index=True)
         dft = dft.sort_values([c for c in ["mass_GeV", "strength", "toy"] if c in dft.columns]).reset_index(drop=True)
@@ -748,6 +773,8 @@ def inject_plot(input_dir, output_dir, dataset, write_merged_toys):
         dedup_cols = [c for c in ["dataset", "mass_GeV", "strength", "toy"] if c in dft.columns]
         if dedup_cols:
             dft = dft.drop_duplicates(subset=dedup_cols, keep="last")
+
+        toy_merged[str(ds)] = dft.copy()
 
         if write_merged_toys:
             toys_out = os.path.join(outdir, f"inj_extract_toys_{ds}.csv")
@@ -761,6 +788,33 @@ def inject_plot(input_dir, output_dir, dataset, write_merged_toys):
         dsum.to_csv(sum_out, index=False)
         all_summaries.append(dsum)
         print(f"Wrote {sum_out}")
+
+    non_combined = {k: pd.concat(v, ignore_index=True) for k, v in by_dataset.items() if k != "combined"}
+    if len(non_combined) >= 2:
+        support = _combined_mass_support_summary(
+            non_combined,
+            mass_policy=mass_policy,
+            min_n_contrib=min_n_contrib,
+        )
+        print(format_combined_mass_support_summary(support))
+
+        df_comb = combine_injection_toy_tables(
+            non_combined,
+            mass_policy=mass_policy,
+            min_n_contrib=min_n_contrib,
+        )
+        if not df_comb.empty:
+            if write_merged_toys:
+                toys_out = os.path.join(outdir, "inj_extract_toys_combined.csv")
+                df_comb.to_csv(toys_out, index=False)
+                print(f"Wrote {toys_out}")
+            dsum_c = summarize_injection_grid(df_comb)
+            dsum_c["dataset"] = "combined"
+            sum_out_c = os.path.join(outdir, "inj_extract_summary_combined.csv")
+            dsum_c.to_csv(sum_out_c, index=False)
+            all_summaries = [s for s in all_summaries if not ("dataset" in s.columns and (s["dataset"].astype(str) == "combined").all())]
+            all_summaries.append(dsum_c)
+            print(f"Wrote {sum_out_c}")
 
     df_sum = pd.concat(all_summaries, ignore_index=True) if all_summaries else pd.DataFrame()
     if df_sum.empty:
@@ -783,8 +837,13 @@ def inject_plot(input_dir, output_dir, dataset, write_merged_toys):
     present = [str(x) for x in df_sum["dataset"].astype(str).unique()]
     ds_order = [d for d in preferred_order if d in present] + sorted(d for d in present if d not in preferred_order)
 
+    for required_ds in preferred_order:
+        if required_ds not in present:
+            print(f"Warning: no summary rows found for required dataset '{required_ds}'")
+
     for ds_key in ds_order:
         sub = df_sum[df_sum["dataset"].astype(str) == ds_key].copy()
+        dft = toy_merged.get(ds_key, pd.DataFrame())
         plot_linearity(sub, xvar=xvar, title=f"{ds_key}: linearity", outpath=os.path.join(outdir, f"linearity_{ds_key}.png"))
         plot_bias_vs_injected_strength(sub, xvar=xvar, title=f"{ds_key}: bias", outpath=os.path.join(outdir, f"bias_{ds_key}.png"))
         plot_pull_width(sub, xvar=xvar, title=f"{ds_key}: pull width", outpath=os.path.join(outdir, f"pull_width_{ds_key}.png"))
@@ -800,6 +859,12 @@ def inject_plot(input_dir, output_dir, dataset, write_merged_toys):
             acceptance_bands=[0.5, 1.0],
             band_semantic="toy spread",
         )
+        if not dft.empty:
+            plot_pull_vs_mass(dft, dataset_key=ds_key, title=f"{ds_key}: pull mean/width vs mass", outpath=os.path.join(outdir, f"pull_vs_mass_{ds_key}.png"))
+            hist_dir = os.path.join(outdir, f"pull_hist_{ds_key}")
+            ensure_dir(hist_dir)
+            paths = plot_pull_histogram_by_mass(dft, dataset_key=ds_key, group_by_strength=True, pvalue_method="ks", outdir=hist_dir)
+            print(f"Wrote {len(paths)} pull-histogram plots for {ds_key} to {hist_dir}")
 
     print(f"\nSummary rows: {len(df_sum)}")
     print(df_sum.head(20).to_string())
