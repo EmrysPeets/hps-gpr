@@ -845,10 +845,72 @@ def plot_Z_local_global(
 # Injection study plots
 # ---------------------------------------------------------------------------
 
+def _mad_std(x: np.ndarray) -> float:
+    """Robust Gaussian-equivalent spread estimate from MAD."""
+    v = np.asarray(x, float)
+    v = v[np.isfinite(v)]
+    if v.size == 0:
+        return float("nan")
+    med = float(np.nanmedian(v))
+    mad = float(np.nanmedian(np.abs(v - med)))
+    return float(1.4826 * mad)
+
+
+def _resolve_bias_sem(
+    sub: pd.DataFrame,
+    *,
+    df_toys: Optional[pd.DataFrame] = None,
+    robust: bool = False,
+) -> Tuple[np.ndarray, str]:
+    """Return SEM for linearity/bias curves and a method label.
+
+    Priority:
+      1) summary-table A_hat_std/sqrt(n_toys)
+      2) toy-level grouped estimate from df_toys
+    """
+    n = np.clip(sub.get("n_toys", pd.Series(np.ones(len(sub)))).to_numpy(float), 1.0, None)
+
+    if "A_hat_std" in sub.columns:
+        spread = sub["A_hat_std"].to_numpy(float)
+        if robust and ("A_hat_mad_std" in sub.columns):
+            spread = sub["A_hat_mad_std"].to_numpy(float)
+            return spread / np.sqrt(n), "MAD-based SEM from summary"
+        return spread / np.sqrt(n), "SEM = A_hat_std/sqrt(n_toys) from summary"
+
+    if df_toys is None or df_toys.empty:
+        return np.full(len(sub), np.nan, float), "SEM unavailable"
+
+    need_cols = {"dataset", "mass_GeV", "strength", "A_hat"}
+    if not need_cols.issubset(df_toys.columns):
+        return np.full(len(sub), np.nan, float), "SEM unavailable"
+
+    key_cols = ["dataset", "mass_GeV", "strength"]
+    toy_grp = df_toys.groupby(key_cols, dropna=False)
+    sem_map = {}
+    for key, g in toy_grp:
+        vals = g["A_hat"].to_numpy(float)
+        vals = vals[np.isfinite(vals)]
+        if vals.size == 0:
+            sem_map[key] = float("nan")
+            continue
+        spread = _mad_std(vals) if robust else (float(np.nanstd(vals, ddof=1)) if vals.size > 1 else 0.0)
+        sem_map[key] = float(spread / np.sqrt(max(vals.size, 1)))
+
+    sem = []
+    for _, row in sub.iterrows():
+        sem.append(sem_map.get((row["dataset"], float(row["mass_GeV"]), float(row["strength"])), float("nan")))
+
+    label = "SEM from toy-level MAD" if robust else "SEM from toy-level std/sqrt(n)"
+    return np.asarray(sem, float), label
+
+
 def plot_linearity(
     df_sum: pd.DataFrame,
     *,
     xvar: str = "strength",
+    df_toys: Optional[pd.DataFrame] = None,
+    robust_sem: bool = False,
+    show_sigma_a_mean: bool = True,
     title: str = "",
     outpath: Optional[str] = None,
 ) -> None:
@@ -861,19 +923,24 @@ def plot_linearity(
         outpath: Save path (if None, displays interactively)
     """
     fig, ax = plt.subplots(figsize=(8, 4))
+    err_note = "SEM unavailable"
     for ds, sub in df_sum.groupby("dataset"):
+        sub = sub.sort_values(xvar)
         x = sub[xvar].to_numpy(float)
         y = sub["A_hat_mean"].to_numpy(float)
         xerr = sub["inj_nsigma_xerr"].to_numpy(float) if (xvar == "inj_nsigma" and "inj_nsigma_xerr" in sub.columns) else None
-        yerr = sub["sigma_A_mean"].to_numpy(float) / np.sqrt(np.clip(sub.get("n_toys", pd.Series(np.ones(len(sub)))).to_numpy(float), 1.0, None)) if "sigma_A_mean" in sub.columns else None
+        yerr, err_note = _resolve_bias_sem(sub, df_toys=df_toys, robust=robust_sem)
         ax.errorbar(x, y, xerr=xerr, yerr=yerr, fmt="o-", capsize=2, label=str(ds))
+        if show_sigma_a_mean and "sigma_A_mean" in sub.columns:
+            ax.plot(x, sub["sigma_A_mean"].to_numpy(float), "--", lw=1.2, alpha=0.85, label=f"{ds} $\\langle\\sigma_A\\rangle$")
     # Identity reference
     xlim = ax.get_xlim()
     ax.plot(xlim, xlim, "k--", lw=0.8, label="ideal")
     ax.set_xlim(xlim)
     ax.set_xlabel(xvar)
-    ax.set_ylabel(r"$\langle\hat{A}\rangle$")
+    ax.set_ylabel(r"$\langle\hat{A}\rangle$  (error bars: SEM of $\hat{A}$)")
     _set_title_above(ax, title or "Linearity: mean extracted vs injected")
+    _add_info_box(ax, f"Uncertainty: {err_note}\n$\\langle\\sigma_A\\rangle$ shown separately", loc="upper left")
     ax.legend(loc="best")
     _grid(ax)
     plt.tight_layout()
@@ -888,6 +955,9 @@ def plot_bias_vs_injected_strength(
     df_sum: pd.DataFrame,
     *,
     xvar: str = "strength",
+    df_toys: Optional[pd.DataFrame] = None,
+    robust_sem: bool = False,
+    show_sigma_a_mean: bool = True,
     title: str = "",
     outpath: Optional[str] = None,
 ) -> None:
@@ -900,16 +970,21 @@ def plot_bias_vs_injected_strength(
         outpath: Save path (if None, displays interactively)
     """
     fig, ax = plt.subplots(figsize=(8, 4))
+    err_note = "SEM unavailable"
     for ds, sub in df_sum.groupby("dataset"):
+        sub = sub.sort_values(xvar)
         x = sub[xvar].to_numpy(float)
         bias = sub["A_hat_mean"].to_numpy(float) - sub["strength"].to_numpy(float)
         xerr = sub["inj_nsigma_xerr"].to_numpy(float) if (xvar == "inj_nsigma" and "inj_nsigma_xerr" in sub.columns) else None
-        yerr = sub["sigma_A_mean"].to_numpy(float) / np.sqrt(np.clip(sub.get("n_toys", pd.Series(np.ones(len(sub)))).to_numpy(float), 1.0, None)) if "sigma_A_mean" in sub.columns else None
+        yerr, err_note = _resolve_bias_sem(sub, df_toys=df_toys, robust=robust_sem)
         ax.errorbar(x, bias, xerr=xerr, yerr=yerr, fmt="o-", capsize=2, label=str(ds))
+        if show_sigma_a_mean and "sigma_A_mean" in sub.columns:
+            ax.plot(x, sub["sigma_A_mean"].to_numpy(float), "--", lw=1.2, alpha=0.85, label=f"{ds} $\\langle\\sigma_A\\rangle$")
     ax.axhline(0, color="k", lw=0.8)
     ax.set_xlabel(xvar)
-    ax.set_ylabel(r"$\langle\hat{A}\rangle - A_{\rm inj}$")
+    ax.set_ylabel(r"$\langle\hat{A}\rangle - A_{\rm inj}$  (error bars: SEM of $\hat{A}$)")
     _set_title_above(ax, title or "Extraction bias vs injected strength")
+    _add_info_box(ax, f"Uncertainty: {err_note}\n$\\langle\\sigma_A\\rangle$ shown separately", loc="upper left")
     ax.legend(loc="best")
     _grid(ax)
     plt.tight_layout()
