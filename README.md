@@ -87,7 +87,7 @@ range_2015: [0.020, 0.130]
 
 # CLs settings
 cls_alpha: 0.05
-cls_mode: "toys"
+cls_mode: "asymptotic"
 cls_num_toys: 100
 
 # Output
@@ -170,12 +170,47 @@ hps-gpr inject --config study_configs/config_2016_10pct_blind1p96_95CL_10k_injec
 
 # Combined 2015+2016 production scan + summary suite (95% CL)
 
-# Combined injection/extraction matrix (per-mass, per-strength)
+# Combined injection/extraction matrix (single-process run)
 # strengths in sigma_A: 1,2,3,5 ; masses in GeV: 0.025,0.030,0.040,0.050,0.065,0.080,0.095,0.115,0.135,0.150,0.170,0.200
-hps-gpr inject --config study_configs/config_2015_2016_combined_blind1p96_95CL_10k_injection.yaml --dataset combined --masses 0.025,0.030,0.040,0.050,0.065,0.080,0.095,0.115,0.135,0.150,0.170,0.200 --strengths 1,2,3,5 --n-toys 10000
-hps-gpr slurm-gen --config study_configs/config_2015_2016_combined_blind1p96_95CL_10k_injection.yaml --n-jobs 191 --job-name hps2015_2016_comb_95CL_w196 --partition milano --account hps:hps-prod --time 24:00:00 --memory 8G --output submit_2015_2016_combined_95CL_w196.slurm
-./submit_all.sh submit_2015_2016_combined_95CL_w196.slurm
-hps-gpr slurm-combine --output-dir outputs/study_2015_2016_combined_w1p96_95CL
+hps-gpr inject --config study_configs/config_2015_2016_combined_blind1p64_95CL_10k_injection.yaml --dataset combined --masses 0.025,0.030,0.040,0.050,0.065,0.080,0.095,0.115,0.135,0.150,0.170,0.200 --strengths 1,2,3,5 --n-toys 10000
+
+# Batch production: one job per (dataset, mass, strength)
+# datasets include individual and combined extraction to compare behavior directly
+hps-gpr slurm-gen-inject --config study_configs/config_2015_2016_combined_blind1p64_95CL_10k_injection.yaml --datasets 2015,2016,combined --masses 0.025,0.030,0.040,0.050,0.065,0.080,0.095,0.115,0.135,0.150,0.170,0.200 --strengths 1,2,3,5 --n-toys 10000 --job-name hps2015_2016_inj_95CL_w164 --partition milano --account hps:hps-prod --time 24:00:00 --memory 8G --output submit_2015_2016_injection_95CL_w164.slurm
+# note: submission script auto-skips out-of-range masses (2015: 20-130 MeV, 2016: 34-210 MeV)
+bash submit_injection_all.sh
+
+# After jobs finish, merge flat CSV outputs and build publication-style summaries
+hps-gpr inject-plot --input-dir outputs/study_2015_2016_combined_w1p64_95CL/injection_flat --output-dir outputs/study_2015_2016_combined_w1p64_95CL/injection_summary
+```
+
+
+### GP-mean/global-fit pseudoexperiment mode (v15_8-style full procedural toys)
+
+The injection framework already supports pseudoexperiments in two modes:
+- `inj_refit_gp_on_toy: false` (default fast mode): conditional GP toys in the blind window.
+- `inj_refit_gp_on_toy: true` (full procedural mode): build full-range pseudo-data from the GP global-fit mean, inject signal, and refit GP on sidebands toy-by-toy before extraction.
+
+The second mode corresponds to the requested "GP mean/global fit" pseudoexperiment workflow and is the closest match to the v15_8 notebook methodology.
+
+Ready-made configs are included:
+- `study_configs/config_2015_blind1p64_95CL_10k_injection_gpmean_pseudoexp.yaml`
+- `study_configs/config_2016_10pct_blind1p64_95CL_10k_injection_gpmean_pseudoexp.yaml`
+- `study_configs/config_2015_2016_combined_blind1p64_95CL_10k_injection_gpmean_pseudoexp.yaml`
+
+Example runs:
+
+```bash
+# 2015 full procedural pseudoexperiments from GP mean/global fit
+hps-gpr inject --config study_configs/config_2015_blind1p64_95CL_10k_injection_gpmean_pseudoexp.yaml --dataset 2015 --masses 0.025,0.030,0.040,0.050,0.065,0.080,0.095,0.115,0.135 --strengths 1,2,3,5 --n-toys 10000
+
+# 2016 10% full procedural pseudoexperiments
+hps-gpr inject --config study_configs/config_2016_10pct_blind1p64_95CL_10k_injection_gpmean_pseudoexp.yaml --dataset 2016 --masses 0.040,0.050,0.065,0.080,0.095,0.115,0.135,0.150,0.170,0.200 --strengths 1,2,3,5 --n-toys 10000
+
+# Combined (plus per-dataset in batch) full procedural pseudoexperiments
+hps-gpr slurm-gen-inject --config study_configs/config_2015_2016_combined_blind1p64_95CL_10k_injection_gpmean_pseudoexp.yaml --datasets 2015,2016,combined --masses 0.025,0.030,0.040,0.050,0.065,0.080,0.095,0.115,0.135,0.150,0.170,0.200 --strengths 1,2,3,5 --n-toys 10000 --job-name hps2015_2016_inj_gpmean --partition milano --account hps:hps-prod --time 24:00:00 --memory 8G --output submit_2015_2016_injection_gpmean.slurm
+bash submit_injection_all.sh
+hps-gpr inject-plot --input-dir outputs/study_2015_2016_combined_w1p64_95CL_gpmean_pseudoexp/injection_flat --output-dir outputs/study_2015_2016_combined_w1p64_95CL_gpmean_pseudoexp/injection_summary
 ```
 
 Mass-range convention in all production configs:
@@ -310,6 +345,23 @@ outputs/
 │   ├── ul_pvalues_components_local_global_refs.png
 │   ├── p0_analytic_local_global.png
 │   └── Z_local_global.png
+├── injection_flat/                 # Created by `submit_injection_all.sh` jobs (single folder, uniquely named CSVs)
+│   ├── inj_extract_toys_<dataset>__jobds_<jobds>__m_<mass>__s_<strength>.csv
+│   └── inj_extract_summary_<dataset>__jobds_<jobds>__m_<mass>__s_<strength>.csv
+├── injection_summary/              # Created by `hps-gpr inject-plot`
+│   ├── inj_extract_toys_<dataset>.csv
+│   ├── inj_extract_summary_<dataset>.csv
+│   ├── inj_extract_summary_all.csv
+│   ├── linearity_all.png
+│   ├── bias_all.png
+│   ├── pull_width_all.png
+│   ├── coverage_all.png
+│   ├── linearity_<dataset>.png
+│   ├── bias_<dataset>.png
+│   ├── pull_width_<dataset>.png
+│   ├── coverage_<dataset>.png
+│   ├── heatmap_pull_mean_<dataset>.png
+│   └── heatmap_pull_width_<dataset>.png
 └── mXXXMeV/                        # Optional per-mass folders (if save_per_mass_folders=true)
     ├── <dataset>/
     │   ├── fit_full.png            # Full-range fit diagnostic
@@ -323,6 +375,16 @@ outputs/
 ```
 
 
+
+
+Injection/extraction defaults now use `inj_mode: poisson` (Poissonian signal-count fluctuations per template bin), consistent with counting-experiment pseudo-data generation used in modern HEP profile-likelihood workflows.
+
+Injection/extraction plotting suite (`inject-plot`) covers the v15_8 closure checks used for robustness studies:
+- linearity: `⟨Â⟩` vs injected strength (or injected `n_σ`), with ideal reference line
+- bias: `⟨Â⟩ − A_inj` vs injected strength
+- pull-width stability: `std((Â−A_inj)/σ_A)` with unit-width reference
+- coverage: fractions within `|pull|<1` and `|pull|<2` with Gaussian expectations (68.3%, 95.4%)
+- mass/strength heatmaps for pull mean and pull width, per dataset and for combined extraction
 ## Package Structure
 
 | Module | Description |
@@ -399,6 +461,10 @@ where ρ is the integral density (counts per GeV) in the signal region.
 - HPS Collaboration dark photon search publications
 - Gaussian Process Regression: Rasmussen & Williams, "Gaussian Processes for Machine Learning"
 - CLs method: Read, A.L., "Presentation of search results: the CL_s technique"
+- Asymptotic profile-likelihood tests: Cowan, Cranmer, Gross, Vitells, EPJC 71 (2011) 1554
+- Look-Elsewhere correction / trial factors: Gross & Vitells, EPJC 70 (2010) 525
+- ATLAS/CMS Higgs combinations for modern combined profile-likelihood methodology
 
 
 For combined runs, `slurm-combine` also writes per-dataset publication overlays inside the summary suite, e.g. `2015_UL_sig_yield_bands.png`, `2015_UL_eps2_yield_bands.png`, `2016_UL_sig_yield_bands.png`, `2016_UL_eps2_yield_bands.png`, plus dataset-specific `*_p0_local_global.png` and `*_Z_local_global.png`.
+
