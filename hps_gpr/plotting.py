@@ -1,7 +1,7 @@
 """Plotting functions for HPS GPR analysis."""
 
 import os
-from typing import List, Optional, Tuple, TYPE_CHECKING
+from typing import Dict, List, Optional, Tuple, TYPE_CHECKING
 
 import numpy as np
 import pandas as pd
@@ -11,6 +11,7 @@ import matplotlib as mpl
 mpl.use("Agg", force=True)
 
 import matplotlib.pyplot as plt
+from scipy import stats
 
 from .template import build_template
 from .statistics import (
@@ -44,6 +45,37 @@ def make_mass_folder(base_dir: str, mass: float) -> str:
 def ensure_dir(p: str) -> None:
     """Ensure a directory exists."""
     os.makedirs(p, exist_ok=True)
+
+
+def _savefig_png_pdf(fig: plt.Figure, outpath: str, *, dpi: int = 180) -> None:
+    """Save a figure as both PNG and PDF using outpath stem."""
+    root, ext = os.path.splitext(outpath)
+    if ext.lower() in {".png", ".pdf"}:
+        base = root
+    else:
+        base = outpath
+    fig.savefig(f"{base}.png", dpi=dpi)
+    fig.savefig(f"{base}.pdf", dpi=dpi)
+
+
+def _mass_style_map(masses: np.ndarray) -> Tuple[dict, dict]:
+    """Build stable color/marker maps for a sorted mass list."""
+    mvals = np.sort(np.unique(np.asarray(masses, float)))
+    cmap = plt.get_cmap("viridis")
+    markers = ["o", "s", "^", "D", "v", "P", "X", "<", ">", "*"]
+    n = max(1, len(mvals) - 1)
+    c_map = {m: cmap(i / n) for i, m in enumerate(mvals)}
+    m_map = {m: markers[i % len(markers)] for i, m in enumerate(mvals)}
+    return c_map, m_map
+
+
+def _dataset_axes(df_sum: pd.DataFrame, *, figsize_per_row: float = 3.4) -> Tuple[plt.Figure, np.ndarray, List[str]]:
+    """Create one axis per dataset (faceted overlay)."""
+    datasets = sorted(df_sum["dataset"].astype(str).unique())
+    nrows = max(1, len(datasets))
+    fig, axs = plt.subplots(nrows, 1, figsize=(8.8, figsize_per_row * nrows), sharex=True)
+    axs = np.atleast_1d(axs)
+    return fig, axs, datasets
 
 
 def set_plot_style(style: str = "paper") -> None:
@@ -945,7 +977,7 @@ def plot_linearity(
     _grid(ax)
     plt.tight_layout()
     if outpath:
-        plt.savefig(outpath, dpi=180)
+        _savefig_png_pdf(fig, outpath, dpi=180)
         plt.close(fig)
     else:
         plt.show()
@@ -989,7 +1021,7 @@ def plot_bias_vs_injected_strength(
     _grid(ax)
     plt.tight_layout()
     if outpath:
-        plt.savefig(outpath, dpi=180)
+        _savefig_png_pdf(fig, outpath, dpi=180)
         plt.close(fig)
     else:
         plt.show()
@@ -1010,20 +1042,29 @@ def plot_pull_width(
         title: Plot title
         outpath: Save path (if None, displays interactively)
     """
-    fig, ax = plt.subplots(figsize=(8, 4))
-    for ds, sub in df_sum.groupby("dataset"):
-        x = sub[xvar].to_numpy(float)
-        y = sub["pull_std"].to_numpy(float)
-        ax.plot(x, y, "o-", label=str(ds))
-    ax.axhline(1.0, color="k", ls="--", lw=0.8, label="ideal (σ=1)")
-    ax.set_xlabel(xvar)
-    ax.set_ylabel(r"std$((\hat{A}-A_{\rm inj})/\sigma_A)$")
-    _set_title_above(ax, title or "Pull width vs injected strength")
-    ax.legend(loc="best")
-    _grid(ax)
+    fig, axs, datasets = _dataset_axes(df_sum)
+    c_map, m_map = _mass_style_map(df_sum["mass_GeV"].to_numpy(float))
+    for i, ds in enumerate(datasets):
+        ax = axs[i]
+        sub_ds = df_sum[df_sum["dataset"].astype(str) == ds].copy()
+        for mass, sub_m in sub_ds.groupby("mass_GeV"):
+            sub_m = sub_m.sort_values(xvar)
+            x = sub_m[xvar].to_numpy(float)
+            y = sub_m["pull_std"].to_numpy(float)
+            ax.plot(
+                x, y, f"{m_map[mass]}-", color=c_map[mass], lw=1.6, ms=5.0,
+                label=f"m={mass * 1e3:.0f} MeV",
+            )
+        ax.axhline(1.0, color="k", ls="--", lw=1.0, label="ideal (σ=1)")
+        ax.set_ylabel(r"std$((\hat{A}-A_{\rm inj})/\sigma_A)$")
+        _set_title_above(ax, f"{ds}")
+        ax.legend(loc="upper left", bbox_to_anchor=(1.01, 1.0), borderaxespad=0.0)
+        _grid(ax)
+    axs[-1].set_xlabel(xvar)
+    fig.suptitle(title or "Pull width vs injected strength", y=1.01)
     plt.tight_layout()
     if outpath:
-        plt.savefig(outpath, dpi=180)
+        _savefig_png_pdf(fig, outpath, dpi=180)
         plt.close(fig)
     else:
         plt.show()
@@ -1044,22 +1085,34 @@ def plot_coverage(
         title: Plot title
         outpath: Save path (if None, displays interactively)
     """
-    fig, ax = plt.subplots(figsize=(8, 4))
-    for ds, sub in df_sum.groupby("dataset"):
-        x = sub[xvar].to_numpy(float)
-        ax.plot(x, sub["cov_1sigma"].to_numpy(float), "o-", label=f"{ds} 1σ")
-        ax.plot(x, sub["cov_2sigma"].to_numpy(float), "s--", label=f"{ds} 2σ")
-    ax.axhline(0.683, color="k", ls=":", lw=0.8, label="68.3%")
-    ax.axhline(0.954, color="gray", ls=":", lw=0.8, label="95.4%")
-    ax.set_ylim(0, 1.05)
-    ax.set_xlabel(xvar)
-    ax.set_ylabel("Coverage fraction")
-    _set_title_above(ax, title or "Extraction coverage vs injected strength")
-    ax.legend(loc="best", fontsize=8)
-    _grid(ax)
+    fig, axs, datasets = _dataset_axes(df_sum)
+    c_map, m_map = _mass_style_map(df_sum["mass_GeV"].to_numpy(float))
+    for i, ds in enumerate(datasets):
+        ax = axs[i]
+        sub_ds = df_sum[df_sum["dataset"].astype(str) == ds].copy()
+        for mass, sub_m in sub_ds.groupby("mass_GeV"):
+            sub_m = sub_m.sort_values(xvar)
+            x = sub_m[xvar].to_numpy(float)
+            ax.plot(
+                x, sub_m["cov_1sigma"].to_numpy(float), f"{m_map[mass]}-", color=c_map[mass],
+                lw=1.6, ms=5.0, label=f"m={mass * 1e3:.0f} MeV (1σ)",
+            )
+            ax.plot(
+                x, sub_m["cov_2sigma"].to_numpy(float), f"{m_map[mass]}--", color=c_map[mass],
+                lw=1.4, ms=5.0, alpha=0.9, label=f"m={mass * 1e3:.0f} MeV (2σ)",
+            )
+        ax.axhline(0.683, color="k", ls=":", lw=1.0, label="68.3%")
+        ax.axhline(0.954, color="gray", ls=":", lw=1.0, label="95.4%")
+        ax.set_ylim(0, 1.05)
+        ax.set_ylabel("Coverage fraction")
+        _set_title_above(ax, f"{ds}")
+        ax.legend(loc="upper left", bbox_to_anchor=(1.01, 1.0), borderaxespad=0.0, fontsize=8)
+        _grid(ax)
+    axs[-1].set_xlabel(xvar)
+    fig.suptitle(title or "Extraction coverage vs injected strength", y=1.01)
     plt.tight_layout()
     if outpath:
-        plt.savefig(outpath, dpi=180)
+        _savefig_png_pdf(fig, outpath, dpi=180)
         plt.close(fig)
     else:
         plt.show()
@@ -1113,6 +1166,328 @@ def plot_injection_heatmap(
             plt.close(fig)
         else:
             plt.show()
+
+
+def plot_z_calibration_residual(
+    df_toys: pd.DataFrame,
+    *,
+    outdir: str,
+    acceptance_bands: Optional[List[float]] = None,
+    dataset_order: Optional[List[str]] = None,
+    band_semantic: str = "toy spread",
+    panel_ncols: int = 2,
+) -> None:
+    r"""Plot calibration residuals in significance space from toy studies.
+
+    Computes :math:`\Delta Z = \hat{Z} - Z_{inj}` on the toy level and summarizes
+    by (dataset, mass, injection level) using median and 16/84 quantiles.
+
+    Notes:
+        * The shaded interval represents the central toy spread (q16--q84), not
+          uncertainty on the median/mean unless explicitly requested upstream.
+        * Optional horizontal acceptance bands can be drawn at ±value.
+    """
+    ensure_dir(outdir)
+    needed = {"dataset", "mass_GeV", "inj_nsigma", "Zhat"}
+    if df_toys is None or df_toys.empty or not needed.issubset(set(df_toys.columns)):
+        print("[plot_z_calibration_residual] skipped: missing required toy-level columns")
+        return
+
+    work = df_toys.copy()
+    work["dataset"] = work["dataset"].astype(str)
+    work["delta_z"] = work["Zhat"].to_numpy(float) - work["inj_nsigma"].to_numpy(float)
+    finite = np.isfinite(work["delta_z"].to_numpy(float)) & np.isfinite(work["mass_GeV"].to_numpy(float))
+    work = work.loc[finite].copy()
+    if work.empty:
+        print("[plot_z_calibration_residual] skipped: no finite ΔZ values")
+        return
+
+    def q(v: np.ndarray, p: float) -> float:
+        arr = np.asarray(v, float)
+        return float(np.nanquantile(arr, p)) if np.any(np.isfinite(arr)) else float("nan")
+
+    rows: List[Dict[str, float]] = []
+    gcols = ["dataset", "mass_GeV", "inj_nsigma"]
+    for (ds, m, z_inj), sub in work.groupby(gcols, dropna=False):
+        dz = sub["delta_z"].to_numpy(float)
+        rows.append(dict(
+            dataset=str(ds), mass_GeV=float(m), inj_nsigma=float(z_inj),
+            n_toys=int(len(sub)),
+            dz_med=q(dz, 0.50), dz_q16=q(dz, 0.16), dz_q84=q(dz, 0.84),
+        ))
+    df_sum = pd.DataFrame(rows)
+    df_sum = df_sum.sort_values(["dataset", "inj_nsigma", "mass_GeV"]).reset_index(drop=True)
+
+    datasets_present = [str(x) for x in df_sum["dataset"].unique()]
+    if dataset_order:
+        ds_order = [d for d in dataset_order if d in datasets_present] + [d for d in datasets_present if d not in dataset_order]
+    else:
+        preferred = ["2015", "2016", "combined"]
+        ds_order = [d for d in preferred if d in datasets_present] + sorted(d for d in datasets_present if d not in preferred)
+
+    acc = sorted([abs(float(a)) for a in (acceptance_bands or []) if np.isfinite(a) and float(a) > 0])
+    inj_levels = sorted(df_sum["inj_nsigma"].dropna().astype(float).unique().tolist())
+    cmap = plt.get_cmap("viridis", max(3, len(inj_levels)))
+    color_map = {z: cmap(i) for i, z in enumerate(inj_levels)}
+
+    legend_handles = None
+    for ds in ds_order:
+        sub_ds = df_sum[df_sum["dataset"] == ds].copy()
+        if sub_ds.empty:
+            continue
+        fig, ax = plt.subplots(figsize=(9.2, 5.0))
+        handles, labels = [], []
+        for z in inj_levels:
+            sub = sub_ds[sub_ds["inj_nsigma"] == z].sort_values("mass_GeV")
+            if sub.empty:
+                continue
+            x = sub["mass_GeV"].to_numpy(float)
+            y = sub["dz_med"].to_numpy(float)
+            lo = sub["dz_q16"].to_numpy(float)
+            hi = sub["dz_q84"].to_numpy(float)
+            c = color_map[z]
+            ax.fill_between(x, lo, hi, color=c, alpha=0.18, linewidth=0.0)
+            h, = ax.plot(x, y, "-o", color=c, ms=3.8, label=fr"$Z_{{inj}}={z:.2g}$")
+            handles.append(h)
+            labels.append(fr"$Z_{{inj}}={z:.2g}$")
+
+        for a in acc:
+            ax.axhspan(-a, a, color="0.85", alpha=0.12, zorder=0)
+            ax.axhline(+a, color="0.45", lw=0.9, ls=":", zorder=1)
+            ax.axhline(-a, color="0.45", lw=0.9, ls=":", zorder=1)
+        ax.axhline(0.0, color="k", lw=1.0, zorder=2)
+        ax.set_xlabel("Mass hypothesis [GeV]")
+        ax.set_ylabel(r"$\Delta Z = \hat{Z} - Z_{inj}$")
+        _set_title_above(ax, f"{ds}: Z calibration residual vs mass")
+        _grid(ax)
+        if handles:
+            ax.legend(handles, labels, title="Injection level", loc="best", ncol=2)
+            legend_handles = (handles, labels)
+        note = f"Band semantics: {band_semantic}; shaded = toy q16--q84."
+        ax.text(0.01, 0.01, note, transform=ax.transAxes, va="bottom", ha="left", fontsize=8,
+                bbox=dict(boxstyle="round,pad=0.25", fc="white", ec="0.7", alpha=0.9))
+        plt.tight_layout()
+        out = os.path.join(outdir, f"z_calibration_residual_{ds}.png")
+        plt.savefig(out, dpi=220)
+        plt.close(fig)
+
+    if not ds_order:
+        return
+
+    ncols = int(max(1, panel_ncols))
+    nrows = int(np.ceil(len(ds_order) / ncols))
+    fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(5.8 * ncols, 3.8 * nrows), sharex=True, sharey=True)
+    axes_arr = np.atleast_1d(axes).ravel()
+
+    for i, ds in enumerate(ds_order):
+        ax = axes_arr[i]
+        sub_ds = df_sum[df_sum["dataset"] == ds].copy()
+        for z in inj_levels:
+            sub = sub_ds[sub_ds["inj_nsigma"] == z].sort_values("mass_GeV")
+            if sub.empty:
+                continue
+            x = sub["mass_GeV"].to_numpy(float)
+            y = sub["dz_med"].to_numpy(float)
+            lo = sub["dz_q16"].to_numpy(float)
+            hi = sub["dz_q84"].to_numpy(float)
+            c = color_map[z]
+            ax.fill_between(x, lo, hi, color=c, alpha=0.16, linewidth=0.0)
+            ax.plot(x, y, "-o", color=c, ms=3.4)
+        for a in acc:
+            ax.axhspan(-a, a, color="0.85", alpha=0.10, zorder=0)
+            ax.axhline(+a, color="0.45", lw=0.8, ls=":", zorder=1)
+            ax.axhline(-a, color="0.45", lw=0.8, ls=":", zorder=1)
+        ax.axhline(0.0, color="k", lw=0.9, zorder=2)
+        _set_title_above(ax, str(ds), pad=8.0)
+        _grid(ax)
+        if i // ncols == (nrows - 1):
+            ax.set_xlabel("Mass hypothesis [GeV]")
+        if i % ncols == 0:
+            ax.set_ylabel(r"$\Delta Z$")
+
+    for j in range(len(ds_order), len(axes_arr)):
+        axes_arr[j].axis("off")
+
+    if legend_handles is not None:
+        handles, labels = legend_handles
+        fig.legend(handles, labels, loc="upper center", ncol=min(5, max(1, len(labels))), frameon=True, title="Injection level")
+    fig.suptitle("Z calibration residual comparison (median with toy q16--q84)", y=1.02)
+    fig.text(0.01, 0.01, f"Band semantics: {band_semantic}; shaded intervals are toy spread, not uncertainty-on-mean.", fontsize=9)
+    plt.tight_layout()
+    plt.savefig(os.path.join(outdir, "z_calibration_residual_comparison.png"), dpi=220)
+    plt.close(fig)
+    print(f"[plot_z_calibration_residual] Band semantics: {band_semantic}; shaded intervals represent toy spread (q16--q84).")
+def _normality_pvalue(
+    pull_vals: np.ndarray,
+    *,
+    method: str = "ks",
+) -> float:
+    """Compute a p-value for consistency with N(0,1)."""
+    vals = np.asarray(pull_vals, float)
+    vals = vals[np.isfinite(vals)]
+    if vals.size < 3:
+        return float("nan")
+    m = str(method).lower().strip()
+    try:
+        if m == "ad":
+            res = stats.anderson(vals, dist="norm")
+            z = np.asarray(res.significance_level, float)
+            crit = np.asarray(res.critical_values, float)
+            order = np.argsort(crit)
+            z = z[order]
+            crit = crit[order]
+            p = np.interp(float(res.statistic), crit, z / 100.0, left=0.25, right=0.001)
+            return float(np.clip(p, 0.0, 1.0))
+        # KS test against standard normal
+        return float(stats.kstest(vals, "norm", args=(0.0, 1.0)).pvalue)
+    except Exception:
+        return float("nan")
+
+
+def plot_pull_histogram_by_mass(
+    df_toys: pd.DataFrame,
+    *,
+    dataset_key: Optional[str] = None,
+    group_by_strength: bool = True,
+    bins: int = 30,
+    pvalue_method: Optional[str] = "ks",
+    title_prefix: str = "",
+    outdir: Optional[str] = None,
+) -> List[str]:
+    """Plot toy pull histograms per mass (and optional strength), with N(0,1) reference."""
+    if df_toys.empty or "pull_param" not in df_toys.columns or "mass_GeV" not in df_toys.columns:
+        return []
+
+    dft = df_toys.copy()
+    if dataset_key is not None and "dataset" in dft.columns:
+        dft = dft[dft["dataset"].astype(str) == str(dataset_key)].copy()
+    if dft.empty:
+        return []
+
+    ensure_dir(outdir or ".")
+    paths: List[str] = []
+    grp_cols = ["mass_GeV"] + (["strength"] if group_by_strength and "strength" in dft.columns else [])
+    base = str(dataset_key) if dataset_key is not None else "all"
+
+    for keys, sub in dft.groupby(grp_cols, dropna=False):
+        if not isinstance(keys, tuple):
+            keys = (keys,)
+        mass = float(keys[0])
+        strength = float(keys[1]) if len(keys) > 1 else None
+        pull = sub["pull_param"].to_numpy(float)
+        pull = pull[np.isfinite(pull)]
+        if pull.size == 0:
+            continue
+
+        fig, ax = plt.subplots(figsize=(8.2, 4.8))
+        n, edges, _ = ax.hist(pull, bins=int(bins), density=True, alpha=0.65, color="C0", label="toys")
+        xlo = float(min(np.nanmin(pull), -4.0))
+        xhi = float(max(np.nanmax(pull), 4.0))
+        xg = np.linspace(xlo, xhi, 500)
+        ax.plot(xg, stats.norm.pdf(xg, loc=0.0, scale=1.0), "k--", lw=1.3, label=r"$\mathcal{N}(0,1)$")
+
+        m = float(np.nanmean(pull))
+        w = float(np.nanstd(pull, ddof=1)) if pull.size > 1 else float("nan")
+        ptxt = ""
+        if pvalue_method:
+            pval = _normality_pvalue(pull, method=str(pvalue_method))
+            if np.isfinite(pval):
+                ptxt = f"\n{str(pvalue_method).upper()} p={pval:.3g}"
+        ax.text(
+            0.98,
+            0.97,
+            f"N={pull.size}\nmean={m:.3f}\nwidth={w:.3f}{ptxt}",
+            transform=ax.transAxes,
+            ha="right",
+            va="top",
+            fontsize=9,
+            bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="0.5", alpha=0.9),
+        )
+        ax.set_xlabel(r"pull = $(\hat{A}-A_{inj})/\sigma_A$")
+        ax.set_ylabel("density")
+        t_bits = [f"m={mass*1e3:.1f} MeV"]
+        if strength is not None:
+            t_bits.append(f"A_inj={strength:.3g}")
+        _set_title_above(ax, f"{title_prefix}{base}: pull histogram ({', '.join(t_bits)})".strip())
+        ax.legend(loc="best", frameon=True)
+        _grid(ax)
+        plt.tight_layout()
+
+        mtag = mass_tag(mass)
+        stag = f"_A{strength:.3g}".replace("+", "").replace("-", "m").replace(".", "p") if strength is not None else ""
+        outpath = os.path.join(outdir or ".", f"pull_hist_{base}_{mtag}{stag}.png")
+        plt.savefig(outpath, dpi=220)
+        plt.close(fig)
+        paths.append(outpath)
+    return paths
+
+
+def plot_pull_vs_mass(
+    df_toys: pd.DataFrame,
+    *,
+    dataset_key: Optional[str] = None,
+    title: str = "",
+    outpath: Optional[str] = None,
+) -> None:
+    """Plot pull mean and width versus mass for each injected strength."""
+    if df_toys.empty or "pull_param" not in df_toys.columns:
+        return
+    req = {"mass_GeV", "strength", "pull_param"}
+    if not req.issubset(df_toys.columns):
+        return
+
+    dft = df_toys.copy()
+    if dataset_key is not None and "dataset" in dft.columns:
+        dft = dft[dft["dataset"].astype(str) == str(dataset_key)].copy()
+    if dft.empty:
+        return
+
+    rows = []
+    for (m, s), sub in dft.groupby(["mass_GeV", "strength"], dropna=False):
+        pull = sub["pull_param"].to_numpy(float)
+        pull = pull[np.isfinite(pull)]
+        if pull.size == 0:
+            continue
+        mu = float(np.mean(pull))
+        sd = float(np.std(pull, ddof=1)) if pull.size > 1 else float("nan")
+        sem = float(sd / np.sqrt(pull.size)) if pull.size > 1 else float("nan")
+        sd_err = float(sd / np.sqrt(2 * (pull.size - 1))) if pull.size > 2 and np.isfinite(sd) else float("nan")
+        rows.append(dict(mass_GeV=float(m), strength=float(s), pull_mean=mu, pull_sem=sem, pull_std=sd, pull_std_err=sd_err))
+
+    if not rows:
+        return
+    dsum = pd.DataFrame(rows).sort_values(["strength", "mass_GeV"]).reset_index(drop=True)
+
+    fig, (ax0, ax1) = plt.subplots(2, 1, figsize=(9.0, 7.2), sharex=True, gridspec_kw={"hspace": 0.08})
+    for strength, sub in dsum.groupby("strength"):
+        x = sub["mass_GeV"].to_numpy(float) * 1e3
+        y = sub["pull_mean"].to_numpy(float)
+        yerr = sub["pull_sem"].to_numpy(float)
+        ax0.plot(x, y, "o-", label=rf"$A_{{inj}}={float(strength):.3g}$")
+        if np.any(np.isfinite(yerr)):
+            ax0.fill_between(x, y - yerr, y + yerr, alpha=0.20)
+
+        w = sub["pull_std"].to_numpy(float)
+        werr = sub["pull_std_err"].to_numpy(float)
+        ax1.plot(x, w, "o-")
+        if np.any(np.isfinite(werr)):
+            ax1.fill_between(x, w - werr, w + werr, alpha=0.20)
+
+    ax0.axhline(0.0, color="k", lw=0.8, ls="--")
+    ax1.axhline(1.0, color="k", lw=0.8, ls="--")
+    ax0.set_ylabel("pull mean")
+    ax1.set_ylabel("pull width")
+    ax1.set_xlabel("mass hypothesis [MeV]")
+    _set_title_above(ax0, title or f"{dataset_key or 'all'}: pull moments vs mass")
+    ax0.legend(loc="best", ncol=2)
+    _grid(ax0)
+    _grid(ax1)
+    plt.tight_layout()
+    if outpath:
+        plt.savefig(outpath, dpi=220)
+        plt.close(fig)
+    else:
+        plt.show()
 
 # ---------------------------------------------------------------------------
 # Summary plots (UL curves)
