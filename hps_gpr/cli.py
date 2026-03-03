@@ -279,6 +279,7 @@ def inject(config, dataset, masses, strengths, n_toys, output_dir):
         plot_pull_width,
         plot_coverage,
         plot_injection_heatmap,
+        plot_z_calibration_residual,
     )
 
     cfg = load_config(config)
@@ -367,6 +368,12 @@ def inject(config, dataset, masses, strengths, n_toys, output_dir):
                 plot_coverage(sub, xvar=xvar, title=f"{ds_key}: coverage", outpath=os.path.join(outdir, f"coverage_{ds_key}.png"))
                 plot_injection_heatmap(sub, value_col="pull_mean", dataset_filter=ds_key, title=f"{ds_key}: mean pull heatmap", outpath=os.path.join(outdir, f"heatmap_pull_mean_{ds_key}.png"))
                 plot_injection_heatmap(sub, value_col="pull_std", dataset_filter=ds_key, title=f"{ds_key}: pull width heatmap", outpath=os.path.join(outdir, f"heatmap_pull_width_{ds_key}.png"))
+            plot_z_calibration_residual(
+                pd.concat([*df_map.values(), df_comb_toys], ignore_index=True) if not df_comb_toys.empty else pd.concat([*df_map.values()], ignore_index=True),
+                outdir=outdir,
+                acceptance_bands=[0.5, 1.0],
+                band_semantic="toy spread",
+            )
 
         print(f"\nSummary rows (all datasets + combined): {len(df_sum)}")
         if not df_sum.empty:
@@ -398,6 +405,13 @@ def inject(config, dataset, masses, strengths, n_toys, output_dir):
         plot_coverage(df_sum, xvar=xvar, title=f"{ds.label}: coverage", outpath=os.path.join(outdir, f"coverage_{ds.key}.png"))
         plot_injection_heatmap(df_sum, value_col="pull_mean", title=f"{ds.label}: mean pull heatmap", outpath=os.path.join(outdir, f"heatmap_pull_mean_{ds.key}.png"))
         plot_injection_heatmap(df_sum, value_col="pull_std", title=f"{ds.label}: pull width heatmap", outpath=os.path.join(outdir, f"heatmap_pull_width_{ds.key}.png"))
+        plot_z_calibration_residual(
+            df,
+            outdir=outdir,
+            acceptance_bands=[0.5, 1.0],
+            dataset_order=[str(ds.key)],
+            band_semantic="toy spread",
+        )
 
         print(f"\nToy-level rows: {len(df)}")
         print(f"Summary rows: {len(df_sum)}")
@@ -707,6 +721,7 @@ def inject_plot(input_dir, output_dir, dataset, write_merged_toys):
         plot_pull_width,
         plot_coverage,
         plot_injection_heatmap,
+        plot_z_calibration_residual,
         plot_pull_histogram_by_mass,
         plot_pull_vs_mass,
     )
@@ -746,6 +761,7 @@ def inject_plot(input_dir, output_dir, dataset, write_merged_toys):
         sys.exit(1)
 
     all_summaries = []
+    all_toys = []
     toy_merged = {}
     mass_policy = "intersection"
     min_n_contrib = 2
@@ -765,6 +781,7 @@ def inject_plot(input_dir, output_dir, dataset, write_merged_toys):
             dft.to_csv(toys_out, index=False)
             print(f"Wrote {toys_out}")
 
+        all_toys.append(dft.copy())
         dsum = summarize_injection_grid(dft)
         dsum["dataset"] = str(ds)
         sum_out = os.path.join(outdir, f"inj_extract_summary_{ds}.csv")
@@ -834,6 +851,14 @@ def inject_plot(input_dir, output_dir, dataset, write_merged_toys):
         plot_injection_heatmap(sub, value_col="pull_mean", dataset_filter=ds_key, title=f"{ds_key}: mean pull heatmap", outpath=os.path.join(outdir, f"heatmap_pull_mean_{ds_key}.png"))
         plot_injection_heatmap(sub, value_col="pull_std", dataset_filter=ds_key, title=f"{ds_key}: pull width heatmap", outpath=os.path.join(outdir, f"heatmap_pull_width_{ds_key}.png"))
 
+    if all_toys:
+        toys_all = pd.concat(all_toys, ignore_index=True)
+        plot_z_calibration_residual(
+            toys_all,
+            outdir=outdir,
+            acceptance_bands=[0.5, 1.0],
+            band_semantic="toy spread",
+        )
         if not dft.empty:
             plot_pull_vs_mass(dft, dataset_key=ds_key, title=f"{ds_key}: pull mean/width vs mass", outpath=os.path.join(outdir, f"pull_vs_mass_{ds_key}.png"))
             hist_dir = os.path.join(outdir, f"pull_hist_{ds_key}")
