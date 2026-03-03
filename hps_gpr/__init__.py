@@ -8,7 +8,7 @@ from .validation import validate_datasets
 from .gpr import fit_gpr, predict_counts_from_log_gpr
 from .template import build_template, cls_limit_for_amplitude, cls_limit_for_template
 from .plotting import (
-    set_plot_style,
+    set_plot_style, set_injection_plot_style,
     plot_full_range, plot_blind_window, plot_s_over_b,
     plot_scan_diagnostic_panels,
     plot_ul_bands, plot_ul_pvalues,
@@ -76,6 +76,7 @@ __all__ = [
     "summarize_injection_grid",
     # Plotting
     "set_plot_style",
+    "set_injection_plot_style",
     "plot_full_range",
     "plot_blind_window",
     "plot_s_over_b",
