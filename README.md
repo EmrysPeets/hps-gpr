@@ -385,6 +385,16 @@ Injection/extraction plotting suite (`inject-plot`) covers the v15_8 closure che
 - pull-width stability: `std((Â−A_inj)/σ_A)` with unit-width reference
 - coverage: fractions within `|pull|<1` and `|pull|<2` with Gaussian expectations (68.3%, 95.4%)
 - mass/strength heatmaps for pull mean and pull width, per dataset and for combined extraction
+
+### Injection plotting style profile
+
+`hps_gpr.plotting.set_injection_plot_style(mode="paper")` configures a publication-ready injection style with:
+- consistent `rcParams` (font scale, linewidths, marker sizes, legend framing/columns, grid alpha)
+- constrained-layout figures and legends placed outside axes for crowded overlays
+- axis labels standardized with HEP notation (`A_{inj}`, `\hat{A}`, `\sigma_A`) and explicit units where relevant
+- colorblind-safe Okabe–Ito-like palette and deterministic mass-to-color assignment
+- automatic dual-output save policy for injection summary plots: high-DPI PNG + vector PDF
+- faceted all-dataset summaries (via `subplot_mosaic`) when overlays become crowded
 ## Package Structure
 
 | Module | Description |
