@@ -44,3 +44,40 @@ def test_combine_injection_toys_union_min_n_requires_two_contributors():
     assert sorted(out["mass_GeV"].tolist()) == [0.06]
     assert int(out.iloc[0]["n_contrib"]) == 2
     assert out.iloc[0]["contrib_datasets"] == "2015+2016"
+
+
+def test_combine_injection_toys_intersection_excludes_mismatched_strength_rows():
+    df_2015 = pd.DataFrame(
+        [
+            {
+                "dataset": "2015",
+                "mass_GeV": 0.060,
+                "strength": 100.0,
+                "toy": 0,
+                "sigma_A": 2.0,
+                "A_hat": 100.0,
+                "inj_nsigma": 1.0,
+                "sigmaA_ref": 2.0,
+                "success": True,
+            },
+        ]
+    )
+    df_2016 = pd.DataFrame(
+        [
+            {
+                "dataset": "2016",
+                "mass_GeV": 0.060,
+                "strength": 120.0,
+                "toy": 0,
+                "sigma_A": 2.0,
+                "A_hat": 120.0,
+                "inj_nsigma": 1.2,
+                "sigmaA_ref": 2.0,
+                "success": True,
+            },
+        ]
+    )
+
+    out = combine_injection_toy_tables({"2015": df_2015, "2016": df_2016})
+
+    assert out.empty

@@ -434,6 +434,8 @@ def combine_injection_toy_tables(
     if not frames:
         return pd.DataFrame()
 
+    n_expected_datasets = len(frames)
+
     all_df = pd.concat(frames, ignore_index=True)
     support = _combined_mass_support_summary(
         df_toys_by_dataset,
@@ -473,8 +475,17 @@ def combine_injection_toy_tables(
         .reset_index()
     )
 
-    if support["mass_policy"] == "union_min_n":
+    n_groups_before = len(agg)
+    if support["mass_policy"] == "intersection":
+        agg = agg[agg["n_contrib"] == int(n_expected_datasets)]
+    elif support["mass_policy"] == "union_min_n":
         agg = agg[agg["n_contrib"] >= int(min_n_contrib)]
+    n_groups_after = len(agg)
+    print(
+        "[inj] combine_injection_toy_tables: "
+        f"dropped {n_groups_before - n_groups_after} groups due to missing contributors "
+        f"(policy={support['mass_policy']}, expected_datasets={n_expected_datasets}, min_n_contrib={int(min_n_contrib)})"
+    )
 
     if agg.empty:
         print("[inj] combine_injection_toy_tables: no groups after contribution filtering")
