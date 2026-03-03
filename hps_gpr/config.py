@@ -174,7 +174,7 @@ class Config:
     inj_dataset_key: str = "2015"
     inj_masses_gev: List[float] = field(default_factory=lambda: [0.030, 0.060, 0.090])
     inj_strengths: List[int] = field(default_factory=lambda: [0, 100, 200, 500, 1000, 2000, 5000])
-    inj_mode: str = "multinomial"
+    inj_mode: str = "poisson"
     extract_allow_negative: bool = True
     # v15 injection extensions
     inj_strength_mode: str = "absolute"   # "absolute" | "sigmaA"

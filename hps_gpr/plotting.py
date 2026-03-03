@@ -1009,10 +1009,13 @@ def plot_injection_heatmap(
         if dataset_filter is not None and str(ds) != str(dataset_filter):
             continue
         piv = sub.pivot_table(index=ycol, columns=xcol, values=value_col, aggfunc="mean")
+        piv = piv.sort_index(axis=0).sort_index(axis=1)
         if piv.empty:
             continue
+        z = piv.to_numpy(float)
+        z_masked = np.ma.array(z, mask=~np.isfinite(z))
         fig, ax = plt.subplots(figsize=(9, 4.8))
-        im = ax.imshow(piv.to_numpy(float), aspect="auto", origin="lower", cmap="coolwarm")
+        im = ax.imshow(z_masked, aspect="auto", origin="lower", cmap="coolwarm")
         ax.set_yticks(np.arange(len(piv.index)))
         ax.set_yticklabels([f"{v:.2g}" for v in piv.index.to_numpy(float)])
         ax.set_xticks(np.arange(len(piv.columns))[::max(1, len(piv.columns)//8)])

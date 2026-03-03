@@ -617,6 +617,12 @@ def slurm_gen_inject(config, datasets, masses, strengths, n_toys, output, job_na
 
     extra = [f"--account={account}"] if account else None
 
+    ds_ranges = {
+        "2015": tuple(cfg.range_2015),
+        "2016": tuple(cfg.range_2016),
+        "2021": tuple(cfg.range_2021),
+    }
+
     job_script, submit_script, n_jobs = generate_injection_slurm_scripts(
         config_path=config,
         output_path=output,
@@ -631,6 +637,7 @@ def slurm_gen_inject(config, datasets, masses, strengths, n_toys, output, job_na
         memory=memory,
         conda_env=conda_env,
         extra_sbatch=extra,
+        mass_ranges_by_dataset=ds_ranges,
     )
     print(f"\nPrepared {n_jobs} injection jobs.")
     print("To submit all jobs, run:")
@@ -644,7 +651,7 @@ def slurm_gen_inject(config, datasets, masses, strengths, n_toys, output, job_na
     "-i",
     required=True,
     type=click.Path(exists=True),
-    help="Root directory containing injection job outputs",
+    help="Root directory containing injection job outputs (injection_jobs/ or injection_flat/)",
 )
 @click.option(
     "--output-dir",
@@ -677,7 +684,10 @@ def inject_plot(input_dir, output_dir, dataset):
     outdir = output_dir or os.path.join(input_dir, "injection_summary")
     ensure_dir(outdir)
 
-    toy_paths = sorted(glob.glob(os.path.join(input_dir, "**", "injection_extraction", "inj_extract_toys_*.csv"), recursive=True))
+    toy_paths = sorted(set(
+        glob.glob(os.path.join(input_dir, "**", "injection_extraction", "inj_extract_toys_*.csv"), recursive=True)
+        + glob.glob(os.path.join(input_dir, "**", "inj_extract_toys_*.csv"), recursive=True)
+    ))
     if not toy_paths:
         print(f"No toy-level injection CSVs found under {input_dir}")
         sys.exit(1)
@@ -685,7 +695,8 @@ def inject_plot(input_dir, output_dir, dataset):
     by_dataset = {}
     for fp in toy_paths:
         base = os.path.basename(fp)
-        ds = base.replace("inj_extract_toys_", "").replace(".csv", "").strip()
+        ds_token = base.replace("inj_extract_toys_", "").replace(".csv", "").strip()
+        ds = ds_token.split("__", 1)[0]
         if ds_filter and ds not in ds_filter:
             continue
         try:

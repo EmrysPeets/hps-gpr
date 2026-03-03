@@ -129,6 +129,7 @@ def generate_injection_slurm_scripts(
     memory: str = "4G",
     conda_env: Optional[str] = None,
     extra_sbatch: Optional[List[str]] = None,
+    mass_ranges_by_dataset: Optional[dict] = None,
 ) -> tuple:
     """Generate SLURM scripts for one injection job per (dataset, mass, strength)."""
     job_lines = [
@@ -162,7 +163,9 @@ def generate_injection_slurm_scripts(
     job_lines.extend([
         "# INJECT_* and BASE_OUTPUT_DIR are passed via --export at submission time",
         'JOB_OUTDIR="${BASE_OUTPUT_DIR}/injection_jobs/${INJECT_DATASET}/m_${INJECT_MASS_TAG}/s_${INJECT_STRENGTH_TAG}"',
+        'FLAT_OUTDIR="${BASE_OUTPUT_DIR}/injection_flat"',
         "mkdir -p \"${JOB_OUTDIR}\"",
+        "mkdir -p \"${FLAT_OUTDIR}\"",
         "",
         "hps-gpr inject \\",
         f"    --config {config_path} \\",
@@ -171,6 +174,17 @@ def generate_injection_slurm_scripts(
         "    --strengths ${INJECT_STRENGTH} \\",
         f"    --n-toys {int(n_toys)} \\",
         "    --output-dir \"${JOB_OUTDIR}\"",
+        "",
+        "if [ \"${INJECT_DATASET}\" = \"combined\" ]; then",
+        '  FILE_GLOB="${JOB_OUTDIR}/injection_extraction/*_combined.csv"',
+        "else",
+        '  FILE_GLOB="${JOB_OUTDIR}/injection_extraction/*_${INJECT_DATASET}.csv"',
+        "fi",
+        "for f in ${FILE_GLOB}; do",
+        "  [ -f \"$f\" ] || continue",
+        "  b=$(basename \"$f\" .csv)",
+        '  cp "$f" "${FLAT_OUTDIR}/${b}__jobds_${INJECT_DATASET}__m_${INJECT_MASS_TAG}__s_${INJECT_STRENGTH_TAG}.csv"',
+        "done",
     ])
 
     with open(output_path, "w") as f:
@@ -192,9 +206,17 @@ def generate_injection_slurm_scripts(
     ]
 
     n_jobs = 0
+    n_skipped = 0
     for ds in datasets:
+        ds_range = (mass_ranges_by_dataset or {}).get(str(ds))
         for mass in masses:
-            mass_str = f"{float(mass):.6f}".rstrip("0").rstrip(".")
+            mass_f = float(mass)
+            if ds_range is not None and str(ds) != "combined":
+                lo, hi = float(ds_range[0]), float(ds_range[1])
+                if mass_f < lo or mass_f > hi:
+                    n_skipped += 1
+                    continue
+            mass_str = f"{mass_f:.6f}".rstrip("0").rstrip(".")
             mass_tag = mass_str.replace("-", "m").replace(".", "p")
             for strength in strengths:
                 strength_str = f"{float(strength):.6g}"
@@ -214,6 +236,7 @@ def generate_injection_slurm_scripts(
     submit_lines.extend([
         "",
         f'echo "Submitted {n_jobs} injection jobs."',
+        f'echo "Skipped {n_skipped} out-of-range (dataset,mass) combinations."',
     ])
 
     with open(submit_path, "w") as f:
@@ -222,7 +245,6 @@ def generate_injection_slurm_scripts(
     print(f"Wrote injection submission loop script to {submit_path}")
 
     return output_path, submit_path, n_jobs
-
 
 def get_mass_range_for_task(
     datasets: dict,
