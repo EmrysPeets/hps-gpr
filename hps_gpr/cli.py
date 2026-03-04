@@ -286,6 +286,7 @@ def inject(config, dataset, masses, strengths, n_toys, output_dir, write_toy_csv
         plot_coverage,
         plot_injection_heatmap,
         plot_z_calibration_residual,
+        plot_delta_z_minus_pull_vs_injected_sigma,
     )
 
     cfg = load_config(config)
@@ -386,6 +387,10 @@ def inject(config, dataset, masses, strengths, n_toys, output_dir, write_toy_csv
                 acceptance_bands=[0.5, 1.0],
                 band_semantic="toy spread",
             )
+            plot_delta_z_minus_pull_vs_injected_sigma(
+                df_sum,
+                outpath=os.path.join(outdir, "delta_z_minus_pull_vs_inj_sigma_all.png"),
+            )
 
         print(f"\nSummary rows (all datasets + combined): {len(df_sum)}")
         if not df_sum.empty:
@@ -426,6 +431,10 @@ def inject(config, dataset, masses, strengths, n_toys, output_dir, write_toy_csv
             acceptance_bands=[0.5, 1.0],
             dataset_order=[str(ds.key)],
             band_semantic="toy spread",
+        )
+        plot_delta_z_minus_pull_vs_injected_sigma(
+            df_sum,
+            outpath=os.path.join(outdir, f"delta_z_minus_pull_vs_inj_sigma_{ds.key}.png"),
         )
 
         print(f"\nToy-level rows: {len(df)}")
@@ -738,6 +747,7 @@ def inject_plot(input_dir, output_dir, dataset, write_merged_toys):
         plot_coverage,
         plot_injection_heatmap,
         plot_z_calibration_residual,
+        plot_delta_z_minus_pull_vs_injected_sigma,
         plot_pull_histogram_by_mass,
         plot_pull_vs_mass,
         plot_combined_search_power,
@@ -873,6 +883,10 @@ def inject_plot(input_dir, output_dir, dataset, write_merged_toys):
             outdir=outdir,
             acceptance_bands=[0.5, 1.0],
             band_semantic="toy spread",
+        )
+        plot_delta_z_minus_pull_vs_injected_sigma(
+            df_sum,
+            outpath=os.path.join(outdir, "delta_z_minus_pull_vs_inj_sigma_all.png"),
         )
 
         try:

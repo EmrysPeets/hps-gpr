@@ -587,26 +587,31 @@ def summarize_injection_grid(df_toys: pd.DataFrame) -> pd.DataFrame:
         pull_finite = pull[np.isfinite(pull)]
         inj_nsigma_vals = sub["inj_nsigma"].to_numpy(float)
         inj_nsigma_std = float(np.nanstd(inj_nsigma_vals, ddof=1)) if np.sum(np.isfinite(inj_nsigma_vals)) > 1 else 0.0
+        sigmaA_ref_mean = _mean_col(sub, "sigmaA_ref")
+        pull_mean = float(np.nanmean(pull))
+        zhat_mean = float(np.nanmean(Zhat))
 
         rows.append(dict(
             dataset=ds, mass_GeV=float(m), strength=float(A),
             n_toys=n_toys,
             inj_nsigma=float(np.nanmean(inj_nsigma_vals)),
             inj_nsigma_xerr=float(inj_nsigma_std),
-            sigmaA_ref=_mean_col(sub, "sigmaA_ref"),
+            sigmaA_ref=sigmaA_ref_mean,
             f_win=_mean_col(sub, "f_win"),
             f_train_frac=_mean_col(sub, "f_train_frac"),
             A_hat_mean=float(np.nanmean(Ahat)),
             A_hat_std=float(np.nanstd(Ahat, ddof=1)),
             sigma_A_mean=float(np.nanmean(sigA)),
-            pull_mean=float(np.nanmean(pull)),
+            pull_mean=pull_mean,
             pull_std=float(np.nanstd(pull, ddof=1)),
             pull_std_err=float(np.nanstd(pull_finite, ddof=1) / np.sqrt(max(1, 2*(len(pull_finite)-1)))) if len(pull_finite) > 1 else float("nan"),
             pull_q16=q(pull, 0.16), pull_q84=q(pull, 0.84),
             pull_q02=q(pull, 0.025), pull_q97=q(pull, 0.975),
             cov_1sigma=float(np.nanmean(np.abs(pull) < 1.0)),
             cov_2sigma=float(np.nanmean(np.abs(pull) < 2.0)),
-            Zhat_mean=float(np.nanmean(Zhat)),
+            Zhat_mean=zhat_mean,
+            delta_z_minus_pull=float(zhat_mean - pull_mean),
+            ainj_over_sigmaAref=(float(A) / sigmaA_ref_mean if np.isfinite(sigmaA_ref_mean) and sigmaA_ref_mean > 0 else float("nan")),
             Zhat_q16=q(Zhat, 0.16), Zhat_q84=q(Zhat, 0.84),
             success_rate=_mean_col(sub, "success"),
         ))

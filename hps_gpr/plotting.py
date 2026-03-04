@@ -1226,6 +1226,85 @@ def plot_coverage(
 
 
 
+
+def plot_delta_z_minus_pull_vs_injected_sigma(
+    df_sum: pd.DataFrame,
+    *,
+    outpath: Optional[str] = None,
+    panel_ncols: int = 2,
+) -> None:
+    r"""Plot :math:`\langle\hat{Z}\rangle-\langle pull\rangle` vs expected injected sigma-level.
+
+    Uses summary-level columns from :func:`summarize_injection_grid` and supports
+    either ``ainj_over_sigmaAref`` or ``inj_nsigma`` on the x-axis.
+    """
+    needed = {"dataset"}
+    if df_sum is None or df_sum.empty or not needed.issubset(set(df_sum.columns)):
+        return
+
+    work = df_sum.copy()
+    if "delta_z_minus_pull" not in work.columns:
+        if {"Zhat_mean", "pull_mean"}.issubset(work.columns):
+            work["delta_z_minus_pull"] = work["Zhat_mean"].to_numpy(float) - work["pull_mean"].to_numpy(float)
+        else:
+            return
+
+    xcol = "ainj_over_sigmaAref" if "ainj_over_sigmaAref" in work.columns else "inj_nsigma"
+    if xcol not in work.columns:
+        return
+
+    x = pd.to_numeric(work[xcol], errors="coerce").to_numpy(float)
+    y = pd.to_numeric(work["delta_z_minus_pull"], errors="coerce").to_numpy(float)
+    finite = np.isfinite(x) & np.isfinite(y)
+    work = work.loc[finite].copy()
+    if work.empty:
+        return
+
+    set_injection_plot_style("paper")
+    ds_order = sorted(work["dataset"].astype(str).unique())
+    ncols = int(max(1, panel_ncols))
+    nrows = int(np.ceil(len(ds_order) / ncols))
+    fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(5.6 * ncols, 3.8 * nrows), sharex=True, sharey=True)
+    axes_arr = np.atleast_1d(axes).ravel()
+
+    for i, ds in enumerate(ds_order):
+        ax = axes_arr[i]
+        sub = work[work["dataset"].astype(str) == ds].copy().sort_values([xcol, "mass_GeV"] if "mass_GeV" in work.columns else [xcol])
+        if "mass_GeV" in sub.columns and np.isfinite(pd.to_numeric(sub["mass_GeV"], errors="coerce").to_numpy(float)).any():
+            mvals = pd.to_numeric(sub["mass_GeV"], errors="coerce").to_numpy(float)
+            sc = ax.scatter(
+                pd.to_numeric(sub[xcol], errors="coerce").to_numpy(float),
+                pd.to_numeric(sub["delta_z_minus_pull"], errors="coerce").to_numpy(float),
+                c=mvals,
+                cmap="viridis",
+                s=36,
+                alpha=0.85,
+                edgecolors="none",
+            )
+            cbar = fig.colorbar(sc, ax=ax, pad=0.01)
+            cbar.set_label("Mass [GeV]")
+        else:
+            ax.plot(
+                pd.to_numeric(sub[xcol], errors="coerce").to_numpy(float),
+                pd.to_numeric(sub["delta_z_minus_pull"], errors="coerce").to_numpy(float),
+                "o-",
+                ms=4.0,
+            )
+        ax.axhline(0.0, color="k", lw=0.9, ls="--")
+        _set_title_above(ax, str(ds), pad=8.0)
+        _grid(ax)
+        if i // ncols == (nrows - 1):
+            ax.set_xlabel(r"Expected injected sigma-level $A_{inj}/\sigma_{A,ref}$")
+        if i % ncols == 0:
+            ax.set_ylabel(r"$\langle\hat{Z}\rangle - \langle(\hat{A}-A_{inj})/\sigma_A\rangle$")
+
+    for j in range(len(ds_order), len(axes_arr)):
+        axes_arr[j].axis("off")
+
+    fig.suptitle(r"$\langle\hat{Z}\rangle-\langle pull\rangle$ vs expected injection significance", y=1.02)
+    plt.tight_layout()
+    _save_plot_outputs(fig, outpath)
+
 def plot_injection_heatmap(
 
     df_sum: pd.DataFrame,
@@ -1293,6 +1372,9 @@ def plot_z_calibration_residual(
         * The shaded interval represents the central toy spread (q16--q84), not
           uncertainty on the median/mean unless explicitly requested upstream.
         * Optional horizontal acceptance bands can be drawn at ±value.
+        * Denominator convention: toy-level :math:`\sigma_A` enters both
+          :math:`\hat{Z}=\hat{A}/\sigma_A` and pull; ``inj_nsigma`` uses the
+          reference scale :math:`\sigma_{A,ref}`.
     """
     ensure_dir(outdir)
     needed = {"dataset", "mass_GeV", "inj_nsigma", "Zhat"}
@@ -1370,7 +1452,10 @@ def plot_z_calibration_residual(
         if handles:
             ax.legend(handles, labels, title="Injection level", loc="best", ncol=2)
             legend_handles = (handles, labels)
-        note = f"Band semantics: {band_semantic}; shaded = toy q16--q84."
+        note = (
+            f"Band semantics: {band_semantic}; shaded = toy q16--q84. "
+            r"$\hat{Z}$ and pull use toy $\sigma_A$; $Z_{inj}$ uses $\sigma_{A,ref}$."
+        )
         ax.text(0.01, 0.01, note, transform=ax.transAxes, va="bottom", ha="left", fontsize=8,
                 bbox=dict(boxstyle="round,pad=0.25", fc="white", ec="0.7", alpha=0.9))
         plt.tight_layout()
@@ -1419,11 +1504,23 @@ def plot_z_calibration_residual(
         handles, labels = legend_handles
         fig.legend(handles, labels, loc="upper center", ncol=min(5, max(1, len(labels))), frameon=True, title="Injection level")
     fig.suptitle("Z calibration residual comparison (median with toy q16--q84)", y=1.02)
-    fig.text(0.01, 0.01, f"Band semantics: {band_semantic}; shaded intervals are toy spread, not uncertainty-on-mean.", fontsize=9)
+    fig.text(
+        0.01,
+        0.01,
+        " ".join([
+            f"Band semantics: {band_semantic}; shaded intervals are toy spread, not uncertainty-on-mean.",
+            r"$\hat{Z}$ and pull use toy $\sigma_A$; $Z_{inj}$ uses $\sigma_{A,ref}$.",
+        ]),
+        fontsize=9,
+    )
     plt.tight_layout()
     plt.savefig(os.path.join(outdir, "z_calibration_residual_comparison.png"), dpi=220)
     plt.close(fig)
-    print(f"[plot_z_calibration_residual] Band semantics: {band_semantic}; shaded intervals represent toy spread (q16--q84).")
+    print(
+        "[plot_z_calibration_residual] "
+        f"Band semantics: {band_semantic}; shaded intervals represent toy spread (q16--q84). "
+        "Denominators: Zhat/pull -> toy sigma_A; Zinj(inj_nsigma) -> sigmaA_ref."
+    )
 def _normality_pvalue(
     pull_vals: np.ndarray,
     *,

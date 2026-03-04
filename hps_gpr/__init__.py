@@ -14,7 +14,7 @@ from .plotting import (
     plot_ul_bands, plot_ul_pvalues,
     plot_analytic_p0, plot_Z_local_global,
     plot_linearity, plot_bias_vs_injected_strength, plot_pull_width, plot_coverage,
-    plot_z_calibration_residual,
+    plot_z_calibration_residual, plot_delta_z_minus_pull_vs_injected_sigma,
     plot_eps2_curves, plot_bands,
 )
 from .statistics import p0_from_blind_vectors, fit_A_profiled_gaussian, _p_local_from_global_summary
@@ -91,6 +91,7 @@ __all__ = [
     "plot_pull_width",
     "plot_coverage",
     "plot_z_calibration_residual",
+    "plot_delta_z_minus_pull_vs_injected_sigma",
     "plot_eps2_curves",
     "plot_bands",
 ]
