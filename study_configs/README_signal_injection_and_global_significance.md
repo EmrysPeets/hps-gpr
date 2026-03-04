@@ -28,6 +28,15 @@ This guide documents reproducible commands for:
 - Cowan et al., *Asymptotic formulae for likelihood-based tests of new physics*, EPJC 71 (2011), arXiv:1007.1727.
 - Read, *Presentation of search results: the CLs technique*, J. Phys. G 28 (2002).
 
+
+## Short theory note (for interpretation and reporting)
+
+- **Asymptotic profile-likelihood calibration (Cowan et al.)**: local test statistics and quoted local significances should be interpreted through asymptotic profile-likelihood results, with toy studies used as closure checks for finite-sample effects and nuisance-treatment fidelity.
+- **Look-Elsewhere Effect / global significance (Gross & Vitells)**: when scanning many mass hypotheses, convert local to global significance using an effective-trials treatment (or equivalent upcrossing-based approximation) to avoid overstating discovery significance.
+- **Frequentist limits with CLs (Read)**: reported upper limits should be based on the CLs construction to control exclusions in low-sensitivity regimes, with expected bands from background-only pseudoexperiments.
+
+These references define the statistical backbone of this workflow: asymptotic local tests, LEE-corrected global claims, and CLs limits.
+
 ## Configs in this folder
 
 - 90% CL (legacy):
