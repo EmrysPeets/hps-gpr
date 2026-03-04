@@ -190,6 +190,12 @@ class Config:
     inj_combined_mass_policy: str = "intersection"  # "intersection" | "union_min_n"
     inj_combined_min_n_contrib: int = 2
     inj_write_toy_csv: bool = True
+    # Streaming injection aggregation (default-on)
+    inj_stream_aggregate: bool = True
+    inj_aggregate_every: int = 100
+    inj_n_workers: int = 5
+    inj_parallel_backend: str = "loky"
+    inj_threads_per_worker: int = 1
     # MVN non-negative sampling
     mvn_trunc_method: str = "reject_then_clip"  # "clip" | "reject" | "reject_then_clip"
     mvn_trunc_max_tries: int = 80

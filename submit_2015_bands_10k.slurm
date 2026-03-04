@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=hps2015_bands_10k
-#SBATCH --partition=milano
+#SBATCH --partition=roma
 #SBATCH --time=24:00:00
 #SBATCH --mem=8G
 #SBATCH --output=logs/%j.out

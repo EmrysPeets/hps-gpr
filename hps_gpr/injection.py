@@ -1,10 +1,24 @@
 """Signal injection and extraction closure tests."""
 
+import hashlib
 import os
+from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING
 
 import numpy as np
 import pandas as pd
+
+try:
+    import joblib
+    _HAVE_JOBLIB = True
+except ImportError:
+    _HAVE_JOBLIB = False
+
+try:
+    from threadpoolctl import threadpool_limits as _threadpool_limits
+except ImportError:
+    import contextlib
+    _threadpool_limits = contextlib.nullcontext  # type: ignore[assignment]
 
 from .io import estimate_background_for_dataset
 from .template import build_template
@@ -340,6 +354,873 @@ def run_injection_extraction_toys(
     else:
         print(f"[inj] skipped writing toy CSV for {ds.key} (write_toy_csv=False)")
     return df
+
+
+@dataclass
+class _InjectionMassContext:
+    """Precomputed per-mass context used by streaming toy workers."""
+
+    ds: "DatasetConfig"
+    mass: float
+    mu: np.ndarray
+    cov: np.ndarray
+    mu_full: np.ndarray
+    x_full: np.ndarray
+    msk_blind: np.ndarray
+    msk_train: np.ndarray
+    tmpl_win: np.ndarray
+    tmpl_full: np.ndarray
+    sigmaA_ref: float
+    sigma_val: float
+    sigma_x: float
+    f_win: float
+    f_full: float
+    f_train: float
+    f_train_frac: float
+    blind_nsigma: float
+    train_exclude_nsigma: float
+    inj_mode: str
+    inj_shape_mode: str
+    refit_gp_on_toy: bool
+    refit_restarts: int
+    refit_optimize: bool
+    allow_negative: bool
+    mvn_method: str
+    mvn_max_tries: int
+
+
+@dataclass
+class _ToyPointAccumulator:
+    """Compact per-point accumulator for summary-level statistics."""
+
+    dataset: str
+    mass_GeV: float
+    strength: float
+    sigmaA_ref: float
+    f_win: float
+    f_train_frac: float
+    pull_vals: List[float] = field(default_factory=list)
+    zhat_vals: List[float] = field(default_factory=list)
+    ahat_vals: List[float] = field(default_factory=list)
+    sigma_a_vals: List[float] = field(default_factory=list)
+    inj_nsigma_vals: List[float] = field(default_factory=list)
+    success_vals: List[float] = field(default_factory=list)
+
+    def update(self, row: Dict[str, Any]) -> None:
+        self.pull_vals.append(float(row.get("pull_param", np.nan)))
+        self.zhat_vals.append(float(row.get("Zhat", np.nan)))
+        self.ahat_vals.append(float(row.get("A_hat", np.nan)))
+        self.sigma_a_vals.append(float(row.get("sigma_A", np.nan)))
+        self.inj_nsigma_vals.append(float(row.get("inj_nsigma", np.nan)))
+        self.success_vals.append(1.0 if bool(row.get("success", False)) else 0.0)
+
+    def update_many(self, rows: List[Dict[str, Any]]) -> None:
+        for row in rows:
+            self.update(row)
+
+    def finalize(self) -> Dict[str, Any]:
+        pull = np.asarray(self.pull_vals, float)
+        zhat = np.asarray(self.zhat_vals, float)
+        ahat = np.asarray(self.ahat_vals, float)
+        siga = np.asarray(self.sigma_a_vals, float)
+        inj = np.asarray(self.inj_nsigma_vals, float)
+        succ = np.asarray(self.success_vals, float)
+        n_toys = int(len(pull))
+        pull_finite = pull[np.isfinite(pull)]
+
+        def q(x: np.ndarray, p: float) -> float:
+            v = np.asarray(x, float)
+            return float(np.nanquantile(v, p)) if np.any(np.isfinite(v)) else float("nan")
+
+        inj_std = float(np.nanstd(inj, ddof=1)) if np.sum(np.isfinite(inj)) > 1 else 0.0
+        pull_mean = float(np.nanmean(pull)) if n_toys else float("nan")
+        zhat_mean = float(np.nanmean(zhat)) if n_toys else float("nan")
+
+        return dict(
+            dataset=str(self.dataset),
+            mass_GeV=float(self.mass_GeV),
+            strength=float(self.strength),
+            n_toys=n_toys,
+            inj_nsigma=float(np.nanmean(inj)) if n_toys else float("nan"),
+            inj_nsigma_xerr=float(inj_std),
+            sigmaA_ref=float(self.sigmaA_ref),
+            f_win=float(self.f_win),
+            f_train_frac=float(self.f_train_frac),
+            A_hat_mean=float(np.nanmean(ahat)) if n_toys else float("nan"),
+            A_hat_std=float(np.nanstd(ahat, ddof=1)) if n_toys > 1 else float("nan"),
+            sigma_A_mean=float(np.nanmean(siga)) if n_toys else float("nan"),
+            pull_mean=float(pull_mean),
+            pull_std=float(np.nanstd(pull, ddof=1)) if n_toys > 1 else float("nan"),
+            pull_std_err=(
+                float(np.nanstd(pull_finite, ddof=1) / np.sqrt(max(1, 2 * (len(pull_finite) - 1))))
+                if len(pull_finite) > 1
+                else float("nan")
+            ),
+            pull_q16=q(pull, 0.16),
+            pull_q84=q(pull, 0.84),
+            pull_q02=q(pull, 0.025),
+            pull_q97=q(pull, 0.975),
+            cov_1sigma=float(np.nanmean(np.abs(pull) < 1.0)) if n_toys else float("nan"),
+            cov_2sigma=float(np.nanmean(np.abs(pull) < 2.0)) if n_toys else float("nan"),
+            Zhat_mean=float(zhat_mean),
+            delta_z_minus_pull=float(zhat_mean - pull_mean) if np.isfinite(zhat_mean) and np.isfinite(pull_mean) else float("nan"),
+            ainj_over_sigmaAref=(
+                float(self.strength) / float(self.sigmaA_ref)
+                if np.isfinite(self.sigmaA_ref) and float(self.sigmaA_ref) > 0
+                else float("nan")
+            ),
+            Zhat_q16=q(zhat, 0.16),
+            Zhat_q84=q(zhat, 0.84),
+            success_rate=float(np.nanmean(succ)) if succ.size else float("nan"),
+        )
+
+
+def _stable_point_seed(base_seed: int, dataset_key: str, mass: float, strength: float) -> int:
+    """Stable point seed independent of runtime ordering/scheduling."""
+    payload = f"{int(base_seed)}|{str(dataset_key)}|{float(mass):.9f}|{float(strength):.12g}"
+    h = hashlib.blake2b(payload.encode("utf-8"), digest_size=8).digest()
+    return int.from_bytes(h, "little") & 0xFFFFFFFF
+
+
+def _stable_toy_seed(point_seed: int, toy_index: int) -> int:
+    """Stable toy seed from point seed + toy index."""
+    return int((int(point_seed) + int(toy_index) * 2654435761) & 0xFFFFFFFF)
+
+
+def _chunk_indices(indices: List[int], n_chunks: int) -> List[List[int]]:
+    """Split integer indices into approximately equal contiguous chunks."""
+    if not indices:
+        return []
+    n_chunks = int(max(1, n_chunks))
+    if n_chunks <= 1 or len(indices) <= 1:
+        return [indices]
+    chunks: List[List[int]] = []
+    step = int(np.ceil(len(indices) / float(n_chunks)))
+    for i in range(0, len(indices), step):
+        chunks.append(indices[i:i + step])
+    return [c for c in chunks if c]
+
+
+def _append_toy_rows_csv(path: str, rows: List[Dict[str, Any]], *, header_written: bool) -> bool:
+    """Append toy rows to a CSV file, writing header only once."""
+    if not rows:
+        return bool(header_written)
+    df = pd.DataFrame(rows)
+    df.to_csv(path, mode="a", index=False, header=not bool(header_written))
+    return True
+
+
+def _simulate_toy_rows_chunk(
+    ctx: _InjectionMassContext,
+    config: "Config",
+    *,
+    toy_indices: List[int],
+    A_inj: float,
+    inj_nsigma: float,
+    point_seed: int,
+    threads_per_worker: int,
+) -> List[Dict[str, Any]]:
+    """Simulate one chunk of toys for one (dataset, mass, strength) point."""
+    if not toy_indices:
+        return []
+
+    out_rows: List[Dict[str, Any]] = []
+    toy_mode = "full_refit" if bool(ctx.refit_gp_on_toy) else "conditional_gp"
+
+    with _threadpool_limits(limits=int(max(1, threads_per_worker))):
+        ker = make_kernel_for_dataset(ctx.ds, config, mass=float(ctx.mass)) if bool(ctx.refit_gp_on_toy) else None
+        x_win = ctx.x_full[ctx.msk_blind]
+        for toy_idx in toy_indices:
+            rng = np.random.default_rng(_stable_toy_seed(point_seed, int(toy_idx)))
+            refit_ok = float("nan")
+
+            if bool(ctx.refit_gp_on_toy):
+                bkg_full = rng.poisson(np.clip(ctx.mu_full, 0.0, None)).astype(int)
+                if str(ctx.inj_shape_mode) == "window":
+                    sig_full = np.zeros_like(bkg_full, dtype=int)
+                    s_win, Nsig_win, _ = _inject_counts_from_template(ctx.tmpl_win, A_inj, rng, ctx.inj_mode)
+                    idx_blind = np.where(ctx.msk_blind)[0]
+                    n = min(len(s_win), len(idx_blind))
+                    sig_full[idx_blind[:n]] = s_win[:n]
+                else:
+                    s_full, _, _ = _inject_counts_from_template(ctx.tmpl_full, A_inj, rng, ctx.inj_mode)
+                    sig_full = np.asarray(s_full, dtype=int)
+                    Nsig_win = int(np.sum(sig_full[ctx.msk_blind]))
+
+                y_toy = (bkg_full + sig_full).astype(int)
+                obs = y_toy[ctx.msk_blind].astype(int)
+                Nsig_train = int(np.sum(sig_full[ctx.msk_train]))
+                mu_fit = np.asarray(ctx.mu, float)
+                cov_fit = np.asarray(ctx.cov, float)
+                try:
+                    X_tr = ctx.x_full[ctx.msk_train]
+                    y_tr = y_toy[ctx.msk_train].astype(float)
+                    gpr = fit_gpr(
+                        X_tr,
+                        y_tr,
+                        config,
+                        restarts=int(ctx.refit_restarts),
+                        kernel=ker,
+                        optimize=bool(ctx.refit_optimize),
+                    )
+                    mu_fit, cov_fit = predict_counts_from_log_gpr(gpr, x_win, config)
+                    refit_ok = 1.0
+                except Exception:
+                    refit_ok = 0.0
+            else:
+                b = draw_bkg_mvn_nonneg(
+                    ctx.mu,
+                    ctx.cov,
+                    1,
+                    rng,
+                    method=str(ctx.mvn_method),
+                    max_tries=int(ctx.mvn_max_tries),
+                )[0]
+                sig, Nsig_win, _ = _inject_counts_from_template(ctx.tmpl_win, A_inj, rng, ctx.inj_mode)
+                lam = np.clip(b, 0.0, None) + np.clip(sig.astype(float), 0.0, None)
+                obs = rng.poisson(lam).astype(int)
+                Nsig_train = 0
+                mu_fit, cov_fit = ctx.mu, ctx.cov
+
+            fit = fit_A_profiled_gaussian(
+                obs,
+                np.asarray(mu_fit, float),
+                np.asarray(cov_fit, float),
+                ctx.tmpl_win,
+                allow_negative=bool(ctx.allow_negative),
+            )
+            A_hat = float(fit["A_hat"])
+            sigma_A = float(fit["sigma_A"])
+            pull = (A_hat - float(A_inj)) / sigma_A if np.isfinite(sigma_A) and sigma_A > 0 else float("nan")
+            Zhat = A_hat / sigma_A if np.isfinite(sigma_A) and sigma_A > 0 else float("nan")
+
+            out_rows.append(
+                dict(
+                    dataset=str(ctx.ds.key),
+                    mass_GeV=float(ctx.mass),
+                    toy=int(toy_idx),
+                    strength=float(A_inj),
+                    inj_nsigma=float(inj_nsigma),
+                    sigmaA_ref=float(ctx.sigmaA_ref),
+                    sigma_val=float(ctx.sigma_val),
+                    sigma_x=float(ctx.sigma_x),
+                    f_win=float(ctx.f_win),
+                    f_full=float(ctx.f_full),
+                    f_train=float(ctx.f_train),
+                    f_train_frac=float(ctx.f_train_frac),
+                    blind_nsigma=float(ctx.blind_nsigma),
+                    train_exclude_nsigma=float(ctx.train_exclude_nsigma),
+                    inj_shape_mode=str(ctx.inj_shape_mode),
+                    A_hat=float(A_hat),
+                    sigma_A=float(sigma_A),
+                    Zhat=float(Zhat),
+                    pull_param=float(pull),
+                    Nsig_win=int(Nsig_win),
+                    Nsig_train=int(Nsig_train),
+                    success=bool(fit["success"]),
+                    nll=float(fit.get("nll", float("nan"))),
+                    toy_mode=str(toy_mode),
+                    refit_gp_on_toy=bool(ctx.refit_gp_on_toy),
+                    refit_ok=float(refit_ok),
+                    refit_restarts=int(ctx.refit_restarts),
+                    refit_optimize=bool(ctx.refit_optimize),
+                )
+            )
+
+    return out_rows
+
+
+def _simulate_toy_rows_batch(
+    ctx: _InjectionMassContext,
+    config: "Config",
+    *,
+    toy_indices: List[int],
+    A_inj: float,
+    inj_nsigma: float,
+    point_seed: int,
+    n_workers: int,
+    parallel_backend: str,
+    threads_per_worker: int,
+) -> List[Dict[str, Any]]:
+    """Simulate a toy batch with optional per-point worker parallelism."""
+    chunks = _chunk_indices(list(toy_indices), int(max(1, n_workers)))
+    if not chunks:
+        return []
+    if int(n_workers) <= 1 or not _HAVE_JOBLIB:
+        rows = _simulate_toy_rows_chunk(
+            ctx,
+            config,
+            toy_indices=chunks[0],
+            A_inj=float(A_inj),
+            inj_nsigma=float(inj_nsigma),
+            point_seed=int(point_seed),
+            threads_per_worker=int(threads_per_worker),
+        )
+        rows.sort(key=lambda r: int(r["toy"]))
+        return rows
+
+    parts = joblib.Parallel(n_jobs=int(n_workers), backend=str(parallel_backend))(
+        joblib.delayed(_simulate_toy_rows_chunk)(
+            ctx,
+            config,
+            toy_indices=chunk,
+            A_inj=float(A_inj),
+            inj_nsigma=float(inj_nsigma),
+            point_seed=int(point_seed),
+            threads_per_worker=int(threads_per_worker),
+        )
+        for chunk in chunks
+    )
+    rows = [r for part in parts for r in part]
+    rows.sort(key=lambda r: int(r["toy"]))
+    return rows
+
+
+def _resolve_injection_strength_tags(
+    *,
+    config: "Config",
+    strengths: Optional[List[float]] = None,
+    strengths_mode: Optional[str] = None,
+    sigma_multipliers: Optional[List[float]] = None,
+) -> Tuple[str, List[float]]:
+    """Resolve injection strength mode + requested strength tags."""
+    mode = (strengths_mode or getattr(config, "inj_strength_mode", "absolute")).lower().strip()
+    if mode == "sigmaa":
+        if strengths is not None:
+            tags = [float(x) for x in strengths]
+        elif sigma_multipliers is not None:
+            tags = [float(x) for x in sigma_multipliers]
+        else:
+            tags = [float(x) for x in getattr(config, "inj_sigma_multipliers", [0.0, 1.0, 2.0, 3.0])]
+    else:
+        tags = [float(x) for x in (strengths or getattr(config, "inj_strengths", []))]
+    return mode, tags
+
+
+def _build_injection_mass_context(
+    ds: "DatasetConfig",
+    config: "Config",
+    *,
+    mass: float,
+    seed: int,
+    inj_mode: str,
+    sigma_source: str,
+    refit_gp_on_toy: bool,
+    refit_restarts: int,
+    refit_optimize: bool,
+    inj_shape_mode: str,
+    train_exclude_nsigma: Optional[float],
+    mvn_method: str,
+    mvn_max_tries: int,
+) -> _InjectionMassContext:
+    """Build per-mass context used by the streaming toy runner."""
+    pred = estimate_background_for_dataset(ds, float(mass), config)
+
+    tmpl_win = build_template(pred.edges, float(mass), pred.sigma_val)
+    f_win = float(np.sum(tmpl_win))
+    x_full = np.asarray(pred.x_full, float).reshape(-1)
+    tmpl_full = build_template(np.asarray(pred.edges_full, float), float(mass), pred.sigma_val)
+    f_full = float(np.sum(tmpl_full))
+
+    sigma_seed = _stable_point_seed(int(seed), str(ds.key), float(mass), -1.0)
+    sigma_rng = np.random.default_rng(int(sigma_seed))
+    sigmaA_ref = _sigmaA_reference(pred, float(mass), source=str(sigma_source), rng=sigma_rng)
+
+    train_nsig_default = float(getattr(config, "gp_train_exclude_nsigma", None) or config.blind_nsigma)
+    if train_exclude_nsigma is not None:
+        tn = float(train_exclude_nsigma)
+    else:
+        tn = float(getattr(pred, "train_exclude_nsigma", train_nsig_default))
+
+    blind = tuple(pred.blind)
+    msk_blind = (x_full >= float(blind[0])) & (x_full <= float(blind[1]))
+    if int(np.sum(msk_blind)) == 0:
+        raise RuntimeError(f"[inj][{ds.key}] m={float(mass):.6g}: blind window has no bins")
+    blind_train = (float(mass) - tn * float(pred.sigma_val), float(mass) + tn * float(pred.sigma_val))
+    msk_train = (x_full < blind_train[0]) | (x_full > blind_train[1])
+    f_train = float(np.sum(tmpl_full[msk_train])) if tmpl_full.shape[0] == x_full.shape[0] else float("nan")
+    f_train_frac = float(f_train / f_full) if np.isfinite(f_train) and f_full > 0 else float("nan")
+
+    return _InjectionMassContext(
+        ds=ds,
+        mass=float(mass),
+        mu=np.asarray(pred.mu, float),
+        cov=np.asarray(pred.cov, float),
+        mu_full=np.asarray(pred.mu_full, float).reshape(-1),
+        x_full=x_full,
+        msk_blind=msk_blind,
+        msk_train=msk_train,
+        tmpl_win=np.asarray(tmpl_win, float),
+        tmpl_full=np.asarray(tmpl_full, float),
+        sigmaA_ref=float(sigmaA_ref),
+        sigma_val=float(pred.sigma_val),
+        sigma_x=float(getattr(pred, "sigma_x", float("nan"))),
+        f_win=float(f_win),
+        f_full=float(f_full),
+        f_train=float(f_train),
+        f_train_frac=float(f_train_frac),
+        blind_nsigma=float(config.blind_nsigma),
+        train_exclude_nsigma=float(tn),
+        inj_mode=str(inj_mode),
+        inj_shape_mode=str(inj_shape_mode),
+        refit_gp_on_toy=bool(refit_gp_on_toy),
+        refit_restarts=int(refit_restarts),
+        refit_optimize=bool(refit_optimize),
+        allow_negative=bool(getattr(config, "extract_allow_negative", True)),
+        mvn_method=str(mvn_method),
+        mvn_max_tries=int(mvn_max_tries),
+    )
+
+
+def run_injection_extraction_streaming(
+    ds: "DatasetConfig",
+    config: "Config",
+    *,
+    masses: List[float],
+    strengths: Optional[List[float]] = None,
+    n_toys: int = 200,
+    outdir: Optional[str] = None,
+    seed: int = 314159,
+    inj_mode: Optional[str] = None,
+    strengths_mode: Optional[str] = None,
+    sigma_multipliers: Optional[List[float]] = None,
+    sigma_source: Optional[str] = None,
+    refit_gp_on_toy: Optional[bool] = None,
+    refit_restarts: Optional[int] = None,
+    refit_optimize: Optional[bool] = None,
+    inj_shape_mode: Optional[str] = None,
+    train_exclude_nsigma: Optional[float] = None,
+    write_toy_csv: Optional[bool] = None,
+    aggregate_every: Optional[int] = None,
+    n_workers: Optional[int] = None,
+    parallel_backend: Optional[str] = None,
+    threads_per_worker: Optional[int] = None,
+) -> pd.DataFrame:
+    """Streaming injection runner for one dataset.
+
+    Processes toys in small batches and stores only per-point aggregate statistics
+    (plus optional toy CSV append output).
+    """
+    if outdir is None:
+        outdir = os.path.join(config.output_dir, "injection_extraction")
+    ensure_dir(outdir)
+
+    if write_toy_csv is None:
+        write_toy_csv = bool(getattr(config, "inj_write_toy_csv", True))
+    if aggregate_every is None:
+        aggregate_every = int(getattr(config, "inj_aggregate_every", 100))
+    if n_workers is None:
+        n_workers = int(getattr(config, "inj_n_workers", 5))
+    if parallel_backend is None:
+        parallel_backend = str(getattr(config, "inj_parallel_backend", "loky"))
+    if threads_per_worker is None:
+        threads_per_worker = int(getattr(config, "inj_threads_per_worker", 1))
+
+    aggregate_every = int(max(1, aggregate_every))
+    n_workers = int(max(1, n_workers))
+    threads_per_worker = int(max(1, threads_per_worker))
+
+    inj_mode = (inj_mode or getattr(config, "inj_mode", "poisson")).lower().strip()
+    sigma_source = (sigma_source or getattr(config, "inj_sigma_a_source", "asimov")).lower().strip()
+    if refit_gp_on_toy is None:
+        refit_gp_on_toy = bool(getattr(config, "inj_refit_gp_on_toy", False))
+    if refit_restarts is None:
+        refit_restarts = int(getattr(config, "inj_refit_gp_restarts", 0))
+    if refit_optimize is None:
+        refit_optimize = bool(getattr(config, "inj_refit_gp_optimize", True))
+    inj_shape_mode = (inj_shape_mode or getattr(config, "inj_shape_mode", "full")).lower().strip()
+    if inj_shape_mode not in ("full", "window"):
+        inj_shape_mode = "full"
+    if train_exclude_nsigma is None:
+        train_exclude_nsigma = getattr(config, "inj_train_exclude_nsigma", None)
+
+    mvn_method = str(getattr(config, "mvn_trunc_method", "reject_then_clip"))
+    mvn_max_tries = int(getattr(config, "mvn_trunc_max_tries", 80))
+    strengths_mode_resolved, strength_tags = _resolve_injection_strength_tags(
+        config=config,
+        strengths=strengths,
+        strengths_mode=strengths_mode,
+        sigma_multipliers=sigma_multipliers,
+    )
+
+    toy_csv_path = os.path.join(outdir, f"inj_extract_toys_{ds.key}.csv")
+    toy_header_written = False
+    if bool(write_toy_csv) and os.path.exists(toy_csv_path):
+        os.remove(toy_csv_path)
+
+    summary_rows: List[Dict[str, Any]] = []
+    for m in [float(x) for x in masses]:
+        ctx = _build_injection_mass_context(
+            ds,
+            config,
+            mass=float(m),
+            seed=int(seed),
+            inj_mode=str(inj_mode),
+            sigma_source=str(sigma_source),
+            refit_gp_on_toy=bool(refit_gp_on_toy),
+            refit_restarts=int(refit_restarts),
+            refit_optimize=bool(refit_optimize),
+            inj_shape_mode=str(inj_shape_mode),
+            train_exclude_nsigma=train_exclude_nsigma,
+            mvn_method=str(mvn_method),
+            mvn_max_tries=int(mvn_max_tries),
+        )
+
+        if strengths_mode_resolved == "sigmaa":
+            A_inj_list = [float(t) * float(ctx.sigmaA_ref) for t in strength_tags]
+            inj_nsigma_list = [float(t) for t in strength_tags]
+        else:
+            A_inj_list = [float(t) for t in strength_tags]
+            inj_nsigma_list = [
+                float(A) / float(ctx.sigmaA_ref) if np.isfinite(ctx.sigmaA_ref) and ctx.sigmaA_ref > 0 else float("nan")
+                for A in A_inj_list
+            ]
+
+        for A_inj, inj_nsigma_val in zip(A_inj_list, inj_nsigma_list):
+            acc = _ToyPointAccumulator(
+                dataset=str(ds.key),
+                mass_GeV=float(m),
+                strength=float(A_inj),
+                sigmaA_ref=float(ctx.sigmaA_ref),
+                f_win=float(ctx.f_win),
+                f_train_frac=float(ctx.f_train_frac),
+            )
+            point_seed = _stable_point_seed(int(seed), str(ds.key), float(m), float(A_inj))
+            done = 0
+            while done < int(n_toys):
+                end = min(done + aggregate_every, int(n_toys))
+                toy_indices = list(range(done, end))
+                batch_rows = _simulate_toy_rows_batch(
+                    ctx,
+                    config,
+                    toy_indices=toy_indices,
+                    A_inj=float(A_inj),
+                    inj_nsigma=float(inj_nsigma_val),
+                    point_seed=int(point_seed),
+                    n_workers=int(n_workers),
+                    parallel_backend=str(parallel_backend),
+                    threads_per_worker=int(threads_per_worker),
+                )
+                acc.update_many(batch_rows)
+                if bool(write_toy_csv):
+                    toy_header_written = _append_toy_rows_csv(
+                        toy_csv_path, batch_rows, header_written=bool(toy_header_written)
+                    )
+                done = end
+                print(
+                    "[inj][stream] "
+                    f"{ds.key} m={float(m):.6g} GeV strength={float(A_inj):.6g}: "
+                    f"{done}/{int(n_toys)} toys"
+                )
+
+            summary_rows.append(acc.finalize())
+
+    df_sum = pd.DataFrame(summary_rows)
+    if df_sum.empty:
+        return df_sum
+    return df_sum.sort_values(["dataset", "mass_GeV", "strength"]).reset_index(drop=True)
+
+
+def _combine_toy_rows(rows: List[Dict[str, Any]], *, mass: float, toy_idx: int) -> Optional[Dict[str, Any]]:
+    """Combine per-dataset toy rows with inverse-variance weighting."""
+    valid = []
+    for r in rows:
+        s = float(r.get("sigma_A", np.nan))
+        if np.isfinite(s) and s > 0:
+            valid.append(r)
+    if not valid:
+        return None
+
+    sigma = np.array([float(r["sigma_A"]) for r in valid], float)
+    w = 1.0 / np.square(sigma)
+    if not np.any(np.isfinite(w)) or float(np.sum(w)) <= 0:
+        return None
+    sum_w = float(np.sum(w))
+
+    ah = np.array([float(r.get("A_hat", np.nan)) for r in valid], float)
+    st = np.array([float(r.get("strength", np.nan)) for r in valid], float)
+    zinj = np.array([float(r.get("inj_nsigma", np.nan)) for r in valid], float)
+    sref = np.array([float(r.get("sigmaA_ref", np.nan)) for r in valid], float)
+
+    A_hat = float(np.nansum(w * ah) / sum_w)
+    sigma_A = float(1.0 / np.sqrt(sum_w))
+    strength = float(np.nansum(w * st) / sum_w)
+    inj_nsigma = float(np.nanmean(zinj)) if np.any(np.isfinite(zinj)) else float("nan")
+    sigmaA_ref = float(np.nanmean(sref)) if np.any(np.isfinite(sref)) else float("nan")
+    pull = (A_hat - strength) / sigma_A if np.isfinite(sigma_A) and sigma_A > 0 else float("nan")
+    zhat = A_hat / sigma_A if np.isfinite(sigma_A) and sigma_A > 0 else float("nan")
+
+    return dict(
+        dataset="combined",
+        mass_GeV=float(mass),
+        toy=int(toy_idx),
+        strength=float(strength),
+        inj_nsigma=float(inj_nsigma),
+        sigmaA_ref=float(sigmaA_ref),
+        A_hat=float(A_hat),
+        sigma_A=float(sigma_A),
+        pull_param=float(pull),
+        Zhat=float(zhat),
+        n_contrib=int(len(valid)),
+        contrib_datasets="+".join(sorted({str(r.get("dataset", "")) for r in valid})),
+        success=bool(all(bool(r.get("success", False)) for r in valid)),
+    )
+
+
+def run_injection_extraction_streaming_combined(
+    datasets: Dict[str, "DatasetConfig"],
+    config: "Config",
+    *,
+    masses: List[float],
+    strengths: Optional[List[float]] = None,
+    n_toys: int = 200,
+    outdir: Optional[str] = None,
+    seed: int = 314159,
+    inj_mode: Optional[str] = None,
+    strengths_mode: Optional[str] = None,
+    sigma_multipliers: Optional[List[float]] = None,
+    sigma_source: Optional[str] = None,
+    refit_gp_on_toy: Optional[bool] = None,
+    refit_restarts: Optional[int] = None,
+    refit_optimize: Optional[bool] = None,
+    inj_shape_mode: Optional[str] = None,
+    train_exclude_nsigma: Optional[float] = None,
+    write_toy_csv: Optional[bool] = None,
+    aggregate_every: Optional[int] = None,
+    n_workers: Optional[int] = None,
+    parallel_backend: Optional[str] = None,
+    threads_per_worker: Optional[int] = None,
+    mass_policy: Optional[str] = None,
+    min_n_contrib: Optional[int] = None,
+) -> Tuple[Dict[str, pd.DataFrame], pd.DataFrame]:
+    """Streaming injection runner across multiple datasets + on-the-fly combined toy aggregation."""
+    if outdir is None:
+        outdir = os.path.join(config.output_dir, "injection_extraction")
+    ensure_dir(outdir)
+
+    ds_keys = [str(k) for k in datasets.keys()]
+    if not ds_keys:
+        return {}, pd.DataFrame()
+
+    if write_toy_csv is None:
+        write_toy_csv = bool(getattr(config, "inj_write_toy_csv", True))
+    if aggregate_every is None:
+        aggregate_every = int(getattr(config, "inj_aggregate_every", 100))
+    if n_workers is None:
+        n_workers = int(getattr(config, "inj_n_workers", 5))
+    if parallel_backend is None:
+        parallel_backend = str(getattr(config, "inj_parallel_backend", "loky"))
+    if threads_per_worker is None:
+        threads_per_worker = int(getattr(config, "inj_threads_per_worker", 1))
+    mass_policy = str(mass_policy or getattr(config, "inj_combined_mass_policy", "intersection")).strip().lower()
+    min_n_contrib = int(min_n_contrib if min_n_contrib is not None else getattr(config, "inj_combined_min_n_contrib", 2))
+
+    aggregate_every = int(max(1, aggregate_every))
+    n_workers = int(max(1, n_workers))
+    threads_per_worker = int(max(1, threads_per_worker))
+
+    inj_mode = (inj_mode or getattr(config, "inj_mode", "poisson")).lower().strip()
+    sigma_source = (sigma_source or getattr(config, "inj_sigma_a_source", "asimov")).lower().strip()
+    if refit_gp_on_toy is None:
+        refit_gp_on_toy = bool(getattr(config, "inj_refit_gp_on_toy", False))
+    if refit_restarts is None:
+        refit_restarts = int(getattr(config, "inj_refit_gp_restarts", 0))
+    if refit_optimize is None:
+        refit_optimize = bool(getattr(config, "inj_refit_gp_optimize", True))
+    inj_shape_mode = (inj_shape_mode or getattr(config, "inj_shape_mode", "full")).lower().strip()
+    if inj_shape_mode not in ("full", "window"):
+        inj_shape_mode = "full"
+    if train_exclude_nsigma is None:
+        train_exclude_nsigma = getattr(config, "inj_train_exclude_nsigma", None)
+
+    mvn_method = str(getattr(config, "mvn_trunc_method", "reject_then_clip"))
+    mvn_max_tries = int(getattr(config, "mvn_trunc_max_tries", 80))
+    strengths_mode_resolved, strength_tags = _resolve_injection_strength_tags(
+        config=config,
+        strengths=strengths,
+        strengths_mode=strengths_mode,
+        sigma_multipliers=sigma_multipliers,
+    )
+
+    contexts_by_ds: Dict[str, Dict[float, _InjectionMassContext]] = {k: {} for k in ds_keys}
+    for ds_key, ds in datasets.items():
+        for m in [float(x) for x in masses]:
+            contexts_by_ds[str(ds_key)][float(m)] = _build_injection_mass_context(
+                ds,
+                config,
+                mass=float(m),
+                seed=int(seed),
+                inj_mode=str(inj_mode),
+                sigma_source=str(sigma_source),
+                refit_gp_on_toy=bool(refit_gp_on_toy),
+                refit_restarts=int(refit_restarts),
+                refit_optimize=bool(refit_optimize),
+                inj_shape_mode=str(inj_shape_mode),
+                train_exclude_nsigma=train_exclude_nsigma,
+                mvn_method=str(mvn_method),
+                mvn_max_tries=int(mvn_max_tries),
+            )
+
+    support_input = {
+        k: pd.DataFrame({"mass_GeV": sorted(list(v.keys()))}) for k, v in contexts_by_ds.items()
+    }
+    support = _combined_mass_support_summary(
+        support_input,
+        mass_policy=mass_policy,
+        min_n_contrib=int(min_n_contrib),
+    )
+    print(format_combined_mass_support_summary(support))
+    accepted_masses = set(float(x) for x in support.get("accepted_masses", set()))
+
+    toy_paths = {k: os.path.join(outdir, f"inj_extract_toys_{k}.csv") for k in ds_keys}
+    toy_header_written = {k: False for k in ds_keys}
+    comb_toy_path = os.path.join(outdir, "inj_extract_toys_combined.csv")
+    comb_toy_header_written = False
+    if bool(write_toy_csv):
+        for p in [*toy_paths.values(), comb_toy_path]:
+            if os.path.exists(p):
+                os.remove(p)
+
+    summary_rows_by_ds: Dict[str, List[Dict[str, Any]]] = {k: [] for k in ds_keys}
+    summary_rows_combined: List[Dict[str, Any]] = []
+
+    for m in [float(x) for x in masses]:
+        ctxs_m = {k: contexts_by_ds[k][float(m)] for k in ds_keys if float(m) in contexts_by_ds[k]}
+        if not ctxs_m:
+            continue
+
+        for strength_tag in strength_tags:
+            A_inj_by_ds: Dict[str, float] = {}
+            inj_nsigma_by_ds: Dict[str, float] = {}
+            for ds_key, ctx in ctxs_m.items():
+                if strengths_mode_resolved == "sigmaa":
+                    A_inj_by_ds[ds_key] = float(strength_tag) * float(ctx.sigmaA_ref)
+                    inj_nsigma_by_ds[ds_key] = float(strength_tag)
+                else:
+                    A_inj_by_ds[ds_key] = float(strength_tag)
+                    inj_nsigma_by_ds[ds_key] = (
+                        float(strength_tag) / float(ctx.sigmaA_ref)
+                        if np.isfinite(ctx.sigmaA_ref) and float(ctx.sigmaA_ref) > 0
+                        else float("nan")
+                    )
+
+            acc_by_ds = {
+                ds_key: _ToyPointAccumulator(
+                    dataset=str(ds_key),
+                    mass_GeV=float(m),
+                    strength=float(A_inj_by_ds[ds_key]),
+                    sigmaA_ref=float(ctxs_m[ds_key].sigmaA_ref),
+                    f_win=float(ctxs_m[ds_key].f_win),
+                    f_train_frac=float(ctxs_m[ds_key].f_train_frac),
+                )
+                for ds_key in ctxs_m.keys()
+            }
+
+            can_combine = float(m) in accepted_masses
+            if can_combine:
+                w_ref = []
+                for ds_key, ctx in ctxs_m.items():
+                    sref = float(ctx.sigmaA_ref)
+                    w_ref.append(1.0 / (sref * sref) if np.isfinite(sref) and sref > 0 else 0.0)
+                w_ref_arr = np.asarray(w_ref, float)
+                if np.any(np.isfinite(w_ref_arr)) and float(np.sum(w_ref_arr)) > 0:
+                    Ain_arr = np.asarray([A_inj_by_ds[k] for k in ctxs_m.keys()], float)
+                    sref_arr = np.asarray([ctxs_m[k].sigmaA_ref for k in ctxs_m.keys()], float)
+                    z_arr = np.asarray([inj_nsigma_by_ds[k] for k in ctxs_m.keys()], float)
+                    comb_strength_nom = float(np.nansum(w_ref_arr * Ain_arr) / np.sum(w_ref_arr))
+                    comb_sigma_ref = float(np.nanmean(sref_arr)) if np.any(np.isfinite(sref_arr)) else float("nan")
+                    comb_inj = float(np.nanmean(z_arr)) if np.any(np.isfinite(z_arr)) else float("nan")
+                    acc_comb = _ToyPointAccumulator(
+                        dataset="combined",
+                        mass_GeV=float(m),
+                        strength=float(comb_strength_nom),
+                        sigmaA_ref=float(comb_sigma_ref),
+                        f_win=float("nan"),
+                        f_train_frac=float("nan"),
+                    )
+                else:
+                    can_combine = False
+                    acc_comb = None
+            else:
+                acc_comb = None
+
+            done = 0
+            while done < int(n_toys):
+                end = min(done + aggregate_every, int(n_toys))
+                toy_indices = list(range(done, end))
+                rows_batch_by_ds: Dict[str, List[Dict[str, Any]]] = {}
+                for ds_key, ctx in ctxs_m.items():
+                    point_seed = _stable_point_seed(int(seed), str(ds_key), float(m), float(A_inj_by_ds[ds_key]))
+                    rows_ds = _simulate_toy_rows_batch(
+                        ctx,
+                        config,
+                        toy_indices=toy_indices,
+                        A_inj=float(A_inj_by_ds[ds_key]),
+                        inj_nsigma=float(inj_nsigma_by_ds[ds_key]),
+                        point_seed=int(point_seed),
+                        n_workers=int(n_workers),
+                        parallel_backend=str(parallel_backend),
+                        threads_per_worker=int(threads_per_worker),
+                    )
+                    rows_batch_by_ds[ds_key] = rows_ds
+                    acc_by_ds[ds_key].update_many(rows_ds)
+                    if bool(write_toy_csv):
+                        toy_header_written[ds_key] = _append_toy_rows_csv(
+                            toy_paths[ds_key],
+                            rows_ds,
+                            header_written=bool(toy_header_written[ds_key]),
+                        )
+
+                if can_combine and acc_comb is not None:
+                    rows_map = {
+                        ds_key: {int(r["toy"]): r for r in rows}
+                        for ds_key, rows in rows_batch_by_ds.items()
+                    }
+                    comb_rows: List[Dict[str, Any]] = []
+                    for toy_idx in toy_indices:
+                        contrib = [rows_map[k].get(int(toy_idx)) for k in ctxs_m.keys() if int(toy_idx) in rows_map[k]]
+                        contrib = [r for r in contrib if r is not None]
+                        if mass_policy == "intersection" and len(contrib) != len(ctxs_m):
+                            continue
+                        if mass_policy == "union_min_n" and len(contrib) < int(min_n_contrib):
+                            continue
+                        comb_row = _combine_toy_rows(contrib, mass=float(m), toy_idx=int(toy_idx))
+                        if comb_row is None:
+                            continue
+                        comb_rows.append(comb_row)
+                    acc_comb.update_many(comb_rows)
+                    if bool(write_toy_csv):
+                        comb_toy_header_written = _append_toy_rows_csv(
+                            comb_toy_path,
+                            comb_rows,
+                            header_written=bool(comb_toy_header_written),
+                        )
+
+                done = end
+                print(
+                    "[inj][stream][combined] "
+                    f"m={float(m):.6g} GeV tag={float(strength_tag):.6g}: "
+                    f"{done}/{int(n_toys)} toys"
+                )
+
+            for ds_key, acc in acc_by_ds.items():
+                summary_rows_by_ds[ds_key].append(acc.finalize())
+            if can_combine and acc_comb is not None and len(acc_comb.pull_vals):
+                summary_rows_combined.append(acc_comb.finalize())
+
+    out_by_ds = {
+        k: (
+            pd.DataFrame(rows).sort_values(["dataset", "mass_GeV", "strength"]).reset_index(drop=True)
+            if rows else pd.DataFrame()
+        )
+        for k, rows in summary_rows_by_ds.items()
+    }
+    out_comb = (
+        pd.DataFrame(summary_rows_combined).sort_values(["dataset", "mass_GeV", "strength"]).reset_index(drop=True)
+        if summary_rows_combined
+        else pd.DataFrame()
+    )
+    return out_by_ds, out_comb
 
 
 def run_injection_extraction(

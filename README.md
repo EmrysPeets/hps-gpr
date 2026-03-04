@@ -180,7 +180,7 @@ hps-gpr inject --config study_configs/config_2015_2016_combined_blind1p64_95CL_1
 
 # Batch production: one job per (dataset, mass, strength)
 # datasets include individual and combined extraction to compare behavior directly
-hps-gpr slurm-gen-inject --config study_configs/config_2015_2016_combined_blind1p64_95CL_10k_injection.yaml --datasets 2015,2016,combined --masses 0.025,0.030,0.040,0.050,0.065,0.080,0.095,0.115,0.135,0.150,0.170,0.200 --strengths s1,s2,s3,s5 --n-toys 10000 --no-write-toy-csv --job-name hps2015_2016_inj_95CL_w164 --partition milano --account hps:hps-prod --time 24:00:00 --memory 8G --output submit_2015_2016_injection_95CL_w164.slurm
+hps-gpr slurm-gen-inject --config study_configs/config_2015_2016_combined_blind1p64_95CL_10k_injection.yaml --datasets 2015,2016,combined --masses 0.025,0.030,0.040,0.050,0.065,0.080,0.095,0.115,0.135,0.150,0.170,0.200 --strengths s1,s2,s3,s5 --n-toys 10000 --no-write-toy-csv --job-name hps2015_2016_inj_95CL_w164 --partition roma --account hps:hps-prod --time 24:00:00 --memory 8G --output submit_2015_2016_injection_95CL_w164.slurm
 # note: submission script auto-skips out-of-range masses (2015: 20-130 MeV, 2016: 34-210 MeV)
 bash submit_injection_all.sh
 
@@ -191,8 +191,9 @@ hps-gpr inject-plot --input-dir outputs/study_2015_2016_combined_w1p64_95CL/inje
 Notes:
 - In `inj_strength_mode: sigmaA`, `--strengths` accepts both `1,2,3,5` and `s1,s2,s3,s5`.
 - SLURM injection jobs now run only the explicitly requested strength per job point (no implicit rerun of all configured strengths).
+- `inject` now defaults to streaming toy aggregation (`inj_stream_aggregate: true`) with per-point batching (`inj_aggregate_every`, default 100) and toy workers (`inj_n_workers`, default 5). Use `--legacy-toys` to force the old full toy-table path.
 - Use `--no-write-toy-csv` (or `inj_write_toy_csv: false`) for large productions when toy-level tables are not needed; this avoids multi-million-row `inj_extract_toys_*` files in `injection_flat`.
-- `inject-plot` supports summary-only inputs (from `inj_extract_summary_*.csv`) and still builds linearity/bias/pull-width/coverage/heatmap/pull-vs-mass summaries; toy-only products (pull histograms and Z-residual panels) require toy CSVs.
+- `inject-plot` supports summary-only inputs (from `inj_extract_summary_*.csv`) and still builds linearity/bias/pull-width/coverage/heatmap/pull-vs-mass summaries plus Z-calibration residual panels (using `Zhat_mean`/`Zhat_q16`/`Zhat_q84` when available); pull histograms still require toy CSVs.
 
 
 ### GP-mean/global-fit pseudoexperiment mode (v15_8-style full procedural toys)
@@ -218,7 +219,7 @@ hps-gpr inject --config study_configs/config_2015_blind1p64_95CL_10k_injection_g
 hps-gpr inject --config study_configs/config_2016_10pct_blind1p64_95CL_10k_injection_gpmean_pseudoexp.yaml --dataset 2016 --masses 0.040,0.050,0.065,0.080,0.095,0.115,0.135,0.150,0.170,0.200 --strengths 1,2,3,5 --n-toys 10000
 
 # Combined (plus per-dataset in batch) full procedural pseudoexperiments
-hps-gpr slurm-gen-inject --config study_configs/config_2015_2016_combined_blind1p64_95CL_10k_injection_gpmean_pseudoexp.yaml --datasets 2015,2016,combined --masses 0.025,0.030,0.040,0.050,0.065,0.080,0.095,0.115,0.135,0.150,0.170,0.200 --strengths s1,s2,s3,s5 --n-toys 10000 --no-write-toy-csv --job-name hps2015_2016_inj_gpmean --partition milano --account hps:hps-prod --time 24:00:00 --memory 8G --output submit_2015_2016_injection_gpmean.slurm
+hps-gpr slurm-gen-inject --config study_configs/config_2015_2016_combined_blind1p64_95CL_10k_injection_gpmean_pseudoexp.yaml --datasets 2015,2016,combined --masses 0.025,0.030,0.040,0.050,0.065,0.080,0.095,0.115,0.135,0.150,0.170,0.200 --strengths s1,s2,s3,s5 --n-toys 10000 --no-write-toy-csv --job-name hps2015_2016_inj_gpmean --partition roma --account hps:hps-prod --time 24:00:00 --memory 8G --output submit_2015_2016_injection_gpmean.slurm
 bash submit_injection_all.sh
 hps-gpr inject-plot --input-dir outputs/study_2015_2016_combined_w1p64_95CL_gpmean_pseudoexp/injection_flat --output-dir outputs/study_2015_2016_combined_w1p64_95CL_gpmean_pseudoexp/injection_summary
 ```
@@ -253,7 +254,7 @@ from merged UL-band CSVs with priority `ul_bands_combined_*` → `ul_bands_eps2_
 - p-value component overlays with local/global 1$\sigma$, 2$\sigma$, and (when visible) 3$\sigma$ references.
 
 
-Example: generate job files for 10k-toy limit-band production on S3DF (`milano`),
+Example: generate job files for 10k-toy limit-band production on S3DF (`roma`),
 including explicit account charging:
 
 ```bash
@@ -262,7 +263,7 @@ hps-gpr slurm-gen \
   --config config_2015_10k.yaml \
   --n-jobs 111 \
   --job-name hps2015_bands_10k \
-  --partition milano \
+  --partition roma \
   --account hps:hps-prod \
   --time 24:00:00 \
   --memory 8G \
@@ -273,7 +274,7 @@ hps-gpr slurm-gen \
   --config config_2016_10pct_10k.yaml \
   --n-jobs 176 \
   --job-name hps2016_10pct_bands_10k \
-  --partition milano \
+  --partition roma \
   --account hps:hps-prod \
   --time 24:00:00 \
   --memory 8G \
@@ -284,7 +285,7 @@ hps-gpr slurm-gen \
   --config config_2015_2016_combined_10k.yaml \
   --n-jobs 191 \
   --job-name hps2015_2016_combined_bands_10k \
-  --partition milano \
+  --partition roma \
   --account hps:hps-prod \
   --time 24:00:00 \
   --memory 8G \
@@ -371,6 +372,8 @@ outputs/
 │   ├── coverage_<dataset>.png
 │   ├── heatmap_pull_mean_<dataset>.png
 │   ├── heatmap_pull_width_<dataset>.png
+│   ├── z_calibration_residual_<dataset>.png
+│   ├── z_calibration_residual_comparison.png
 │   ├── combined_search_power_scenarios.png
 │   └── combined_signal_allocation_mXXXMeV.png/.csv
 └── mXXXMeV/                        # Optional per-mass folders (if save_per_mass_folders=true)
@@ -423,6 +426,65 @@ These plots are designed to show *why* combined searches improve sensitivity:
 - explicit allocation tables improve reproducibility for internal notes/publication follow-up and allow direct cross-checks against UL-derived sensitivity expectations.
 
 Methodology follows standard profile-likelihood asymptotics and inverse-variance combination conventions used broadly in HEP analyses (e.g. Cowan et al., EPJC 71 (2011) 1554).
+
+Copy/paste: generate combined-search scenario plots (and constituent 5σ table) from an existing injection summary folder:
+
+```bash
+python - <<'PY'
+import glob
+import os
+import pandas as pd
+from hps_gpr.plotting import plot_combined_search_power
+
+in_dir = "outputs/study_2015_2016_combined_w1p64_95CL/injection_summary"
+out_dir = os.path.join(in_dir, "combined_search_power_scenarios_only")
+paths = sorted(glob.glob(os.path.join(in_dir, "inj_extract_toys_*.csv")))
+if paths:
+    df = pd.concat([pd.read_csv(p) for p in paths], ignore_index=True)
+else:
+    paths = sorted(glob.glob(os.path.join(in_dir, "inj_extract_summary_*.csv")))
+    df = pd.concat([pd.read_csv(p) for p in paths], ignore_index=True)
+written = plot_combined_search_power(df, outdir=out_dir)
+print("wrote", len(written), "plots to", out_dir)
+PY
+```
+
+Expected scenario products in `combined_search_power_scenarios_only/`:
+- `combined_search_power_scenarios.png`
+- `combined_search_power_constituent_pvalues_5sigma.png`
+- `combined_constituent_pvalues_target5sigma.csv`
+
+Copy/paste: generate combined signal-allocation products for custom masses and targets:
+
+```bash
+python - <<'PY'
+import glob
+import os
+import pandas as pd
+from hps_gpr.plotting import plot_combined_search_power
+
+in_dir = "outputs/study_2015_2016_combined_w1p64_95CL/injection_summary"
+out_dir = os.path.join(in_dir, "combined_signal_allocation_only")
+paths = sorted(glob.glob(os.path.join(in_dir, "inj_extract_toys_*.csv")))
+if paths:
+    df = pd.concat([pd.read_csv(p) for p in paths], ignore_index=True)
+else:
+    paths = sorted(glob.glob(os.path.join(in_dir, "inj_extract_summary_*.csv")))
+    df = pd.concat([pd.read_csv(p) for p in paths], ignore_index=True)
+written = plot_combined_search_power(
+    df,
+    outdir=out_dir,
+    masses_focus=[0.040, 0.080, 0.110],
+    z_targets=[1.0, 3.0, 5.0],
+)
+print("wrote", len(written), "plots to", out_dir)
+PY
+```
+
+Expected allocation products include:
+- `combined_signal_allocation_m040MeV.png` + `.csv`
+- `combined_signal_allocation_m080MeV.png` + `.csv`
+- `combined_signal_allocation_m110MeV.png` + `.csv`
 
 ### Statistical validation checklist (publication gate)
 

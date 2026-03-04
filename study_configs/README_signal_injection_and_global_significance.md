@@ -59,11 +59,11 @@ These references define the statistical backbone of this workflow: asymptotic lo
 ### 1) Generate SLURM scripts (95% CL, 10k toys)
 
 ```bash
-hps-gpr slurm-gen --config study_configs/config_2015_blind1p96_95CL_10k_injection.yaml --n-jobs 111 --job-name hps2015_95CL_w196 --partition milano --account hps:hps-prod --time 24:00:00 --memory 8G --output submit_2015_95CL_w196.slurm
+hps-gpr slurm-gen --config study_configs/config_2015_blind1p96_95CL_10k_injection.yaml --n-jobs 111 --job-name hps2015_95CL_w196 --partition roma --account hps:hps-prod --time 24:00:00 --memory 8G --output submit_2015_95CL_w196.slurm
 
-hps-gpr slurm-gen --config study_configs/config_2016_10pct_blind1p96_95CL_10k_injection.yaml --n-jobs 176 --job-name hps2016_10pct_95CL_w196 --partition milano --account hps:hps-prod --time 24:00:00 --memory 8G --output submit_2016_10pct_95CL_w196.slurm
+hps-gpr slurm-gen --config study_configs/config_2016_10pct_blind1p96_95CL_10k_injection.yaml --n-jobs 176 --job-name hps2016_10pct_95CL_w196 --partition roma --account hps:hps-prod --time 24:00:00 --memory 8G --output submit_2016_10pct_95CL_w196.slurm
 
-hps-gpr slurm-gen --config study_configs/config_2015_2016_combined_blind1p96_95CL_10k_injection.yaml --n-jobs 191 --job-name hps2015_2016_comb_95CL_w196 --partition milano --account hps:hps-prod --time 24:00:00 --memory 8G --output submit_2015_2016_combined_95CL_w196.slurm
+hps-gpr slurm-gen --config study_configs/config_2015_2016_combined_blind1p96_95CL_10k_injection.yaml --n-jobs 191 --job-name hps2015_2016_comb_95CL_w196 --partition roma --account hps:hps-prod --time 24:00:00 --memory 8G --output submit_2015_2016_combined_95CL_w196.slurm
 ```
 
 Repeat with `blind1p64` configs for the 1.64-width study.
@@ -95,17 +95,17 @@ hps-gpr inject --config study_configs/config_2016_10pct_blind1p96_95CL_10k_injec
 
 For large-scale 10k toys per mass/strength point, use Python batch wrappers calling `run_injection_extraction_toys(..., n_toys=10000)` in array jobs and aggregate summary tables.
 
-Example SLURM matrix generation (S3DF/milano) with explicit per-point strengths:
+Example SLURM matrix generation (S3DF/roma) with explicit per-point strengths:
 
 ```bash
-hps-gpr slurm-gen-inject --config study_configs/config_2015_2016_combined_blind1p96_95CL_10k_injection.yaml --datasets 2015,2016,combined --masses 0.025,0.030,0.040,0.050,0.065,0.080,0.095,0.115,0.135,0.150,0.170,0.200 --strengths s1,s2,s3,s5 --n-toys 10000 --no-write-toy-csv --job-name hps2015_2016_inj_95CL --partition milano --account hps:hps-prod --time 24:00:00 --memory 8G --output submit_2015_2016_injection_95CL.slurm
+hps-gpr slurm-gen-inject --config study_configs/config_2015_2016_combined_blind1p96_95CL_10k_injection.yaml --datasets 2015,2016,combined --masses 0.025,0.030,0.040,0.050,0.065,0.080,0.095,0.115,0.135,0.150,0.170,0.200 --strengths s1,s2,s3,s5 --n-toys 10000 --no-write-toy-csv --job-name hps2015_2016_inj_95CL --partition roma --account hps:hps-prod --time 24:00:00 --memory 8G --output submit_2015_2016_injection_95CL.slurm
 bash submit_injection_all.sh
 ```
 
 Notes:
 - In `inj_strength_mode: sigmaA`, both `--strengths 1,2,3,5` and `--strengths s1,s2,s3,s5` are valid.
 - Each generated `(dataset, mass, strength)` job now runs only that requested strength (no implicit rerun of all configured strengths).
-- `inject-plot` can run in summary-only mode from `inj_extract_summary_*.csv`; toy-only diagnostics still require `inj_extract_toys_*.csv`.
+- `inject-plot` can run in summary-only mode from `inj_extract_summary_*.csv`; pull histograms require `inj_extract_toys_*.csv`, while Z-calibration residual panels can use summary columns (`Zhat_mean`, `Zhat_q16`, `Zhat_q84`) when available.
 
 ## Injection output policy and file-size scaling
 

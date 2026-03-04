@@ -28,7 +28,14 @@ from .evaluation import (
 )
 from .scan import run_scan, union_scan_grid
 from .bands import expected_ul_bands_for_dataset, expected_ul_bands_for_combination
-from .injection import inject_counts, run_injection_extraction, run_injection_extraction_toys, summarize_injection_grid
+from .injection import (
+    inject_counts,
+    run_injection_extraction,
+    run_injection_extraction_toys,
+    run_injection_extraction_streaming,
+    run_injection_extraction_streaming_combined,
+    summarize_injection_grid,
+)
 
 __all__ = [
     # Config
@@ -74,6 +81,8 @@ __all__ = [
     "inject_counts",
     "run_injection_extraction",
     "run_injection_extraction_toys",
+    "run_injection_extraction_streaming",
+    "run_injection_extraction_streaming_combined",
     "summarize_injection_grid",
     # Plotting
     "set_plot_style",

@@ -280,7 +280,30 @@ def bands(config, dataset, n_toys, output_dir):
     default=None,
     help="Write per-toy CSV tables (inj_extract_toys_*.csv). Defaults to config inj_write_toy_csv.",
 )
-def inject(config, dataset, masses, strengths, n_toys, output_dir, write_toy_csv):
+@click.option(
+    "--stream-aggregate",
+    "stream_aggregate",
+    flag_value=True,
+    default=None,
+    help="Enable streaming toy aggregation (default: value from config).",
+)
+@click.option(
+    "--legacy-toys",
+    "stream_aggregate",
+    flag_value=False,
+    help="Use legacy full toy-table accumulation workflow.",
+)
+@click.option(
+    "--aggregate-every",
+    type=int,
+    help="Streaming aggregation batch size (toys). Overrides config inj_aggregate_every.",
+)
+@click.option(
+    "--toy-workers",
+    type=int,
+    help="Per-point toy workers for streaming mode. Overrides config inj_n_workers.",
+)
+def inject(config, dataset, masses, strengths, n_toys, output_dir, write_toy_csv, stream_aggregate, aggregate_every, toy_workers):
     """Run injection/extraction study."""
     import pandas as pd
 
@@ -288,6 +311,8 @@ def inject(config, dataset, masses, strengths, n_toys, output_dir, write_toy_csv
     from .dataset import make_datasets
     from .injection import (
         run_injection_extraction_toys,
+        run_injection_extraction_streaming,
+        run_injection_extraction_streaming_combined,
         summarize_injection_grid,
         combine_injection_toy_tables,
         _combined_mass_support_summary,
@@ -310,6 +335,14 @@ def inject(config, dataset, masses, strengths, n_toys, output_dir, write_toy_csv
         cfg.output_dir = output_dir
     if write_toy_csv is not None:
         cfg.inj_write_toy_csv = bool(write_toy_csv)
+    if aggregate_every is not None:
+        cfg.inj_aggregate_every = int(max(1, aggregate_every))
+    if toy_workers is not None:
+        cfg.inj_n_workers = int(max(1, toy_workers))
+    if stream_aggregate is None:
+        stream_aggregate = bool(getattr(cfg, "inj_stream_aggregate", True))
+    else:
+        stream_aggregate = bool(stream_aggregate)
 
     cfg.ensure_output_dir()
     datasets = make_datasets(cfg)
@@ -336,53 +369,93 @@ def inject(config, dataset, masses, strengths, n_toys, output_dir, write_toy_csv
         print("Running combined injection study over all enabled datasets")
         print(f"Masses: {mass_list}")
         print(f"Strengths: {strength_list}")
+        summary_frames = []
+        zcal_input = pd.DataFrame()
+        zcal_semantic = "summary q16--q84"
 
-        df_map = {}
-        for key, ds in datasets.items():
-            print(f"  -> {ds.label}")
-            df_map[key] = run_injection_extraction_toys(
-                ds,
+        if stream_aggregate:
+            print(
+                "[inj] streaming aggregation enabled: "
+                f"aggregate_every={int(cfg.inj_aggregate_every)}, "
+                f"toy_workers={int(cfg.inj_n_workers)}, backend={str(cfg.inj_parallel_backend)}"
+            )
+            dsum_map, dsum_c = run_injection_extraction_streaming_combined(
+                datasets,
                 cfg,
                 masses=mass_list,
                 strengths=[float(x) for x in strength_list],
                 n_toys=int(n_toys),
                 strengths_mode=strengths_mode,
                 write_toy_csv=cfg.inj_write_toy_csv,
+                aggregate_every=int(cfg.inj_aggregate_every),
+                n_workers=int(cfg.inj_n_workers),
+                parallel_backend=str(cfg.inj_parallel_backend),
+                threads_per_worker=int(cfg.inj_threads_per_worker),
             )
+            for key, dsum in dsum_map.items():
+                if dsum.empty:
+                    continue
+                dsum["dataset"] = str(key)
+                dsum.to_csv(os.path.join(outdir, f"inj_extract_summary_{key}.csv"), index=False)
+                summary_frames.append(dsum)
+            if not dsum_c.empty:
+                dsum_c["dataset"] = "combined"
+                dsum_c.to_csv(os.path.join(outdir, "inj_extract_summary_combined.csv"), index=False)
+                summary_frames.append(dsum_c)
+        else:
+            print("[inj] legacy toy-table mode enabled (--legacy-toys)")
+            df_map = {}
+            for key, ds in datasets.items():
+                print(f"  -> {ds.label}")
+                df_map[key] = run_injection_extraction_toys(
+                    ds,
+                    cfg,
+                    masses=mass_list,
+                    strengths=[float(x) for x in strength_list],
+                    n_toys=int(n_toys),
+                    strengths_mode=strengths_mode,
+                    write_toy_csv=cfg.inj_write_toy_csv,
+                )
 
-        mass_policy = str(getattr(cfg, "inj_combined_mass_policy", "intersection")).strip().lower()
-        min_n_contrib = int(getattr(cfg, "inj_combined_min_n_contrib", 2))
-        support = _combined_mass_support_summary(
-            df_map,
-            mass_policy=mass_policy,
-            min_n_contrib=min_n_contrib,
-        )
-        print(format_combined_mass_support_summary(support))
+            mass_policy = str(getattr(cfg, "inj_combined_mass_policy", "intersection")).strip().lower()
+            min_n_contrib = int(getattr(cfg, "inj_combined_min_n_contrib", 2))
+            support = _combined_mass_support_summary(
+                df_map,
+                mass_policy=mass_policy,
+                min_n_contrib=min_n_contrib,
+            )
+            print(format_combined_mass_support_summary(support))
 
-        df_comb_toys = combine_injection_toy_tables(
-            df_map,
-            mass_policy=mass_policy,
-            min_n_contrib=min_n_contrib,
-        )
-        if not df_comb_toys.empty and bool(cfg.inj_write_toy_csv):
-            comb_toys_path = os.path.join(outdir, "inj_extract_toys_combined.csv")
-            df_comb_toys.to_csv(comb_toys_path, index=False)
-            print(f"Wrote {comb_toys_path}")
-        elif not df_comb_toys.empty:
-            print("Skipped writing inj_extract_toys_combined.csv (--no-write-toy-csv)")
+            df_comb_toys = combine_injection_toy_tables(
+                df_map,
+                mass_policy=mass_policy,
+                min_n_contrib=min_n_contrib,
+            )
+            if not df_comb_toys.empty and bool(cfg.inj_write_toy_csv):
+                comb_toys_path = os.path.join(outdir, "inj_extract_toys_combined.csv")
+                df_comb_toys.to_csv(comb_toys_path, index=False)
+                print(f"Wrote {comb_toys_path}")
+            elif not df_comb_toys.empty:
+                print("Skipped writing inj_extract_toys_combined.csv (--no-write-toy-csv)")
 
-        summary_frames = []
-        for key, dfi in df_map.items():
-            dsum = summarize_injection_grid(dfi)
-            dsum["dataset"] = str(key)
-            summary_frames.append(dsum)
-            dsum.to_csv(os.path.join(outdir, f"inj_extract_summary_{key}.csv"), index=False)
+            for key, dfi in df_map.items():
+                dsum = summarize_injection_grid(dfi)
+                dsum["dataset"] = str(key)
+                summary_frames.append(dsum)
+                dsum.to_csv(os.path.join(outdir, f"inj_extract_summary_{key}.csv"), index=False)
 
-        if not df_comb_toys.empty:
-            dsum_c = summarize_injection_grid(df_comb_toys)
-            dsum_c["dataset"] = "combined"
-            summary_frames.append(dsum_c)
-            dsum_c.to_csv(os.path.join(outdir, "inj_extract_summary_combined.csv"), index=False)
+            if not df_comb_toys.empty:
+                dsum_c = summarize_injection_grid(df_comb_toys)
+                dsum_c["dataset"] = "combined"
+                summary_frames.append(dsum_c)
+                dsum_c.to_csv(os.path.join(outdir, "inj_extract_summary_combined.csv"), index=False)
+
+            zcal_input = (
+                pd.concat([*df_map.values(), df_comb_toys], ignore_index=True)
+                if not df_comb_toys.empty
+                else pd.concat([*df_map.values()], ignore_index=True)
+            )
+            zcal_semantic = "toy spread"
 
         df_sum = pd.concat(summary_frames, ignore_index=True) if summary_frames else pd.DataFrame()
         if not df_sum.empty:
@@ -402,11 +475,14 @@ def inject(config, dataset, masses, strengths, n_toys, output_dir, write_toy_csv
                 plot_coverage(sub, xvar=xvar, title=f"{ds_key}: coverage", outpath=os.path.join(outdir, f"coverage_{ds_key}.png"))
                 plot_injection_heatmap(sub, value_col="pull_mean", dataset_filter=ds_key, title=f"{ds_key}: mean pull heatmap", outpath=os.path.join(outdir, f"heatmap_pull_mean_{ds_key}.png"))
                 plot_injection_heatmap(sub, value_col="pull_std", dataset_filter=ds_key, title=f"{ds_key}: pull width heatmap", outpath=os.path.join(outdir, f"heatmap_pull_width_{ds_key}.png"))
+
+            if zcal_input.empty:
+                zcal_input = df_sum
             plot_z_calibration_residual(
-                pd.concat([*df_map.values(), df_comb_toys], ignore_index=True) if not df_comb_toys.empty else pd.concat([*df_map.values()], ignore_index=True),
+                zcal_input,
                 outdir=outdir,
                 acceptance_bands=[0.5, 1.0],
-                band_semantic="toy spread",
+                band_semantic=zcal_semantic,
             )
             plot_delta_z_minus_pull_vs_injected_sigma(
                 df_sum,
@@ -422,18 +498,42 @@ def inject(config, dataset, masses, strengths, n_toys, output_dir, write_toy_csv
         print(f"Running injection study for {ds.label}")
         print(f"Masses: {mass_list}")
         print(f"Strengths: {strength_list}")
+        if stream_aggregate:
+            print(
+                "[inj] streaming aggregation enabled: "
+                f"aggregate_every={int(cfg.inj_aggregate_every)}, "
+                f"toy_workers={int(cfg.inj_n_workers)}, backend={str(cfg.inj_parallel_backend)}"
+            )
+            df_sum = run_injection_extraction_streaming(
+                ds,
+                cfg,
+                masses=mass_list,
+                strengths=[float(x) for x in strength_list],
+                n_toys=int(n_toys),
+                strengths_mode=strengths_mode,
+                write_toy_csv=cfg.inj_write_toy_csv,
+                aggregate_every=int(cfg.inj_aggregate_every),
+                n_workers=int(cfg.inj_n_workers),
+                parallel_backend=str(cfg.inj_parallel_backend),
+                threads_per_worker=int(cfg.inj_threads_per_worker),
+            )
+            zcal_input = df_sum
+            zcal_semantic = "summary q16--q84"
+        else:
+            print("[inj] legacy toy-table mode enabled (--legacy-toys)")
+            df = run_injection_extraction_toys(
+                ds,
+                cfg,
+                masses=mass_list,
+                strengths=[float(x) for x in strength_list],
+                n_toys=int(n_toys),
+                strengths_mode=strengths_mode,
+                write_toy_csv=cfg.inj_write_toy_csv,
+            )
+            df_sum = summarize_injection_grid(df)
+            zcal_input = df
+            zcal_semantic = "toy spread"
 
-        df = run_injection_extraction_toys(
-            ds,
-            cfg,
-            masses=mass_list,
-            strengths=[float(x) for x in strength_list],
-            n_toys=int(n_toys),
-            strengths_mode=strengths_mode,
-            write_toy_csv=cfg.inj_write_toy_csv,
-        )
-
-        df_sum = summarize_injection_grid(df)
         out_sum = os.path.join(outdir, f"inj_extract_summary_{ds.key}.csv")
         df_sum.to_csv(out_sum, index=False)
         out_sum_all = os.path.join(outdir, "inj_extract_summary_all.csv")
@@ -447,18 +547,17 @@ def inject(config, dataset, masses, strengths, n_toys, output_dir, write_toy_csv
         plot_injection_heatmap(df_sum, value_col="pull_mean", title=f"{ds.label}: mean pull heatmap", outpath=os.path.join(outdir, f"heatmap_pull_mean_{ds.key}.png"))
         plot_injection_heatmap(df_sum, value_col="pull_std", title=f"{ds.label}: pull width heatmap", outpath=os.path.join(outdir, f"heatmap_pull_width_{ds.key}.png"))
         plot_z_calibration_residual(
-            df,
+            zcal_input,
             outdir=outdir,
             acceptance_bands=[0.5, 1.0],
             dataset_order=[str(ds.key)],
-            band_semantic="toy spread",
+            band_semantic=zcal_semantic,
         )
         plot_delta_z_minus_pull_vs_injected_sigma(
             df_sum,
             outpath=os.path.join(outdir, f"delta_z_minus_pull_vs_inj_sigma_{ds.key}.png"),
         )
 
-        print(f"\nToy-level rows: {len(df)}")
         print(f"Summary rows: {len(df_sum)}")
         print(f"Wrote summary table: {out_sum}")
         print(f"Wrote unified summary table: {out_sum_all}")
@@ -808,6 +907,7 @@ def inject_plot(input_dir, output_dir, dataset, write_merged_toys):
 
     by_dataset = {}
     by_dataset_summary = {}
+    toy_like_cols = {"A_hat", "sigma_A", "pull_param", "Zhat"}
     for fp in toy_paths:
         base = os.path.basename(fp)
         ds_token = base.replace("inj_extract_toys_", "").replace(".csv", "").strip()
@@ -840,6 +940,11 @@ def inject_plot(input_dir, output_dir, dataset, write_merged_toys):
             continue
         if "dataset" not in dfi.columns:
             dfi["dataset"] = ds
+        # Guardrail for mislabeled summary files that actually contain toy-level rows.
+        if len(toy_like_cols.intersection(set(dfi.columns))) >= 3:
+            print(f"Warning: {fp} appears toy-level despite summary filename; treating as toy table.")
+            by_dataset.setdefault(ds, []).append(dfi)
+            continue
         by_dataset_summary.setdefault(ds, []).append(dfi)
 
     if not by_dataset and not by_dataset_summary:
@@ -986,7 +1091,15 @@ def inject_plot(input_dir, output_dir, dataset, write_merged_toys):
             plot_combined_search_power(toys_all, outdir=outdir)
         except Exception as e:
             print(f"Warning: combined-search power plots failed: {e}")
-    elif {"dataset", "mass_GeV", "sigmaA_ref"}.issubset(set(df_sum.columns)):
+    else:
+        plot_z_calibration_residual(
+            df_sum,
+            outdir=outdir,
+            acceptance_bands=[0.5, 1.0],
+            band_semantic="summary q16--q84",
+        )
+
+    if (not all_toys) and {"dataset", "mass_GeV", "sigmaA_ref"}.issubset(set(df_sum.columns)):
         try:
             plot_combined_search_power(df_sum, outdir=outdir)
         except Exception as e:

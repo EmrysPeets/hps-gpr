@@ -2,7 +2,7 @@
 #SBATCH --job-name=hps2015_10k
 #SBATCH --array=0-110
 #SBATCH --account hps:hps-prod
-#SBATCH --partition=milano
+#SBATCH --partition=roma
 #SBATCH --time=24:00:00
 #SBATCH --mem=8G
 #SBATCH --output=/sdf/scratch/hps/epeets/output/logs/%A_%a.out
