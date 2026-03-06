@@ -318,6 +318,28 @@ for z in 3 5 7; do
 done
 ```
 
+Ready-to-run SLURM launcher scripts are also included at the repo top level if you prefer a single command that submits the 3 sigma / 5 sigma / 7 sigma jobs for you:
+
+```bash
+# Submit 2015 extraction-display jobs
+bash submit_2015_extraction_display.sh
+
+# Submit 2016 10% extraction-display jobs
+bash submit_2016_10pct_extraction_display.sh
+
+# Submit combined 2015+2016 extraction-display jobs
+bash submit_2015_2016_combined_extraction_display.sh
+```
+
+Those scripts:
+- submit one SLURM job per injected strength
+- default to `roma`, `hps:hps-prod`, `04:00:00`, and `6G`
+- can be retuned from bash, for example:
+
+```bash
+PARTITION=roma ACCOUNT=hps:hps-prod TIME_LIMIT=06:00:00 MEMORY=8G SIGMAS="3 5 7" bash submit_2015_2016_combined_extraction_display.sh
+```
+
 On SLURM the same idea becomes one task per sigma level, for example:
 
 ```bash
@@ -487,6 +509,12 @@ outputs/
 │   ├── z_calibration_residual_comparison.png
 │   ├── combined_search_power_scenarios.png
 │   └── combined_signal_allocation_mXXXMeV.png/.csv
+├── extraction_display/             # Created by `hps-gpr extract-display`
+│   ├── 2015/ or 2016/ or combined/
+│   │   ├── extract_display_<tag>.png
+│   │   ├── extract_display_<tag>.pdf
+│   │   └── extract_display_<tag>.json
+│   └── ...                         # tag includes mass and injected sigma level
 └── mXXXMeV/                        # Optional per-mass folders (if save_per_mass_folders=true)
     ├── <dataset>/
     │   ├── fit_full.png            # Full-range fit diagnostic
