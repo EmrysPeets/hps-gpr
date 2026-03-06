@@ -453,14 +453,18 @@ def plot_single_extraction_display(
     x_win = display.x_win
 
     yerr_full = np.sqrt(np.clip(display.y_full_toy, 1.0, None))
+    gp_color = "#1f77b4"
+    prof_bkg_color = "#d62728"
+    blind_fit_color = "#2ca02c"
+
     ax_full.errorbar(x_full, display.y_full_toy, yerr=yerr_full, fmt="o", ms=2.6, lw=0.9, color="black", label="Pseudoexperiment", zorder=4)
-    ax_full.plot(x_full, display.mu_full_plot, color="#1f77b4", lw=1.6, label="GP background", zorder=5)
+    ax_full.plot(x_full, display.mu_full_plot, color=gp_color, lw=1.6, label="GP background", zorder=5)
     ax_full.plot(x_full, display.mu_full_plot + display.signal_curve_injected, color="#C44E52", lw=1.5, ls=":", label="Injected mean", zorder=6)
     _shade_blind_window(ax_full, pred.blind, blind_train=blind_train, alpha=float(blind_shade_alpha) * 0.8, color=str(blind_shade_color), zorder=0)
     ax_full.set_ylabel("Counts / bin")
     _set_title_above(
         ax_full,
-        f"{display.ctx.ds.label} — Injected {display.inj_nsigma:.0f} sigma [{display.Nsig_realized_total} realized events] at {display.ctx.mass * 1e3:.0f} MeV",
+        f"{display.ctx.ds.label} Pseudoexperiment",
     )
     ax_full.legend(loc="upper left", frameon=True, fontsize=9)
     _grid(ax_full)
@@ -470,9 +474,9 @@ def plot_single_extraction_display(
     yz = display.y_full_toy[m_zoom]
     muz = display.mu_full_plot[m_zoom]
     ax_fit.errorbar(xz, yz, yerr=np.sqrt(np.clip(yz, 1.0, None)), fmt="o", ms=3.0, lw=0.9, color="black", label="Pseudoexperiment", zorder=4)
-    ax_fit.plot(xz, muz, color="#1f77b4", lw=1.5, label="GP background", zorder=5)
-    ax_fit.plot(x_win, display.b_fit, color="#9467bd", lw=1.5, label="Profiled background", zorder=6)
-    ax_fit.plot(x_win, display.lambda_fit, color="#6A3D9A", lw=1.7, label="Blind-window fit", zorder=7)
+    ax_fit.plot(xz, muz, color=gp_color, lw=1.5, label="GP background", zorder=5)
+    ax_fit.plot(x_win, display.b_fit, color=prof_bkg_color, lw=1.5, label="Profiled background", zorder=6)
+    ax_fit.plot(x_win, display.lambda_fit, color=blind_fit_color, lw=1.7, label="Blind-window fit", zorder=7)
     _shade_blind_window(ax_fit, pred.blind, blind_train=blind_train, alpha=float(blind_shade_alpha), color=str(blind_shade_color), zorder=0)
     ax_fit.set_xlim(float(xz[0]), float(xz[-1]))
     ax_fit.set_ylabel("Counts / bin")
@@ -549,6 +553,9 @@ def plot_combined_extraction_display(
     ax_info.axis("off")
 
     colors = {"2015": "#0072B2", "2016": "#E69F00", "combined": "#111111"}
+    gp_color = "#1f77b4"
+    prof_bkg_color = "#d62728"
+    blind_fit_colors = {"2015": "#2ca02c", "2016": "#9467bd"}
     sum_A_inj = 0.0
     sum_A_hat = 0.0
 
@@ -564,9 +571,9 @@ def plot_combined_extraction_display(
         c = colors.get(str(disp.ctx.ds.key), f"C{idx}")
 
         ax_fit[idx].errorbar(xz, yz, yerr=np.sqrt(np.clip(yz, 1.0, None)), fmt="o", ms=3.0, lw=0.9, color="black", label="Pseudoexperiment", zorder=4)
-        ax_fit[idx].plot(xz, muz, color="#1f77b4", lw=1.5, label="GP background", zorder=5)
-        ax_fit[idx].plot(x_win, disp.b_fit, color="#9467bd", lw=1.4, label="Profiled background", zorder=6)
-        ax_fit[idx].plot(x_win, disp.lambda_fit, color=c, lw=1.8, label="Blind-window fit", zorder=7)
+        ax_fit[idx].plot(xz, muz, color=gp_color, lw=1.5, label="GP background", zorder=5)
+        ax_fit[idx].plot(x_win, disp.b_fit, color=prof_bkg_color, lw=1.4, label="Profiled background", zorder=6)
+        ax_fit[idx].plot(x_win, disp.lambda_fit, color=blind_fit_colors.get(str(disp.ctx.ds.key), c), lw=1.8, label="Blind-window fit", zorder=7)
         _shade_blind_window(ax_fit[idx], pred.blind, blind_train=blind_train, alpha=float(blind_shade_alpha), color=str(blind_shade_color), zorder=0)
         ax_fit[idx].set_xlim(float(xz[0]), float(xz[-1]))
         ax_fit[idx].set_ylabel("Counts / bin")
