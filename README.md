@@ -254,6 +254,9 @@ hps-gpr extract-display --config study_configs/config_2016_extraction_display_v1
 
 # Combined 2015+2016 representative extraction displays
 hps-gpr extract-display --config study_configs/config_2015_2016_combined_extraction_display_v15p8.yaml
+
+# Optional: override the sigma-level list for this run only
+hps-gpr extract-display --config study_configs/config_2015_extraction_display_v15p8.yaml --strengths 5
 ```
 
 What these plots mean:
@@ -266,7 +269,45 @@ To customize later:
 - edit `extraction_display_masses_gev` in the YAML to add or remove mass points
 - edit `extraction_display_sigma_multipliers` to change the injected `n sigma` values
 - for the combined config, edit `extraction_display_dataset_keys` if you want to extend the common-signal display to a different enabled dataset set
+- use `--strengths` on the CLI when you want a one-off subset without editing the YAML
 - outputs are written under `output_dir/extraction_display/<dataset-or-combined>/` as both PNG and PDF, with a JSON sidecar for the numerical values shown in the figure
+
+Batch workflow tip:
+- extraction displays are independent across injected sigma level, so for cluster production it is natural to submit one job per strength and let each job render all requested masses for that strength only
+- this avoids running `3 sigma`, `5 sigma`, and `7 sigma` serially in one long walltime slot
+
+Example shell pattern:
+
+```bash
+for z in 3 5 7; do
+  hps-gpr extract-display \
+    --config study_configs/config_2015_2016_combined_extraction_display_v15p8.yaml \
+    --strengths "${z}" \
+    --output-dir "outputs/extraction_display_combined_z${z}"
+done
+```
+
+On SLURM the same idea becomes one task per sigma level, for example:
+
+```bash
+#!/bin/bash
+#SBATCH --job-name=hps_exdisp_combined
+#SBATCH --partition=roma
+#SBATCH --account=hps:hps-prod
+#SBATCH --time=04:00:00
+#SBATCH --memory=6G
+#SBATCH --array=0-2
+
+SIGMAS=(3 5 7)
+Z="${SIGMAS[$SLURM_ARRAY_TASK_ID]}"
+
+hps-gpr extract-display \
+  --config study_configs/config_2015_2016_combined_extraction_display_v15p8.yaml \
+  --strengths "${Z}" \
+  --output-dir "outputs/extraction_display_combined_z${Z}"
+```
+
+That layout keeps the outputs separated by injected strength and gives a straightforward reviewer-production path: one mass set per YAML, one significance level per batch job.
 
 ### SLURM Batch Processing
 

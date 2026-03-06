@@ -644,7 +644,13 @@ def plot_combined_extraction_display(
         json.dump(display.to_metadata(), fh, indent=2, sort_keys=True)
 
 
-def run_extraction_display_suite(config, *, dataset_key: Optional[str] = None, output_dir: Optional[str] = None) -> List[str]:
+def run_extraction_display_suite(
+    config,
+    *,
+    dataset_key: Optional[str] = None,
+    output_dir: Optional[str] = None,
+    sigma_multipliers: Optional[Sequence[float]] = None,
+) -> List[str]:
     datasets = make_datasets(config)
     if not datasets:
         raise RuntimeError("No datasets enabled for extraction display")
@@ -652,7 +658,8 @@ def run_extraction_display_suite(config, *, dataset_key: Optional[str] = None, o
     masses = [float(m) for m in getattr(config, "extraction_display_masses_gev", [])]
     if not masses:
         raise RuntimeError("Config field extraction_display_masses_gev is empty")
-    sigmas = [float(z) for z in getattr(config, "extraction_display_sigma_multipliers", [3.0, 5.0, 7.0])]
+    raw_sigmas = sigma_multipliers if sigma_multipliers is not None else getattr(config, "extraction_display_sigma_multipliers", [3.0, 5.0, 7.0])
+    sigmas = [float(z) for z in raw_sigmas]
     if not sigmas:
         raise RuntimeError("Config field extraction_display_sigma_multipliers is empty")
 

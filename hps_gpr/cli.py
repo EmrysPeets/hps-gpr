@@ -1129,7 +1129,12 @@ def inject_plot(input_dir, output_dir, dataset, write_merged_toys):
     type=click.Path(),
     help="Override extraction-display output directory",
 )
-def extract_display(config, dataset, output_dir):
+@click.option(
+    "--strengths",
+    type=str,
+    help="Optional comma-separated injected sigma levels for this run (e.g. 3,5,7 or s3,s5,s7). Overrides extraction_display_sigma_multipliers.",
+)
+def extract_display(config, dataset, output_dir, strengths):
     """Generate reviewer-facing extraction displays from one pseudoexperiment per point."""
     from .config import load_config
     from .extraction_display import run_extraction_display_suite
@@ -1143,6 +1148,7 @@ def extract_display(config, dataset, output_dir):
         cfg,
         dataset_key=(dataset.lower() if dataset else None),
         output_dir=(os.path.join(cfg.output_dir, "extraction_display", dataset.lower()) if dataset and output_dir else None),
+        sigma_multipliers=(_parse_strength_tokens(strengths) if strengths else None),
     )
     print(f"Wrote {len(written)} extraction display plot(s)")
     for path in written:
