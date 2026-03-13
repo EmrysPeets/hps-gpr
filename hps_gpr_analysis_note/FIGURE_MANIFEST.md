@@ -40,10 +40,10 @@ standalone project.
 | `upper_limit_figs/2021_0pt03pct/ul_bands_eps2_obsexp.png` | not yet exported | placeholder | Planned 2021 0.03% `\eps^2` bands. |
 | `upper_limit_figs/2021_1pct/ul_bands_signal_yield_obsexp.png` | not yet exported | placeholder | Planned 2021 1% signal-yield bands. |
 | `upper_limit_figs/2021_1pct/ul_bands_eps2_obsexp.png` | not yet exported | placeholder | Planned 2021 1% `\eps^2` bands. |
-| `upper_limit_figs/2015_2016_2021_1pct_combined/ul_bands_signal_yield_obsexp.png` | not yet exported | placeholder | Planned 2015+2016+2021 1% combined signal-yield bands. |
-| `upper_limit_figs/2015_2016_2021_1pct_combined/ul_bands_eps2_obsexp.png` | not yet exported | placeholder | Planned 2015+2016+2021 1% combined `\eps^2` bands. |
-| `upper_limit_figs/first_round_unblinding_2015_2016_2021_10pct/ul_bands_signal_yield_obsexp.png` | not yet exported | placeholder | Planned first-round unblinding signal-yield bands. |
-| `upper_limit_figs/first_round_unblinding_2015_2016_2021_10pct/ul_bands_eps2_obsexp.png` | not yet exported | placeholder | Planned first-round unblinding `\eps^2` bands. |
+| `upper_limit_figs/2015_2016_2021_1pct_combined/ul_bands_signal_yield_obsexp.png` | not yet exported | placeholder | Planned 2015+2016 10%+2021 1% combined signal-yield bands. |
+| `upper_limit_figs/2015_2016_2021_1pct_combined/ul_bands_eps2_obsexp.png` | not yet exported | placeholder | Planned 2015+2016 10%+2021 1% combined `\eps^2` bands. |
+| `upper_limit_figs/first_round_unblinding_2015_2016_2021_10pct/ul_bands_signal_yield_obsexp.png` | not yet exported | placeholder | Planned 2015+2016 10%+2021 10% first-round unblinding signal-yield bands. |
+| `upper_limit_figs/first_round_unblinding_2015_2016_2021_10pct/ul_bands_eps2_obsexp.png` | not yet exported | placeholder | Planned 2015+2016 10%+2021 10% first-round unblinding `\eps^2` bands. |
 
 ## Significance figures
 

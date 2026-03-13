@@ -76,6 +76,12 @@ For ROOT file paths/histogram names used in the legacy validation notebook workf
 use [`v15_8_HPS_simultaneous_GP_notebook_quality.ipynb`](v15_8_HPS_simultaneous_GP_notebook_quality.ipynb)
 as the reference map (especially for local path conventions and histogram-key checks).
 
+Current 2021 production defaults in this repo use:
+- ROOT file: `/sdf/home/e/epeets/run/2021_bump/preselection_invM_psumlt2p8_hists.root`
+- histogram: `h_invM_8000`
+- scan window: `30-250 MeV`
+- resolution-scaled GP upper length-scale cap: `9 sigma_m`
+
 ### Example Configuration
 
 ```yaml
@@ -423,6 +429,75 @@ hps-gpr slurm-gen \
   --time 24:00:00 \
   --memory 8G \
   --output submit_2015_2016_combined_bands_10k.slurm
+```
+
+For the staged `1%` pass, the recommended order is to finish the three individual
+summary suites first, then launch the three-way combination:
+
+```bash
+# 1. 2015-only limit bands (111 mass points => 111 jobs)
+hps-gpr slurm-gen \
+  --config config_2015_10k.yaml \
+  --n-jobs 111 \
+  --job-name hps2015_bands_10k \
+  --partition roma \
+  --account hps:hps-prod \
+  --time 24:00:00 \
+  --memory 8G \
+  --output submit_2015_bands_10k.slurm
+
+./submit_all.sh submit_2015_bands_10k.slurm
+hps-gpr slurm-combine --output-dir outputs/prod_2015_10k_3
+
+# 2. 2016 10% limit bands (176 mass points => 176 jobs)
+hps-gpr slurm-gen \
+  --config config_2016_10pct_10k.yaml \
+  --n-jobs 176 \
+  --job-name hps2016_10pct_bands_10k \
+  --partition roma \
+  --account hps:hps-prod \
+  --time 24:00:00 \
+  --memory 8G \
+  --output submit_2016_10pct_bands_10k.slurm
+
+./submit_all.sh submit_2016_10pct_bands_10k.slurm
+hps-gpr slurm-combine --output-dir outputs/prod_2016_10pct_10k
+
+# 3. 2021 1% limit bands (30-250 MeV => 221 mass points => 221 jobs)
+hps-gpr slurm-gen \
+  --config config_2021_1pct_10k.yaml \
+  --n-jobs 221 \
+  --job-name hps2021_1pct_bands_10k \
+  --partition roma \
+  --account hps:hps-prod \
+  --time 24:00:00 \
+  --memory 8G \
+  --output submit_2021_1pct_bands_10k.slurm
+
+./submit_all.sh submit_2021_1pct_bands_10k.slurm
+hps-gpr slurm-combine --output-dir outputs/prod_2021_1pct_10k
+
+# 4. Combined 2015 + 2016 10% + 2021 1% limit bands
+# Union scan window: 20-250 MeV => 231 mass points => 231 jobs
+hps-gpr slurm-gen \
+  --config config_2015_2016_10pct_2021_1pct_10k.yaml \
+  --n-jobs 231 \
+  --job-name hps2015_2016_10pct_2021_1pct_bands_10k \
+  --partition roma \
+  --account hps:hps-prod \
+  --time 24:00:00 \
+  --memory 8G \
+  --output submit_2015_2016_10pct_2021_1pct_bands_10k.slurm
+
+./submit_all.sh submit_2015_2016_10pct_2021_1pct_bands_10k.slurm
+hps-gpr slurm-combine --output-dir outputs/prod_2015_2016_10pct_2021_1pct_10k_bands
+```
+
+If you want quick local non-SLURM smoke passes before the full productions:
+
+```bash
+hps-gpr scan --config config_2021_1pct_10k.yaml
+hps-gpr scan --config config_2015_2016_10pct_2021_1pct_10k.yaml
 ```
 
 

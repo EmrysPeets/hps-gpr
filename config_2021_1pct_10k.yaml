@@ -11,7 +11,7 @@ range_2015:
 - 0.13
 range_2016:
 - 0.035
-- 0.21
+- 0.210
 range_2021:
 - 0.03
 - 0.25
@@ -41,9 +41,9 @@ radiative_penalty_on: false
 radiative_penalty_frac_2015: 0.07
 radiative_penalty_frac_2016: 0.07
 radiative_penalty_frac_2021: 0.07
-enable_2015: true
-enable_2016: true
-enable_2021: false
+enable_2015: false
+enable_2016: false
+enable_2021: true
 kernel_constant_init: 1.0
 kernel_constant_bounds:
 - 1.0e-08
@@ -102,28 +102,19 @@ ul_bands_refit_gp_on_toy: false
 ul_bands_refit_gp_restarts: 0
 ul_bands_refit_gp_optimize: true
 ul_bands_train_exclude_nsigma: 1.64
-do_combined_bands: true
-combined_bands_n_toys: 10000
+do_combined_bands: false
+combined_bands_n_toys: 500
 combined_bands_seed: 24680
 data_visibility:
   '2015': observed
   '2016': observed
   '2021': observed
 inject_signal: false
-inj_dataset_key: '2015'
+inj_dataset_key: '2021'
 inj_masses_gev:
-- 0.025
 - 0.03
-- 0.04
-- 0.05
-- 0.065
-- 0.08
-- 0.095
-- 0.115
-- 0.135
-- 0.15
-- 0.17
-- 0.2
+- 0.06
+- 0.09
 inj_strengths:
 - 0
 - 100
@@ -134,7 +125,7 @@ inj_strengths:
 - 5000
 inj_mode: multinomial
 extract_allow_negative: true
-inj_strength_mode: sigmaA
+inj_strength_mode: absolute
 inj_sigma_a_source: asimov
 inj_shape_mode: full
 inj_refit_gp_on_toy: false
@@ -142,17 +133,18 @@ inj_refit_gp_restarts: 0
 inj_refit_gp_optimize: true
 inj_train_exclude_nsigma: 1.64
 inj_sigma_multipliers:
+- 0.0
 - 1.0
 - 2.0
 - 3.0
 - 5.0
 mvn_trunc_method: reject_then_clip
 mvn_trunc_max_tries: 80
-do_combined: true
+do_combined: false
 eps2_lrt_scale: 1.0e10
-run_limit_bands_on: None
+run_limit_bands_on: '2021'
 make_eps2_bands: true
-output_dir: outputs/prod_2015_2016_combined_10k_bands
+output_dir: outputs/prod_2021_1pct_10k
 debug_print: true
 debug_max_errors: 10
 fail_fast: false

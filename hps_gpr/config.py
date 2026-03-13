@@ -22,7 +22,7 @@ class HistogramNames:
     """Histogram names within ROOT files."""
     hist_2015: str = "invariant_mass"
     hist_2016: str = "h_Minv_General_Final_1"
-    hist_2021: str = "unc_vtx_mass_hist"
+    hist_2021: str = "h_invM_8000"
 
 
 @dataclass
@@ -30,7 +30,7 @@ class AnalysisRanges:
     """Analysis mass ranges (GeV) for each dataset."""
     range_2015: Tuple[float, float] = (0.015, 0.140)
     range_2016: Tuple[float, float] = (0.035, 0.190)
-    range_2021: Tuple[float, float] = (0.035, 0.230)
+    range_2021: Tuple[float, float] = (0.030, 0.250)
 
 
 @dataclass
@@ -47,12 +47,12 @@ class Config:
     # Histogram names
     hist_2015: str = "invariant_mass"
     hist_2016: str = "h_Minv_General_Final_1"
-    hist_2021: str = "unc_vtx_mass_hist"
+    hist_2021: str = "h_invM_8000"
 
     # Analysis ranges (GeV)
     range_2015: Tuple[float, float] = (0.015, 0.140)
     range_2016: Tuple[float, float] = (0.035, 0.190)
-    range_2021: Tuple[float, float] = (0.035, 0.230)
+    range_2021: Tuple[float, float] = (0.030, 0.250)
     # Optional full histogram fit/training ranges (GeV).
     # If None, model training uses full histogram extent.
     data_range_2015: Optional[Tuple[float, float]] = None
@@ -114,7 +114,9 @@ class Config:
     kernel_ls_local_hi_cap_xrange_frac: Optional[float] = None
 
     # Per-dataset kernel overrides (empty dicts = use global factors)
-    kernel_ls_res_upper_factor_by_dataset: Dict[str, float] = field(default_factory=dict)
+    kernel_ls_res_upper_factor_by_dataset: Dict[str, float] = field(
+        default_factory=lambda: {"2021": 9.0}
+    )
     kernel_ls_res_lower_factor_by_dataset: Dict[str, float] = field(default_factory=dict)
     kernel_ls_bounds_by_dataset: Dict[str, Any] = field(default_factory=dict)
     kernel_ls_init_by_dataset: Dict[str, float] = field(default_factory=dict)
