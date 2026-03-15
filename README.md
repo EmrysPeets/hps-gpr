@@ -50,6 +50,22 @@ The package converts the original Jupyter notebook analysis into a modular, batc
    hps-gpr --help
    ```
 
+### Local Analysis Note Build
+
+The analysis note in `hps_gpr_analysis_note/` can be built locally with `tectonic`:
+
+```bash
+cd hps_gpr_analysis_note
+tectonic main.tex
+```
+
+That writes `hps_gpr_analysis_note/main.pdf`. The same folder is also upload-ready for Overleaf.
+If `tectonic` is not available on your machine, the lightweight macOS install is:
+
+```bash
+brew install tectonic
+```
+
 ## Configuration
 
 The analysis is configured via a YAML file. Copy the example configuration and modify it for your analysis:
@@ -167,7 +183,9 @@ hps-gpr inject --config my_config.yaml --dataset 2015 --masses 0.03,0.06,0.09 --
 The repository supports injection/extraction studies for:
 - **2015-only**
 - **2016 10%-only**
+- **2021 1%-only**
 - **2015+2016 combined**
+- **2015+2016 10%+2021 1% combined**
 
 Ready-to-run study configs live in `study_configs/` for both legacy 90% CL and new 95% CL settings (for blind widths 1.64 and 1.96).
 
@@ -192,6 +210,47 @@ bash submit_injection_all.sh
 
 # After jobs finish, merge flat CSV outputs and build publication-style summaries
 hps-gpr inject-plot --input-dir outputs/study_2015_2016_combined_w1p64_95CL/injection_flat --output-dir outputs/study_2015_2016_combined_w1p64_95CL/injection_summary
+```
+
+New 2021 1% and three-way combined copy/paste examples:
+
+```bash
+# 2021 1% injection/extraction study
+hps-gpr inject \
+  --config study_configs/config_2021_1pct_blind1p64_95CL_10k_injection.yaml \
+  --dataset 2021 \
+  --masses 0.040,0.060,0.080,0.100,0.120,0.160 \
+  --strengths 1,2,3,5 \
+  --n-toys 10000
+
+# Combined 2015 + 2016 10% + 2021 1% injection/extraction study
+# The YAML is configured for intersection-only masses where all three datasets contribute.
+hps-gpr inject \
+  --config study_configs/config_2015_2016_10pct_2021_1pct_blind1p64_95CL_10k_injection.yaml \
+  --dataset combined \
+  --masses 0.040,0.060,0.080,0.100,0.120 \
+  --strengths 1,2,3,5 \
+  --n-toys 10000
+
+# Batch production for the three-way study: generate per-dataset and combined outputs together
+hps-gpr slurm-gen-inject \
+  --config study_configs/config_2015_2016_10pct_2021_1pct_blind1p64_95CL_10k_injection.yaml \
+  --datasets 2015,2016,2021,combined \
+  --masses 0.040,0.060,0.080,0.100,0.120 \
+  --strengths s1,s2,s3,s5 \
+  --n-toys 10000 \
+  --no-write-toy-csv \
+  --job-name hps2015_2016_2021_1pct_inj_95CL_w164 \
+  --partition roma \
+  --account hps:hps-prod \
+  --time 24:00:00 \
+  --memory 8G \
+  --output submit_2015_2016_2021_1pct_injection_95CL_w164.slurm
+
+# After the batch jobs finish, merge and plot the three-way injection study
+hps-gpr inject-plot \
+  --input-dir outputs/study_2015_2016_10pct_2021_1pct_w1p64_95CL/injection_flat \
+  --output-dir outputs/study_2015_2016_10pct_2021_1pct_w1p64_95CL/injection_summary
 ```
 
 Notes:
@@ -244,10 +303,12 @@ For reviewer-facing figures it is often more useful to show one carefully constr
 - an extracted-signal panel with the injected/extracted Gaussian extending outside the blind window
 - a right-side boxed summary with the injected level, realized event count, extracted yield, and epsilon-squared numbers
 
-Three ready-made configs are included:
+Five ready-made configs are included:
 - `study_configs/config_2015_extraction_display_v15p8.yaml`
 - `study_configs/config_2016_extraction_display_v15p8.yaml`
+- `study_configs/config_2021_1pct_extraction_display_v15p8.yaml`
 - `study_configs/config_2015_2016_combined_extraction_display_v15p8.yaml`
+- `study_configs/config_2015_2016_2021_1pct_combined_extraction_display_v15p8.yaml`
 
 Copy/paste:
 
@@ -260,6 +321,12 @@ hps-gpr extract-display --config study_configs/config_2016_extraction_display_v1
 
 # Combined 2015+2016 representative extraction displays
 hps-gpr extract-display --config study_configs/config_2015_2016_combined_extraction_display_v15p8.yaml
+
+# 2021 1% representative extraction displays
+hps-gpr extract-display --config study_configs/config_2021_1pct_extraction_display_v15p8.yaml
+
+# Combined 2015+2016 10%+2021 1% representative extraction displays
+hps-gpr extract-display --config study_configs/config_2015_2016_2021_1pct_combined_extraction_display_v15p8.yaml
 
 # Optional: override the sigma-level list for this run only
 hps-gpr extract-display --config study_configs/config_2015_extraction_display_v15p8.yaml --strengths 5
@@ -277,6 +344,61 @@ To customize later:
 - for the combined config, edit `extraction_display_dataset_keys` if you want to extend the common-signal display to a different enabled dataset set
 - use `--strengths` on the CLI when you want a one-off subset without editing the YAML
 - outputs are written under `output_dir/extraction_display/<dataset-or-combined>/` as both PNG and PDF, with a JSON sidecar for the numerical values shown in the figure
+
+#### Observed-data mass-validation displays
+
+The `observed-display` workflow is the data-facing companion to `extract-display`. It is meant for reviewer-grade bump validation at one specified mass hypothesis:
+- combined mode produces one hero figure with one fit panel and one residual/extracted-signal panel per active dataset, plus a shared combined bump panel
+- per-dataset context and zoom views are written alongside the hero figure
+- by default, outputs are written under `config.output_dir/observed_display/mXXXMeV/`; if `--output-dir` is supplied, the mass folders are written directly under that root
+- metadata sidecars are dataset-specific (`metadata_combined.json`, `metadata_2015.json`, etc.), so combined and per-dataset commands can safely write into the same mass folder
+
+Copy/paste example series for a `123 MeV` hypothesis:
+
+```bash
+# Choose the production config:
+# current post-leakage baseline:
+CFG=config_2015_2016_10pct_2021_1pct_10k.yaml
+# for the radiative-penalty rerun instead, use:
+# CFG=config_2015_2016_10pct_2021_1pct_10k_rpen7.yaml
+
+# Combined observed-data validation display at 123 MeV
+hps-gpr observed-display \
+  --config "${CFG}" \
+  --mass 0.123 \
+  --dataset combined \
+  --datasets 2015,2016,2021 \
+  --output-dir outputs/observed_validation_123
+
+# Individual observed-data cross-checks at the same mass
+hps-gpr observed-display \
+  --config "${CFG}" \
+  --mass 0.123 \
+  --dataset 2015 \
+  --output-dir outputs/observed_validation_123
+
+hps-gpr observed-display \
+  --config "${CFG}" \
+  --mass 0.123 \
+  --dataset 2016 \
+  --output-dir outputs/observed_validation_123
+
+hps-gpr observed-display \
+  --config "${CFG}" \
+  --mass 0.123 \
+  --dataset 2021 \
+  --output-dir outputs/observed_validation_123
+```
+
+Typical products in `outputs/observed_validation_123/m123MeV/`:
+- `observed_display_combined.png/.pdf/.json`
+- `observed_context_2015.png/.pdf`
+- `observed_zoom_2015.png/.pdf`
+- `observed_context_2016.png/.pdf`
+- `observed_zoom_2016.png/.pdf`
+- `observed_context_2021.png/.pdf`
+- `observed_zoom_2021.png/.pdf`
+- `metadata_combined.json`
 
 Batch workflow tip:
 - extraction displays are independent across injected sigma level, so for cluster production it is natural to submit one job per strength and let each job render all requested masses for that strength only
@@ -491,6 +613,20 @@ hps-gpr slurm-gen \
 
 ./submit_all.sh submit_2015_2016_10pct_2021_1pct_bands_10k.slurm
 hps-gpr slurm-combine --output-dir outputs/prod_2015_2016_10pct_2021_1pct_10k_bands
+
+# 5. Same three-way production with a 7% radiative-fraction penalty on all datasets
+hps-gpr slurm-gen \
+  --config config_2015_2016_10pct_2021_1pct_10k_rpen7.yaml \
+  --n-jobs 231 \
+  --job-name hps2015_2016_10pct_2021_1pct_bands_10k_rpen7 \
+  --partition roma \
+  --account hps:hps-prod \
+  --time 24:00:00 \
+  --memory 8G \
+  --output submit_2015_2016_10pct_2021_1pct_bands_10k_rpen7.slurm
+
+./submit_all.sh submit_2015_2016_10pct_2021_1pct_bands_10k_rpen7.slurm
+hps-gpr slurm-combine --output-dir outputs/prod_2015_2016_10pct_2021_1pct_10k_bands_rpen7
 ```
 
 If you want quick local non-SLURM smoke passes before the full productions:
@@ -498,6 +634,7 @@ If you want quick local non-SLURM smoke passes before the full productions:
 ```bash
 hps-gpr scan --config config_2021_1pct_10k.yaml
 hps-gpr scan --config config_2015_2016_10pct_2021_1pct_10k.yaml
+hps-gpr scan --config config_2015_2016_10pct_2021_1pct_10k_rpen7.yaml
 ```
 
 
@@ -590,6 +727,14 @@ outputs/
 │   │   ├── extract_display_<tag>.pdf
 │   │   └── extract_display_<tag>.json
 │   └── ...                         # tag includes mass and injected sigma level
+├── observed_display/               # Created by `hps-gpr observed-display`
+│   └── mXXXMeV/
+│       ├── observed_display_combined.png/.pdf/.json
+│       ├── observed_display_<dataset>.png/.pdf/.json
+│       ├── observed_context_<dataset>.png/.pdf
+│       ├── observed_zoom_<dataset>.png/.pdf
+│       ├── metadata_combined.json
+│       └── metadata_<dataset>.json
 └── mXXXMeV/                        # Optional per-mass folders (if save_per_mass_folders=true)
     ├── <dataset>/
     │   ├── fit_full.png            # Full-range fit diagnostic

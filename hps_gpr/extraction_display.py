@@ -1229,7 +1229,7 @@ def run_observed_display_suite(
             )
             written.extend([ctx_stem + ".png", zoom_stem + ".png"])
 
-        with open(os.path.join(mass_dir, "metadata.json"), "w", encoding="utf-8") as fh:
+        with open(os.path.join(mass_dir, "metadata_combined.json"), "w", encoding="utf-8") as fh:
             json.dump(display.to_metadata(), fh, indent=2, sort_keys=True)
         return written
 
@@ -1252,7 +1252,9 @@ def run_observed_display_suite(
         blind_shade_alpha=blind_shade_alpha,
         blind_shade_color=blind_shade_color,
     )
-    with open(os.path.join(mass_dir, "metadata.json"), "w", encoding="utf-8") as fh:
+    with open(hero_stem + ".json", "w", encoding="utf-8") as fh:
+        json.dump(disp.to_metadata(), fh, indent=2, sort_keys=True)
+    with open(os.path.join(mass_dir, f"metadata_{disp.ctx.ds.key}.json"), "w", encoding="utf-8") as fh:
         json.dump(disp.to_metadata(), fh, indent=2, sort_keys=True)
     written.extend([hero_stem + ".png", ctx_stem + ".png"])
     return written

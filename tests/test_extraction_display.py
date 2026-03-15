@@ -182,7 +182,7 @@ def test_combined_observed_display_suite_writes_outputs(tmp_path, monkeypatch):
 
     mass_dir = tmp_path / "observed_display" / "m040MeV"
     hero = mass_dir / "observed_display_combined.png"
-    meta = mass_dir / "metadata.json"
+    meta = mass_dir / "metadata_combined.json"
     assert hero.exists()
     assert meta.exists()
     assert len(written) == 7
