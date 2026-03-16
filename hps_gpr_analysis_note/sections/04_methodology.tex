@@ -326,56 +326,58 @@ $\eps^2$.
 
 \subsection{Observed-limit tail diagnostics and significance summaries}
 
-In addition to the analytic profile-likelihood $p_0$ and $Z$ curves, the upper-limit
-study produces three toy-tail diagnostics derived from the distribution of background-only
-toy limits at each mass:
+The analysis uses two distinct families of $p$-values, and the distinction is
+important for internal review. The first family is the local profile-likelihood bump
+statistic of Eq.~\eqref{eq:singlelike}, summarized through $q_0(m)$, $p_0(m)$, and
+$Z_{\mathrm{local}}(m)$. The second family is a set of toy-tail summaries derived from
+the background-only \CLs{} limit ensemble at each mass. For $N_{\mathrm{toys}}$
+background-only pseudoexperiments and an observed limit
+$\eps^2_{95,\mathrm{obs}}(m)$, those toy-tail quantities are
 \begin{align}
-p_{\mathrm{strong}} &= P\!\left(\eps^2_{\mathrm{toy}} \le \eps^2_{\mathrm{obs}}\right), \\
-p_{\mathrm{weak}} &= P\!\left(\eps^2_{\mathrm{toy}} \ge \eps^2_{\mathrm{obs}}\right), \\
-p_{\mathrm{two}} &= 2\min\!\left(p_{\mathrm{strong}}, p_{\mathrm{weak}}\right).
+p_{\mathrm{strong}}(m)
+&=
+\frac{1}{N_{\mathrm{toys}}}
+\sum_{t=1}^{N_{\mathrm{toys}}}
+\mathbf{1}\!\left[
+\eps^2_{95,t}(m)\le \eps^2_{95,\mathrm{obs}}(m)
+\right], \\
+p_{\mathrm{weak}}(m)
+&=
+\frac{1}{N_{\mathrm{toys}}}
+\sum_{t=1}^{N_{\mathrm{toys}}}
+\mathbf{1}\!\left[
+\eps^2_{95,t}(m)\ge \eps^2_{95,\mathrm{obs}}(m)
+\right], \\
+p_{\mathrm{two}}(m)
+&=
+2\min\!\left[p_{\mathrm{strong}}(m),\,p_{\mathrm{weak}}(m)\right].
 \end{align}
-These quantities are not discovery $p$-values in the same sense as the analytic
-profile-likelihood $p_0$ used for a local bump hunt \cite{Cowan1998,Cowan2011}.
-Instead, they measure where the observed upper limit falls relative to the
-background-only \CLs{} limit ensemble \cite{Junk1999,Read2002}. That is why the curves
-often start near 0.5 rather than near 1.0: if the observed limit is close to the
-median of the background-only toy ensemble, then roughly half the toys lie above it
-and half lie below it. In that regime, $p_{\mathrm{strong}}$ and
-$p_{\mathrm{weak}}$ are both near 0.5 by construction.
-
-These curves are still useful. They provide a compact summary of whether the observed
-limit is stronger than typical, weaker than typical, or statistically ordinary at a
-given mass. When plotted together with local and global reference lines, they also show
-how the observed-limit behavior compares with the usual one-sided Gaussian significance
-benchmarks. They should nevertheless be interpreted only as limit diagnostics. With
-$N_{\mathrm{toys}}$ background-only pseudoexperiments, the smallest non-zero empirical
-tail probability is of order $1/(N_{\mathrm{toys}}+1)$. For the common
-$N_{\mathrm{toys}}=\num{10000}$ setup used in the present validation studies, this is
-only $\mathcal{O}(10^{-4})$, corresponding to about \SI{3.7}{\sigma} one-sided. Toy
-limit tails at that granularity therefore cannot by themselves validate or refute a
-\SIrange{5}{7}{\sigma} local excess in the analytic bump-hunt statistic.
+Here $p_{\mathrm{strong}}$ quantifies how unusually \emph{strong} the observed limit
+is relative to the toy ensemble, while $p_{\mathrm{weak}}$ quantifies how unusually
+\emph{weak} it is. They are therefore limit-diagnostic quantities rather than
+discovery-significance measures in the sense of $p_0$ \cite{Junk1999,Read2002,Cowan2011}.
 
 \begin{figure}[H]
 \centering
-\begin{subfigure}[t]{0.48\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{significance_figs/2015_2016_combined/ul_pvalues.png}
-  \caption{Combined toy-tail $p$-values.}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.48\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{significance_figs/2015_2016_combined/ul_pvalues_components_local_global_refs.png}
-  \caption{Same quantities with local and provisional global reference lines.}
-\end{subfigure}
-\caption{Toy-tail significance summary for the combined search. The curves
-$p_{\rm strong}$, $p_{\rm weak}$, and $p_{\rm two}$ describe the position of the
-observed upper limit within the toy-derived limit ensemble and therefore naturally take
-values near 0.5 when the observation is close to the median expected behavior. The
-reference lines indicate the one-sided Gaussian levels used elsewhere in the note for
-local and provisional global-significance comparisons.}
-\label{fig:combined-ul-tail-pvalues}
+\graphicorplaceholder{0.96\linewidth}{methodology_figs/pvalue_tail_schematic.png}
+\caption{Schematic interpretation of the toy-tail limit diagnostics used in this note.
+The shaded regions illustrate the weak-sided, strong-sided, and two-sided tail
+definitions for a generic test variable. In the HPS workflow the plotted variable is
+the observed \CLs{} upper limit relative to the background-only toy ensemble at fixed
+mass, so these quantities diagnose the behavior of the \emph{limit} rather than the
+local bump-hunt significance.}
+\label{fig:pvalue-tail-schematic}
 \end{figure}
+
+This distinction also explains why the toy-tail curves often hover near 0.5. If the
+observed limit is close to the median of the background-only ensemble, then roughly
+half of the toys lie above it and half lie below it, making both
+$p_{\mathrm{strong}}$ and $p_{\mathrm{weak}}$ naturally $\mathcal{O}(0.5)$. With
+$N_{\mathrm{toys}}=\num{10000}$, the smallest non-zero empirical tail probability is
+of order $1/(N_{\mathrm{toys}}+1)\sim 10^{-4}$, corresponding to only about
+\SI{3.7}{\sigma} one-sided. Toy-limit tails at this granularity therefore cannot by
+themselves validate or refute a \SIrange{5}{7}{\sigma} local excess in the analytic
+bump-hunt statistic.
 
 \subsection{Shared-\texorpdfstring{$\eps^2$}{epsilon2} combination across datasets}
 \label{sec:combination}
@@ -392,7 +394,14 @@ each $d \in \mathcal{D}(m)$, define
 K_d(m),
 \end{equation}
 where $K_d(m)$ converts the shared coupling $\eps^2$ into the total signal yield of
-dataset $d$. The per-dataset likelihood is then
+dataset $d$. When the radiative-fraction penalty of Eq.~\eqref{eq:frad-penalty} is
+enabled, the conversion becomes
+\begin{equation}
+K_d^{\mathrm{eff}}(m) = \left(1-\delta_{f,d}\right)K_d(m),
+\label{eq:kdeff}
+\end{equation}
+so the expected signal vector per unit $\eps^2$ is reduced coherently in every active
+dataset. The per-dataset likelihood is then
 \begin{equation}
 \mathcal{L}_d(\eps^2,\bm{\theta}_d)
 =
@@ -400,7 +409,7 @@ dataset $d$. The per-dataset likelihood is then
 \prod_{i=1}^{N_d(m)}
 \mathrm{Pois}\!\left(
 n_{d,i}\,\middle|\,
-b_{d,i} + (L_d\bm{\theta}_d)_i + \eps^2 K_d(m) w_{d,i}(m)
+b_{d,i} + (L_d\bm{\theta}_d)_i + \eps^2 K_d^{\mathrm{eff}}(m) w_{d,i}(m)
 \right)
 \right]
 \exp\!\left(-\frac{1}{2}\bm{\theta}_d^\top\bm{\theta}_d\right).
@@ -419,7 +428,7 @@ Equivalently, one may concatenate all blinded-bin vectors into a single object,
 \bm{b} &=
 \left(\bm{b}_1,\bm{b}_2,\ldots\right), \\
 \bm{s}_{\mathrm{unit}} &=
-\left(K_1\bm{w}_1, K_2\bm{w}_2,\ldots\right), \\
+\left(K_1^{\mathrm{eff}}\bm{w}_1, K_2^{\mathrm{eff}}\bm{w}_2,\ldots\right), \\
 \bm{C}_{\mathrm{comb}} &=
 \mathrm{blockdiag}(\bm{C}_1,\bm{C}_2,\ldots),
 \end{align}
@@ -445,60 +454,92 @@ upper-limit curves. At fixed $\eps^2$,
 after profiling the independent nuisance blocks. The sensitivity gain therefore comes
 from the additive information content of statistically independent channels, each with
 its own detector response and normalization factor, rather than from any post hoc
-merging of already-compressed outputs.
-
-The combined upper limit is set directly on the shared coupling,
+merging of already-compressed outputs. The combined upper limit is set directly on the
+shared coupling,
 \begin{equation}
 \eps^2_{95}(m) = \min\{\eps^2 : \mathrm{CL}_s(\eps^2)=0.05\},
 \end{equation}
 while the combined local significance is evaluated from the same profiled likelihood
 with the common signal vector $\eps^2 \bm{s}_{\mathrm{unit}}$.
 
-\subsection{Global significance and the look-elsewhere placeholder}
+\subsection{Global significance and the look-elsewhere treatment}
 
-The package currently reports local/global $p_0$ and $Z$ curves using a
-Sidak-corrected effective-trials estimate derived from the scan spacing, blind-window
-width, and detector resolution \cite{GrossVitells2010}. That treatment is adequate for
-validation studies, for layout studies, and for monitoring where the local search
-has its largest upward fluctuation. It is not yet the final global-significance
-prescription intended for the finished prompt-search result. All global-significance
-statements in the present note should therefore be read as provisional until the
-dedicated rerun with the corrected global-$p$ treatment is complete.
+The physics-facing local significance is the minimum one-sided $p_0$ in the scan,
+\begin{equation}
+p_{0,\min}^{\mathrm{obs}} = \min_m p_0^{\mathrm{obs}}(m),
+\qquad
+q_{0,\max}^{\mathrm{obs}} = \max_m q_0^{\mathrm{obs}}(m).
+\end{equation}
+The cleanest global-significance definition is then scan based:
+\begin{equation}
+p_{\mathrm{global}}^{\mathrm{toy}}
+=
+\frac{1}{N_{\mathrm{toys}}}
+\sum_{t=1}^{N_{\mathrm{toys}}}
+\mathbf{1}\!\left[
+q_{0,\max}^{(t)} \ge q_{0,\max}^{\mathrm{obs}}
+\right],
+\label{eq:pglobal-toy}
+\end{equation}
+with
+\begin{equation}
+Z_{\mathrm{global}}^{\mathrm{toy}} = \Phi^{-1}\!\left(1-p_{\mathrm{global}}^{\mathrm{toy}}\right).
+\end{equation}
+When a dense full-scan toy calibration is not yet frozen, the workflow monitors the
+look-elsewhere effect through an effective-trials approximation based on the scan span
+and detector resolution \cite{GrossVitells2010}. In that representation,
+\begin{equation}
+p_{\mathrm{global}}^{\mathrm{Sidak}}
+=
+1-\left(1-p_{0,\min}^{\mathrm{obs}}\right)^{N_{\mathrm{eff}}},
+\qquad
+Z_{\mathrm{global}}^{\mathrm{Sidak}}
+=
+\Phi^{-1}\!\left(1-p_{\mathrm{global}}^{\mathrm{Sidak}}\right).
+\label{eq:sidak-global}
+\end{equation}
+For small $p_{0,\min}^{\mathrm{obs}}$, Eq.~\eqref{eq:sidak-global} reduces to the
+familiar $p_{\mathrm{global}}\simeq N_{\mathrm{eff}}p_{0,\min}$ form.
 
-The reason for that caution is methodological rather than conceptual. An effective
-trials factor combined with a \v{S}id\'{a}k correction is a common monitoring
-approximation for dense one-dimensional scans, and it captures the right qualitative
-look-elsewhere trend. For a final quoted result, however, the more standard HEP
-procedure is to calibrate the scan-level maximum of the local test statistic
-$q_0(m)$ with background-only pseudoexperiments, or, when that is computationally
-prohibitive, to use the Gross--Vitells upcrossing formalism
-\cite{GrossVitells2010,Cowan2011}. That stronger calibration is the intended final
-path for this analysis.
+The present note uses these quantities asymmetrically. The combined
+2015$+$2016 10\%$+$2021 1\% radiative-penalty summary is the only place where the
+global conversion is treated as the physics-facing look-elsewhere diagnostic. The
+single-dataset overlays are retained only to show where each dataset has its largest
+\emph{local} upward fluctuation; their orange global overlays should not be
+interpreted as final because those auxiliary summary PNGs predate the resolution-column
+cleanup described in Section~\ref{sec:results-combined-151621-1pct}.
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.88\linewidth}{methodology_figs/local_significances_across_datasets.png}
+\caption{Local significances across datasets, shown here as the analytic one-sided
+$p_0(m)$ curves for 2015, 2016 10\%, and 2021 1\%. These panels are included to show
+where each input sample contributes upward local fluctuations to the combined search.
+The orange single-dataset global overlays are retained from the summary products for
+bookkeeping only; the local blue curves are the quantities actually interpreted in this
+note.}
+\label{fig:local-significances-across-datasets}
+\end{figure}
 
 \begin{figure}[H]
 \centering
 \begin{subfigure}[t]{0.48\linewidth}
   \centering
-  \graphicorplaceholder{\linewidth}{significance_figs/2015_2016_combined/p0_analytic_local_global.png}
-  \caption{Combined local and provisional global $p_0$ curves.}
+  \graphicorplaceholder{\linewidth}{summary_combined_all_rad_penalty/p0_analytic_local_global.png}
+  \caption{Combined local and global one-sided $p_0$ curves.}
 \end{subfigure}
 \hfill
 \begin{subfigure}[t]{0.48\linewidth}
   \centering
-  \graphicorplaceholder{\linewidth}{significance_figs/2015_2016_combined/Z_local_global.png}
-  \caption{Combined local and provisional global $Z$ curves.}
+  \graphicorplaceholder{\linewidth}{summary_combined_all_rad_penalty/Z_local_global.png}
+  \caption{Equivalent local and global $Z$ representation.}
 \end{subfigure}
-\caption{Current combined analytic-significance curves. These are useful for documenting
-the present
-scan structure, but the global component should be treated as a placeholder until the
-final look-elsewhere rerun is completed.}
-\label{fig:combined-significance-placeholder}
+\caption{Analytic significance curves for the radiative-penalty three-dataset
+combination. Unlike the auxiliary single-dataset overlays, this combined global
+representation is the one interpreted in the results section when discussing the
+look-elsewhere effect of the shared-$\eps^2$ search.}
+\label{fig:combined-significance-rpen}
 \end{figure}
-
-\analysisplaceholder{\textbf{LEE placeholder.} Replace the provisional Sidak-style
-global-significance treatment with the finalized look-elsewhere evaluation once the
-dedicated rerun is complete. The local-significance curves are already useful for scan
-summary; the global curves should not yet be quoted as final physics results.}
 
 \subsection{Signal absorption and alternative background-profile treatments}
 

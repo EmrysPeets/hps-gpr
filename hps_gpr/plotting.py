@@ -760,7 +760,7 @@ def plot_ul_pvalue_components(
 
     masses = df["mass_GeV"].to_numpy(float)
     if neff is None:
-        sig = df[sigma_col].to_numpy(float) if sigma_col in df.columns else None
+        sig, _ = _resolve_sigma_values(df, sigma_col)
         neff = _effective_trials_from_spacing(masses, sig, indep_width_sigma=float(indep_width_sigma))
 
     fig, ax = plt.subplots(figsize=(10, 4.5))
@@ -808,6 +808,32 @@ def plot_ul_pvalue_components(
 # ---------------------------------------------------------------------------
 # Significance / LEE plots
 # ---------------------------------------------------------------------------
+
+
+def _resolve_sigma_values(
+    df: pd.DataFrame,
+    sigma_col: Optional[str],
+) -> tuple[Optional[np.ndarray], Optional[str]]:
+    """Return the first usable mass-resolution column and its values."""
+    candidates: List[str] = []
+    for name in [
+        sigma_col,
+        "sigma_val",
+        "sigma_mass_res_GeV",
+        "sigma_mass_res_min_GeV",
+        "sigma_mass_res_mean_GeV",
+    ]:
+        if name and name not in candidates:
+            candidates.append(str(name))
+
+    for name in candidates:
+        if name not in df.columns:
+            continue
+        vals = df[name].to_numpy(float)
+        if np.isfinite(vals).any() and np.nanmax(np.where(np.isfinite(vals), vals, np.nan)) > 0:
+            return vals, name
+
+    return None, None
 
 
 def _effective_trials_from_spacing(
@@ -874,7 +900,7 @@ def plot_analytic_p0(
     p0_global = None
     if apply_lee:
         if neff is None:
-            sig = df[sigma_col].to_numpy(float) if sigma_col in df.columns else None
+            sig, _ = _resolve_sigma_values(df, sigma_col)
             neff = _effective_trials_from_spacing(masses, sig, indep_width_sigma=float(indep_width_sigma))
         p0_global = np.asarray([
             _p_global_from_local(float(p), Neff=neff, method=lee_method)
@@ -956,7 +982,7 @@ def plot_Z_local_global(
 
     if apply_lee:
         if neff is None:
-            sig = df[sigma_col].to_numpy(float) if sigma_col in df.columns else None
+            sig, _ = _resolve_sigma_values(df, sigma_col)
             neff = _effective_trials_from_spacing(masses, sig, indep_width_sigma=float(indep_width_sigma))
         p_local = np.asarray([_p_from_z_one_sided(float(z)) for z in Z_local], float)
         p_global = np.asarray([

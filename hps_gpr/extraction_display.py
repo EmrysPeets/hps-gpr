@@ -734,7 +734,26 @@ def _combined_u_grid(displays: Sequence, zoom_half_sigma: float) -> np.ndarray:
         float(d.ctx.pred.blind[1] - d.ctx.mass) / float(d.ctx.pred.sigma_val) + float(zoom_half_sigma)
         for d in displays
     )
-    return np.linspace(-span, +span, 400)
+    return np.linspace(-span, +span, 800)
+
+
+def _combined_panel_curve(
+    disp,
+    curve: np.ndarray,
+    *,
+    span: float,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Return a common-u representation using the full extracted signal shape."""
+    sigma = float(disp.ctx.pred.sigma_val)
+    u_full = (disp.x_full - float(disp.ctx.mass)) / sigma
+    y_full = np.asarray(curve, float)
+    keep = np.isfinite(u_full) & np.isfinite(y_full) & (u_full >= -span - 0.25) & (u_full <= span + 0.25)
+    u_plot = np.asarray(u_full[keep], float)
+    y_plot = np.asarray(y_full[keep], float)
+    if u_plot.size < 2:
+        return np.asarray([], float), np.asarray([], float)
+    order = np.argsort(u_plot)
+    return u_plot[order], y_plot[order]
 
 
 def _plot_combined_signal_panel(
@@ -748,23 +767,26 @@ def _plot_combined_signal_panel(
 ) -> None:
     colors = _display_colors()
     u = _combined_u_grid(displays, zoom_half_sigma=float(zoom_half_sigma))
+    span = float(np.max(np.abs(u))) if u.size else 0.0
     blind_nsigma = float(displays[0].ctx.pred.blind[1] - displays[0].ctx.mass) / float(displays[0].ctx.pred.sigma_val)
     total_extracted = np.zeros_like(u, float)
     total_injected = np.zeros_like(u, float)
 
     for idx, disp in enumerate(displays):
         c = colors.get(str(disp.ctx.ds.key), f"C{idx}")
-        x_full = disp.x_full
-        m_zoom = _zoom_mask(disp, float(zoom_half_sigma))
-        uz = (x_full[m_zoom] - float(disp.ctx.mass)) / float(disp.ctx.pred.sigma_val)
-        yz = np.asarray(disp.signal_curve_extracted[m_zoom], float)
+        uz, yz = _combined_panel_curve(disp, disp.signal_curve_extracted, span=span)
+        if uz.size < 2:
+            continue
         ax.plot(uz, yz, color=c, lw=1.6, alpha=0.92, label=f"{disp.ctx.ds.key} extracted", zorder=4)
         total_extracted += np.interp(u, uz, yz, left=0.0, right=0.0)
         if include_injected and hasattr(disp, "signal_curve_injected"):
+            uz_inj, yz_inj = _combined_panel_curve(disp, disp.signal_curve_injected, span=span)
+            if uz_inj.size < 2:
+                continue
             total_injected += np.interp(
                 u,
-                uz,
-                np.asarray(disp.signal_curve_injected[m_zoom], float),
+                uz_inj,
+                yz_inj,
                 left=0.0,
                 right=0.0,
             )

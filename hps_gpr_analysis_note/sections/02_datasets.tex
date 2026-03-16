@@ -1,149 +1,119 @@
-\section{HPS Data Sets and Analysis Scope}
+\section{HPS Apparatus, Data-Taking Campaigns, and Analysis Scope}
 \label{sec:datasets}
 
-\subsection{HPS 2015, 2016, and 2021 data samples}
+\subsection{Detector eras and apparatus relevant to the prompt search}
 
-The present analysis is organized around three HPS running periods: the 2015
-engineering run, the 2016 engineering run, and the 2021 physics run. The 2015 and
-2016 data were collected with essentially the same detector configuration; in
-particular, the engineering-run detector remained under vacuum between those periods,
-which makes the two samples especially natural to compare and combine. By contrast, the
-2021 run followed the major detector and beam-delivery upgrades described in the later
-HPS experiment documentation \cite{HPSExperiment2022}. It therefore represents both a
-substantially larger exposure and a distinct detector era.
+HPS is a forward spectrometer optimized for narrow $e^+e^-$ resonances and displaced
+vertices in the high-rate environment immediately downstream of a thin tungsten target.
+Its prompt $A^\prime \rightarrow e^+e^-$ sensitivity is set primarily by three
+subsystems: the Silicon Vertex Tracker (SVT), which determines the mass and vertex
+resolution; the electromagnetic calorimeter (ECal), which provides the trigger and
+track--cluster matching; and the beamline/target geometry, which defines the forward
+acceptance and the occupancy environment \cite{HPSExperiment2022,HPS2016PromptLong}.
 
-From the standpoint of statistical workflow, the three samples also play different
-roles. The 2015 data remain fully unblinded in the present GPR development chain and
-therefore provide the cleanest environment for methodology validation. The 2016 and
-2021 samples are treated in staged unblinding steps, consistent with standard HEP
-practice: first through development subsets used for fit and toy validation, then
-through progressively larger analysis stages once the procedure is frozen.
+The 2015 and 2016 engineering runs used the baseline six-station SVT. In that
+configuration, six double-layer stereo measurement stations were distributed between
+$z=\SIrange{10}{90}{cm}$ downstream of the target, with the first active silicon only
+about \SI{1.5}{mm} from the beam plane \cite{HPS2016BumpInternal,HPSExperiment2022}.
+The ECal geometry used in the engineering runs was already close to the final HPS
+layout: two PbWO$_4$ crystal halves with the highest-rate crystals nearest the beam
+removed, leaving the beam to pass between the two halves
+\cite{HPS2016BumpInternal,HPSExperiment2022}.
+
+Before the first physics run in 2019, HPS moved into a distinct detector era. The
+front SVT was upgraded with a seventh double layer at $z=\SI{5}{cm}$, thin silicon,
+slim-edge processing, and short split striplets to preserve low-mass acceptance while
+reducing material and occupancy \cite{HPSExperiment2022,HPSSlimEdgeSensors2020}. The
+same slim-edge module design was used to replace the previous first layer, and the
+front layers were moved closer to the beam, which is the key hardware change behind
+the improved 2019/2021 low-mass prompt acceptance. The ECal crystal layout itself did
+not change between the engineering and physics runs, but a positron hodoscope was
+installed in front of the ECal before the 2019 run to support the single-arm positron
+trigger that recovers events otherwise lost in the ECal hole
+\cite{HPSExperiment2022}. The 2019 and 2021 runs therefore share a common upgraded
+apparatus era.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[t]{0.90\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{apparatus_figs/hps_2015_2016_svt_baseline.png}
+  \caption{Baseline six-layer SVT used in the 2015 and 2016 engineering runs
+  \cite{HPS2016BumpInternal}.}
+\end{subfigure}
+
+\vspace{0.9em}
+
+\begin{subfigure}[t]{0.78\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{apparatus_figs/hps_2019_2021_svt_upgrade.png}
+  \caption{Front-layer upgrade used in the 2019 and 2021 physics runs, including the
+  added seventh double layer and slim-edge front sensors
+  \cite{HPSExperiment2022,HPSSlimEdgeSensors2020}.}
+\end{subfigure}
+\caption{SVT detector eras relevant for the prompt-resonance note. The engineering-run
+baseline and the 2019/2021 upgraded front tracker differ in both layer count and the
+construction of the innermost stations, while the ECal remains the same subsystem apart
+from the addition of the positron hodoscope before the physics runs.}
+\label{fig:hps-svt-eras}
+\end{figure}
+
+\subsection{Data-taking campaigns and present analysis scope}
+
+The present note is organized around three HPS running campaigns: the 2015 engineering
+run, the 2016 engineering run, and the 2021 physics run. The 2015 and 2016 datasets
+are especially natural to compare because they were recorded with the same detector era
+and were already analyzed in the published prompt-search workflow. The 2021 dataset
+belongs to the upgraded-detector era and is the first large-statistics physics-run
+sample to be carried through the GPR workflow.
+
+The 2019 physics run is acknowledged here because it shares the upgraded SVT and
+hodoscope configuration with 2021, but its prompt-resonance analysis is not included in
+the present scope. This note keeps the statement explicit: 2019 data exist, but they
+will be analyzed in a similar capacity in later work rather than merged into the
+review-ready workflow described here.
 
 \begin{table}[H]
 \centering
-\scriptsize
-{\setlength{\tabcolsep}{4pt}
-\begin{tabularx}{\linewidth}{@{} P{0.20\linewidth} P{0.11\linewidth} P{0.21\linewidth} P{0.14\linewidth} Y @{}}
+\small
+{\setlength{\tabcolsep}{6pt}
+\begin{tabularx}{\linewidth}{@{} P{0.24\linewidth} P{0.14\linewidth} P{0.18\linewidth} P{0.15\linewidth} Y @{}}
 \toprule
-Data set & Beam energy & Exposure used here & Scan range & Comments \\
+Run period & Beam energy & Exposure used here & Prompt scan range & Role in this note \\
 \midrule
 2015 engineering run &
 \SI{1.056}{GeV} &
 \SI{1170}{nb^{-1}} &
 \SIrange{20}{130}{MeV} &
-Published HPS prompt $A^\prime\rightarrow e^+e^-$ search \cite{HPS2015DarkPhoton}. The
-published resonance search covered \SIrange{19}{81}{MeV}; the present GPR study is
-validated over a wider interval. \\
-2016 engineering run\newline (10\% study sample) &
+Fully unblinded prompt-resonance validation sample anchored to the published 2015
+prompt search. \\
+2016 engineering run (10\% study sample) &
 \SI{2.3}{GeV} &
-Parent prompt-search exposure:\newline \SI{10608}{nb^{-1}} &
+10\% development subset of a
+\SI{10608}{nb^{-1}} parent sample &
 \SIrange{35}{210}{MeV} &
-Published HPS prompt and displaced search on the full run \cite{HPS2016PromptLong}. The
-current note documents the 10\% subset used for statistical development while retaining
-the run-level detector and normalization context of the full sample. \\
-2021 physics run\newline (0.03\%, 1\%, and 10\% study stages) &
+Development-stage prompt sample used to validate the 2016 detector response,
+radiative fraction, and shared-$\eps^2$ combination logic. \\
+2021 physics run (0.03\%, 1\%, and 10\% stages) &
 \SI{3.74}{GeV} &
-Full-run luminosity\newline $\sim \SI{160}{pb^{-1}}$ &
+Staged subsets of a $\sim\SI{160}{pb^{-1}}$ run &
 \SIrange{30}{250}{MeV} &
-Upgraded-detector physics run. The note keeps 0.03\%, 1\%, and 10\% stages explicit so
-that the document already matches the intended staged-unblinding sequence. \\
+Upgraded-detector physics-run sample. The present note emphasizes the 1\% stage for
+the current combined baseline, while keeping later unblinding stages explicit. \\
 \bottomrule
 \end{tabularx}
 }
-\caption{Summary of the HPS data samples considered in this note. The 2015 and 2016
-rows are anchored to published prompt-search results, while the 2021 row records the
-physics-run beam energy and approximate delivered luminosity used to organize the later
-analysis stages.}
+\caption{Data-taking campaigns carried through the present prompt-resonance note. The
+scan ranges quoted here are the current GPR analysis ranges rather than the smaller
+published-window searches.}
 \label{tab:dataset-summary}
 \end{table}
 
-\subsection{Mass resolution and the reconstructed invariant-mass spectrum}
-
-The observable entering the statistical analysis is the reconstructed $e^+e^-$
-invariant-mass spectrum after the prompt event selection. The narrow signal model is
-therefore controlled by the detector mass resolution,
-\begin{equation}
-\sigma_d(m) = \sum_{k=0}^{N_d} c^{(d)}_k\,m^k,
-\end{equation}
-with $m$ and $\sigma_d(m)$ expressed in GeV. The current baseline parameterizations are
-\begin{align}
-\sigma_{2015}(m) &= -9.22283032152\times10^{-5} + 5.32190838657\times10^{-2}\,m, \\
-\sigma_{2016}(m) &= 3.8\times10^{-4} + 4.1\times10^{-2}m - 2.7\times10^{-1}m^2
-+ 3.49\,m^3 - 11.11\,m^4, \\
-\sigma_{2021}(m) &= 2.86957\times10^{-3} - 8.51449\times10^{-3}m + 2.5362319\times10^{-1}m^2.
-\end{align}
-For 2016, the polynomial is not used unchanged at arbitrarily high mass. The older
-parameterization turns over above approximately \SI{180}{MeV} and would imply an
-artificial improvement of the mass resolution with increasing mass. To avoid that
-unphysical behavior, the current implementation enforces a linear continuation above
-$m_0=\SI{0.18}{GeV}$ with slope override \num{0.0239}. This is a technical but
-important detail: without it, the width of the signal model would be systematically
-underestimated in the upper part of the 2016 search window.
-
-\subsection{Radiative fraction and the \texorpdfstring{$\eps^2$}{epsilon2} normalization}
-
-The radiative fraction encodes the fraction of the selected prompt $e^+e^-$ background
-that arises from the purely radiative trident process. This quantity matters because
-heavy-photon production in fixed-target experiments is proportional to the radiative
-trident rate \cite{EssigEtAl2011,HPS2015DarkPhoton,HPS2016PromptLong}. In the language
-used by the published HPS prompt searches,
-\begin{equation}
-f_{\mathrm{rad}}(m)
-= \frac{dN_{\gamma^\ast}/dm}{dN_{\mathrm{bkg}}/dm}
-= \frac{dN_{\gamma^\ast}/dm}{dN_{\mathrm{tri}}/dm + dN_{\mathrm{wab}}/dm},
-\end{equation}
-where $dN_{\gamma^\ast}/dm$ denotes the radiative trident contribution, while the
-denominator contains the full physical prompt background after selection. Operationally,
-$f_{\mathrm{rad}}$ is determined from Monte Carlo samples of radiative tridents,
-tridents, and converted wide-angle Bremsstrahlung passed through the same selection
-used for the resonance search. It is therefore not an arbitrary scale factor: it is the
-physics quantity that converts the measured prompt spectrum into the rate of the
-process most directly analogous to $A^\prime$ production.
-
-For 2015, the present analysis follows the published constant approximation
-\begin{equation}
-f_{\mathrm{rad},2015}(m) = 0.085.
-\end{equation}
-For 2016, the earlier bump-hunt notes and the published prompt search used a
-mass-dependent fifth-order polynomial extracted from the Monte Carlo composition study.
-That parameterization is useful historically and should be discussed as part of the
-published methodology, but it becomes unstable above approximately \SI{180}{MeV} and
-can grow in a way that is not suitable for the wider GPR search window. The current GPR
-analysis therefore adopts the constant approximation
-\begin{equation}
-f_{\mathrm{rad},2016}(m) = 0.05,
-\end{equation}
-which is a good representation of the radiative fraction across the selected search
-region and avoids the high-mass blow-up of the published polynomial. The 2021
-radiative-fraction treatment is retained as provisional in this note pending the final
-freeze of the corresponding normalization inputs.
-
-The package now also supports an optional radiative-fraction sensitivity penalty in the
-$A \leftrightarrow \eps^2$ conversion. When enabled, the effective radiative fraction
-is reduced according to
-\begin{equation}
-f_{\mathrm{rad},d}^{\mathrm{eff}}(m)
-= \left(1-\delta_{f,d}\right) f_{\mathrm{rad},d}(m),
-\end{equation}
-with dataset-specific penalty fractions configured at the YAML level. The intended
-starting point is $\delta_{f,d}=0.07$ for 2015, 2016, and 2021, corresponding to a
-7\% sensitivity penalty in the radiative-fraction normalization. Because the bundled
-limit figures predate the activation of this switch, the current plots should be read
-as pre-penalty results unless stated otherwise.
-
-\subsection{Analysis subsets and staged unblinding}
-
-The current study uses the full 2015 sample, a 2016 10\% development sample, and a set
-of progressively larger 2021 study stages. The 2021 0.03\% sample is the first
-development subset used for functional-form and GP toy studies. The 2021 1\% sample is
-reserved for the first upper-limit and combination campaign, while the 2021 10\% sample
-marks the intended first-round unblinding stage. This staged structure is kept explicit
-throughout the note because it mirrors the actual analysis strategy rather than merely
-the bookkeeping of the current development stage.
-
-The broader statistical motivation for these staged subsets is that the global GP model
-is being validated over search windows that are already wider than those used in the
-published 2015 and 2016 local-window analyses. That extension is only defensible if the
-background model, mass-resolution treatment, and toy-validation program remain stable
-across the enlarged mass range. The later sections are organized precisely to document
-that validation.
+The staged-analysis logic matters for the way the results are interpreted. The 2015
+sample remains the cleanest environment for methodology validation because it is fully
+unblinded. The 2016 and 2021 analyses are instead organized in review-friendly stages:
+small subsets for functional-form and toy studies, then larger subsets for the first
+complete upper-limit and combination passes. The 2021 1\% sample is the key current
+physics-stage input to the shared-$\eps^2$ result discussed later in the note, while
+the 2021 10\% stage and the fully unblinded 2021 analysis remain reserved for later
+milestones.

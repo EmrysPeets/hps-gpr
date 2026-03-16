@@ -1,41 +1,222 @@
-\section{Event Selection}
+\section{Event Selection, Mass Resolutions, and Radiative Fraction}
 \label{sec:event-selection}
 
-The resonance-search workflow begins from histogrammed invariant-mass distributions that
-already encode the prompt-selection logic for each run period. The goal of the
-selection is to retain prompt $e^+e^-$ pairs that are kinematically consistent with the
-electroproduction of a narrow $A^\prime$, while suppressing accidental pairings,
-converted wide-angle Bremsstrahlung, and the broad Bethe--Heitler-dominated trident
-background that does not share the same prompt-resonance sensitivity as the radiative
-trident component.
+The prompt-resonance workflow begins from histogrammed invariant-mass spectra that
+already incorporate run-specific event selection. Those selections determine not only
+the cleanliness of the prompt $e^+e^-$ sample but also the sample composition entering
+the radiative-fraction normalization and the detector response entering the signal
+model. For that reason the prompt selection, the mass resolution, and the
+radiative-fraction treatment are documented together in this section.
 
-Several common ideas underlie the selection across all HPS data sets. The analysis uses
-well-reconstructed oppositely charged tracks matched to electromagnetic clusters, tight
-timing consistency between the two clusters, and momentum and vertex requirements that
-favor prompt pair production. These cuts matter for more than detector cleanliness
-alone. They directly control the sample composition entering the invariant-mass
-spectrum, and therefore they also control the radiative fraction, the mass resolution,
-and the background covariance subsequently modeled by the GP.
+\subsection{Prompt event selection}
 
-The distinction between event categories is especially important in the 2016 analysis,
-where target-constrained and unconstrained vertex fits play different roles in the
-prompt and displaced searches. For the prompt narrow-resonance search, the
-target-constrained reconstruction is preferred because it improves the angular and mass
-resolution of the $e^+e^-$ pair. That is precisely the category whose invariant-mass
-spectrum enters the present GPR note.
-
-The 2015 and 2016 selections shown in Table~\ref{tab:event-selection} are adapted from
-the mature HPS prompt-resonance notes and from the earlier analysis drafts that led to
-the current statistical workflow. They are sufficiently mature to anchor the present
-note. By contrast, the 2021 column is kept deliberately provisional: the row structure
-is in place, but several prompt-tight values still need to be synchronized with the
-final 2021 reconstruction documentation.
+Across all HPS campaigns, the prompt selection is built from the same experimental
+logic: oppositely charged tracks matched to ECal clusters, tight cluster-time
+coincidence, track-quality and vertex requirements, and momentum selections that
+retain prompt radiative tridents while suppressing accidentals and converted
+wide-angle Bremsstrahlung. The 2015 and 2016 selections are already mature because
+they are inherited from the published prompt searches. The 2021 column is kept
+explicitly provisional where the final prompt-tight values still need to be
+synchronized with the reconstruction note for the upgraded detector era.
 
 \input{tables/event_selection_table}
 
-The statistical interpretation in the remaining sections assumes that each histogram is
-already defined after the corresponding prompt selection. No additional per-event cuts
-are introduced by the GP analysis itself. The inference layer consumes only the binned
-invariant-mass spectrum together with the dataset-specific scan range, mass resolution,
-and radiative-fraction inputs, but all three of those quantities inherit their physical
-meaning from the event selection summarized here.
+The GPR layer does not add any new per-event selection on top of these prompt cuts. In
+the remainder of the note, each dataset is represented only by the selected
+invariant-mass histogram together with the detector response and normalization inputs
+derived from the same event category.
+
+\subsection{2015 mass resolution}
+\label{sec:massres-2015}
+
+For the 2015 engineering run, the prompt search sensitivity is driven by the mass
+resolution of the target-constrained $e^+e^-$ pair. The 2015 internal note determined
+that response by combining three ingredients \cite{HPS2015InternalNote}. First, M{\o}ller
+events were used to anchor the detector resolution directly in data at the known
+M{\o}ller mass. Second, the momentum-resolution discrepancy between data and MC was
+translated into a smearing correction. Third, a set of $A^\prime$ MC samples spanning
+the prompt-search region was fitted and then rescaled to match the data-driven M{\o}ller
+point. The resulting 2015 parameterization is the linear form
+\begin{equation}
+\sigma_{2015}(m) = -9.22\times10^{-5} + 5.322\times10^{-2}\,m,
+\label{eq:sigma2015}
+\end{equation}
+with $m$ and $\sigma_{2015}$ expressed in GeV.
+
+The important review point is that the 2015 resolution is not taken from MC in
+isolation. The M{\o}ller calibration fixes the absolute detector response, and the
+scaled $A^\prime$ MC points then provide the mass dependence needed to interpolate away
+from the single M{\o}ller mass. That is the same physics logic used in the published
+2015 search, and it is why the 2015 mass-resolution uncertainty is ultimately tied to
+the M{\o}ller calibration, the target-position uncertainty, and the limited residual
+mismodelling of the momentum response \cite{HPS2015DarkPhoton,HPS2015InternalNote}.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[t]{0.48\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{resolution_figs/hps2015_mass_resolution_internal_fig24.png}
+  \caption{2015 mass-resolution parameterization from scaled $A^\prime$ MC and M{\o}ller
+  data \cite{HPS2015InternalNote}.}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{normalization_figs/hps2015_radiative_fraction_internal_fig31.png}
+  \caption{2015 radiative fraction used to normalize the prompt yield to
+  $\eps^2$ \cite{HPS2015InternalNote}.}
+\end{subfigure}
+\caption{Key 2015 prompt-search inputs reused in the present GPR note. The mass
+resolution is anchored by M{\o}ller data and scaled $A^\prime$ MC, while the
+radiative-fraction curve sets the signal-yield to $\eps^2$ conversion.}
+\label{fig:2015-resolution-radfrac}
+\end{figure}
+
+\subsection{2016 mass resolution}
+\label{sec:massres-2016}
+
+The 2016 prompt-search program followed the same overall structure as 2015, but with a
+broader mass range and a more explicit study of momentum smearing and systematic
+uncertainties \cite{HPS2016BumpInternal,HPS2016PromptLong}. The M{\o}ller point at
+\SI{48.5}{MeV} fixed the absolute detector response, a dedicated study of the FEE
+momentum peaks quantified the data--MC momentum mismatch, and smeared $A^\prime$ MC
+samples were then used to derive the mass dependence of the prompt resolution. In the
+2016 bump-hunt note this procedure is summarized by the smeared $A^\prime$ points shown
+in Figure~\ref{fig:2016-resolution-radfrac}, which were fitted with a fourth-order
+polynomial.
+
+The current GPR workflow uses the same published-resolution logic, with one practical
+extension: the historical polynomial is not allowed to turn over and improve
+artificially above about \SI{180}{MeV}. The operative 2016 parameterization is
+\begin{align}
+\sigma_{2016}(m) &= 3.8\times10^{-4} + 4.1\times10^{-2}m - 2.7\times10^{-1}m^2 \nonumber\\
+&\quad + 3.49\,m^3 - 11.11\,m^4,
+\qquad m \le \SI{0.18}{GeV},
+\label{eq:sigma2016}
+\end{align}
+followed by a linear continuation above $m_0=\SI{0.18}{GeV}$ with slope override
+\num{0.0239}. That tail prescription is purely technical, but it is necessary for the
+wider GPR scan window because an unphysical decrease of $\sigma_m$ at high mass would
+overstate the prompt sensitivity.
+
+The 2016 review emphasis is therefore twofold. First, the mass resolution must be
+described as a data-validated quantity rather than a free fit parameter. Second, the
+momentum-smearing correction is central to that validation because it is the step that
+reconciles the M{\o}ller and $A^\prime$ MC widths with the observed detector response
+\cite{HPS2016BumpInternal,HPS2016PromptLong}.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[t]{0.48\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{resolution_figs/hps2016_mass_resolution_internal_fig29.png}
+  \caption{2016 smeared-$A^\prime$ and M{\o}ller-based mass-resolution summary
+  \cite{HPS2016BumpInternal}.}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{normalization_figs/hps2016_radiative_fraction_internal_fig30.png}
+  \caption{2016 radiative-fraction study from radiative, trident, and converted-WAB MC
+  \cite{HPS2016BumpInternal}.}
+\end{subfigure}
+\caption{Key 2016 prompt-search inputs reused in the GPR note. The mass-resolution plot
+shows why the momentum-smearing and M{\o}ller calibration steps are essential, while the
+radiative-fraction plot shows the MC composition entering the normalization.}
+\label{fig:2016-resolution-radfrac}
+\end{figure}
+
+\subsection{2021 mass resolution}
+\label{sec:massres-2021}
+
+The 2021 prompt workflow inherits the upgraded slim-edge SVT era and therefore requires
+a separate resolution parameterization. The current GPR implementation uses
+\begin{equation}
+\sigma_{2021}(m)
+= 2.86957\times10^{-3} - 8.51449\times10^{-3}m + 2.5362319\times10^{-1}m^2,
+\label{eq:sigma2021}
+\end{equation}
+again with $m$ and $\sigma_{2021}$ in GeV. In contrast to 2015 and 2016, the present
+note does not yet bundle a standalone M{\o}ller-validation figure for the 2021
+parameterization. That absence should be stated explicitly for reviewers: the 2021
+resolution input is already implemented and used in the current 1\% combination, but
+its detector-response documentation is not yet as mature in this note as the
+engineering-run case.
+
+Figure~\ref{fig:2021-resolution-radfrac} therefore serves a different purpose from the
+2015 and 2016 internal-note reproductions. It records the actual parameterizations
+currently used by the GPR package for the 2021 prompt workflow, together with the
+baseline and penalty-adjusted radiative-fraction inputs that enter the shared-$\eps^2$
+conversion.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.88\linewidth}{resolution_figs/hps2021_resolution_and_frad.png}
+\caption{Current 2021 prompt-analysis parameterizations used by the GPR package. The
+left panel shows the 2021 mass-resolution model, while the right panel shows the
+baseline and penalty-adjusted radiative-fraction inputs used in the present note.}
+\label{fig:2021-resolution-radfrac}
+\end{figure}
+
+\subsection{Radiative fraction and the \texorpdfstring{$\eps^2$}{epsilon2} normalization}
+\label{sec:radfrac}
+
+The radiative fraction encodes the fraction of the selected prompt background arising
+from the purely radiative trident process,
+\begin{equation}
+f_{\mathrm{rad},d}(m)
+=
+\frac{dN_{\gamma^\ast,d}/dm}{dN_{\mathrm{tri},d}/dm + dN_{\mathrm{wab},d}/dm},
+\label{eq:frad-def}
+\end{equation}
+where the numerator is the selected radiative-trident component and the denominator is
+the full selected prompt background for dataset $d$
+\cite{HPS2015DarkPhoton,HPS2016PromptLong}. Because heavy-photon production is
+normalized to the radiative trident rate, $f_{\mathrm{rad}}$ is the physics quantity
+that converts a fitted prompt signal yield into a limit on the coupling. In the
+present notation,
+\begin{equation}
+K_d(m) \equiv A_d(\eps^2 = 1)
+= \frac{3\pi\,m\,f_{\mathrm{rad},d}^{\mathrm{eff}}(m)\,\rho_d(m)}{2\alpha_{\mathrm{EM}}},
+\qquad
+A_d = K_d(m)\,\eps^2,
+\label{eq:kd-radfrac}
+\end{equation}
+where $\rho_d(m)$ is the selected prompt-spectrum density in dataset $d$ and
+$f_{\mathrm{rad},d}^{\mathrm{eff}}$ is the radiative fraction after any systematic
+penalty.
+
+The 2015 prompt search used a constant approximation,
+\begin{equation}
+f_{\mathrm{rad},2015}(m) = 0.085,
+\end{equation}
+which is the baseline retained in the current GPR workflow. The 2016 prompt search
+used a fifth-order polynomial derived from radiative, trident, and converted-WAB MC
+after the full prompt selection. That full shape should be described because it is part
+of the published methodology, but the present GPR implementation uses a constant
+approximation,
+\begin{equation}
+f_{\mathrm{rad},2016}(m) = 0.05,
+\end{equation}
+for stability over the wider scan range. For the current 2021 1\% workflow, the same
+constant value is used as a provisional normalization input,
+\begin{equation}
+f_{\mathrm{rad},2021}(m) = 0.05,
+\end{equation}
+with the explicit understanding that the final 2021 normalization note may update this
+choice.
+
+The package also supports a dataset-dependent radiative-fraction penalty,
+\begin{equation}
+f_{\mathrm{rad},d}^{\mathrm{eff}}(m)
+= \left(1-\delta_{f,d}\right) f_{\mathrm{rad},d}(m).
+\label{eq:frad-penalty}
+\end{equation}
+For the current combined rerun summarized later in the note,
+$\delta_{f,d}=0.07$ for 2015, 2016, and 2021. At the single-dataset level, this means
+that a fixed signal-yield limit maps to a weaker coupling limit by approximately
+$1/(1-\delta_f)\simeq 1.075$. In the combined analysis, the same logic applies to every
+constituent dataset at once: each conversion factor $K_d(m)$ is reduced, so the shared
+$\eps^2$ value required to produce the same per-dataset yields becomes larger. This is
+why the radiative-fraction penalty is best described as a normalization systematic on
+the coupling interpretation rather than as a change in the underlying likelihood shape.

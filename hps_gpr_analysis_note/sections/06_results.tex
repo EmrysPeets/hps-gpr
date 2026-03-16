@@ -1,14 +1,14 @@
 \section{Results}
 \label{sec:results}
 
-This section summarizes the currently completed 2015, 2016 10\%, and 2015+2016
-combination outputs. The quoted figures are still pre-rerun products in the sense
-described earlier: they were generated before the final leakage-retaining template
-update and before the optional radiative-fraction penalty was introduced. They are
-therefore best read as the present physics organization of the result rather than as
-the last word on the numerical limits. Even so, they already show the structure of the
-analysis clearly and indicate why the global-GP approach is promising for a combined
-prompt $A^\prime$ search.
+This section separates two result layers. The standalone 2015, 2016 10\%, and
+2015$+$2016 subsections are retained as the current validated baseline summaries for
+the individual and early-combination stages of the workflow. The review-facing update,
+however, is the shared-$\eps^2$ combination of 2015, 2016 10\%, and 2021 1\%, for
+which the note now uses the bundled `summary\_combined\_all\_rad\_penalty` suite. In
+that three-dataset study the radiative-fraction penalty is applied consistently to all
+active datasets, and the combined global-significance curve is the only global
+look-elsewhere representation interpreted in the note.
 
 \subsection{2015 analysis}
 \label{sec:results-2015}
@@ -228,77 +228,59 @@ and the way that subset enters the later shared-$\eps^2$ combinations.}
 \subsection{Combined limit on \texorpdfstring{$\eps^2$}{epsilon2} using 2015+2016 10\%+2021 1\%}
 \label{sec:results-combined-151621-1pct}
 
-This first three-sample study combines the full 2015 data set, the 2016 10\%
-development subset, and the 2021 1\% subset using the most recent
-leakage-retaining signal model. It should therefore be regarded as the current
-post-leakage baseline for the shared-$\eps^2$ workflow. At the same time, it is
-\emph{not} yet the final physics result: the radiative-fraction penalty has not
-been applied, and the significance bookkeeping described below still needs one
-more frozen rerun before any discovery-style statement is appropriate.
+This three-sample study combines the full 2015 data set, the 2016 10\% development
+subset, and the 2021 1\% subset using the leakage-retaining signal template and the
+radiative-fraction penalty described in Eq.~\eqref{eq:frad-penalty}. In the current
+configuration the baseline radiative fractions are $f_{\mathrm{rad}}=0.085$ for 2015
+and $f_{\mathrm{rad}}=0.05$ for both 2016 and 2021, with a common
+$\delta_f=0.07$ penalty applied to each dataset through
+$f_{\mathrm{rad}}^{\mathrm{eff}}=(1-\delta_f)f_{\mathrm{rad}}$. At fixed extracted
+signal yield this weakens the corresponding $\eps^2$ constraint by a factor of
+$1/(1-\delta_f)\simeq 1.075$, so the combined limit shown here should be interpreted as
+the conservative systematic-penalized baseline rather than as the no-penalty central
+value.
 
 The observed combined $\eps^2$ limit in Figure~\ref{fig:results-combined-151621-1pct-ul}
-is broadly well behaved and remains close to the expected band over most of the
-scan. That general behavior is what one would expect from a statistically stable
-combined analysis. The visible kinks in the curve should not be overinterpreted
-as narrow resonant structure: this summary suite is labeled ``all'' because the
-active data-set content changes across the scan. Only the approximate
-\SIrange{35}{130}{MeV} interval is a genuine three-way overlap. Below that range,
-the curve interpolates between 2015-only and 2015+2021 support, while above it
-the result transitions to a 2016+2021 combination and finally to the 2021-only
-tail near the upper edge of the plot. In that sense the limit plot looks
-qualitatively reasonable.
+is smooth and remains close to the expected band over most of the scan. That behavior
+is consistent with a statistically stable shared-$\eps^2$ analysis. Changes in slope
+should not be overinterpreted as narrow resonant structure, because the active dataset
+content varies across the mass scan. Only the approximate \SIrange{35}{130}{MeV}
+interval is a genuine three-way overlap. Below that range the result interpolates
+between 2015-only and 2015$+$2021 support, while above it the analysis transitions to a
+2016$+$2021 combination and finally to a 2021-dominated tail near the upper edge of the
+scan.
 
-The significance panels require more care. The toy-based quantities
-$p_{\rm strong}$, $p_{\rm weak}$, and $p_{\rm two}$ in
-Figure~\ref{fig:results-combined-151621-1pct-significance} are \emph{not}
-discovery-significance estimators; they test how unusual the observed
-\emph{upper limit} is relative to the background-only toy ensemble. By contrast,
-the analytic $p_0$ curve is the local profile-likelihood bump-hunt statistic.
-These two diagnostics need not agree numerically, and they should not be
-extrapolated into one another. This is especially important here because the
-toy-limit ensemble contains \num{10000} pseudoexperiments, so the smallest
-resolvable one-sided tail probability is only $\mathcal{O}(10^{-4})$, i.e. about
-\SI{3.7}{\sigma}; it cannot by itself validate or refute a
-\SIrange{6}{7}{\sigma} excursion.
+The significance diagnostics in Figure~\ref{fig:results-combined-151621-1pct-significance}
+must be read with the definitions of Section~\ref{sec:methodology} in mind. The toy-tail
+quantities $p_{\rm strong}$, $p_{\rm weak}$, and $p_{\rm two}$ test how unusual the
+\emph{observed limit} is relative to the background-only limit ensemble, whereas the
+analytic $p_0$ curve is the local bump-hunt statistic obtained from the profiled shared
+likelihood. These are intentionally different questions. The combined local/global
+$p_0$ representation in the radiative-penalty suite is the correct place to discuss the
+look-elsewhere effect for the shared search; by contrast, the stacked single-dataset
+panels of Figure~\ref{fig:local-significances-across-datasets} are included only to
+show local fluctuation structure and not to support dataset-level global-significance
+claims.
 
-The striking feature of the present three-way summary is the narrow combined
-analytic-significance spike near \SI{126}{MeV}. A combined local enhancement
-larger than any individual input sample is qualitatively possible, because the
-shared-$\eps^2$ fit pools statistically independent information with
-mass-dependent weights. However, the auxiliary 2015, 2016, and 2021 local/global
-panels in the same summary folder show only $\mathcal{O}(2$--$3)\sigma$ local
-excursions and no comparably large global effect. For that reason, the current
-combined peak is larger than one would expect from a naive extrapolation of the
-toy-tail weak-$p$ values or from a simple quadrature estimate based on the
-dataset-level panels. Under the statistical standards usually applied in
-high-statistics HEP searches, that makes the feature interesting but not yet
-claimable.
-
-I verified that the \emph{form} of the global-significance conversion is the
-standard one used elsewhere in this workflow: a one-sided local $p_0$ is mapped
-to a global $p$-value with a \v{S}id\'{a}k trials-factor correction using an
-effective $N_{\rm eff}$ derived from the scan range and the mass resolution.
-That is an acceptable provisional look-elsewhere treatment. The caveat is that
-the current summary-level significance products still need a frozen rerun before
-their numerical values should be treated as final. In particular, the
-individual-dataset global $p$-value overlays in this combined-summary folder
-should be considered provisional even after restricting them to the
-combined-support mass domain, and the present three-way combined significance
-peak should be revisited after rerunning the corrected post-leakage summary with
-the radiative-fraction penalties included. The correct conservative reading of
-this study is therefore: the combined \emph{limit} behavior looks plausible and
-encouraging, while the quoted global-significance values remain preliminary.
+The main feature of the present three-way summary remains the narrow local enhancement
+in the combined analytic-significance curve near \SI{126}{MeV}. A combined local excess
+larger than any individual input fluctuation is qualitatively possible because the
+shared-$\eps^2$ fit pools statistically independent information with mass-dependent
+weights, but the feature is still best treated as a review target rather than a
+physics claim. The conservative reading is that the systematic-penalized combined
+\emph{limit} behaves sensibly and that the combined global-significance conversion has
+the correct form for this stage of the analysis, while the individual-dataset auxiliary
+overlays and the final scan-level calibration still await a frozen rerun with the
+updated plotting code.
 
 \begin{figure}[H]
 \centering
-\graphicorplaceholder{0.86\linewidth}{upper_limit_figs/2015_2016_2021_1pct_combined/ul_bands_eps2_obsexp.png}
-\caption{Observed and expected 95\% CL upper limit on $\eps^2$ for the current
-2015+2016 10\%+2021 1\% shared-coupling study using the leakage-retaining signal
-update. The overall smoothness of the curve is consistent with a statistically
-stable combination. Changes in slope are expected when the active set of input
-data sets changes across the mass scan, so this figure should be read as an
-``all available data'' summary rather than as a pure three-way-overlap result at
-every mass point.}
+\graphicorplaceholder{0.86\linewidth}{summary_combined_all_rad_penalty/ul_bands_eps2_obsexp.png}
+\caption{Observed and expected 95\% CL upper limit on $\eps^2$ for the
+2015$+$2016 10\%$+$2021 1\% shared-coupling study with the radiative-fraction penalty
+applied. The penalty weakens the yield-to-$\eps^2$ conversion coherently in every
+active dataset, so this curve is the conservative combined baseline currently used for
+internal review.}
 \label{fig:results-combined-151621-1pct-ul}
 \end{figure}
 
@@ -306,25 +288,39 @@ every mass point.}
 \centering
 \begin{subfigure}[t]{0.48\linewidth}
   \centering
-  \graphicorplaceholder{\linewidth}{significance_figs/2015_2016_2021_1pct_combined/ul_pvalues_components_local_global_refs.png}
+  \graphicorplaceholder{\linewidth}{summary_combined_all_rad_penalty/ul_pvalues_components_local_global_refs.png}
   \caption{Toy-tail diagnostics for the observed CL$_s$ limit.}
 \end{subfigure}
 \hfill
 \begin{subfigure}[t]{0.48\linewidth}
   \centering
-  \graphicorplaceholder{\linewidth}{significance_figs/2015_2016_2021_1pct_combined/p0_analytic_local_global.png}
-  \caption{Analytic local and provisional global $p_0$ curves.}
+  \graphicorplaceholder{\linewidth}{summary_combined_all_rad_penalty/p0_analytic_local_global.png}
+  \caption{Analytic local and global $p_0$ curves for the combined search.}
 \end{subfigure}
-\caption{Current three-way combined significance summary. The left panel tests how
-unusual the observed \emph{limit} is relative to background-only toy limits,
-whereas the right panel shows the analytic bump-hunt statistic. The two should
-not be identified with one another. The narrow high-significance structure near
-\SI{126}{MeV} is the main feature requiring rerun-level scrutiny. The
-look-elsewhere conversion itself follows the standard trial-factor logic, but
-the numerical global $p$-values shown here, especially for the auxiliary
-individual-dataset overlays in this study, should still be regarded as
-preliminary until the post-leakage and radiative-penalty rerun is frozen.}
+\caption{Current three-way combined significance summary using the bundled
+radiative-penalty products. The left panel tests how unusual the observed
+\emph{limit} is relative to background-only toy limits, while the right panel shows the
+analytic bump-hunt statistic. The two panels answer different statistical questions and
+should not be identified with one another.}
 \label{fig:results-combined-151621-1pct-significance}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.96\linewidth}{observed_display_combined_119MeV.png}
+\caption{Observed shared-coupling extraction display at a mass hypothesis of
+\SI{119}{MeV}. The top row shows, for 2015, 2016, and 2021 separately, the observed
+mass spectrum in the fit region together with the GP background prediction, the
+profiled background, the best-fit signal$+$background model, and the blinded window.
+The middle row recasts the same mass window as residuals relative to the profiled
+background and overlays the extracted signal component for each dataset. The lower
+panel maps the extracted signal templates into the common variable
+$(m-m_0)/\sigma_m$ and shows how the dataset-level extractions sum to the combined
+black curve. The bundled image predates the lower-panel display fix, so the slight
+edge truncation in the black curve is a plotting artifact of the old interpolation
+path; the code has been corrected in the current repository so that the next
+data-access rerender uses the full template support.}
+\label{fig:results-combined-151621-1pct-display}
 \end{figure}
 
 \subsection{First-round unblinding: 2015+2016 10\%+2021 10\%}

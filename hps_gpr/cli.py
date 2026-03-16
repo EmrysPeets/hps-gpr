@@ -1399,6 +1399,7 @@ def slurm_combine(output_dir, prefix):
                         if sub.empty:
                             continue
                         if "p0_analytic" in sub.columns:
+                            sigma_col_single = "sigma_val" if "sigma_val" in sub.columns else "sigma_mass_res_GeV"
                             plot_analytic_p0(
                                 sub,
                                 title=f"{ds_name}: analytic local/global p0",
@@ -1406,6 +1407,7 @@ def slurm_combine(output_dir, prefix):
                                 apply_lee=True,
                                 lee_method="sidak",
                                 indep_width_sigma=lee_width,
+                                sigma_col=sigma_col_single,
                             )
                             plot_Z_local_global(
                                 sub,
@@ -1414,6 +1416,7 @@ def slurm_combine(output_dir, prefix):
                                 apply_lee=True,
                                 lee_method="sidak",
                                 indep_width_sigma=lee_width,
+                                sigma_col=sigma_col_single,
                             )
                     except Exception as e:
                         print(f"Warning: dataset local/global summary failed for {ds_name}: {e}")
