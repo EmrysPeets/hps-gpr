@@ -5,7 +5,7 @@ This section separates two result layers. The standalone 2015, 2016 10\%, and
 2015$+$2016 subsections are retained as the current validated baseline summaries for
 the individual and early-combination stages of the workflow. The review-facing update,
 however, is the shared-$\eps^2$ combination of 2015, 2016 10\%, and 2021 1\%, for
-which the note now uses the bundled `summary\_combined\_all\_rad\_penalty` suite. In
+which the note now uses the current `summary\_combined\_all\_rad\_penalty` summary. In
 that three-dataset study the radiative-fraction penalty is applied consistently to all
 active datasets, and the combined global-significance curve is the only global
 look-elsewhere representation interpreted in the note.
@@ -159,14 +159,15 @@ before the final global-significance evaluation is frozen.}
 
 \begin{figure}[p]
 \centering
-\graphicorplaceholder{0.96\linewidth}{extract_display_combined_m040MeV_z5p0.png}
+\graphicorplaceholder{0.96\linewidth}{combined_search_figs/extract_display_combined_m040MeV_z7p0.png}
 \caption{Illustrative combined extraction display at \SI{40}{MeV}. The annotation box
 summarizes the injected common coupling, the extracted coupling, the observed combined
-limit, and the fitted per-dataset responses. The upper panels show how
-the two input data sets respond individually, while the lower panel shows the combined
-Gaussian signal representation. The no-refit version is used here because it is the
-clearest visualization of the shared-likelihood method before the extra complication of
-toy-by-toy GP retraining is introduced.}
+limit, and the fitted per-dataset responses for the 2015$+$2016 study. The upper
+panels show how the two input data sets respond individually, while the lower panel
+shows the combined Gaussian signal representation in the shared parameter of interest.
+This note-local export corresponds to a no-refit injected \SI{7}{\sigma}
+pseudoexperiment and is used here because it cleanly isolates the shared-likelihood
+construction before toy-by-toy GP retraining is introduced.}
 \label{fig:results-combined-1516-display}
 \end{figure}
 
@@ -259,6 +260,43 @@ internal review.}
 \label{fig:results-combined-151621-1pct-ul}
 \end{figure}
 
+The projected unblinded reach in Figure~\ref{fig:results-combined-151621-1pct-projection}
+is obtained from the same dataset-level $\eps^2$ curves using explicit
+$1/\sqrt{L}$ rescaling before the shared-coupling combination is recomputed. In the
+current projection, the fully unblinded 2015 sample is held fixed, the 2016 10\%
+subset is promoted by a factor of 10 in statistics, and the 2021 1\% subset is
+promoted by a factor of 100. At each mass, the constituent curves are therefore scaled
+dataset by dataset and then recombined through the same inverse-variance logic used in
+the live projection code. Writing $x_d(m)\equiv\eps^2_d(m)$ for the dataset-level
+curve,
+\begin{equation}
+\frac{1}{x_{\mathrm{proj}}(m)^2}
+=
+\sum_d \frac{L_d/L_{d,0}}{x_d(m)^2},
+\end{equation}
+so the projected combined limit is
+\begin{equation}
+\eps^2_{\mathrm{proj}}(m) = \left[\sum_d
+\frac{L_d/L_{d,0}}{\left(\eps^2_d(m)\right)^2}\right]^{-1/2}.
+\end{equation}
+The consequence is that the projection changes shape, not only normalization: the
+highest-statistics 2021 input dominates much of the upper-mass reach, while extra gains
+still appear where multiple constituent datasets simultaneously occupy relatively
+low-background regions.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.86\linewidth}{combined_search_figs/projected_unblinded_reach_eps2_note_version.png}
+\caption{Projected full-statistics shared-$\eps^2$ reach for the
+2015$+$2016 10\%$+$2021 1\% program. The projection rescales the dataset-level
+$\eps^2$ curves as $1/\sqrt{L}$ with 2015 held fixed, 2016 promoted by a factor of 10,
+and 2021 promoted by a factor of 100, and then recomputes the shared-coupling
+combination point by point. The contour therefore changes shape as well as depth:
+the highest-statistics input increasingly dominates the upper-mass reach, while the
+overlap region still benefits from coherent support among the constituent datasets.}
+\label{fig:results-combined-151621-1pct-projection}
+\end{figure}
+
 \begin{figure}[H]
 \centering
 \begin{subfigure}[t]{0.48\linewidth}
@@ -272,8 +310,8 @@ internal review.}
   \graphicorplaceholder{\linewidth}{summary_combined_all_rad_penalty/p0_analytic_local_global.png}
   \caption{Analytic local and global $p_0$ curves for the combined search.}
 \end{subfigure}
-\caption{Current three-way combined significance summary using the bundled
-radiative-penalty products. The left panel tests how unusual the observed
+\caption{Current three-way combined significance summary using the radiative-penalty
+summary products. The left panel tests how unusual the observed
 \emph{limit} is relative to background-only toy limits, while the right panel shows the
 analytic bump-hunt statistic. The two panels answer different statistical questions and
 should not be identified with one another.}

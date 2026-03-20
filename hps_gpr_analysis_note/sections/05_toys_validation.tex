@@ -11,11 +11,13 @@ Throughout this section, the combined interpretation is focused on the overlap r
 \SIrange{35}{130}{MeV}, which is the mass interval where both data sets contribute
 meaningfully to the prompt-resonance search.
 
-The bundled toy-validation figures were produced before the final adoption of the
+Many of the toy-validation figures were produced before the final adoption of the
 leakage-retaining signal template and before the future likelihood refinements
 mentioned in Section~\ref{sec:methodology}. They are nevertheless already informative
 for the statistical questions that matter most: closure, bias, pull calibration,
-coverage, and the logic of the combined extraction.
+coverage, and the logic of the combined extraction. Where newer note-local products are
+available, especially for the no-refit three-dataset pseudoexperiment displays and the
+projected reach discussion, those updated exports are used explicitly below.
 
 \subsection{Three toy-generation modes}
 
@@ -198,7 +200,10 @@ behavior. The large downward excursion below \SI{40}{MeV} is dominated by the fa
 the 2016 geometric acceptance is essentially zero there, especially at
 \SIlist{25;30}{MeV}. The upward drift above approximately \SI{130}{MeV} is influenced by
 the truncation of the 2015 spectrum near \SI{150}{MeV} and may also contain residual
-signal-leakage effects that should be revisited after the next likelihood update.
+signal-leakage effects that should be revisited after the next likelihood update. For
+the note-local summary, the same layout is extended to the current combined study, with
+the bottom row reserved for the 2021 1\% and combined exports once the full
+three-dataset toy summary is frozen.
 
 \begin{figure}[p]
 \centering
@@ -213,11 +218,24 @@ signal-leakage effects that should be revisited after the next likelihood update
   \graphicorplaceholder{\linewidth}{injection_extraction_figs/pull_vs_mass_2016.png}
   \caption{2016 10\% pull mean and width versus mass.}
 \end{subfigure}
-\caption{Mass-dependent pull diagnostics for the single-dataset analyses. The points
-show the mean pull and pull width extracted from the toy ensembles, while the shaded
-bands reflect the uncertainty of those quantities under the Poisson injection scheme.
-These plots summarize the most important closure information more directly than the
-separate linearity, bias, and pull-width aggregate summaries.}
+\vspace{0.8em}
+
+\begin{subfigure}[t]{0.48\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{injection_extraction_figs/pull_vs_mass_2021.png}
+  \caption{2021 1\% pull mean and width versus mass.}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{injection_extraction_figs/pull_vs_mass_combined.png}
+  \caption{Current combined pull mean and width versus mass.}
+\end{subfigure}
+\caption{Mass-dependent pull diagnostics for the staged single-dataset and combined
+studies. The top row shows the 2015 and 2016 10\% validations; the bottom row is
+reserved for the 2021 1\% export and the current combined summary. These panels test
+estimator closure directly: the pull mean tracks bias while the pull width tests
+whether the quoted $\sigma_A$ is correctly calibrated as an uncertainty scale.}
 \label{fig:pull-vs-mass}
 \end{figure}
 
@@ -225,7 +243,9 @@ The coverage plots complement the pull diagnostics by testing whether the empiri
 fractions satisfying $|\mathrm{pull}|<1$ and $|\mathrm{pull}|<2$ remain close to the
 nominal Gaussian expectations of approximately 68\% and 95\%. For both 2015 and the
 2016 10\% sample, the observed coverage is reasonably close to expectation across the
-core search region.
+core search region. The combined coverage panel is especially useful because it tests
+whether the shared-$\eps^2$ uncertainty remains interpretable as an interval statement
+after statistically independent datasets have been merged in one likelihood.
 
 \begin{figure}[p]
 \centering
@@ -240,9 +260,24 @@ core search region.
   \graphicorplaceholder{\linewidth}{injection_extraction_figs/coverage_2016.png}
   \caption{2016 10\% interval coverage.}
 \end{subfigure}
+\vspace{0.8em}
+
+\begin{subfigure}[t]{0.48\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{injection_extraction_figs/coverage_2021.png}
+  \caption{2021 1\% interval coverage.}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{injection_extraction_figs/coverage_combined.png}
+  \caption{Current combined interval coverage.}
+\end{subfigure}
 \caption{Empirical coverage of the nominal one- and two-standard-deviation pull
-intervals. These panels test whether the extracted uncertainty $\sigma_A$ is correctly
-calibrated as an interval statement, not only as a width parameter.}
+intervals. The top row shows the 2015 and 2016 10\% single-dataset studies, while the
+bottom row is reserved for the 2021 1\% export and the current combined summary. These
+panels test whether the extracted uncertainty $\sigma_A$ is correctly calibrated as an
+interval statement, not only as a width parameter.}
 \label{fig:coverage}
 \end{figure}
 
@@ -251,6 +286,20 @@ the extracted significance scale with the injected scale. This information corro
 the combined-search-power studies discussed below: both are asking whether the
 multi-dataset procedure accumulates significance in a way consistent with the expected
 inverse-variance weighting of the constituent channels.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.86\linewidth}{injection_extraction_figs/z_calibration_residual_comparison.png}
+\caption{Residual significance calibration for the staged toy studies. The 2015 and
+2016 single-dataset panels stay centered near $\Delta Z=0$, showing that an injected
+local significance is recovered without visible extra bias. In the combined panel, the
+median $\Delta Z$ becomes positive in the overlap region because statistically
+independent inputs add coherently in the shared-$\eps^2$ fit; in the current
+2015+2016 summary the enhancement is strongest near \SIrange{50}{70}{MeV}, where a
+$Z_{\rm inj}=5$ signal gains about two additional significance units in the median
+combined response.}
+\label{fig:z-calibration-residual}
+\end{figure}
 
 \subsection{Combined search-power studies}
 
@@ -265,9 +314,9 @@ not the same per-dataset significance in each constituent channel.
 
 The updated search-power plotter is now configured to support both the current
 two-dataset export and the intended three-dataset scenarios. In particular, once the
-2021 injection-summary CSV is bundled into the workspace, the same stacked layout can
+2021 injection-summary CSV is added to the note workspace, the same stacked layout can
 be rerendered for the intuitive ``1$\sigma$ + 1$\sigma$ + 1$\sigma$'' and
-``1$\sigma$ + 2$\sigma$ + 3$\sigma$'' shared-coupling tests. The bundled panels shown
+``1$\sigma$ + 2$\sigma$ + 3$\sigma$'' shared-coupling tests. The panels shown
 here are therefore still provisional in their numerical content, but they now use the
 publication-facing top-bottom layout and the final inverse-variance bookkeeping.
 
@@ -276,9 +325,10 @@ publication-facing top-bottom layout and the final inverse-variance bookkeeping.
 \begin{subfigure}[t]{0.66\linewidth}
   \centering
   \graphicorplaceholder{\linewidth}{combined_search_figs/combined_search_power_scenarios.png}
-  \caption{Current bundled search-power scenario panel, regenerated with the final
-  stacked layout from the locally available toy-summary export. The same plotter now
-  supports the intended three-dataset benchmarks once the 2021 summary CSV is bundled.}
+  \caption{Current two-dataset search-power scan. The injected common coupling is
+  translated into dataset-specific signal yields before the combined significance is
+  evaluated, so the curves track genuine shared-likelihood sensitivity rather than a
+  same-event-count toy convention.}
 \end{subfigure}
 
 \vspace{0.25em}
@@ -286,36 +336,28 @@ publication-facing top-bottom layout and the final inverse-variance bookkeeping.
 \begin{subfigure}[t]{0.66\linewidth}
   \centering
   \graphicorplaceholder{\linewidth}{combined_search_figs/combined_search_power_constituent_pvalues_5sigma.png}
-  \caption{Constituent-dataset requirements for a target combined $5\sigma$ excess.}
+  \caption{Constituent-dataset requirements for a target combined $5\sigma$ excess. The
+  point of this panel is that the shared fit can reach a fixed combined threshold from
+  many different per-dataset allocations, depending on where each spectrum has the
+  better local signal-to-background leverage.}
 \end{subfigure}
 \caption{Combined-search-power diagnostics. These plots show how sensitivity accumulates
 in the shared-$\eps^2$ framework and should be interpreted together with the
-significance-calibration studies rather than as direct limit-setting observables. The
-current bundled export remains provisional because the 2021 toy-summary inputs are not
-yet packaged in this workspace.}
+significance-calibration studies rather than as direct limit-setting observables. Their
+review value is to show why the combined search can outperform any one constituent
+dataset even when the underlying injected coupling is the same in every channel.}
 \label{fig:combined-search-power}
 \end{figure}
 
 \subsection{Projected unblinded reach in \texorpdfstring{$\eps^2$}{epsilon2}}
 
 The same inverse-variance logic can be used for a simple full-luminosity projection.
-For the placeholder study kept in this note, the sensitivity is scaled as
-$1/\sqrt{L}$ relative to the current validated subsets, with the fully unblinded 2015
-sample held fixed, the 2016 program promoted from the current 10\% validation subset to
-its full parent luminosity, and the 2021 program promoted from the current 1\% subset
-to the full physics-run sample. This is not a substitute for the final rerun with the
-complete event selections and normalization inputs, but it is the right compact figure
-to show the expected unblinded trajectory of the shared-$\eps^2$ search.
-
-\begin{figure}[H]
-\centering
-\graphicorplaceholder{0.84\linewidth}{combined_search_figs/projected_unblinded_reach_eps2_placeholder.png}
-\caption{Projected unblinded reach in $\eps^2$. The final version of this figure will
-be generated from the combined UL-band or combined-results CSV output using
-$1/\sqrt{L}$ scaling with 2015 held fixed, the full 2016 luminosity, and the full 2021
-luminosity.}
-\label{fig:projected-unblinded-reach}
-\end{figure}
+For the current study this is implemented directly at the level of the dataset-specific
+$\eps^2$ curves: each constituent curve is scaled by $1/\sqrt{L}$, and the projected
+shared-coupling sensitivity is then recomputed with the same inverse-variance
+combination logic used elsewhere in the note. The resulting projection is shown with
+the three-dataset results in Section~\ref{sec:results-combined-151621-1pct}, where it
+is most naturally interpreted as part of the physics-facing combined reach.
 
 \subsection{Combined extraction displays}
 
@@ -323,23 +365,48 @@ The common-signal extraction displays are the most transparent way to visualize 
 shared-$\eps^2$ construction. The top row shows individual single-dataset
 pseudoexperiments. The lower panel shows the combined Gaussian signal representation
 constructed from the same injected coupling. For the reviewer-facing note, the main
-illustration is now the \SI{40}{MeV} no-refit pseudoexperiment at an injected combined
-strength of five standard deviations. That choice is deliberate: it looks most like the
-observed-data display because the same sideband-conditioned background model is being
-tested for extraction closure rather than for signal absorption.
+illustrations are now the no-refit pseudoexperiments with a five-standard-deviation
+injected shared signal at \SIlist{40;80;120}{MeV}. Those examples are deliberately
+shown without toy-by-toy GP retraining because they are meant to test extraction
+closure under the sideband-conditioned background model and to show, mass by mass, how
+the shared coupling is partitioned among 2015, 2016, and 2021.
 
 \begin{figure}[p]
 \centering
-\graphicorplaceholder{0.96\linewidth}{extract_display_combined_m040MeV_z5p0.png}
+\graphicorplaceholder{0.96\linewidth}{extract_display_combined_m040MeV_z5p0_polished.png}
 \caption{Illustrative no-refit combined extraction display at \SI{40}{MeV}. The
 annotation box summarizes the injected coupling, the extracted combined coupling, the
-observed combined limit, and the corresponding per-dataset fit summaries. The upper
-panels show the single-dataset fits and extracted signal
+observed combined limit, the local significance, and the corresponding per-dataset fit
+summaries. The upper panels show the single-dataset fits and extracted signal
 components, while the lower panel shows the combined Gaussian signal representation that
-enters the shared-$\eps^2$ interpretation. This is the main closure-style
-pseudoexperiment figure used in the note because it can be compared directly with the
-observed-data validation display at the same level of background modelling.}
+enters the shared-$\eps^2$ interpretation. At \SI{40}{MeV}, the 2015 spectrum carries
+most of the signal normalization, but the three-way fit still illustrates the core
+physics point of the combination: statistically independent datasets with different
+resolutions and backgrounds are constrained in one common coupling parameter.}
 \label{fig:combined-extract-displays}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\begin{subfigure}[t]{0.88\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{extract_display_combined_m080MeV_z5p0_polished.png}
+  \caption{No-refit shared-coupling pseudoexperiment at \SI{80}{MeV}.}
+\end{subfigure}
+
+\vspace{0.8em}
+
+\begin{subfigure}[t]{0.88\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{extract_display_combined_m120MeV_z5p0_polished.png}
+  \caption{No-refit shared-coupling pseudoexperiment at \SI{120}{MeV}.}
+\end{subfigure}
+\caption{Additional no-refit combined pseudoexperiments at \SIlist{80;120}{MeV}. The
+local-significance entry in the metadata box and the changing relative sizes of the
+per-dataset extracted signals make the mass dependence of the shared fit concrete:
+different datasets dominate at different masses because their resolutions, accepted
+statistics, and prompt-background levels are not the same.}
+\label{fig:combined-extract-displays-additional}
 \end{figure}
 
 The full-refit comparison is retained as a diagnostic because it answers a different
@@ -348,7 +415,7 @@ spectrum is regenerated over the full mass range. The visibly poorer recovery in
 case is therefore not a contradiction of the no-refit closure test; it is the point of
 the absorption diagnostic.
 
-\begin{figure}[H]
+\begin{figure}[p]
 \centering
 \graphicorplaceholder{0.88\linewidth}{extract_display_combined_m040MeV_z3p0_refit.png}
 \caption{Diagnostic full-refit combined extraction display at \SI{40}{MeV}. This panel

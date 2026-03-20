@@ -324,6 +324,14 @@ smallest parameter value satisfying
 pseudoexperiments and are reported both in signal-yield space and after mapping to
 $\eps^2$.
 
+The reason the toy program remains central even after writing down the asymptotic test
+statistic is that the HPS problem is not a textbook one-bin counting limit. The local
+likelihood combines low blind-window counts with a GP-conditioned covariance, a
+non-renormalized Gaussian signal template, and a mass-dependent yield-to-$\eps^2$
+conversion. The pull, coverage, and injection studies of Section~\ref{sec:toys}
+therefore validate not only code closure but also the statistical conditions under
+which the asymptotic summaries can be interpreted with confidence.
+
 \subsection{Observed-limit tail diagnostics and significance summaries}
 
 The analysis uses two distinct families of $p$-values, and the distinction is
@@ -377,7 +385,9 @@ $N_{\mathrm{toys}}=\num{10000}$, the smallest non-zero empirical tail probabilit
 of order $1/(N_{\mathrm{toys}}+1)\sim 10^{-4}$, corresponding to only about
 \SI{3.7}{\sigma} one-sided. Toy-limit tails at this granularity therefore cannot by
 themselves validate or refute a \SIrange{5}{7}{\sigma} local excess in the analytic
-bump-hunt statistic.
+bump-hunt statistic. This is another reason the note treats the toy-tail curves as
+limit diagnostics and reserves discovery-language statements for the profile-likelihood
+$p_0$ construction.
 
 \subsection{Shared-\texorpdfstring{$\eps^2$}{epsilon2} combination across datasets}
 \label{sec:combination}
