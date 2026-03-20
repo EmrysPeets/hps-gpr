@@ -19,7 +19,7 @@ except ImportError:
     _threadpool_limits = contextlib.nullcontext  # type: ignore[assignment]
 
 from .io import estimate_background_for_dataset
-from .template import build_template, cls_limit_for_template
+from .template import build_window_template_from_full, cls_limit_for_template
 from .statistics import draw_bkg_mvn_nonneg, p0_profiled_gaussian_LRT
 from .gpr import make_kernel_for_dataset, fit_gpr, predict_counts_from_log_gpr
 from .evaluation import (
@@ -128,14 +128,16 @@ def expected_ul_bands_for_dataset(
                 train_exclude_nsigma=float(train_exclude_nsigma),
             )
 
-        tmpl = build_template(pred.edges, m, pred.sigma_val)
+        tmpl, _ = build_window_template_from_full(
+            pred.edges_full, pred.blind_mask, m, pred.sigma_val
+        )
         obs = np.asarray(pred.obs, int)
         mu = np.asarray(pred.mu, float)
         cov = np.asarray(pred.cov, float)
 
         alpha = float(config.cls_alpha)
-        mode = str(config.cls_mode)
-        num_toys_cls = int(config.cls_num_toys)
+        mode = str(getattr(config, "ul_bands_cls_mode", None) or config.cls_mode)
+        num_toys_cls = int(getattr(config, "ul_bands_cls_num_toys", None) or config.cls_num_toys)
 
         # Observed UL
         if compute_obs:
@@ -266,9 +268,9 @@ def expected_ul_bands_for_dataset(
         # Analytic p0 / Z on observed data (only when unblinded)
         if compute_obs:
             try:
-                p0_obs = float(p0_profiled_gaussian_LRT(obs, mu, cov, tmpl))
-                from scipy.stats import norm as _norm
-                Z_obs = float(_norm.ppf(1.0 - p0_obs)) if np.isfinite(p0_obs) and p0_obs < 1.0 else np.nan
+                p0_obs, Z_obs, _, _ = p0_profiled_gaussian_LRT(obs, mu, cov, tmpl)
+                p0_obs = float(p0_obs)
+                Z_obs = float(Z_obs)
             except Exception:
                 p0_obs = np.nan
                 Z_obs = np.nan
@@ -279,6 +281,8 @@ def expected_ul_bands_for_dataset(
         return dict(
             dataset=ds.key,
             mass_GeV=float(m),
+            sigma_mass_res_GeV=float(pred.sigma_val),
+            cls_alpha=float(alpha),
             # Publication-facing columns
             eps2_obs=float(eps2_obs) if np.isfinite(eps2_obs) else np.nan,
             A_obs=float(A_obs) if np.isfinite(A_obs) else np.nan,
@@ -442,8 +446,8 @@ def expected_ul_bands_for_combination(
         obs_vec0, b_vec, cov_mat, s_unit = build_combined_components(float(m), ds_list, preds_list)
 
         alpha = float(config.cls_alpha)
-        mode = str(config.cls_mode)
-        num_toys_cls = int(config.cls_num_toys)
+        mode = str(getattr(config, "ul_bands_cls_mode", None) or config.cls_mode)
+        num_toys_cls = int(getattr(config, "ul_bands_cls_num_toys", None) or config.cls_num_toys)
 
         # Blinding: compute obs only if all datasets are "observed"
         compute_obs = all(
@@ -474,7 +478,9 @@ def expected_ul_bands_for_combination(
             if len(ds_here) == 1:
                 # Single-dataset fallback: use single-dataset CLs
                 k = ds_here[0]
-                tmpl = build_template(preds[k].edges, m, preds[k].sigma_val)
+                tmpl, _ = build_window_template_from_full(
+                    preds[k].edges_full, preds[k].blind_mask, m, preds[k].sigma_val
+                )
                 for t in range(int(n_toys)):
                     eps2_t, _ = cls_limit_for_template(
                         n_draws_list[0][t],
@@ -548,6 +554,8 @@ def expected_ul_bands_for_combination(
                         mu=np.asarray(mu_fit, float),
                         cov=np.asarray(cov_fit, float),
                         edges=np.asarray(preds[k].edges, float),
+                        edges_full=np.asarray(preds[k].edges_full, float),
+                        blind_mask=np.asarray(preds[k].blind_mask, bool),
                         sigma_val=float(preds[k].sigma_val),
                         integral_density=float(preds[k].integral_density),
                     ))
@@ -577,15 +585,16 @@ def expected_ul_bands_for_combination(
         # Analytic p0 / Z for combined observed data (null signal, A=0 template)
         if compute_obs:
             try:
-                # Build a unit template at eps2=1 to get a combined signal shape
-                from .template import build_template as _bt
-                tmpl_c = np.concatenate([
-                    _bt(preds[k].edges, float(m), float(preds[k].sigma_val))
-                    for k in ds_here
-                ])
-                p0_obs_c = float(p0_profiled_gaussian_LRT(obs_vec0, b_vec, cov_mat, tmpl_c))
-                from scipy.stats import norm as _norm
-                Z_obs_c = float(_norm.ppf(1.0 - p0_obs_c)) if np.isfinite(p0_obs_c) and p0_obs_c < 1.0 else nan
+                # Use the same shared-epsilon^2 weighting as the combined fit itself.
+                eps2_scale = float(getattr(config, "eps2_lrt_scale", 1e10))
+                p0_obs_c, Z_obs_c, _, _ = p0_profiled_gaussian_LRT(
+                    obs_vec0,
+                    b_vec,
+                    cov_mat,
+                    s_unit / eps2_scale,
+                )
+                p0_obs_c = float(p0_obs_c)
+                Z_obs_c = float(Z_obs_c)
             except Exception:
                 p0_obs_c = nan
                 Z_obs_c = nan
@@ -596,6 +605,9 @@ def expected_ul_bands_for_combination(
         return dict(
             dataset_set=str(ds_tag),
             mass_GeV=float(m),
+            sigma_mass_res_GeV=float(np.mean([float(preds[k].sigma_val) for k in ds_here])) if ds_here else nan,
+            sigma_mass_res_min_GeV=float(np.min([float(preds[k].sigma_val) for k in ds_here])) if ds_here else nan,
+            cls_alpha=float(config.cls_alpha),
             # Publication-facing columns
             eps2_obs=float(eps2_obs) if np.isfinite(eps2_obs) else nan,
             p0_analytic=float(p0_obs_c), Z_analytic=float(Z_obs_c),

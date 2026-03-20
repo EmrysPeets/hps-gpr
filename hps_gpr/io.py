@@ -5,7 +5,13 @@ from typing import Optional, Tuple, TYPE_CHECKING
 
 import numpy as np
 
-from .gpr import fit_gpr, predict_counts_from_log_gpr
+from .gpr import (
+    fit_gpr,
+    predict_counts_from_log_gpr,
+    make_kernel_for_dataset,
+    compute_kernel_ls_bounds,
+    _extract_rbf_bounds_and_scale,
+)
 
 if TYPE_CHECKING:
     from sklearn.gaussian_process import GaussianProcessRegressor
@@ -28,8 +34,21 @@ class BlindPrediction:
     y_full: np.ndarray  # All observed counts
     mu_full: np.ndarray  # Background prediction for all bins
     edges_full: np.ndarray  # All bin edges
+    blind_mask: np.ndarray  # Mask of the blind window in the full binning
 
     integral_density: float  # Counts per GeV in signal region
+    blind_train: Optional[Tuple[float, float]] = None  # GP training exclusion window
+
+    # GP/kernel diagnostics for summary CSV/plots
+    kernel_str: str = ""
+    ls_lo: float = float("nan")
+    ls_hi: float = float("nan")
+    ls_init: float = float("nan")
+    ls_opt: float = float("nan")
+    sigma_x: float = float("nan")
+    const_opt: float = float("nan")
+    lml: float = float("nan")
+    n_train: int = 0
 
 
 def _gp_model(h, kernel, **kwargs):
@@ -60,11 +79,13 @@ def _build_model(
     blind: Tuple[float, float],
     rebin: int,
     config: "Config",
+    *,
+    mass: Optional[float] = None,
 ):
     """Build the gp model for a dataset."""
     import gp
 
-    kernel = config.get_kernel()
+    kernel = make_kernel_for_dataset(ds, config, mass=mass)
 
     # Probe histogram edges
     probe = _gp_model((ds.root_path, ds.hist_name), kernel)
@@ -72,9 +93,12 @@ def _build_model(
     first_edge = float(edges_all[0])
     last_edge = float(edges_all[-1])
 
-    # Clamp to dataset analysis range
-    lower = max(first_edge, ds.m_low)
-    upper = min(last_edge, ds.m_high)
+    # Prefer explicit data-range overrides for training/fits; otherwise use
+    # full histogram extent to avoid edge instabilities near the search range.
+    data_lo = getattr(ds, "data_low", None)
+    data_hi = getattr(ds, "data_high", None)
+    lower = max(first_edge, float(data_lo)) if data_lo is not None else first_edge
+    upper = min(last_edge, float(data_hi)) if data_hi is not None else last_edge
 
     manip = gp._hist.manipulation.rebin_and_limit(int(rebin), lower, upper)
 
@@ -191,7 +215,7 @@ def estimate_background_for_dataset(
         mass + float(train_exclude_nsigma) * sigma_val,
     )
 
-    model = _build_model(ds, blind, rebin=rebin, config=config)
+    model = _build_model(ds, blind, rebin=rebin, config=config, mass=float(mass))
 
     X = model.histogram.axes[0].centers
     y = model.histogram.values().astype(float)
@@ -200,7 +224,8 @@ def estimate_background_for_dataset(
     X_train = X[mask_train]
     y_train = y[mask_train]
 
-    gpr = fit_gpr(X_train, y_train, config, restarts=int(restarts))
+    gpr = fit_gpr(X_train, y_train, config, restarts=int(restarts),
+        kernel=make_kernel_for_dataset(ds, config, mass=float(mass)))
 
     mu_blind, cov_blind, obs_blind, edges_blind = _blind_pred_detail(
         model, gpr, blind, config
@@ -209,6 +234,33 @@ def estimate_background_for_dataset(
     mu_full, _ = predict_counts_from_log_gpr(gpr, X, config)
 
     integral_density = _compute_integral_density(model, mass, sigma_val)
+
+    # Kernel diagnostics for scan summary outputs
+    ls_lo = ls_hi = ls_init = sigma_x = float("nan")
+    try:
+        ls_info = compute_kernel_ls_bounds(ds, config, mass=float(mass))
+        ls_lo = float(ls_info.get("ls_lo", float("nan")))
+        ls_hi = float(ls_info.get("ls_hi", float("nan")))
+        ls_init = float(ls_info.get("ls_init", float("nan")))
+        sigma_x = float(ls_info.get("sigma_x", float("nan")))
+    except Exception:
+        pass
+
+    const_opt = float("nan")
+    ls_opt = float("nan")
+    lml = float("nan")
+    try:
+        kopt = getattr(gpr, "kernel_", None)
+        if kopt is not None and hasattr(kopt, "k1"):
+            const_opt = float(getattr(kopt.k1, "constant_value", float("nan")))
+        _, _, ls_opt = _extract_rbf_bounds_and_scale(kopt if kopt is not None else gpr.kernel)
+    except Exception:
+        pass
+
+    try:
+        lml = float(gpr.log_marginal_likelihood_value_)
+    except Exception:
+        pass
 
     return BlindPrediction(
         mu=mu_blind,
@@ -221,5 +273,16 @@ def estimate_background_for_dataset(
         y_full=np.asarray(y, float),
         mu_full=np.asarray(mu_full, float),
         edges_full=np.asarray(model.histogram.axes[0].edges, float),
+        blind_mask=np.asarray((X >= blind[0]) & (X <= blind[1]), bool),
         integral_density=integral_density,
+        blind_train=blind_train,
+        kernel_str=str(getattr(gpr, "kernel_", "")),
+        ls_lo=ls_lo,
+        ls_hi=ls_hi,
+        ls_init=ls_init,
+        ls_opt=float(ls_opt),
+        sigma_x=sigma_x,
+        const_opt=const_opt,
+        lml=lml,
+        n_train=int(np.count_nonzero(mask_train)),
     )

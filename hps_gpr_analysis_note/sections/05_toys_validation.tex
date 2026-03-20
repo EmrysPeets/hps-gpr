@@ -1,0 +1,426 @@
+\section{Toy Generation and Validation Studies}
+\label{sec:toys}
+
+\subsection{Scope of the current validation campaign}
+
+Unless stated otherwise, the toy studies summarized here correspond to the 95\%
+confidence-level workflow with blind width $1.64\,\sigma_m$ and \num{10000} toys per
+mass-strength point. The completed suites cover the fully unblinded 2015 sample, the
+2016 10\% development sample, and the first 2015+2016 shared-$\eps^2$ combination.
+Throughout this section, the combined interpretation is focused on the overlap region
+\SIrange{35}{130}{MeV}, which is the mass interval where both data sets contribute
+meaningfully to the prompt-resonance search.
+
+Many of the toy-validation figures were produced before the final adoption of the
+leakage-retaining signal template and before the future likelihood refinements
+mentioned in Section~\ref{sec:methodology}. They are nevertheless already informative
+for the statistical questions that matter most: closure, bias, pull calibration,
+coverage, and the logic of the combined extraction. Where newer note-local products are
+available, especially for the no-refit three-dataset pseudoexperiment displays and the
+projected reach discussion, those updated exports are used explicitly below.
+
+\subsection{Three toy-generation modes}
+
+The validation program uses three complementary pseudoexperiment constructions.
+
+\subsubsection{Analytic functional-form pseudoexperiments}
+
+The first class of toys starts from an analytic fit to the smooth $e^+e^-$
+invariant-mass spectrum and fluctuates pseudo-data around that closed-form background
+model. These studies isolate the question of gross spectral smoothness from the later
+question of GP conditioning. They are therefore useful as the first closure test before
+the full inference chain is exercised.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[t]{0.32\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{toy_generation_figs/good_fit_2021_0pt03_pct.png}
+  \caption{Early 2021 analytic-fit validation sample.}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.32\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{toy_generation_figs/good_fit_2015_placeholder.png}
+  \caption{2015 placeholder.}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.32\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{toy_generation_figs/good_fit_2016_placeholder.png}
+  \caption{2016 placeholder.}
+\end{subfigure}
+\caption{Analytic background fits used to seed functional-form pseudoexperiments. The
+2021 panel shown here comes from the early upgraded-detector validation pass; analogous
+2015 and 2016 plots should be added when those studies are exported in final form.}
+\label{fig:analytic-fit-toys}
+\end{figure}
+
+\subsubsection{Conditional blind-window GP toys}
+
+The fastest toy mode keeps the sideband-trained GP fixed at a given test mass. The GP
+fit is performed once on the sidebands, the blind-window mean vector and covariance are
+constructed from that fit, a background realization is drawn, signal is added, and the
+result is Poisson-sampled. This construction is ideal for high-statistics expected-band
+studies and for testing the response of the extraction fit under the posterior
+background model preferred by the real data.
+
+\subsubsection{Full procedural GP-mean/refit pseudoexperiments}
+
+The most realistic toy mode generates a full pseudoexperiment from the GP-derived
+background expectation, injects signal with the full Gaussian template, and then reruns
+the GP sideband-to-blind prediction on the toy before signal extraction. This is the
+appropriate mode for diagnosing signal absorption, because it directly tests how much
+of the injected signal may be absorbed by the refitted background model or by the
+profiled nuisance treatment.
+
+\subsection{Asimov calibration and background-only pseudoexperiments}
+
+When toy strengths are specified in units of $\sigma_A$, the package first constructs a
+reference extraction uncertainty $\sigma_{A,\mathrm{ref}}(m)$ by fitting the local
+signal-strength model to a background-only reference spectrum,
+\begin{equation}
+\left(\hat A_{\mathrm{ref}},\sigma_{A,\mathrm{ref}}\right)
+=
+\mathcal{F}\!\left[\bm{n}_{\mathrm{ref}};\,\bm{b}(m),\bm{C}(m),\bm{w}(m)\right],
+\end{equation}
+where $\bm{b}(m)$ and $\bm{C}(m)$ are the GP-predicted blind-window mean and covariance,
+and $\bm{w}(m)$ is the full-range Gaussian signal template restricted to the blinded
+bins. The injected strength axis is then defined by
+\begin{equation}
+A_{\mathrm{inj}}(m) = Z_{\mathrm{inj}}\,\sigma_{A,\mathrm{ref}}(m).
+\end{equation}
+
+In \textbf{Asimov mode}, the reference spectrum is deterministic,
+\begin{equation}
+n_{\mathrm{ref},i} = b_i,
+\end{equation}
+so $\sigma_{A,\mathrm{ref}}$ measures the nominal local sensitivity implied by the
+fitted background model. In \textbf{Poisson mode}, the reference spectrum is first
+fluctuated,
+\begin{equation}
+n_{\mathrm{ref},i} \sim \mathrm{Pois}\!\left(b_i\right),
+\end{equation}
+and the extracted $\sigma_{A,\mathrm{ref}}$ then inherits an extra layer of
+background-only sampling noise. The completed 95\% CL studies summarized here use the
+Asimov convention because it cleanly separates the definition of the injected signal
+axis from the later ensemble fluctuations of the toy study itself
+\cite{Cowan1998,Cowan2011}.
+
+This distinction matters for the later profile-likelihood interpretation. The Asimov
+construction defines the expected sensitivity scale, while the background-only
+pseudoexperiments are what test coverage, bias, and finite-sample departures from the
+asymptotic approximation. Put differently: the Asimov dataset calibrates the injection
+axis, but the pseudoexperiments remain the mechanism that profiles the background model
+and measures how realistic background-only fluctuations propagate through the
+extraction chain.
+
+\subsection{Poisson versus multinomial signal injection}
+
+Signal injection is distinct from the choice of $\sigma_A$ reference. In
+\textbf{Poisson-total injection}, each bin receives a Poisson draw with mean
+$A_{\mathrm{inj}}w_i$, so the realized total signal fluctuates from toy to toy. In
+\textbf{multinomial fixed-total injection}, the total number of injected events is
+fixed and only the bin-to-bin allocation fluctuates. Since the present signal template
+is normalized on the full histogram range, $A_{\mathrm{inj}}$ denotes the total local
+signal yield and only the fraction $f_{\mathrm{blind}}A_{\mathrm{inj}}$ is expected to
+appear inside the blinded bins for the nominal $1.64\,\sigma_m$ window.
+
+This distinction matters when interpreting uncertainty bars on validation plots. Only
+Poisson-total injection produces a genuine horizontal spread in the realized injected
+strength. Under fixed-total multinomial injection the horizontal coordinate is exact.
+
+\subsection{Refit versus no-refit extraction displays}
+
+The note now distinguishes two reviewer-facing pseudoexperiment tests because they are
+answering different questions. In the \textbf{no-refit} display, the GP sideband model
+is fitted once on the real data and then held fixed while a background realization is
+drawn in the blind window. This is the cleanest closure test of whether the extraction
+fit can recover an injected signal when the background prediction is treated as the
+correct local model. In the \textbf{full-refit} display, the toy is generated over the
+full mass range and the GP is refit on the toy sidebands before the blind-window
+extraction is repeated. That second test is slower and more aggressive, but it is also
+the direct diagnostic for signal absorption by the refitted background model.
+
+These tests should therefore not be judged by the same visual criterion. Agreement
+between the no-refit pseudoexperiment display and the observed-data display is expected
+and desirable because both are using the same sideband-conditioned background
+description. The full-refit display is instead meant to stress the nuisance-model
+freedom. When it visibly degrades the extracted signal, the correct interpretation is
+not that the no-refit test was ``too easy,'' but that the full procedural toy is
+probing how much the sideband refit can absorb signal-like structure. That is exactly
+why both views should be documented in the publication workflow.
+
+\subsection{Representative single-mass extraction displays}
+
+Representative extraction displays make the statistical procedure concrete at the level
+of an individual mass hypothesis. The 2015 \SI{30}{MeV} display and the 2016 10\%
+\SI{58}{MeV} display are retained because they show, in real data, how the profiled
+background deformation competes with the narrow signal template. The 2016 example is
+particularly useful because the best-fit amplitude is negative.
+
+\begin{figure}[p]
+\centering
+\begin{subfigure}[t]{0.88\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{fit_example_figs/2015/m030MeV_blind_fit.png}
+  \caption{2015 data at \SI{30}{MeV}.}
+\end{subfigure}
+
+\vspace{1.0em}
+
+\begin{subfigure}[t]{0.88\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{fit_example_figs/2016/m058MeV_blind_fit.png}
+  \caption{2016 10\% data at \SI{58}{MeV}, including a negative $\hat A$.}
+\end{subfigure}
+\caption{Representative blind-window fits using data. These displays show the fit
+components directly and serve as concrete examples of the local extraction machinery
+before one moves to ensemble diagnostics.}
+\label{fig:data-fit-examples}
+\end{figure}
+
+\subsection{Pull, coverage, and significance-calibration diagnostics}
+
+The central ensemble-level validation quantities are the pull,
+\begin{equation}
+\mathrm{pull} = \frac{\hat A - A_{\mathrm{inj}}}{\sigma_A},
+\end{equation}
+its mean and width as a function of mass and injected strength, and the empirical
+coverage of the nominal one- and two-standard-deviation intervals. These are standard
+closure diagnostics in HEP statistical analyses because they test, respectively,
+whether the estimator is biased, whether the quoted uncertainty is correctly calibrated,
+and whether the reported intervals achieve the claimed frequentist coverage
+\cite{Cowan1998,Cowan2011}.
+
+For the present study, the pull-versus-mass plots are the most compact summary because
+they display both the pull mean and pull width at once. In the overlap region
+\SIrange{40}{115}{MeV}, both the 2015 and 2016 10\% studies show broadly promising
+behavior. The large downward excursion below \SI{40}{MeV} is dominated by the fact that
+the 2016 geometric acceptance is essentially zero there, especially at
+\SIlist{25;30}{MeV}. The upward drift above approximately \SI{130}{MeV} is influenced by
+the truncation of the 2015 spectrum near \SI{150}{MeV} and may also contain residual
+signal-leakage effects that should be revisited after the next likelihood update. For
+the note-local summary, the same layout is extended to the current combined study, with
+the bottom row reserved for the 2021 1\% and combined exports once the full
+three-dataset toy summary is frozen.
+
+\begin{figure}[p]
+\centering
+\begin{subfigure}[t]{0.48\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{injection_extraction_figs/pull_vs_mass_2015.png}
+  \caption{2015 pull mean and width versus mass.}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{injection_extraction_figs/pull_vs_mass_2016.png}
+  \caption{2016 10\% pull mean and width versus mass.}
+\end{subfigure}
+\vspace{0.8em}
+
+\begin{subfigure}[t]{0.48\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{injection_extraction_figs/pull_vs_mass_2021.png}
+  \caption{2021 1\% pull mean and width versus mass.}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{injection_extraction_figs/pull_vs_mass_combined.png}
+  \caption{Current combined pull mean and width versus mass.}
+\end{subfigure}
+\caption{Mass-dependent pull diagnostics for the staged single-dataset and combined
+studies. The top row shows the 2015 and 2016 10\% validations; the bottom row is
+reserved for the 2021 1\% export and the current combined summary. These panels test
+estimator closure directly: the pull mean tracks bias while the pull width tests
+whether the quoted $\sigma_A$ is correctly calibrated as an uncertainty scale.}
+\label{fig:pull-vs-mass}
+\end{figure}
+
+The coverage plots complement the pull diagnostics by testing whether the empirical
+fractions satisfying $|\mathrm{pull}|<1$ and $|\mathrm{pull}|<2$ remain close to the
+nominal Gaussian expectations of approximately 68\% and 95\%. For both 2015 and the
+2016 10\% sample, the observed coverage is reasonably close to expectation across the
+core search region. The combined coverage panel is especially useful because it tests
+whether the shared-$\eps^2$ uncertainty remains interpretable as an interval statement
+after statistically independent datasets have been merged in one likelihood.
+
+\begin{figure}[p]
+\centering
+\begin{subfigure}[t]{0.48\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{injection_extraction_figs/coverage_2015.png}
+  \caption{2015 interval coverage.}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{injection_extraction_figs/coverage_2016.png}
+  \caption{2016 10\% interval coverage.}
+\end{subfigure}
+\vspace{0.8em}
+
+\begin{subfigure}[t]{0.48\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{injection_extraction_figs/coverage_2021.png}
+  \caption{2021 1\% interval coverage.}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{injection_extraction_figs/coverage_combined.png}
+  \caption{Current combined interval coverage.}
+\end{subfigure}
+\caption{Empirical coverage of the nominal one- and two-standard-deviation pull
+intervals. The top row shows the 2015 and 2016 10\% single-dataset studies, while the
+bottom row is reserved for the 2021 1\% export and the current combined summary. These
+panels test whether the extracted uncertainty $\sigma_A$ is correctly calibrated as an
+interval statement, not only as a width parameter.}
+\label{fig:coverage}
+\end{figure}
+
+The significance-calibration studies provide a third layer of validation by comparing
+the extracted significance scale with the injected scale. This information corroborates
+the combined-search-power studies discussed below: both are asking whether the
+multi-dataset procedure accumulates significance in a way consistent with the expected
+inverse-variance weighting of the constituent channels.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.86\linewidth}{injection_extraction_figs/z_calibration_residual_comparison.png}
+\caption{Residual significance calibration for the staged toy studies. The 2015 and
+2016 single-dataset panels stay centered near $\Delta Z=0$, showing that an injected
+local significance is recovered without visible extra bias. In the combined panel, the
+median $\Delta Z$ becomes positive in the overlap region because statistically
+independent inputs add coherently in the shared-$\eps^2$ fit; in the current
+2015+2016 summary the enhancement is strongest near \SIrange{50}{70}{MeV}, where a
+$Z_{\rm inj}=5$ signal gains about two additional significance units in the median
+combined response.}
+\label{fig:z-calibration-residual}
+\end{figure}
+
+\subsection{Combined search-power studies}
+
+The combined-search-power figures illustrate why a shared-$\eps^2$ combination can
+outperform any one constituent data set alone. The key point is that the combined
+injection is not defined by adding the same number of signal events to each data set.
+Instead, a common injected $\eps^2$ is mapped into dataset-specific total signal yields
+through the conversion factors $K_d(m)$ and then interpreted relative to the
+dataset-specific $\sigma_{A,\mathrm{ref}}$. As a result, a combined ``5$\sigma$'' or
+``7$\sigma$'' injection means a common-coupling significance in the combined statistic,
+not the same per-dataset significance in each constituent channel.
+
+The updated search-power plotter is now configured to support both the current
+two-dataset export and the intended three-dataset scenarios. In particular, once the
+2021 injection-summary CSV is added to the note workspace, the same stacked layout can
+be rerendered for the intuitive ``1$\sigma$ + 1$\sigma$ + 1$\sigma$'' and
+``1$\sigma$ + 2$\sigma$ + 3$\sigma$'' shared-coupling tests. The panels shown
+here are therefore still provisional in their numerical content, but they now use the
+publication-facing top-bottom layout and the final inverse-variance bookkeeping.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[t]{0.66\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{combined_search_figs/combined_search_power_scenarios.png}
+  \caption{Current two-dataset search-power scan. The injected common coupling is
+  translated into dataset-specific signal yields before the combined significance is
+  evaluated, so the curves track genuine shared-likelihood sensitivity rather than a
+  same-event-count toy convention.}
+\end{subfigure}
+
+\vspace{0.25em}
+
+\begin{subfigure}[t]{0.66\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{combined_search_figs/combined_search_power_constituent_pvalues_5sigma.png}
+  \caption{Constituent-dataset requirements for a target combined $5\sigma$ excess. The
+  point of this panel is that the shared fit can reach a fixed combined threshold from
+  many different per-dataset allocations, depending on where each spectrum has the
+  better local signal-to-background leverage.}
+\end{subfigure}
+\caption{Combined-search-power diagnostics. These plots show how sensitivity accumulates
+in the shared-$\eps^2$ framework and should be interpreted together with the
+significance-calibration studies rather than as direct limit-setting observables. Their
+review value is to show why the combined search can outperform any one constituent
+dataset even when the underlying injected coupling is the same in every channel.}
+\label{fig:combined-search-power}
+\end{figure}
+
+\subsection{Projected unblinded reach in \texorpdfstring{$\eps^2$}{epsilon2}}
+
+The same inverse-variance logic can be used for a simple full-luminosity projection.
+For the current study this is implemented directly at the level of the dataset-specific
+$\eps^2$ curves: each constituent curve is scaled by $1/\sqrt{L}$, and the projected
+shared-coupling sensitivity is then recomputed with the same inverse-variance
+combination logic used elsewhere in the note. The resulting projection is shown with
+the three-dataset results in Section~\ref{sec:results-combined-151621-1pct}, where it
+is most naturally interpreted as part of the physics-facing combined reach.
+
+\subsection{Combined extraction displays}
+
+The common-signal extraction displays are the most transparent way to visualize the
+shared-$\eps^2$ construction. The top row shows individual single-dataset
+pseudoexperiments. The lower panel shows the combined Gaussian signal representation
+constructed from the same injected coupling. For the reviewer-facing note, the main
+illustrations are now the no-refit pseudoexperiments with a five-standard-deviation
+injected shared signal at \SIlist{40;80;120}{MeV}. Those examples are deliberately
+shown without toy-by-toy GP retraining because they are meant to test extraction
+closure under the sideband-conditioned background model and to show, mass by mass, how
+the shared coupling is partitioned among 2015, 2016, and 2021.
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.96\linewidth}{extract_display_combined_m040MeV_z5p0_polished.png}
+\caption{Illustrative no-refit combined extraction display at \SI{40}{MeV}. The
+annotation box summarizes the injected coupling, the extracted combined coupling, the
+observed combined limit, the local significance, and the corresponding per-dataset fit
+summaries. The upper panels show the single-dataset fits and extracted signal
+components, while the lower panel shows the combined Gaussian signal representation that
+enters the shared-$\eps^2$ interpretation. At \SI{40}{MeV}, the 2015 spectrum carries
+most of the signal normalization, but the three-way fit still illustrates the core
+physics point of the combination: statistically independent datasets with different
+resolutions and backgrounds are constrained in one common coupling parameter.}
+\label{fig:combined-extract-displays}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\begin{subfigure}[t]{0.88\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{extract_display_combined_m080MeV_z5p0_polished.png}
+  \caption{No-refit shared-coupling pseudoexperiment at \SI{80}{MeV}.}
+\end{subfigure}
+
+\vspace{0.8em}
+
+\begin{subfigure}[t]{0.88\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{extract_display_combined_m120MeV_z5p0_polished.png}
+  \caption{No-refit shared-coupling pseudoexperiment at \SI{120}{MeV}.}
+\end{subfigure}
+\caption{Additional no-refit combined pseudoexperiments at \SIlist{80;120}{MeV}. The
+local-significance entry in the metadata box and the changing relative sizes of the
+per-dataset extracted signals make the mass dependence of the shared fit concrete:
+different datasets dominate at different masses because their resolutions, accepted
+statistics, and prompt-background levels are not the same.}
+\label{fig:combined-extract-displays-additional}
+\end{figure}
+
+The full-refit comparison is retained as a diagnostic because it answers a different
+question: whether the sideband refit can absorb signal-like structure once the toy
+spectrum is regenerated over the full mass range. The visibly poorer recovery in that
+case is therefore not a contradiction of the no-refit closure test; it is the point of
+the absorption diagnostic.
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.88\linewidth}{extract_display_combined_m040MeV_z3p0_refit.png}
+\caption{Diagnostic full-refit combined extraction display at \SI{40}{MeV}. This panel
+is kept specifically to document how the sideband refit can absorb part of an injected
+signal when the toy is regenerated over the full mass range and the GP background model
+is retrained on the toy sidebands before extraction.}
+\label{fig:combined-extract-displays-refit}
+\end{figure}

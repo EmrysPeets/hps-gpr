@@ -22,7 +22,7 @@ class HistogramNames:
     """Histogram names within ROOT files."""
     hist_2015: str = "invariant_mass"
     hist_2016: str = "h_Minv_General_Final_1"
-    hist_2021: str = "unc_vtx_mass_hist"
+    hist_2021: str = "preselection/h_invM_8000"
 
 
 @dataclass
@@ -30,7 +30,7 @@ class AnalysisRanges:
     """Analysis mass ranges (GeV) for each dataset."""
     range_2015: Tuple[float, float] = (0.015, 0.140)
     range_2016: Tuple[float, float] = (0.035, 0.190)
-    range_2021: Tuple[float, float] = (0.035, 0.230)
+    range_2021: Tuple[float, float] = (0.030, 0.250)
 
 
 @dataclass
@@ -47,12 +47,17 @@ class Config:
     # Histogram names
     hist_2015: str = "invariant_mass"
     hist_2016: str = "h_Minv_General_Final_1"
-    hist_2021: str = "unc_vtx_mass_hist"
+    hist_2021: str = "preselection/h_invM_8000"
 
     # Analysis ranges (GeV)
     range_2015: Tuple[float, float] = (0.015, 0.140)
     range_2016: Tuple[float, float] = (0.035, 0.190)
-    range_2021: Tuple[float, float] = (0.035, 0.230)
+    range_2021: Tuple[float, float] = (0.030, 0.250)
+    # Optional full histogram fit/training ranges (GeV).
+    # If None, model training uses full histogram extent.
+    data_range_2015: Optional[Tuple[float, float]] = None
+    data_range_2016: Optional[Tuple[float, float]] = None
+    data_range_2021: Optional[Tuple[float, float]] = None
 
     # Mass resolution sigma(m) polynomial coefficients
     # sigma(m) = sum_i coeffs[i] * m**i
@@ -62,18 +67,27 @@ class Config:
     sigma_coeffs_2016: List[float] = field(
         default_factory=lambda: [0.00038, 0.041, -0.27, 3.49, -11.11]
     )
+    # Optional linear tail for 2016 sigma(m):
+    # for m > sigma_tail_m0_2016, enforce sigma(m) = sigma(m0) + slope*(m-m0)
+    sigma_tail_m0_2016: Optional[float] = 0.18
+    sigma_tail_slope_floor_2016: float = 0.0
+    sigma_tail_slope_override_2016: Optional[float] = 0.0239
     sigma_coeffs_2021: List[float] = field(
         default_factory=lambda: [0.00286957, -0.00851449, 0.25362319]
     )
 
     # Radiative fraction f_rad(m) polynomial coefficients
     frad_coeffs_2015: List[float] = field(default_factory=lambda: [0.085])
-    frad_coeffs_2016: List[float] = field(
-        default_factory=lambda: [-0.104070, 9.59977, -212.211, 2148.12, -10140.1, 18048.5]
-    )
+    frad_coeffs_2016: List[float] = field(default_factory=lambda: [0.05])
     frad_coeffs_2021: List[float] = field(
         default_factory=lambda: [-0.211, 10.5, -161.8, 1189.0, -4165.0, 5565.0]
     )
+    # Optional radiative-fraction sensitivity penalty.
+    # When enabled, conversions use f_rad^eff = f_rad * (1 - penalty_frac).
+    radiative_penalty_on: bool = False
+    radiative_penalty_frac_2015: float = 0.07
+    radiative_penalty_frac_2016: float = 0.07
+    radiative_penalty_frac_2021: float = 0.07
 
     # Dataset enable switches
     enable_2015: bool = True
@@ -100,7 +114,9 @@ class Config:
     kernel_ls_local_hi_cap_xrange_frac: Optional[float] = None
 
     # Per-dataset kernel overrides (empty dicts = use global factors)
-    kernel_ls_res_upper_factor_by_dataset: Dict[str, float] = field(default_factory=dict)
+    kernel_ls_res_upper_factor_by_dataset: Dict[str, float] = field(
+        default_factory=lambda: {"2021": 9.0}
+    )
     kernel_ls_res_lower_factor_by_dataset: Dict[str, float] = field(default_factory=dict)
     kernel_ls_bounds_by_dataset: Dict[str, Any] = field(default_factory=dict)
     kernel_ls_init_by_dataset: Dict[str, float] = field(default_factory=dict)
@@ -134,6 +150,10 @@ class Config:
     cls_seed_base: int = 12345
     make_ul_bands: bool = True
     ul_bands_toys: int = 100
+    # Optional CLs settings specifically for UL-band evaluation.
+    # When None, fall back to cls_mode / cls_num_toys.
+    ul_bands_cls_mode: Optional[str] = None
+    ul_bands_cls_num_toys: Optional[int] = None
     # v15 UL bands extensions
     ul_bands_seed: int = 12345
     ul_bands_n_workers: int = 1
@@ -160,7 +180,7 @@ class Config:
     inj_dataset_key: str = "2015"
     inj_masses_gev: List[float] = field(default_factory=lambda: [0.030, 0.060, 0.090])
     inj_strengths: List[int] = field(default_factory=lambda: [0, 100, 200, 500, 1000, 2000, 5000])
-    inj_mode: str = "multinomial"
+    inj_mode: str = "poisson"
     extract_allow_negative: bool = True
     # v15 injection extensions
     inj_strength_mode: str = "absolute"   # "absolute" | "sigmaA"
@@ -173,6 +193,30 @@ class Config:
     inj_sigma_multipliers: List[float] = field(
         default_factory=lambda: [0.0, 1.0, 2.0, 3.0, 5.0]
     )
+    inj_combined_mass_policy: str = "intersection"  # "intersection" | "union_min_n"
+    inj_combined_min_n_contrib: int = 2
+    inj_write_toy_csv: bool = True
+    # Streaming injection aggregation (default-on)
+    inj_stream_aggregate: bool = True
+    inj_aggregate_every: int = 100
+    inj_n_workers: int = 5
+    inj_parallel_backend: str = "loky"
+    inj_threads_per_worker: int = 1
+    # Reviewer-facing extraction display plots (single representative pseudoexperiments)
+    extraction_display_dataset_key: str = ""
+    extraction_display_dataset_keys: List[str] = field(default_factory=lambda: ["2015", "2016"])
+    extraction_display_masses_gev: List[float] = field(default_factory=list)
+    extraction_display_sigma_multipliers: List[float] = field(default_factory=lambda: [3.0, 5.0, 7.0])
+    extraction_display_seed: int = 271828
+    extraction_display_inj_mode: str = "multinomial"
+    extraction_display_sigma_source: str = "asimov"
+    extraction_display_refit_gp_on_toy: bool = True
+    extraction_display_gp_restarts: int = 0
+    extraction_display_gp_optimize: bool = True
+    extraction_display_train_exclude_nsigma: Optional[float] = None
+    extraction_display_zoom_half_sigma: float = 0.5
+    extraction_display_blind_shade_alpha: float = 0.18
+    extraction_display_blind_shade_color: str = "0.88"
     # MVN non-negative sampling
     mvn_trunc_method: str = "reject_then_clip"  # "clip" | "reject" | "reject_then_clip"
     mvn_trunc_max_tries: int = 80
@@ -226,6 +270,9 @@ def load_config(path: str) -> Config:
         "range_2015",
         "range_2016",
         "range_2021",
+        "data_range_2015",
+        "data_range_2016",
+        "data_range_2021",
         "kernel_constant_bounds",
         "kernel_ls_bounds",
     ]

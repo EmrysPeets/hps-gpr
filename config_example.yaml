@@ -6,9 +6,14 @@
 # =====================
 # Dataset ROOT file paths
 # =====================
-path_2015: "/path/to/2015_data/invariant_mass_0pt5mm_full.root"
-path_2016: "/path/to/2016_data/EventSelection_Data_10Percent.root"
-path_2021: "/path/to/2021_data/limited_data_8kbins_0_04.root"
+path_2015: "/sdf/home/e/epeets/move/2015_IMD.root"
+path_2016: "/sdf/home/e/epeets/move/EventSelection_Data_10Percent.root"
+path_2021: "/sdf/home/e/epeets/run/2021_bump/preselection_invM_psumlt2p8_hists.root"
+
+
+#when ready for 100% 2016, hist name is the same
+#/fs/ddn/sdf/group/hps/users/epeets/run/resonance_fitting/EventSelection_pass4Full.root
+
 
 # Optional: MC-only mode path
 path_2021_mc: "/path/to/2021_MC_dataset.root"
@@ -19,14 +24,14 @@ only_2021_mc: false
 # =====================
 hist_2015: "invariant_mass"
 hist_2016: "h_Minv_General_Final_1"
-hist_2021: "unc_vtx_mass_hist"
+hist_2021: "preselection/h_invM_8000"
 
 # =====================
 # Analysis mass ranges (GeV)
 # =====================
-range_2015: [0.015, 0.140]
-range_2016: [0.035, 0.190]
-range_2021: [0.035, 0.230]
+range_2015: [0.030, 0.040] #[0.020, 0.130]
+range_2016: [0.035, 0.210]
+range_2021: [0.030, 0.250]
 
 # =====================
 # Mass resolution sigma(m) polynomial coefficients
@@ -34,8 +39,11 @@ range_2021: [0.035, 0.230]
 # =====================
 # 2015: linear model
 sigma_coeffs_2015: [-0.0000922283032152, 0.0532190838657]
-# 2016: 4th order
+# 2016: 4th-order polynomial with optional linear high-mass tail (default m0=0.18 GeV)
 sigma_coeffs_2016: [0.00038, 0.041, -0.27, 3.49, -11.11]
+sigma_tail_m0_2016: 0.18
+sigma_tail_slope_floor_2016: 0.0
+sigma_tail_slope_override_2016: 0.0239
 # 2021: quadratic
 sigma_coeffs_2021: [0.00286957, -0.00851449, 0.25362319]
 
@@ -44,8 +52,15 @@ sigma_coeffs_2021: [0.00286957, -0.00851449, 0.25362319]
 # f_rad(m) = sum_i coeffs[i] * m^i
 # =====================
 frad_coeffs_2015: [0.085]  # constant from paper
-frad_coeffs_2016: [-0.104070, 9.59977, -212.211, 2148.12, -10140.1, 18048.5]
-frad_coeffs_2021: [-0.211, 10.5, -161.8, 1189.0, -4165.0, 5565.0]
+frad_coeffs_2016: [0.05]  # constant approximation used in the current search window
+frad_coeffs_2021: [0.05] #[-0.211, 10.5, -161.8, 1189.0, -4165.0, 5565.0]
+
+# Optional radiative-fraction penalty applied in the A <-> epsilon^2 conversion.
+# When enabled, the effective radiative fraction is f_rad^eff = f_rad * (1 - penalty_frac).
+radiative_penalty_on: false
+radiative_penalty_frac_2015: 0.07
+radiative_penalty_frac_2016: 0.07
+radiative_penalty_frac_2021: 0.07
 
 # =====================
 # Dataset enable switches
@@ -61,6 +76,9 @@ kernel_constant_init: 1.0
 kernel_constant_bounds: [1.0e-8, 1.0e+18]
 kernel_ls_init: 1.0
 kernel_ls_bounds: [0.001, 10.0]
+kernel_ls_policy: "resolution_scaled_local"
+kernel_ls_res_upper_factor_by_dataset:
+  "2021": 9.0
 
 # =====================
 # Preprocessing options
@@ -75,9 +93,9 @@ pre_alpha_first_factor: 0.1
 # Scan settings
 # =====================
 mass_step_gev: 0.001    # 1 MeV step
-blind_nsigma: 1.96      # Blind window half-width in sigma units
-neighborhood_rebin: 10  # Rebinning factor for speed
-n_restarts: 20          # GPR optimizer restarts
+blind_nsigma: 1.96      # Blind window half-width in sigma units either use 1.64(90%)
+neighborhood_rebin: 5  # Rebinning factor for speed, for final bands use rebin==1
+n_restarts: 10          # GPR optimizer restarts 
 
 # =====================
 # CLs settings

@@ -1,0 +1,163 @@
+\section{Introduction}
+\label{sec:introduction}
+
+The Heavy Photon Search (HPS) prompt-resonance program is formulated in the minimal
+visible dark-photon model, in which a new broken $U(1)_D$ gauge boson mixes
+kinetically with the Standard-Model photon \cite{Holdom1986,EssigEtAl2011}. After
+diagonalizing the gauge fields, the interaction terms relevant for the prompt
+$A^\prime \rightarrow e^+e^-$ search can be written schematically as
+\begin{equation}
+\mathcal{L}
+\supset
+-\frac{1}{4}F_{\mu\nu}^{\prime}F^{\prime\mu\nu}
+-\frac{\eps}{2}F_{\mu\nu}^{\prime}F^{\mu\nu}
+\,+\,\frac{1}{2}m_{A^\prime}^{2}A_\mu^\prime A^{\prime\mu}
+\,+\,\eps e J_{\mathrm{EM}}^\mu A_\mu^\prime .
+\label{eq:dark-photon-lagrangian}
+\end{equation}
+Here $\eps$ is the kinetic-mixing parameter, $m_{A^\prime}$ is the dark-photon mass,
+and $J_{\mathrm{EM}}^\mu$ is the ordinary electromagnetic current. Over the low-mass
+region emphasized in this note, the minimal visible model predicts a narrow prompt
+dielectron resonance whose natural width is negligible compared with the HPS detector
+resolution, so the observed line shape is set entirely by the experimental mass
+resolution \cite{HPS2015DarkPhoton,HPS2016PromptLong}. That regime is precisely what
+makes the HPS prompt search powerful in the \SIrange{10}{300}{MeV} mass window:
+fixed-target electroproduction can probe visibly decaying vectors that would appear as
+localized excesses above the smooth trident spectrum, while the relevant coupling range
+overlaps both classic dark-sector targets and the long-standing lepton-anomaly
+benchmark space.
+
+In the fixed-target approximation relevant for HPS, prompt dark-photon production is
+normalized to the radiative trident rate,
+\begin{equation}
+\sigma(e Z \rightarrow e Z A^\prime)
+\simeq
+\frac{3\pi \eps^2}{2\alpha_{\mathrm{EM}}}\,
+m_{A^\prime}\,
+\left.\frac{d\sigma_{\gamma^\ast}}{dm}\right|_{m=m_{A^\prime}},
+\label{eq:ap-production}
+\end{equation}
+so the experimental problem is naturally phrased as the extraction of a narrow signal
+yield on top of the smooth prompt $e^+e^-$ spectrum, followed by a conversion of that
+yield into a limit or best fit for $\eps^2$
+\cite{EssigEtAl2011,HPS2015DarkPhoton,HPS2016PromptLong}. That physics logic is the
+through-line of this note: the dark-sector Lagrangian, the minimal prompt $A^\prime$
+interpretation, and the radiative-trident normalization are treated as the central
+physics objects, while the Gaussian-process-regression (GPR) machinery is the
+statistical framework used to realize the search.
+
+\subsection{Published HPS prompt-resonance benchmarks}
+
+The published HPS prompt searches provide the immediate experimental context for the
+current GPR analysis. The 2015 engineering-run publication analyzed
+\SI{1170}{nb^{-1}} at \SI{1.056}{GeV} over \SIrange{19}{81}{MeV} and reported a lowest
+local $p$-value of $1.7\times10^{-3}$ at \SI{37.7}{MeV}; after the look-elsewhere
+correction the global $p$-value was 17\%
+\cite{HPS2015DarkPhoton}. The 2016 prompt search analyzed the full engineering-run
+sample, \SI{10608}{nb^{-1}} at \SI{2.3}{GeV}, over \SIrange{39}{179}{MeV}. Its lowest
+local $p$-value was $6.38\times10^{-3}$ at \SI{94}{MeV}, with a global significance of
+about $1\,\sigma$, and it propagated mass-resolution and radiative-fraction
+systematics explicitly into the final prompt limit \cite{HPS2016PromptLong}.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[t]{0.32\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{published_reference_figs/hps2015_published_limit.png}
+  \caption{Published 2015 95\% power-constrained prompt limit.}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.32\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{published_reference_figs/hps2016_published_prompt_pvalue.png}
+  \caption{Published 2016 prompt-search local $p$-value scan.}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.32\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{published_reference_figs/hps2016_published_prompt_limit.png}
+  \caption{Published 2016 prompt-search $\eps^2$ limit.}
+\end{subfigure}
+\caption{Published HPS prompt-resonance benchmarks. These re-exported crops are used as
+high-level context for the current GPR workflow rather than as a replacement for the
+original publications \cite{HPS2015DarkPhoton,HPS2016PromptLong}.}
+\label{fig:published-hps-context}
+\end{figure}
+
+\subsection{Complementary prompt-visible constraints}
+
+For internal review, the relevant comparison is not merely which experiments reach the
+same mass window, but how their exclusions and favored regions populate the
+$(m_{A^\prime},\eps^2)$ plane over roughly \SIrange{10}{300}{MeV}. In that space HPS
+occupies a distinct fixed-target niche between very-low-mass meson-decay constraints
+and the higher-mass collider reach. Fixed-target electron-beam searches from APEX and
+A1/MAMI provide especially relevant low-mass visible benchmarks
+\cite{APEX2011,A1MAMI2014}; KLOE/KLOE-2 and BaBar probe complementary visible
+production in $e^+e^-$ collisions \cite{KLOE2013,KLOE22015,BaBarDarkPhoton2014}; and
+NA48/2 and NA64 constrain, respectively, low-mass meson-decay and visible missing-beam
+interpretations that border the same general parameter space
+\cite{NA48DarkPhoton2015,NA64X17Visible2021}. Those published contours are the correct
+objects for the final review figure because they show exclusion depth, not only mass
+coverage.
+
+For the present draft, Figure~\ref{fig:prompt-visible-constraints} is a placeholder
+panel that already puts the discussion in the correct coordinates. It overlays the
+electron- and muon-anomaly motivated bands taken from
+Ref.~\cite{PeetsX17g2Comparison2026}, marks the published HPS and current GPR scan
+windows, and highlights the \SI{16.7}{MeV} $X17$ mass location. The
+$X17$/protophobic interpretation should be understood here as adjacent motivation
+rather than as part of the minimal kinetically mixed dark-photon benchmark itself
+\cite{Krasznahorkay2016,FengProtophobic2016}. In the final version of this note, the
+placeholder should be replaced by the cited experimental exclusion contours on the same
+$(m_{A^\prime},\eps^2)$ axes.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.88\linewidth}{context_figs/prompt_visible_eps2_placeholder.png}
+\caption{Placeholder prompt-visible parameter-space panel for the review note. The
+electron- and muon-anomaly bands are adapted from
+Ref.~\cite{PeetsX17g2Comparison2026} and are shown only as motivation benchmarks; the
+shaded HPS intervals indicate the published 2015 and 2016 prompt windows together with
+the current GPR scan scope. The final review figure should replace the placeholder
+annotations with explicit exclusion contours from APEX, A1/MAMI, KLOE/KLOE-2, BaBar,
+NA48/2, and NA64 on the same $(m_{A^\prime},\eps^2)$ axes.}
+\label{fig:prompt-visible-constraints}
+\end{figure}
+
+\subsection{Motivation for the present GPR analysis}
+
+The motivation for the present note is not simply to replace a local polynomial fit
+with a different smooth background parameterization. The earlier HPS prompt searches
+were built around mass-window-specific background models, window-by-window optimization,
+and a resonance-extraction procedure whose numerical behavior depended on the local fit
+boundaries. In the current study, each active dataset is described by a single global
+GP fit to the invariant-mass spectrum, with the test-mass region removed during
+training. That construction provides a mean vector and covariance matrix for the
+blinded bins at every mass hypothesis and allows the signal extraction, local
+significance, \CLs\ limits, radiative-fraction conversion, and shared-$\eps^2$
+combination to be written inside one consistent statistical framework.
+
+This change is especially valuable for the present HPS program because the current GPR
+workflow is already being validated over wider scan windows than the published 2015 and
+2016 resonance searches. A stable global model therefore matters both for numerical
+smoothness and for physics reach: it is what makes it realistic to scan a wider mass
+range without losing narrow-resolution sensitivity, to propagate a consistent
+radiative-fraction treatment across datasets, and to combine statistically independent
+2015, 2016, and 2021 samples in a shared coupling parameter.
+
+\subsection{Scope of this note}
+
+This note documents the current HPS prompt $A^\prime \rightarrow e^+e^-$ GPR analysis
+at the level needed for internal physics review. It emphasizes three related physics
+inputs: the detector apparatus that defines the mass resolution and acceptance, the
+dataset-specific radiative-fraction normalization that converts signal yield into
+$\eps^2$, and the profile-likelihood methodology used to quote local significance and
+upper limits. The 2015 data are fully unblinded and are used as the most mature
+validation sample. The 2016 and 2021 datasets are treated in staged-analysis form, and
+the combined 2015+2016 10\%+2021 1\% study is presented as the current shared-coupling
+baseline.
+
+The 2019 physics run is mentioned only as part of the detector evolution from the
+2015/2016 baseline configuration to the 2019/2021 upgraded configuration. Data were
+recorded in 2019 with the upgraded detector, but their dedicated prompt-resonance
+analysis is beyond the scope of the present note and will be documented separately.

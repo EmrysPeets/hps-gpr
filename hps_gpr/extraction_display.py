@@ -1,0 +1,1350 @@
+"""Reviewer-facing extraction display plots for representative pseudoexperiments."""
+
+import hashlib
+import json
+import os
+from dataclasses import dataclass
+from typing import Dict, List, Optional, Sequence
+
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import stats
+
+from .conversion import A_from_epsilon2, epsilon2_from_A
+from .dataset import DatasetConfig, make_datasets
+from .evaluation import combined_cls_limit_epsilon2, evaluate_combined
+from .gpr import fit_gpr, make_kernel_for_dataset, predict_counts_from_log_gpr
+from .injection import _inject_counts_from_template, _sigmaA_reference
+from .io import BlindPrediction, estimate_background_for_dataset
+from .plotting import (
+    _grid,
+    _save_plot_outputs,
+    _set_title_above,
+    _shade_blind_window,
+    ensure_dir,
+    mass_tag,
+    set_injection_plot_style,
+)
+from .statistics import fit_A_profiled_gaussian_details, p0_profiled_gaussian_LRT
+from .template import (
+    build_full_template,
+    build_window_template_from_full,
+    cls_limit_for_amplitude,
+)
+
+
+@dataclass
+class _SingleDisplayContext:
+    ds: DatasetConfig
+    mass: float
+    pred: BlindPrediction
+    sigmaA_ref: float
+    A_per_eps2_unit: float
+    A_up_obs: float
+    eps2_up_obs: float
+    blind_mask: np.ndarray
+    blind_train: tuple
+    raw_signal_full: np.ndarray
+    signal_per_blind_amp_full: np.ndarray
+    blind_fraction: float
+
+
+@dataclass
+class SingleExtractionDisplay:
+    ctx: _SingleDisplayContext
+    inj_nsigma: float
+    A_inj_total: float
+    eps2_inj: float
+    seed: int
+    refit_gp_on_toy: bool
+    refit_ok: bool
+    y_full_toy: np.ndarray
+    y_win_toy: np.ndarray
+    mu_full_plot: np.ndarray
+    mu_win_fit: np.ndarray
+    cov_win_fit: np.ndarray
+    b_fit: np.ndarray
+    lambda_fit: np.ndarray
+    A_hat: float
+    sigma_A: float
+    fit_success: bool
+    Nsig_realized_total: int
+    Nsig_realized_blind: int
+    Nsig_expected_total: float
+
+    @property
+    def x_full(self) -> np.ndarray:
+        return np.asarray(self.ctx.pred.x_full, float)
+
+    @property
+    def x_win(self) -> np.ndarray:
+        return self.x_full[self.ctx.blind_mask]
+
+    @property
+    def blind(self) -> tuple:
+        return tuple(self.ctx.pred.blind)
+
+    @property
+    def pull(self) -> float:
+        if np.isfinite(self.sigma_A) and self.sigma_A > 0:
+            return float((self.A_hat - self.A_inj_total) / self.sigma_A)
+        return float("nan")
+
+    @property
+    def Z_hat(self) -> float:
+        if np.isfinite(self.sigma_A) and self.sigma_A > 0:
+            return float(self.A_hat / self.sigma_A)
+        return float("nan")
+
+    @property
+    def signal_curve_injected(self) -> np.ndarray:
+        return float(self.A_inj_total) * self.ctx.signal_per_blind_amp_full
+
+    @property
+    def signal_curve_extracted(self) -> np.ndarray:
+        return float(self.A_hat) * self.ctx.signal_per_blind_amp_full
+
+    @property
+    def residual_obs(self) -> np.ndarray:
+        return self.y_win_toy - np.asarray(self.b_fit, float)
+
+    @property
+    def residual_sigma(self) -> np.ndarray:
+        cov = np.asarray(self.cov_win_fit, float)
+        bg = np.sqrt(np.clip(np.diag(cov), 0.0, None)) if cov.ndim == 2 else np.zeros_like(self.y_win_toy, float)
+        cnt = np.sqrt(np.clip(np.asarray(self.lambda_fit, float), 1.0, None))
+        return np.sqrt(np.square(bg) + np.square(cnt))
+
+    def to_metadata(self) -> Dict[str, object]:
+        return {
+            "dataset": str(self.ctx.ds.key),
+            "mass_GeV": float(self.ctx.mass),
+            "mass_MeV": float(self.ctx.mass * 1e3),
+            "inj_nsigma": float(self.inj_nsigma),
+            "A_inj_total": float(self.A_inj_total),
+            "A_hat": float(self.A_hat),
+            "sigma_A": float(self.sigma_A),
+            "Zhat": float(self.Z_hat),
+            "pull": float(self.pull),
+            "eps2_inj": float(self.eps2_inj),
+            "eps2_up_obs": float(self.ctx.eps2_up_obs),
+            "A_up_obs": float(self.ctx.A_up_obs),
+            "sigmaA_ref": float(self.ctx.sigmaA_ref),
+            "blind_fraction": float(self.ctx.blind_fraction),
+            "Nsig_expected_total": float(self.Nsig_expected_total),
+            "Nsig_realized_total": int(self.Nsig_realized_total),
+            "Nsig_realized_blind": int(self.Nsig_realized_blind),
+            "refit_gp_on_toy": bool(self.refit_gp_on_toy),
+            "refit_ok": bool(self.refit_ok),
+            "fit_success": bool(self.fit_success),
+            "seed": int(self.seed),
+        }
+
+
+@dataclass
+class CombinedExtractionDisplay:
+    mass: float
+    inj_nsigma_combined: float
+    eps2_inj: float
+    eps2_hat: float
+    sigma_eps2: float
+    Zhat_combined: float
+    eps2_up_obs: float
+    displays: List[SingleExtractionDisplay]
+    dataset_keys: List[str]
+
+    def to_metadata(self) -> Dict[str, object]:
+        return {
+            "mass_GeV": float(self.mass),
+            "mass_MeV": float(self.mass * 1e3),
+            "inj_nsigma_combined": float(self.inj_nsigma_combined),
+            "eps2_inj": float(self.eps2_inj),
+            "eps2_hat": float(self.eps2_hat),
+            "sigma_eps2": float(self.sigma_eps2),
+            "Zhat_combined": float(self.Zhat_combined),
+            "eps2_up_obs": float(self.eps2_up_obs),
+            "datasets": list(self.dataset_keys),
+            "per_dataset": [d.to_metadata() for d in self.displays],
+        }
+
+
+@dataclass
+class SingleObservedDisplay:
+    ctx: _SingleDisplayContext
+    mu_full_plot: np.ndarray
+    mu_win_fit: np.ndarray
+    cov_win_fit: np.ndarray
+    b_fit: np.ndarray
+    lambda_fit: np.ndarray
+    A_hat: float
+    sigma_A: float
+    fit_success: bool
+    p0_analytic: float
+    Z_analytic: float
+
+    @property
+    def x_full(self) -> np.ndarray:
+        return np.asarray(self.ctx.pred.x_full, float)
+
+    @property
+    def y_full_obs(self) -> np.ndarray:
+        return np.asarray(self.ctx.pred.y_full, float)
+
+    @property
+    def x_win(self) -> np.ndarray:
+        return self.x_full[self.ctx.blind_mask]
+
+    @property
+    def y_win_obs(self) -> np.ndarray:
+        return np.asarray(self.ctx.pred.obs, float)
+
+    @property
+    def blind(self) -> tuple:
+        return tuple(self.ctx.pred.blind)
+
+    @property
+    def signal_curve_extracted(self) -> np.ndarray:
+        return float(self.A_hat) * self.ctx.signal_per_blind_amp_full
+
+    @property
+    def residual_obs(self) -> np.ndarray:
+        return self.y_win_obs - np.asarray(self.b_fit, float)
+
+    @property
+    def residual_sigma(self) -> np.ndarray:
+        cov = np.asarray(self.cov_win_fit, float)
+        bg = np.sqrt(np.clip(np.diag(cov), 0.0, None)) if cov.ndim == 2 else np.zeros_like(self.y_win_obs, float)
+        cnt = np.sqrt(np.clip(np.asarray(self.lambda_fit, float), 1.0, None))
+        return np.sqrt(np.square(bg) + np.square(cnt))
+
+    @property
+    def pull_win(self) -> np.ndarray:
+        sig = np.clip(self.residual_sigma, 1e-12, None)
+        return self.residual_obs / sig
+
+    def to_metadata(self) -> Dict[str, object]:
+        return {
+            "dataset": str(self.ctx.ds.key),
+            "mass_GeV": float(self.ctx.mass),
+            "mass_MeV": float(self.ctx.mass * 1e3),
+            "A_hat": float(self.A_hat),
+            "sigma_A": float(self.sigma_A),
+            "p0_analytic": float(self.p0_analytic),
+            "Z_analytic": float(self.Z_analytic),
+            "eps2_up_obs": float(self.ctx.eps2_up_obs),
+            "A_up_obs": float(self.ctx.A_up_obs),
+            "sigmaA_ref": float(self.ctx.sigmaA_ref),
+            "blind_fraction": float(self.ctx.blind_fraction),
+            "fit_success": bool(self.fit_success),
+        }
+
+
+@dataclass
+class CombinedObservedDisplay:
+    mass: float
+    eps2_hat: float
+    sigma_eps2: float
+    Zhat_combined: float
+    eps2_up_obs: float
+    p0_analytic: float
+    Z_analytic: float
+    displays: List[SingleObservedDisplay]
+    dataset_keys: List[str]
+
+    def to_metadata(self) -> Dict[str, object]:
+        return {
+            "mass_GeV": float(self.mass),
+            "mass_MeV": float(self.mass * 1e3),
+            "eps2_hat": float(self.eps2_hat),
+            "sigma_eps2": float(self.sigma_eps2),
+            "Zhat_combined": float(self.Zhat_combined),
+            "eps2_up_obs": float(self.eps2_up_obs),
+            "p0_analytic": float(self.p0_analytic),
+            "Z_analytic": float(self.Z_analytic),
+            "datasets": list(self.dataset_keys),
+            "per_dataset": [d.to_metadata() for d in self.displays],
+        }
+
+
+def _stable_display_seed(base_seed: int, *parts: object) -> int:
+    payload = "|".join(str(p) for p in parts)
+    digest = hashlib.blake2b(payload.encode("utf-8"), digest_size=8).digest()
+    return int((int(base_seed) + int.from_bytes(digest, "little")) & 0xFFFFFFFF)
+
+
+def _strength_tag(z: float) -> str:
+    return str(float(z)).replace("-", "m").replace(".", "p")
+
+
+def _zoom_mask(display: SingleExtractionDisplay, zoom_half_sigma: float) -> np.ndarray:
+    pred = display.ctx.pred
+    zlo = float(pred.blind[0] - float(zoom_half_sigma) * float(pred.sigma_val))
+    zhi = float(pred.blind[1] + float(zoom_half_sigma) * float(pred.sigma_val))
+    x_full = display.x_full
+    return (x_full >= zlo) & (x_full <= zhi)
+
+
+def _build_single_context(
+    ds: DatasetConfig,
+    config,
+    *,
+    mass: float,
+    sigma_source: str,
+    train_exclude_nsigma: Optional[float],
+) -> _SingleDisplayContext:
+    pred = estimate_background_for_dataset(
+        ds,
+        float(mass),
+        config,
+        train_exclude_nsigma=train_exclude_nsigma,
+    )
+    sigma_rng = np.random.default_rng(
+        _stable_display_seed(int(getattr(config, "extraction_display_seed", 271828)), ds.key, float(mass), "sigmaA")
+    )
+    sigmaA_ref = _sigmaA_reference(pred, float(mass), source=str(sigma_source), rng=sigma_rng)
+    A_per_eps2_unit = float(A_from_epsilon2(ds, float(mass), 1.0, pred.integral_density))
+
+    seed_cls = None
+    if str(getattr(config, "cls_mode", "asymptotic")).lower().strip() == "toys":
+        seed_cls = _stable_display_seed(int(getattr(config, "cls_seed_base", 12345)), ds.key, float(mass), "display-cls")
+    A_up_obs, _ = cls_limit_for_amplitude(
+        n_obs=pred.obs,
+        b_mean=pred.mu,
+        b_cov=pred.cov,
+        edges=pred.edges,
+        mass=float(mass),
+        sigma_val=float(pred.sigma_val),
+        config=config,
+        seed=seed_cls,
+        full_edges=pred.edges_full,
+        window_mask=pred.blind_mask,
+    )
+    eps2_up_obs = float(epsilon2_from_A(ds, float(mass), float(A_up_obs), pred.integral_density))
+
+    x_full = np.asarray(pred.x_full, float).reshape(-1)
+    blind = tuple(pred.blind)
+    blind_mask = np.asarray(pred.blind_mask, bool)
+    raw_signal_full = build_full_template(
+        np.asarray(pred.edges_full, float), float(mass), float(pred.sigma_val)
+    )
+    blind_fraction = float(np.sum(raw_signal_full[blind_mask]))
+    if not np.isfinite(blind_fraction) or blind_fraction <= 0:
+        raise RuntimeError(f"{ds.key} m={float(mass):.6g}: blind-window signal fraction is non-positive")
+    signal_per_blind_amp_full = np.asarray(raw_signal_full, float)
+
+    tn = getattr(config, "extraction_display_train_exclude_nsigma", None)
+    if train_exclude_nsigma is not None:
+        tn = train_exclude_nsigma
+    if tn is None:
+        blind_train_pred = getattr(pred, "blind_train", None)
+        if blind_train_pred is not None:
+            tn = float((float(blind_train_pred[1]) - float(mass)) / float(pred.sigma_val))
+        else:
+            tn = getattr(config, "gp_train_exclude_nsigma", config.blind_nsigma)
+    blind_train = (
+        float(mass) - float(tn) * float(pred.sigma_val),
+        float(mass) + float(tn) * float(pred.sigma_val),
+    )
+
+    return _SingleDisplayContext(
+        ds=ds,
+        mass=float(mass),
+        pred=pred,
+        sigmaA_ref=float(sigmaA_ref),
+        A_per_eps2_unit=float(A_per_eps2_unit),
+        A_up_obs=float(A_up_obs),
+        eps2_up_obs=float(eps2_up_obs),
+        blind_mask=blind_mask,
+        blind_train=blind_train,
+        raw_signal_full=np.asarray(raw_signal_full, float),
+        signal_per_blind_amp_full=np.asarray(signal_per_blind_amp_full, float),
+        blind_fraction=float(blind_fraction),
+    )
+
+
+def _simulate_single_display_from_context(
+    ctx: _SingleDisplayContext,
+    config,
+    *,
+    inj_nsigma: float,
+    A_inj_total: float,
+    seed: int,
+    inj_mode: str,
+    refit_gp_on_toy: bool,
+    gp_restarts: int,
+    gp_optimize: bool,
+) -> SingleExtractionDisplay:
+    rng = np.random.default_rng(int(seed))
+    pred = ctx.pred
+    x_full = np.asarray(pred.x_full, float).reshape(-1)
+    mu_full = np.asarray(pred.mu_full, float).reshape(-1)
+
+    bkg_full = rng.poisson(np.clip(mu_full, 0.0, None)).astype(int)
+    expected_total_strength = float(A_inj_total)
+    sig_full, n_sig_realized_total, _ = _inject_counts_from_template(
+        ctx.raw_signal_full,
+        expected_total_strength,
+        rng,
+        mode=str(inj_mode),
+    )
+    y_full_toy = (bkg_full + np.asarray(sig_full, int)).astype(int)
+    y_win_toy = y_full_toy[ctx.blind_mask].astype(int)
+    n_sig_realized_blind = int(np.sum(np.asarray(sig_full, int)[ctx.blind_mask]))
+
+    mu_win_fit = np.asarray(pred.mu, float)
+    cov_win_fit = np.asarray(pred.cov, float)
+    mu_full_plot = np.asarray(mu_full, float)
+    refit_ok = False
+    if bool(refit_gp_on_toy):
+        mask_train = (x_full < float(ctx.blind_train[0])) | (x_full > float(ctx.blind_train[1]))
+        try:
+            gpr = fit_gpr(
+                x_full[mask_train],
+                y_full_toy[mask_train].astype(float),
+                config,
+                restarts=int(gp_restarts),
+                kernel=make_kernel_for_dataset(ctx.ds, config, mass=float(ctx.mass)),
+                optimize=bool(gp_optimize),
+            )
+            mu_full_plot, _ = predict_counts_from_log_gpr(gpr, x_full, config)
+            mu_win_fit, cov_win_fit = predict_counts_from_log_gpr(gpr, x_full[ctx.blind_mask], config)
+            mu_full_plot = np.asarray(mu_full_plot, float).reshape(-1)
+            mu_win_fit = np.asarray(mu_win_fit, float).reshape(-1)
+            cov_win_fit = np.asarray(cov_win_fit, float)
+            refit_ok = True
+        except Exception:
+            refit_ok = False
+
+    fitd = fit_A_profiled_gaussian_details(
+        y_win_toy,
+        mu_win_fit,
+        cov_win_fit,
+        build_window_template_from_full(
+            pred.edges_full, pred.blind_mask, float(ctx.mass), float(pred.sigma_val)
+        )[0],
+        allow_negative=bool(getattr(config, "extract_allow_negative", True)),
+    )
+    return SingleExtractionDisplay(
+        ctx=ctx,
+        inj_nsigma=float(inj_nsigma),
+        A_inj_total=float(A_inj_total),
+        eps2_inj=float(epsilon2_from_A(ctx.ds, float(ctx.mass), float(A_inj_total), pred.integral_density)),
+        seed=int(seed),
+        refit_gp_on_toy=bool(refit_gp_on_toy),
+        refit_ok=bool(refit_ok),
+        y_full_toy=np.asarray(y_full_toy, int),
+        y_win_toy=np.asarray(y_win_toy, int),
+        mu_full_plot=np.asarray(mu_full_plot, float),
+        mu_win_fit=np.asarray(mu_win_fit, float),
+        cov_win_fit=np.asarray(cov_win_fit, float),
+        b_fit=np.asarray(fitd.get("b_fit", mu_win_fit), float).reshape(-1),
+        lambda_fit=np.asarray(fitd.get("lambda_hat", mu_win_fit), float).reshape(-1),
+        A_hat=float(fitd.get("A_hat", float("nan"))),
+        sigma_A=float(fitd.get("sigma_A", float("nan"))),
+        fit_success=bool(fitd.get("success", False)),
+        Nsig_realized_total=int(n_sig_realized_total),
+        Nsig_realized_blind=int(n_sig_realized_blind),
+        Nsig_expected_total=float(expected_total_strength),
+    )
+
+
+def make_single_extraction_display(
+    ds: DatasetConfig,
+    config,
+    *,
+    mass: float,
+    inj_nsigma: float,
+    seed: int,
+    ctx: Optional[_SingleDisplayContext] = None,
+) -> SingleExtractionDisplay:
+    if ctx is None:
+        ctx = _build_single_context(
+            ds,
+            config,
+            mass=float(mass),
+            sigma_source=str(getattr(config, "extraction_display_sigma_source", "asimov")),
+            train_exclude_nsigma=getattr(config, "extraction_display_train_exclude_nsigma", None),
+        )
+    return _simulate_single_display_from_context(
+        ctx,
+        config,
+        inj_nsigma=float(inj_nsigma),
+        A_inj_total=float(inj_nsigma) * float(ctx.sigmaA_ref),
+        seed=int(seed),
+        inj_mode=str(getattr(config, "extraction_display_inj_mode", "multinomial")),
+        refit_gp_on_toy=bool(getattr(config, "extraction_display_refit_gp_on_toy", True)),
+        gp_restarts=int(getattr(config, "extraction_display_gp_restarts", 0)),
+        gp_optimize=bool(getattr(config, "extraction_display_gp_optimize", True)),
+    )
+
+
+def make_combined_extraction_display(
+    datasets: Sequence[DatasetConfig],
+    config,
+    *,
+    mass: float,
+    inj_nsigma: float,
+    seed: int,
+    contexts: Optional[Sequence[_SingleDisplayContext]] = None,
+) -> CombinedExtractionDisplay:
+    if contexts is None:
+        contexts = [
+            _build_single_context(
+                ds,
+                config,
+                mass=float(mass),
+                sigma_source=str(getattr(config, "extraction_display_sigma_source", "asimov")),
+                train_exclude_nsigma=getattr(config, "extraction_display_train_exclude_nsigma", None),
+            )
+            for ds in datasets
+        ]
+    info_sum = float(
+        np.sum(
+            [
+                (ctx.A_per_eps2_unit * ctx.A_per_eps2_unit) / (ctx.sigmaA_ref * ctx.sigmaA_ref)
+                for ctx in contexts
+                if np.isfinite(ctx.A_per_eps2_unit)
+                and np.isfinite(ctx.sigmaA_ref)
+                and ctx.sigmaA_ref > 0
+            ]
+        )
+    )
+    if not np.isfinite(info_sum) or info_sum <= 0:
+        raise RuntimeError(f"m={float(mass):.6g}: could not build combined epsilon^2 information")
+    sigma_eps2 = float(1.0 / np.sqrt(info_sum))
+    eps2_inj = float(inj_nsigma) * float(sigma_eps2)
+
+    displays = []
+    for ctx in contexts:
+        A_inj_total = float(ctx.A_per_eps2_unit) * float(eps2_inj)
+        ds_seed = _stable_display_seed(int(seed), str(ctx.ds.key), float(mass), float(inj_nsigma))
+        displays.append(
+            _simulate_single_display_from_context(
+                ctx,
+                config,
+                inj_nsigma=float(A_inj_total / ctx.sigmaA_ref) if ctx.sigmaA_ref > 0 else float("nan"),
+                A_inj_total=float(A_inj_total),
+                seed=int(ds_seed),
+                inj_mode=str(getattr(config, "extraction_display_inj_mode", "multinomial")),
+                refit_gp_on_toy=bool(getattr(config, "extraction_display_refit_gp_on_toy", True)),
+                gp_restarts=int(getattr(config, "extraction_display_gp_restarts", 0)),
+                gp_optimize=bool(getattr(config, "extraction_display_gp_optimize", True)),
+            )
+        )
+
+    num = 0.0
+    denom = 0.0
+    for disp in displays:
+        ctx = disp.ctx
+        if np.isfinite(disp.A_hat) and np.isfinite(disp.sigma_A) and disp.sigma_A > 0 and np.isfinite(ctx.A_per_eps2_unit):
+            w = float(ctx.A_per_eps2_unit) / float(disp.sigma_A * disp.sigma_A)
+            num += w * float(disp.A_hat)
+            denom += float(ctx.A_per_eps2_unit) * w
+    eps2_hat = float(num / denom) if denom > 0 else float("nan")
+    sigma_eps2_hat = float(1.0 / np.sqrt(denom)) if denom > 0 else float("nan")
+    zhat_combined = float(eps2_hat / sigma_eps2_hat) if np.isfinite(sigma_eps2_hat) and sigma_eps2_hat > 0 else float("nan")
+    eps2_up_obs = float(combined_cls_limit_epsilon2(float(mass), [ctx.ds for ctx in contexts], [ctx.pred for ctx in contexts], config))
+
+    return CombinedExtractionDisplay(
+        mass=float(mass),
+        inj_nsigma_combined=float(inj_nsigma),
+        eps2_inj=float(eps2_inj),
+        eps2_hat=float(eps2_hat),
+        sigma_eps2=float(sigma_eps2_hat),
+        Zhat_combined=float(zhat_combined),
+        eps2_up_obs=float(eps2_up_obs),
+        displays=displays,
+        dataset_keys=[str(ctx.ds.key) for ctx in contexts],
+    )
+
+
+def make_single_observed_display(
+    ds: DatasetConfig,
+    config,
+    *,
+    mass: float,
+) -> SingleObservedDisplay:
+    ctx = _build_single_context(
+        ds,
+        config,
+        mass=float(mass),
+        sigma_source=str(getattr(config, "extraction_display_sigma_source", "asimov")),
+        train_exclude_nsigma=getattr(config, "extraction_display_train_exclude_nsigma", None),
+    )
+    pred = ctx.pred
+    tmpl = build_window_template_from_full(
+        pred.edges_full, pred.blind_mask, float(ctx.mass), float(pred.sigma_val)
+    )[0]
+    fitd = fit_A_profiled_gaussian_details(
+        pred.obs,
+        pred.mu,
+        pred.cov,
+        tmpl,
+        allow_negative=bool(getattr(config, "extract_allow_negative", True)),
+    )
+    p0_obs, z_obs, _, _ = p0_profiled_gaussian_LRT(pred.obs, pred.mu, pred.cov, tmpl)
+    return SingleObservedDisplay(
+        ctx=ctx,
+        mu_full_plot=np.asarray(pred.mu_full, float),
+        mu_win_fit=np.asarray(pred.mu, float),
+        cov_win_fit=np.asarray(pred.cov, float),
+        b_fit=np.asarray(fitd.get("b_fit", pred.mu), float).reshape(-1),
+        lambda_fit=np.asarray(fitd.get("lambda_hat", pred.mu), float).reshape(-1),
+        A_hat=float(fitd.get("A_hat", float("nan"))),
+        sigma_A=float(fitd.get("sigma_A", float("nan"))),
+        fit_success=bool(fitd.get("success", False)),
+        p0_analytic=float(p0_obs),
+        Z_analytic=float(z_obs),
+    )
+
+
+def make_combined_observed_display(
+    datasets: Sequence[DatasetConfig],
+    config,
+    *,
+    mass: float,
+) -> CombinedObservedDisplay:
+    displays = [make_single_observed_display(ds, config, mass=float(mass)) for ds in datasets]
+    contexts = [disp.ctx for disp in displays]
+
+    num = 0.0
+    denom = 0.0
+    for disp in displays:
+        ctx = disp.ctx
+        if np.isfinite(disp.A_hat) and np.isfinite(disp.sigma_A) and disp.sigma_A > 0 and np.isfinite(ctx.A_per_eps2_unit):
+            w = float(ctx.A_per_eps2_unit) / float(disp.sigma_A * disp.sigma_A)
+            num += w * float(disp.A_hat)
+            denom += float(ctx.A_per_eps2_unit) * w
+    eps2_hat = float(num / denom) if denom > 0 else float("nan")
+    sigma_eps2_hat = float(1.0 / np.sqrt(denom)) if denom > 0 else float("nan")
+    zhat_combined = float(eps2_hat / sigma_eps2_hat) if np.isfinite(sigma_eps2_hat) and sigma_eps2_hat > 0 else float("nan")
+
+    comb = evaluate_combined(float(mass), [ctx.ds for ctx in contexts], [ctx.pred for ctx in contexts], config)
+
+    return CombinedObservedDisplay(
+        mass=float(mass),
+        eps2_hat=float(eps2_hat),
+        sigma_eps2=float(sigma_eps2_hat),
+        Zhat_combined=float(zhat_combined),
+        eps2_up_obs=float(comb.eps2_up),
+        p0_analytic=float(comb.p0_analytic),
+        Z_analytic=float(comb.Z_analytic),
+        displays=displays,
+        dataset_keys=[str(ctx.ds.key) for ctx in contexts],
+    )
+
+
+def plot_single_extraction_display(
+    display: SingleExtractionDisplay,
+    *,
+    outpath: str,
+    blind_shade_alpha: float,
+    blind_shade_color: str,
+    zoom_half_sigma: float,
+) -> None:
+    set_injection_plot_style("paper")
+    ensure_dir(os.path.dirname(outpath) or ".")
+
+    fig = plt.figure(figsize=(13.2, 9.4), constrained_layout=False)
+    gs = fig.add_gridspec(3, 2, width_ratios=[4.9, 1.55], height_ratios=[1.1, 1.0, 0.92], wspace=0.16, hspace=0.24)
+    ax_full = fig.add_subplot(gs[0, 0])
+    ax_fit = fig.add_subplot(gs[1, 0])
+    ax_sig = fig.add_subplot(gs[2, 0])
+    ax_info = fig.add_subplot(gs[:, 1])
+    ax_info.axis("off")
+
+    pred = display.ctx.pred
+    blind_train = display.ctx.blind_train
+    x_full = display.x_full
+    blind_mask = display.ctx.blind_mask
+    x_win = display.x_win
+
+    yerr_full = np.sqrt(np.clip(display.y_full_toy, 1.0, None))
+    gp_color = "#1f77b4"
+    prof_bkg_color = "#d62728"
+    blind_fit_color = "#2ca02c"
+
+    ax_full.errorbar(x_full, display.y_full_toy, yerr=yerr_full, fmt="o", ms=2.6, lw=0.9, color="black", label="Pseudoexperiment", zorder=4)
+    ax_full.plot(x_full, display.mu_full_plot, color=gp_color, lw=1.6, label="GP background", zorder=5)
+    ax_full.plot(x_full, display.mu_full_plot + display.signal_curve_injected, color="#C44E52", lw=1.5, ls=":", label="Injected mean", zorder=6)
+    _shade_blind_window(ax_full, pred.blind, blind_train=blind_train, alpha=float(blind_shade_alpha) * 0.8, color=str(blind_shade_color), zorder=0)
+    ax_full.set_ylabel("Counts / bin")
+    _set_title_above(
+        ax_full,
+        rf"{display.ctx.ds.label} Pseudoexperiment -- Injected {display.inj_nsigma:.0f} $\sigma$ "
+        rf"[{display.Nsig_realized_total} realized events] at {display.ctx.mass * 1e3:.0f} MeV",
+    )
+    ax_full.legend(loc="upper left", frameon=True, fontsize=9)
+    _grid(ax_full)
+
+    m_zoom = _zoom_mask(display, float(zoom_half_sigma))
+    xz = x_full[m_zoom]
+    yz = display.y_full_toy[m_zoom]
+    muz = display.mu_full_plot[m_zoom]
+    ax_fit.errorbar(xz, yz, yerr=np.sqrt(np.clip(yz, 1.0, None)), fmt="o", ms=3.0, lw=0.9, color="black", label="Pseudoexperiment", zorder=4)
+    ax_fit.plot(xz, muz, color=gp_color, lw=1.5, label="GP background", zorder=5)
+    ax_fit.plot(x_win, display.b_fit, color=prof_bkg_color, lw=1.5, label="Profiled background", zorder=6)
+    ax_fit.plot(x_win, display.lambda_fit, color=blind_fit_color, lw=1.7, label="Blind-window fit", zorder=7)
+    _shade_blind_window(ax_fit, pred.blind, blind_train=blind_train, alpha=float(blind_shade_alpha), color=str(blind_shade_color), zorder=0)
+    ax_fit.set_xlim(float(xz[0]), float(xz[-1]))
+    ax_fit.set_ylabel("Counts / bin")
+    _set_title_above(ax_fit, f"Blind-window fit ({zoom_half_sigma:.1f} sigma sideband padding)")
+    ax_fit.legend(loc="upper left", frameon=True, fontsize=8.8)
+    _grid(ax_fit)
+
+    resid_sig = np.asarray(display.residual_sigma, float)
+    ax_sig.fill_between(x_win, -resid_sig, resid_sig, color="0.78", alpha=0.55, lw=0, zorder=1, label="Residual ±1σ")
+    ax_sig.errorbar(x_win, display.residual_obs, yerr=np.sqrt(np.clip(display.y_win_toy, 1.0, None)), fmt="o", ms=3.0, lw=0.9, color="black", label="Pseudoexperiment - profiled background", zorder=4)
+    ax_sig.plot(xz, display.signal_curve_injected[m_zoom], color="#C44E52", lw=1.6, ls=":", label="Injected signal", zorder=5)
+    ax_sig.plot(xz, display.signal_curve_extracted[m_zoom], color="#2CA02C", lw=1.8, label="Extracted signal", zorder=6)
+    ax_sig.axhline(0.0, color="0.2", lw=0.9, alpha=0.7, zorder=2)
+    _shade_blind_window(ax_sig, pred.blind, blind_train=blind_train, alpha=float(blind_shade_alpha), color=str(blind_shade_color), zorder=0)
+    ax_sig.set_xlim(float(xz[0]), float(xz[-1]))
+    ax_sig.set_xlabel("Mass [GeV]")
+    ax_sig.set_ylabel("Signal counts / bin")
+    _set_title_above(ax_sig, "Residual and extracted signal")
+    ax_sig.legend(loc="upper left", frameon=True, fontsize=8.8)
+    _grid(ax_sig)
+
+    ul_ratio = float(display.eps2_inj / display.ctx.eps2_up_obs) if np.isfinite(display.ctx.eps2_up_obs) and display.ctx.eps2_up_obs > 0 else float("nan")
+    info_lines = [
+        f"Dataset: {display.ctx.ds.key}",
+        f"Mass: {display.ctx.mass * 1e3:.0f} MeV",
+        f"Injected level: {display.inj_nsigma:.1f} sigma",
+        f"A_inj (total): {display.A_inj_total:.1f}",
+        f"A_hat: {display.A_hat:.1f} ± {display.sigma_A:.1f}",
+        f"Zhat: {display.Z_hat:.2f}",
+        f"Pull: {display.pull:.2f}",
+        f"eps^2_inj: {display.eps2_inj:.3e}",
+        f"obs UL eps^2: {display.ctx.eps2_up_obs:.3e}",
+        f"eps^2_inj / UL: {ul_ratio:.2f}" if np.isfinite(ul_ratio) else "eps^2_inj / UL: n/a",
+        f"Sigma_A ref: {display.ctx.sigmaA_ref:.1f}",
+        f"Blind frac: {display.ctx.blind_fraction:.3f}",
+        f"Realized signal: {display.Nsig_realized_total} total, {display.Nsig_realized_blind} in blind",
+        f"GP refit: {'yes' if display.refit_ok else 'no'}",
+        f"Fit success: {'yes' if display.fit_success else 'no'}",
+    ]
+    ax_info.text(
+        0.02,
+        0.98,
+        "\n".join(info_lines),
+        va="top",
+        ha="left",
+        fontsize=9.6,
+        bbox=dict(boxstyle="round,pad=0.45", fc="white", ec="0.65", alpha=0.96),
+    )
+
+    fig.subplots_adjust(top=0.94, bottom=0.08, left=0.07, right=0.97)
+    _save_plot_outputs(fig, outpath, png_dpi=320)
+    with open(os.path.splitext(outpath)[0] + ".json", "w", encoding="utf-8") as fh:
+        json.dump(display.to_metadata(), fh, indent=2, sort_keys=True)
+
+
+def _display_colors() -> Dict[str, str]:
+    return {
+        "2015": "#0072B2",
+        "2016": "#E69F00",
+        "2021": "#009E73",
+        "combined": "#111111",
+        "gp": "#4C72B0",
+        "profiled": "#D55E00",
+        "info": "#FFFFFF",
+        "inj": "#C44E52",
+    }
+
+
+def _combined_u_grid(displays: Sequence, zoom_half_sigma: float) -> np.ndarray:
+    span = max(
+        float(d.ctx.pred.blind[1] - d.ctx.mass) / float(d.ctx.pred.sigma_val) + float(zoom_half_sigma)
+        for d in displays
+    )
+    return np.linspace(-span, +span, 800)
+
+
+def _combined_panel_curve(
+    disp,
+    curve: np.ndarray,
+    *,
+    span: float,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Return a common-u representation using the full extracted signal shape."""
+    sigma = float(disp.ctx.pred.sigma_val)
+    u_full = (disp.x_full - float(disp.ctx.mass)) / sigma
+    y_full = np.asarray(curve, float)
+    keep = np.isfinite(u_full) & np.isfinite(y_full) & (u_full >= -span - 0.25) & (u_full <= span + 0.25)
+    u_plot = np.asarray(u_full[keep], float)
+    y_plot = np.asarray(y_full[keep], float)
+    if u_plot.size < 2:
+        return np.asarray([], float), np.asarray([], float)
+    order = np.argsort(u_plot)
+    return u_plot[order], y_plot[order]
+
+
+def _plot_combined_signal_panel(
+    ax,
+    displays: Sequence,
+    *,
+    zoom_half_sigma: float,
+    blind_shade_alpha: float,
+    blind_shade_color: str,
+    include_injected: bool = False,
+) -> None:
+    colors = _display_colors()
+    u = _combined_u_grid(displays, zoom_half_sigma=float(zoom_half_sigma))
+    span = float(np.max(np.abs(u))) if u.size else 0.0
+    blind_nsigma = float(displays[0].ctx.pred.blind[1] - displays[0].ctx.mass) / float(displays[0].ctx.pred.sigma_val)
+    total_extracted = np.zeros_like(u, float)
+    total_injected = np.zeros_like(u, float)
+
+    for idx, disp in enumerate(displays):
+        c = colors.get(str(disp.ctx.ds.key), f"C{idx}")
+        uz, yz = _combined_panel_curve(disp, disp.signal_curve_extracted, span=span)
+        if uz.size < 2:
+            continue
+        ax.plot(uz, yz, color=c, lw=1.6, alpha=0.92, label=f"{disp.ctx.ds.key} extracted", zorder=4)
+        total_extracted += np.interp(u, uz, yz, left=0.0, right=0.0)
+        if include_injected and hasattr(disp, "signal_curve_injected"):
+            uz_inj, yz_inj = _combined_panel_curve(disp, disp.signal_curve_injected, span=span)
+            if uz_inj.size < 2:
+                continue
+            total_injected += np.interp(
+                u,
+                uz_inj,
+                yz_inj,
+                left=0.0,
+                right=0.0,
+            )
+
+    if include_injected:
+        ax.plot(u, total_injected, color=colors["inj"], lw=1.8, ls=":", label="Injected total", zorder=5)
+    ax.plot(u, total_extracted, color=colors["combined"], lw=2.2, label="Combined extracted", zorder=6)
+    ax.axvspan(-blind_nsigma, +blind_nsigma, color=str(blind_shade_color), alpha=float(blind_shade_alpha), lw=0, zorder=0)
+    ax.axhline(0.0, color="0.2", lw=0.9, alpha=0.7, zorder=1)
+    ax.set_xlabel(r"$(m - m_0)/\sigma_m$")
+    ax.set_ylabel("Signal counts / bin")
+    _set_title_above(ax, "Shared signal view")
+    ax.legend(loc="upper left", frameon=True, fontsize=8.6)
+    _grid(ax)
+
+
+def plot_combined_extraction_display(
+    display: CombinedExtractionDisplay,
+    *,
+    outpath: str,
+    blind_shade_alpha: float,
+    blind_shade_color: str,
+    zoom_half_sigma: float,
+) -> None:
+    if len(display.displays) < 2:
+        raise ValueError("Combined extraction display requires at least two datasets")
+
+    set_injection_plot_style("paper")
+    ensure_dir(os.path.dirname(outpath) or ".")
+
+    n_disp = len(display.displays)
+    fig = plt.figure(figsize=(4.35 * n_disp + 3.7, 10.8), constrained_layout=False)
+    gs = fig.add_gridspec(
+        3,
+        n_disp + 1,
+        width_ratios=[1.0] * n_disp + [1.08],
+        height_ratios=[1.0, 0.95, 0.88],
+        wspace=0.18,
+        hspace=0.26,
+    )
+    ax_fit = [fig.add_subplot(gs[0, i]) for i in range(n_disp)]
+    ax_sig = [fig.add_subplot(gs[1, i]) for i in range(n_disp)]
+    ax_comb = fig.add_subplot(gs[2, :n_disp])
+    ax_info = fig.add_subplot(gs[:, n_disp])
+    ax_info.axis("off")
+
+    colors = _display_colors()
+    blind_fit_colors = {"2015": "#2ca02c", "2016": "#9467bd", "2021": "#55A868"}
+
+    for idx, disp in enumerate(display.displays):
+        pred = disp.ctx.pred
+        x_full = disp.x_full
+        x_win = disp.x_win
+        blind_train = disp.ctx.blind_train
+        m_zoom = _zoom_mask(disp, float(zoom_half_sigma))
+        xz = x_full[m_zoom]
+        yz = disp.y_full_toy[m_zoom]
+        muz = disp.mu_full_plot[m_zoom]
+        c = colors.get(str(disp.ctx.ds.key), f"C{idx}")
+
+        ax_fit[idx].errorbar(xz, yz, yerr=np.sqrt(np.clip(yz, 1.0, None)), fmt="o", ms=2.9, lw=0.9, color="black", label="Pseudoexperiment", zorder=4)
+        ax_fit[idx].plot(xz, muz, color=colors["gp"], lw=1.5, label="GP background", zorder=5)
+        ax_fit[idx].plot(x_win, disp.b_fit, color=colors["profiled"], lw=1.4, label="Profiled background", zorder=6)
+        ax_fit[idx].plot(x_win, disp.lambda_fit, color=blind_fit_colors.get(str(disp.ctx.ds.key), c), lw=1.8, label="Blind-window fit", zorder=7)
+        _shade_blind_window(ax_fit[idx], pred.blind, blind_train=blind_train, alpha=float(blind_shade_alpha), color=str(blind_shade_color), zorder=0)
+        ax_fit[idx].set_xlim(float(xz[0]), float(xz[-1]))
+        ax_fit[idx].set_ylabel("Counts / bin")
+        _set_title_above(ax_fit[idx], f"{disp.ctx.ds.label} blind-window fit")
+        ax_fit[idx].legend(loc="upper left", frameon=True, fontsize=8.3)
+        _grid(ax_fit[idx])
+
+        resid_sig = np.asarray(disp.residual_sigma, float)
+        ax_sig[idx].fill_between(x_win, -resid_sig, resid_sig, color="0.78", alpha=0.55, lw=0, zorder=1, label="Residual ±1σ")
+        ax_sig[idx].errorbar(x_win, disp.residual_obs, yerr=np.sqrt(np.clip(disp.y_win_toy, 1.0, None)), fmt="o", ms=2.9, lw=0.9, color="black", label="Pseudoexperiment - profiled background", zorder=4)
+        ax_sig[idx].plot(xz, disp.signal_curve_injected[m_zoom], color=colors["inj"], lw=1.6, ls=":", label="Injected signal", zorder=5)
+        ax_sig[idx].plot(xz, disp.signal_curve_extracted[m_zoom], color=c, lw=1.8, label="Extracted signal", zorder=6)
+        ax_sig[idx].axhline(0.0, color="0.2", lw=0.9, alpha=0.7, zorder=1)
+        _shade_blind_window(ax_sig[idx], pred.blind, blind_train=blind_train, alpha=float(blind_shade_alpha), color=str(blind_shade_color), zorder=0)
+        ax_sig[idx].set_xlim(float(xz[0]), float(xz[-1]))
+        ax_sig[idx].set_xlabel("Mass [GeV]")
+        ax_sig[idx].set_ylabel("Signal counts / bin")
+        _set_title_above(ax_sig[idx], f"{disp.ctx.ds.label} residual and extracted signal")
+        ax_sig[idx].legend(loc="upper left", frameon=True, fontsize=8.3)
+        _grid(ax_sig[idx])
+
+    _plot_combined_signal_panel(
+        ax_comb,
+        display.displays,
+        zoom_half_sigma=float(zoom_half_sigma),
+        blind_shade_alpha=float(blind_shade_alpha),
+        blind_shade_color=str(blind_shade_color),
+        include_injected=True,
+    )
+
+    ul_ratio = float(display.eps2_inj / display.eps2_up_obs) if np.isfinite(display.eps2_up_obs) and display.eps2_up_obs > 0 else float("nan")
+    info_lines = [
+        f"Combined model: {' + '.join(display.dataset_keys)}",
+        f"Mass: {display.mass * 1e3:.0f} MeV",
+        f"Injected level: {display.inj_nsigma_combined:.1f} sigma",
+        f"eps^2_inj: {display.eps2_inj:.3e}",
+        f"eps^2_hat: {display.eps2_hat:.3e} ± {display.sigma_eps2:.3e}",
+        f"Zhat_combined: {display.Zhat_combined:.2f}",
+        f"obs UL eps^2: {display.eps2_up_obs:.3e}",
+        f"eps^2_inj / UL: {ul_ratio:.2f}" if np.isfinite(ul_ratio) else "eps^2_inj / UL: n/a",
+        "",
+    ]
+    for disp in display.displays:
+        info_lines.extend(
+            [
+                f"{disp.ctx.ds.key}: A_inj={disp.A_inj_total:.1f}, A_hat={disp.A_hat:.1f} ± {disp.sigma_A:.1f}, Zhat={disp.Z_hat:.2f}",
+                f"{disp.ctx.ds.key}: eps^2_UL={disp.ctx.eps2_up_obs:.3e}, signal={disp.Nsig_realized_total} total / {disp.Nsig_realized_blind} blind",
+            ]
+        )
+    ax_info.text(
+        0.02,
+        0.98,
+        "\n".join(info_lines),
+        va="top",
+        ha="left",
+        fontsize=9.4,
+        bbox=dict(boxstyle="round,pad=0.45", fc="white", ec="0.65", alpha=0.96),
+    )
+
+    fig.suptitle(
+        rf"HPS Combined Pseudoexperiment -- Injected {display.inj_nsigma_combined:.0f} $\sigma$ "
+        rf"[{sum(d.Nsig_realized_total for d in display.displays)} realized events] at {display.mass * 1e3:.0f} MeV",
+        y=0.985,
+    )
+    fig.subplots_adjust(top=0.94, bottom=0.07, left=0.06, right=0.97)
+    _save_plot_outputs(fig, outpath, png_dpi=320)
+    with open(os.path.splitext(outpath)[0] + ".json", "w", encoding="utf-8") as fh:
+        json.dump(display.to_metadata(), fh, indent=2, sort_keys=True)
+
+
+def plot_single_observed_context(
+    display: SingleObservedDisplay,
+    *,
+    outpath: str,
+    blind_shade_alpha: float,
+    blind_shade_color: str,
+) -> None:
+    set_injection_plot_style("paper")
+    ensure_dir(os.path.dirname(outpath) or ".")
+    colors = _display_colors()
+
+    fig, ax = plt.subplots(figsize=(11.8, 4.7), constrained_layout=True)
+    ax.errorbar(display.x_full, display.y_full_obs, yerr=np.sqrt(np.clip(display.y_full_obs, 1.0, None)), fmt="o", ms=2.8, lw=0.9, color="black", label="Observed data", zorder=4)
+    ax.plot(display.x_full, display.mu_full_plot, color=colors["gp"], lw=1.6, label="GP background", zorder=5)
+    _shade_blind_window(ax, display.blind, blind_train=display.ctx.blind_train, alpha=float(blind_shade_alpha) * 0.8, color=str(blind_shade_color), zorder=0)
+    ax.set_xlabel("Mass [GeV]")
+    ax.set_ylabel("Counts / bin")
+    _set_title_above(ax, f"{display.ctx.ds.label} observed-data context @ {display.ctx.mass * 1e3:.0f} MeV")
+    ax.legend(loc="upper left", frameon=True, fontsize=8.8)
+    _grid(ax)
+
+    info_lines = [
+        f"A_hat = {display.A_hat:.1f} ± {display.sigma_A:.1f}",
+        f"local p0 = {display.p0_analytic:.3e}",
+        f"local Z = {display.Z_analytic:.2f}",
+        f"obs UL eps^2 = {display.ctx.eps2_up_obs:.3e}",
+    ]
+    ax.text(
+        0.98,
+        0.97,
+        "\n".join(info_lines),
+        transform=ax.transAxes,
+        va="top",
+        ha="right",
+        fontsize=9.0,
+        bbox=dict(boxstyle="round,pad=0.38", fc="white", ec="0.65", alpha=0.95),
+    )
+    _save_plot_outputs(fig, outpath, png_dpi=320)
+
+
+def plot_single_observed_zoom(
+    display: SingleObservedDisplay,
+    *,
+    outpath: str,
+    blind_shade_alpha: float,
+    blind_shade_color: str,
+    zoom_half_sigma: float,
+) -> None:
+    set_injection_plot_style("paper")
+    ensure_dir(os.path.dirname(outpath) or ".")
+    colors = _display_colors()
+
+    fig = plt.figure(figsize=(11.0, 6.9), constrained_layout=True)
+    gs = fig.add_gridspec(2, 1, height_ratios=[1.05, 0.92], hspace=0.18)
+    ax_fit = fig.add_subplot(gs[0, 0])
+    ax_sig = fig.add_subplot(gs[1, 0], sharex=ax_fit)
+
+    pred = display.ctx.pred
+    m_zoom = _zoom_mask(display, float(zoom_half_sigma))
+    xz = display.x_full[m_zoom]
+    yz = display.y_full_obs[m_zoom]
+    muz = display.mu_full_plot[m_zoom]
+    sig_bkg = np.sqrt(np.clip(np.diag(np.asarray(display.cov_win_fit, float)), 0.0, None))
+
+    ax_fit.errorbar(xz, yz, yerr=np.sqrt(np.clip(yz, 1.0, None)), fmt="o", ms=2.9, lw=0.9, color="black", label="Observed data", zorder=4)
+    ax_fit.plot(xz, muz, color=colors["gp"], lw=1.6, label="GP background", zorder=5)
+    ax_fit.plot(display.x_win, display.b_fit, color=colors["profiled"], lw=1.6, label="Profiled background", zorder=6)
+    ax_fit.plot(display.x_win, display.lambda_fit, color=colors.get(str(display.ctx.ds.key), "#2ca02c"), lw=1.8, label="Best-fit signal + background", zorder=7)
+    ax_fit.fill_between(display.x_win, np.asarray(display.b_fit, float) - sig_bkg, np.asarray(display.b_fit, float) + sig_bkg, color=colors["profiled"], alpha=0.15, lw=0, zorder=2, label="Profiled bkg ±1σ")
+    _shade_blind_window(ax_fit, pred.blind, blind_train=display.ctx.blind_train, alpha=float(blind_shade_alpha), color=str(blind_shade_color), zorder=0)
+    ax_fit.set_ylabel("Counts / bin")
+    _set_title_above(ax_fit, f"{display.ctx.ds.label} blind-window fit @ {display.ctx.mass * 1e3:.0f} MeV")
+    ax_fit.legend(loc="upper left", frameon=True, fontsize=8.5)
+    _grid(ax_fit)
+
+    resid_sig = np.asarray(display.residual_sigma, float)
+    ax_sig.fill_between(display.x_win, -resid_sig, resid_sig, color="0.78", alpha=0.55, lw=0, zorder=1, label="Residual ±1σ")
+    ax_sig.errorbar(display.x_win, display.residual_obs, yerr=np.sqrt(np.clip(display.y_win_obs, 1.0, None)), fmt="o", ms=2.9, lw=0.9, color="black", label="Observed - profiled bkg", zorder=4)
+    ax_sig.plot(xz, display.signal_curve_extracted[m_zoom], color=colors.get(str(display.ctx.ds.key), "#2ca02c"), lw=1.8, label="Extracted signal", zorder=5)
+    ax_sig.axhline(0.0, color="0.2", lw=0.9, alpha=0.7, zorder=2)
+    _shade_blind_window(ax_sig, pred.blind, blind_train=display.ctx.blind_train, alpha=float(blind_shade_alpha), color=str(blind_shade_color), zorder=0)
+    ax_sig.set_xlabel("Mass [GeV]")
+    ax_sig.set_ylabel("Signal counts / bin")
+    _set_title_above(ax_sig, f"Residual view (max |pull| = {np.nanmax(np.abs(display.pull_win)):.2f})")
+    ax_sig.legend(loc="upper left", frameon=True, fontsize=8.5)
+    _grid(ax_sig)
+    _save_plot_outputs(fig, outpath, png_dpi=320)
+
+
+def plot_combined_observed_display(
+    display: CombinedObservedDisplay,
+    *,
+    outpath: str,
+    blind_shade_alpha: float,
+    blind_shade_color: str,
+    zoom_half_sigma: float,
+) -> None:
+    if len(display.displays) < 2:
+        raise ValueError("Combined observed display requires at least two datasets")
+
+    set_injection_plot_style("paper")
+    ensure_dir(os.path.dirname(outpath) or ".")
+    colors = _display_colors()
+    n_disp = len(display.displays)
+
+    fig = plt.figure(figsize=(4.35 * n_disp + 3.7, 10.8), constrained_layout=False)
+    gs = fig.add_gridspec(
+        3,
+        n_disp + 1,
+        width_ratios=[1.0] * n_disp + [1.08],
+        height_ratios=[1.0, 0.95, 0.88],
+        wspace=0.18,
+        hspace=0.26,
+    )
+    ax_fit = [fig.add_subplot(gs[0, i]) for i in range(n_disp)]
+    ax_sig = [fig.add_subplot(gs[1, i]) for i in range(n_disp)]
+    ax_comb = fig.add_subplot(gs[2, :n_disp])
+    ax_info = fig.add_subplot(gs[:, n_disp])
+    ax_info.axis("off")
+
+    for idx, disp in enumerate(display.displays):
+        pred = disp.ctx.pred
+        m_zoom = _zoom_mask(disp, float(zoom_half_sigma))
+        xz = disp.x_full[m_zoom]
+        yz = disp.y_full_obs[m_zoom]
+        muz = disp.mu_full_plot[m_zoom]
+        c = colors.get(str(disp.ctx.ds.key), f"C{idx}")
+        sig_bkg = np.sqrt(np.clip(np.diag(np.asarray(disp.cov_win_fit, float)), 0.0, None))
+
+        ax_fit[idx].errorbar(xz, yz, yerr=np.sqrt(np.clip(yz, 1.0, None)), fmt="o", ms=2.9, lw=0.9, color="black", label="Observed data", zorder=4)
+        ax_fit[idx].plot(xz, muz, color=colors["gp"], lw=1.5, label="GP background", zorder=5)
+        ax_fit[idx].plot(disp.x_win, disp.b_fit, color=colors["profiled"], lw=1.5, label="Profiled background", zorder=6)
+        ax_fit[idx].plot(disp.x_win, disp.lambda_fit, color=c, lw=1.8, label="Best-fit signal + background", zorder=7)
+        ax_fit[idx].fill_between(disp.x_win, np.asarray(disp.b_fit, float) - sig_bkg, np.asarray(disp.b_fit, float) + sig_bkg, color=colors["profiled"], alpha=0.14, lw=0, zorder=2)
+        _shade_blind_window(ax_fit[idx], pred.blind, blind_train=disp.ctx.blind_train, alpha=float(blind_shade_alpha), color=str(blind_shade_color), zorder=0)
+        ax_fit[idx].set_ylabel("Counts / bin")
+        _set_title_above(ax_fit[idx], f"{disp.ctx.ds.label} fit")
+        ax_fit[idx].legend(loc="upper left", frameon=True, fontsize=8.2)
+        _grid(ax_fit[idx])
+
+        resid_sig = np.asarray(disp.residual_sigma, float)
+        ax_sig[idx].fill_between(disp.x_win, -resid_sig, resid_sig, color="0.78", alpha=0.55, lw=0, zorder=1, label="Residual ±1σ")
+        ax_sig[idx].errorbar(disp.x_win, disp.residual_obs, yerr=np.sqrt(np.clip(disp.y_win_obs, 1.0, None)), fmt="o", ms=2.9, lw=0.9, color="black", label="Observed - profiled bkg", zorder=4)
+        ax_sig[idx].plot(xz, disp.signal_curve_extracted[m_zoom], color=c, lw=1.8, label="Extracted signal", zorder=5)
+        ax_sig[idx].axhline(0.0, color="0.2", lw=0.9, alpha=0.7, zorder=2)
+        _shade_blind_window(ax_sig[idx], pred.blind, blind_train=disp.ctx.blind_train, alpha=float(blind_shade_alpha), color=str(blind_shade_color), zorder=0)
+        ax_sig[idx].set_xlabel("Mass [GeV]")
+        ax_sig[idx].set_ylabel("Signal counts / bin")
+        _set_title_above(ax_sig[idx], f"{disp.ctx.ds.label} residual")
+        ax_sig[idx].legend(loc="upper left", frameon=True, fontsize=8.2)
+        _grid(ax_sig[idx])
+
+    _plot_combined_signal_panel(
+        ax_comb,
+        display.displays,
+        zoom_half_sigma=float(zoom_half_sigma),
+        blind_shade_alpha=float(blind_shade_alpha),
+        blind_shade_color=str(blind_shade_color),
+        include_injected=False,
+    )
+
+    info_lines = [
+        f"Observed combined model: {' + '.join(display.dataset_keys)}",
+        f"Mass: {display.mass * 1e3:.0f} MeV",
+        f"eps^2_hat: {display.eps2_hat:.3e} ± {display.sigma_eps2:.3e}",
+        f"Zhat_combined: {display.Zhat_combined:.2f}",
+        f"local p0 = {display.p0_analytic:.3e}",
+        f"local Z = {display.Z_analytic:.2f}",
+        f"obs UL eps^2: {display.eps2_up_obs:.3e}",
+        "",
+    ]
+    for disp in display.displays:
+        info_lines.extend(
+            [
+                f"{disp.ctx.ds.key}: A_hat={disp.A_hat:.1f} ± {disp.sigma_A:.1f}",
+                f"{disp.ctx.ds.key}: local p0={disp.p0_analytic:.3e}, Z={disp.Z_analytic:.2f}",
+            ]
+        )
+    ax_info.text(
+        0.02,
+        0.98,
+        "\n".join(info_lines),
+        va="top",
+        ha="left",
+        fontsize=9.4,
+        bbox=dict(boxstyle="round,pad=0.45", fc="white", ec="0.65", alpha=0.96),
+    )
+
+    fig.suptitle(
+        rf"HPS Observed Data -- Shared-coupling validation at {display.mass * 1e3:.0f} MeV",
+        y=0.985,
+    )
+    fig.subplots_adjust(top=0.94, bottom=0.07, left=0.06, right=0.97)
+    _save_plot_outputs(fig, outpath, png_dpi=320)
+    with open(os.path.splitext(outpath)[0] + ".json", "w", encoding="utf-8") as fh:
+        json.dump(display.to_metadata(), fh, indent=2, sort_keys=True)
+
+
+def run_extraction_display_suite(
+    config,
+    *,
+    dataset_key: Optional[str] = None,
+    dataset_keys: Optional[Sequence[str]] = None,
+    output_dir: Optional[str] = None,
+    masses: Optional[Sequence[float]] = None,
+    sigma_multipliers: Optional[Sequence[float]] = None,
+) -> List[str]:
+    datasets = make_datasets(config)
+    if not datasets:
+        raise RuntimeError("No datasets enabled for extraction display")
+
+    raw_masses = masses if masses is not None else getattr(config, "extraction_display_masses_gev", [])
+    masses = [float(m) for m in raw_masses]
+    if not masses:
+        raise RuntimeError("Config field extraction_display_masses_gev is empty")
+    raw_sigmas = sigma_multipliers if sigma_multipliers is not None else getattr(config, "extraction_display_sigma_multipliers", [3.0, 5.0, 7.0])
+    sigmas = [float(z) for z in raw_sigmas]
+    if not sigmas:
+        raise RuntimeError("Config field extraction_display_sigma_multipliers is empty")
+
+    target = str(dataset_key or getattr(config, "extraction_display_dataset_key", "")).strip().lower()
+    if not target:
+        target = list(datasets.keys())[0] if len(datasets) == 1 else "combined"
+
+    out_root = output_dir or os.path.join(config.output_dir, "extraction_display", target)
+    ensure_dir(out_root)
+    blind_shade_alpha = float(getattr(config, "extraction_display_blind_shade_alpha", 0.18))
+    blind_shade_color = str(getattr(config, "extraction_display_blind_shade_color", "0.88"))
+    zoom_half_sigma = float(getattr(config, "extraction_display_zoom_half_sigma", 0.5))
+    base_seed = int(getattr(config, "extraction_display_seed", 271828))
+    written: List[str] = []
+
+    if target == "combined":
+        requested = dataset_keys if dataset_keys is not None else getattr(config, "extraction_display_dataset_keys", ["2015", "2016"])
+        requested = [str(k).strip() for k in requested if str(k).strip()]
+        ds_list = [datasets[k] for k in requested if k in datasets]
+        if len(ds_list) < 2:
+            raise RuntimeError("Combined extraction display needs at least two enabled datasets")
+        context_cache = {
+            float(mass): [
+                _build_single_context(
+                    ds,
+                    config,
+                    mass=float(mass),
+                    sigma_source=str(getattr(config, "extraction_display_sigma_source", "asimov")),
+                    train_exclude_nsigma=getattr(config, "extraction_display_train_exclude_nsigma", None),
+                )
+                for ds in ds_list
+            ]
+            for mass in masses
+        }
+        for mass in masses:
+            contexts = context_cache[float(mass)]
+            for z in sigmas:
+                seed = _stable_display_seed(base_seed, "combined", float(mass), float(z))
+                display = make_combined_extraction_display(
+                    ds_list,
+                    config,
+                    mass=float(mass),
+                    inj_nsigma=float(z),
+                    seed=int(seed),
+                    contexts=contexts,
+                )
+                stem = os.path.join(out_root, f"extract_display_combined_m{int(round(float(mass) * 1e3)):03d}MeV_z{_strength_tag(z)}")
+                plot_combined_extraction_display(
+                    display,
+                    outpath=stem + ".png",
+                    blind_shade_alpha=blind_shade_alpha,
+                    blind_shade_color=blind_shade_color,
+                    zoom_half_sigma=zoom_half_sigma,
+                )
+                written.append(stem + ".png")
+        return written
+
+    if target not in datasets:
+        raise RuntimeError(f"Dataset '{target}' is not enabled; enabled datasets: {sorted(datasets)}")
+
+    ds = datasets[target]
+    context_cache = {
+        float(mass): _build_single_context(
+            ds,
+            config,
+            mass=float(mass),
+            sigma_source=str(getattr(config, "extraction_display_sigma_source", "asimov")),
+            train_exclude_nsigma=getattr(config, "extraction_display_train_exclude_nsigma", None),
+        )
+        for mass in masses
+    }
+    for mass in masses:
+        ctx = context_cache[float(mass)]
+        for z in sigmas:
+            seed = _stable_display_seed(base_seed, str(ds.key), float(mass), float(z))
+            display = make_single_extraction_display(
+                ds,
+                config,
+                mass=float(mass),
+                inj_nsigma=float(z),
+                seed=int(seed),
+                ctx=ctx,
+            )
+            stem = os.path.join(out_root, f"extract_display_{ds.key}_m{int(round(float(mass) * 1e3)):03d}MeV_z{_strength_tag(z)}")
+            plot_single_extraction_display(
+                display,
+                outpath=stem + ".png",
+                blind_shade_alpha=blind_shade_alpha,
+                blind_shade_color=blind_shade_color,
+                zoom_half_sigma=zoom_half_sigma,
+            )
+            written.append(stem + ".png")
+    return written
+
+
+def run_observed_display_suite(
+    config,
+    *,
+    mass: float,
+    dataset_key: Optional[str] = None,
+    dataset_keys: Optional[Sequence[str]] = None,
+    output_dir: Optional[str] = None,
+) -> List[str]:
+    """Generate observed-data validation displays for a single mass hypothesis."""
+    datasets = make_datasets(config)
+    if not datasets:
+        raise RuntimeError("No datasets enabled for observed display")
+
+    target = str(dataset_key or getattr(config, "extraction_display_dataset_key", "")).strip().lower()
+    if not target:
+        target = list(datasets.keys())[0] if len(datasets) == 1 else "combined"
+
+    blind_shade_alpha = float(getattr(config, "extraction_display_blind_shade_alpha", 0.18))
+    blind_shade_color = str(getattr(config, "extraction_display_blind_shade_color", "0.88"))
+    zoom_half_sigma = float(getattr(config, "extraction_display_zoom_half_sigma", 0.5))
+
+    out_root = output_dir or os.path.join(config.output_dir, "observed_display")
+    mass_dir = os.path.join(out_root, mass_tag(float(mass)))
+    ensure_dir(mass_dir)
+    written: List[str] = []
+
+    if target == "combined":
+        requested = dataset_keys if dataset_keys is not None else getattr(config, "extraction_display_dataset_keys", list(datasets.keys()))
+        requested = [str(k).strip() for k in requested if str(k).strip()]
+        ds_list = [datasets[k] for k in requested if k in datasets]
+        if len(ds_list) < 2:
+            raise RuntimeError("Combined observed display needs at least two enabled datasets")
+
+        display = make_combined_observed_display(ds_list, config, mass=float(mass))
+        hero_stem = os.path.join(mass_dir, "observed_display_combined")
+        plot_combined_observed_display(
+            display,
+            outpath=hero_stem + ".png",
+            blind_shade_alpha=blind_shade_alpha,
+            blind_shade_color=blind_shade_color,
+            zoom_half_sigma=zoom_half_sigma,
+        )
+        written.append(hero_stem + ".png")
+
+        for disp in display.displays:
+            ctx_stem = os.path.join(mass_dir, f"observed_context_{disp.ctx.ds.key}")
+            zoom_stem = os.path.join(mass_dir, f"observed_zoom_{disp.ctx.ds.key}")
+            plot_single_observed_context(
+                disp,
+                outpath=ctx_stem + ".png",
+                blind_shade_alpha=blind_shade_alpha,
+                blind_shade_color=blind_shade_color,
+            )
+            plot_single_observed_zoom(
+                disp,
+                outpath=zoom_stem + ".png",
+                blind_shade_alpha=blind_shade_alpha,
+                blind_shade_color=blind_shade_color,
+                zoom_half_sigma=zoom_half_sigma,
+            )
+            written.extend([ctx_stem + ".png", zoom_stem + ".png"])
+
+        with open(os.path.join(mass_dir, "metadata_combined.json"), "w", encoding="utf-8") as fh:
+            json.dump(display.to_metadata(), fh, indent=2, sort_keys=True)
+        return written
+
+    if target not in datasets:
+        raise RuntimeError(f"Dataset '{target}' is not enabled; enabled datasets: {sorted(datasets)}")
+
+    disp = make_single_observed_display(datasets[target], config, mass=float(mass))
+    hero_stem = os.path.join(mass_dir, f"observed_display_{disp.ctx.ds.key}")
+    ctx_stem = os.path.join(mass_dir, f"observed_context_{disp.ctx.ds.key}")
+    plot_single_observed_zoom(
+        disp,
+        outpath=hero_stem + ".png",
+        blind_shade_alpha=blind_shade_alpha,
+        blind_shade_color=blind_shade_color,
+        zoom_half_sigma=zoom_half_sigma,
+    )
+    plot_single_observed_context(
+        disp,
+        outpath=ctx_stem + ".png",
+        blind_shade_alpha=blind_shade_alpha,
+        blind_shade_color=blind_shade_color,
+    )
+    with open(hero_stem + ".json", "w", encoding="utf-8") as fh:
+        json.dump(disp.to_metadata(), fh, indent=2, sort_keys=True)
+    with open(os.path.join(mass_dir, f"metadata_{disp.ctx.ds.key}.json"), "w", encoding="utf-8") as fh:
+        json.dump(disp.to_metadata(), fh, indent=2, sort_keys=True)
+    written.extend([hero_stem + ".png", ctx_stem + ".png"])
+    return written

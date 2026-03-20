@@ -1,0 +1,126 @@
+\section{HPS Apparatus, Data-Taking Campaigns, and Analysis Scope}
+\label{sec:datasets}
+
+\subsection{Detector configurations and apparatus relevant to the prompt search}
+
+HPS is a forward spectrometer optimized for narrow $e^+e^-$ resonances and displaced
+vertices in the high-rate environment immediately downstream of a thin tungsten target.
+Its prompt $A^\prime \rightarrow e^+e^-$ sensitivity is set primarily by three
+subsystems: the Silicon Vertex Tracker (SVT), which determines the mass and vertex
+resolution; the electromagnetic calorimeter (ECal), which provides the trigger and
+track--cluster matching; and the beamline/target geometry, which defines the forward
+acceptance and the occupancy environment \cite{HPSExperiment2022,HPS2016PromptLong}.
+
+The 2015 and 2016 engineering runs used the baseline six-station SVT. In that
+configuration, six double-layer stereo measurement stations were distributed between
+$z=\SIrange{10}{90}{cm}$ downstream of the target, with the first active silicon only
+about \SI{1.5}{mm} from the beam plane \cite{HPS2016BumpInternal,HPSExperiment2022}.
+The ECal geometry used in the engineering runs was already close to the final HPS
+layout: two PbWO$_4$ crystal halves with the highest-rate crystals nearest the beam
+removed, leaving the beam to pass between the two halves
+\cite{HPS2016BumpInternal,HPSExperiment2022}.
+
+Before the first physics run in 2019, HPS upgraded the front tracker. The 2019 and
+2021 running periods used a seventh double layer at $z=\SI{5}{cm}$, thin silicon,
+slim-edge processing, and short split striplets to preserve low-mass acceptance while
+reducing material and occupancy \cite{HPSExperiment2022,HPSSlimEdgeSensors2020}. The
+same slim-edge module design was used to replace the previous first layer, and the
+front layers were moved closer to the beam. Those hardware changes are the main reason
+the 2019/2021 configuration improves the low-mass prompt search: the first precision
+measurements occur closer to the beam, the front material budget is reduced, and the
+small-opening-angle acceptance is correspondingly better. The ECal crystal layout
+itself did not change between the engineering and physics runs, but a positron
+hodoscope was installed in front of the ECal before the 2019 run to support the
+single-arm positron trigger that recovers events otherwise lost in the ECal hole
+\cite{HPSExperiment2022}.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[t]{0.90\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{apparatus_figs/hps_2015_2016_svt_baseline.png}
+  \caption{Baseline six-layer SVT used in the 2015 and 2016 engineering runs
+  \cite{HPS2016BumpInternal}.}
+\end{subfigure}
+
+\vspace{0.9em}
+
+\begin{subfigure}[t]{0.78\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{apparatus_figs/hps_2019_2021_svt_upgrade.png}
+  \caption{Front-layer upgrade used in the 2019 and 2021 physics runs, including the
+  added seventh double layer and slim-edge front sensors
+  \cite{HPSExperiment2022,HPSSlimEdgeSensors2020}.}
+\end{subfigure}
+\caption{SVT configurations relevant for the prompt-resonance note. The 2015/2016
+baseline tracker and the 2019/2021 upgraded front tracker differ in both layer count
+and the construction of the innermost stations, while the ECal remains the same
+subsystem apart from the addition of the positron hodoscope before the physics runs.}
+\label{fig:hps-svt-eras}
+\end{figure}
+
+\subsection{Data-taking campaigns and present analysis scope}
+
+The present note is organized around three HPS running campaigns: the 2015 engineering
+run, the 2016 engineering run, and the 2021 physics run. The 2015 and 2016 datasets
+are especially natural to compare because they were recorded with the same baseline
+detector configuration and were already analyzed in the published prompt-search
+workflow. The 2021 dataset belongs to the upgraded detector configuration and is the
+first large-statistics physics-run sample to be carried through the GPR workflow.
+
+The 2019 physics run is acknowledged here because it shares the upgraded SVT and
+hodoscope configuration with 2021, but its prompt-resonance analysis is not included in
+the present scope. This note keeps the statement explicit: 2019 data exist, but they
+will be analyzed in a similar capacity in later work rather than merged into the
+review-ready workflow described here.
+
+\begin{table}[H]
+\centering
+\small
+{\setlength{\tabcolsep}{6pt}
+\begin{tabularx}{\linewidth}{@{} P{0.24\linewidth} P{0.12\linewidth} P{0.16\linewidth} P{0.23\linewidth} Y @{}}
+\toprule
+Run period & Beam energy & Approx. EOT & Exposure used here & Prompt scan range \\
+\midrule
+2015 engineering run &
+\SI{1.056}{GeV} &
+$\sim 6.2\times10^{16}$ &
+\SI{1170}{nb^{-1}} &
+\SIrange{20}{130}{MeV} \\
+2016 engineering run &
+\SI{2.3}{GeV} &
+$\sim 5.8\times10^{17}$ &
+10\% development subset of a
+\SI{10608}{nb^{-1}} parent sample &
+\SIrange{35}{210}{MeV} \\
+2021 physics run &
+\SI{3.74}{GeV} &
+$\sim 6\times10^{18}$ &
+1\% review-stage subset of a $\sim\SI{160}{pb^{-1}}$ parent run &
+\SIrange{30}{250}{MeV} \\
+\bottomrule
+\end{tabularx}
+}
+\caption{Data-taking campaigns carried through the present prompt-resonance note. The
+quoted EOT values are campaign-scale approximations intended only to indicate the order
+of magnitude of the accumulated statistics. In the present note, the fully unblinded
+2015 engineering run anchors the methodology validation, the 2016 program is carried
+through the current 10\% development sample on the way to the first 100\%
+unblinding-stage analysis, and the 2021 program is represented by the current 1\%
+validation subset on the way to the final 100\% analysis. The scan ranges
+quoted here are the current GPR analysis ranges rather than the smaller published
+window searches; the corresponding prompt-search publications scanned
+\SIrange{19}{81}{MeV} in 2015 and \SIrange{39}{179}{MeV} in 2016
+\cite{HPS2015DarkPhoton,HPS2016PromptLong}.}
+\label{tab:dataset-summary}
+\end{table}
+
+The staged-analysis logic matters for the way the results are interpreted. The 2015
+sample remains the cleanest environment for methodology validation because it is fully
+unblinded. The 2016 and 2021 analyses are instead organized in review-friendly stages:
+the present note uses the 2016 10\% and 2021 1\% subsets to validate the statistical
+machinery, while the 2016 100\% first-unblinding milestone and the final fully
+unblinded 2021 analysis remain the end points of the program. The 2021 1\% sample is
+therefore best viewed as a validation subset of the upgraded detector configuration:
+it already shows how the upgraded geometry and normalization inputs enter the
+shared-$\eps^2$ reach, but it is not yet the final physics statement for the 2021 run.

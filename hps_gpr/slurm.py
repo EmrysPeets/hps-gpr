@@ -2,6 +2,7 @@
 
 import glob
 import os
+import re
 from typing import List, Optional, TYPE_CHECKING
 
 import numpy as np
@@ -114,6 +115,278 @@ def generate_slurm_script(
     return output_path, submit_path
 
 
+def generate_injection_slurm_scripts(
+    config_path: str,
+    output_path: str,
+    datasets: List[str],
+    masses: List[float],
+    strengths: List[float],
+    n_toys: int,
+    output_root: str,
+    job_name: str = "hps-gpr-inj",
+    partition: str = "batch",
+    time_limit: str = "4:00:00",
+    memory: str = "4G",
+    conda_env: Optional[str] = None,
+    extra_sbatch: Optional[List[str]] = None,
+    mass_ranges_by_dataset: Optional[dict] = None,
+    write_toy_csv: Optional[bool] = None,
+) -> tuple:
+    """Generate SLURM scripts for one injection job per (dataset, mass, strength)."""
+    job_lines = [
+        "#!/bin/bash",
+        f"#SBATCH --job-name={job_name}",
+        f"#SBATCH --partition={partition}",
+        f"#SBATCH --time={time_limit}",
+        f"#SBATCH --mem={memory}",
+        "#SBATCH --output=logs/%j.out",
+        "#SBATCH --error=logs/%j.err",
+    ]
+
+    if extra_sbatch:
+        for directive in extra_sbatch:
+            job_lines.append(f"#SBATCH {directive}")
+
+    job_lines.extend([
+        "",
+        "mkdir -p logs",
+        "",
+    ])
+
+    if conda_env:
+        job_lines.extend([
+            "# Activate conda environment",
+            "source $(conda info --base)/etc/profile.d/conda.sh",
+            f"conda activate {conda_env}",
+            "",
+        ])
+
+    csv_flag_line = None
+    if write_toy_csv is True:
+        csv_flag_line = "    --write-toy-csv \\"
+    elif write_toy_csv is False:
+        csv_flag_line = "    --no-write-toy-csv \\"
+
+    job_lines.extend([
+        "# INJECT_* and BASE_OUTPUT_DIR are passed via --export at submission time",
+        'JOB_OUTDIR="${BASE_OUTPUT_DIR}/injection_jobs/${INJECT_DATASET}/m_${INJECT_MASS_TAG}/s_${INJECT_STRENGTH_TAG}"',
+        'FLAT_OUTDIR="${BASE_OUTPUT_DIR}/injection_flat"',
+        "mkdir -p \"${JOB_OUTDIR}\"",
+        "mkdir -p \"${FLAT_OUTDIR}\"",
+        "",
+        "hps-gpr inject \\",
+        f"    --config {config_path} \\",
+        "    --dataset ${INJECT_DATASET} \\",
+        "    --masses ${INJECT_MASS} \\",
+        "    --strengths ${INJECT_STRENGTH} \\",
+        f"    --n-toys {int(n_toys)} \\",
+    ])
+    if csv_flag_line is not None:
+        job_lines.append(csv_flag_line)
+    job_lines.extend([
+        "    --output-dir \"${JOB_OUTDIR}\"",
+        "",
+        "if [ \"${INJECT_DATASET}\" = \"combined\" ]; then",
+        '  FILE_GLOB="${JOB_OUTDIR}/injection_extraction/*_combined.csv"',
+        "else",
+        '  FILE_GLOB="${JOB_OUTDIR}/injection_extraction/*_${INJECT_DATASET}.csv"',
+        "fi",
+        "for f in ${FILE_GLOB}; do",
+        "  [ -f \"$f\" ] || continue",
+        "  b=$(basename \"$f\" .csv)",
+        '  cp "$f" "${FLAT_OUTDIR}/${b}__jobds_${INJECT_DATASET}__m_${INJECT_MASS_TAG}__s_${INJECT_STRENGTH_TAG}.csv"',
+        "done",
+    ])
+
+    with open(output_path, "w") as f:
+        f.write("\n".join(job_lines) + "\n")
+    os.chmod(output_path, 0o755)
+    print(f"Wrote injection SLURM job script to {output_path}")
+
+    submit_path = os.path.join(os.path.dirname(os.path.abspath(output_path)), "submit_injection_all.sh")
+    abs_job = os.path.abspath(output_path)
+
+    submit_lines = [
+        "#!/bin/bash",
+        "# Submit one SLURM job per (dataset, mass, strength) injection point",
+        f'JOB_SCRIPT="{abs_job}"',
+        f'BASE_OUTPUT_DIR="{output_root}"',
+        "",
+        "mkdir -p logs",
+        "",
+    ]
+
+    n_jobs = 0
+    n_skipped = 0
+    for ds in datasets:
+        ds_range = (mass_ranges_by_dataset or {}).get(str(ds))
+        for mass in masses:
+            mass_f = float(mass)
+            if ds_range is not None and str(ds) != "combined":
+                lo, hi = float(ds_range[0]), float(ds_range[1])
+                if mass_f < lo or mass_f > hi:
+                    n_skipped += 1
+                    continue
+            mass_str = f"{mass_f:.6f}".rstrip("0").rstrip(".")
+            mass_tag = mass_str.replace("-", "m").replace(".", "p")
+            for strength in strengths:
+                strength_str = f"{float(strength):.6g}"
+                strength_tag = strength_str.replace("-", "m").replace(".", "p")
+                submit_lines.append(
+                    "sbatch --export=ALL,"
+                    f"INJECT_DATASET={ds},"
+                    f"INJECT_MASS={mass_str},"
+                    f"INJECT_MASS_TAG={mass_tag},"
+                    f"INJECT_STRENGTH={strength_str},"
+                    f"INJECT_STRENGTH_TAG={strength_tag},"
+                    "BASE_OUTPUT_DIR=${BASE_OUTPUT_DIR} "
+                    "\"${JOB_SCRIPT}\""
+                )
+                n_jobs += 1
+
+    submit_lines.extend([
+        "",
+        f'echo "Submitted {n_jobs} injection jobs."',
+        f'echo "Skipped {n_skipped} out-of-range (dataset,mass) combinations."',
+    ])
+
+    with open(submit_path, "w") as f:
+        f.write("\n".join(submit_lines) + "\n")
+    os.chmod(submit_path, 0o755)
+    print(f"Wrote injection submission loop script to {submit_path}")
+
+    return output_path, submit_path, n_jobs
+
+
+def generate_extraction_display_slurm_scripts(
+    config_path: str,
+    output_path: str,
+    dataset: str,
+    masses: List[float],
+    strengths: List[float],
+    output_root: str,
+    *,
+    dataset_keys: Optional[List[str]] = None,
+    mass_range: Optional[tuple] = None,
+    job_name: str = "hps-gpr-exdisp",
+    partition: str = "batch",
+    time_limit: str = "4:00:00",
+    memory: str = "4G",
+    conda_env: Optional[str] = None,
+    extra_sbatch: Optional[List[str]] = None,
+) -> tuple:
+    """Generate SLURM scripts for one extraction-display job per (mass, strength)."""
+    dataset_key = str(dataset).strip().lower()
+    combined_keys = [str(k).strip() for k in (dataset_keys or []) if str(k).strip()]
+
+    job_lines = [
+        "#!/bin/bash",
+        f"#SBATCH --job-name={job_name}",
+        f"#SBATCH --partition={partition}",
+        f"#SBATCH --time={time_limit}",
+        f"#SBATCH --mem={memory}",
+        "#SBATCH --output=logs/%j.out",
+        "#SBATCH --error=logs/%j.err",
+    ]
+
+    if extra_sbatch:
+        for directive in extra_sbatch:
+            job_lines.append(f"#SBATCH {directive}")
+
+    job_lines.extend([
+        "",
+        "mkdir -p logs",
+        "",
+    ])
+
+    if conda_env:
+        job_lines.extend([
+            "# Activate conda environment",
+            "source $(conda info --base)/etc/profile.d/conda.sh",
+            f"conda activate {conda_env}",
+            "",
+        ])
+
+    job_lines.extend([
+        "# EXTRACT_* and BASE_OUTPUT_DIR are passed via --export at submission time",
+        'JOB_OUTDIR="${BASE_OUTPUT_DIR}/extraction_display_jobs/${EXTRACT_DATASET}/m_${EXTRACT_MASS_TAG}/s_${EXTRACT_STRENGTH_TAG}"',
+        'mkdir -p "${JOB_OUTDIR}"',
+        "",
+        'EXTRACT_DATASET_KEYS_CSV="${EXTRACT_DATASET_KEYS//:/,}"',
+        "",
+        'CMD=(hps-gpr extract-display',
+        f'  --config "{config_path}"',
+        '  --dataset "${EXTRACT_DATASET}"',
+        '  --masses "${EXTRACT_MASS}"',
+        '  --strengths "${EXTRACT_STRENGTH}"',
+        '  --output-dir "${JOB_OUTDIR}")',
+        'if [ -n "${EXTRACT_DATASET_KEYS_CSV}" ]; then',
+        '  CMD+=(--datasets "${EXTRACT_DATASET_KEYS_CSV}")',
+        "fi",
+        '"${CMD[@]}"',
+    ])
+
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(job_lines) + "\n")
+    os.chmod(output_path, 0o755)
+    print(f"Wrote extraction-display SLURM job script to {output_path}")
+
+    submit_path = os.path.join(os.path.dirname(os.path.abspath(output_path)), "submit_extract_display_all.sh")
+    abs_job = os.path.abspath(output_path)
+    dataset_keys_str = ":".join(combined_keys)
+
+    submit_lines = [
+        "#!/bin/bash",
+        "# Submit one SLURM job per (mass, strength) extraction-display point",
+        f'JOB_SCRIPT="{abs_job}"',
+        f'BASE_OUTPUT_DIR="{output_root}"',
+        f'EXTRACT_DATASET="{dataset_key}"',
+        f'EXTRACT_DATASET_KEYS="{dataset_keys_str}"',
+        "",
+        "mkdir -p logs",
+        "",
+    ]
+
+    n_jobs = 0
+    n_skipped = 0
+    for mass in masses:
+        mass_f = float(mass)
+        if mass_range is not None:
+            lo, hi = float(mass_range[0]), float(mass_range[1])
+            if mass_f < lo or mass_f > hi:
+                n_skipped += 1
+                continue
+        mass_str = f"{mass_f:.6f}".rstrip("0").rstrip(".")
+        mass_tag = mass_str.replace("-", "m").replace(".", "p")
+        for strength in strengths:
+            strength_str = f"{float(strength):.6g}"
+            strength_tag = strength_str.replace("-", "m").replace(".", "p")
+            submit_lines.append(
+                "sbatch --export=ALL,"
+                "EXTRACT_DATASET=${EXTRACT_DATASET},"
+                f"EXTRACT_MASS={mass_str},"
+                f"EXTRACT_MASS_TAG={mass_tag},"
+                f"EXTRACT_STRENGTH={strength_str},"
+                f"EXTRACT_STRENGTH_TAG={strength_tag},"
+                "EXTRACT_DATASET_KEYS=${EXTRACT_DATASET_KEYS},"
+                "BASE_OUTPUT_DIR=${BASE_OUTPUT_DIR} "
+                "\"${JOB_SCRIPT}\""
+            )
+            n_jobs += 1
+
+    submit_lines.extend([
+        "",
+        f'echo "Submitted {n_jobs} extraction-display jobs."',
+        f'echo "Skipped {n_skipped} out-of-range masses for dataset selection {dataset_key}."',
+    ])
+
+    with open(submit_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(submit_lines) + "\n")
+    os.chmod(submit_path, 0o755)
+    print(f"Wrote extraction-display submission loop script to {submit_path}")
+
+    return output_path, submit_path, n_jobs
+
 def get_mass_range_for_task(
     datasets: dict,
     mass_step: float,
@@ -160,6 +433,112 @@ def get_mass_range_for_task(
     return mass_min, mass_max
 
 
+def infer_n_tasks_from_output_dir(output_dir: str) -> Optional[int]:
+    """Infer the total task count from ``task_####`` folders in an output directory."""
+    if not os.path.isdir(output_dir):
+        return None
+
+    task_ids: List[int] = []
+    for name in os.listdir(output_dir):
+        m = re.fullmatch(r"task_(\d{4})", str(name))
+        if m:
+            task_ids.append(int(m.group(1)))
+
+    if not task_ids:
+        return None
+
+    # Tasks are generated with contiguous IDs [0, N_TASKS-1].
+    return max(task_ids) + 1
+
+
+def get_task_ids_for_masses(
+    datasets: dict,
+    mass_step: float,
+    n_tasks: int,
+    masses_gev: List[float],
+) -> List[int]:
+    """Map requested masses to the SLURM task IDs that own those mass points."""
+    lo = min([d.m_low for d in datasets.values()])
+    hi = max([d.m_high for d in datasets.values()])
+
+    all_masses = np.arange(lo, hi + 0.5 * mass_step, mass_step)
+    all_masses = np.round(all_masses, 3)
+    n_masses = len(all_masses)
+
+    if n_tasks <= 0:
+        raise ValueError(f"n_tasks must be > 0, got {n_tasks}")
+
+    task_ids = set()
+    for req_mass in masses_gev:
+        req_mass = float(np.round(req_mass, 3))
+        idx = np.where(np.isclose(all_masses, req_mass, atol=1e-9))[0]
+        if idx.size == 0:
+            raise ValueError(
+                f"Requested mass {req_mass:.3f} GeV is not on the scan grid "
+                f"[{lo:.3f}, {hi:.3f}] with step {mass_step:.3f} GeV"
+            )
+        i = int(idx[0])
+
+        chunk_size = n_masses // n_tasks
+        remainder = n_masses % n_tasks
+
+        boundary = (chunk_size + 1) * remainder
+        if i < boundary:
+            task_id = i // (chunk_size + 1)
+        else:
+            task_id = remainder + (i - boundary) // max(chunk_size, 1)
+
+        task_ids.add(int(task_id))
+
+    return sorted(task_ids)
+
+
+
+
+def _combine_band_family(output_dir: str, output_prefix: str, stem: str, subset_cols: List[str]):
+    """Combine per-task UL-band CSV files with matching stem pattern."""
+    files = glob.glob(os.path.join(output_dir, "**", "*.csv"), recursive=True)
+    if not files:
+        return {}
+
+    out = {}
+    by_name = {}
+    pat = re.compile(rf"^{re.escape(stem)}_(.+)\.csv$")
+    for f in files:
+        base = os.path.basename(f)
+        m = pat.match(base)
+        if not m:
+            continue
+        # keep families disjoint: ul_bands_* should not absorb ul_bands_eps2_* or ul_bands_combined_*
+        name = str(m.group(1))
+        if stem == "ul_bands" and (name.startswith("eps2_") or name.startswith("combined_")):
+            continue
+        by_name.setdefault(name, []).append(f)
+
+    for name, paths in by_name.items():
+        dfs = []
+        for fp in paths:
+            try:
+                dfs.append(pd.read_csv(fp))
+            except Exception as e:
+                print(f"Warning: Could not read {fp}: {e}")
+        if not dfs:
+            continue
+        df = pd.concat(dfs, ignore_index=True)
+        keep = [c for c in subset_cols if c in df.columns]
+        if keep:
+            df = df.drop_duplicates(subset=keep)
+        sort_cols = [c for c in ["dataset", "dataset_set", "mass_GeV"] if c in df.columns]
+        if sort_cols:
+            df = df.sort_values(sort_cols).reset_index(drop=True)
+        else:
+            df = df.reset_index(drop=True)
+        out_path = os.path.join(output_dir, f"{output_prefix}_{stem}_{name}.csv")
+        df.to_csv(out_path, index=False)
+        print(f"Wrote combined band table to {out_path}")
+        out[name] = out_path
+
+    return out
 def combine_results(output_dir: str, output_prefix: str = "combined") -> tuple:
     """Combine results from parallel SLURM jobs.
 
@@ -218,4 +597,8 @@ def combine_results(output_dir: str, output_prefix: str = "combined") -> tuple:
     else:
         df_comb = None
 
-    return df_single, df_comb
+    combined_ul_bands = _combine_band_family(output_dir, output_prefix, "ul_bands", ["dataset", "mass_GeV"])
+    combined_ul_bands_eps2 = _combine_band_family(output_dir, output_prefix, "ul_bands_eps2", ["dataset", "mass_GeV"])
+    combined_ul_bands_combined = _combine_band_family(output_dir, output_prefix, "ul_bands_combined", ["dataset_set", "mass_GeV"])
+
+    return df_single, df_comb, combined_ul_bands, combined_ul_bands_eps2, combined_ul_bands_combined
