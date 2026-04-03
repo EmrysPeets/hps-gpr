@@ -109,6 +109,56 @@ def inject_counts(
     return rng.poisson(float(strength) * w).astype(int)
 
 
+def _prediction_blind_mask(pred: Any) -> np.ndarray:
+    """Return the blind-window mask, deriving it when older mocks omit the field."""
+    blind_mask = getattr(pred, "blind_mask", None)
+    if blind_mask is not None:
+        return np.asarray(blind_mask, bool).reshape(-1)
+
+    blind = getattr(pred, "blind", None)
+    if blind is None:
+        raise AttributeError("Prediction is missing both 'blind_mask' and 'blind'.")
+
+    x_full = getattr(pred, "x_full", None)
+    if x_full is None:
+        edges_full = np.asarray(getattr(pred, "edges_full"), float).reshape(-1)
+        if edges_full.size < 2:
+            raise AttributeError(
+                "Prediction cannot derive 'blind_mask' without 'x_full' or usable 'edges_full'."
+            )
+        x_full = 0.5 * (edges_full[:-1] + edges_full[1:])
+
+    x_full = np.asarray(x_full, float).reshape(-1)
+    return np.asarray(
+        (x_full >= float(blind[0])) & (x_full <= float(blind[1])),
+        bool,
+    )
+
+
+def _prediction_integral_density(pred: Any) -> float:
+    """Return a finite signal-density scale, with a simple fallback for test doubles."""
+    integral_density = getattr(pred, "integral_density", None)
+    if integral_density is not None:
+        val = float(integral_density)
+        if np.isfinite(val) and val > 0:
+            return val
+
+    mu_full = getattr(pred, "mu_full", None)
+    if mu_full is None:
+        mu_full = getattr(pred, "mu", None)
+    arr = np.asarray(mu_full, float).reshape(-1)
+
+    edges_full = getattr(pred, "edges_full", None)
+    if edges_full is not None:
+        edges = np.asarray(edges_full, float).reshape(-1)
+        if edges.size >= 2:
+            width = float(edges[-1] - edges[0])
+            if np.isfinite(width) and width > 0:
+                return float(np.sum(np.clip(arr, 0.0, None)) / width)
+
+    return float(np.sum(np.clip(arr, 0.0, None)))
+
+
 # ---------------------------------------------------------------------------
 # Reference sigma_A for strength scaling
 # ---------------------------------------------------------------------------
@@ -121,8 +171,9 @@ def _sigmaA_reference(
     rng: Optional[np.random.Generator] = None,
 ) -> float:
     """Estimate σ_A(m) under B-only for 'sigma-level' injection scaling."""
+    blind_mask = _prediction_blind_mask(pred)
     tmpl, _ = build_window_template_from_full(
-        pred.edges_full, pred.blind_mask, mass, pred.sigma_val
+        pred.edges_full, blind_mask, mass, pred.sigma_val
     )
     b = np.asarray(pred.mu, float)
     if source == "poisson":
@@ -226,9 +277,11 @@ def run_injection_extraction_toys(
     for m in masses:
         m = float(m)
         pred = estimate_background_for_dataset(ds, m, config)
+        blind_mask = _prediction_blind_mask(pred)
+        integral_density = _prediction_integral_density(pred)
 
         tmpl_win, tmpl_full = build_window_template_from_full(
-            pred.edges_full, pred.blind_mask, m, pred.sigma_val
+            pred.edges_full, blind_mask, m, pred.sigma_val
         )
         f_win = float(np.sum(tmpl_win))
 
@@ -333,8 +386,8 @@ def run_injection_extraction_toys(
                     dataset=ds.key, mass_GeV=m, toy=int(i),
                     strength=float(A_inj), inj_nsigma=float(inj_nsigma),
                     sigmaA_ref=float(sigmaA_ref), sigma_val=float(pred.sigma_val),
-                    integral_density=float(pred.integral_density),
-                    A_per_eps2_unit=float(A_from_epsilon2(ds, float(m), 1.0, pred.integral_density)),
+                    integral_density=float(integral_density),
+                    A_per_eps2_unit=float(A_from_epsilon2(ds, float(m), 1.0, integral_density)),
                     sigma_x=float(getattr(pred, "sigma_x", float("nan"))),
                     f_win=float(f_win), f_full=float(f_full),
                     f_train=float(f_train), f_train_frac=float(f_train_frac),
@@ -728,9 +781,10 @@ def _build_injection_mass_context(
 ) -> _InjectionMassContext:
     """Build per-mass context used by the streaming toy runner."""
     pred = estimate_background_for_dataset(ds, float(mass), config)
+    blind_mask = _prediction_blind_mask(pred)
 
     tmpl_win, tmpl_full = build_window_template_from_full(
-        pred.edges_full, pred.blind_mask, float(mass), pred.sigma_val
+        pred.edges_full, blind_mask, float(mass), pred.sigma_val
     )
     f_win = float(np.sum(tmpl_win))
     x_full = np.asarray(pred.x_full, float).reshape(-1)
@@ -739,7 +793,7 @@ def _build_injection_mass_context(
     sigma_seed = _stable_point_seed(int(seed), str(ds.key), float(mass), -1.0)
     sigma_rng = np.random.default_rng(int(sigma_seed))
     sigmaA_ref = _sigmaA_reference(pred, float(mass), source=str(sigma_source), rng=sigma_rng)
-    integral_density = float(pred.integral_density)
+    integral_density = _prediction_integral_density(pred)
     A_per_eps2_unit = float(A_from_epsilon2(ds, float(mass), 1.0, integral_density))
 
     train_nsig_default = float(getattr(config, "gp_train_exclude_nsigma", None) or config.blind_nsigma)

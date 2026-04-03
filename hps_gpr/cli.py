@@ -1546,12 +1546,12 @@ def slurm_combine(output_dir, prefix):
 
             plot_ul_pvalues(
                 df,
-                title=f"UL toy-tail p-values ({tag})",
+                title=f"Toy-limit diagnostic tail areas ({tag})",
                 outpath=os.path.join(suite_dir, "ul_pvalues.png"),
             )
             plot_ul_pvalue_components(
                 df,
-                title=f"UL toy-tail p-value components + local/global references ({tag})",
+                title=f"Toy-limit diagnostics with local p0 and global-reference curves ({tag})",
                 outpath=os.path.join(suite_dir, "ul_pvalues_components_local_global_refs.png"),
                 indep_width_sigma=float(df["bands_train_exclude_nsigma"].dropna().iloc[0]) if "bands_train_exclude_nsigma" in df.columns and df["bands_train_exclude_nsigma"].notna().any() else 1.96,
                 sigma_col=("sigma_mass_res_min_GeV" if "sigma_mass_res_min_GeV" in df.columns else "sigma_mass_res_GeV"),
@@ -1562,7 +1562,7 @@ def slurm_combine(output_dir, prefix):
                 sigma_col_combined = "sigma_mass_res_min_GeV" if "sigma_mass_res_min_GeV" in df.columns else "sigma_mass_res_GeV"
                 plot_analytic_p0(
                     df,
-                    title=f"Analytic local/global p0 vs mass ({tag})",
+                    title=f"Local p0 with global approximation vs mass ({tag})",
                     outpath=os.path.join(suite_dir, "p0_analytic_local_global.png"),
                     apply_lee=True,
                     lee_method="sidak",
@@ -1571,7 +1571,7 @@ def slurm_combine(output_dir, prefix):
                 )
                 plot_Z_local_global(
                     df,
-                    title=f"Local/global Z vs mass ({tag})",
+                    title=f"Local Z with global approximation vs mass ({tag})",
                     outpath=os.path.join(suite_dir, "Z_local_global.png"),
                     apply_lee=True,
                     lee_method="sidak",
@@ -1579,7 +1579,7 @@ def slurm_combine(output_dir, prefix):
                     sigma_col=sigma_col_combined,
                 )
 
-            # Add per-dataset UL + local/global suites into combined summary folder
+            # Add per-dataset UL + local/global-reference suites into combined summary folder
             for ds_name, ds_path in (bands_a or {}).items():
                 try:
                     dfa = pd.read_csv(ds_path).sort_values("mass_GeV").reset_index(drop=True)
@@ -1626,7 +1626,7 @@ def slurm_combine(output_dir, prefix):
                             sigma_col_single = "sigma_val" if "sigma_val" in sub.columns else "sigma_mass_res_GeV"
                             plot_analytic_p0(
                                 sub,
-                                title=f"{ds_name}: analytic local/global p0",
+                                title=f"{ds_name}: local p0 with global approximation",
                                 outpath=os.path.join(suite_dir, f"{ds_name}_p0_local_global.png"),
                                 apply_lee=True,
                                 lee_method="sidak",
@@ -1635,7 +1635,7 @@ def slurm_combine(output_dir, prefix):
                             )
                             plot_Z_local_global(
                                 sub,
-                                title=f"{ds_name}: local/global Z",
+                                title=f"{ds_name}: local Z with global approximation",
                                 outpath=os.path.join(suite_dir, f"{ds_name}_Z_local_global.png"),
                                 apply_lee=True,
                                 lee_method="sidak",
@@ -1643,7 +1643,7 @@ def slurm_combine(output_dir, prefix):
                                 sigma_col=sigma_col_single,
                             )
                     except Exception as e:
-                        print(f"Warning: dataset local/global summary failed for {ds_name}: {e}")
+                        print(f"Warning: dataset local/global-reference summary failed for {ds_name}: {e}")
 
             inj_dir = os.path.join(output_dir, "injection_extraction")
             inj_all = os.path.join(inj_dir, "inj_extract_summary_all.csv")

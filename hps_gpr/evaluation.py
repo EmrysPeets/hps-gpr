@@ -14,8 +14,6 @@ from .template import (
     cls_limit_for_amplitude,
     cls_amplitude_asymptotic,
     cls_amplitude_toys,
-    _log_lr,
-    _safe_mvn_draw,
 )
 from .statistics import (
     p0_from_blind_vectors,
@@ -281,27 +279,29 @@ def combined_cls_limit_epsilon2_from_vectors(
 
     rng = np.random.default_rng(seed)
     alpha = float(config.cls_alpha)
-    mode = str(config.cls_mode)
+    mode = str(config.cls_mode).lower().strip()
     num_toys = int(config.cls_num_toys)
 
     def cls_at_eps2(eps2: float) -> float:
         eps2 = float(max(eps2, 0.0))
         if mode == "asymptotic":
-            return cls_amplitude_asymptotic(1.0, obs, b, cov, eps2 * s_unit)[0]
-        s = eps2 * s_unit
-        lnQ_obs = float(_log_lr(obs, b, s))
-        b_toys = _safe_mvn_draw(b, cov, size=int(num_toys), rng=rng)
-        n_b = rng.poisson(b_toys)
-        lnQ_b = _log_lr(n_b, b_toys, s)
-        sb_means = b_toys + s
-        n_sb = rng.poisson(sb_means)
-        lnQ_sb = _log_lr(n_sb, b_toys, s)
-        CL_b = max(float(np.mean(lnQ_b <= lnQ_obs)), 1e-9)
-        return float(np.mean(lnQ_sb <= lnQ_obs)) / CL_b
+            return cls_amplitude_asymptotic(eps2, obs, b, cov, s_unit)[0]
+        return cls_amplitude_toys(
+            eps2,
+            obs,
+            b,
+            cov,
+            s_unit,
+            rng,
+            max(1, int(num_toys)),
+        )[0]
 
-    eps_lo, eps_hi = 0.0, 1e-10
+    s_sum = float(np.sum(np.clip(s_unit, 0.0, None)))
+    b_sum = float(np.sum(np.clip(b, 0.0, None)))
+    eps_lo = 0.0
+    eps_hi = max(1e-10, 3.0 * math.sqrt(max(b_sum, 1.0)) / max(s_sum, 1e-12))
     it = 0
-    while cls_at_eps2(eps_hi) > alpha and eps_hi < 1.0 and it < 80:
+    while cls_at_eps2(eps_hi) > alpha and eps_hi < 1e12 and it < 80:
         eps_hi *= 2.0
         it += 1
     for _ in range(80):

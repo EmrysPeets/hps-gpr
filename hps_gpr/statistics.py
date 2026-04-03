@@ -419,7 +419,7 @@ def p0_profiled_gaussian_LRT(
     b_cov: np.ndarray,
     template: np.ndarray,
 ) -> Tuple[float, float, float, Dict[str, object]]:
-    """Exact profiled LRT p0 for A >= 0 vs A = 0.
+    """Asymptotic profiled LRT p0 for A >= 0 vs A = 0.
 
     Returns (p0, Z, q0, info) where q0 = -2 ln Λ and Z = sqrt(q0).
 
@@ -460,6 +460,335 @@ def p0_profiled_gaussian_LRT(
         ok=bool(ok_alt and ok_null),
     )
     return float(p0), float(Z), float(q0), info
+
+
+def profiled_gaussian_fixed_poi_nll(
+    n_obs: np.ndarray,
+    b_mean: np.ndarray,
+    b_cov: np.ndarray,
+    template: np.ndarray,
+    A_fixed: float,
+) -> Dict[str, object]:
+    """Profile the nuisance block for a fixed signal strength."""
+    out = _profile_theta_given_A(
+        n_obs=n_obs,
+        b_mean=b_mean,
+        b_cov=b_cov,
+        template=template,
+        A_fixed=float(A_fixed),
+    )
+    out["A_fixed"] = float(A_fixed)
+    return out
+
+
+def profiled_gaussian_likelihood_summary(
+    n_obs: np.ndarray,
+    b_mean: np.ndarray,
+    b_cov: np.ndarray,
+    template: np.ndarray,
+    *,
+    A_fixed: Optional[float] = None,
+) -> Dict[str, object]:
+    """Return the profiled likelihood ingredients needed for q0 and q_mu tests."""
+    fit_unbounded = fit_A_profiled_gaussian_details(
+        n_obs,
+        b_mean,
+        b_cov,
+        template,
+        allow_negative=True,
+    )
+    fit_bounded = fit_A_profiled_gaussian_details(
+        n_obs,
+        b_mean,
+        b_cov,
+        template,
+        allow_negative=False,
+    )
+    null = profiled_gaussian_fixed_poi_nll(
+        n_obs,
+        b_mean,
+        b_cov,
+        template,
+        A_fixed=0.0,
+    )
+    out: Dict[str, object] = {
+        "fit_unbounded": fit_unbounded,
+        "fit_bounded": fit_bounded,
+        "null": null,
+    }
+    if A_fixed is not None:
+        out["fixed"] = profiled_gaussian_fixed_poi_nll(
+            n_obs,
+            b_mean,
+            b_cov,
+            template,
+            A_fixed=float(A_fixed),
+        )
+    return out
+
+
+def qmu_tilde_profiled_gaussian(
+    n_obs: np.ndarray,
+    b_mean: np.ndarray,
+    b_cov: np.ndarray,
+    template: np.ndarray,
+    A_test: float,
+    *,
+    summary: Optional[Dict[str, object]] = None,
+    tol: float = 1e-10,
+) -> Tuple[float, Dict[str, object]]:
+    r"""Bounded profiled upper-limit statistic for a fixed signal strength.
+
+    This implements the Cowan-style one-sided statistic with a lower physical
+    boundary at A >= 0:
+
+    - q_tilde_mu = 0 for \hat{A} > A_test
+    - q_tilde_mu = -2 ln lambda(A_test) for 0 <= \hat{A} <= A_test
+    - q_tilde_mu = -2 ln [L(A_test)/L(0)] for \hat{A} < 0
+    """
+    A_test = float(max(A_test, 0.0))
+    if summary is None:
+        summary = profiled_gaussian_likelihood_summary(
+            n_obs,
+            b_mean,
+            b_cov,
+            template,
+            A_fixed=A_test,
+        )
+    fit_unbounded = dict(summary["fit_unbounded"])
+    fit_bounded = dict(summary["fit_bounded"])
+    null = dict(summary["null"])
+    fixed = summary.get("fixed")
+    if fixed is None or not np.isclose(float(fixed.get("A_fixed", np.nan)), A_test, rtol=0.0, atol=max(tol, 1e-14)):
+        fixed = profiled_gaussian_fixed_poi_nll(
+            n_obs,
+            b_mean,
+            b_cov,
+            template,
+            A_fixed=A_test,
+        )
+    fixed = dict(fixed)
+
+    A_hat = float(fit_unbounded.get("A_hat", float("nan")))
+    A_hat_bounded = float(fit_bounded.get("A_hat", float("nan")))
+    nll_fixed = float(fixed.get("nll", float("nan")))
+    nll_unbounded = float(fit_unbounded.get("nll", float("nan")))
+    nll_null = float(null.get("nll", float("nan")))
+
+    branch = "undefined"
+    denom_nll = float("nan")
+    qmu = 0.0
+    if not np.isfinite(A_hat) or not np.isfinite(nll_fixed):
+        qmu = float("nan")
+    elif A_hat > A_test + tol:
+        branch = "muhat_gt_test"
+        denom_nll = nll_unbounded
+        qmu = 0.0
+    elif A_hat >= -tol:
+        branch = "interior"
+        denom_nll = nll_unbounded
+        if np.isfinite(denom_nll):
+            qmu = max(0.0, 2.0 * (nll_fixed - denom_nll))
+        else:
+            qmu = float("nan")
+    else:
+        branch = "boundary"
+        denom_nll = nll_null
+        if np.isfinite(denom_nll):
+            qmu = max(0.0, 2.0 * (nll_fixed - denom_nll))
+        else:
+            qmu = float("nan")
+
+    info = dict(
+        A_test=float(A_test),
+        qmu=float(qmu),
+        A_hat=float(A_hat),
+        A_hat_bounded=float(A_hat_bounded),
+        sigma_A=float(fit_unbounded.get("sigma_A", float("nan"))),
+        nll_fixed=float(nll_fixed),
+        nll_unbounded=float(nll_unbounded),
+        nll_bounded=float(fit_bounded.get("nll", float("nan"))),
+        nll_null=float(nll_null),
+        denom_nll=float(denom_nll),
+        branch=str(branch),
+        ok=bool(
+            fit_unbounded.get("success", False)
+            and fit_bounded.get("success", False)
+            and fixed.get("success", False)
+            and null.get("success", False)
+        ),
+    )
+    return float(qmu), info
+
+
+def asymptotic_cls_profiled_gaussian(
+    A_test: float,
+    n_obs: np.ndarray,
+    b_mean: np.ndarray,
+    b_cov: np.ndarray,
+    template: np.ndarray,
+) -> Tuple[float, float, float, Dict[str, object]]:
+    """Asymptotic CLs using the bounded profiled q_tilde_mu statistic."""
+    A_test = float(max(A_test, 0.0))
+    if A_test <= 0.0:
+        info = {
+            "A_test": 0.0,
+            "qmu_obs": 0.0,
+            "qmu_asimov_b": 0.0,
+            "cls_statistic": "tilde_q_mu",
+            "calibration": "asymptotic",
+        }
+        return 1.0, 1.0, 1.0, info
+
+    summary_obs = profiled_gaussian_likelihood_summary(
+        n_obs,
+        b_mean,
+        b_cov,
+        template,
+        A_fixed=A_test,
+    )
+    qmu_obs, qinfo_obs = qmu_tilde_profiled_gaussian(
+        n_obs,
+        b_mean,
+        b_cov,
+        template,
+        A_test,
+        summary=summary_obs,
+    )
+
+    asimov_counts = np.asarray(b_mean, float)
+    summary_asimov = profiled_gaussian_likelihood_summary(
+        asimov_counts,
+        b_mean,
+        b_cov,
+        template,
+        A_fixed=A_test,
+    )
+    qmu_asimov_b, qinfo_asimov = qmu_tilde_profiled_gaussian(
+        asimov_counts,
+        b_mean,
+        b_cov,
+        template,
+        A_test,
+        summary=summary_asimov,
+    )
+
+    sqrt_qmu = float(np.sqrt(max(qmu_obs, 0.0))) if np.isfinite(qmu_obs) else float("nan")
+    sqrt_qA = float(np.sqrt(max(qmu_asimov_b, 0.0))) if np.isfinite(qmu_asimov_b) else float("nan")
+
+    CL_sb = float(norm.sf(sqrt_qmu)) if np.isfinite(sqrt_qmu) else float("nan")
+    CL_b = float(norm.cdf(sqrt_qA - sqrt_qmu)) if np.isfinite(sqrt_qmu) and np.isfinite(sqrt_qA) else float("nan")
+    CL_b = max(CL_b, 1e-12) if np.isfinite(CL_b) else float("nan")
+    CL_s = float(CL_sb / CL_b) if np.isfinite(CL_sb) and np.isfinite(CL_b) and CL_b > 0 else float("nan")
+
+    info = dict(
+        A_test=float(A_test),
+        qmu_obs=float(qmu_obs),
+        qmu_asimov_b=float(qmu_asimov_b),
+        sqrt_qmu=float(sqrt_qmu),
+        sqrt_qA=float(sqrt_qA),
+        cls_statistic="tilde_q_mu",
+        calibration="asymptotic",
+        observed=qinfo_obs,
+        asimov_b=qinfo_asimov,
+    )
+    return float(CL_s), float(CL_sb), float(CL_b), info
+
+
+def toy_cls_profiled_gaussian(
+    A_test: float,
+    n_obs: np.ndarray,
+    b_mean: np.ndarray,
+    b_cov: np.ndarray,
+    template: np.ndarray,
+    rng: np.random.Generator,
+    num_toys: int,
+) -> Tuple[float, float, float, Dict[str, object]]:
+    """Toy-calibrated CLs using the bounded profiled q_tilde_mu statistic."""
+    A_test = float(max(A_test, 0.0))
+    num_toys = int(max(1, num_toys))
+    if A_test <= 0.0:
+        info = {
+            "A_test": 0.0,
+            "qmu_obs": 0.0,
+            "cls_statistic": "tilde_q_mu",
+            "calibration": "toys",
+        }
+        return 1.0, 1.0, 1.0, info
+
+    summary_obs = profiled_gaussian_likelihood_summary(
+        n_obs,
+        b_mean,
+        b_cov,
+        template,
+        A_fixed=A_test,
+    )
+    qmu_obs, qinfo_obs = qmu_tilde_profiled_gaussian(
+        n_obs,
+        b_mean,
+        b_cov,
+        template,
+        A_test,
+        summary=summary_obs,
+    )
+
+    b = np.asarray(b_mean, float)
+    C = np.asarray(b_cov, float) if b_cov is not None else None
+    s = A_test * np.asarray(template, float)
+    if C is None:
+        b_toys = np.tile(b, (num_toys, 1))
+    else:
+        b_toys = draw_bkg_mvn_nonneg(b, C, size=num_toys, rng=rng)
+
+    qmu_b = np.empty(num_toys, float)
+    qmu_sb = np.empty(num_toys, float)
+    for i in range(num_toys):
+        n_b = rng.poisson(np.clip(b_toys[i], 0.0, None)).astype(float)
+        n_sb = rng.poisson(np.clip(b_toys[i] + s, 0.0, None)).astype(float)
+        qmu_b[i] = qmu_tilde_profiled_gaussian(
+            n_b,
+            b_mean,
+            b_cov,
+            template,
+            A_test,
+        )[0]
+        qmu_sb[i] = qmu_tilde_profiled_gaussian(
+            n_sb,
+            b_mean,
+            b_cov,
+            template,
+            A_test,
+        )[0]
+
+    finite_b = qmu_b[np.isfinite(qmu_b)]
+    finite_sb = qmu_sb[np.isfinite(qmu_sb)]
+    n_b_eff = int(finite_b.size)
+    n_sb_eff = int(finite_sb.size)
+
+    CL_b = (
+        (1.0 + float(np.count_nonzero(finite_b >= qmu_obs))) / float(n_b_eff + 1)
+        if n_b_eff > 0 and np.isfinite(qmu_obs)
+        else float("nan")
+    )
+    CL_sb = (
+        (1.0 + float(np.count_nonzero(finite_sb >= qmu_obs))) / float(n_sb_eff + 1)
+        if n_sb_eff > 0 and np.isfinite(qmu_obs)
+        else float("nan")
+    )
+    CL_b = max(CL_b, 1e-12) if np.isfinite(CL_b) else float("nan")
+    CL_s = float(CL_sb / CL_b) if np.isfinite(CL_sb) and np.isfinite(CL_b) and CL_b > 0 else float("nan")
+
+    info = dict(
+        A_test=float(A_test),
+        qmu_obs=float(qmu_obs),
+        cls_statistic="tilde_q_mu",
+        calibration="toys",
+        n_toys=int(num_toys),
+        n_b_eff=int(n_b_eff),
+        n_sb_eff=int(n_sb_eff),
+        observed=qinfo_obs,
+    )
+    return float(CL_s), float(CL_sb), float(CL_b), info
 
 
 # ---------------------------------------------------------------------------

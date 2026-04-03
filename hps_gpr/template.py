@@ -6,6 +6,11 @@ from typing import Dict, Optional, Tuple, TYPE_CHECKING
 
 import numpy as np
 
+from .statistics import (
+    asymptotic_cls_profiled_gaussian,
+    toy_cls_profiled_gaussian,
+)
+
 if TYPE_CHECKING:
     from .config import Config
     from .dataset import DatasetConfig
@@ -143,7 +148,7 @@ def cls_amplitude_asymptotic(
     template: np.ndarray,
     eps: float = 1e-12,
 ) -> Tuple[float, float, float]:
-    """Compute CLs using asymptotic approximation.
+    """Compute CLs using asymptotic bounded profile-likelihood calibration.
 
     Args:
         A: Signal amplitude
@@ -157,43 +162,21 @@ def cls_amplitude_asymptotic(
     Returns:
         Tuple of (CLs, CL_sb, CL_b)
     """
-    A = float(max(A, 0.0))
+    del eps
     b = np.asarray(b_mean, dtype=float)
-    s = A * np.asarray(template, dtype=float)
-    n = np.asarray(n_obs, dtype=float)
-
-    b_eff = np.clip(b, eps, None)
-    c = np.log1p(s / b_eff)
-    S = float(np.sum(s))
-    lnQ_obs = float(-S + np.dot(c, n))
-
-    cov_term = 0.0
-    if cov is not None:
-        try:
-            cov_term = float(c @ np.asarray(cov, dtype=float) @ c)
-        except Exception:
-            cov_term = 0.0
-
-    mu_b = float(-S + np.dot(c, b))
-    var_b = float(np.dot(c * c, b) + cov_term)
-    sd_b = math.sqrt(max(var_b, eps))
-
-    sb = b + s
-    mu_sb = float(-S + np.dot(c, sb))
-    var_sb = float(np.dot(c * c, sb) + cov_term)
-    sd_sb = math.sqrt(max(var_sb, eps))
-
-    def Phi(x: float) -> float:
-        return 0.5 * (1.0 + erf(x / sqrt(2.0)))
-
-    z_b = (lnQ_obs - mu_b) / sd_b
-    z_sb = (lnQ_obs - mu_sb) / sd_sb
-
-    CL_b = float(Phi(z_b))
-    CL_sb = float(Phi(z_sb))
-    CL_b = max(CL_b, 1e-9)
-
-    return CL_sb / CL_b, CL_sb, CL_b
+    C = (
+        np.asarray(cov, dtype=float)
+        if cov is not None
+        else np.zeros((b.size, b.size), dtype=float)
+    )
+    cls, CL_sb, CL_b, _ = asymptotic_cls_profiled_gaussian(
+        float(A),
+        np.asarray(n_obs, dtype=float),
+        b,
+        C,
+        np.asarray(template, dtype=float),
+    )
+    return float(cls), float(CL_sb), float(CL_b)
 
 
 def cls_amplitude_toys(
@@ -206,7 +189,7 @@ def cls_amplitude_toys(
     num_toys: int,
     floor: float = 1e-12,
 ) -> Tuple[float, float, float]:
-    """Compute CLs using toy Monte Carlo.
+    """Compute CLs using toy calibration of the bounded profile-likelihood test.
 
     Args:
         A: Signal amplitude
@@ -222,24 +205,23 @@ def cls_amplitude_toys(
     Returns:
         Tuple of (CLs, CL_sb, CL_b)
     """
-    A = float(max(A, 0.0))
-    s = A * template
-    lnQ_obs = float(_log_lr(n_obs, b_mean, s, eps=floor))
-
-    b_toys = _safe_mvn_draw(b_mean, cov, size=num_toys, rng=rng)
-
-    n_b = rng.poisson(b_toys)
-    lnQ_b = _log_lr(n_b, b_toys, s, eps=floor)
-
-    sb_means = b_toys + s
-    n_sb = rng.poisson(sb_means)
-    lnQ_sb = _log_lr(n_sb, b_toys, s, eps=floor)
-
-    CL_b = float(np.mean(lnQ_b <= lnQ_obs))
-    CL_sb = float(np.mean(lnQ_sb <= lnQ_obs))
-    CL_b = max(CL_b, 1e-9)
-
-    return CL_sb / CL_b, CL_sb, CL_b
+    del floor
+    b = np.asarray(b_mean, dtype=float)
+    C = (
+        np.asarray(cov, dtype=float)
+        if cov is not None
+        else np.zeros((b.size, b.size), dtype=float)
+    )
+    cls, CL_sb, CL_b, _ = toy_cls_profiled_gaussian(
+        float(A),
+        np.asarray(n_obs, dtype=float),
+        b,
+        C,
+        np.asarray(template, dtype=float),
+        rng,
+        int(num_toys),
+    )
+    return float(cls), float(CL_sb), float(CL_b)
 
 
 def cls_limit_for_amplitude(
@@ -316,14 +298,14 @@ def cls_limit_for_amplitude(
         gridA.append(Amid)
         gridC.append(cls_mid)
 
-        if abs(cls_mid - alpha) < 1e-2:
+        if abs(cls_mid - alpha) < 1e-6:
             A_lo = A_hi = Amid
             break
         if cls_mid > alpha:
             A_lo = Amid
         else:
             A_hi = Amid
-        if abs(A_hi - A_lo) <= max(1e-3, 1e-3 * (1.0 + A_hi)):
+        if abs(A_hi - A_lo) <= max(1e-12, 1e-6 * max(abs(A_hi), abs(A_lo))):
             break
 
     return 0.5 * (A_lo + A_hi), {
@@ -401,14 +383,14 @@ def cls_limit_for_template(
     for _ in range(60):
         Amid = 0.5 * (A_lo + A_hi)
         cls_mid = cls_at(Amid)
-        if abs(cls_mid - alpha) < 1e-3:
+        if abs(cls_mid - alpha) < 1e-8:
             A_lo = A_hi = Amid
             break
         if cls_mid > alpha:
             A_lo = Amid
         else:
             A_hi = Amid
-        if abs(A_hi - A_lo) <= max(1e-3, 1e-3 * (1.0 + A_hi)):
+        if abs(A_hi - A_lo) <= max(1e-12, 1e-6 * max(abs(A_hi), abs(A_lo))):
             break
 
     A_up = float(0.5 * (A_lo + A_hi))

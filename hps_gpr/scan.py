@@ -193,6 +193,9 @@ def run_scan(
                             "sigma_val": _jfloat(pred.sigma_val),
                             "blind": [_jfloat(pred.blind[0]), _jfloat(pred.blind[1])],
                             "integral_density": _jfloat(pred.integral_density),
+                            "cls_statistic": "tilde_q_mu",
+                            "cls_calibration": str(config.cls_mode).lower().strip(),
+                            "global_method": "sidak_approx",
                             "visibility": "observed" if compute_obs else "expected_only",
                         },
                     )
@@ -210,6 +213,9 @@ def run_scan(
                     "A_hat": float(res.A_hat),
                     "sigma_A": float(res.sigma_A),
                     "extract_success": bool(res.extract_success),
+                    "cls_statistic": "tilde_q_mu",
+                    "cls_calibration": str(config.cls_mode).lower().strip(),
+                    "global_method": "sidak_approx",
                     "visibility": "observed" if compute_obs else "expected_only",
                     "kernel_str": str(getattr(pred, "kernel_str", "")),
                     "ls_lo": float(getattr(pred, "ls_lo", float("nan"))),
@@ -280,6 +286,9 @@ def run_scan(
                             "eps2_up": _jfloat(comb.eps2_up),
                             "p0_analytic": _jfloat(comb.p0_analytic),
                             "Z_analytic": _jfloat(comb.Z_analytic),
+                            "cls_statistic": "tilde_q_mu",
+                            "cls_calibration": str(config.cls_mode).lower().strip(),
+                            "global_method": "sidak_approx",
                         },
                     )
 
@@ -290,6 +299,9 @@ def run_scan(
                     "eps2_up": float(comb.eps2_up),
                     "p0_analytic": float(comb.p0_analytic),
                     "Z_analytic": float(comb.Z_analytic),
+                    "cls_statistic": "tilde_q_mu",
+                    "cls_calibration": str(config.cls_mode).lower().strip(),
+                    "global_method": "sidak_approx",
                 })
 
             except Exception as e:

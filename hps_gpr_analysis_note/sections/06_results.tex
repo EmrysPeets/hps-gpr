@@ -8,7 +8,9 @@ however, is the shared-$\eps^2$ combination of 2015, 2016 10\%, and 2021 1\%, fo
 which the note now uses the current `summary\_combined\_all\_rad\_penalty` summary. In
 that three-dataset study the radiative-fraction penalty is applied consistently to all
 active datasets, and the combined global-significance curve is the only global
-look-elsewhere representation interpreted in the note.
+look-elsewhere representation interpreted in the note; unless explicitly stated
+otherwise, that curve should be read as the current approximation rather than as a
+fully frozen toy-calibrated scan result.
 
 \subsection{2015 analysis}
 \label{sec:results-2015}
@@ -21,7 +23,7 @@ value of the GP approach is not merely that it fits the local background, but th
 does so in a way that remains stable when the search window is widened and the local
 fit boundaries of the earlier polynomial approach are removed.
 Figure~\ref{fig:results-2015-ul} shows the corresponding observed and expected upper
-limits, while Figure~\ref{fig:results-2015-significance} separates the toy-tail
+limits, while Figure~\ref{fig:results-2015-significance} separates the toy-limit
 diagnostic from the analytic $p_0$ significance summary.
 
 \begin{figure}[H]
@@ -49,19 +51,20 @@ demonstrate the smooth scan structure obtained with the global-GP background mod
 \begin{subfigure}[t]{0.48\linewidth}
   \centering
   \graphicorplaceholder{\linewidth}{significance_figs/2015/ul_pvalues_components_local_global_refs.png}
-  \caption{Toy-tail significance diagnostics: $p_{\rm strong}$, $p_{\rm weak}$, and
+  \caption{Toy-limit diagnostics: $p_{\rm strong}$, $p_{\rm weak}$, and
   $p_{\rm two}$.}
 \end{subfigure}
 \hfill
 \begin{subfigure}[t]{0.48\linewidth}
   \centering
   \graphicorplaceholder{\linewidth}{significance_figs/2015/p0_analytic_local_global.png}
-  \caption{Analytic local and provisional global $p_0$ curves.}
+  \caption{Analytic local $p_0$ with the current global approximation.}
 \end{subfigure}
 \caption{2015 significance summary. The left panel reports where the observed limit
-falls relative to the toy-limit ensemble, while the right panel shows the analytic
-profile-likelihood significance curves. The global component remains provisional until
-the final look-elsewhere treatment is rerun.}
+falls relative to the background-only toy-limit ensemble, while the right panel shows
+the analytic profile-likelihood discovery statistic. The global overlay should be read
+as the current look-elsewhere approximation rather than as a finalized toy-calibrated
+global significance.}
 \label{fig:results-2015-significance}
 \end{figure}
 
@@ -72,7 +75,7 @@ The 2016 result shown here corresponds to the 10\% development subset used for t
 present statistical validation program. The mass resolution, radiative-fraction
 approximation, and search interval all differ from the 2015 case, but the statistical
 machinery is identical. In particular, the significance curves now carry the full set
-of analytic and toy-tail diagnostics discussed in Section~\ref{sec:methodology}, which
+of analytic and toy-limit diagnostics discussed in Section~\ref{sec:methodology}, which
 makes the interpretation of upward and downward fluctuations considerably more
 transparent than in the earliest draft studies.
 Figure~\ref{fig:results-2016-ul} shows the 2016 10\% upper-limit behavior, and
@@ -103,15 +106,15 @@ expanded 2016 mass interval.}
 \begin{subfigure}[t]{0.48\linewidth}
   \centering
   \graphicorplaceholder{\linewidth}{significance_figs/2016_10pct/ul_pvalues_components_local_global_refs.png}
-  \caption{Toy-tail significance diagnostics.}
+  \caption{Toy-limit diagnostics.}
 \end{subfigure}
 \hfill
 \begin{subfigure}[t]{0.48\linewidth}
   \centering
   \graphicorplaceholder{\linewidth}{significance_figs/2016_10pct/p0_analytic_local_global.png}
-  \caption{Analytic local and provisional global $p_0$ curves.}
+  \caption{Analytic local $p_0$ with the current global approximation.}
 \end{subfigure}
-\caption{2016 10\% significance summary. The separation between toy-tail
+\caption{2016 10\% significance summary. The separation between toy-limit
 diagnostics and analytic profile-likelihood significance is important: the former test
 how unusual the observed \emph{limit} is relative to the toy ensemble, while the latter
 test how signal-like the observed spectrum is under the local extraction model.}
@@ -153,17 +156,17 @@ channels in a common coupling parameter.}
 \begin{subfigure}[t]{0.48\linewidth}
   \centering
   \graphicorplaceholder{\linewidth}{significance_figs/2015_2016_combined/ul_pvalues_components_local_global_refs.png}
-  \caption{Combined toy-tail significance diagnostics.}
+  \caption{Combined toy-limit diagnostics.}
 \end{subfigure}
 \hfill
 \begin{subfigure}[t]{0.48\linewidth}
   \centering
   \graphicorplaceholder{\linewidth}{significance_figs/2015_2016_combined/p0_analytic_local_global.png}
-  \caption{Combined analytic local and provisional global $p_0$ curves.}
+  \caption{Combined analytic local $p_0$ with the current global approximation.}
 \end{subfigure}
 \caption{Combined significance summary for the 2015+2016 study. These plots are the
 appropriate place to track how the shared-$\eps^2$ procedure behaves statistically
-before the final global-significance evaluation is frozen.}
+before a final toy-calibrated global-significance evaluation is frozen.}
 \label{fig:results-combined-1516-significance}
 \end{figure}
 
@@ -244,7 +247,7 @@ between 2015-only and 2015$+$2021 support, while above it the analysis transitio
 scan.
 
 The significance diagnostics in Figure~\ref{fig:results-combined-151621-1pct-significance}
-must be read with the definitions of Section~\ref{sec:methodology} in mind. The toy-tail
+must be read with the definitions of Section~\ref{sec:methodology} in mind. The toy-limit
 quantities $p_{\rm strong}$, $p_{\rm weak}$, and $p_{\rm two}$ test how unusual the
 \emph{observed limit} is relative to the background-only limit ensemble, whereas the
 analytic $p_0$ curve is the local bump-hunt statistic obtained from the profiled shared
@@ -320,19 +323,20 @@ overlap region still benefits from coherent support among the constituent datase
 \begin{subfigure}[t]{0.48\linewidth}
   \centering
   \graphicorplaceholder{\linewidth}{summary_combined_all_rad_penalty/ul_pvalues_components_local_global_refs.png}
-  \caption{Toy-tail diagnostics for the observed CL$_s$ limit.}
+  \caption{Toy-limit diagnostics for the observed CL$_s$ limit.}
 \end{subfigure}
 \hfill
 \begin{subfigure}[t]{0.48\linewidth}
   \centering
   \graphicorplaceholder{\linewidth}{summary_combined_all_rad_penalty/p0_analytic_local_global.png}
-  \caption{Analytic local and global $p_0$ curves for the combined search.}
+  \caption{Analytic local $p_0$ with the current global approximation for the combined search.}
 \end{subfigure}
 \caption{Current three-way combined significance summary using the radiative-penalty
 summary products. The left panel tests how unusual the observed
 \emph{limit} is relative to background-only toy limits, while the right panel shows the
-analytic bump-hunt statistic. The two panels answer different statistical questions and
-should not be identified with one another.}
+analytic bump-hunt statistic together with the present global approximation. The two
+panels answer different statistical questions and should not be identified with one
+another.}
 \label{fig:results-combined-151621-1pct-significance}
 \end{figure}
 

@@ -26,6 +26,9 @@ from .plotting import (
 from .statistics import (
     p0_from_blind_vectors,
     fit_A_profiled_gaussian,
+    qmu_tilde_profiled_gaussian,
+    asymptotic_cls_profiled_gaussian,
+    toy_cls_profiled_gaussian,
     _p_local_from_global_summary,
     q0_from_local_p0,
     max_q0_from_local_p0_curve,
@@ -80,6 +83,9 @@ __all__ = [
     # Statistics
     "p0_from_blind_vectors",
     "fit_A_profiled_gaussian",
+    "qmu_tilde_profiled_gaussian",
+    "asymptotic_cls_profiled_gaussian",
+    "toy_cls_profiled_gaussian",
     "_p_local_from_global_summary",
     "q0_from_local_p0",
     "max_q0_from_local_p0_curve",

@@ -78,29 +78,67 @@ def tile_images_horizontal(paths: list[Path], out_path: Path, *, bg: str = "whit
 
 
 def make_pvalue_schematic(out_path: Path) -> None:
-    x = np.linspace(-4.0, 4.0, 1000)
-    y = np.exp(-0.5 * x * x) / np.sqrt(2.0 * np.pi)
-    obs = 1.15
+    rng = np.random.default_rng(1729)
+    toys = rng.lognormal(mean=np.log(1.0), sigma=0.18, size=5000)
+    obs = float(np.quantile(toys, 0.32))
+    p_strong = float(np.mean(toys <= obs))
+    p_weak = float(np.mean(toys >= obs))
+    p_two = float(2.0 * min(p_strong, p_weak))
 
-    fig, axs = plt.subplots(1, 3, figsize=(11.2, 3.2), constrained_layout=True)
-    panels = [
-        (r"$p_{\rm strong} = P(x \leq x_{\rm obs})$", x <= obs, "#4C72B0"),
-        (r"$p_{\rm weak} = P(x \geq x_{\rm obs})$", x >= obs, "#DD8452"),
-        (r"$p_{\rm two} = 2 \min(p_{\rm strong}, p_{\rm weak})$", x >= obs, "#55A868"),
-    ]
-    for ax, (title, mask, color) in zip(axs, panels):
-        ax.plot(x, y, color="0.2", lw=2.0)
-        ax.fill_between(x, 0.0, y, where=mask, color=color, alpha=0.85)
-        if title.startswith(r"$p_{\rm two}"):
-            ax.fill_between(x, 0.0, y, where=x <= -obs, color=color, alpha=0.35)
-        ax.axvline(obs, color="black", lw=1.4, ls="--")
-        ax.text(obs + 0.08, 0.34, r"$x_{\rm obs}$", fontsize=10)
-        ax.set_title(title, fontsize=11)
-        ax.set_xlabel("Test statistic / toy-limit summary variable")
-        ax.set_ylabel("Density")
-        ax.set_xlim(-4.0, 4.0)
-        ax.set_ylim(0.0, 0.43)
-        ax.grid(alpha=0.25)
+    bins = np.linspace(np.quantile(toys, 0.002), np.quantile(toys, 0.998), 36)
+    counts, edges = np.histogram(toys, bins=bins, density=True)
+    centers = 0.5 * (edges[:-1] + edges[1:])
+    widths = np.diff(edges)
+
+    xs = np.sort(toys)
+    ecdf = np.arange(1, xs.size + 1) / xs.size
+
+    fig, axs = plt.subplots(1, 2, figsize=(10.4, 3.8), constrained_layout=True)
+
+    ax = axs[0]
+    colors = np.where(centers <= obs, "#4C72B0", "#DD8452")
+    ax.bar(centers, counts, width=widths, color=colors, alpha=0.78, edgecolor="white", linewidth=0.8)
+    ax.axvline(obs, color="black", lw=1.6, ls="--")
+    ax.text(obs, 1.02 * np.max(counts), r"$\epsilon^2_{95,\rm obs}$", ha="center", va="bottom", fontsize=10)
+    ax.text(
+        0.03,
+        0.95,
+        r"$p_{\rm strong}=P(\epsilon^2_{95,t}\leq \epsilon^2_{95,\rm obs})$" "\n"
+        r"$p_{\rm weak}=P(\epsilon^2_{95,t}\geq \epsilon^2_{95,\rm obs})$",
+        transform=ax.transAxes,
+        va="top",
+        fontsize=9.4,
+        bbox=dict(boxstyle="round,pad=0.25", fc="white", ec="0.75", alpha=0.94),
+    )
+    ax.set_xlabel(r"Toy upper limit $\epsilon^2_{95,t}$ at fixed mass")
+    ax.set_ylabel("Density")
+    ax.set_title("Background-only toy-limit ensemble", fontsize=11)
+    ax.grid(alpha=0.25)
+
+    ax = axs[1]
+    ax.step(xs, ecdf, where="post", color="0.15", lw=2.0, label="Empirical CDF")
+    ax.axvline(obs, color="black", lw=1.6, ls="--")
+    ax.axhline(p_strong, color="#4C72B0", lw=1.2, ls=":")
+    ax.axhline(1.0 - p_weak, color="#DD8452", lw=1.2, ls=":")
+    ax.fill_between(xs, 0.0, ecdf, where=xs <= obs, color="#4C72B0", alpha=0.18)
+    ax.fill_between(xs, ecdf, 1.0, where=xs >= obs, color="#DD8452", alpha=0.18)
+    ax.text(
+        0.04,
+        0.93,
+        rf"$p_{{\rm strong}}={p_strong:.2f}$" "\n"
+        rf"$p_{{\rm weak}}={p_weak:.2f}$" "\n"
+        rf"$p_{{\rm two}}={p_two:.2f}$",
+        transform=ax.transAxes,
+        va="top",
+        fontsize=9.6,
+        bbox=dict(boxstyle="round,pad=0.25", fc="white", ec="0.75", alpha=0.94),
+    )
+    ax.set_xlabel(r"Observed-limit position in toy ensemble")
+    ax.set_ylabel("Empirical CDF")
+    ax.set_ylim(0.0, 1.0)
+    ax.set_title("Equivalent cumulative representation", fontsize=11)
+    ax.grid(alpha=0.25)
+
     ensure_dir(out_path.parent)
     fig.savefig(out_path, dpi=220)
     plt.close(fig)

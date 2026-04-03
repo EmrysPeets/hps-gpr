@@ -672,10 +672,10 @@ def plot_ul_pvalues(
     title: str = "",
     outpath: Optional[str] = None,
 ) -> None:
-    """Plot UL p-values vs mass (how consistent is observed with expected bands).
+    """Plot toy-limit diagnostic tail areas vs mass.
 
     Args:
-        df: Bands DataFrame with p_strong, p_weak, p_two columns
+        df: Bands DataFrame with toy-limit diagnostic columns
         title: Plot title
         outpath: Save path (if None, displays interactively)
     """
@@ -683,9 +683,9 @@ def plot_ul_pvalues(
 
     fig, ax = plt.subplots(figsize=(9, 4))
     for col, label, color in [
-        ("p_strong", r"$p_{\rm strong}$ (obs ≤ toy)", "C0"),
-        ("p_weak", r"$p_{\rm weak}$ (obs ≥ toy)", "C1"),
-        ("p_two", r"$p_{\rm two}$ (2×min)", "C2"),
+        ("p_strong", r"$p_{\rm strong}$ (toy UL $\le$ obs UL)", "C0"),
+        ("p_weak", r"$p_{\rm weak}$ (toy UL $\ge$ obs UL)", "C1"),
+        ("p_two", r"$p_{\rm two}$ (diagnostic 2$\times$min)", "C2"),
     ]:
         if col in df.columns:
             v = df[col].to_numpy(float)
@@ -695,7 +695,7 @@ def plot_ul_pvalues(
     ax.set_xlabel("m (GeV)")
     ax.set_ylabel("p-value")
     ax.set_ylim(0, 1)
-    _set_title_above(ax, title or "UL p-values vs mass")
+    _set_title_above(ax, title or "Toy-limit diagnostic tail areas vs mass")
     ax.legend(loc="best")
     _grid(ax)
     plt.tight_layout()
@@ -761,7 +761,7 @@ def plot_ul_pvalue_components(
     indep_width_sigma: float = 1.96,
     sigma_col: str = "sigma_mass_res_GeV",
 ) -> None:
-    """Overlay p_strong, p_weak, p_two with local/global sigma-reference p-values."""
+    """Overlay toy-limit diagnostics with local p0 and global-reference curves."""
     if not {"p_strong", "p_weak", "p_two"}.intersection(set(df.columns)):
         return
 
@@ -794,13 +794,13 @@ def plot_ul_pvalue_components(
             ax.text(masses.max(), p_local, f" local {int(z)}σ", va="bottom", ha="right", fontsize=8)
         if z <= 2.0 or ymin_plot <= p_global * 1.2:
             ax.axhline(p_global, color="0.15", ls="--", lw=0.9)
-            ax.text(masses.min(), p_global, f"global {int(z)}σ ", va="bottom", ha="left", fontsize=8)
+            ax.text(masses.min(), p_global, f"approx global {int(z)}σ ", va="bottom", ha="left", fontsize=8)
 
     ax.set_yscale("log")
     ax.set_ylim(min(1.0, max(ymin_plot, 1e-6)), 1.0)
     ax.set_xlabel("Mass hypothesis m (GeV)")
     ax.set_ylabel("p-value")
-    _set_title_above(ax, title or "UL-tail p-value components with local/global references")
+    _set_title_above(ax, title or "Toy-limit diagnostics with local p0 and global-reference curves")
     ax.legend(loc="best")
     _grid(ax)
     plt.tight_layout()
@@ -902,19 +902,25 @@ def plot_analytic_p0(
     p0_local = np.clip(df["p0_analytic"].to_numpy(float), 1e-300, 1.0)
 
     fig, ax = plt.subplots(figsize=(10, 4))
-    ax.plot(masses, p0_local, label="Local p0 (analytic LRT)")
+    ax.plot(masses, p0_local, label="Local p0 (profile LRT)")
 
     p0_global = None
+    global_label = ""
     if apply_lee:
-        if neff is None:
-            sig, _ = _resolve_sigma_values(df, sigma_col)
-            neff = _effective_trials_from_spacing(masses, sig, indep_width_sigma=float(indep_width_sigma))
-        p0_global = np.asarray([
-            _p_global_from_local(float(p), Neff=neff, method=lee_method)
-            for p in p0_local
-        ], float)
-        p0_global = np.clip(p0_global, 1e-300, 1.0)
-        ax.plot(masses, p0_global, "--", label=f"Global p0 (N_eff={neff:.1f})")
+        if "p0_global_toy" in df.columns:
+            p0_global = np.clip(df["p0_global_toy"].to_numpy(float), 1e-300, 1.0)
+            global_label = "Global p0 (toy max q0)"
+        else:
+            if neff is None:
+                sig, _ = _resolve_sigma_values(df, sigma_col)
+                neff = _effective_trials_from_spacing(masses, sig, indep_width_sigma=float(indep_width_sigma))
+            p0_global = np.asarray([
+                _p_global_from_local(float(p), Neff=neff, method=lee_method)
+                for p in p0_local
+            ], float)
+            p0_global = np.clip(p0_global, 1e-300, 1.0)
+            global_label = f"Global p0 ({lee_method.capitalize()} approx; N_eff={neff:.1f})"
+        ax.plot(masses, p0_global, "--", label=global_label)
 
     z_local = np.asarray([_z_from_p_one_sided(float(p)) for p in p0_local], float)
     z_global = np.asarray([_z_from_p_one_sided(float(p)) for p in p0_global], float) if p0_global is not None else np.array([0.0])
@@ -988,17 +994,22 @@ def plot_Z_local_global(
     ax.plot(masses, Z_local, label="Local Z")
 
     if apply_lee:
-        if neff is None:
-            sig, _ = _resolve_sigma_values(df, sigma_col)
-            neff = _effective_trials_from_spacing(masses, sig, indep_width_sigma=float(indep_width_sigma))
-        p_local = np.asarray([_p_from_z_one_sided(float(z)) for z in Z_local], float)
-        p_global = np.asarray([
-            _p_global_from_local(float(p), Neff=neff, method=lee_method)
-            for p in p_local
-        ], float)
-        Z_global = np.clip(np.asarray([_z_from_p_one_sided(float(p)) for p in p_global], float), 0.0, None)
-        ax.plot(masses, Z_global, "--", label=f"Global Z (N_eff={neff:.1f})")
-        _add_info_box(ax, f"N_eff = {neff:.1f}\nmethod: {lee_method}", loc="upper right")
+        if "Z_global_toy" in df.columns:
+            Z_global = np.clip(df["Z_global_toy"].to_numpy(float), 0.0, None)
+            ax.plot(masses, Z_global, "--", label="Global Z (toy max q0)")
+            _add_info_box(ax, "global method: toy max q0", loc="upper right")
+        else:
+            if neff is None:
+                sig, _ = _resolve_sigma_values(df, sigma_col)
+                neff = _effective_trials_from_spacing(masses, sig, indep_width_sigma=float(indep_width_sigma))
+            p_local = np.asarray([_p_from_z_one_sided(float(z)) for z in Z_local], float)
+            p_global = np.asarray([
+                _p_global_from_local(float(p), Neff=neff, method=lee_method)
+                for p in p_local
+            ], float)
+            Z_global = np.clip(np.asarray([_z_from_p_one_sided(float(p)) for p in p_global], float), 0.0, None)
+            ax.plot(masses, Z_global, "--", label=f"Global Z ({lee_method.capitalize()} approx; N_eff={neff:.1f})")
+            _add_info_box(ax, f"N_eff = {neff:.1f}\nmethod: {lee_method} approx", loc="upper right")
 
     for z in (z_lines or []):
         ax.axhline(float(z), color="k", ls=":", lw=0.8, label=f"{z:.0f}σ")
@@ -1008,7 +1019,7 @@ def plot_Z_local_global(
     ax.set_ylim(0.0, zmax)
     ax.set_xlabel("m (GeV)")
     ax.set_ylabel("Z (Gaussian significance)")
-    _set_title_above(ax, title or "Local/global significance vs mass")
+    _set_title_above(ax, title or "Local Z with global reference vs mass")
     ax.legend(loc="best")
     _grid(ax)
     plt.tight_layout()
@@ -2144,19 +2155,19 @@ def plot_eps2_curves(
             plt.savefig(os.path.join(outdir, f"A_hat_{ds}.png"), dpi=200)
             plt.close(fig)
 
-        # p0 and Z summaries (local+global)
+        # p0 and Z summaries with the current global reference/approximation
         sp = _finite(sub, "p0_analytic")
         if len(sp):
             plot_analytic_p0(
                 sp,
-                title=f"{ds}: analytic local/global p0",
+                title=f"{ds}: local p0 with global reference",
                 outpath=os.path.join(outdir, f"p0_{ds}.png"),
                 apply_lee=True,
                 neff=float(max(len(sp), 1.0)),
             )
             plot_Z_local_global(
                 sp,
-                title=f"{ds}: local/global Z",
+                title=f"{ds}: local Z with global reference",
                 outpath=os.path.join(outdir, f"Z_local_global_{ds}.png"),
                 apply_lee=True,
                 neff=float(max(len(sp), 1.0)),

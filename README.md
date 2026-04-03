@@ -16,6 +16,29 @@ This package implements a simultaneous bump hunt analysis across multiple HPS da
 
 The package converts the original Jupyter notebook analysis into a modular, batch-ready Python package with a command-line interface.
 
+## Statistical Conventions
+
+The production inference uses a profiled likelihood with correlated Gaussian
+background-deformation nuisances derived from the GP blind-window covariance. For
+upper limits, the current code uses the bounded one-sided Cowan-style statistic
+`qtilde_mu` rather than the older simple `lnQ` ordering variable. In practice:
+
+- the unconstrained signal estimator may be negative for extraction, closure, and pull studies,
+- the production local-significance path uses the bounded discovery statistic `q0`,
+- the production upper-limit path uses `qtilde_mu` with the physical constraint `mu >= 0`.
+
+The modified-frequentist limit is defined as
+`CLs(mu) = CL_{s+b}(mu) / CL_b(mu)`, with both tail areas computed from the same
+profiled statistic:
+`CL_{s+b}(mu) = P(qtilde_mu >= qtilde_mu_obs | s+b)` and
+`CL_b(mu) = P(qtilde_mu >= qtilde_mu_obs | b)`.
+
+`cls_mode: asymptotic` evaluates those quantities with the Cowan et al. asymptotic
+formulae and the background-only Asimov reference data set. `cls_mode: toys`
+calibrates that same `qtilde_mu` statistic directly with background-only and
+signal-plus-background pseudoexperiments. The quoted 95% upper limit is the smallest
+parameter value for which `CLs = 0.05`.
+
 ## Installation
 
 ### Prerequisites

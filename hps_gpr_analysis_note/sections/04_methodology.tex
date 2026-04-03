@@ -221,6 +221,7 @@ regime.}
 \end{figure}
 
 \subsection{Blind-window prediction in count space}
+\label{sec:blind-window-prediction}
 
 For each mass point, the package trains the GP only on the bins outside the training
 exclusion window and predicts the posterior mean and covariance of the latent smooth
@@ -241,6 +242,25 @@ counts in the blinded bins. The Poisson counting fluctuation of the observed
 $n_{d,i}$ is handled separately by the likelihood, so $\bm{C}_d$ should be read as the
 covariance of the GP-predicted background mean rather than the covariance of the
 observed histogram counts themselves.
+
+To propagate that correlated GP uncertainty into the profile likelihood, the analysis
+uses the Cholesky factorization
+\begin{equation}
+\bm{C}_d(m)=L_d(m)L_d^\top(m),
+\label{eq:Cd-cholesky}
+\end{equation}
+with $L_d(m)$ the lower-triangular Cholesky factor of the positive-semidefinite
+blind-window covariance. Introducing an auxiliary standard-normal nuisance vector
+$\bm{\theta}_d\sim\mathcal{N}(0,I)$ and the background-deformation field
+$\Delta\bm{b}_d(m)=L_d(m)\bm{\theta}_d$ then gives
+$\Delta\bm{b}_d\sim\mathcal{N}(0,\bm{C}_d)$. This is the standard HEP construction for
+encoding correlated Gaussian-constrained nuisance variations inside a profile
+likelihood model \cite{HistFactory,Cowan2011}. In the present analysis it is
+especially important because the GP prediction induces nontrivial bin-to-bin
+correlations across the blinded window; carrying those correlations through
+$L_d\bm{\theta}_d$ lets the local significance and \CLs\ limit respond to coherent
+background deformations rather than misinterpreting the GP uncertainty as independent
+per-bin noise.
 
 \subsection{Signal model and conversion to \texorpdfstring{$\eps^2$}{epsilon2}}
 
@@ -265,6 +285,7 @@ w_{d,i}(m_0) =
 w^{\mathrm{full}}_{d,i}(m_0), & i \in \mathcal{B}_d(m_0), \\
 \text{not used in the local fit}, & i \notin \mathcal{B}_d(m_0).
 \end{cases}
+\label{eq:window-template}
 \end{equation}
 By the blinded-bin slice we mean exactly this restriction of the full normalized
 Gaussian template to the subset of bins in $\mathcal{B}_d(m_0)$; the template is not
@@ -279,6 +300,7 @@ with the mass hypothesis, not merely the yield inside the blind window. The expe
 signal contribution entering bin $i$ of the local likelihood is therefore
 \begin{equation}
 s_{d,i}(A_d;m_0) = A_d\,w_{d,i}(m_0),
+\label{eq:signal-bin-contribution}
 \end{equation}
 so the total expected signal actually visible inside the blind window is
 $f_{\mathrm{blind},d}(m_0)\,A_d$.
@@ -327,6 +349,7 @@ dataset-specific conversion factor
 \begin{equation}
 K_d(m) \equiv A_d(\eps^2 = 1)
 = \frac{3\pi\,m\,f_{\mathrm{rad},d}(m)\,\rho_d(m)}{2\alpha_{\mathrm{EM}}},
+\label{eq:Kd-conversion}
 \end{equation}
 so that a shared coupling $\eps^2$ predicts a dataset-specific total signal yield
 $A_d = K_d(m)\eps^2$.
@@ -342,12 +365,15 @@ f_{\mathrm{rad},d}^{\mathrm{eff}}(m)
 \end{equation}
 so the same signal-yield limit maps to a weaker $\eps^2$ limit.
 
-\subsection{Local significance and single-dataset signal extraction}
+\subsection{Statistical inference in a single dataset}
 
 For a fixed dataset $d$ and mass hypothesis $m$, let $\bm{n}_d$ denote the vector of
 observed blinded-bin counts, $\bm{b}_d$ the GP-predicted blinded-bin mean,
-$\bm{C}_d = L_dL_d^\top$ the corresponding covariance, and $\bm{w}_d$ the non-renormalized
-blind slice of the full Gaussian template. The profiled local likelihood is
+$\bm{C}_d=L_dL_d^\top$ the corresponding covariance of
+Section~\ref{sec:blind-window-prediction} and Eq.~\eqref{eq:Cd-cholesky}, and
+$\bm{w}_d(m)$ the
+non-renormalized blinded-bin slice of the full Gaussian template defined in
+Eq.~\eqref{eq:window-template}. The profiled local likelihood is
 \begin{equation}
 \mathcal{L}_d(A_d,\bm{\theta}_d)
 =
@@ -355,71 +381,150 @@ blind slice of the full Gaussian template. The profiled local likelihood is
 \prod_{i=1}^{N_d(m)}
 \mathrm{Pois}\!\left(
 n_{d,i}\,\middle|\,
-b_{d,i} + (L_d\bm{\theta}_d)_i + A_d w_{d,i}
+b_{d,i} + (L_d\bm{\theta}_d)_i + A_d w_{d,i}(m)
 \right)
 \right]
 \exp\!\left(-\frac{1}{2}\bm{\theta}_d^\top\bm{\theta}_d\right),
 \label{eq:singlelike}
 \end{equation}
-where the Gaussian nuisance vector $\bm{\theta}_d \sim \mathcal{N}(0,I)$ encodes
-correlated background deformations consistent with the GP covariance in the blind
-window, $L_d$ is the Cholesky factor of $\bm{C}_d$, and $N_d(m)$ is the number of bins
-in the local blinded set $\mathcal{B}_d(m)$. Profiling Eq.~\eqref{eq:singlelike}
-yields the best-fit signal amplitude
-$\hat A_d$ and its local uncertainty $\sigma_{A,d}$. For closure and linearity studies
-$\hat A_d$ is allowed to fluctuate below zero; for discovery and upper-limit test
-statistics the physical boundary $A_d \ge 0$ is imposed in the usual way.
+where the Gaussian nuisance vector $\bm{\theta}_d\sim\mathcal{N}(0,I)$ induces the
+correlated background-deformation field $L_d\bm{\theta}_d$ defined below
+Eq.~\eqref{eq:Cd-cholesky}, and $N_d(m)$ is the number of bins in the local blinded
+set $\mathcal{B}_d(m)$. The signal contribution entering the Poisson mean is exactly
+the blinded-bin restriction of Eq.~\eqref{eq:signal-bin-contribution}.
 
-The local significance is obtained from the profiled likelihood-ratio statistic
+At fixed $m$, profiling Eq.~\eqref{eq:singlelike} with no physical sign constraint on
+$A_d$ yields the reviewer-facing extraction estimator $\hat A_d^{\,\mathrm{unc}}$ and
+its local uncertainty $\sigma_{A,d}$. This unconstrained fit is used for closure,
+linearity, and pull studies because it allows downward background fluctuations to be
+captured by the estimator itself rather than being clipped at zero. For discovery and
+production upper limits, however, the parameter of interest is restricted to the
+physical region $A_d\ge0$, and the corresponding physical best fit is
+\begin{equation}
+\hat A_d = \max\!\left(0,\hat A_d^{\,\mathrm{unc}}\right).
+\end{equation}
+We denote by $\hat{\bm{\theta}}_d$ the nuisance-parameter maximizer at the
+unconditional best fit and by $\hat{\hat{\bm{\theta}}}_d(A_d)$ the conditional maximum
+likelihood estimator of $\bm{\theta}_d$ for fixed $A_d$.
+
+\subsubsection{Local significance}
+
+The single-dataset discovery statistic is the bounded profile-likelihood ratio
 \begin{equation}
 q_{0,d}(m) = -2\ln
-\frac{\mathcal{L}_d(A_d=0,\hat{\hat{\bm{\theta}}}_d)}
-{\mathcal{L}_d(\hat A_d,\hat{\bm{\theta}}_d)},
+\frac{\mathcal{L}_d\!\left(A_d=0,\hat{\hat{\bm{\theta}}}_d(0)\right)}
+{\mathcal{L}_d\!\left(\hat A_d,\hat{\bm{\theta}}_d\right)},
+\label{eq:q0-single}
 \end{equation}
-with
+with $\hat A_d\ge0$. The local one-sided discovery $p$-value and the corresponding
+Gaussian significance are then obtained with the asymptotic Cowan-et-al.\ mapping,
 \begin{equation}
-Z_{\mathrm{local},d}(m) = \sqrt{q_{0,d}(m)},
+Z_{\mathrm{local},d}(m)=\sqrt{q_{0,d}(m)},
 \qquad
-p_{0,d}(m) = 1-\Phi\!\left(Z_{\mathrm{local},d}(m)\right).
+p_{0,d}(m)=1-\Phi\!\left(Z_{\mathrm{local},d}(m)\right).
+\label{eq:p0-single}
 \end{equation}
 This profiled multi-bin test replaces the older sum-count approximation used in the
 earliest drafts and is the only local-significance definition treated as current in
-this note. In the asymptotic regime this is the standard profile-likelihood discovery
-construction used throughout collider physics \cite{Cowan1998,Cowan2011}.
+this note \cite{Cowan2011}.
 
-\subsection{\texorpdfstring{\CLs}{CLs} upper limits}
+\subsubsection{\texorpdfstring{\CLs}{CLs} upper limits}
 
-For a fixed signal hypothesis, the package constructs the usual likelihood-ratio test
-for either the total amplitude $A_d$ or, after conversion, the shared coupling
-$\eps^2$. In asymptotic mode the variance of the log-likelihood ratio includes both the
-Poisson counting component and the additional GP background uncertainty
-$\bm{c}^\top\bm{C}\bm{c}$, where $c_i=\ln(1+s_i/b_i)$. In toy mode the same test
-statistic is calibrated by pseudoexperiments. The quoted 95\% upper limit is the
-smallest parameter value satisfying
+To test a fixed non-negative signal amplitude $A_d$, the production limit setting uses
+the bounded one-sided profile-likelihood statistic
 \begin{equation}
-\mathrm{CL}_s = 0.05
+\tilde q_{A_d}(m)=
+\begin{cases}
+0, &
+\hat A_d^{\,\mathrm{unc}} > A_d, \\
+-2\ln
+\dfrac{\mathcal{L}_d\!\left(A_d,\hat{\hat{\bm{\theta}}}_d(A_d)\right)}
+{\mathcal{L}_d\!\left(\hat A_d^{\,\mathrm{unc}},\hat{\bm{\theta}}_d\right)}, &
+0\le \hat A_d^{\,\mathrm{unc}}\le A_d, \\
+-2\ln
+\dfrac{\mathcal{L}_d\!\left(A_d,\hat{\hat{\bm{\theta}}}_d(A_d)\right)}
+{\mathcal{L}_d\!\left(0,\hat{\hat{\bm{\theta}}}_d(0)\right)}, &
+\hat A_d^{\,\mathrm{unc}} < 0,
+\end{cases}
+\label{eq:qmu-single}
 \end{equation}
-\cite{Junk1999,Read2002,Cowan2011}. Expected bands are obtained from background-only
-pseudoexperiments and are reported both in signal-yield space and after mapping to
-$\eps^2$.
+which is the standard bounded Cowan construction for upper limits \cite{Cowan2011}.
+The corresponding modified-frequentist tail areas are
+\begin{equation}
+\mathrm{CL}_{s+b}(A_d;m)
+=
+P\!\left(
+\tilde q_{A_d}\ge \tilde q_{A_d}^{\mathrm{obs}}
+\middle|\,
+A_d+\mathrm{bkg}
+\right),
+\qquad
+\mathrm{CL}_{b}(A_d;m)
+=
+P\!\left(
+\tilde q_{A_d}\ge \tilde q_{A_d}^{\mathrm{obs}}
+\middle|\,
+\mathrm{bkg}
+\right),
+\end{equation}
+and
+\begin{equation}
+\mathrm{CL}_{s}(A_d;m)=
+\frac{\mathrm{CL}_{s+b}(A_d;m)}{\mathrm{CL}_{b}(A_d;m)}.
+\label{eq:cls-definition}
+\end{equation}
+Dividing by $\mathrm{CL}_b$ prevents a downward background fluctuation from producing
+an artificially aggressive exclusion in a region with little intrinsic sensitivity
+\cite{Junk1999,Read2002}. The quoted single-dataset 95\% limit is
+\begin{equation}
+A_{95,d}(m)=\min\{A_d:\mathrm{CL}_s(A_d;m)=0.05\}.
+\label{eq:a95-single}
+\end{equation}
+The package reports this limit both in signal-yield space and, after applying the
+dataset-specific conversion factor of Eq.~\eqref{eq:Kd-conversion}, in $\eps^2$ space.
 
-The reason the toy program remains central even after writing down the asymptotic test
-statistic is that the HPS problem is not a textbook one-bin counting limit. The local
-likelihood combines low blind-window counts with a GP-conditioned covariance, a
-non-renormalized Gaussian signal template, and a mass-dependent yield-to-$\eps^2$
-conversion. The pull, coverage, and injection studies of Section~\ref{sec:toys}
-therefore validate not only code closure but also the statistical conditions under
+\subsection{Asymptotic and toy calibration}
+
+The local-significance mapping of Eq.~\eqref{eq:p0-single} is treated asymptotically
+throughout the production scan. For upper limits, the same bounded statistic
+$\tilde q_{A_d}$ is calibrated in one of two ways. In asymptotic mode, the
+background-only Asimov data set is used to evaluate the reference quantity
+$\tilde q_{A_d,A}$, so that
+\begin{equation}
+\mathrm{CL}_{s+b}(A_d;m)
+=
+1-\Phi\!\left(\sqrt{\tilde q_{A_d}^{\mathrm{obs}}}\right),
+\qquad
+\mathrm{CL}_{b}(A_d;m)
+=
+\Phi\!\left(
+\sqrt{\tilde q_{A_d,A}}-\sqrt{\tilde q_{A_d}^{\mathrm{obs}}}
+\right).
+\label{eq:cls-asymptotic}
+\end{equation}
+In toy mode, the same statistic $\tilde q_{A_d}$ is calibrated directly with
+background-only and signal-plus-background pseudoexperiments rather than by switching
+to a different ordering variable. The shared-coupling combination described below uses
+the identical logic after replacing the single-dataset amplitude $A_d$ with the common
+parameter of interest $\eps^2$.
+
+The pseudoexperiment program remains central even with the asymptotic formulae in
+place because the HPS problem is not a textbook one-bin counting limit. The local
+likelihood combines a multi-bin Poisson term, a GP-conditioned blind-window
+covariance, a non-renormalized Gaussian signal template, and a mass-dependent
+yield-to-$\eps^2$ conversion. The pull, coverage, and $Z$-calibration studies of
+Section~\ref{sec:toys} therefore validate not only code closure but also the domain in
 which the asymptotic summaries can be interpreted with confidence.
 
-\subsection{Observed-limit tail diagnostics and significance summaries}
+\subsection{Observed-limit toy diagnostics}
 
 The analysis uses two distinct families of $p$-values, and the distinction is
-important for internal review. The first family is the local profile-likelihood bump
-statistic of Eq.~\eqref{eq:singlelike}, summarized through $q_0(m)$, $p_0(m)$, and
-$Z_{\mathrm{local}}(m)$. The second family is a set of toy-tail summaries derived from
-the background-only \CLs{} limit ensemble at each mass. For $N_{\mathrm{toys}}$
-background-only pseudoexperiments and an observed limit
-$\eps^2_{95,\mathrm{obs}}(m)$, those toy-tail quantities are
+important for internal review. The first family is the discovery statistic of
+Eq.~\eqref{eq:q0-single}, summarized through $q_0(m)$, $p_0(m)$, and
+$Z_{\mathrm{local}}(m)$. The second family is a set of reviewer-facing diagnostics
+derived from the background-only \CLs{} limit ensemble at each mass. For
+$N_{\mathrm{toys}}$ background-only pseudoexperiments and an observed limit
+$\eps^2_{95,\mathrm{obs}}(m)$, those quantities are
 \begin{align}
 p_{\mathrm{strong}}(m)
 &=
@@ -440,35 +545,32 @@ p_{\mathrm{two}}(m)
 2\min\!\left[p_{\mathrm{strong}}(m),\,p_{\mathrm{weak}}(m)\right].
 \end{align}
 Here $p_{\mathrm{strong}}$ quantifies how unusually \emph{strong} the observed limit
-is relative to the toy ensemble, while $p_{\mathrm{weak}}$ quantifies how unusually
-\emph{weak} it is. They are therefore limit-diagnostic quantities rather than
-discovery-significance measures in the sense of $p_0$ \cite{Junk1999,Read2002,Cowan2011}.
-Figure~\ref{fig:pvalue-tail-schematic} sketches these tail definitions explicitly so
-the toy-limit diagnostic and the bump-hunt significance are not conflated.
+is relative to the background-only toy ensemble, while $p_{\mathrm{weak}}$ quantifies
+how unusually \emph{weak} it is. The two-sided quantity $p_{\mathrm{two}}$ is retained
+only as a symmetric reviewer diagnostic; because it responds to both unusually strong
+and unusually weak limits, it is less targeted than the one-sided discovery or
+exclusion tests and is not used as a search statistic.
 
 \begin{figure}[H]
 \centering
 \graphicorplaceholder{0.96\linewidth}{methodology_figs/pvalue_tail_schematic.png}
-\caption{Schematic interpretation of the toy-tail limit diagnostics used in this note.
-The shaded regions illustrate the weak-sided, strong-sided, and two-sided tail
-definitions for a generic test variable. In the HPS workflow the plotted variable is
-the observed \CLs{} upper limit relative to the background-only toy ensemble at fixed
-mass, so these quantities diagnose the behavior of the \emph{limit} rather than the
-local bump-hunt significance.}
+\caption{Illustrative toy-limit diagnostic at fixed mass. The left panel shows a
+background-only ensemble of observed \CLs{} upper limits, and the right panel shows the
+corresponding empirical cumulative distribution. The vertical line marks the observed
+limit. The lower-tail area defines $p_{\mathrm{strong}}$, the upper-tail area defines
+$p_{\mathrm{weak}}$, and $p_{\mathrm{two}}=2\min(p_{\mathrm{strong}},p_{\mathrm{weak}})$
+is used only as a symmetric diagnostic summary.}
 \label{fig:pvalue-tail-schematic}
 \end{figure}
 
-This distinction also explains why the toy-tail curves often hover near 0.5. If the
-observed limit is close to the median of the background-only ensemble, then roughly
-half of the toys lie above it and half lie below it, making both
-$p_{\mathrm{strong}}$ and $p_{\mathrm{weak}}$ naturally $\mathcal{O}(0.5)$. With
-$N_{\mathrm{toys}}=\num{10000}$, the smallest non-zero empirical tail probability is
-of order $1/(N_{\mathrm{toys}}+1)\sim 10^{-4}$, corresponding to only about
-\SI{3.7}{\sigma} one-sided. Toy-limit tails at this granularity therefore cannot by
-themselves validate or refute a \SIrange{5}{7}{\sigma} local excess in the analytic
-bump-hunt statistic. This is another reason the note treats the toy-tail curves as
-limit diagnostics and reserves discovery-language statements for the profile-likelihood
-$p_0$ construction.
+These quantities are therefore limit diagnostics rather than discovery-significance
+measures in the sense of $p_0$. If the observed limit lies near the median of the
+background-only ensemble, then roughly half of the toys lie above it and half lie
+below it, making both $p_{\mathrm{strong}}$ and $p_{\mathrm{weak}}$ naturally
+$\mathcal{O}(0.5)$. With $N_{\mathrm{toys}}=\num{10000}$, the smallest non-zero
+empirical tail probability is still only of order $10^{-4}$, so these toy-limit
+diagnostics cannot by themselves establish or refute a high-significance local excess
+in the discovery statistic.
 
 \subsection{Shared-\texorpdfstring{$\eps^2$}{epsilon2} combination across datasets}
 \label{sec:combination}
@@ -484,8 +586,10 @@ each $d \in \mathcal{D}(m)$, define
 \bm{w}_d(m),\qquad
 K_d(m),
 \end{equation}
-where $K_d(m)$ converts the shared coupling $\eps^2$ into the total signal yield of
-dataset $d$. When the radiative-fraction penalty of Eq.~\eqref{eq:frad-penalty} is
+where $\bm{w}_d(m)$ is the blinded-bin template slice of
+Eq.~\eqref{eq:window-template}, $K_d(m)$ is the yield-per-unit-$\eps^2$ conversion of
+Eq.~\eqref{eq:Kd-conversion}, and $L_d$ is the Cholesky factor of the GP covariance in
+that dataset. When the radiative-fraction penalty of Eq.~\eqref{eq:frad-penalty} is
 enabled, the conversion becomes
 \begin{equation}
 K_d^{\mathrm{eff}}(m) = \left(1-\delta_{f,d}\right)K_d(m),
@@ -520,8 +624,12 @@ Equivalently, one may concatenate all blinded-bin vectors into a single object,
 \left(\bm{b}_1,\bm{b}_2,\ldots\right), \\
 \bm{s}_{\mathrm{unit}} &=
 \left(K_1^{\mathrm{eff}}\bm{w}_1, K_2^{\mathrm{eff}}\bm{w}_2,\ldots\right), \\
+\bm{\theta} &=
+\left(\bm{\theta}_1,\bm{\theta}_2,\ldots\right), \\
 \bm{C}_{\mathrm{comb}} &=
 \mathrm{blockdiag}(\bm{C}_1,\bm{C}_2,\ldots),
+\qquad
+L_{\mathrm{comb}}=\mathrm{blockdiag}(L_1,L_2,\ldots),
 \end{align}
 so that the total expected mean is
 \begin{equation}
@@ -530,13 +638,16 @@ so that the total expected mean is
 \qquad
 \bm{C}_{\mathrm{comb}} = L_{\mathrm{comb}}L_{\mathrm{comb}}^\top.
 \end{equation}
-
-Two points are essential. First, the baseline combination shares only the parameter of
-interest $\eps^2$. The nuisance vectors $\bm{\theta}_d$ are independent between
-datasets, and no common radiative-fraction, luminosity, or resolution nuisance
-parameters are profiled across runs in the current production model. Second, the
-combination is performed at the likelihood level, not by averaging precomputed
-upper-limit curves. At fixed $\eps^2$,
+The bounded upper-limit statistic for the shared coupling,
+$\tilde q_{\eps^2}(m)$, is defined exactly as in Eq.~\eqref{eq:qmu-single} after
+replacing the single-dataset amplitude with the common parameter of interest
+$\eps^2$ and the single-dataset likelihood with
+$\mathcal{L}_{\mathrm{comb}}$. Two points are essential. First, the baseline
+combination shares only the parameter of interest $\eps^2$. The nuisance vectors
+$\bm{\theta}_d$ are independent between datasets, and no common radiative-fraction,
+luminosity, or resolution nuisance parameters are profiled across runs in the current
+production model. Second, the combination is performed at the likelihood level, not by
+averaging precomputed upper-limit curves. At fixed $\eps^2$,
 \begin{equation}
 -2\ln\lambda_{\mathrm{comb}}(\eps^2)
 =
@@ -545,13 +656,16 @@ upper-limit curves. At fixed $\eps^2$,
 after profiling the independent nuisance blocks. The sensitivity gain therefore comes
 from the additive information content of statistically independent channels, each with
 its own detector response and normalization factor, rather than from any post hoc
-merging of already-compressed outputs. The combined upper limit is set directly on the
-shared coupling,
+merging of already-compressed outputs. This is the standard common-POI structure used
+in multi-channel HEP combinations \cite{HistFactory,ATLASCMSHiggs2016}. The combined
+upper limit is set directly on the shared coupling,
 \begin{equation}
 \eps^2_{95}(m) = \min\{\eps^2 : \mathrm{CL}_s(\eps^2)=0.05\},
 \end{equation}
 while the combined local significance is evaluated from the same profiled likelihood
-with the common signal vector $\eps^2 \bm{s}_{\mathrm{unit}}$.
+with the common signal vector $\eps^2 \bm{s}_{\mathrm{unit}}$. By contrast, the
+inverse-variance expressions shown later in the search-power figures are auxiliary
+interpretations of combined sensitivity, not the defining inference.
 
 \subsection{Global significance and the look-elsewhere treatment}
 
@@ -592,15 +706,18 @@ Z_{\mathrm{global}}^{\mathrm{Sidak}}
 For small $p_{0,\min}^{\mathrm{obs}}$, Eq.~\eqref{eq:sidak-global} reduces to the
 familiar $p_{\mathrm{global}}\simeq N_{\mathrm{eff}}p_{0,\min}$ form.
 
-The present note uses these quantities asymmetrically. The combined
-2015$+$2016 10\%$+$2021 1\% radiative-penalty summary is the only place where the
-global conversion is treated as the physics-facing look-elsewhere diagnostic. The
-single-dataset overlays retained in Figure~\ref{fig:local-significances-across-datasets}
-are used only to show where each dataset has its largest \emph{local} upward
-fluctuation; their orange global overlays should not be interpreted as final because
-those auxiliary summary PNGs predate the resolution-column cleanup described in
-Section~\ref{sec:results-combined-151621-1pct}. The combined look-elsewhere summary
-actually interpreted later in the note is shown in Figure~\ref{fig:combined-significance-rpen}.
+The preferred final calibration is therefore toy based: if the background-only
+distribution of $q_{0,\max}$ is available, Eq.~\eqref{eq:pglobal-toy} is the
+physics-facing look-elsewhere result. When that distribution has not yet been frozen,
+the summary products fall back to the \v{S}id\'ak approximation of
+Eq.~\eqref{eq:sidak-global}. The present note uses these quantities asymmetrically.
+The combined 2015$+$2016 10\%$+$2021 1\% radiative-penalty summary is the only place
+where the global conversion is interpreted as part of the final look-elsewhere
+discussion. The single-dataset overlays retained in
+Figure~\ref{fig:local-significances-across-datasets} are used only to show where each
+dataset has its largest \emph{local} upward fluctuation; any orange global overlays in
+those auxiliary PNGs should be read as approximations rather than as finalized
+toy-calibrated claims.
 
 \begin{figure}[p]
 \centering
@@ -608,9 +725,9 @@ actually interpreted later in the note is shown in Figure~\ref{fig:combined-sign
 \caption{Local significances across datasets, shown here as the analytic one-sided
 $p_0(m)$ curves for 2015, 2016 10\%, and 2021 1\%. These panels are included to show
 where each input sample contributes upward local fluctuations to the combined search.
-The orange single-dataset global overlays are retained from the summary products for
-bookkeeping only; the local blue curves are the quantities actually interpreted in this
-note.}
+Any orange global overlays in the auxiliary summary products represent
+\v{S}id\'ak-style approximations; the local blue curves are the quantities actually
+interpreted in this note.}
 \label{fig:local-significances-across-datasets}
 \end{figure}
 
@@ -619,18 +736,19 @@ note.}
 \begin{subfigure}[t]{0.48\linewidth}
   \centering
   \graphicorplaceholder{\linewidth}{summary_combined_all_rad_penalty/p0_analytic_local_global.png}
-  \caption{Combined local and global one-sided $p_0$ curves.}
+  \caption{Combined local $p_0$ curve with the current global approximation overlay.}
 \end{subfigure}
 \hfill
 \begin{subfigure}[t]{0.48\linewidth}
   \centering
   \graphicorplaceholder{\linewidth}{summary_combined_all_rad_penalty/Z_local_global.png}
-  \caption{Equivalent local and global $Z$ representation.}
+  \caption{Equivalent local-$Z$ representation with the current global approximation.}
 \end{subfigure}
 \caption{Analytic significance curves for the radiative-penalty three-dataset
-combination. Unlike the auxiliary single-dataset overlays, this combined global
-representation is the one interpreted in the results section when discussing the
-look-elsewhere effect of the shared-$\eps^2$ search.}
+combination. When a full scan-level toy calibration of $q_{0,\max}$ is unavailable,
+the global curve shown here is the effective-trials approximation described by
+Eq.~\eqref{eq:sidak-global}; a toy-calibrated $q_{0,\max}$ distribution would take
+precedence for a final discovery claim.}
 \label{fig:combined-significance-rpen}
 \end{figure}
 
