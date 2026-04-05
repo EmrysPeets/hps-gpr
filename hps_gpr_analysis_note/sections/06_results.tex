@@ -2,15 +2,16 @@
 \label{sec:results}
 
 This section separates two result layers. The standalone 2015, 2016 10\%, and
-2015$+$2016 subsections are retained as the current validated baseline summaries for
-the individual and early-combination stages of the workflow. The review-facing update,
-however, is the shared-$\eps^2$ combination of 2015, 2016 10\%, and 2021 1\%, for
-which the note now uses the current `summary\_combined\_all\_rad\_penalty` summary. In
-that three-dataset study the radiative-fraction penalty is applied consistently to all
-active datasets, and the combined global-significance curve is the only global
-look-elsewhere representation interpreted in the note; unless explicitly stated
-otherwise, that curve should be read as the current approximation rather than as a
-fully frozen toy-calibrated scan result.
+2015$+$2016 subsections remain the baseline summaries for the individual and
+early-combination stages of the workflow, but the 2015/2016 local-significance panels
+and the two-dataset combined suite have now been refreshed from the latest batch3
+1.64-blind exports. The review-facing update, however, is still the shared-$\eps^2$
+combination of 2015, 2016 10\%, and 2021 1\%, for which the note uses the current
+`summary\_combined\_all\_rad\_penalty` summary. In that three-dataset study the
+radiative-fraction penalty is applied consistently to all active datasets, and the
+combined global-significance curve is the only global look-elsewhere representation
+interpreted in the note; unless explicitly stated otherwise, that curve should be read
+as the current approximation rather than as a fully frozen toy-calibrated scan result.
 
 \subsection{2015 analysis}
 \label{sec:results-2015}
@@ -60,13 +61,18 @@ demonstrate the smooth scan structure obtained with the global-GP background mod
   \graphicorplaceholder{\linewidth}{significance_figs/2015/p0_analytic_local_global.png}
   \caption{Analytic local $p_0$ with the current global approximation.}
 \end{subfigure}
-\caption{2015 significance summary. The left panel reports where the observed limit
-falls relative to the background-only toy-limit ensemble, while the right panel shows
-the analytic profile-likelihood discovery statistic. The global overlay should be read
-as the current look-elsewhere approximation rather than as a finalized toy-calibrated
-global significance.}
+\caption{2015 significance summary. The left panel remains the older standalone
+toy-limit diagnostic because the current batch3 refresh does not bundle a new 2015
+toy-tail table, while the right panel is refreshed from the updated local-significance
+output. The local one-sided $p_0$ curve is bounded above by 0.5; the dashed overlay is
+a scan-level global p-value reference, not another local $p_0$ curve. The visible 2015
+structures remain review targets rather than frozen claims.}
 \label{fig:results-2015-significance}
 \end{figure}
+
+With the updated plotting convention the 2015 local-significance curve stays in the
+few-sigma-local regime. Several narrow dips remain, but none should be separated from
+the still-unfrozen look-elsewhere treatment or promoted to a completed global claim.
 
 \subsection{2016 10\% analysis}
 \label{sec:results-2016}
@@ -114,10 +120,13 @@ expanded 2016 mass interval.}
   \graphicorplaceholder{\linewidth}{significance_figs/2016_10pct/p0_analytic_local_global.png}
   \caption{Analytic local $p_0$ with the current global approximation.}
 \end{subfigure}
-\caption{2016 10\% significance summary. The separation between toy-limit
-diagnostics and analytic profile-likelihood significance is important: the former test
-how unusual the observed \emph{limit} is relative to the toy ensemble, while the latter
-test how signal-like the observed spectrum is under the local extraction model.}
+\caption{2016 10\% significance summary. The separation between toy-limit diagnostics
+and analytic profile-likelihood significance remains important: the former test how
+unusual the observed \emph{limit} is relative to the toy ensemble, while the latter test
+how signal-like the observed spectrum is under the local extraction model. The refreshed
+right-hand panel shows that 2016 still carries the sharpest local structure of the two
+legacy inputs, but the dashed overlay is again a scan-level global p-value reference and
+the final global statement still requires a frozen toy calibration.}
 \label{fig:results-2016-significance}
 \end{figure}
 
@@ -125,10 +134,13 @@ test how signal-like the observed spectrum is under the local extraction model.}
 \label{sec:results-combined-1516}
 
 The first shared-$\eps^2$ combination joins the fully unblinded 2015 spectrum with the
-2016 10\% development sample. This is already a meaningful milestone for the analysis
+2016 10\% development sample. This remains a meaningful milestone for the analysis
 because it shows that the GPR framework can combine statistically independent data sets
 with different resolutions, search ranges, and radiative normalizations inside a single
-likelihood rather than by comparing precomputed limit curves after the fact.
+likelihood rather than by comparing precomputed limit curves after the fact. The plots
+shown here are refreshed from the latest batch3 two-dataset export, so this subsection
+now reflects the current 1.64-blind visual summary rather than the older pre-rerun
+placeholder curves.
 
 The combined parameter of interest is $\eps^2$, not the individual signal yield of a
 single data set. For that reason the combined result is quoted directly as an
@@ -143,11 +155,13 @@ extraction display at a single mass point.
 \begin{figure}[H]
 \centering
 \graphicorplaceholder{0.86\linewidth}{upper_limit_figs/2015_2016_combined/ul_bands_eps2_obsexp.png}
-\caption{Combined 2015+2016 10\% upper limit on $\eps^2$ at 95\% CL. This is the first
-result in the note that is intrinsically a shared-coupling measurement rather than a
-single-spectrum reinterpretation. The present curve is still a pre-rerun baseline, but
-it already demonstrates the expected gain from combining statistically independent
-channels in a common coupling parameter.}
+\caption{Combined 2015+2016 10\% upper limit on $\eps^2$ at 95\% CL from the refreshed
+batch3 two-dataset summary. This is the first result in the note that is intrinsically
+a shared-coupling measurement rather than a single-spectrum reinterpretation. The
+observed curve remains smooth and broadly follows the expected band, which is the
+behavior expected for a sensible shared-coupling combination of statistically
+independent inputs. The figure should still be treated as review-stage rather than as a
+frozen production result.}
 \label{fig:results-combined-1516-ul}
 \end{figure}
 
@@ -164,11 +178,18 @@ channels in a common coupling parameter.}
   \graphicorplaceholder{\linewidth}{significance_figs/2015_2016_combined/p0_analytic_local_global.png}
   \caption{Combined analytic local $p_0$ with the current global approximation.}
 \end{subfigure}
-\caption{Combined significance summary for the 2015+2016 study. These plots are the
-appropriate place to track how the shared-$\eps^2$ procedure behaves statistically
-before a final toy-calibrated global-significance evaluation is frozen.}
+\caption{Combined significance summary for the refreshed 2015+2016 study. The combined
+local one-sided $p_0$ curve is again bounded above by 0.5, while the dashed overlay is
+a scan-level global p-value reference. In the current two-dataset summary the
+combination does not strengthen the case beyond the sharpest single-dataset local
+excursion; it remains a review target pending the final toy-based scan calibration.}
 \label{fig:results-combined-1516-significance}
 \end{figure}
+
+The updated two-dataset significance panels therefore support a cautious reading. The
+2016 input still carries the sharpest local upward structure, while the shared-$\eps^2$
+combination stays at the same qualitative level and does not by itself justify a
+completed global-significance statement.
 
 \begin{figure}[p]
 \centering

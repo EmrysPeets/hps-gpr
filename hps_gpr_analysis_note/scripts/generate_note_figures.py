@@ -476,8 +476,8 @@ def main() -> None:
     make_2021_radiative_inputs_fig(NOTE_DIR / "normalization_figs" / "hps2021_radiative_fraction_inputs.png")
     stack_images(
         [
-            NOTE_DIR / "summary_combined_all_rad_penalty" / "2015_p0_local_global.png",
-            NOTE_DIR / "summary_combined_all_rad_penalty" / "2016_p0_local_global.png",
+            NOTE_DIR / "significance_figs" / "2015" / "p0_analytic_local_global.png",
+            NOTE_DIR / "significance_figs" / "2016_10pct" / "p0_analytic_local_global.png",
             NOTE_DIR / "summary_combined_all_rad_penalty" / "2021_p0_local_global.png",
         ],
         NOTE_DIR / "methodology_figs" / "local_significances_across_datasets.png",

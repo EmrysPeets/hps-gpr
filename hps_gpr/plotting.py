@@ -683,8 +683,8 @@ def plot_ul_pvalues(
 
     fig, ax = plt.subplots(figsize=(9, 4))
     for col, label, color in [
-        ("p_strong", r"$p_{\rm strong}$ (toy UL $\le$ obs UL)", "C0"),
-        ("p_weak", r"$p_{\rm weak}$ (toy UL $\ge$ obs UL)", "C1"),
+        ("p_strong", r"$p_{\rm strong}$ (toy UL $\leq$ obs UL)", "C0"),
+        ("p_weak", r"$p_{\rm weak}$ (toy UL $\geq$ obs UL)", "C1"),
         ("p_two", r"$p_{\rm two}$ (diagnostic 2$\times$min)", "C2"),
     ]:
         if col in df.columns:
@@ -788,13 +788,18 @@ def plot_ul_pvalue_components(
 
     for z in [1.0, 2.0, 3.0]:
         p_local = _p_from_z_one_sided(z)
-        p_global = _p_global_from_local(p_local, Neff=neff, method=lee_method)
+        p_global, _ = _scan_global_pvalue_and_excess_z(
+            np.asarray([p_local], float),
+            neff=float(neff),
+            lee_method=lee_method,
+        )
+        p_global = float(p_global[0])
         if z <= 2.0 or ymin_plot <= p_local * 1.2:
             ax.axhline(p_local, color="0.35", ls=":", lw=0.9)
             ax.text(masses.max(), p_local, f" local {int(z)}σ", va="bottom", ha="right", fontsize=8)
         if z <= 2.0 or ymin_plot <= p_global * 1.2:
             ax.axhline(p_global, color="0.15", ls="--", lw=0.9)
-            ax.text(masses.min(), p_global, f"approx global {int(z)}σ ", va="bottom", ha="left", fontsize=8)
+            ax.text(masses.min(), p_global, f"scan global {int(z)}σ ", va="bottom", ha="left", fontsize=8)
 
     ax.set_yscale("log")
     ax.set_ylim(min(1.0, max(ymin_plot, 1e-6)), 1.0)
@@ -872,6 +877,79 @@ def _effective_trials_from_spacing(
     return float(np.clip(neff, 1.0, float(masses_arr.size)))
 
 
+def _scan_global_pvalue_and_excess_z(
+    p0_local: np.ndarray,
+    *,
+    neff: float,
+    lee_method: str = "sidak",
+) -> tuple[np.ndarray, np.ndarray]:
+    """Return raw scan-level global p-values plus the clipped excess-Z overlay."""
+    p_local = np.asarray(p0_local, float)
+    p_global = np.full(p_local.shape, np.nan, float)
+    finite = np.isfinite(p_local)
+    if np.any(finite):
+        p_global[finite] = np.asarray([
+            _p_global_from_local(float(p), Neff=neff, method=lee_method)
+            for p in p_local[finite]
+        ], float)
+    p_global = np.clip(p_global, 1e-300, 1.0)
+
+    z_global_plot = np.full(p_global.shape, np.nan, float)
+    finite_global = np.isfinite(p_global)
+    if np.any(finite_global):
+        z_global_plot[finite_global] = np.asarray([
+            _z_from_p_one_sided(float(p))
+            for p in p_global[finite_global]
+        ], float)
+    z_global_plot = np.clip(z_global_plot, 0.0, None)
+    return p_global, z_global_plot
+
+
+def _resolve_global_overlay_from_local_p(
+    df: pd.DataFrame,
+    p0_local: np.ndarray,
+    *,
+    masses: np.ndarray,
+    lee_method: str = "sidak",
+    neff: Optional[float] = None,
+    indep_width_sigma: float = 1.96,
+    sigma_col: str = "sigma_mass_res_GeV",
+) -> tuple[np.ndarray, np.ndarray, str, str]:
+    """Resolve global scan p-value and excess-Z overlays from summary-table inputs."""
+    if "p0_global_toy" in df.columns:
+        p_global = np.clip(df["p0_global_toy"].to_numpy(float), 1e-300, 1.0)
+        _, z_global = _scan_global_pvalue_and_excess_z(
+            p_global,
+            neff=1.0,
+            lee_method=lee_method,
+        )
+        return (
+            p_global,
+            z_global,
+            "Global scan p-value (toy max q0)",
+            "global method: toy max q0",
+        )
+
+    if neff is None:
+        sig, _ = _resolve_sigma_values(df, sigma_col)
+        neff = _effective_trials_from_spacing(
+            masses,
+            sig,
+            indep_width_sigma=float(indep_width_sigma),
+        )
+    p_global, z_global = _scan_global_pvalue_and_excess_z(
+        p0_local,
+        neff=float(neff),
+        lee_method=lee_method,
+    )
+    return (
+        p_global,
+        z_global,
+        f"Global scan p-value ({lee_method.capitalize()} approx; N_eff={neff:.1f})",
+        f"N_eff = {neff:.1f}\nmethod: {lee_method} approx",
+    )
+
+
 def plot_analytic_p0(
     df: pd.DataFrame,
     *,
@@ -905,25 +983,21 @@ def plot_analytic_p0(
     ax.plot(masses, p0_local, label="Local p0 (profile LRT)")
 
     p0_global = None
+    z_global = np.array([0.0])
     global_label = ""
     if apply_lee:
-        if "p0_global_toy" in df.columns:
-            p0_global = np.clip(df["p0_global_toy"].to_numpy(float), 1e-300, 1.0)
-            global_label = "Global p0 (toy max q0)"
-        else:
-            if neff is None:
-                sig, _ = _resolve_sigma_values(df, sigma_col)
-                neff = _effective_trials_from_spacing(masses, sig, indep_width_sigma=float(indep_width_sigma))
-            p0_global = np.asarray([
-                _p_global_from_local(float(p), Neff=neff, method=lee_method)
-                for p in p0_local
-            ], float)
-            p0_global = np.clip(p0_global, 1e-300, 1.0)
-            global_label = f"Global p0 ({lee_method.capitalize()} approx; N_eff={neff:.1f})"
+        p0_global, z_global, global_label, _ = _resolve_global_overlay_from_local_p(
+            df,
+            p0_local,
+            masses=masses,
+            lee_method=lee_method,
+            neff=neff,
+            indep_width_sigma=indep_width_sigma,
+            sigma_col=sigma_col,
+        )
         ax.plot(masses, p0_global, "--", label=global_label)
 
     z_local = np.asarray([_z_from_p_one_sided(float(p)) for p in p0_local], float)
-    z_global = np.asarray([_z_from_p_one_sided(float(p)) for p in p0_global], float) if p0_global is not None else np.array([0.0])
     z_peak = float(np.nanmax(np.concatenate([z_local, z_global]))) if (z_local.size or z_global.size) else 0.0
     z_floor = max(3.0, z_peak)
 
@@ -994,22 +1068,18 @@ def plot_Z_local_global(
     ax.plot(masses, Z_local, label="Local Z")
 
     if apply_lee:
-        if "Z_global_toy" in df.columns:
-            Z_global = np.clip(df["Z_global_toy"].to_numpy(float), 0.0, None)
-            ax.plot(masses, Z_global, "--", label="Global Z (toy max q0)")
-            _add_info_box(ax, "global method: toy max q0", loc="upper right")
-        else:
-            if neff is None:
-                sig, _ = _resolve_sigma_values(df, sigma_col)
-                neff = _effective_trials_from_spacing(masses, sig, indep_width_sigma=float(indep_width_sigma))
-            p_local = np.asarray([_p_from_z_one_sided(float(z)) for z in Z_local], float)
-            p_global = np.asarray([
-                _p_global_from_local(float(p), Neff=neff, method=lee_method)
-                for p in p_local
-            ], float)
-            Z_global = np.clip(np.asarray([_z_from_p_one_sided(float(p)) for p in p_global], float), 0.0, None)
-            ax.plot(masses, Z_global, "--", label=f"Global Z ({lee_method.capitalize()} approx; N_eff={neff:.1f})")
-            _add_info_box(ax, f"N_eff = {neff:.1f}\nmethod: {lee_method} approx", loc="upper right")
+        p_local = np.asarray([_p_from_z_one_sided(float(z)) for z in Z_local], float)
+        _, Z_global, p_label, info_box = _resolve_global_overlay_from_local_p(
+            df,
+            p_local,
+            masses=masses,
+            lee_method=lee_method,
+            neff=neff,
+            indep_width_sigma=indep_width_sigma,
+            sigma_col=sigma_col,
+        )
+        ax.plot(masses, Z_global, "--", label=p_label.replace("scan p-value", "Z"))
+        _add_info_box(ax, info_box, loc="upper right")
 
     for z in (z_lines or []):
         ax.axhline(float(z), color="k", ls=":", lw=0.8, label=f"{z:.0f}σ")
@@ -1019,7 +1089,7 @@ def plot_Z_local_global(
     ax.set_ylim(0.0, zmax)
     ax.set_xlabel("m (GeV)")
     ax.set_ylabel("Z (Gaussian significance)")
-    _set_title_above(ax, title or "Local Z with global reference vs mass")
+    _set_title_above(ax, title or "Local Z with global excess-significance reference vs mass")
     ax.legend(loc="best")
     _grid(ax)
     plt.tight_layout()

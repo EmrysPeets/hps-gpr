@@ -1562,7 +1562,7 @@ def slurm_combine(output_dir, prefix):
                 sigma_col_combined = "sigma_mass_res_min_GeV" if "sigma_mass_res_min_GeV" in df.columns else "sigma_mass_res_GeV"
                 plot_analytic_p0(
                     df,
-                    title=f"Local p0 with global approximation vs mass ({tag})",
+                    title=f"Local p0 with global scan-p-value reference vs mass ({tag})",
                     outpath=os.path.join(suite_dir, "p0_analytic_local_global.png"),
                     apply_lee=True,
                     lee_method="sidak",
@@ -1571,7 +1571,7 @@ def slurm_combine(output_dir, prefix):
                 )
                 plot_Z_local_global(
                     df,
-                    title=f"Local Z with global approximation vs mass ({tag})",
+                    title=f"Local Z with global excess-significance reference vs mass ({tag})",
                     outpath=os.path.join(suite_dir, "Z_local_global.png"),
                     apply_lee=True,
                     lee_method="sidak",
@@ -1626,7 +1626,7 @@ def slurm_combine(output_dir, prefix):
                             sigma_col_single = "sigma_val" if "sigma_val" in sub.columns else "sigma_mass_res_GeV"
                             plot_analytic_p0(
                                 sub,
-                                title=f"{ds_name}: local p0 with global approximation",
+                                title=f"{ds_name}: local p0 with global scan-p-value reference",
                                 outpath=os.path.join(suite_dir, f"{ds_name}_p0_local_global.png"),
                                 apply_lee=True,
                                 lee_method="sidak",
@@ -1635,7 +1635,7 @@ def slurm_combine(output_dir, prefix):
                             )
                             plot_Z_local_global(
                                 sub,
-                                title=f"{ds_name}: local Z with global approximation",
+                                title=f"{ds_name}: local Z with global excess-significance reference",
                                 outpath=os.path.join(suite_dir, f"{ds_name}_Z_local_global.png"),
                                 apply_lee=True,
                                 lee_method="sidak",
