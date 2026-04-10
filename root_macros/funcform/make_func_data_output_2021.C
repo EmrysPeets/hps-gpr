@@ -16,11 +16,14 @@ void make_func_data_output_2021(
   job.primary_target_chi2ndf = 2.0;
   job.allow_bernstein_primary_fallback = false;
   job.bernstein_tag = "fBern5";
+  job.fit_min_scan = {0.030, 0.032, 0.035};
 
   std::vector<FuncFormCandidateDef> defs;
-  defs.push_back({"fSigPowExpQ", "sigmoid * power * exp(-x/theta + c_{1}x + c_{2}x^{2})", true, true, ff_make_sigpowexp_expquad});
-  defs.push_back({"fSigPow", "sigmoid * x^{a} * exp(-x/theta)", true, true, ff_make_sigpowexp});
-  defs.push_back({"fBern5", "positive Bernstein fallback", false, true, ff_make_bern5});
+  defs.push_back({"fSigPowExpQ", "sigmoid*power*exp + raw expquad", true, true, ff_make_sigpowexp_expquad});
+  defs.push_back({"fShiftSigPowTail", "shifted sigmoid*power*exp + tail", true, true, ff_make_shift_sigpowexp_tail});
+  defs.push_back({"fShiftSigPow", "shifted sigmoid*power*exp", false, true, ff_make_shift_sigpowexp});
+  defs.push_back({"fSigPow", "sigmoid*x^{a}*exp(-x/theta)", false, false, ff_make_sigpowexp});
+  defs.push_back({"fBern5", "positive Bernstein fallback", false, false, ff_make_bern5});
 
   ff_run_job(job, defs);
 }

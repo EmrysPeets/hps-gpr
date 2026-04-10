@@ -205,7 +205,9 @@ ROOT layout conventions:
 - `fit_metadata/` with the primary-function tag plus JSON metadata objects
 
 The overlay legends use the same bin-integral `chi2/ndof` convention as the macro's
-selection metric.
+selection metric. The current retuning pass targets Pearson `chi2/ndof < 2` for the
+selected primary family in 2016 and 2021, with the present 2015 seed accepted
+provisionally at `< 4` while that low-mass turn-on is iterated further.
 
 ### Functional-Form Toy Scans
 
@@ -378,6 +380,8 @@ Ready-made configs are included:
 - `study_configs/config_2015_blind1p64_95CL_10k_injection_gpmean_pseudoexp.yaml`
 - `study_configs/config_2016_10pct_blind1p64_95CL_10k_injection_gpmean_pseudoexp.yaml`
 - `study_configs/config_2015_2016_combined_blind1p64_95CL_10k_injection_gpmean_pseudoexp.yaml`
+- `study_configs/config_2021_1pct_blind1p64_95CL_10k_injection_gpmean_pseudoexp.yaml`
+- `study_configs/config_2015_2016_10pct_2021_1pct_blind1p64_95CL_10k_injection_gpmean_pseudoexp.yaml`
 
 Example runs:
 
@@ -388,16 +392,25 @@ hps-gpr inject --config study_configs/config_2015_blind1p64_95CL_10k_injection_g
 # 2016 10% full procedural pseudoexperiments
 hps-gpr inject --config study_configs/config_2016_10pct_blind1p64_95CL_10k_injection_gpmean_pseudoexp.yaml --dataset 2016 --masses 0.040,0.050,0.065,0.080,0.095,0.115,0.135,0.150,0.170,0.200 --strengths 1,2,3,5 --n-toys 10000
 
-# Combined (plus per-dataset in batch) full procedural pseudoexperiments
+# 2021 1% full procedural pseudoexperiments
+hps-gpr inject --config study_configs/config_2021_1pct_blind1p64_95CL_10k_injection_gpmean_pseudoexp.yaml --dataset 2021 --masses 0.040,0.060,0.080,0.100,0.120,0.160 --strengths 1,2,3,5 --n-toys 10000
+
+# Combined 2015+2016 (plus per-dataset in batch) full procedural pseudoexperiments
 hps-gpr slurm-gen-inject --config study_configs/config_2015_2016_combined_blind1p64_95CL_10k_injection_gpmean_pseudoexp.yaml --datasets 2015,2016,combined --masses 0.025,0.030,0.040,0.050,0.065,0.080,0.095,0.115,0.135,0.150,0.170,0.200 --strengths s1,s2,s3,s5 --n-toys 10000 --no-write-toy-csv --job-name hps2015_2016_inj_gpmean --partition roma --account hps:hps-prod --time 24:00:00 --memory 8G --output submit_2015_2016_injection_gpmean.slurm
 bash submit_injection_all.sh
 hps-gpr inject-plot --input-dir outputs/study_2015_2016_combined_w1p64_95CL_gpmean_pseudoexp/injection_flat --output-dir outputs/study_2015_2016_combined_w1p64_95CL_gpmean_pseudoexp/injection_summary
+
+# Combined 2015+2016 10%+2021 1% full procedural pseudoexperiments
+hps-gpr slurm-gen-inject --config study_configs/config_2015_2016_10pct_2021_1pct_blind1p64_95CL_10k_injection_gpmean_pseudoexp.yaml --datasets 2015,2016,2021,combined --masses 0.040,0.060,0.080,0.100,0.120 --strengths s1,s2,s3,s5 --n-toys 10000 --no-write-toy-csv --job-name hps2015_2016_2021_inj_gpmean --partition roma --account hps:hps-prod --time 24:00:00 --memory 8G --output submit_2015_2016_2021_injection_gpmean.slurm
+bash submit_injection_all.sh
+hps-gpr inject-plot --input-dir outputs/study_2015_2016_10pct_2021_1pct_w1p64_95CL_gpmean_pseudoexp/injection_flat --output-dir outputs/study_2015_2016_10pct_2021_1pct_w1p64_95CL_gpmean_pseudoexp/injection_summary
 ```
 
 Mass-range convention in all production configs:
 - 2015: **20–130 MeV**
 - 2016: **35–210 MeV**
-- Combined scan window: **20–210 MeV** (combined-fit significance populated in overlap region where multiple datasets are active)
+- 2021: **30–250 MeV**
+- Combined scan window: **20–250 MeV** (combined-fit significance populated only where the enabled dataset set contributes)
 
 #### Generating example extraction displays from pseudoexperiments
 
@@ -828,6 +841,17 @@ Injection/extraction plotting suite (`inject-plot`) covers the v15_8 closure che
 - coverage: fractions within `|pull|<1` and `|pull|<2` with Gaussian expectations (68.3%, 95.4%); dataset panels now split by injection level when mass overlays would otherwise overdraw
 - mass/strength heatmaps for pull mean and pull width, per dataset and for combined extraction
 - pull-vs-mass panels with connected lines and sigma-level legend labels (`1σ`, `2σ`, `3σ`, `5σ`) when `inj_nsigma` is available
+- Z-calibration residual panels: `z_calibration_residual_<dataset>.png` and `z_calibration_residual_comparison.png` summarize whether extracted local significance tracks the injected target without mass-dependent drift
+
+The output stems line up with the questions asked in the v15_8 notebook and the note:
+- `linearity_*`: closure of the extracted central value against the injected strength scale
+- `bias_*`: additive estimator bias after converting back to the fitted amplitude convention
+- `pull_width_*`: uncertainty calibration, with width near one indicating a trustworthy `sigma_A`
+- `coverage_*`: empirical frequentist interval coverage for the nominal 1 and 2 sigma bands
+- `heatmap_pull_mean_*`: where residual bias localizes in the mass-strength plane
+- `heatmap_pull_width_*`: where the quoted uncertainties are over- or under-dispersed
+- `pull_vs_mass_*`: the most compact mass-trend view of bias plus uncertainty calibration together
+- `z_calibration_residual_*`: local-significance calibration, especially useful when comparing no-refit and refit toy modes
 
 
 
@@ -856,6 +880,11 @@ These plots are designed to show *why* combined searches improve sensitivity:
 - statistically optimal weighting emphasizes the dataset with smaller `sigmaA_ref` (higher information content);
 - combined significance scales with the quadrature of independent information channels, making modest per-dataset excesses more impactful when combined;
 - explicit allocation tables improve reproducibility for internal notes/publication follow-up and allow direct cross-checks against UL-derived sensitivity expectations.
+
+In that taxonomy:
+- `combined_search_power_scenarios.png` is the closure-style sensitivity forecast for whole-search combinations
+- `combined_search_power_constituent_pvalues_5sigma.png` is the significance-budget diagnostic for a target combined excess
+- `combined_signal_allocation_mXXXMeV.png/.csv` are the dataset-sharing diagnostics that show where the injected common signal must land to realize the chosen combined target
 
 Methodology follows standard profile-likelihood asymptotics and inverse-variance combination conventions used broadly in HEP analyses (e.g. Cowan et al., EPJC 71 (2011) 1554).
 

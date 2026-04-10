@@ -5,11 +5,13 @@
 
 Unless stated otherwise, the toy studies summarized here correspond to the 95\%
 confidence-level workflow with blind width $1.64\,\sigma_m$ and \num{10000} toys per
-mass-strength point. The completed suites cover the fully unblinded 2015 sample, the
-2016 10\% development sample, and the first 2015+2016 shared-$\eps^2$ combination.
-Throughout this section, the combined interpretation is focused on the overlap region
-\SIrange{35}{130}{MeV}, which is the mass interval where both data sets contribute
-meaningfully to the prompt-resonance search.
+mass-strength point. The staged suites now cover the fully unblinded 2015 sample, the
+2016 10\% development sample, the 2021 1\% validation stream, and the current
+shared-$\eps^2$ combinations built from those inputs. Throughout this section, the
+combined interpretation is focused on the mass intervals where multiple data sets
+contribute meaningfully to the prompt-resonance search, with the two-dataset
+2015+2016 overlap anchored near \SIrange{35}{130}{MeV} and the three-dataset examples
+drawn from the common subset used by the current injection configs.
 
 Many of the toy-validation figures were produced before the final adoption of the
 leakage-retaining signal template and before the future likelihood refinements
@@ -31,8 +33,14 @@ model. These studies isolate the question of gross spectral smoothness from the 
 question of GP conditioning. They are therefore useful as the first closure test before
 the full inference chain is exercised. Figure~\ref{fig:analytic-fit-toys} shows the
 three dataset-specific seed spectra currently exported by the repo-local ROOT macros.
-In each panel, the legend reports the same bin-integral $\chi^2/\mathrm{ndof}$
-convention used by the macro when ranking the candidate functions.
+The current retuning pass is organized around one portable shifted
+sigmoid$\times$power$\times$exponential family plus a normalized tail modifier, with
+generalized-gamma variants retained as cross-checks in the lower-mass years. In each
+panel, the legend reports the same bin-integral $\chi^2/\mathrm{ndof}$ convention used
+by the macro when ranking the candidate functions. The present seeds reach the target
+selection region of $\chi^2/\mathrm{ndof}<2$ for the 2016 and 2021 primaries, while
+the 2015 turn-on remains provisionally acceptable at $\chi^2/\mathrm{ndof}<4$ pending a
+later dedicated low-mass iteration.
 
 \begin{figure}[H]
 \centering
@@ -57,7 +65,10 @@ convention used by the macro when ranking the candidate functions.
 2015, 2016, and 2021 panels are now produced directly by the dataset-specific
 functional-form macros in this repository. These overlays document the candidate
 families considered for toy generation and make the primary-versus-alternate choice
-visible at the spectrum level before the GPR scan is run over the resulting toys.}
+visible at the spectrum level before the GPR scan is run over the resulting toys. The
+shared shifted-sigmoid family provides the portable baseline across all three years,
+while the dataset-specific alternates show where extra tail flexibility or a
+generalized-gamma shoulder is still informative.}
 \label{fig:analytic-fit-toys}
 \end{figure}
 
@@ -200,6 +211,14 @@ whether the estimator is biased, whether the quoted uncertainty is correctly cal
 and whether the reported intervals achieve the claimed frequentist coverage
 \cite{Cowan1998,Cowan2011}.
 
+In practice the validation outputs are organized so that each product answers one
+statistical question cleanly. The linearity and bias panels test estimator closure;
+the pull-width and coverage panels test uncertainty calibration; the pull-mean and
+pull-width heatmaps localize those effects in the mass-strength plane; the
+pull-versus-mass summaries compress the dominant mass trends into one view; and the
+$\Delta Z$ residual plots test significance calibration for both the single-dataset
+and shared-$\eps^2$ workflows.
+
 For the present study, the pull-versus-mass plots are the most compact summary because
 they display both the pull mean and pull width at once. In the overlap region
 \SIrange{40}{115}{MeV}, both the 2015 and 2016 10\% studies show broadly promising
@@ -323,15 +342,16 @@ dataset-specific $\sigma_{A,\mathrm{ref}}$. As a result, a combined ``5$\sigma$'
 ``7$\sigma$'' injection means a common-coupling significance in the combined statistic,
 not the same per-dataset significance in each constituent channel.
 
-The updated search-power plotter is now configured to support both the current
-two-dataset export and the intended three-dataset scenarios. In particular, once the
-2021 injection-summary CSV is added to the note workspace, the same stacked layout can
-be rerendered for the intuitive ``1$\sigma$ + 1$\sigma$ + 1$\sigma$'' and
-``1$\sigma$ + 2$\sigma$ + 3$\sigma$'' shared-coupling tests. The panels shown
-here are therefore still provisional in their numerical content, but they now use the
-publication-facing top-bottom layout and the final inverse-variance bookkeeping.
-Figure~\ref{fig:combined-search-power} then shows both the combined search-power scan
-and the constituent-dataset allocations needed to reach a target shared significance.
+The updated search-power plotter is now configured for both the historical
+two-dataset export and the current three-dataset scenarios documented in the README.
+In particular, the same stacked layout can be rerendered for intuitive
+``1$\sigma$ + 1$\sigma$ + 1$\sigma$'' and ``1$\sigma$ + 2$\sigma$ + 3$\sigma$''
+shared-coupling tests once the corresponding injection-summary CSVs are bundled in the
+note workspace. The panels shown here therefore remain provisional in their numerical
+content, but they already use the publication-facing top-bottom layout and the final
+inverse-variance bookkeeping. Figure~\ref{fig:combined-search-power} then shows both
+the combined search-power scan and the constituent-dataset allocations needed to reach
+a target shared significance.
 
 \begin{figure}[H]
 \centering

@@ -50,6 +50,10 @@ struct FuncFormFitSummary {
   int ndf_root{0};
   double chi2ndf_root{-1.0};
   FuncFormChi2Info eval;
+  double fit_min{0.0};
+  double fit_max{0.0};
+  int trial_index{-1};
+  std::string trial_label;
 };
 
 struct FuncFormJobConfig {
@@ -65,6 +69,7 @@ struct FuncFormJobConfig {
   double primary_target_chi2ndf{2.0};
   bool allow_bernstein_primary_fallback{false};
   std::string bernstein_tag{"fBern5"};
+  std::vector<double> fit_min_scan;
 };
 
 inline std::string ff_json_escape(const std::string& in) {
@@ -169,6 +174,43 @@ inline double ff_clip_exp(double arg) {
   return TMath::Exp(arg);
 }
 
+inline double ff_clamp_to_limits(TF1* f, int idx, double value) {
+  double lo = 0.0;
+  double hi = 0.0;
+  f->GetParLimits(idx, lo, hi);
+  if (hi > lo) {
+    const double pad = std::max(1e-9, 1e-6 * (hi - lo));
+    return std::min(std::max(value, lo + pad), hi - pad);
+  }
+  return value;
+}
+
+inline int ff_find_param_index(TF1* f, const char* name) {
+  if (f == nullptr || name == nullptr) {
+    return -1;
+  }
+  for (int i = 0; i < f->GetNpar(); ++i) {
+    const char* pname = f->GetParName(i);
+    if (pname != nullptr && std::string(pname) == name) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+inline void ff_set_param_named(TF1* f, const char* name, double value) {
+  const int idx = ff_find_param_index(f, name);
+  if (idx < 0) {
+    return;
+  }
+  f->SetParameter(idx, ff_clamp_to_limits(f, idx, value));
+}
+
+inline double ff_seed_value_named(TF1* f, const char* name, double fallback) {
+  const int idx = ff_find_param_index(f, name);
+  return (idx >= 0) ? f->GetParameter(idx) : fallback;
+}
+
 inline double ff_model_sigpowexp(double* xx, double* p) {
   const double x = xx[0];
   if (x <= 0.0) {
@@ -224,7 +266,51 @@ inline double ff_model_sigpowexp_endpoint(double* xx, double* p) {
     return 0.0;
   }
   return A * ff_sigmoid(x, xt, w) * TMath::Power(x, a) * TMath::Exp(-x / theta)
-         * TMath::Power(tail, b);
+         * TMath::Power(std::max(tail, 1e-9), b);
+}
+
+inline double ff_model_shift_sigpowexp(double* xx, double* p) {
+  const double x = xx[0];
+  if (x <= 0.0) {
+    return 0.0;
+  }
+  const double A = p[0];
+  const double a = p[1];
+  const double theta = p[2];
+  const double x0 = p[3];
+  const double xt = p[4];
+  const double w = p[5];
+  const double z = x - x0;
+  if (z <= 0.0 || theta <= 0.0 || w <= 0.0) {
+    return 0.0;
+  }
+  const double safe_z = std::max(z, 1e-9);
+  return A * ff_sigmoid(x, xt, w) * TMath::Power(safe_z, a) * TMath::Exp(-safe_z / theta);
+}
+
+inline double ff_model_shift_sigpowexp_tail(double* xx, double* p) {
+  const double x = xx[0];
+  if (x <= 0.0) {
+    return 0.0;
+  }
+  const double A = p[0];
+  const double a = p[1];
+  const double theta = p[2];
+  const double x0 = p[3];
+  const double xt = p[4];
+  const double w = p[5];
+  const double c1 = p[6];
+  const double c2 = p[7];
+  const double xmid = p[8];
+  const double xscale = p[9];
+  const double z = x - x0;
+  if (z <= 0.0 || theta <= 0.0 || w <= 0.0 || xscale <= 0.0) {
+    return 0.0;
+  }
+  const double safe_z = std::max(z, 1e-9);
+  const double u = (x - xmid) / xscale;
+  return A * ff_sigmoid(x, xt, w) * TMath::Power(safe_z, a) * TMath::Exp(-safe_z / theta)
+         * ff_clip_exp(c1 * u + c2 * u * u);
 }
 
 inline double ff_model_gengamma_shift(double* xx, double* p) {
@@ -238,7 +324,8 @@ inline double ff_model_gengamma_shift(double* xx, double* p) {
   if (z <= 0.0 || lambda <= 0.0 || power <= 0.0) {
     return 0.0;
   }
-  return A * TMath::Power(z, a) * TMath::Exp(-TMath::Power(z / lambda, power));
+  const double safe_z = std::max(z, 1e-9);
+  return A * TMath::Power(safe_z, a) * TMath::Exp(-TMath::Power(safe_z / lambda, power));
 }
 
 inline double ff_model_gengamma_thresh(double* xx, double* p) {
@@ -254,8 +341,9 @@ inline double ff_model_gengamma_thresh(double* xx, double* p) {
   if (z <= 0.0 || lambda <= 0.0 || power <= 0.0 || w <= 0.0) {
     return 0.0;
   }
-  return A * ff_sigmoid(x, xt, w) * TMath::Power(z, a)
-         * TMath::Exp(-TMath::Power(z / lambda, power));
+  const double safe_z = std::max(z, 1e-9);
+  return A * ff_sigmoid(x, xt, w) * TMath::Power(safe_z, a)
+         * TMath::Exp(-TMath::Power(safe_z / lambda, power));
 }
 
 inline double ff_model_logpoly_thresh(double* xx, double* p) {
@@ -320,12 +408,12 @@ inline TF1* ff_make_sigpowexp(TH1* h, double fit_min, double fit_max, double, do
   TF1* f = new TF1("fSigPow", ff_model_sigpowexp, fit_min, fit_max, 5);
   f->SetParNames("A", "a", "theta", "xt", "w");
   f->SetNpx(8000);
-  f->SetParameters(h->GetMaximum(), 6.0, std::max(1e-3, rmsw / 8.0), fit_min + 0.004, 0.003);
+  f->SetParameters(h->GetMaximum(), 6.0, std::max(1e-3, rmsw / 8.0), std::max(0.0, fit_min - 0.002), 0.003);
   f->SetParLimits(0, 1e-9, 1e18);
-  f->SetParLimits(1, 0.0, 40.0);
-  f->SetParLimits(2, 1e-4, 0.4);
-  f->SetParLimits(3, fit_min, std::min(fit_min + 0.05, fit_max - 1e-3));
-  f->SetParLimits(4, 1e-3, 0.02);
+  f->SetParLimits(1, 2.0, 12.0);
+  f->SetParLimits(2, 0.004, 0.20);
+  f->SetParLimits(3, std::max(0.0, fit_min - 0.010), std::min(fit_min + 0.010, fit_max - 1e-3));
+  f->SetParLimits(4, 0.0015, 0.010);
   return f;
 }
 
@@ -333,11 +421,11 @@ inline TF1* ff_make_sigpowexp_expquad(TH1* h, double fit_min, double fit_max, do
   TF1* f = new TF1("fSigPowExpQ", ff_model_sigpowexp_expquad, fit_min, fit_max, 7);
   f->SetParNames("A", "a", "theta", "xt", "w", "c1", "c2");
   f->SetNpx(8000);
-  f->SetParameters(h->GetMaximum(), 6.0, std::max(1e-3, rmsw / 8.0), fit_min + 0.004, 0.003, 0.0, 0.0);
+  f->SetParameters(h->GetMaximum(), 6.0, std::max(1e-3, rmsw / 8.0), std::max(0.0, fit_min - 0.002), 0.003, 0.0, 0.0);
   f->SetParLimits(0, 1e-9, 1e18);
   f->SetParLimits(1, 0.0, 40.0);
   f->SetParLimits(2, 1e-4, 0.4);
-  f->SetParLimits(3, fit_min, std::min(fit_min + 0.05, fit_max - 1e-3));
+  f->SetParLimits(3, std::max(0.0, fit_min - 0.010), std::min(fit_min + 0.05, fit_max - 1e-3));
   f->SetParLimits(4, 1e-3, 0.02);
   f->SetParLimits(5, -50.0, 50.0);
   f->SetParLimits(6, -2000.0, 2000.0);
@@ -348,14 +436,64 @@ inline TF1* ff_make_sigpowexp_endpoint(TH1* h, double fit_min, double fit_max, d
   TF1* f = new TF1("fEndpoint", ff_model_sigpowexp_endpoint, fit_min, fit_max, 7);
   f->SetParNames("A", "a", "theta", "xt", "w", "xmax", "b");
   f->SetNpx(8000);
-  f->SetParameters(h->GetMaximum(), 5.0, std::max(1e-3, rmsw / 6.0), fit_min + 0.003, 0.002, fit_max * 1.03, 1.5);
+  f->SetParameters(h->GetMaximum(), 5.0, std::max(1e-3, rmsw / 6.0), std::max(0.0, fit_min - 0.002), 0.002, fit_max * 1.03, 1.5);
   f->SetParLimits(0, 1e-9, 1e18);
   f->SetParLimits(1, 0.0, 40.0);
   f->SetParLimits(2, 1e-4, 0.4);
-  f->SetParLimits(3, fit_min, std::min(fit_min + 0.05, fit_max - 1e-3));
+  f->SetParLimits(3, std::max(0.0, fit_min - 0.010), std::min(fit_min + 0.05, fit_max - 1e-3));
   f->SetParLimits(4, 1e-3, 0.02);
   f->SetParLimits(5, fit_max * 1.001, fit_max * 2.5);
   f->SetParLimits(6, 0.0, 20.0);
+  return f;
+}
+
+inline TF1* ff_make_shift_sigpowexp(TH1* h, double fit_min, double fit_max, double, double rmsw) {
+  TF1* f = new TF1("fShiftSigPow", ff_model_shift_sigpowexp, fit_min, fit_max, 6);
+  f->SetParNames("A", "a", "theta", "x0", "xt", "w");
+  f->SetNpx(8000);
+  f->SetParameters(
+      h->GetMaximum(),
+      6.0,
+      std::max(0.004, std::max(1e-3, rmsw / 10.0)),
+      std::max(0.0, fit_min - 0.008),
+      std::max(0.0, fit_min - 0.004),
+      0.003);
+  f->SetParLimits(0, 1e-9, 1e18);
+  f->SetParLimits(1, 2.0, 12.0);
+  f->SetParLimits(2, 0.004, 0.20);
+  f->SetParLimits(3, std::max(0.0, fit_min - 0.020), std::min(fit_min + 0.005, fit_max - 1e-3));
+  f->SetParLimits(4, std::max(0.0, fit_min - 0.010), std::min(fit_min + 0.010, fit_max - 1e-3));
+  f->SetParLimits(5, 0.0015, 0.010);
+  return f;
+}
+
+inline TF1* ff_make_shift_sigpowexp_tail(TH1* h, double fit_min, double fit_max, double, double rmsw) {
+  TF1* f = new TF1("fShiftSigPowTail", ff_model_shift_sigpowexp_tail, fit_min, fit_max, 10);
+  f->SetParNames("A", "a", "theta", "x0", "xt", "w", "c1", "c2", "xmid", "xscale");
+  f->SetNpx(8000);
+  const double xmid = 0.5 * (fit_min + fit_max);
+  const double xscale = std::max(1e-3, 0.5 * (fit_max - fit_min));
+  f->SetParameters(
+      h->GetMaximum(),
+      6.0,
+      std::max(0.004, std::max(1e-3, rmsw / 10.0)),
+      std::max(0.0, fit_min - 0.008),
+      std::max(0.0, fit_min - 0.004),
+      0.003,
+      1.0,
+      -0.8,
+      xmid,
+      xscale);
+  f->SetParLimits(0, 1e-9, 1e18);
+  f->SetParLimits(1, 2.0, 12.0);
+  f->SetParLimits(2, 0.004, 0.20);
+  f->SetParLimits(3, std::max(0.0, fit_min - 0.020), std::min(fit_min + 0.005, fit_max - 1e-3));
+  f->SetParLimits(4, std::max(0.0, fit_min - 0.010), std::min(fit_min + 0.010, fit_max - 1e-3));
+  f->SetParLimits(5, 0.0015, 0.010);
+  f->SetParLimits(6, -3.0, 3.0);
+  f->SetParLimits(7, -3.0, 1.0);
+  f->FixParameter(8, xmid);
+  f->FixParameter(9, xscale);
   return f;
 }
 
@@ -365,7 +503,7 @@ inline TF1* ff_make_gengamma_shift(TH1* h, double fit_min, double fit_max, doubl
   f->SetNpx(8000);
   f->SetParameters(h->GetMaximum(), 1.5, std::max(1e-3, rmsw / 3.0), 1.2, std::max(0.0, fit_min - 0.01));
   f->SetParLimits(0, 1e-9, 1e18);
-  f->SetParLimits(1, 0.0, 20.0);
+  f->SetParLimits(1, 0.5, 20.0);
   f->SetParLimits(2, 1e-4, std::max(0.02, 2.0 * (fit_max - fit_min)));
   f->SetParLimits(3, 0.2, 10.0);
   f->SetParLimits(4, std::max(0.0, fit_min - 0.03), std::min(meanw, fit_min + 0.02));
@@ -376,13 +514,13 @@ inline TF1* ff_make_gengamma_thresh(TH1* h, double fit_min, double fit_max, doub
   TF1* f = new TF1("fGenGammaThresh", ff_model_gengamma_thresh, fit_min, fit_max, 7);
   f->SetParNames("A", "a", "lambda", "power", "x0", "xt", "w");
   f->SetNpx(8000);
-  f->SetParameters(h->GetMaximum(), 1.2, std::max(1e-3, rmsw / 3.0), 1.2, std::max(0.0, fit_min - 0.01), fit_min + 0.004, 0.003);
+  f->SetParameters(h->GetMaximum(), 1.2, std::max(1e-3, rmsw / 3.0), 1.2, std::max(0.0, fit_min - 0.01), std::max(0.0, fit_min - 0.002), 0.003);
   f->SetParLimits(0, 1e-9, 1e18);
-  f->SetParLimits(1, 0.0, 20.0);
+  f->SetParLimits(1, 0.5, 20.0);
   f->SetParLimits(2, 1e-4, std::max(0.02, 2.0 * (fit_max - fit_min)));
   f->SetParLimits(3, 0.2, 10.0);
   f->SetParLimits(4, std::max(0.0, fit_min - 0.03), std::min(meanw, fit_min + 0.02));
-  f->SetParLimits(5, fit_min, std::min(fit_min + 0.05, fit_max - 1e-3));
+  f->SetParLimits(5, std::max(0.0, fit_min - 0.010), std::min(fit_min + 0.05, fit_max - 1e-3));
   f->SetParLimits(6, 1e-3, 0.02);
   return f;
 }
@@ -391,11 +529,11 @@ inline TF1* ff_make_logpoly_thresh(TH1* h, double fit_min, double fit_max, doubl
   TF1* f = new TF1("fLogPolyThresh", ff_model_logpoly_thresh, fit_min, fit_max, 5);
   f->SetParNames("A", "c1", "c2", "xt", "w");
   f->SetNpx(8000);
-  f->SetParameters(h->GetMaximum(), -2.0, -0.3, fit_min + 0.004, 0.003);
+  f->SetParameters(h->GetMaximum(), -2.0, -0.3, std::max(0.0, fit_min - 0.002), 0.003);
   f->SetParLimits(0, 1e-9, 1e18);
   f->SetParLimits(1, -30.0, 30.0);
   f->SetParLimits(2, -10.0, 10.0);
-  f->SetParLimits(3, fit_min, std::min(fit_min + 0.05, fit_max - 1e-3));
+  f->SetParLimits(3, std::max(0.0, fit_min - 0.010), std::min(fit_min + 0.05, fit_max - 1e-3));
   f->SetParLimits(4, 1e-3, 0.02);
   return f;
 }
@@ -412,35 +550,168 @@ inline TF1* ff_make_bern5(TH1* h, double fit_min, double fit_max, double, double
   return f;
 }
 
-inline FuncFormFitSummary ff_fit_candidate(TH1* h, const FuncFormCandidateDef& def,
-                                           double fit_min, double fit_max) {
-  double meanw = 0.0;
-  double varw = 0.0;
-  long long nwin = 0;
-  ff_window_moments(h, fit_min, fit_max, meanw, varw, nwin);
-  const double rmsw = std::sqrt(std::max(0.0, varw));
+inline std::vector<double> ff_fit_min_scan_values(const FuncFormJobConfig& job) {
+  if (!job.fit_min_scan.empty()) {
+    return job.fit_min_scan;
+  }
+  return std::vector<double>{job.fit_min};
+}
 
-  FuncFormFitSummary out;
-  out.tag = def.tag;
-  out.label = def.label;
-  out.func = def.factory(h, fit_min, fit_max, meanw, rmsw);
-  if (out.func == nullptr) {
-    return out;
+inline int ff_seed_trial_count(const std::string& tag) {
+  if (tag == "fBern5") {
+    return 1;
+  }
+  if (tag == "fLogPolyThresh") {
+    return 2;
+  }
+  if (tag == "fShiftSigPowTail") {
+    return 4;
+  }
+  if (tag == "fSigPowExpQ") {
+    return 1;
+  }
+  return 4;
+}
+
+inline std::string ff_trial_label(int trial_index) {
+  switch (trial_index) {
+    case 0: return "default";
+    case 1: return "early-turnon";
+    case 2: return "broad-tail";
+    case 3: return "late-turnon";
+    default: return "trial";
+  }
+}
+
+inline void ff_apply_trial_seed(
+    TF1* f,
+    const std::string& tag,
+    int trial_index,
+    double fit_min,
+    double fit_max,
+    double meanw,
+    double rmsw) {
+  if (f == nullptr || trial_index <= 0) {
+    return;
+  }
+  const double span = std::max(1e-3, fit_max - fit_min);
+  const double theta_short = std::max(0.003, std::max(1e-3, rmsw / 10.0));
+  const double theta_mid = std::max(0.006, std::max(1e-3, rmsw / 7.0));
+  const double theta_long = std::max(theta_mid, std::min(0.35, 0.45 * span));
+  const double x0_early = std::max(0.0, fit_min - std::min(0.015, 0.25 * span));
+  const double x0_mid = std::max(0.0, fit_min - std::min(0.008, 0.15 * span));
+  const double xt_early = std::max(0.0, fit_min - std::min(0.006, 0.10 * span));
+  const double xt_mid = std::max(0.0, fit_min - std::min(0.002, 0.03 * span));
+  const double xt_late = std::min(fit_max - 1e-3, fit_min + std::min(0.008, 0.10 * span));
+  const double lambda_short = std::max(0.003, std::max(1e-3, rmsw / 3.5));
+  const double lambda_mid = std::max(lambda_short, std::min(0.25, 0.30 * span));
+  const double lambda_long = std::max(lambda_mid, std::min(0.30, 0.45 * span));
+  if (trial_index == 1) {
+    ff_set_param_named(f, "a", 4.0);
+    ff_set_param_named(f, "theta", theta_mid);
+    ff_set_param_named(f, "x0", x0_early);
+    ff_set_param_named(f, "xt", xt_early);
+    ff_set_param_named(f, "w", 0.0025);
+    ff_set_param_named(f, "lambda", lambda_short);
+    ff_set_param_named(f, "power", 1.0);
+    ff_set_param_named(f, "c1", 1.5);
+    ff_set_param_named(f, "c2", -1.0);
+    return;
+  }
+  if (trial_index == 2) {
+    ff_set_param_named(f, "a", 5.0);
+    ff_set_param_named(f, "theta", theta_long);
+    ff_set_param_named(f, "x0", x0_mid);
+    ff_set_param_named(f, "xt", xt_mid);
+    ff_set_param_named(f, "w", 0.0045);
+    ff_set_param_named(f, "lambda", lambda_mid);
+    ff_set_param_named(f, "power", 1.5);
+    ff_set_param_named(f, "c1", 1.5);
+    ff_set_param_named(f, "c2", -0.5);
+    return;
+  }
+  if (trial_index == 3) {
+    ff_set_param_named(f, "a", 2.5);
+    ff_set_param_named(f, "theta", theta_mid);
+    ff_set_param_named(f, "x0", x0_early);
+    ff_set_param_named(f, "xt", xt_late);
+    ff_set_param_named(f, "w", 0.0060);
+    ff_set_param_named(f, "lambda", lambda_long);
+    ff_set_param_named(f, "power", 2.0);
+    ff_set_param_named(f, "c1", 1.2);
+    ff_set_param_named(f, "c2", -2.2);
+    return;
+  }
+  if (tag == "fLogPolyThresh") {
+    ff_set_param_named(f, "c1", ff_seed_value_named(f, "c1", -2.0));
+    ff_set_param_named(f, "c2", ff_seed_value_named(f, "c2", -0.3));
+  }
+  (void)meanw;
+}
+
+inline FuncFormFitSummary ff_fit_candidate(TH1* h, const FuncFormCandidateDef& def,
+                                           const FuncFormJobConfig& job) {
+  FuncFormFitSummary best;
+  best.tag = def.tag;
+  best.label = def.label;
+  double best_metric = std::numeric_limits<double>::infinity();
+
+  const std::vector<double> fit_mins = ff_fit_min_scan_values(job);
+  for (double fit_min : fit_mins) {
+    const double fit_max = job.fit_max;
+    double meanw = 0.0;
+    double varw = 0.0;
+    long long nwin = 0;
+    ff_window_moments(h, fit_min, fit_max, meanw, varw, nwin);
+    const double rmsw = std::sqrt(std::max(0.0, varw));
+    const int trial_count = ff_seed_trial_count(def.tag);
+    for (int trial = 0; trial < trial_count; ++trial) {
+      std::cout << "[funcform][" << def.tag << "] try fit_min=" << fit_min
+                << " trial=" << ff_trial_label(trial) << std::endl;
+      TF1* func = def.factory(h, fit_min, fit_max, meanw, rmsw);
+      if (func == nullptr) {
+        continue;
+      }
+      ff_apply_trial_seed(func, def.tag, trial, fit_min, fit_max, meanw, rmsw);
+      const char* fit_opt = "RQSNLI";
+      TFitResultPtr r = h->Fit(func, fit_opt);
+
+      FuncFormFitSummary trial_fit;
+      trial_fit.tag = def.tag;
+      trial_fit.label = def.label;
+      trial_fit.func = func;
+      trial_fit.ok = (static_cast<int>(r) == 0) && r->IsValid();
+      trial_fit.ndf_root = (r && r->Ndf() > 0) ? r->Ndf() : 0;
+      trial_fit.chi2ndf_root = (trial_fit.ndf_root > 0) ? (r->Chi2() / trial_fit.ndf_root) : -1.0;
+      trial_fit.eval = ff_eval_binavg_chi2(h, func, fit_min, fit_max);
+      trial_fit.fit_min = fit_min;
+      trial_fit.fit_max = fit_max;
+      trial_fit.trial_index = trial;
+      trial_fit.trial_label = ff_trial_label(trial);
+
+      const double metric = trial_fit.eval.pearson_chi2ndf;
+      if (metric < best_metric) {
+        if (best.func != nullptr) {
+          delete best.func;
+          best.func = nullptr;
+        }
+        best = trial_fit;
+        best_metric = metric;
+      } else {
+        delete trial_fit.func;
+        trial_fit.func = nullptr;
+      }
+    }
   }
 
-  const char* fit_opt = "RQSNLI";
-  TFitResultPtr r = h->Fit(out.func, fit_opt);
-  out.ok = (static_cast<int>(r) == 0) && r->IsValid();
-  out.ndf_root = (r && r->Ndf() > 0) ? r->Ndf() : 0;
-  out.chi2ndf_root = (out.ndf_root > 0) ? (r->Chi2() / out.ndf_root) : -1.0;
-  out.eval = ff_eval_binavg_chi2(h, out.func, fit_min, fit_max);
-
   std::cout << "[funcform][" << def.tag << "] "
-            << (out.ok ? "fit OK" : "fit PROBLEM")
-            << "  ROOT chi2/ndf=" << out.chi2ndf_root
-            << "  Pearson(eval)=" << out.eval.pearson_chi2ndf
-            << "  Neyman(eval)=" << out.eval.neyman_chi2ndf << "\n";
-  return out;
+            << (best.ok ? "fit OK" : "fit PROBLEM")
+            << "  fit_min=" << best.fit_min
+            << "  trial=" << best.trial_label
+            << "  ROOT chi2/ndf=" << best.chi2ndf_root
+            << "  Pearson(eval)=" << best.eval.pearson_chi2ndf
+            << "  Neyman(eval)=" << best.eval.neyman_chi2ndf << "\n";
+  return best;
 }
 
 inline double ff_metric(const FuncFormFitSummary& fit) {
@@ -488,6 +759,17 @@ inline int ff_find_best_index(const std::vector<FuncFormFitSummary>& fits,
 inline int ff_choose_primary_index(const std::vector<FuncFormFitSummary>& fits,
                                    const FuncFormJobConfig& job,
                                    const std::vector<FuncFormCandidateDef>& defs) {
+  for (const auto& def : defs) {
+    if (!def.preferred_primary) {
+      continue;
+    }
+    for (std::size_t i = 0; i < fits.size(); ++i) {
+      if (fits[i].tag == def.tag && ff_is_usable(fits[i])
+          && ff_metric(fits[i]) <= job.primary_target_chi2ndf) {
+        return static_cast<int>(i);
+      }
+    }
+  }
   std::vector<std::string> preferred_tags;
   for (const auto& def : defs) {
     if (def.preferred_primary) {
@@ -547,6 +829,10 @@ inline void ff_write_fit_metadata(TFile* fout,
         << "  \"label\": \"" << ff_json_escape(fit.label) << "\",\n"
         << "  \"is_primary\": " << (static_cast<int>(i) == primary_idx ? "true" : "false") << ",\n"
         << "  \"fit_ok\": " << (fit.ok ? "true" : "false") << ",\n"
+        << "  \"fit_min_GeV\": " << fit.fit_min << ",\n"
+        << "  \"fit_max_GeV\": " << fit.fit_max << ",\n"
+        << "  \"trial_index\": " << fit.trial_index << ",\n"
+        << "  \"trial_label\": \"" << ff_json_escape(fit.trial_label) << "\",\n"
         << "  \"root_chi2ndf\": " << fit.chi2ndf_root << ",\n"
         << "  \"pearson_chi2ndf\": " << fit.eval.pearson_chi2ndf << ",\n"
         << "  \"neyman_chi2ndf\": " << fit.eval.neyman_chi2ndf << ",\n"
@@ -580,9 +866,12 @@ inline void ff_make_toys_for_fit(TFile* fout, const FuncFormFitSummary& fit,
   const double hxmin = h_in->GetXaxis()->GetXmin();
   const double hxmax = h_in->GetXaxis()->GetXmax();
   const long long nfill = static_cast<long long>(
-      std::llround(h_in->Integral(h_in->FindBin(fit_min + 1e-9), h_in->FindBin(fit_max - 1e-9))));
+      std::llround(h_in->Integral(h_in->FindBin(fit.fit_min + 1e-9), h_in->FindBin(fit.fit_max - 1e-9))));
 
-  fit.func->SetRange(fit_min, fit_max);
+  fit.func->SetRange(fit.fit_min, fit.fit_max);
+  if (gROOT->GetListOfFunctions()->FindObject(fit.func->GetName()) == nullptr) {
+    gROOT->GetListOfFunctions()->Add(fit.func);
+  }
   TDirectory* d = fout->mkdir(fit.tag.c_str());
   TDirectory::TContext ctx(d);
   for (int itoy = 0; itoy < n_toys; ++itoy) {
@@ -594,25 +883,64 @@ inline void ff_make_toys_for_fit(TFile* fout, const FuncFormFitSummary& fit,
   }
 }
 
+inline std::string ff_short_legend_label(const std::string& label) {
+  if (label == "shifted sigmoid*power*exp + tail") {
+    return "shifted sigm*pow*exp + tail";
+  }
+  if (label == "shifted sigmoid*power*exp") {
+    return "shifted sigm*pow*exp";
+  }
+  if (label == "sigmoid*power*exp + raw expquad") {
+    return "sigm*pow*exp + expquad";
+  }
+  if (label == "sigmoid*x^{a}*exp(-x/theta)") {
+    return "sigmoid*x^{a}*exp(-x/#theta)";
+  }
+  if (label == "thresholded gen-gamma") {
+    return "thresholded gen-gamma";
+  }
+  if (label == "thresholded log-polynomial") {
+    return "thresholded log-poly";
+  }
+  if (label == "positive Bernstein fallback") {
+    return "Bernstein fallback";
+  }
+  if (label == "endpoint-aware sigmoid*power*exp") {
+    return "endpoint-aware sigm*pow*exp";
+  }
+  return label;
+}
+
 inline void ff_make_overlay_plot(TH1* h_in,
                                  const std::vector<FuncFormFitSummary>& fits,
                                  int primary_idx,
                                  const FuncFormJobConfig& job) {
   gStyle->SetOptStat(0);
-  TCanvas c("c_funcform", "c_funcform", 1100, 780);
+  TCanvas c("c_funcform", "c_funcform", 1550, 820);
+  c.SetLeftMargin(0.10);
+  c.SetBottomMargin(0.11);
+  c.SetTopMargin(0.08);
+  c.SetRightMargin(0.36);
   c.SetLogy();
 
   TH1* hdraw = dynamic_cast<TH1*>(h_in->Clone("hdraw_funcform"));
   hdraw->SetDirectory(nullptr);
-  hdraw->GetXaxis()->SetRangeUser(job.fit_min, job.fit_max);
+  double plot_min = job.fit_min;
+  const std::vector<double> fit_mins = ff_fit_min_scan_values(job);
+  if (!fit_mins.empty()) {
+    plot_min = *std::min_element(fit_mins.begin(), fit_mins.end());
+  }
+  hdraw->GetXaxis()->SetRangeUser(plot_min, job.fit_max);
   hdraw->SetMarkerStyle(20);
   hdraw->SetMarkerSize(0.8);
   hdraw->SetLineColor(kBlack);
   hdraw->SetTitle((job.dataset_label + ";m_{e^{+}e^{-}} [GeV];Events / bin").c_str());
+  hdraw->GetXaxis()->SetTitleOffset(1.0);
+  hdraw->GetYaxis()->SetTitleOffset(1.2);
 
   double ymax = 0.0;
   double ymin = std::numeric_limits<double>::infinity();
-  const int b1 = hdraw->GetXaxis()->FindBin(job.fit_min + 1e-12);
+  const int b1 = hdraw->GetXaxis()->FindBin(plot_min + 1e-12);
   const int b2 = hdraw->GetXaxis()->FindBin(job.fit_max - 1e-12);
   for (int i = b1; i <= b2; ++i) {
     const double y = hdraw->GetBinContent(i);
@@ -629,9 +957,12 @@ inline void ff_make_overlay_plot(TH1* h_in,
   hdraw->Draw("E1");
 
   const int colors[] = {kBlue + 1, kRed + 1, kGreen + 2, kOrange + 7, kMagenta + 2};
-  TLegend leg(0.54, 0.60, 0.92, 0.90);
+  TLegend leg(0.66, 0.12, 0.985, 0.92);
   leg.SetBorderSize(0);
   leg.SetFillStyle(0);
+  leg.SetMargin(0.22);
+  leg.SetTextSize(0.022);
+  leg.SetEntrySeparation(0.18);
   leg.AddEntry(hdraw, "Input histogram", "lep");
 
   int color_idx = 0;
@@ -639,12 +970,12 @@ inline void ff_make_overlay_plot(TH1* h_in,
     if (fits[i].func == nullptr) {
       continue;
     }
-    fits[i].func->SetRange(job.fit_min, job.fit_max);
+    fits[i].func->SetRange(fits[i].fit_min, fits[i].fit_max);
     fits[i].func->SetLineColor(colors[color_idx % (sizeof(colors) / sizeof(colors[0]))]);
     fits[i].func->SetLineWidth(static_cast<int>(i) == primary_idx ? 4 : 2);
     fits[i].func->Draw("SAME");
     std::ostringstream entry;
-    entry << "#splitline{" << fits[i].label << "}{#chi^{2}/ndof = "
+    entry << "#splitline{" << ff_short_legend_label(fits[i].label) << "}{#chi^{2}/ndof = "
           << std::fixed << std::setprecision(2) << ff_metric(fits[i]) << "}";
     leg.AddEntry(fits[i].func, entry.str().c_str(), "l");
     color_idx++;
@@ -681,7 +1012,7 @@ inline void ff_run_job(const FuncFormJobConfig& job,
     if (!def.enabled) {
       continue;
     }
-    fits.push_back(ff_fit_candidate(h0, def, job.fit_min, job.fit_max));
+    fits.push_back(ff_fit_candidate(h0, def, job));
     if (fits.back().func != nullptr) {
       fits.back().func->SetName(def.tag.c_str());
       fits.back().func->SetTitle(def.label.c_str());
