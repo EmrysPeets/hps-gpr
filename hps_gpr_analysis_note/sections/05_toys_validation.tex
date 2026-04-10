@@ -30,30 +30,34 @@ invariant-mass spectrum and fluctuates pseudo-data around that closed-form backg
 model. These studies isolate the question of gross spectral smoothness from the later
 question of GP conditioning. They are therefore useful as the first closure test before
 the full inference chain is exercised. Figure~\ref{fig:analytic-fit-toys} shows the
-kind of smooth seed spectrum used for this earliest validation stage.
+three dataset-specific seed spectra currently exported by the repo-local ROOT macros.
+In each panel, the legend reports the same bin-integral $\chi^2/\mathrm{ndof}$
+convention used by the macro when ranking the candidate functions.
 
 \begin{figure}[H]
 \centering
 \begin{subfigure}[t]{0.32\linewidth}
   \centering
-  \graphicorplaceholder{\linewidth}{toy_generation_figs/good_fit_2021_0pt03_pct.png}
-  \caption{Early 2021 analytic-fit validation sample.}
+  \graphicorplaceholder{\linewidth}{toy_generation_figs/funcform_fit_2021.png}
+  \caption{2021 1\% candidate-family overlay.}
 \end{subfigure}
 \hfill
 \begin{subfigure}[t]{0.32\linewidth}
   \centering
-  \graphicorplaceholder{\linewidth}{toy_generation_figs/good_fit_2015_placeholder.png}
-  \caption{2015 placeholder.}
+  \graphicorplaceholder{\linewidth}{toy_generation_figs/funcform_fit_2015.png}
+  \caption{2015 endpoint-aware and fallback overlays.}
 \end{subfigure}
 \hfill
 \begin{subfigure}[t]{0.32\linewidth}
   \centering
-  \graphicorplaceholder{\linewidth}{toy_generation_figs/good_fit_2016_placeholder.png}
-  \caption{2016 placeholder.}
+  \graphicorplaceholder{\linewidth}{toy_generation_figs/funcform_fit_2016.png}
+  \caption{2016 thresholded-family overlays.}
 \end{subfigure}
 \caption{Analytic background fits used to seed functional-form pseudoexperiments. The
-2021 panel shown here comes from the early upgraded-detector validation pass; analogous
-2015 and 2016 plots should be added when those studies are exported in final form.}
+2015, 2016, and 2021 panels are now produced directly by the dataset-specific
+functional-form macros in this repository. These overlays document the candidate
+families considered for toy generation and make the primary-versus-alternate choice
+visible at the spectrum level before the GPR scan is run over the resulting toys.}
 \label{fig:analytic-fit-toys}
 \end{figure}
 

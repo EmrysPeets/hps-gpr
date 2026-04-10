@@ -60,7 +60,12 @@ def validate_datasets(
 
     for k, ds in datasets.items():
         try:
-            vals, edges = _validate_hist_with_uproot(ds.root_path, ds.hist_name)
+            if getattr(ds, "hist_override", None) is not None:
+                h = ds.hist_override
+                vals = np.asarray(h.values(), dtype=float)
+                edges = np.asarray(h.axes[0].edges, dtype=float)
+            else:
+                vals, edges = _validate_hist_with_uproot(ds.root_path, ds.hist_name)
             lo_e, hi_e = float(edges[0]), float(edges[-1])
             tot = float(np.sum(vals))
 

@@ -258,6 +258,118 @@ def generate_injection_slurm_scripts(
     return output_path, submit_path, n_jobs
 
 
+def generate_toy_scan_slurm_scripts(
+    config_path: str,
+    output_path: str,
+    dataset: str,
+    toy_root: str,
+    toy_names: List[str],
+    output_root: str,
+    *,
+    container: Optional[str] = None,
+    job_name: str = "hps-gpr-toys",
+    partition: str = "batch",
+    time_limit: str = "4:00:00",
+    memory: str = "4G",
+    conda_env: Optional[str] = None,
+    extra_sbatch: Optional[List[str]] = None,
+) -> tuple:
+    """Generate SLURM scripts for one functional-form toy scan per job."""
+    dataset_key = str(dataset).strip()
+    toy_container = str(container or "").strip()
+
+    job_lines = [
+        "#!/bin/bash",
+        f"#SBATCH --job-name={job_name}",
+        f"#SBATCH --partition={partition}",
+        f"#SBATCH --time={time_limit}",
+        f"#SBATCH --mem={memory}",
+        "#SBATCH --output=logs/%j.out",
+        "#SBATCH --error=logs/%j.err",
+    ]
+
+    if extra_sbatch:
+        for directive in extra_sbatch:
+            job_lines.append(f"#SBATCH {directive}")
+
+    job_lines.extend([
+        "",
+        "mkdir -p logs",
+        "",
+    ])
+
+    if conda_env:
+        job_lines.extend([
+            "# Activate conda environment",
+            "source $(conda info --base)/etc/profile.d/conda.sh",
+            f"conda activate {conda_env}",
+            "",
+        ])
+
+    job_lines.extend([
+        "# TOY_* and BASE_OUTPUT_DIR are passed via --export at submission time",
+        'CMD=(hps-gpr toy-scan',
+        f'  --config "{config_path}"',
+        '  --dataset "${TOY_DATASET}"',
+        '  --toy-root "${TOY_ROOT}"',
+        '  --toy-pattern "${TOY_NAME}"',
+        '  --output-dir "${BASE_OUTPUT_DIR}"',
+        '  --max-toys 1)',
+        'if [ -n "${TOY_CONTAINER}" ]; then',
+        '  CMD+=(--container "${TOY_CONTAINER}")',
+        "fi",
+        '"${CMD[@]}"',
+    ])
+
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(job_lines) + "\n")
+    os.chmod(output_path, 0o755)
+    print(f"Wrote toy-scan SLURM job script to {output_path}")
+
+    submit_path = os.path.join(os.path.dirname(os.path.abspath(output_path)), "submit_toy_scan_all.sh")
+    abs_job = os.path.abspath(output_path)
+    toy_root_abs = os.path.abspath(toy_root)
+
+    submit_lines = [
+        "#!/bin/bash",
+        "# Submit one SLURM job per functional-form toy histogram",
+        f'JOB_SCRIPT="{abs_job}"',
+        f'BASE_OUTPUT_DIR="{output_root}"',
+        f'TOY_DATASET="{dataset_key}"',
+        f'TOY_ROOT="{toy_root_abs}"',
+        f'TOY_CONTAINER="{toy_container}"',
+        "",
+        "mkdir -p logs",
+        "",
+    ]
+
+    n_jobs = 0
+    for toy_index, toy_name in enumerate(toy_names):
+        submit_lines.append(
+            "sbatch --export=ALL,"
+            "TOY_DATASET=${TOY_DATASET},"
+            "TOY_ROOT=${TOY_ROOT},"
+            "TOY_CONTAINER=${TOY_CONTAINER},"
+            f"TOY_INDEX={int(toy_index)},"
+            f"TOY_NAME={toy_name},"
+            "BASE_OUTPUT_DIR=${BASE_OUTPUT_DIR} "
+            "\"${JOB_SCRIPT}\""
+        )
+        n_jobs += 1
+
+    submit_lines.extend([
+        "",
+        f'echo "Submitted {n_jobs} toy-scan jobs."',
+    ])
+
+    with open(submit_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(submit_lines) + "\n")
+    os.chmod(submit_path, 0o755)
+    print(f"Wrote toy-scan submission loop script to {submit_path}")
+
+    return output_path, submit_path, n_jobs
+
+
 def generate_extraction_display_slurm_scripts(
     config_path: str,
     output_path: str,

@@ -250,6 +250,184 @@ def bands(config, dataset, n_toys, output_dir):
         print(f"Wrote {out_plot_eps2}")
 
 
+@main.command("toy-scan")
+@click.option(
+    "--config",
+    "-c",
+    required=True,
+    type=click.Path(exists=True),
+    help="Path to configuration YAML file",
+)
+@click.option(
+    "--dataset",
+    "-d",
+    required=True,
+    help="Dataset key (2015, 2016, or 2021)",
+)
+@click.option(
+    "--toy-root",
+    required=True,
+    type=click.Path(exists=True),
+    help="ROOT file containing functional-form toy histograms",
+)
+@click.option(
+    "--container",
+    help="Optional ROOT directory containing the toy histograms",
+)
+@click.option(
+    "--toy-pattern",
+    default="*",
+    show_default=True,
+    help="Shell-style pattern selecting toy histograms within the container",
+)
+@click.option(
+    "--toy-name-fmt",
+    help="Optional explicit toy-name format string, for example fSigPow_toy_{i}",
+)
+@click.option(
+    "--toy-index",
+    "toy_indices",
+    multiple=True,
+    type=int,
+    help="Toy indices to use together with --toy-name-fmt (repeatable)",
+)
+@click.option(
+    "--max-toys",
+    type=int,
+    help="Limit the run to the first N discovered toys",
+)
+@click.option(
+    "--output-dir",
+    "-o",
+    type=click.Path(),
+    help="Override output directory from config",
+)
+@click.option(
+    "--mass-min",
+    type=float,
+    help="Minimum mass to scan (GeV)",
+)
+@click.option(
+    "--mass-max",
+    type=float,
+    help="Maximum mass to scan (GeV)",
+)
+@click.option(
+    "--save-plots/--no-save-plots",
+    default=False,
+    show_default=True,
+    help="Write per-toy scan plots and summary plots",
+)
+@click.option(
+    "--save-fit-json/--no-save-fit-json",
+    default=False,
+    show_default=True,
+    help="Write per-toy fit JSON sidecars",
+)
+@click.option(
+    "--save-per-mass-folders/--no-save-per-mass-folders",
+    default=False,
+    show_default=True,
+    help="Write nested mass folders for each toy scan",
+)
+def toy_scan(
+    config,
+    dataset,
+    toy_root,
+    container,
+    toy_pattern,
+    toy_name_fmt,
+    toy_indices,
+    max_toys,
+    output_dir,
+    mass_min,
+    mass_max,
+    save_plots,
+    save_fit_json,
+    save_per_mass_folders,
+):
+    """Run the mass scan once per functional-form toy histogram."""
+    from .config import load_config
+    from .dataset import make_datasets
+    from .funcform_toys import discover_funcform_toys, run_funcform_toy_scans
+
+    cfg = load_config(config)
+    if output_dir:
+        cfg.output_dir = output_dir
+    cfg.ensure_output_dir()
+
+    if toy_name_fmt and not toy_indices:
+        raise click.BadParameter(
+            "--toy-name-fmt requires at least one --toy-index value",
+            param_hint="--toy-index",
+        )
+
+    datasets = make_datasets(cfg)
+    if dataset not in datasets:
+        available = list(datasets.keys())
+        print(f"Dataset '{dataset}' not found or not enabled. Available: {available}")
+        sys.exit(1)
+    ds = datasets[dataset]
+
+    specs = discover_funcform_toys(
+        toy_root,
+        container=container,
+        toy_pattern=toy_pattern,
+        toy_name_fmt=toy_name_fmt,
+        toy_indices=list(toy_indices) if toy_indices else None,
+    )
+    if max_toys is not None:
+        specs = specs[: int(max_toys)]
+    if not specs:
+        print("No toy histograms matched the requested selection.")
+        sys.exit(1)
+
+    print(f"Running functional-form toy scans for {ds.label}")
+    print(f"Toy source: {toy_root}")
+    if container:
+        print(f"Container: {container}")
+    print(f"Matched toys: {len(specs)}")
+
+    written = run_funcform_toy_scans(
+        ds,
+        cfg,
+        specs,
+        base_output_dir=cfg.output_dir,
+        mass_min=mass_min,
+        mass_max=mass_max,
+        save_plots=save_plots,
+        save_fit_json=save_fit_json,
+        save_per_mass_folders=save_per_mass_folders,
+    )
+    print(f"Wrote {len(written)} toy scan directories under {os.path.join(cfg.output_dir, 'toy_scans', ds.key)}")
+
+
+@main.command("toy-scan-merge")
+@click.option(
+    "--input-dir",
+    "-i",
+    required=True,
+    type=click.Path(exists=True),
+    help="Directory containing toy_scans/<dataset>/toy_XXXX outputs",
+)
+@click.option(
+    "--output-dir",
+    "-o",
+    type=click.Path(),
+    help="Directory to write merged CSV outputs",
+)
+def toy_scan_merge(input_dir, output_dir):
+    """Merge functional-form toy scan outputs into long and per-toy summaries."""
+    from .funcform_toys import merge_toy_scan_results
+
+    merged, summary = merge_toy_scan_results(input_dir, output_dir=output_dir)
+    outdir = output_dir or input_dir
+    print(f"Wrote {os.path.join(outdir, 'toy_scan_merged.csv')}")
+    print(f"Wrote {os.path.join(outdir, 'toy_scan_summary.csv')}")
+    print(f"Merged rows: {len(merged)}")
+    print(f"Toy summaries: {len(summary)}")
+
+
 @main.command()
 @click.option(
     "--config",
@@ -654,6 +832,108 @@ def test(config, output_dir):
                 traceback.print_exc()
 
     print("\nSmoke test complete!")
+
+
+@main.command("slurm-gen-toy-scan")
+@click.option(
+    "--config",
+    "-c",
+    required=True,
+    type=click.Path(exists=True),
+    help="Path to configuration YAML file",
+)
+@click.option(
+    "--dataset",
+    required=True,
+    help="Dataset key (2015, 2016, or 2021)",
+)
+@click.option(
+    "--toy-root",
+    required=True,
+    type=click.Path(exists=True),
+    help="ROOT file containing functional-form toy histograms",
+)
+@click.option(
+    "--container",
+    help="Optional ROOT directory containing the toy histograms",
+)
+@click.option(
+    "--toy-pattern",
+    default="*",
+    show_default=True,
+    help="Shell-style pattern selecting toy histograms within the container",
+)
+@click.option(
+    "--output",
+    "-o",
+    default="submit_toy_scan.slurm",
+    help="Output SLURM script path",
+)
+@click.option(
+    "--job-name",
+    default="hps-gpr-toys",
+    help="SLURM job name",
+)
+@click.option(
+    "--partition",
+    default="batch",
+    help="SLURM partition",
+)
+@click.option(
+    "--time",
+    default="4:00:00",
+    help="Time limit per task",
+)
+@click.option(
+    "--memory",
+    default="4G",
+    help="Memory per task",
+)
+@click.option(
+    "--conda-env",
+    help="Conda environment to activate",
+)
+@click.option(
+    "--account",
+    help="SLURM account/project to charge",
+)
+def slurm_gen_toy_scan(config, dataset, toy_root, container, toy_pattern, output, job_name, partition, time, memory, conda_env, account):
+    """Generate SLURM scripts for one functional-form toy scan per job."""
+    from .config import load_config
+    from .funcform_toys import discover_funcform_toys
+    from .slurm import generate_toy_scan_slurm_scripts
+
+    cfg = load_config(config)
+    specs = discover_funcform_toys(
+        toy_root,
+        container=container,
+        toy_pattern=toy_pattern,
+    )
+    if not specs:
+        raise click.BadParameter(
+            "No toy histograms matched the requested selection",
+            param_hint="--toy-pattern",
+        )
+
+    extra = [f"--account={account}"] if account else None
+    job_script, submit_script, n_jobs = generate_toy_scan_slurm_scripts(
+        config_path=config,
+        output_path=output,
+        dataset=dataset,
+        toy_root=toy_root,
+        toy_names=[spec.toy_name for spec in specs],
+        output_root=cfg.output_dir,
+        container=container,
+        job_name=job_name,
+        partition=partition,
+        time_limit=time,
+        memory=memory,
+        conda_env=conda_env,
+        extra_sbatch=extra,
+    )
+    print(f"\nPrepared {n_jobs} toy-scan jobs.")
+    print("To submit all jobs, run:")
+    print(f"  bash {submit_script}")
 
 
 @main.command("slurm-gen")

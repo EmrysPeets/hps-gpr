@@ -86,9 +86,10 @@ def _build_model(
     import gp
 
     kernel = make_kernel_for_dataset(ds, config, mass=mass)
+    hist_source = ds.hist_override if getattr(ds, "hist_override", None) is not None else (ds.root_path, ds.hist_name)
 
     # Probe histogram edges
-    probe = _gp_model((ds.root_path, ds.hist_name), kernel)
+    probe = _gp_model(hist_source, kernel)
     edges_all = np.asarray(probe.histogram.axes[0].edges, float)
     first_edge = float(edges_all[0])
     last_edge = float(edges_all[-1])
@@ -103,7 +104,7 @@ def _build_model(
     manip = gp._hist.manipulation.rebin_and_limit(int(rebin), lower, upper)
 
     model = _gp_model(
-        (ds.root_path, ds.hist_name),
+        hist_source,
         kernel,
         n_restarts_optimizer=0,
         blind_range=blind,

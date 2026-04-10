@@ -1,7 +1,7 @@
 """Dataset configuration and utilities."""
 
 from dataclasses import dataclass
-from typing import Dict, List, Optional, TYPE_CHECKING
+from typing import Any, Dict, List, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .config import Config
@@ -21,6 +21,7 @@ class DatasetConfig:
     m_high: float
     sigma_coeffs: List[float]
     frad_coeffs: List[float]
+    hist_override: Optional[Any] = None
     enabled: bool = True
     radiative_penalty_on: bool = False
     radiative_penalty_frac: float = 0.0

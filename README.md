@@ -176,6 +176,80 @@ Compute expected upper limit bands for a specific dataset:
 hps-gpr bands --config my_config.yaml --dataset 2015 --n-toys 100
 ```
 
+### Functional-Form Toy Seeds
+
+The repo now carries dataset-specific ROOT macros for the analytic functional-form
+toy inputs under `root_macros/funcform/`. Each macro reads the fixed source histogram
+for one dataset, fits a small candidate set, writes a standardized ROOT file with the
+input histogram, fit metadata, and per-function toy directories, and exports a note-ready
+overlay plot to `hps_gpr_analysis_note/toy_generation_figs/`.
+
+```bash
+# Build the dataset-specific toy ROOT files + note plots
+root -l -b -q 'root_macros/funcform/make_func_data_output_2015.C()'
+root -l -b -q 'root_macros/funcform/make_func_data_output_2016.C()'
+root -l -b -q 'root_macros/funcform/make_func_data_output_2021.C()'
+```
+
+Default outputs:
+
+- `outputs/funcform_toys/funcform_2015_toys.root`
+- `outputs/funcform_toys/funcform_2016_toys.root`
+- `outputs/funcform_toys/funcform_2021_toys.root`
+
+ROOT layout conventions:
+
+- one directory per function tag
+- toy names `{tag}_toy_{i}`
+- `fit_functions/` with the fitted `TF1`s
+- `fit_metadata/` with the primary-function tag plus JSON metadata objects
+
+The overlay legends use the same bin-integral `chi2/ndof` convention as the macro's
+selection metric.
+
+### Functional-Form Toy Scans
+
+Use the new batch tooling to run the existing GPR scan engine over the toy histograms
+without writing temporary ROOT files:
+
+```bash
+# Quick smoke: run two toys from one function family
+hps-gpr toy-scan \
+  --config config_example.yaml \
+  --dataset 2015 \
+  --toy-root outputs/funcform_toys/funcform_2015_toys.root \
+  --container fGenGammaShift \
+  --toy-pattern 'fGenGammaShift_toy_*' \
+  --max-toys 2 \
+  --output-dir outputs/funcform_toy_scans_smoke \
+  --mass-min 0.030 \
+  --mass-max 0.040
+
+# Generate one SLURM job per toy histogram
+hps-gpr slurm-gen-toy-scan \
+  --config config_example.yaml \
+  --dataset 2015 \
+  --toy-root outputs/funcform_toys/funcform_2015_toys.root \
+  --container fGenGammaShift \
+  --toy-pattern 'fGenGammaShift_toy_*' \
+  --output submit_toy_scan.slurm
+
+# Merge the per-toy scan outputs
+hps-gpr toy-scan-merge \
+  --input-dir outputs/funcform_toy_scans_smoke \
+  --output-dir outputs/funcform_toy_scans_smoke/merged
+```
+
+`toy-scan` writes one directory per toy at:
+
+- `OUTPUT_DIR/toy_scans/<dataset>/toy_XXXX/`
+
+`toy-scan-merge` writes:
+
+- `toy_scan_merged.csv`: long table with toy identity columns plus the normal scan outputs
+- `toy_scan_summary.csv`: compact per-toy summary with `n_fail`, `max_Z_analytic`,
+  `mass_at_max_Z`, and `min_p0_analytic`
+
 ### Re-run Selected Failed Mass Points
 
 If only a few mass points failed in a SLURM production, re-run just the owning task(s) and overwrite those task outputs in place:
