@@ -6,6 +6,7 @@ import sys
 
 import click
 import numpy as np
+from click.core import ParameterSource
 
 
 @click.group()
@@ -315,22 +316,24 @@ def bands(config, dataset, n_toys, output_dir):
 @click.option(
     "--save-plots/--no-save-plots",
     default=False,
-    show_default=True,
-    help="Write per-toy scan plots and summary plots",
+    show_default=False,
+    help="Override the config value and write or skip per-toy scan plots and summary plots",
 )
 @click.option(
     "--save-fit-json/--no-save-fit-json",
     default=False,
-    show_default=True,
-    help="Write per-toy fit JSON sidecars",
+    show_default=False,
+    help="Override the config value and write or skip per-toy fit JSON sidecars",
 )
 @click.option(
     "--save-per-mass-folders/--no-save-per-mass-folders",
     default=False,
-    show_default=True,
-    help="Write nested mass folders for each toy scan",
+    show_default=False,
+    help="Override the config value and write or skip nested mass folders for each toy scan",
 )
+@click.pass_context
 def toy_scan(
+    ctx,
     config,
     dataset,
     toy_root,
@@ -354,6 +357,12 @@ def toy_scan(
     cfg = load_config(config)
     if output_dir:
         cfg.output_dir = output_dir
+    if ctx.get_parameter_source("save_plots") != ParameterSource.DEFAULT:
+        cfg.save_plots = bool(save_plots)
+    if ctx.get_parameter_source("save_fit_json") != ParameterSource.DEFAULT:
+        cfg.save_fit_json = bool(save_fit_json)
+    if ctx.get_parameter_source("save_per_mass_folders") != ParameterSource.DEFAULT:
+        cfg.save_per_mass_folders = bool(save_per_mass_folders)
     cfg.ensure_output_dir()
 
     if toy_name_fmt and not toy_indices:
@@ -395,9 +404,9 @@ def toy_scan(
         base_output_dir=cfg.output_dir,
         mass_min=mass_min,
         mass_max=mass_max,
-        save_plots=save_plots,
-        save_fit_json=save_fit_json,
-        save_per_mass_folders=save_per_mass_folders,
+        save_plots=cfg.save_plots,
+        save_fit_json=cfg.save_fit_json,
+        save_per_mass_folders=cfg.save_per_mass_folders,
     )
     print(f"Wrote {len(written)} toy scan directories under {os.path.join(cfg.output_dir, 'toy_scans', ds.key)}")
 
@@ -408,7 +417,7 @@ def toy_scan(
     "-i",
     required=True,
     type=click.Path(exists=True),
-    help="Directory containing toy_scans/<dataset>/toy_XXXX outputs",
+    help="Directory containing toy scan outputs, for example OUTPUT_DIR/jobs or OUTPUT_DIR/toy_scans/<dataset>",
 )
 @click.option(
     "--output-dir",
@@ -420,7 +429,10 @@ def toy_scan_merge(input_dir, output_dir):
     """Merge functional-form toy scan outputs into long and per-toy summaries."""
     from .funcform_toys import merge_toy_scan_results
 
-    merged, summary = merge_toy_scan_results(input_dir, output_dir=output_dir)
+    try:
+        merged, summary = merge_toy_scan_results(input_dir, output_dir=output_dir)
+    except FileNotFoundError as exc:
+        raise click.ClickException(str(exc)) from exc
     outdir = output_dir or input_dir
     print(f"Wrote {os.path.join(outdir, 'toy_scan_merged.csv')}")
     print(f"Wrote {os.path.join(outdir, 'toy_scan_summary.csv')}")
@@ -922,6 +934,7 @@ def slurm_gen_toy_scan(config, dataset, toy_root, container, toy_pattern, output
         dataset=dataset,
         toy_root=toy_root,
         toy_names=[spec.toy_name for spec in specs],
+        toy_indices=[spec.toy_index for spec in specs],
         output_root=cfg.output_dir,
         container=container,
         job_name=job_name,

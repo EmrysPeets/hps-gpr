@@ -3,6 +3,7 @@
 import glob
 import os
 import re
+from pathlib import Path
 from typing import List, Optional, TYPE_CHECKING
 
 import numpy as np
@@ -266,6 +267,7 @@ def generate_toy_scan_slurm_scripts(
     toy_names: List[str],
     output_root: str,
     *,
+    toy_indices: Optional[List[int]] = None,
     container: Optional[str] = None,
     job_name: str = "hps-gpr-toys",
     partition: str = "batch",
@@ -277,9 +279,24 @@ def generate_toy_scan_slurm_scripts(
     """Generate SLURM scripts for one functional-form toy scan per job."""
     dataset_key = str(dataset).strip()
     toy_container = str(container or "").strip()
+    repo_root = str(Path(__file__).resolve().parents[1])
+    config_abs = os.path.abspath(config_path)
+    toy_root_abs = os.path.abspath(toy_root)
+    output_root_abs = os.path.abspath(output_root)
+
+    if toy_indices is not None and len(toy_indices) != len(toy_names):
+        raise ValueError("toy_indices must have the same length as toy_names")
+    if toy_indices is None:
+        resolved_toy_indices = []
+        for fallback_index, toy_name in enumerate(toy_names):
+            m = re.search(r"_toy_(\d+)$", str(toy_name))
+            resolved_toy_indices.append(int(m.group(1)) if m is not None else int(fallback_index))
+    else:
+        resolved_toy_indices = [int(idx) for idx in toy_indices]
 
     job_lines = [
         "#!/bin/bash",
+        "set -euo pipefail",
         f"#SBATCH --job-name={job_name}",
         f"#SBATCH --partition={partition}",
         f"#SBATCH --time={time_limit}",
@@ -296,25 +313,34 @@ def generate_toy_scan_slurm_scripts(
         "",
         "mkdir -p logs",
         "",
+        'cd "${REPO_ROOT}"',
+        "",
     ])
 
-    if conda_env:
-        job_lines.extend([
-            "# Activate conda environment",
-            "source $(conda info --base)/etc/profile.d/conda.sh",
-            f"conda activate {conda_env}",
-            "",
-        ])
-
     job_lines.extend([
-        "# TOY_* and BASE_OUTPUT_DIR are passed via --export at submission time",
-        'CMD=(hps-gpr toy-scan',
-        f'  --config "{config_path}"',
+        "# REPO_ROOT, TOY_* and BASE_OUTPUT_DIR are passed via --export at submission time",
+        'if [ -f "${REPO_ROOT}/startup.sh" ]; then',
+        '  source "${REPO_ROOT}/startup.sh"',
+        'elif [ -n "${TOY_CONDA_ENV}" ]; then',
+        "  source $(conda info --base)/etc/profile.d/conda.sh",
+        '  conda activate "${TOY_CONDA_ENV}"',
+        "fi",
+        "",
+        'JOB_OUTDIR="${BASE_OUTPUT_DIR}/jobs/${TOY_DIR_NAME}"',
+        'mkdir -p "${JOB_OUTDIR}"',
+        "",
+        'CMD=(python -m hps_gpr.cli toy-scan',
+        f'  --config "{config_abs}"',
         '  --dataset "${TOY_DATASET}"',
         '  --toy-root "${TOY_ROOT}"',
-        '  --toy-pattern "${TOY_NAME}"',
-        '  --output-dir "${BASE_OUTPUT_DIR}"',
+        '  --output-dir "${JOB_OUTDIR}"',
         '  --max-toys 1)',
+        'if [ -n "${TOY_INDEX}" ]; then',
+        '  CMD+=(--toy-name-fmt "${TOY_NAME}")',
+        '  CMD+=(--toy-index "${TOY_INDEX}")',
+        "else",
+        '  CMD+=(--toy-pattern "${TOY_NAME}")',
+        "fi",
         'if [ -n "${TOY_CONTAINER}" ]; then',
         '  CMD+=(--container "${TOY_CONTAINER}")',
         "fi",
@@ -328,30 +354,38 @@ def generate_toy_scan_slurm_scripts(
 
     submit_path = os.path.join(os.path.dirname(os.path.abspath(output_path)), "submit_toy_scan_all.sh")
     abs_job = os.path.abspath(output_path)
-    toy_root_abs = os.path.abspath(toy_root)
 
     submit_lines = [
         "#!/bin/bash",
+        "set -euo pipefail",
         "# Submit one SLURM job per functional-form toy histogram",
+        'SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"',
         f'JOB_SCRIPT="{abs_job}"',
-        f'BASE_OUTPUT_DIR="{output_root}"',
+        f'REPO_ROOT="{repo_root}"',
+        f'BASE_OUTPUT_DIR="{output_root_abs}"',
         f'TOY_DATASET="{dataset_key}"',
         f'TOY_ROOT="{toy_root_abs}"',
         f'TOY_CONTAINER="{toy_container}"',
+        f'TOY_CONDA_ENV="{str(conda_env or "").strip()}"',
         "",
+        'cd "${SCRIPT_DIR}"',
         "mkdir -p logs",
         "",
     ]
 
     n_jobs = 0
-    for toy_index, toy_name in enumerate(toy_names):
+    for toy_name, toy_index in zip(toy_names, resolved_toy_indices):
+        toy_dir_name = re.sub(r"[^A-Za-z0-9._-]+", "_", str(toy_name)).strip("._-") or "toy"
         submit_lines.append(
             "sbatch --export=ALL,"
+            "REPO_ROOT=${REPO_ROOT},"
             "TOY_DATASET=${TOY_DATASET},"
             "TOY_ROOT=${TOY_ROOT},"
             "TOY_CONTAINER=${TOY_CONTAINER},"
-            f"TOY_INDEX={int(toy_index)},"
             f"TOY_NAME={toy_name},"
+            f"TOY_INDEX={int(toy_index)},"
+            f"TOY_DIR_NAME={toy_dir_name},"
+            "TOY_CONDA_ENV=${TOY_CONDA_ENV},"
             "BASE_OUTPUT_DIR=${BASE_OUTPUT_DIR} "
             "\"${JOB_SCRIPT}\""
         )

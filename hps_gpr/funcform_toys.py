@@ -9,7 +9,7 @@ import os
 import re
 from dataclasses import asdict, dataclass, replace
 from pathlib import Path
-from typing import Iterable, List, Optional, Sequence, TYPE_CHECKING
+from typing import List, Optional, Sequence, TYPE_CHECKING
 
 import hist
 import numpy as np
@@ -55,6 +55,14 @@ def _natural_sort_key(name: str) -> tuple:
     return tuple(out)
 
 
+def _extract_toy_index(toy_name: str) -> Optional[int]:
+    """Parse the trailing toy index from a histogram name, if present."""
+    m = re.search(r"_toy_(\d+)$", str(toy_name))
+    if m is None:
+        return None
+    return int(m.group(1))
+
+
 def _infer_function_tag(container: Optional[str], toy_name: str) -> str:
     """Infer the function tag from the container or toy name."""
     if container:
@@ -96,22 +104,40 @@ def discover_funcform_toys(
     container = str(container or "").strip()
 
     if toy_name_fmt is not None:
-        idxs = list(toy_indices or [])
-        names = [str(toy_name_fmt).format(i=int(i)) for i in idxs]
-    else:
-        names = _iter_hist_names(root_path, container=container or None)
-        names = [n for n in names if fnmatch.fnmatch(n, str(toy_pattern))]
+        idxs = [int(i) for i in (toy_indices or [])]
+        specs: List[FuncFormToySpec] = []
+        seen = set()
+        for idx in idxs:
+            name = str(toy_name_fmt).format(i=int(idx))
+            if name in seen:
+                continue
+            seen.add(name)
+            specs.append(
+                FuncFormToySpec(
+                    source_root=root_path,
+                    container=container,
+                    function_tag=_infer_function_tag(container, name),
+                    toy_name=str(name),
+                    toy_index=int(idx),
+                )
+            )
+        return specs
 
+    names = _iter_hist_names(root_path, container=container or None)
+    names = [n for n in names if fnmatch.fnmatch(n, str(toy_pattern))]
     names = sorted(dict.fromkeys(names), key=_natural_sort_key)
-    specs: List[FuncFormToySpec] = []
-    for i, name in enumerate(names):
+    specs = []
+    for fallback_index, name in enumerate(names):
+        toy_index = _extract_toy_index(name)
+        if toy_index is None:
+            toy_index = int(fallback_index)
         specs.append(
             FuncFormToySpec(
                 source_root=root_path,
                 container=container,
                 function_tag=_infer_function_tag(container, name),
                 toy_name=str(name),
-                toy_index=int(i),
+                toy_index=int(toy_index),
             )
         )
     return specs
@@ -269,6 +295,35 @@ def _load_toy_scan_frames(input_dir: str) -> List[pd.DataFrame]:
     return frames
 
 
+def _toy_scan_inventory(input_dir: str) -> dict:
+    """Collect simple counts describing a toy-scan output tree."""
+    base = Path(input_dir)
+    toy_dirs = [
+        path for path in base.glob("**/toy_scans/*/toy_*")
+        if path.is_dir()
+    ]
+    meta_paths = [path for path in base.glob("**/toy_metadata.json") if path.is_file()]
+    single_paths = [path for path in base.glob("**/results_single.csv") if path.is_file()]
+    comb_paths = [path for path in base.glob("**/results_combined.csv") if path.is_file()]
+    return {
+        "toy_dirs": int(len(toy_dirs)),
+        "metadata_files": int(len(meta_paths)),
+        "results_single_files": int(len(single_paths)),
+        "results_combined_files": int(len(comb_paths)),
+    }
+
+
+def describe_toy_scan_inventory(input_dir: str, inventory: Optional[dict] = None) -> str:
+    """Return a compact textual summary of toy-scan artifacts."""
+    inv = inventory if inventory is not None else _toy_scan_inventory(input_dir)
+    return (
+        f"toy_dirs={inv['toy_dirs']}, "
+        f"toy_metadata.json={inv['metadata_files']}, "
+        f"results_single.csv={inv['results_single_files']}, "
+        f"results_combined.csv={inv['results_combined_files']}"
+    )
+
+
 def _summarize_one_toy(group: pd.DataFrame) -> dict:
     """Build one compact per-toy summary row."""
     grp = group.copy()
@@ -317,9 +372,13 @@ def merge_toy_scan_results(
     outdir = str(output_dir or input_dir)
     ensure_dir(outdir)
 
+    inventory = _toy_scan_inventory(input_dir)
     frames = _load_toy_scan_frames(input_dir)
     if not frames:
-        raise FileNotFoundError(f"No toy scan results found under {input_dir}")
+        raise FileNotFoundError(
+            "No toy scan results found under "
+            f"{input_dir} ({describe_toy_scan_inventory(input_dir, inventory)})"
+        )
 
     merged = pd.concat(frames, ignore_index=True)
     sort_cols = [c for c in ["dataset", "function_tag", "toy_index", "mass_GeV"] if c in merged.columns]

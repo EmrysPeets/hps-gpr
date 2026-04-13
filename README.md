@@ -211,12 +211,15 @@ provisionally at `< 4` while that low-mass turn-on is iterated further.
 
 ### Functional-Form Toy Scans
 
-Use the new batch tooling to run the existing GPR scan engine over the toy histograms
-without writing temporary ROOT files:
+Use the v15.8-style functional-form closure workflow to run the existing GPR scan
+engine over analytic toy histograms without writing temporary ROOT files. These
+background-only functional-form scans are meant to test smooth-spectrum closure and
+long-wavelength GP bias; they complement, but do not replace, the separate
+`inject`/`inject-plot` pull, coverage, and Z-calibration studies.
 
 ```bash
 # Quick smoke: run two toys from one function family
-hps-gpr toy-scan \
+python -m hps_gpr.cli toy-scan \
   --config config_example.yaml \
   --dataset 2015 \
   --toy-root outputs/funcform_toys/funcform_2015_toys.root \
@@ -227,30 +230,52 @@ hps-gpr toy-scan \
   --mass-min 0.030 \
   --mass-max 0.040
 
-# Generate one SLURM job per toy histogram
-hps-gpr slurm-gen-toy-scan \
-  --config config_example.yaml \
+# Generate one SLURM job per toy histogram from the source checkout
+python -m hps_gpr.cli slurm-gen-toy-scan \
+  --config config_2015_10k.yaml \
   --dataset 2015 \
   --toy-root outputs/funcform_toys/funcform_2015_toys.root \
-  --container fGenGammaShift \
-  --toy-pattern 'fGenGammaShift_toy_*' \
+  --container fShiftSigPowTail \
+  --toy-pattern 'fShiftSigPowTail_toy_*' \
+  --job-name hps2015_toyscan \
+  --partition roma \
+  --account hps:hps-prod \
+  --time 4:00:00 \
+  --memory 8G \
   --output submit_toy_scan.slurm
 
-# Merge the per-toy scan outputs
-hps-gpr toy-scan-merge \
-  --input-dir outputs/funcform_toy_scans_smoke \
-  --output-dir outputs/funcform_toy_scans_smoke/merged
+bash submit_toy_scan_all.sh
+
+# Merge the completed per-job scan outputs
+python -m hps_gpr.cli toy-scan-merge \
+  --input-dir outputs/prod_2015_10k_3/jobs \
+  --output-dir outputs/prod_2015_10k_3/merged
 ```
 
-`toy-scan` writes one directory per toy at:
+Local `toy-scan` smoke runs write one directory per toy at:
 
 - `OUTPUT_DIR/toy_scans/<dataset>/toy_XXXX/`
 
+The production SLURM workflow writes one isolated job tree per toy at:
+
+- `OUTPUT_DIR/jobs/<toy_name>/toy_scans/<dataset>/toy_XXXX/results_single.csv`
+- `OUTPUT_DIR/jobs/<toy_name>/toy_scans/<dataset>/toy_XXXX/results_combined.csv`
+- `OUTPUT_DIR/jobs/<toy_name>/toy_scans/<dataset>/toy_XXXX/combined.csv`
+- `OUTPUT_DIR/jobs/<toy_name>/toy_scans/<dataset>/toy_XXXX/toy_metadata.json`
+- `OUTPUT_DIR/jobs/<toy_name>/toy_scans/<dataset>/toy_XXXX/mXXXMeV/<dataset>/...` when `save_per_mass_folders: true`
+- `logs/%j.out` and `logs/%j.err` beside the generated submission scripts
+
 `toy-scan-merge` writes:
 
-- `toy_scan_merged.csv`: long table with toy identity columns plus the normal scan outputs
-- `toy_scan_summary.csv`: compact per-toy summary with `n_fail`, `max_Z_analytic`,
+- `OUTPUT_DIR/merged/toy_scan_merged.csv`: long table with toy identity columns plus the normal scan outputs
+- `OUTPUT_DIR/merged/toy_scan_summary.csv`: compact per-toy summary with `n_fail`, `max_Z_analytic`,
   `mass_at_max_Z`, and `min_p0_analytic`
+
+For large productions, validate the workflow in three steps:
+
+1. run a one-toy local smoke with a narrow mass window
+2. run a 10-toy pilot on the batch system and inspect `toy_scan_summary.csv`
+3. submit the full 100-toy study only after the pilot merges cleanly
 
 ### Re-run Selected Failed Mass Points
 
@@ -751,6 +776,23 @@ The scan produces the following outputs:
 
 ```
 outputs/
+├── jobs/                          # Created by `python -m hps_gpr.cli slurm-gen-toy-scan`
+│   └── <toy_name>/
+│       └── toy_scans/<dataset>/toy_XXXX/
+│           ├── results_single.csv
+│           ├── results_combined.csv
+│           ├── combined.csv
+│           ├── toy_metadata.json
+│           └── mXXXMeV/           # Optional per-mass folders (if save_per_mass_folders=true)
+│               └── <dataset>/
+│                   ├── fit_full.png
+│                   ├── blind_fit.png
+│                   ├── s_over_b_ul.png
+│                   ├── numbers.json
+│                   └── error.txt  # Present only when that mass-point fit fails
+├── merged/                        # Created by `python -m hps_gpr.cli toy-scan-merge`
+│   ├── toy_scan_merged.csv
+│   └── toy_scan_summary.csv
 ├── validation_report.json          # Dataset validation results
 ├── results_single.csv              # Per-dataset scan results (+ GP diagnostics columns)
 ├── results_combined.csv            # Combined-fit scan results
