@@ -338,12 +338,15 @@ def test_generate_toy_scan_slurm_scripts_writes_expected_commands(tmp_path):
         toy_indices=[0, 1],
         output_root="outputs/funcform_toys",
         container="primary",
+        extra_sbatch=["--account=testacct", "--qos=testqos"],
     )
 
     assert n_jobs == 2
     job_text = Path(job_script).read_text()
     submit_text = Path(submit_script).read_text()
     assert "python -m hps_gpr.cli toy-scan" in job_text
+    assert "#SBATCH --account=testacct" in job_text
+    assert "#SBATCH --qos=testqos" in job_text
     assert 'cd "${REPO_ROOT}"' in job_text
     assert 'source "${REPO_ROOT}/startup.sh"' in job_text
     assert 'JOB_OUTDIR="${BASE_OUTPUT_DIR}/jobs/${TOY_DIR_NAME}"' in job_text
@@ -353,6 +356,8 @@ def test_generate_toy_scan_slurm_scripts_writes_expected_commands(tmp_path):
     assert 'CMD+=(--toy-index "${TOY_INDEX}")' in job_text
     assert 'CMD+=(--toy-pattern "${TOY_NAME}")' in job_text
     assert 'CMD+=(--container "${TOY_CONTAINER}")' in job_text
+    assert 'SBATCH_ARGS=("$@")' in submit_text
+    assert 'sbatch "${SBATCH_ARGS[@]}" --export=ALL,' in submit_text
     assert 'SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"' in submit_text
     assert 'cd "${SCRIPT_DIR}"' in submit_text
     assert "TOY_NAME=primary_toy_1" in submit_text

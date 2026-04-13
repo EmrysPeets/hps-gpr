@@ -93,14 +93,18 @@ def generate_slurm_script(
 
     submit_lines = [
         "#!/bin/bash",
+        "set -euo pipefail",
         f"# Submit {n_jobs} individual SLURM jobs for hps-gpr scan",
+        'SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"',
         f"N_TASKS={n_jobs}",
         f'JOB_SCRIPT="{abs_job}"',
+        'SBATCH_ARGS=("$@")',
         "",
+        'cd "${SCRIPT_DIR}"',
         "mkdir -p logs",
         "",
         f"for TASK_ID in $(seq 0 $(( N_TASKS - 1 ))); do",
-        f'    sbatch --export=ALL,TASK_ID=${{TASK_ID}},N_TASKS=${{N_TASKS}} "${{JOB_SCRIPT}}"',
+        f'    sbatch "${{SBATCH_ARGS[@]}}" --export=ALL,TASK_ID=${{TASK_ID}},N_TASKS=${{N_TASKS}} "${{JOB_SCRIPT}}"',
         "done",
         "",
         f'echo "Submitted ${{N_TASKS}} jobs."',
@@ -209,10 +213,14 @@ def generate_injection_slurm_scripts(
 
     submit_lines = [
         "#!/bin/bash",
+        "set -euo pipefail",
         "# Submit one SLURM job per (dataset, mass, strength) injection point",
+        'SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"',
         f'JOB_SCRIPT="{abs_job}"',
         f'BASE_OUTPUT_DIR="{output_root}"',
+        'SBATCH_ARGS=("$@")',
         "",
+        'cd "${SCRIPT_DIR}"',
         "mkdir -p logs",
         "",
     ]
@@ -234,7 +242,7 @@ def generate_injection_slurm_scripts(
                 strength_str = f"{float(strength):.6g}"
                 strength_tag = strength_str.replace("-", "m").replace(".", "p")
                 submit_lines.append(
-                    "sbatch --export=ALL,"
+                    'sbatch "${SBATCH_ARGS[@]}" --export=ALL,'
                     f"INJECT_DATASET={ds},"
                     f"INJECT_MASS={mass_str},"
                     f"INJECT_MASS_TAG={mass_tag},"
@@ -367,6 +375,7 @@ def generate_toy_scan_slurm_scripts(
         f'TOY_ROOT="{toy_root_abs}"',
         f'TOY_CONTAINER="{toy_container}"',
         f'TOY_CONDA_ENV="{str(conda_env or "").strip()}"',
+        'SBATCH_ARGS=("$@")',
         "",
         'cd "${SCRIPT_DIR}"',
         "mkdir -p logs",
@@ -377,7 +386,7 @@ def generate_toy_scan_slurm_scripts(
     for toy_name, toy_index in zip(toy_names, resolved_toy_indices):
         toy_dir_name = re.sub(r"[^A-Za-z0-9._-]+", "_", str(toy_name)).strip("._-") or "toy"
         submit_lines.append(
-            "sbatch --export=ALL,"
+            'sbatch "${SBATCH_ARGS[@]}" --export=ALL,'
             "REPO_ROOT=${REPO_ROOT},"
             "TOY_DATASET=${TOY_DATASET},"
             "TOY_ROOT=${TOY_ROOT},"
@@ -483,12 +492,16 @@ def generate_extraction_display_slurm_scripts(
 
     submit_lines = [
         "#!/bin/bash",
+        "set -euo pipefail",
         "# Submit one SLURM job per (mass, strength) extraction-display point",
+        'SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"',
         f'JOB_SCRIPT="{abs_job}"',
         f'BASE_OUTPUT_DIR="{output_root}"',
         f'EXTRACT_DATASET="{dataset_key}"',
         f'EXTRACT_DATASET_KEYS="{dataset_keys_str}"',
+        'SBATCH_ARGS=("$@")',
         "",
+        'cd "${SCRIPT_DIR}"',
         "mkdir -p logs",
         "",
     ]
@@ -508,7 +521,7 @@ def generate_extraction_display_slurm_scripts(
             strength_str = f"{float(strength):.6g}"
             strength_tag = strength_str.replace("-", "m").replace(".", "p")
             submit_lines.append(
-                "sbatch --export=ALL,"
+                'sbatch "${SBATCH_ARGS[@]}" --export=ALL,'
                 "EXTRACT_DATASET=${EXTRACT_DATASET},"
                 f"EXTRACT_MASS={mass_str},"
                 f"EXTRACT_MASS_TAG={mass_tag},"

@@ -277,6 +277,17 @@ For large productions, validate the workflow in three steps:
 2. run a 10-toy pilot on the batch system and inspect `toy_scan_summary.csv`
 3. submit the full 100-toy study only after the pilot merges cleanly
 
+If your site requires separate submission-time charging flags, pass them through when
+you run the submit helper:
+
+```bash
+bash submit_toy_scan_all.sh --account <valid-account> --qos <valid-qos>
+```
+
+On SDF, the exact `--account` and `--qos` values depend on your association. If
+`hps:hps-prod` is rejected, check the values available to your account with `sshare -U -u $USER`
+or `sacctmgr -n show assoc user=$USER format=account%30,partition%20,qos%40`.
+
 ### Re-run Selected Failed Mass Points
 
 If only a few mass points failed in a SLURM production, re-run just the owning task(s) and overwrite those task outputs in place:

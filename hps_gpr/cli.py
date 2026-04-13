@@ -44,6 +44,16 @@ def _parse_mass_tokens(raw: str) -> list:
     return out
 
 
+def _build_extra_sbatch(account=None, qos=None):
+    """Build optional extra SBATCH directives from CLI charging flags."""
+    extra = []
+    if account:
+        extra.append(f"--account={account}")
+    if qos:
+        extra.append(f"--qos={qos}")
+    return extra or None
+
+
 @main.command()
 @click.option(
     "--config",
@@ -909,7 +919,11 @@ def test(config, output_dir):
     "--account",
     help="SLURM account/project to charge",
 )
-def slurm_gen_toy_scan(config, dataset, toy_root, container, toy_pattern, output, job_name, partition, time, memory, conda_env, account):
+@click.option(
+    "--qos",
+    help="Optional SLURM QOS to request",
+)
+def slurm_gen_toy_scan(config, dataset, toy_root, container, toy_pattern, output, job_name, partition, time, memory, conda_env, account, qos):
     """Generate SLURM scripts for one functional-form toy scan per job."""
     from .config import load_config
     from .funcform_toys import discover_funcform_toys
@@ -927,7 +941,7 @@ def slurm_gen_toy_scan(config, dataset, toy_root, container, toy_pattern, output
             param_hint="--toy-pattern",
         )
 
-    extra = [f"--account={account}"] if account else None
+    extra = _build_extra_sbatch(account=account, qos=qos)
     job_script, submit_script, n_jobs = generate_toy_scan_slurm_scripts(
         config_path=config,
         output_path=output,
@@ -947,6 +961,7 @@ def slurm_gen_toy_scan(config, dataset, toy_root, container, toy_pattern, output
     print(f"\nPrepared {n_jobs} toy-scan jobs.")
     print("To submit all jobs, run:")
     print(f"  bash {submit_script}")
+    print("If your site needs different submission-time charging flags, append them to the submit helper.")
 
 
 @main.command("slurm-gen")
@@ -998,11 +1013,15 @@ def slurm_gen_toy_scan(config, dataset, toy_root, container, toy_pattern, output
     "--account",
     help="SLURM account/project to charge",
 )
-def slurm_gen(config, n_jobs, output, job_name, partition, time, memory, conda_env, account):
+@click.option(
+    "--qos",
+    help="Optional SLURM QOS to request",
+)
+def slurm_gen(config, n_jobs, output, job_name, partition, time, memory, conda_env, account, qos):
     """Generate SLURM array job script."""
     from .slurm import generate_slurm_script
 
-    extra = [f"--account={account}"] if account else None
+    extra = _build_extra_sbatch(account=account, qos=qos)
 
     job_script, submit_script = generate_slurm_script(
         config_path=config,
@@ -1090,7 +1109,11 @@ def slurm_gen(config, n_jobs, output, job_name, partition, time, memory, conda_e
     default=None,
     help="Force per-toy CSV writing policy in generated inject jobs (default: use config setting).",
 )
-def slurm_gen_inject(config, datasets, masses, strengths, n_toys, output, job_name, partition, time, memory, conda_env, account, write_toy_csv):
+@click.option(
+    "--qos",
+    help="Optional SLURM QOS to request",
+)
+def slurm_gen_inject(config, datasets, masses, strengths, n_toys, output, job_name, partition, time, memory, conda_env, account, write_toy_csv, qos):
     """Generate SLURM scripts for per-(dataset,mass,strength) injection jobs."""
     from .config import load_config
     from .slurm import generate_injection_slurm_scripts
@@ -1114,7 +1137,7 @@ def slurm_gen_inject(config, datasets, masses, strengths, n_toys, output, job_na
     if not strength_list:
         raise click.BadParameter("No strengths provided", param_hint="--strengths")
 
-    extra = [f"--account={account}"] if account else None
+    extra = _build_extra_sbatch(account=account, qos=qos)
 
     ds_ranges = {
         "2015": tuple(cfg.range_2015),
@@ -1207,7 +1230,11 @@ def slurm_gen_inject(config, datasets, masses, strengths, n_toys, output, job_na
     "--account",
     help="SLURM account/project to charge",
 )
-def slurm_gen_extract_display(config, dataset, datasets, masses, strengths, output, job_name, partition, time, memory, conda_env, account):
+@click.option(
+    "--qos",
+    help="Optional SLURM QOS to request",
+)
+def slurm_gen_extract_display(config, dataset, datasets, masses, strengths, output, job_name, partition, time, memory, conda_env, account, qos):
     """Generate SLURM scripts for per-(dataset set,mass,strength) extraction-display jobs."""
     from .config import load_config
     from .slurm import generate_extraction_display_slurm_scripts
@@ -1228,7 +1255,7 @@ def slurm_gen_extract_display(config, dataset, datasets, masses, strengths, outp
     if not strength_list:
         raise click.BadParameter("No strengths provided", param_hint="--strengths")
 
-    extra = [f"--account={account}"] if account else None
+    extra = _build_extra_sbatch(account=account, qos=qos)
     ds_ranges = {
         "2015": tuple(cfg.range_2015),
         "2016": tuple(cfg.range_2016),
