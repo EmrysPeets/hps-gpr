@@ -54,16 +54,51 @@ def _build_extra_sbatch(account=None, qos=None):
     return extra or None
 
 
-def _infer_scan_cpus_per_task(cfg, override=None):
-    """Infer a CPU request matching the scan parallelism, unless overridden."""
+def _infer_parallel_cpus_per_task(
+    cfg,
+    *,
+    parallel_attr,
+    workers_attr,
+    threads_attr,
+    override=None,
+):
+    """Infer a CPU request matching a configured parallel-work profile."""
     if override is not None:
         return max(1, int(override))
-    threads_per_worker = int(getattr(cfg, "scan_threads_per_worker", 1) or 1)
-    if bool(getattr(cfg, "scan_parallel", False)):
-        n_workers = int(getattr(cfg, "scan_n_workers", 1) or 1)
-    else:
-        n_workers = 1
+    if not bool(getattr(cfg, parallel_attr, False)):
+        return 1
+    threads_per_worker = int(getattr(cfg, threads_attr, 1) or 1)
+    n_workers = int(getattr(cfg, workers_attr, 1) or 1)
     return max(1, int(n_workers) * int(threads_per_worker))
+
+
+def _infer_scan_cpus_per_task(cfg, override=None):
+    """Infer a CPU request matching the main scan parallelism."""
+    return _infer_parallel_cpus_per_task(
+        cfg,
+        parallel_attr="scan_parallel",
+        workers_attr="scan_n_workers",
+        threads_attr="scan_threads_per_worker",
+        override=override,
+    )
+
+
+def _infer_toy_scan_cpus_per_task(cfg, override=None):
+    """Infer a CPU request matching the functional-form toy-scan parallelism."""
+    return _infer_parallel_cpus_per_task(
+        cfg,
+        parallel_attr="toy_scan_parallel",
+        workers_attr="toy_scan_n_workers",
+        threads_attr="toy_scan_threads_per_worker",
+        override=override,
+    )
+
+
+def _resolve_cli_override(ctx, param_name, explicit_value, default_value):
+    """Return the explicit CLI value when provided, otherwise the supplied default."""
+    if ctx.get_parameter_source(param_name) != ParameterSource.DEFAULT:
+        return explicit_value
+    return default_value
 
 
 @main.command()
@@ -353,6 +388,27 @@ def bands(config, dataset, n_toys, output_dir):
     show_default=False,
     help="Override the config value and write or skip nested mass folders for each toy scan",
 )
+@click.option(
+    "--scan-parallel/--no-scan-parallel",
+    default=None,
+    show_default=False,
+    help="Override toy-scan inner mass parallelism",
+)
+@click.option(
+    "--scan-n-workers",
+    type=int,
+    help="Override toy-scan inner mass workers",
+)
+@click.option(
+    "--scan-backend",
+    type=str,
+    help="Override toy-scan joblib backend",
+)
+@click.option(
+    "--scan-threads-per-worker",
+    type=int,
+    help="Override toy-scan threads per worker",
+)
 @click.pass_context
 def toy_scan(
     ctx,
@@ -370,21 +426,20 @@ def toy_scan(
     save_plots,
     save_fit_json,
     save_per_mass_folders,
+    scan_parallel,
+    scan_n_workers,
+    scan_backend,
+    scan_threads_per_worker,
 ):
     """Run the mass scan once per functional-form toy histogram."""
     from .config import load_config
     from .dataset import make_datasets
     from .funcform_toys import discover_funcform_toys, run_funcform_toy_scans
+    from .scan import union_scan_grid
 
     cfg = load_config(config)
     if output_dir:
         cfg.output_dir = output_dir
-    if ctx.get_parameter_source("save_plots") != ParameterSource.DEFAULT:
-        cfg.save_plots = bool(save_plots)
-    if ctx.get_parameter_source("save_fit_json") != ParameterSource.DEFAULT:
-        cfg.save_fit_json = bool(save_fit_json)
-    if ctx.get_parameter_source("save_per_mass_folders") != ParameterSource.DEFAULT:
-        cfg.save_per_mass_folders = bool(save_per_mass_folders)
     cfg.ensure_output_dir()
 
     if toy_name_fmt and not toy_indices:
@@ -413,11 +468,60 @@ def toy_scan(
         print("No toy histograms matched the requested selection.")
         sys.exit(1)
 
+    resolved_save_plots = bool(_resolve_cli_override(
+        ctx, "save_plots", save_plots, getattr(cfg, "toy_scan_save_plots", False)
+    ))
+    resolved_save_fit_json = bool(_resolve_cli_override(
+        ctx, "save_fit_json", save_fit_json, getattr(cfg, "toy_scan_save_fit_json", False)
+    ))
+    resolved_save_per_mass_folders = bool(_resolve_cli_override(
+        ctx,
+        "save_per_mass_folders",
+        save_per_mass_folders,
+        getattr(cfg, "toy_scan_save_per_mass_folders", False),
+    ))
+    resolved_scan_parallel = bool(_resolve_cli_override(
+        ctx, "scan_parallel", scan_parallel, getattr(cfg, "toy_scan_parallel", False)
+    ))
+    resolved_scan_n_workers = max(
+        1,
+        int(_resolve_cli_override(
+            ctx, "scan_n_workers", scan_n_workers, getattr(cfg, "toy_scan_n_workers", 1)
+        )),
+    )
+    resolved_scan_backend = str(_resolve_cli_override(
+        ctx, "scan_backend", scan_backend, getattr(cfg, "toy_scan_parallel_backend", "threading")
+    ))
+    resolved_scan_threads_per_worker = max(
+        1,
+        int(_resolve_cli_override(
+            ctx,
+            "scan_threads_per_worker",
+            scan_threads_per_worker,
+            getattr(cfg, "toy_scan_threads_per_worker", 1),
+        )),
+    )
+
+    masses = union_scan_grid({str(ds.key): ds}, cfg.mass_step_gev)
+    if mass_min is not None:
+        masses = masses[masses >= float(mass_min)]
+    if mass_max is not None:
+        masses = masses[masses <= float(mass_max)]
+
     print(f"Running functional-form toy scans for {ds.label}")
     print(f"Toy source: {toy_root}")
     if container:
         print(f"Container: {container}")
     print(f"Matched toys: {len(specs)}")
+    print(f"Mass hypotheses per toy: {len(masses)}")
+    print("Effective toy-scan settings:")
+    print(f"  scan_parallel={resolved_scan_parallel}")
+    print(f"  scan_n_workers={resolved_scan_n_workers}")
+    print(f"  scan_backend={resolved_scan_backend}")
+    print(f"  scan_threads_per_worker={resolved_scan_threads_per_worker}")
+    print(f"  save_plots={resolved_save_plots}")
+    print(f"  save_fit_json={resolved_save_fit_json}")
+    print(f"  save_per_mass_folders={resolved_save_per_mass_folders}")
 
     written = run_funcform_toy_scans(
         ds,
@@ -426,9 +530,13 @@ def toy_scan(
         base_output_dir=cfg.output_dir,
         mass_min=mass_min,
         mass_max=mass_max,
-        save_plots=cfg.save_plots,
-        save_fit_json=cfg.save_fit_json,
-        save_per_mass_folders=cfg.save_per_mass_folders,
+        save_plots=resolved_save_plots,
+        save_fit_json=resolved_save_fit_json,
+        save_per_mass_folders=resolved_save_per_mass_folders,
+        scan_parallel=resolved_scan_parallel,
+        scan_n_workers=resolved_scan_n_workers,
+        scan_parallel_backend=resolved_scan_backend,
+        scan_threads_per_worker=resolved_scan_threads_per_worker,
     )
     print(f"Wrote {len(written)} toy scan directories under {os.path.join(cfg.output_dir, 'toy_scans', ds.key)}")
 
@@ -926,7 +1034,7 @@ def test(config, output_dir):
 @click.option(
     "--cpus-per-task",
     type=int,
-    help="SLURM CPUs per task; defaults to scan_n_workers * scan_threads_per_worker from the config",
+    help="SLURM CPUs per task; defaults to toy_scan_n_workers * toy_scan_threads_per_worker from the config",
 )
 @click.option(
     "--conda-env",
@@ -959,7 +1067,7 @@ def slurm_gen_toy_scan(config, dataset, toy_root, container, toy_pattern, output
         )
 
     extra = _build_extra_sbatch(account=account, qos=qos)
-    resolved_cpus_per_task = _infer_scan_cpus_per_task(cfg, override=cpus_per_task)
+    resolved_cpus_per_task = _infer_toy_scan_cpus_per_task(cfg, override=cpus_per_task)
     job_script, submit_script, n_jobs = generate_toy_scan_slurm_scripts(
         config_path=config,
         output_path=output,

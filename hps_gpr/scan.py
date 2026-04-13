@@ -315,9 +315,7 @@ def run_scan(
                     "error": str(e),
                 })
 
-        # Progress print every 25 MeV
-        if int(round(float(m) * 1000)) % 25 == 0:
-            print(f"[scan] reached {float(m):.3f} GeV")
+        print(f"[scan] testing mass hypothesis {float(m):.3f} GeV", flush=True)
 
         return rows_s, rows_c
 

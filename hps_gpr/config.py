@@ -139,6 +139,14 @@ class Config:
     scan_n_workers: int = 1
     scan_parallel_backend: str = "loky"
     scan_threads_per_worker: int = 1
+    # Functional-form toy scans use lean closure-study defaults unless overridden.
+    toy_scan_parallel: bool = False
+    toy_scan_n_workers: int = 1
+    toy_scan_parallel_backend: str = "threading"
+    toy_scan_threads_per_worker: int = 1
+    toy_scan_save_plots: bool = False
+    toy_scan_save_fit_json: bool = False
+    toy_scan_save_per_mass_folders: bool = False
     # Scan diagnostic plots
     scan_diagnostic_plot_every_n: Optional[int] = None
     scan_diagnostic_zoom_half_sigma: float = 0.5

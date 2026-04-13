@@ -218,9 +218,13 @@ def run_funcform_toy_scans(
     base_output_dir: str,
     mass_min: Optional[float] = None,
     mass_max: Optional[float] = None,
-    save_plots: bool = False,
-    save_fit_json: bool = False,
-    save_per_mass_folders: bool = False,
+    save_plots: Optional[bool] = None,
+    save_fit_json: Optional[bool] = None,
+    save_per_mass_folders: Optional[bool] = None,
+    scan_parallel: Optional[bool] = None,
+    scan_n_workers: Optional[int] = None,
+    scan_parallel_backend: Optional[str] = None,
+    scan_threads_per_worker: Optional[int] = None,
 ) -> List[str]:
     """Run the existing scan engine once per toy histogram."""
     from .scan import run_scan
@@ -236,9 +240,40 @@ def run_funcform_toy_scans(
 
         toy_cfg = copy.deepcopy(config)
         toy_cfg.output_dir = _toy_output_dir(base_output_dir, ds.key, spec)
-        toy_cfg.save_plots = bool(save_plots)
-        toy_cfg.save_fit_json = bool(save_fit_json)
-        toy_cfg.save_per_mass_folders = bool(save_per_mass_folders)
+        toy_cfg.save_plots = bool(
+            getattr(config, "toy_scan_save_plots", False)
+            if save_plots is None else save_plots
+        )
+        toy_cfg.save_fit_json = bool(
+            getattr(config, "toy_scan_save_fit_json", False)
+            if save_fit_json is None else save_fit_json
+        )
+        toy_cfg.save_per_mass_folders = bool(
+            getattr(config, "toy_scan_save_per_mass_folders", False)
+            if save_per_mass_folders is None else save_per_mass_folders
+        )
+        toy_cfg.scan_parallel = bool(
+            getattr(config, "toy_scan_parallel", False)
+            if scan_parallel is None else scan_parallel
+        )
+        toy_cfg.scan_n_workers = max(
+            1,
+            int(
+                getattr(config, "toy_scan_n_workers", 1)
+                if scan_n_workers is None else scan_n_workers
+            ),
+        )
+        toy_cfg.scan_parallel_backend = str(
+            getattr(config, "toy_scan_parallel_backend", "threading")
+            if scan_parallel_backend is None else scan_parallel_backend
+        )
+        toy_cfg.scan_threads_per_worker = max(
+            1,
+            int(
+                getattr(config, "toy_scan_threads_per_worker", 1)
+                if scan_threads_per_worker is None else scan_threads_per_worker
+            ),
+        )
         toy_cfg.ensure_output_dir()
 
         df_single, df_comb = run_scan(

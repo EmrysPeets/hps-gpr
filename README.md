@@ -230,6 +230,23 @@ python -m hps_gpr.cli toy-scan \
   --mass-min 0.030 \
   --mass-max 0.040
 
+# Opt into the heavier per-mass diagnostic tree for a small debug run
+python -m hps_gpr.cli toy-scan \
+  --config config_example.yaml \
+  --dataset 2015 \
+  --toy-root outputs/funcform_toys/funcform_2015_toys.root \
+  --container fShiftSigPowTail \
+  --toy-pattern 'fShiftSigPowTail_toy_*' \
+  --max-toys 1 \
+  --output-dir outputs/funcform_toy_scans_debug \
+  --save-plots \
+  --save-fit-json \
+  --save-per-mass-folders \
+  --scan-parallel \
+  --scan-n-workers 5 \
+  --scan-backend loky \
+  --scan-threads-per-worker 2
+
 # Generate one SLURM job per toy histogram from the source checkout
 python -m hps_gpr.cli slurm-gen-toy-scan \
   --config config_2015_10k.yaml \
@@ -257,18 +274,32 @@ Local `toy-scan` smoke runs write one directory per toy at:
 
 - `OUTPUT_DIR/toy_scans/<dataset>/toy_XXXX/`
 
+By default, `toy-scan` now uses lean closure-study settings:
+
+- inner scan parallelism off (`toy_scan_parallel: false`)
+- 1 worker / 1 thread when parallelism is re-enabled
+- no per-mass plots, fit JSON, or nested mass folders unless you opt in
+
+That default output tree contains:
+
+- `results_single.csv`
+- `results_combined.csv`
+- `combined.csv`
+- `toy_metadata.json`
+
 The production SLURM workflow writes one isolated job tree per toy at:
 
 - `OUTPUT_DIR/jobs/<toy_name>/toy_scans/<dataset>/toy_XXXX/results_single.csv`
 - `OUTPUT_DIR/jobs/<toy_name>/toy_scans/<dataset>/toy_XXXX/results_combined.csv`
 - `OUTPUT_DIR/jobs/<toy_name>/toy_scans/<dataset>/toy_XXXX/combined.csv`
 - `OUTPUT_DIR/jobs/<toy_name>/toy_scans/<dataset>/toy_XXXX/toy_metadata.json`
-- `OUTPUT_DIR/jobs/<toy_name>/toy_scans/<dataset>/toy_XXXX/mXXXMeV/<dataset>/...` when `save_per_mass_folders: true`
+- `OUTPUT_DIR/jobs/<toy_name>/toy_scans/<dataset>/toy_XXXX/mXXXMeV/<dataset>/...` only when you opt into `save_per_mass_folders: true`
 - `logs/%j.out` and `logs/%j.err` beside the generated submission scripts
 
-By default, `slurm-gen-toy-scan` requests `scan_n_workers * scan_threads_per_worker`
-CPUs per task from the config. Override that with `--cpus-per-task` if you want a
-different SLURM reservation.
+By default, `slurm-gen-toy-scan` requests
+`toy_scan_n_workers * toy_scan_threads_per_worker` CPUs per task from the config,
+or `1` CPU when `toy_scan_parallel: false`. Override that with `--cpus-per-task`
+if you want a different SLURM reservation.
 
 `toy-scan-merge` writes:
 

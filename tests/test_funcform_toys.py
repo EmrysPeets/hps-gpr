@@ -6,16 +6,18 @@ from click.testing import CliRunner
 import hist
 import numpy as np
 import pandas as pd
+import pytest
 import uproot
 
 from hps_gpr.cli import main
-from hps_gpr.config import Config
+from hps_gpr.config import Config, load_config
 from hps_gpr.dataset import DatasetConfig
 from hps_gpr.funcform_toys import (
     FuncFormToySpec,
     discover_funcform_toys,
     load_funcform_toy_hist,
     merge_toy_scan_results,
+    run_funcform_toy_scans,
 )
 from hps_gpr.io import _build_model
 from hps_gpr.slurm import generate_toy_scan_slurm_scripts
@@ -234,7 +236,87 @@ def test_merge_toy_scan_results_reports_inventory_on_empty_outputs(tmp_path):
         merge_toy_scan_results(str(tmp_path / "jobs"), output_dir=str(tmp_path / "merged"))
 
 
-def test_toy_scan_cli_respects_config_save_defaults_and_overrides(monkeypatch, tmp_path):
+def test_run_funcform_toy_scans_applies_toy_runtime_and_output_overrides(monkeypatch, tmp_path):
+    root_path = tmp_path / "funcform.root"
+    _write_toy_root(root_path)
+    base_output_dir = tmp_path / "toy_out"
+
+    ds = DatasetConfig(
+        key="2015",
+        label="HPS 2015",
+        root_path="unused.root",
+        hist_name="unused",
+        m_low=0.02,
+        m_high=0.13,
+        sigma_coeffs=[0.001],
+        frad_coeffs=[0.1],
+    )
+    cfg = Config(
+        output_dir=str(base_output_dir),
+        scan_parallel=True,
+        scan_n_workers=5,
+        scan_parallel_backend="loky",
+        scan_threads_per_worker=2,
+        save_plots=True,
+        save_fit_json=True,
+        save_per_mass_folders=True,
+        toy_scan_parallel=False,
+        toy_scan_n_workers=1,
+        toy_scan_parallel_backend="threading",
+        toy_scan_threads_per_worker=1,
+        toy_scan_save_plots=False,
+        toy_scan_save_fit_json=False,
+        toy_scan_save_per_mass_folders=False,
+    )
+    spec = FuncFormToySpec(
+        source_root=str(root_path),
+        container="primary",
+        function_tag="primary",
+        toy_name="primary_toy_0",
+        toy_index=0,
+    )
+
+    captured = {}
+
+    def fake_run_scan(datasets, toy_cfg, mass_min=None, mass_max=None):
+        captured["dataset_keys"] = list(datasets.keys())
+        captured["scan_parallel"] = toy_cfg.scan_parallel
+        captured["scan_n_workers"] = toy_cfg.scan_n_workers
+        captured["scan_parallel_backend"] = toy_cfg.scan_parallel_backend
+        captured["scan_threads_per_worker"] = toy_cfg.scan_threads_per_worker
+        captured["save_plots"] = toy_cfg.save_plots
+        captured["save_fit_json"] = toy_cfg.save_fit_json
+        captured["save_per_mass_folders"] = toy_cfg.save_per_mass_folders
+        captured["output_dir"] = toy_cfg.output_dir
+        return (
+            pd.DataFrame([{"dataset": "2015", "mass_GeV": 0.04, "Z_analytic": 1.2, "p0_analytic": 0.1, "extract_success": True}]),
+            pd.DataFrame(),
+        )
+
+    import hps_gpr.scan as scan_mod
+
+    monkeypatch.setattr(scan_mod, "run_scan", fake_run_scan)
+
+    written = run_funcform_toy_scans(
+        ds,
+        cfg,
+        [spec],
+        base_output_dir=str(base_output_dir),
+    )
+
+    assert written == [str(base_output_dir / "toy_scans" / "2015" / "toy_0000")]
+    assert captured["dataset_keys"] == ["2015"]
+    assert captured["scan_parallel"] is False
+    assert captured["scan_n_workers"] == 1
+    assert captured["scan_parallel_backend"] == "threading"
+    assert captured["scan_threads_per_worker"] == 1
+    assert captured["save_plots"] is False
+    assert captured["save_fit_json"] is False
+    assert captured["save_per_mass_folders"] is False
+    assert captured["output_dir"].endswith("toy_scans/2015/toy_0000")
+
+
+def test_toy_scan_cli_uses_toy_defaults_and_prints_effective_settings(monkeypatch, tmp_path):
     config_path = tmp_path / "config.yaml"
     toy_root = tmp_path / "toys.root"
     config_path.write_text("output_dir: outputs/test\n")
@@ -249,6 +331,13 @@ def test_toy_scan_cli_respects_config_save_defaults_and_overrides(monkeypatch, t
             save_plots=True,
             save_fit_json=True,
             save_per_mass_folders=True,
+            toy_scan_parallel=False,
+            toy_scan_n_workers=1,
+            toy_scan_parallel_backend="threading",
+            toy_scan_threads_per_worker=1,
+            toy_scan_save_plots=False,
+            toy_scan_save_fit_json=False,
+            toy_scan_save_per_mass_folders=False,
         )
 
     def fake_make_datasets(cfg):
@@ -302,11 +391,79 @@ def test_toy_scan_cli_respects_config_save_defaults_and_overrides(monkeypatch, t
         ],
     )
     assert result_default.exit_code == 0, result_default.output
-    assert captured[0]["save_plots"] is True
-    assert captured[0]["save_fit_json"] is True
-    assert captured[0]["save_per_mass_folders"] is True
+    assert captured[0]["save_plots"] is False
+    assert captured[0]["save_fit_json"] is False
+    assert captured[0]["save_per_mass_folders"] is False
+    assert captured[0]["scan_parallel"] is False
+    assert captured[0]["scan_n_workers"] == 1
+    assert captured[0]["scan_parallel_backend"] == "threading"
+    assert captured[0]["scan_threads_per_worker"] == 1
+    assert "Mass hypotheses per toy: 111" in result_default.output
+    assert "scan_parallel=False" in result_default.output
+    assert "scan_backend=threading" in result_default.output
 
-    result_override = runner.invoke(
+
+def test_toy_scan_cli_accepts_explicit_runtime_overrides(monkeypatch, tmp_path):
+    config_path = tmp_path / "config.yaml"
+    toy_root = tmp_path / "toys.root"
+    config_path.write_text("output_dir: outputs/test\n")
+    toy_root.write_text("placeholder\n")
+
+    captured = []
+
+    def fake_load_config(path):
+        assert str(path) == str(config_path)
+        return Config(
+            output_dir=str(tmp_path / "out"),
+            toy_scan_parallel=False,
+            toy_scan_n_workers=1,
+            toy_scan_parallel_backend="threading",
+            toy_scan_threads_per_worker=1,
+            toy_scan_save_plots=False,
+            toy_scan_save_fit_json=False,
+            toy_scan_save_per_mass_folders=False,
+        )
+
+    def fake_make_datasets(cfg):
+        return {
+            "2015": DatasetConfig(
+                key="2015",
+                label="HPS 2015",
+                root_path="unused.root",
+                hist_name="unused",
+                m_low=0.02,
+                m_high=0.13,
+                sigma_coeffs=[0.001],
+                frad_coeffs=[0.1],
+            )
+        }
+
+    def fake_discover(*args, **kwargs):
+        return [
+            FuncFormToySpec(
+                source_root=str(toy_root),
+                container="primary",
+                function_tag="primary",
+                toy_name="primary_toy_7",
+                toy_index=7,
+            )
+        ]
+
+    def fake_run(*args, **kwargs):
+        captured.append(kwargs)
+        return [str(Path(kwargs["base_output_dir"]) / "toy_scans" / "2015" / "toy_0007")]
+
+    import hps_gpr.config as cfg_mod
+    import hps_gpr.dataset as dataset_mod
+    import hps_gpr.funcform_toys as funcform_mod
+
+    monkeypatch.setattr(cfg_mod, "load_config", fake_load_config)
+    monkeypatch.setattr(dataset_mod, "make_datasets", fake_make_datasets)
+    monkeypatch.setattr(funcform_mod, "discover_funcform_toys", fake_discover)
+    monkeypatch.setattr(funcform_mod, "run_funcform_toy_scans", fake_run)
+
+    runner = CliRunner()
+    result = runner.invoke(
         main,
         [
             "toy-scan",
@@ -315,15 +472,23 @@ def test_toy_scan_cli_respects_config_save_defaults_and_overrides(monkeypatch, t
             "--toy-root", str(toy_root),
             "--container", "primary",
             "--toy-pattern", "primary_toy_*",
-            "--no-save-plots",
-            "--no-save-fit-json",
-            "--no-save-per-mass-folders",
+            "--save-plots",
+            "--save-fit-json",
+            "--save-per-mass-folders",
+            "--scan-parallel",
+            "--scan-n-workers", "4",
+            "--scan-backend", "loky",
+            "--scan-threads-per-worker", "3",
         ],
     )
-    assert result_override.exit_code == 0, result_override.output
-    assert captured[1]["save_plots"] is False
-    assert captured[1]["save_fit_json"] is False
-    assert captured[1]["save_per_mass_folders"] is False
+    assert result.exit_code == 0, result.output
+    assert captured[0]["save_plots"] is True
+    assert captured[0]["save_fit_json"] is True
+    assert captured[0]["save_per_mass_folders"] is True
+    assert captured[0]["scan_parallel"] is True
+    assert captured[0]["scan_n_workers"] == 4
+    assert captured[0]["scan_parallel_backend"] == "loky"
+    assert captured[0]["scan_threads_per_worker"] == 3
 
 
 def test_generate_toy_scan_slurm_scripts_writes_expected_commands(tmp_path):
@@ -352,6 +517,9 @@ def test_generate_toy_scan_slurm_scripts_writes_expected_commands(tmp_path):
     assert 'cd "${REPO_ROOT}"' in job_text
     assert 'source "${REPO_ROOT}/startup.sh"' in job_text
     assert 'JOB_OUTDIR="${BASE_OUTPUT_DIR}/jobs/${TOY_DIR_NAME}"' in job_text
+    assert 'export PYTHONUNBUFFERED=1' in job_text
+    assert 'echo "[toy-scan] dataset=${TOY_DATASET} toy=${TOY_NAME} output=${JOB_OUTDIR}"' in job_text
+    assert 'mass-hypothesis progress will appear below' in job_text
     assert '--output-dir "${JOB_OUTDIR}"' in job_text
     assert '--toy-root "${TOY_ROOT}"' in job_text
     assert 'CMD+=(--toy-name-fmt "${TOY_NAME}")' in job_text
@@ -382,6 +550,9 @@ def test_slurm_gen_toy_scan_cli_infers_cpus_per_task(monkeypatch, tmp_path):
             scan_parallel=True,
             scan_n_workers=3,
             scan_threads_per_worker=2,
+            toy_scan_parallel=False,
+            toy_scan_n_workers=4,
+            toy_scan_threads_per_worker=3,
         )
 
     def fake_discover(*args, **kwargs):
@@ -415,6 +586,25 @@ def test_slurm_gen_toy_scan_cli_infers_cpus_per_task(monkeypatch, tmp_path):
         ],
     )
     assert result.exit_code == 0, result.output
-    assert "CPUs per task: 6" in result.output
+    assert "CPUs per task: 1" in result.output
     job_text = output_path.read_text()
-    assert "#SBATCH --cpus-per-task=6" in job_text
+    assert "#SBATCH --cpus-per-task=1" in job_text
+
+
+@pytest.mark.parametrize(
+    "config_path",
+    [
+        "config_2016_10pct_10k.yaml",
+        "study_configs/config_2016_10pct_blind1p64_90CL_10k_injection.yaml",
+        "study_configs/config_2016_10pct_blind1p64_95CL_10k_injection.yaml",
+        "study_configs/config_2016_10pct_blind1p64_95CL_10k_injection_gpmean_pseudoexp.yaml",
+        "study_configs/config_2016_10pct_blind1p96_90CL_10k_injection.yaml",
+        "study_configs/config_2016_10pct_blind1p96_95CL_10k_injection.yaml",
+    ],
+)
+def test_2016_only_configs_use_2016_dataset_selectors(config_path):
+    cfg = load_config(config_path)
+    assert cfg.enable_2015 is False
+    assert cfg.enable_2016 is True
+    assert cfg.inj_dataset_key == "2016"
+    assert cfg.run_limit_bands_on == "2016"
