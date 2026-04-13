@@ -54,6 +54,18 @@ def _build_extra_sbatch(account=None, qos=None):
     return extra or None
 
 
+def _infer_scan_cpus_per_task(cfg, override=None):
+    """Infer a CPU request matching the scan parallelism, unless overridden."""
+    if override is not None:
+        return max(1, int(override))
+    threads_per_worker = int(getattr(cfg, "scan_threads_per_worker", 1) or 1)
+    if bool(getattr(cfg, "scan_parallel", False)):
+        n_workers = int(getattr(cfg, "scan_n_workers", 1) or 1)
+    else:
+        n_workers = 1
+    return max(1, int(n_workers) * int(threads_per_worker))
+
+
 @main.command()
 @click.option(
     "--config",
@@ -912,6 +924,11 @@ def test(config, output_dir):
     help="Memory per task",
 )
 @click.option(
+    "--cpus-per-task",
+    type=int,
+    help="SLURM CPUs per task; defaults to scan_n_workers * scan_threads_per_worker from the config",
+)
+@click.option(
     "--conda-env",
     help="Conda environment to activate",
 )
@@ -923,7 +940,7 @@ def test(config, output_dir):
     "--qos",
     help="Optional SLURM QOS to request",
 )
-def slurm_gen_toy_scan(config, dataset, toy_root, container, toy_pattern, output, job_name, partition, time, memory, conda_env, account, qos):
+def slurm_gen_toy_scan(config, dataset, toy_root, container, toy_pattern, output, job_name, partition, time, memory, cpus_per_task, conda_env, account, qos):
     """Generate SLURM scripts for one functional-form toy scan per job."""
     from .config import load_config
     from .funcform_toys import discover_funcform_toys
@@ -942,6 +959,7 @@ def slurm_gen_toy_scan(config, dataset, toy_root, container, toy_pattern, output
         )
 
     extra = _build_extra_sbatch(account=account, qos=qos)
+    resolved_cpus_per_task = _infer_scan_cpus_per_task(cfg, override=cpus_per_task)
     job_script, submit_script, n_jobs = generate_toy_scan_slurm_scripts(
         config_path=config,
         output_path=output,
@@ -955,10 +973,12 @@ def slurm_gen_toy_scan(config, dataset, toy_root, container, toy_pattern, output
         partition=partition,
         time_limit=time,
         memory=memory,
+        cpus_per_task=resolved_cpus_per_task,
         conda_env=conda_env,
         extra_sbatch=extra,
     )
     print(f"\nPrepared {n_jobs} toy-scan jobs.")
+    print(f"CPUs per task: {resolved_cpus_per_task}")
     print("To submit all jobs, run:")
     print(f"  bash {submit_script}")
     print("If your site needs different submission-time charging flags, append them to the submit helper.")

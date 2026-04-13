@@ -239,6 +239,7 @@ python -m hps_gpr.cli slurm-gen-toy-scan \
   --toy-pattern 'fShiftSigPowTail_toy_*' \
   --job-name hps2015_toyscan \
   --partition roma \
+  --cpus-per-task 10 \
   --account hps:hps-prod \
   --time 4:00:00 \
   --memory 8G \
@@ -264,6 +265,10 @@ The production SLURM workflow writes one isolated job tree per toy at:
 - `OUTPUT_DIR/jobs/<toy_name>/toy_scans/<dataset>/toy_XXXX/toy_metadata.json`
 - `OUTPUT_DIR/jobs/<toy_name>/toy_scans/<dataset>/toy_XXXX/mXXXMeV/<dataset>/...` when `save_per_mass_folders: true`
 - `logs/%j.out` and `logs/%j.err` beside the generated submission scripts
+
+By default, `slurm-gen-toy-scan` requests `scan_n_workers * scan_threads_per_worker`
+CPUs per task from the config. Override that with `--cpus-per-task` if you want a
+different SLURM reservation.
 
 `toy-scan-merge` writes:
 

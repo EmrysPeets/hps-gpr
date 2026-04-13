@@ -338,6 +338,7 @@ def test_generate_toy_scan_slurm_scripts_writes_expected_commands(tmp_path):
         toy_indices=[0, 1],
         output_root="outputs/funcform_toys",
         container="primary",
+        cpus_per_task=10,
         extra_sbatch=["--account=testacct", "--qos=testqos"],
     )
 
@@ -347,6 +348,7 @@ def test_generate_toy_scan_slurm_scripts_writes_expected_commands(tmp_path):
     assert "python -m hps_gpr.cli toy-scan" in job_text
     assert "#SBATCH --account=testacct" in job_text
     assert "#SBATCH --qos=testqos" in job_text
+    assert "#SBATCH --cpus-per-task=10" in job_text
     assert 'cd "${REPO_ROOT}"' in job_text
     assert 'source "${REPO_ROOT}/startup.sh"' in job_text
     assert 'JOB_OUTDIR="${BASE_OUTPUT_DIR}/jobs/${TOY_DIR_NAME}"' in job_text
@@ -364,3 +366,55 @@ def test_generate_toy_scan_slurm_scripts_writes_expected_commands(tmp_path):
     assert "TOY_INDEX=1" in submit_text
     assert "TOY_DIR_NAME=primary_toy_1" in submit_text
     assert 'REPO_ROOT="' in submit_text
+
+
+def test_slurm_gen_toy_scan_cli_infers_cpus_per_task(monkeypatch, tmp_path):
+    config_path = tmp_path / "config.yaml"
+    toy_root = tmp_path / "toys.root"
+    output_path = tmp_path / "submit_toy_scan.slurm"
+    config_path.write_text("output_dir: outputs/test\n")
+    toy_root.write_text("placeholder\n")
+
+    def fake_load_config(path):
+        assert str(path) == str(config_path)
+        return Config(
+            output_dir=str(tmp_path / "out"),
+            scan_parallel=True,
+            scan_n_workers=3,
+            scan_threads_per_worker=2,
+        )
+
+    def fake_discover(*args, **kwargs):
+        return [
+            FuncFormToySpec(
+                source_root=str(toy_root),
+                container="primary",
+                function_tag="primary",
+                toy_name="primary_toy_7",
+                toy_index=7,
+            )
+        ]
+
+    import hps_gpr.config as cfg_mod
+    import hps_gpr.funcform_toys as funcform_mod
+
+    monkeypatch.setattr(cfg_mod, "load_config", fake_load_config)
+    monkeypatch.setattr(funcform_mod, "discover_funcform_toys", fake_discover)
+
+    runner = CliRunner()
+    result = runner.invoke(
+        main,
+        [
+            "slurm-gen-toy-scan",
+            "--config", str(config_path),
+            "--dataset", "2015",
+            "--toy-root", str(toy_root),
+            "--container", "primary",
+            "--toy-pattern", "primary_toy_*",
+            "--output", str(output_path),
+        ],
+    )
+    assert result.exit_code == 0, result.output
+    assert "CPUs per task: 6" in result.output
+    job_text = output_path.read_text()
+    assert "#SBATCH --cpus-per-task=6" in job_text

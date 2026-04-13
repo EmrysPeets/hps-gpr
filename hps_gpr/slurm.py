@@ -281,6 +281,7 @@ def generate_toy_scan_slurm_scripts(
     partition: str = "batch",
     time_limit: str = "4:00:00",
     memory: str = "4G",
+    cpus_per_task: Optional[int] = None,
     conda_env: Optional[str] = None,
     extra_sbatch: Optional[List[str]] = None,
 ) -> tuple:
@@ -312,6 +313,8 @@ def generate_toy_scan_slurm_scripts(
         "#SBATCH --output=logs/%j.out",
         "#SBATCH --error=logs/%j.err",
     ]
+    if cpus_per_task is not None:
+        job_lines.append(f"#SBATCH --cpus-per-task={int(cpus_per_task)}")
 
     if extra_sbatch:
         for directive in extra_sbatch:
