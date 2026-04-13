@@ -8,8 +8,8 @@ _startup_venv_activate="${_startup_venv_dir}/bin/activate"
 
 if [ -n "${VIRTUAL_ENV:-}" ]; then
   _startup_active_venv="$(cd "${VIRTUAL_ENV}" 2>/dev/null && pwd || true)"
-  _startup_repo_venv="$(cd "${_startup_venv_dir}" 2>/dev/null && pwd || true)"
-  if [ -n "${_startup_active_venv}" ] && [ -n "${_startup_repo_venv}" ] && [ "${_startup_active_venv}" != "${_startup_repo_venv}" ]; then
+  _startup_repo_venv="${_startup_venv_dir}"
+  if [ -n "${_startup_active_venv}" ] && [ "${_startup_active_venv}" != "${_startup_repo_venv}" ]; then
     if type deactivate >/dev/null 2>&1; then
       echo "[startup] deactivating foreign virtualenv: ${VIRTUAL_ENV}" >&2
       deactivate
