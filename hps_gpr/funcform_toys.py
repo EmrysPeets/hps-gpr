@@ -397,6 +397,386 @@ def _summarize_one_toy(group: pd.DataFrame) -> dict:
     }
 
 
+def _toy_scan_slug(parts: Sequence[object]) -> str:
+    """Build a filesystem-safe slug from a sequence of labels."""
+    toks = []
+    for part in parts:
+        text = str(part).strip()
+        if not text:
+            continue
+        clean = re.sub(r"[^A-Za-z0-9._-]+", "_", text).strip("._-")
+        if clean:
+            toks.append(clean)
+    return "_".join(toks)
+
+
+def _toy_scan_row_quantile(arr: np.ndarray, q: float) -> np.ndarray:
+    """Compute a row-wise quantile while tolerating all-NaN rows."""
+    arr = np.asarray(arr, dtype=float)
+    out = np.full(arr.shape[0], np.nan, dtype=float)
+    for i in range(arr.shape[0]):
+        row = arr[i]
+        finite = row[np.isfinite(row)]
+        if finite.size:
+            out[i] = float(np.percentile(finite, float(q)))
+    return out
+
+
+def _toy_scan_describe_sample(toy_names: Sequence[str]) -> str:
+    """Condense a toy-name list into a reviewer-friendly sample label."""
+    names = [str(name) for name in toy_names if str(name).strip()]
+    if not names:
+        return "unknown"
+    if len(names) <= 3:
+        return ", ".join(names)
+    return f"{names[0]} ... {names[-1]}"
+
+
+def _toy_scan_group_metadata(merged_grp: pd.DataFrame, summary_grp: pd.DataFrame) -> dict:
+    """Collect common metadata for one merged toy-scan group."""
+    dataset = str(merged_grp["dataset"].iloc[0]) if "dataset" in merged_grp.columns else "dataset"
+    function_tag = str(merged_grp["function_tag"].iloc[0]) if "function_tag" in merged_grp.columns else "funcform"
+    container = str(merged_grp["container"].iloc[0]) if "container" in merged_grp.columns else ""
+    source_root = str(merged_grp["source_root"].iloc[0]) if "source_root" in merged_grp.columns else ""
+    source_name = Path(source_root).name if source_root else "unknown"
+
+    toy_names = summary_grp["toy_hist"].astype(str).tolist() if "toy_hist" in summary_grp.columns else []
+    toy_indices = (
+        sorted(int(v) for v in summary_grp["toy_index"].dropna().astype(int).tolist())
+        if "toy_index" in summary_grp.columns
+        else []
+    )
+
+    mass_vals = merged_grp["mass_GeV"].dropna().to_numpy(float) if "mass_GeV" in merged_grp.columns else np.array([])
+    mass_lo_mev = 1000.0 * float(np.nanmin(mass_vals)) if mass_vals.size else float("nan")
+    mass_hi_mev = 1000.0 * float(np.nanmax(mass_vals)) if mass_vals.size else float("nan")
+
+    if {"toy_index", "mass_GeV"}.issubset(merged_grp.columns):
+        per_toy_counts = (
+            merged_grp.groupby("toy_index", dropna=False)["mass_GeV"]
+            .nunique()
+            .to_numpy(dtype=float)
+        )
+        n_mass = int(np.nanmedian(per_toy_counts)) if per_toy_counts.size else int(merged_grp["mass_GeV"].nunique())
+    else:
+        n_mass = int(merged_grp["mass_GeV"].nunique()) if "mass_GeV" in merged_grp.columns else 0
+
+    fail_total = (
+        int(summary_grp["n_fail"].fillna(0).astype(int).sum())
+        if "n_fail" in summary_grp.columns
+        else int((~merged_grp.get("extract_success", pd.Series(dtype=bool)).fillna(False)).sum())
+    )
+
+    med_max_z = (
+        float(np.nanmedian(summary_grp["max_Z_analytic"].to_numpy(float)))
+        if "max_Z_analytic" in summary_grp.columns and len(summary_grp)
+        else float("nan")
+    )
+    med_peak_mass_mev = (
+        1000.0 * float(np.nanmedian(summary_grp["mass_at_max_Z"].to_numpy(float)))
+        if "mass_at_max_Z" in summary_grp.columns and len(summary_grp)
+        else float("nan")
+    )
+    med_min_p0 = (
+        float(np.nanmedian(summary_grp["min_p0_analytic"].to_numpy(float)))
+        if "min_p0_analytic" in summary_grp.columns and len(summary_grp)
+        else float("nan")
+    )
+
+    return {
+        "dataset": dataset,
+        "function_tag": function_tag,
+        "container": container,
+        "source_root": source_root,
+        "source_name": source_name,
+        "toy_names": toy_names,
+        "toy_indices": toy_indices,
+        "toy_label": _toy_scan_describe_sample(toy_names),
+        "n_toys": int(len(summary_grp)),
+        "fail_total": fail_total,
+        "n_mass": n_mass,
+        "mass_lo_mev": mass_lo_mev,
+        "mass_hi_mev": mass_hi_mev,
+        "median_max_z": med_max_z,
+        "median_peak_mass_mev": med_peak_mass_mev,
+        "median_min_p0": med_min_p0,
+    }
+
+
+def _toy_scan_info_text(meta: dict) -> str:
+    """Format an annotation box for the validation plots."""
+    idxs = meta.get("toy_indices") or []
+    if idxs:
+        idx_text = f"{idxs[0]}-{idxs[-1]}" if len(idxs) > 1 else str(idxs[0])
+    else:
+        idx_text = "unknown"
+
+    container = str(meta.get("container", "")).strip()
+    source_label = str(meta.get("source_name", "unknown"))
+    if container:
+        source_label = f"{source_label} :: {container}"
+
+    lines = [
+        f"Dataset: {meta.get('dataset', 'dataset')}",
+        f"Function family: {meta.get('function_tag', 'funcform')}",
+        f"Toy sample: {meta.get('toy_label', 'unknown')}",
+        f"Toy indices: {idx_text} ({int(meta.get('n_toys', 0))} toys)",
+        (
+            f"Mass grid: {meta.get('mass_lo_mev', float('nan')):.0f}-"
+            f"{meta.get('mass_hi_mev', float('nan')):.0f} MeV "
+            f"({int(meta.get('n_mass', 0))} hypotheses/toy)"
+        ),
+        f"Total failed mass fits: {int(meta.get('fail_total', 0))}",
+        f"Source: {source_label}",
+    ]
+
+    med_max_z = float(meta.get("median_max_z", float("nan")))
+    med_peak_mass_mev = float(meta.get("median_peak_mass_mev", float("nan")))
+    med_min_p0 = float(meta.get("median_min_p0", float("nan")))
+    if np.isfinite(med_max_z):
+        lines.append(f"Median max Z: {med_max_z:.2f} @ {med_peak_mass_mev:.0f} MeV")
+    if np.isfinite(med_min_p0):
+        lines.append(f"Median min p0: {med_min_p0:.3g}")
+    return "\n".join(lines)
+
+
+def _save_toy_scan_plot(fig, stem: str) -> None:
+    """Save a toy-scan validation figure as PNG and PDF."""
+    fig.savefig(f"{stem}.png", dpi=220)
+    fig.savefig(f"{stem}.pdf")
+
+
+def write_toy_scan_validation_plots(
+    merged: pd.DataFrame,
+    summary: pd.DataFrame,
+    output_dir: str,
+    *,
+    stem_prefix: str = "toy_scan_validation",
+) -> list[str]:
+    """Write reviewer-facing validation plots for merged toy-scan outputs."""
+    import matplotlib as mpl
+
+    mpl.use("Agg", force=True)
+
+    import matplotlib.pyplot as plt
+
+    from .plotting import set_plot_style
+
+    ensure_dir(str(output_dir))
+    if merged is None or summary is None or merged.empty or summary.empty:
+        return []
+
+    set_plot_style("paper")
+    created_stems: list[str] = []
+
+    group_cols = [c for c in ["dataset", "function_tag", "container", "source_root"] if c in merged.columns]
+    if not group_cols:
+        group_cols = [merged.columns[0]]
+
+    for group_key, merged_grp in merged.groupby(group_cols, sort=True, dropna=False):
+        key_tuple = group_key if isinstance(group_key, tuple) else (group_key,)
+        summary_mask = np.ones(len(summary), dtype=bool)
+        for col, val in zip(group_cols, key_tuple):
+            if col not in summary.columns:
+                continue
+            if pd.isna(val):
+                summary_mask &= summary[col].isna().to_numpy()
+            else:
+                summary_mask &= (summary[col].astype(str) == str(val)).to_numpy()
+        summary_grp = summary.loc[summary_mask].copy()
+        if summary_grp.empty:
+            continue
+
+        meta = _toy_scan_group_metadata(merged_grp, summary_grp)
+        tag = _toy_scan_slug([meta["dataset"], meta["function_tag"]]) or "toy_scan"
+        info_text = _toy_scan_info_text(meta)
+
+        z_pivot = (
+            merged_grp.pivot_table(index="mass_GeV", columns="toy_index", values="Z_analytic", aggfunc="first")
+            .sort_index()
+        )
+        eps2_pivot = (
+            merged_grp.pivot_table(index="mass_GeV", columns="toy_index", values="eps2_up", aggfunc="first")
+            .sort_index()
+        )
+
+        if not z_pivot.empty:
+            masses_mev = 1000.0 * z_pivot.index.to_numpy(float)
+            z_vals = z_pivot.to_numpy(float)
+            z_q16 = _toy_scan_row_quantile(z_vals, 16.0)
+            z_q50 = _toy_scan_row_quantile(z_vals, 50.0)
+            z_q84 = _toy_scan_row_quantile(z_vals, 84.0)
+
+            fig, ax = plt.subplots(figsize=(9.4, 5.6), constrained_layout=True)
+            for col in z_pivot.columns:
+                ax.plot(masses_mev, z_pivot[col].to_numpy(float), color="0.72", alpha=0.70, lw=1.0)
+            ax.fill_between(masses_mev, z_q16, z_q84, color="#9ecae1", alpha=0.60, label="central 68% band")
+            ax.plot(masses_mev, z_q50, color="#08519c", lw=2.2, label="toy median")
+            for zref in [1.0, 2.0, 3.0]:
+                ax.axhline(zref, color="0.80", lw=0.9, ls=":")
+            ax.set_xlabel("Mass hypothesis [MeV]")
+            ax.set_ylabel(r"Local significance $Z$")
+            ax.set_title(
+                f"Toy-scan validation: {meta['dataset']} local-significance scans",
+                pad=10.0,
+            )
+            ax.legend(loc="upper right", frameon=True)
+            ax.text(
+                0.02,
+                0.98,
+                info_text,
+                transform=ax.transAxes,
+                ha="left",
+                va="top",
+                fontsize=8.6,
+                bbox=dict(boxstyle="round,pad=0.35", fc="white", ec="0.75", alpha=0.95),
+            )
+            stem = os.path.join(str(output_dir), f"{stem_prefix}_{tag}_local_significance")
+            _save_toy_scan_plot(fig, stem)
+            plt.close(fig)
+            created_stems.append(stem)
+
+        if not eps2_pivot.empty:
+            masses_mev = 1000.0 * eps2_pivot.index.to_numpy(float)
+            eps2_vals = eps2_pivot.to_numpy(float)
+            eps2_q16 = _toy_scan_row_quantile(eps2_vals, 16.0)
+            eps2_q50 = _toy_scan_row_quantile(eps2_vals, 50.0)
+            eps2_q84 = _toy_scan_row_quantile(eps2_vals, 84.0)
+
+            fig, ax = plt.subplots(figsize=(9.4, 5.6), constrained_layout=True)
+            for col in eps2_pivot.columns:
+                ax.plot(masses_mev, eps2_pivot[col].to_numpy(float), color="0.72", alpha=0.70, lw=1.0)
+            ax.fill_between(masses_mev, eps2_q16, eps2_q84, color="#fdd0a2", alpha=0.65, label="central 68% band")
+            ax.plot(masses_mev, eps2_q50, color="#d94801", lw=2.2, label="toy median")
+            ax.set_xlabel("Mass hypothesis [MeV]")
+            ax.set_ylabel(r"Upper limit on $\epsilon^2$")
+            ax.set_yscale("log")
+            ax.set_title(
+                f"Toy-scan validation: {meta['dataset']} upper-limit scans",
+                pad=10.0,
+            )
+            ax.legend(loc="upper right", frameon=True)
+            ax.text(
+                0.02,
+                0.98,
+                info_text,
+                transform=ax.transAxes,
+                ha="left",
+                va="top",
+                fontsize=8.6,
+                bbox=dict(boxstyle="round,pad=0.35", fc="white", ec="0.75", alpha=0.95),
+            )
+            stem = os.path.join(str(output_dir), f"{stem_prefix}_{tag}_upper_limits")
+            _save_toy_scan_plot(fig, stem)
+            plt.close(fig)
+            created_stems.append(stem)
+
+        fig, axs = plt.subplots(2, 2, figsize=(10.4, 7.2), constrained_layout=True)
+        ax_text, ax_scatter, ax_mass, ax_p0 = axs.flat
+        ax_text.axis("off")
+        ax_text.text(
+            0.02,
+            0.98,
+            info_text,
+            ha="left",
+            va="top",
+            fontsize=9.0,
+            bbox=dict(boxstyle="round,pad=0.4", fc="white", ec="0.75", alpha=0.98),
+            transform=ax_text.transAxes,
+        )
+        ax_text.text(
+            0.02,
+            0.12,
+            "Reviewer-facing smoke-test summary:\n"
+            "use this dashboard to confirm toy identity, scan coverage,\n"
+            "and the size/location of the strongest local upward fluctuation.",
+            ha="left",
+            va="bottom",
+            fontsize=8.6,
+            transform=ax_text.transAxes,
+        )
+
+        scatter_x = summary_grp["toy_index"].to_numpy(int)
+        scatter_y = summary_grp["max_Z_analytic"].to_numpy(float)
+        scatter_c = 1000.0 * summary_grp["mass_at_max_Z"].to_numpy(float)
+        sc = ax_scatter.scatter(
+            scatter_x,
+            scatter_y,
+            c=scatter_c,
+            cmap="viridis",
+            s=78,
+            edgecolors="black",
+            linewidths=0.45,
+        )
+        offset = 0.04 * max(1.0, float(np.nanmax(scatter_y)) if np.isfinite(scatter_y).any() else 1.0)
+        for row in summary_grp.itertuples(index=False):
+            ax_scatter.text(
+                int(row.toy_index),
+                float(row.max_Z_analytic) + offset,
+                str(int(row.toy_index)),
+                ha="center",
+                va="bottom",
+                fontsize=8.0,
+            )
+        ax_scatter.set_xlabel("Toy index")
+        ax_scatter.set_ylabel(r"Max local significance $Z_{\max}$")
+        ax_scatter.set_title("Peak upward fluctuation by toy")
+        if len(scatter_x):
+            ax_scatter.set_xticks(sorted(np.unique(scatter_x)))
+        cbar = fig.colorbar(sc, ax=ax_scatter)
+        cbar.set_label("Mass at max Z [MeV]")
+
+        peak_masses_mev = 1000.0 * summary_grp["mass_at_max_Z"].to_numpy(float)
+        ax_mass.hist(
+            peak_masses_mev[np.isfinite(peak_masses_mev)],
+            bins=min(10, max(4, len(summary_grp))),
+            color="#6baed6",
+            edgecolor="white",
+        )
+        ax_mass.axvline(
+            float(np.nanmedian(peak_masses_mev)),
+            color="#08519c",
+            lw=1.8,
+            ls="--",
+            label="median",
+        )
+        ax_mass.set_xlabel(r"Mass at max $Z$ [MeV]")
+        ax_mass.set_ylabel("Toys")
+        ax_mass.set_title("Where the largest fluctuation lands")
+        ax_mass.legend(loc="upper right", frameon=True)
+
+        min_p0 = np.clip(summary_grp["min_p0_analytic"].to_numpy(float), 1.0e-12, 1.0)
+        neglog_p0 = -np.log10(min_p0)
+        ax_p0.hist(
+            neglog_p0[np.isfinite(neglog_p0)],
+            bins=min(10, max(4, len(summary_grp))),
+            color="#fd8d3c",
+            edgecolor="white",
+        )
+        ax_p0.axvline(
+            float(np.nanmedian(neglog_p0)),
+            color="#a63603",
+            lw=1.8,
+            ls="--",
+            label="median",
+        )
+        ax_p0.set_xlabel(r"$-\log_{10}(\min p_0)$")
+        ax_p0.set_ylabel("Toys")
+        ax_p0.set_title("Smallest local p-value per toy")
+        ax_p0.legend(loc="upper right", frameon=True)
+
+        fig.suptitle(
+            f"Toy-scan validation summary: {meta['dataset']} {meta['function_tag']}",
+            y=1.01,
+        )
+        stem = os.path.join(str(output_dir), f"{stem_prefix}_{tag}_summary")
+        _save_toy_scan_plot(fig, stem)
+        plt.close(fig)
+        created_stems.append(stem)
+
+    return created_stems
+
+
 def merge_toy_scan_results(
     input_dir: str,
     *,

@@ -306,6 +306,12 @@ if you want a different SLURM reservation.
 - `OUTPUT_DIR/merged/toy_scan_merged.csv`: long table with toy identity columns plus the normal scan outputs
 - `OUTPUT_DIR/merged/toy_scan_summary.csv`: compact per-toy summary with `n_fail`, `max_Z_analytic`,
   `mass_at_max_Z`, and `min_p0_analytic`
+- `OUTPUT_DIR/merged/toy_scan_validation_<dataset>_<function>_local_significance.{png,pdf}`:
+  per-toy local-significance scans with the merged median/band and toy metadata box
+- `OUTPUT_DIR/merged/toy_scan_validation_<dataset>_<function>_upper_limits.{png,pdf}`:
+  per-toy upper-limit scans with the merged median/band and toy metadata box
+- `OUTPUT_DIR/merged/toy_scan_validation_<dataset>_<function>_summary.{png,pdf}`:
+  compact dashboard of toy identity, peak-significance location, and minimum local p-value
 
 For large productions, validate the workflow in three steps:
 

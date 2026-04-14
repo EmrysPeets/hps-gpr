@@ -76,6 +76,54 @@ generalized-gamma shoulder is still informative.}
 \label{fig:analytic-fit-toys}
 \end{figure}
 
+\subsubsection{Illustrative smoke test: 2015 toy-scan merge}
+
+The first end-to-end validation product from the new functional-form toy-scan workflow
+is a compact 2015 smoke test built from \num{10} toys,
+\texttt{fShiftSigPowTail\_toy\_0} through
+\texttt{fShiftSigPowTail\_toy\_9}. This sample is included here strictly for
+illustrative purposes: it is not the final high-statistics closure ensemble, but it is
+large enough to show what the merged toy-scan outputs look like once the scans
+complete cleanly and the per-toy results are summarized automatically. The key point
+for the note is that the same merge step now produces reviewer-facing validation plots
+alongside the CSVs, with the toy identity, source functional-form family, merged mass
+range, and summary fluctuation metrics embedded directly in the displays.
+
+\begin{figure}[p]
+\centering
+\begin{subfigure}[t]{0.88\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{toy_generation_figs/toy_scan_smoke_2015_fShiftSigPowTail_local_significance.png}
+  \caption{Per-toy local-significance scans with the merged median and central 68\%
+  band.}
+\end{subfigure}
+
+\vspace{0.8em}
+
+\begin{subfigure}[t]{0.88\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{toy_generation_figs/toy_scan_smoke_2015_fShiftSigPowTail_upper_limits.png}
+  \caption{Per-toy $\eps^2$ upper-limit scans from the same merged toy ensemble.}
+\end{subfigure}
+
+\vspace{0.8em}
+
+\begin{subfigure}[t]{0.88\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{toy_generation_figs/toy_scan_smoke_2015_fShiftSigPowTail_summary.png}
+  \caption{Compact toy-by-toy summary dashboard showing the peak upward fluctuation,
+  the mass where it occurs, and the minimum local $p_0$ reached by each toy.}
+\end{subfigure}
+\caption{Illustrative 2015 toy-scan smoke test from the merged
+\texttt{fShiftSigPowTail} closure sample. These panels are included primarily to show
+the operational validation products of the new workflow rather than to claim a final
+physics conclusion from a \num{10}-toy sample. The annotation boxes record which toy
+histograms were used, the source ROOT container, the 20--130~MeV scan coverage, and
+the number of merged toys and failed mass fits, so the displays can double as an
+immediate batch-production sanity check.}
+\label{fig:toy-scan-smoke-2015}
+\end{figure}
+
 \subsubsection{Conditional blind-window GP toys}
 
 The fastest toy mode keeps the sideband-trained GP fixed at a given test mass. The GP

@@ -557,15 +557,18 @@ def toy_scan(
 )
 def toy_scan_merge(input_dir, output_dir):
     """Merge functional-form toy scan outputs into long and per-toy summaries."""
-    from .funcform_toys import merge_toy_scan_results
+    from .funcform_toys import merge_toy_scan_results, write_toy_scan_validation_plots
 
     try:
         merged, summary = merge_toy_scan_results(input_dir, output_dir=output_dir)
     except FileNotFoundError as exc:
         raise click.ClickException(str(exc)) from exc
     outdir = output_dir or input_dir
+    plot_stems = write_toy_scan_validation_plots(merged, summary, outdir)
     print(f"Wrote {os.path.join(outdir, 'toy_scan_merged.csv')}")
     print(f"Wrote {os.path.join(outdir, 'toy_scan_summary.csv')}")
+    for stem in plot_stems:
+        print(f"Wrote {stem}.png/.pdf")
     print(f"Merged rows: {len(merged)}")
     print(f"Toy summaries: {len(summary)}")
 

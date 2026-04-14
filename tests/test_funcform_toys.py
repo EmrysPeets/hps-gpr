@@ -236,6 +236,48 @@ def test_merge_toy_scan_results_reports_inventory_on_empty_outputs(tmp_path):
         merge_toy_scan_results(str(tmp_path / "jobs"), output_dir=str(tmp_path / "merged"))
 
 
+def test_toy_scan_merge_cli_writes_validation_plots(tmp_path):
+    toy_dir = tmp_path / "jobs" / "primary_toy_7" / "toy_scans" / "2015" / "toy_0007"
+    toy_dir.mkdir(parents=True)
+    (toy_dir / "toy_metadata.json").write_text(json.dumps({
+        "dataset": "2015",
+        "toy_index": 7,
+        "toy_name": "primary_toy_7",
+        "function_tag": "primary",
+        "source_root": "/tmp/funcform.root",
+        "container": "primary",
+    }))
+    pd.DataFrame(
+        [
+            {"dataset": "2015", "mass_GeV": 0.040, "Z_analytic": 1.2, "p0_analytic": 0.1, "eps2_up": 1.0e-5, "extract_success": True},
+            {"dataset": "2015", "mass_GeV": 0.050, "Z_analytic": 2.2, "p0_analytic": 0.02, "eps2_up": 2.0e-5, "extract_success": True},
+        ]
+    ).to_csv(toy_dir / "results_single.csv", index=False)
+
+    outdir = tmp_path / "merged"
+    runner = CliRunner()
+    result = runner.invoke(
+        main,
+        [
+            "toy-scan-merge",
+            "--input-dir", str(tmp_path / "jobs"),
+            "--output-dir", str(outdir),
+        ],
+    )
+    assert result.exit_code == 0, result.output
+    assert "toy_scan_validation_2015_primary_local_significance" in result.output
+    assert "toy_scan_validation_2015_primary_upper_limits" in result.output
+    assert "toy_scan_validation_2015_primary_summary" in result.output
+
+    for stem in [
+        outdir / "toy_scan_validation_2015_primary_local_significance",
+        outdir / "toy_scan_validation_2015_primary_upper_limits",
+        outdir / "toy_scan_validation_2015_primary_summary",
+    ]:
+        assert (stem.with_suffix(".png")).exists()
+        assert (stem.with_suffix(".pdf")).exists()
+
+
 def test_run_funcform_toy_scans_applies_toy_runtime_and_output_overrides(monkeypatch, tmp_path):
     root_path = tmp_path / "funcform.root"
     _write_toy_root(root_path)
