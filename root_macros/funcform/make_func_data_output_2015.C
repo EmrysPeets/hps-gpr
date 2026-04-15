@@ -25,7 +25,7 @@ TF1* ff_make_shift_sigpowexp_tail_2015(TH1* h, double fit_min, double fit_max, d
 }
 
 void make_func_data_output_2015(
-    const char* outfile = "outputs/funcform_toys/funcform_2015_toys.root",
+    const char* outfile = "outputs/funcform_toys/funcform_2015_dataset_mod_toys.root",
     int n_toys = 100) {
   FuncFormJobConfig job;
   job.dataset_key = "2015";
@@ -36,11 +36,18 @@ void make_func_data_output_2015(
   job.note_plot_stem = "hps_gpr_analysis_note/toy_generation_figs/funcform_fit_2015";
   job.fit_min = 0.014;
   job.fit_max = 0.135;
+  job.toy_support_min = 0.0;
+  job.toy_support_max = 0.150;
+  job.scan_min = 0.020;
+  job.scan_max = 0.130;
   job.n_toys = n_toys;
   job.primary_target_chi2ndf = 4.0;
+  job.validation_max_rel_diff_full = 0.05;
+  job.validation_max_rel_diff_scan = 0.05;
+  job.validation_max_abs_sideband_frac_diff = 0.02;
   job.allow_bernstein_primary_fallback = false;
   job.bernstein_tag = "fBern5";
-  job.fit_min_scan = {0.014, 0.015, 0.016};
+  job.fit_min_scan = {0.014, 0.015, 0.018, 0.020};
 
   std::vector<FuncFormCandidateDef> defs;
   defs.push_back({"fShiftSigPowTail", "shifted sigmoid*power*exp + tail", true, true, ff_make_shift_sigpowexp_tail_2015});

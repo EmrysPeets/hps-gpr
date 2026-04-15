@@ -1,7 +1,7 @@
 #include "funcform_common.h"
 
 void make_func_data_output_2021(
-    const char* outfile = "outputs/funcform_toys/funcform_2021_toys.root",
+    const char* outfile = "outputs/funcform_toys/funcform_2021_dataset_mod_toys.root",
     int n_toys = 100) {
   FuncFormJobConfig job;
   job.dataset_key = "2021";
@@ -11,9 +11,14 @@ void make_func_data_output_2021(
   job.output_root = outfile;
   job.note_plot_stem = "hps_gpr_analysis_note/toy_generation_figs/funcform_fit_2021";
   job.fit_min = 0.030;
-  job.fit_max = 0.240;
+  job.fit_max = 0.250;
+  job.scan_min = 0.030;
+  job.scan_max = 0.250;
   job.n_toys = n_toys;
   job.primary_target_chi2ndf = 2.0;
+  job.validation_max_rel_diff_full = 0.05;
+  job.validation_max_rel_diff_scan = 0.05;
+  job.validation_max_abs_sideband_frac_diff = 0.02;
   job.allow_bernstein_primary_fallback = false;
   job.bernstein_tag = "fBern5";
   job.fit_min_scan = {0.030, 0.032, 0.035};

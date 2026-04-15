@@ -193,9 +193,9 @@ root -l -b -q 'root_macros/funcform/make_func_data_output_2021.C()'
 
 Default outputs:
 
-- `outputs/funcform_toys/funcform_2015_toys.root`
-- `outputs/funcform_toys/funcform_2016_toys.root`
-- `outputs/funcform_toys/funcform_2021_toys.root`
+- `outputs/funcform_toys/funcform_2015_dataset_mod_toys.root`
+- `outputs/funcform_toys/funcform_2016_dataset_mod_toys.root`
+- `outputs/funcform_toys/funcform_2021_dataset_mod_toys.root`
 
 ROOT layout conventions:
 
@@ -203,6 +203,20 @@ ROOT layout conventions:
 - toy names `{tag}_toy_{i}`
 - `fit_functions/` with the fitted `TF1`s
 - `fit_metadata/` with the primary-function tag plus JSON metadata objects
+- `validation/` with per-fit expected-count and toy-ensemble-mean histograms
+- sidecar metadata JSON written beside each ROOT output as `*.metadata.json`
+- note-local overlays `hps_gpr_analysis_note/toy_generation_figs/funcform_fit_{year}.{png,pdf}`
+- note-local primary-fit summary `hps_gpr_analysis_note/toy_generation_figs/funcform_primary_fit_summary.{png,pdf}`
+
+Each toy ROOT now records three distinct ranges for reproducibility:
+
+- full support range used for toy generation and normalization
+- fit range used to determine the functional-form parameters
+- scan range intended for the search workflow
+
+Toy bins are generated from support-range-normalized bin integrals with Poisson
+fluctuations, so the ensemble preserves the real-data total count in expectation
+rather than by forcing every toy to have the exact same yield.
 
 The overlay legends use the same bin-integral `chi2/ndof` convention as the macro's
 selection metric. The current retuning pass targets Pearson `chi2/ndof < 2` for the
@@ -222,7 +236,7 @@ long-wavelength GP bias; they complement, but do not replace, the separate
 python -m hps_gpr.cli toy-scan \
   --config config_example.yaml \
   --dataset 2015 \
-  --toy-root outputs/funcform_toys/funcform_2015_toys.root \
+  --toy-root outputs/funcform_toys/funcform_2015_dataset_mod_toys.root \
   --container fGenGammaShift \
   --toy-pattern 'fGenGammaShift_toy_*' \
   --max-toys 2 \
@@ -234,7 +248,7 @@ python -m hps_gpr.cli toy-scan \
 python -m hps_gpr.cli toy-scan \
   --config config_example.yaml \
   --dataset 2015 \
-  --toy-root outputs/funcform_toys/funcform_2015_toys.root \
+  --toy-root outputs/funcform_toys/funcform_2015_dataset_mod_toys.root \
   --container fShiftSigPowTail \
   --toy-pattern 'fShiftSigPowTail_toy_*' \
   --max-toys 1 \
@@ -251,7 +265,7 @@ python -m hps_gpr.cli toy-scan \
 python -m hps_gpr.cli slurm-gen-toy-scan \
   --config config_2015_10k.yaml \
   --dataset 2015 \
-  --toy-root outputs/funcform_toys/funcform_2015_toys.root \
+  --toy-root outputs/funcform_toys/funcform_2015_dataset_mod_toys.root \
   --container fShiftSigPowTail \
   --toy-pattern 'fShiftSigPowTail_toy_*' \
   --job-name hps2015_toyscan \
@@ -318,6 +332,10 @@ For large productions, validate the workflow in three steps:
 1. run a one-toy local smoke with a narrow mass window
 2. run a 10-toy pilot on the batch system and inspect `toy_scan_summary.csv`
 3. submit the full 100-toy study only after the pilot merges cleanly
+
+The corrected 2015 baseline-plus-audit workflow, including exact regeneration,
+closure-study, pseudoexperiment, and full-production commands, is documented in
+[`study_configs/README_2015_toy_study_workflows.md`](study_configs/README_2015_toy_study_workflows.md).
 
 If your site requires separate submission-time charging flags, pass them through when
 you run the submit helper:

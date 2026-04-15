@@ -42,6 +42,17 @@ selection region of $\chi^2/\mathrm{ndof}<2$ for the 2016 and 2021 primaries, wh
 the 2015 turn-on remains provisionally acceptable at $\chi^2/\mathrm{ndof}<4$ pending a
 later dedicated low-mass iteration.
 
+The corrected toy workflow now keeps three mass intervals explicit in every export:
+the full histogram support used for toy normalization, the fit interval used to
+determine the analytic parameters, and the scan interval passed to the search code.
+Pseudo-data are generated bin-by-bin from Poisson means equal to the bin integrals of
+the selected analytic fit after rescaling that fit to the observed event count on the
+full support range. This avoids both the center-value approximation and the earlier
+fixed-total construction in which every toy inherited exactly the same event count.
+It also leaves the blind-window slice un-renormalized: the search interval inherits
+the normalization implied by the full histogram rather than by an isolated scan-window
+fit.
+
 \begin{figure}[p]
 \centering
 \begin{subfigure}[t]{0.60\linewidth}
@@ -74,6 +85,31 @@ shared shifted-sigmoid family provides the portable baseline across all three ye
 while the dataset-specific alternates show where extra tail flexibility or a
 generalized-gamma shoulder is still informative.}
 \label{fig:analytic-fit-toys}
+\end{figure}
+
+The currently selected primaries are the shifted-tail family in both 2015 and 2016
+and the sigmoid$\times$power$\times$expquad family in the 2021 1\% stream. The 2015
+study keeps the scan hypotheses at \SIrange{20}{130}{MeV} while normalizing the toys
+on the full exported support, so sub-\SI{20}{MeV} events can inform the background
+normalization without changing the search window itself. Figure~\ref{fig:analytic-fit-primary-summary}
+compresses the same information to the chosen primary fit in each year and overlays the
+toy-ensemble mean from the generated ROOT file. This is the most direct visualization
+of the corrected generation rule: the toy mean follows the selected fit while the toy
+totals fluctuate around, rather than being pinned to, the observed support-range event
+count.
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.98\linewidth}{toy_generation_figs/funcform_primary_fit_summary.png}
+\caption{Selected primary functional-form seed in each dataset together with the mean
+of the generated toy ensemble. The shaded regions indicate support-only sidebands that
+remain part of the toy normalization even when they lie outside the scan range. The
+2015 and 2016 seeds currently choose the shifted sigmoid$\times$power$\times$exp
+family with the normalized tail modifier, while the 2021 1\% stream selects the
+sigmoid$\times$power$\times$expquad form. In every panel, the toy-ensemble mean is
+computed from pseudoexperiments generated with bin-integrated Poisson expectations
+normalized to the full support-range event count of the real dataset.}
+\label{fig:analytic-fit-primary-summary}
 \end{figure}
 
 \subsubsection{Illustrative smoke test: 2015 toy-scan merge}

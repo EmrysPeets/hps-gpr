@@ -540,7 +540,7 @@ def test_generate_toy_scan_slurm_scripts_writes_expected_commands(tmp_path):
         config_path="config_example.yaml",
         output_path=str(job),
         dataset="2015",
-        toy_root="outputs/funcform_toys/funcform_2015_toys.root",
+        toy_root="outputs/funcform_toys/funcform_2015_dataset_mod_toys.root",
         toy_names=["primary_toy_0", "primary_toy_1"],
         toy_indices=[0, 1],
         output_root="outputs/funcform_toys",

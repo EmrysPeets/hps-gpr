@@ -24,7 +24,7 @@ TF1* ff_make_shift_sigpowexp_tail_2016(TH1* h, double fit_min, double fit_max, d
 }
 
 void make_func_data_output_2016(
-    const char* outfile = "outputs/funcform_toys/funcform_2016_toys.root",
+    const char* outfile = "outputs/funcform_toys/funcform_2016_dataset_mod_toys.root",
     int n_toys = 100) {
   FuncFormJobConfig job;
   job.dataset_key = "2016";
@@ -35,8 +35,13 @@ void make_func_data_output_2016(
   job.note_plot_stem = "hps_gpr_analysis_note/toy_generation_figs/funcform_fit_2016";
   job.fit_min = 0.035;
   job.fit_max = 0.210;
+  job.scan_min = 0.035;
+  job.scan_max = 0.210;
   job.n_toys = n_toys;
   job.primary_target_chi2ndf = 2.0;
+  job.validation_max_rel_diff_full = 0.05;
+  job.validation_max_rel_diff_scan = 0.05;
+  job.validation_max_abs_sideband_frac_diff = 0.02;
   job.allow_bernstein_primary_fallback = false;
   job.bernstein_tag = "fBern5";
   job.fit_min_scan = {0.040, 0.035};

@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import argparse
+import json
 from pathlib import Path
 
 import fitz
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image, ImageOps
+import uproot
 import yaml
 
 
@@ -14,6 +17,13 @@ NOTE_DIR = Path(__file__).resolve().parents[1]
 
 def ensure_dir(path: Path) -> None:
     path.mkdir(parents=True, exist_ok=True)
+
+
+def save_figure(fig: plt.Figure, out_path: Path, *, dpi: int = 220) -> None:
+    ensure_dir(out_path.parent)
+    fig.savefig(out_path, dpi=dpi, bbox_inches="tight")
+    if out_path.suffix.lower() == ".png":
+        fig.savefig(out_path.with_suffix(".pdf"), bbox_inches="tight")
 
 
 def crop_pdf(
@@ -75,6 +85,102 @@ def tile_images_horizontal(paths: list[Path], out_path: Path, *, bg: str = "whit
         x += img.width + pad
     ensure_dir(out_path.parent)
     canvas.save(out_path)
+
+
+def _read_named_json(root_path: Path, object_path: str) -> dict:
+    with uproot.open(root_path) as fin:
+        obj = fin[object_path]
+        return json.loads(obj.member("fTitle"))
+
+
+def make_funcform_primary_fit_summary(out_path: Path) -> None:
+    root_specs = [
+        ("2015", NOTE_DIR.parent / "outputs" / "funcform_toys" / "funcform_2015_dataset_mod_toys.root"),
+        ("2016", NOTE_DIR.parent / "outputs" / "funcform_toys" / "funcform_2016_dataset_mod_toys.root"),
+        ("2021", NOTE_DIR.parent / "outputs" / "funcform_toys" / "funcform_2021_dataset_mod_toys.root"),
+    ]
+
+    colors = {
+        "data": "#222222",
+        "fit": "#C44E52",
+        "toy": "#4C72B0",
+        "sideband": "#D9D9D9",
+    }
+    titles = {
+        "2015": "HPS 2015",
+        "2016": "HPS 2016 10%",
+        "2021": "HPS 2021 1%",
+    }
+
+    fig, axes = plt.subplots(1, 3, figsize=(13.6, 4.2), constrained_layout=True)
+
+    for iax, (dataset, root_path) in enumerate(root_specs):
+        meta = _read_named_json(root_path, "fit_metadata/fit_summary_json")
+        primary = meta["primary_function"]
+        fit_meta = next(item for item in meta["fits"] if item["tag"] == primary)
+
+        with uproot.open(root_path) as fin:
+            data_vals, edges = fin["input_hist"].to_numpy()
+            fit_vals, _ = fin[f"validation/{primary}_expected_counts"].to_numpy()
+            toy_vals, _ = fin[f"validation/{primary}_toy_mean"].to_numpy()
+
+        ax = axes[iax]
+        x_lo = edges[:-1] * 1.0e3
+        x_hi = edges[1:] * 1.0e3
+        x_plot = np.r_[x_lo, x_hi[-1]]
+
+        support_lo, support_hi = meta["toy_support_range_GeV"]
+        scan_lo, scan_hi = meta["scan_range_GeV"]
+        occupied = np.flatnonzero(data_vals > 0.0)
+        display_hi = edges[occupied[-1] + 1] if occupied.size else support_hi
+        if support_lo < scan_lo:
+            ax.axvspan(support_lo * 1.0e3, scan_lo * 1.0e3, color=colors["sideband"], alpha=0.55)
+        if scan_hi < support_hi:
+            ax.axvspan(scan_hi * 1.0e3, support_hi * 1.0e3, color=colors["sideband"], alpha=0.55)
+        ax.axvline(scan_lo * 1.0e3, color="0.45", lw=1.0, ls=":")
+        ax.axvline(scan_hi * 1.0e3, color="0.45", lw=1.0, ls=":")
+
+        ax.step(x_plot, np.r_[data_vals, data_vals[-1]], where="post", color=colors["data"], lw=1.55,
+                label="Observed data")
+        ax.step(x_plot, np.r_[fit_vals, fit_vals[-1]], where="post", color=colors["fit"], lw=1.75,
+                label="Selected fit")
+        ax.step(x_plot, np.r_[toy_vals, toy_vals[-1]], where="post", color=colors["toy"], lw=1.55, ls="--",
+                label="Toy-ensemble mean")
+
+        positive = np.concatenate([data_vals[data_vals > 0], fit_vals[fit_vals > 0], toy_vals[toy_vals > 0]])
+        ymin = max(np.min(positive) * 0.7 if positive.size else 0.5, 0.08)
+        ymax = np.max([data_vals.max(), fit_vals.max(), toy_vals.max()]) * 1.5
+        ax.set_yscale("log")
+        ax.set_ylim(ymin, ymax)
+        ax.set_xlim(support_lo * 1.0e3, display_hi * 1.0e3)
+        ax.grid(alpha=0.22, which="both")
+        ax.set_xlabel(r"$m_{e^+e^-}$ [MeV]")
+        if iax == 0:
+            ax.set_ylabel("Counts / bin")
+        ax.set_title(titles.get(dataset, dataset), fontsize=11.2)
+        ax.text(
+            0.03,
+            0.97,
+            f"Primary: {fit_meta['label']}\n"
+            f"scan: {scan_lo * 1.0e3:.0f}-{scan_hi * 1.0e3:.0f} MeV\n"
+            f"target N: {meta['normalization_target_count']:.3e}",
+            transform=ax.transAxes,
+            va="top",
+            fontsize=8.4,
+            bbox=dict(boxstyle="round,pad=0.28", fc="white", ec="0.75", alpha=0.94),
+        )
+
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 1.06), ncol=3, frameon=False)
+    fig.text(
+        0.5,
+        -0.01,
+        "Shaded sidebands denote the visible support-only regions outside the scan range.",
+        ha="center",
+        fontsize=9.0,
+    )
+    save_figure(fig, out_path)
+    plt.close(fig)
 
 
 def make_pvalue_schematic(out_path: Path) -> None:
@@ -394,7 +500,21 @@ def make_projection_placeholder(out_path: Path) -> None:
     plt.close(fig)
 
 
-def main() -> None:
+def main(argv: list[str] | None = None) -> None:
+    parser = argparse.ArgumentParser(description="Generate note-local figures.")
+    parser.add_argument(
+        "--funcform-only",
+        action="store_true",
+        help="Only regenerate the functional-form toy-fit comparison figure.",
+    )
+    args = parser.parse_args(argv)
+
+    if args.funcform_only:
+        make_funcform_primary_fit_summary(
+            NOTE_DIR / "toy_generation_figs" / "funcform_primary_fit_summary.png"
+        )
+        return
+
     crop_pdf(
         NOTE_DIR / "HPS_2016_Bump_Hunt_Internal_Note_note.pdf",
         4,
@@ -484,6 +604,9 @@ def main() -> None:
     )
     make_projection_placeholder(
         NOTE_DIR / "combined_search_figs" / "projected_unblinded_reach_eps2_placeholder.png"
+    )
+    make_funcform_primary_fit_summary(
+        NOTE_DIR / "toy_generation_figs" / "funcform_primary_fit_summary.png"
     )
 
 

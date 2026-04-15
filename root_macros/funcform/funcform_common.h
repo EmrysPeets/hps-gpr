@@ -12,17 +12,20 @@
 #include "TLegend.h"
 #include "TMath.h"
 #include "TNamed.h"
+#include "TRandom.h"
 #include "TROOT.h"
 #include "TStyle.h"
 #include "TSystem.h"
 
 #include <algorithm>
 #include <cmath>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <limits>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 struct FuncFormChi2Info {
@@ -42,6 +45,80 @@ struct FuncFormCandidateDef {
   TF1* (*factory)(TH1*, double, double, double, double);
 };
 
+struct FuncFormJobConfig {
+  std::string dataset_key;
+  std::string dataset_label;
+  std::string input_file;
+  std::string hist_name;
+  std::string output_root;
+  std::string note_plot_stem;
+  double fit_min{0.0};
+  double fit_max{0.0};
+  double toy_support_min{std::numeric_limits<double>::quiet_NaN()};
+  double toy_support_max{std::numeric_limits<double>::quiet_NaN()};
+  double scan_min{std::numeric_limits<double>::quiet_NaN()};
+  double scan_max{std::numeric_limits<double>::quiet_NaN()};
+  int n_toys{100};
+  double primary_target_chi2ndf{2.0};
+  double validation_max_rel_diff_full{0.05};
+  double validation_max_rel_diff_scan{0.05};
+  double validation_max_abs_sideband_frac_diff{0.02};
+  bool require_validation_pass_for_primary{true};
+  bool allow_bernstein_primary_fallback{false};
+  std::string bernstein_tag{"fBern5"};
+  std::vector<double> fit_min_scan;
+};
+
+struct FuncFormResolvedRanges {
+  double support_min{std::numeric_limits<double>::quiet_NaN()};
+  double support_max{std::numeric_limits<double>::quiet_NaN()};
+  double scan_min{std::numeric_limits<double>::quiet_NaN()};
+  double scan_max{std::numeric_limits<double>::quiet_NaN()};
+};
+
+struct FuncFormCountComparison {
+  double observed{std::numeric_limits<double>::quiet_NaN()};
+  double fit_expected{std::numeric_limits<double>::quiet_NaN()};
+  double toy_mean{std::numeric_limits<double>::quiet_NaN()};
+};
+
+struct FuncFormFractionComparison {
+  double observed{std::numeric_limits<double>::quiet_NaN()};
+  double fit_expected{std::numeric_limits<double>::quiet_NaN()};
+  double toy_mean{std::numeric_limits<double>::quiet_NaN()};
+};
+
+struct FuncFormPeakComparison {
+  double observed_height{std::numeric_limits<double>::quiet_NaN()};
+  double observed_mass{std::numeric_limits<double>::quiet_NaN()};
+  double fit_expected_height{std::numeric_limits<double>::quiet_NaN()};
+  double fit_expected_mass{std::numeric_limits<double>::quiet_NaN()};
+  double toy_mean_height{std::numeric_limits<double>::quiet_NaN()};
+  double toy_mean_mass{std::numeric_limits<double>::quiet_NaN()};
+};
+
+struct FuncFormValidationSummary {
+  double support_min{std::numeric_limits<double>::quiet_NaN()};
+  double support_max{std::numeric_limits<double>::quiet_NaN()};
+  double scan_min{std::numeric_limits<double>::quiet_NaN()};
+  double scan_max{std::numeric_limits<double>::quiet_NaN()};
+  long long normalization_target_count{0};
+  int n_toys{0};
+  FuncFormCountComparison full_range;
+  FuncFormCountComparison scan_range;
+  FuncFormFractionComparison low_sideband_fraction;
+  FuncFormFractionComparison high_sideband_fraction;
+  FuncFormPeakComparison scan_peak;
+  double selection_score{std::numeric_limits<double>::infinity()};
+  bool selection_pass{false};
+};
+
+struct FuncFormToyAggregate {
+  long long normalization_target_count{0};
+  int n_toys{0};
+  std::vector<double> mean_bins;
+};
+
 struct FuncFormFitSummary {
   std::string tag;
   std::string label;
@@ -54,22 +131,7 @@ struct FuncFormFitSummary {
   double fit_max{0.0};
   int trial_index{-1};
   std::string trial_label;
-};
-
-struct FuncFormJobConfig {
-  std::string dataset_key;
-  std::string dataset_label;
-  std::string input_file;
-  std::string hist_name;
-  std::string output_root;
-  std::string note_plot_stem;
-  double fit_min{0.0};
-  double fit_max{0.0};
-  int n_toys{100};
-  double primary_target_chi2ndf{2.0};
-  bool allow_bernstein_primary_fallback{false};
-  std::string bernstein_tag{"fBern5"};
-  std::vector<double> fit_min_scan;
+  FuncFormValidationSummary validation;
 };
 
 inline std::string ff_json_escape(const std::string& in) {
@@ -83,6 +145,291 @@ inline std::string ff_json_escape(const std::string& in) {
       default: out.push_back(c); break;
     }
   }
+  return out;
+}
+
+inline std::string ff_json_double(double value, int precision = 8) {
+  if (!std::isfinite(value)) {
+    return "null";
+  }
+  std::ostringstream out;
+  out << std::setprecision(precision) << value;
+  return out.str();
+}
+
+inline FuncFormResolvedRanges ff_resolve_ranges(const TH1* h, const FuncFormJobConfig& job) {
+  FuncFormResolvedRanges out;
+  const double hist_min = h->GetXaxis()->GetXmin();
+  const double hist_max = h->GetXaxis()->GetXmax();
+
+  out.support_min = std::isfinite(job.toy_support_min) ? std::max(hist_min, job.toy_support_min) : hist_min;
+  out.support_max = std::isfinite(job.toy_support_max) ? std::min(hist_max, job.toy_support_max) : hist_max;
+  if (!(out.support_max > out.support_min)) {
+    out.support_min = hist_min;
+    out.support_max = hist_max;
+  }
+
+  out.scan_min = std::isfinite(job.scan_min) ? std::max(out.support_min, job.scan_min) : std::max(out.support_min, job.fit_min);
+  out.scan_max = std::isfinite(job.scan_max) ? std::min(out.support_max, job.scan_max) : std::min(out.support_max, job.fit_max);
+  if (!(out.scan_max > out.scan_min)) {
+    out.scan_min = out.support_min;
+    out.scan_max = out.support_max;
+  }
+
+  return out;
+}
+
+inline bool ff_center_in_range(double x, double xmin, double xmax,
+                               bool include_lo = true, bool include_hi = true) {
+  if (!std::isfinite(x) || !std::isfinite(xmin) || !std::isfinite(xmax) || xmax < xmin) {
+    return false;
+  }
+  const double eps = 1e-12;
+  const bool lo_ok = include_lo ? (x >= xmin - eps) : (x > xmin + eps);
+  const bool hi_ok = include_hi ? (x <= xmax + eps) : (x < xmax - eps);
+  return lo_ok && hi_ok;
+}
+
+inline double ff_hist_count_in_center_range(const TH1* h, double xmin, double xmax,
+                                            bool include_lo = true, bool include_hi = true) {
+  double sum = 0.0;
+  for (int i = 1; i <= h->GetNbinsX(); ++i) {
+    const double x = h->GetXaxis()->GetBinCenter(i);
+    if (!ff_center_in_range(x, xmin, xmax, include_lo, include_hi)) {
+      continue;
+    }
+    sum += h->GetBinContent(i);
+  }
+  return sum;
+}
+
+inline double ff_expected_bin_count(TF1* f, double x1, double x2) {
+  const double bw = x2 - x1;
+  if (f == nullptr || !std::isfinite(bw) || bw <= 0.0) {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
+  const double integ = f->Integral(x1, x2);
+  if (!std::isfinite(integ)) {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
+  return integ / bw;
+}
+
+inline std::vector<double> ff_expected_bins(const TH1* href, TF1* f,
+                                            double xmin, double xmax) {
+  std::vector<double> out(static_cast<std::size_t>(href->GetNbinsX()), 0.0);
+  for (int i = 1; i <= href->GetNbinsX(); ++i) {
+    const double x = href->GetXaxis()->GetBinCenter(i);
+    if (!ff_center_in_range(x, xmin, xmax, true, true)) {
+      continue;
+    }
+    const double x1 = href->GetXaxis()->GetBinLowEdge(i);
+    const double x2 = href->GetXaxis()->GetBinUpEdge(i);
+    const double expv = ff_expected_bin_count(f, x1, x2);
+    out[static_cast<std::size_t>(i - 1)] = std::isfinite(expv) ? std::max(0.0, expv) : 0.0;
+  }
+  return out;
+}
+
+inline double ff_sum_values(const std::vector<double>& values) {
+  double sum = 0.0;
+  for (double value : values) {
+    sum += value;
+  }
+  return sum;
+}
+
+inline std::vector<double> ff_normalize_expected_bins(const std::vector<double>& expected,
+                                                      double target_total) {
+  std::vector<double> out = expected;
+  const double current_total = ff_sum_values(expected);
+  if (!std::isfinite(target_total) || target_total < 0.0 || !std::isfinite(current_total)
+      || current_total <= 0.0) {
+    return out;
+  }
+  const double scale = target_total / current_total;
+  for (double& value : out) {
+    value *= scale;
+  }
+  return out;
+}
+
+inline std::vector<double> ff_expected_bins_normalized(const TH1* href, TF1* f,
+                                                       double xmin, double xmax,
+                                                       double target_total) {
+  return ff_normalize_expected_bins(ff_expected_bins(href, f, xmin, xmax), target_total);
+}
+
+inline double ff_values_count_in_center_range(const TH1* href,
+                                              const std::vector<double>& values,
+                                              double xmin, double xmax,
+                                              bool include_lo = true,
+                                              bool include_hi = true) {
+  double sum = 0.0;
+  const int nb = std::min(href->GetNbinsX(), static_cast<int>(values.size()));
+  for (int i = 1; i <= nb; ++i) {
+    const double x = href->GetXaxis()->GetBinCenter(i);
+    if (!ff_center_in_range(x, xmin, xmax, include_lo, include_hi)) {
+      continue;
+    }
+    sum += values[static_cast<std::size_t>(i - 1)];
+  }
+  return sum;
+}
+
+inline std::pair<double, double> ff_hist_peak_in_range(const TH1* h,
+                                                       double xmin,
+                                                       double xmax) {
+  double best_y = -1.0;
+  double best_x = std::numeric_limits<double>::quiet_NaN();
+  for (int i = 1; i <= h->GetNbinsX(); ++i) {
+    const double x = h->GetXaxis()->GetBinCenter(i);
+    if (!ff_center_in_range(x, xmin, xmax, true, true)) {
+      continue;
+    }
+    const double y = h->GetBinContent(i);
+    if (y > best_y) {
+      best_y = y;
+      best_x = x;
+    }
+  }
+  if (best_y < 0.0) {
+    return std::make_pair(std::numeric_limits<double>::quiet_NaN(),
+                          std::numeric_limits<double>::quiet_NaN());
+  }
+  return std::make_pair(best_y, best_x);
+}
+
+inline std::pair<double, double> ff_values_peak_in_range(const TH1* href,
+                                                         const std::vector<double>& values,
+                                                         double xmin,
+                                                         double xmax) {
+  double best_y = -1.0;
+  double best_x = std::numeric_limits<double>::quiet_NaN();
+  const int nb = std::min(href->GetNbinsX(), static_cast<int>(values.size()));
+  for (int i = 1; i <= nb; ++i) {
+    const double x = href->GetXaxis()->GetBinCenter(i);
+    if (!ff_center_in_range(x, xmin, xmax, true, true)) {
+      continue;
+    }
+    const double y = values[static_cast<std::size_t>(i - 1)];
+    if (y > best_y) {
+      best_y = y;
+      best_x = x;
+    }
+  }
+  if (best_y < 0.0) {
+    return std::make_pair(std::numeric_limits<double>::quiet_NaN(),
+                          std::numeric_limits<double>::quiet_NaN());
+  }
+  return std::make_pair(best_y, best_x);
+}
+
+inline double ff_safe_fraction(double numerator, double denominator) {
+  if (!std::isfinite(numerator) || !std::isfinite(denominator) || denominator <= 0.0) {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
+  return numerator / denominator;
+}
+
+inline double ff_relative_difference(double a, double b) {
+  if (!std::isfinite(a) || !std::isfinite(b) || std::abs(a) <= 0.0) {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
+  return std::abs(b - a) / std::abs(a);
+}
+
+inline TH1D* ff_make_hist_from_values(const TH1* href,
+                                      const std::vector<double>& values,
+                                      const std::string& name,
+                                      const std::string& title) {
+  TH1D* hout = new TH1D(name.c_str(), title.c_str(),
+                        href->GetNbinsX(),
+                        href->GetXaxis()->GetXmin(),
+                        href->GetXaxis()->GetXmax());
+  hout->SetDirectory(nullptr);
+  for (int i = 1; i <= href->GetNbinsX() && i <= static_cast<int>(values.size()); ++i) {
+    hout->SetBinContent(i, values[static_cast<std::size_t>(i - 1)]);
+    hout->SetBinError(i, 0.0);
+  }
+  return hout;
+}
+
+inline FuncFormValidationSummary ff_build_validation_summary(
+    const TH1* h,
+    TF1* f,
+    const FuncFormJobConfig& job,
+    const FuncFormToyAggregate* toy_summary = nullptr) {
+  FuncFormValidationSummary out;
+  if (h == nullptr || f == nullptr) {
+    return out;
+  }
+
+  const FuncFormResolvedRanges rr = ff_resolve_ranges(h, job);
+  const double full_obs = ff_hist_count_in_center_range(h, rr.support_min, rr.support_max, true, true);
+  const std::vector<double> expected =
+      ff_expected_bins_normalized(h, f, rr.support_min, rr.support_max, full_obs);
+  const double full_fit = ff_values_count_in_center_range(h, expected, rr.support_min, rr.support_max, true, true);
+  const double scan_obs = ff_hist_count_in_center_range(h, rr.scan_min, rr.scan_max, true, true);
+  const double scan_fit = ff_values_count_in_center_range(h, expected, rr.scan_min, rr.scan_max, true, true);
+  const double low_obs = ff_hist_count_in_center_range(h, rr.support_min, rr.scan_min, true, false);
+  const double low_fit = ff_values_count_in_center_range(h, expected, rr.support_min, rr.scan_min, true, false);
+  const double high_obs = ff_hist_count_in_center_range(h, rr.scan_max, rr.support_max, false, true);
+  const double high_fit = ff_values_count_in_center_range(h, expected, rr.scan_max, rr.support_max, false, true);
+  const std::pair<double, double> obs_peak = ff_hist_peak_in_range(h, rr.scan_min, rr.scan_max);
+  const std::pair<double, double> fit_peak = ff_values_peak_in_range(h, expected, rr.scan_min, rr.scan_max);
+
+  out.support_min = rr.support_min;
+  out.support_max = rr.support_max;
+  out.scan_min = rr.scan_min;
+  out.scan_max = rr.scan_max;
+  out.normalization_target_count = static_cast<long long>(std::llround(full_obs));
+  out.full_range.observed = full_obs;
+  out.full_range.fit_expected = full_fit;
+  out.scan_range.observed = scan_obs;
+  out.scan_range.fit_expected = scan_fit;
+  out.low_sideband_fraction.observed = ff_safe_fraction(low_obs, full_obs);
+  out.low_sideband_fraction.fit_expected = ff_safe_fraction(low_fit, full_fit);
+  out.high_sideband_fraction.observed = ff_safe_fraction(high_obs, full_obs);
+  out.high_sideband_fraction.fit_expected = ff_safe_fraction(high_fit, full_fit);
+  out.scan_peak.observed_height = obs_peak.first;
+  out.scan_peak.observed_mass = obs_peak.second;
+  out.scan_peak.fit_expected_height = fit_peak.first;
+  out.scan_peak.fit_expected_mass = fit_peak.second;
+
+  if (toy_summary != nullptr && !toy_summary->mean_bins.empty()) {
+    out.n_toys = toy_summary->n_toys;
+    out.full_range.toy_mean = ff_values_count_in_center_range(
+        h, toy_summary->mean_bins, rr.support_min, rr.support_max, true, true);
+    out.scan_range.toy_mean = ff_values_count_in_center_range(
+        h, toy_summary->mean_bins, rr.scan_min, rr.scan_max, true, true);
+    out.low_sideband_fraction.toy_mean = ff_safe_fraction(
+        ff_values_count_in_center_range(h, toy_summary->mean_bins, rr.support_min, rr.scan_min, true, false),
+        out.full_range.toy_mean);
+    out.high_sideband_fraction.toy_mean = ff_safe_fraction(
+        ff_values_count_in_center_range(h, toy_summary->mean_bins, rr.scan_max, rr.support_max, false, true),
+        out.full_range.toy_mean);
+    const std::pair<double, double> toy_peak = ff_values_peak_in_range(
+        h, toy_summary->mean_bins, rr.scan_min, rr.scan_max);
+    out.scan_peak.toy_mean_height = toy_peak.first;
+    out.scan_peak.toy_mean_mass = toy_peak.second;
+  }
+
+  const double diff_full = ff_relative_difference(out.full_range.observed, out.full_range.fit_expected);
+  const double diff_scan = ff_relative_difference(out.scan_range.observed, out.scan_range.fit_expected);
+  const double diff_low = std::abs(out.low_sideband_fraction.fit_expected - out.low_sideband_fraction.observed);
+  const double diff_high = std::abs(out.high_sideband_fraction.fit_expected - out.high_sideband_fraction.observed);
+
+  out.selection_score = 0.0;
+  out.selection_score += std::isfinite(diff_full) ? diff_full : 1.0e6;
+  out.selection_score += std::isfinite(diff_scan) ? diff_scan : 1.0e6;
+  out.selection_score += std::isfinite(diff_low) ? diff_low : 1.0e6;
+  out.selection_score += std::isfinite(diff_high) ? diff_high : 1.0e6;
+  out.selection_pass =
+      std::isfinite(diff_full) && diff_full <= job.validation_max_rel_diff_full &&
+      std::isfinite(diff_scan) && diff_scan <= job.validation_max_rel_diff_scan &&
+      std::isfinite(diff_low) && diff_low <= job.validation_max_abs_sideband_frac_diff &&
+      std::isfinite(diff_high) && diff_high <= job.validation_max_abs_sideband_frac_diff;
   return out;
 }
 
@@ -688,6 +1035,7 @@ inline FuncFormFitSummary ff_fit_candidate(TH1* h, const FuncFormCandidateDef& d
       trial_fit.fit_max = fit_max;
       trial_fit.trial_index = trial;
       trial_fit.trial_label = ff_trial_label(trial);
+      trial_fit.validation = ff_build_validation_summary(h, func, job, nullptr);
 
       const double metric = trial_fit.eval.pearson_chi2ndf;
       if (metric < best_metric) {
@@ -710,7 +1058,9 @@ inline FuncFormFitSummary ff_fit_candidate(TH1* h, const FuncFormCandidateDef& d
             << "  trial=" << best.trial_label
             << "  ROOT chi2/ndf=" << best.chi2ndf_root
             << "  Pearson(eval)=" << best.eval.pearson_chi2ndf
-            << "  Neyman(eval)=" << best.eval.neyman_chi2ndf << "\n";
+            << "  Neyman(eval)=" << best.eval.neyman_chi2ndf
+            << "  validation=" << (best.validation.selection_pass ? "pass" : "fail")
+            << "  score=" << best.validation.selection_score << "\n";
   return best;
 }
 
@@ -736,8 +1086,24 @@ inline bool ff_is_usable(const FuncFormFitSummary& fit) {
   return true;
 }
 
+inline double ff_primary_rank_metric(const FuncFormFitSummary& fit,
+                                     bool require_validation) {
+  const double val_score = std::isfinite(fit.validation.selection_score)
+                               ? fit.validation.selection_score
+                               : std::numeric_limits<double>::infinity();
+  const double fit_score = ff_metric(fit);
+  if (!require_validation) {
+    return fit_score;
+  }
+  if (!fit.validation.selection_pass) {
+    return std::numeric_limits<double>::infinity();
+  }
+  return val_score + 1.0e-3 * fit_score;
+}
+
 inline int ff_find_best_index(const std::vector<FuncFormFitSummary>& fits,
-                              const std::vector<std::string>& tags) {
+                              const std::vector<std::string>& tags,
+                              bool require_validation = false) {
   int best = -1;
   double best_metric = std::numeric_limits<double>::infinity();
   for (std::size_t i = 0; i < fits.size(); ++i) {
@@ -747,7 +1113,7 @@ inline int ff_find_best_index(const std::vector<FuncFormFitSummary>& fits,
     if (!tags.empty() && std::find(tags.begin(), tags.end(), fits[i].tag) == tags.end()) {
       continue;
     }
-    const double metric = ff_metric(fits[i]);
+    const double metric = ff_primary_rank_metric(fits[i], require_validation);
     if (metric < best_metric) {
       best_metric = metric;
       best = static_cast<int>(i);
@@ -759,13 +1125,15 @@ inline int ff_find_best_index(const std::vector<FuncFormFitSummary>& fits,
 inline int ff_choose_primary_index(const std::vector<FuncFormFitSummary>& fits,
                                    const FuncFormJobConfig& job,
                                    const std::vector<FuncFormCandidateDef>& defs) {
+  const bool require_validation = bool(job.require_validation_pass_for_primary);
   for (const auto& def : defs) {
     if (!def.preferred_primary) {
       continue;
     }
     for (std::size_t i = 0; i < fits.size(); ++i) {
       if (fits[i].tag == def.tag && ff_is_usable(fits[i])
-          && ff_metric(fits[i]) <= job.primary_target_chi2ndf) {
+          && ff_metric(fits[i]) <= job.primary_target_chi2ndf
+          && (!require_validation || fits[i].validation.selection_pass)) {
         return static_cast<int>(i);
       }
     }
@@ -777,8 +1145,9 @@ inline int ff_choose_primary_index(const std::vector<FuncFormFitSummary>& fits,
     }
   }
 
-  const int best_preferred = ff_find_best_index(fits, preferred_tags);
-  const int bern_idx = ff_find_best_index(fits, std::vector<std::string>{job.bernstein_tag});
+  const int best_preferred = ff_find_best_index(fits, preferred_tags, require_validation);
+  const int bern_idx = ff_find_best_index(
+      fits, std::vector<std::string>{job.bernstein_tag}, require_validation);
   if (job.allow_bernstein_primary_fallback && bern_idx >= 0) {
     if (best_preferred < 0) {
       return bern_idx;
@@ -794,6 +1163,12 @@ inline int ff_choose_primary_index(const std::vector<FuncFormFitSummary>& fits,
   if (bern_idx >= 0) {
     return bern_idx;
   }
+  if (require_validation) {
+    const int validated_any = ff_find_best_index(fits, std::vector<std::string>{}, true);
+    if (validated_any >= 0) {
+      return validated_any;
+    }
+  }
   return ff_find_best_index(fits, std::vector<std::string>{});
 }
 
@@ -806,19 +1181,52 @@ inline void ff_save_png_pdf(TCanvas* c, const std::string& stem) {
   c->SaveAs((stem + ".pdf").c_str());
 }
 
+inline void ff_write_text_file(const std::string& path, const std::string& payload) {
+  const std::size_t slash = path.find_last_of("/\\");
+  if (slash != std::string::npos) {
+    gSystem->mkdir(path.substr(0, slash).c_str(), true);
+  }
+  std::ofstream out(path.c_str());
+  out << payload;
+}
+
 inline void ff_write_fit_metadata(TFile* fout,
                                   const std::vector<FuncFormFitSummary>& fits,
                                   int primary_idx,
-                                  const FuncFormJobConfig& job) {
+                                  const FuncFormJobConfig& job,
+                                  const TH1* h_in) {
   TDirectory* meta_dir = fout->mkdir("fit_metadata");
   TDirectory::TContext ctx(meta_dir);
+  const FuncFormResolvedRanges rr = ff_resolve_ranges(h_in, job);
+  const long long normalization_target_count = static_cast<long long>(
+      std::llround(ff_hist_count_in_center_range(h_in, rr.support_min, rr.support_max, true, true)));
 
   std::ostringstream all_json;
   all_json << "{\n"
            << "  \"dataset\": \"" << ff_json_escape(job.dataset_key) << "\",\n"
-           << "  \"fit_min_GeV\": " << std::setprecision(8) << job.fit_min << ",\n"
-           << "  \"fit_max_GeV\": " << std::setprecision(8) << job.fit_max << ",\n"
+           << "  \"input_file\": \"" << ff_json_escape(job.input_file) << "\",\n"
+           << "  \"hist_name\": \"" << ff_json_escape(job.hist_name) << "\",\n"
+           << "  \"input_histogram_range_GeV\": ["
+           << ff_json_double(h_in->GetXaxis()->GetXmin()) << ", "
+           << ff_json_double(h_in->GetXaxis()->GetXmax()) << "],\n"
+           << "  \"fit_min_GeV\": " << ff_json_double(job.fit_min) << ",\n"
+           << "  \"fit_max_GeV\": " << ff_json_double(job.fit_max) << ",\n"
+           << "  \"toy_support_range_GeV\": ["
+           << ff_json_double(rr.support_min) << ", "
+           << ff_json_double(rr.support_max) << "],\n"
+           << "  \"scan_range_GeV\": ["
+           << ff_json_double(rr.scan_min) << ", "
+           << ff_json_double(rr.scan_max) << "],\n"
+           << "  \"n_toys\": " << job.n_toys << ",\n"
+           << "  \"normalization_target_count\": " << normalization_target_count << ",\n"
+           << "  \"validation_thresholds\": {\n"
+           << "    \"max_rel_diff_full\": " << ff_json_double(job.validation_max_rel_diff_full) << ",\n"
+           << "    \"max_rel_diff_scan\": " << ff_json_double(job.validation_max_rel_diff_scan) << ",\n"
+           << "    \"max_abs_sideband_frac_diff\": " << ff_json_double(job.validation_max_abs_sideband_frac_diff) << "\n"
+           << "  },\n"
            << "  \"primary_function\": \"" << ff_json_escape(primary_idx >= 0 ? fits[primary_idx].tag : "") << "\",\n"
+           << "  \"primary_validation_pass\": "
+           << ((primary_idx >= 0 && fits[primary_idx].validation.selection_pass) ? "true" : "false") << ",\n"
            << "  \"fits\": [\n";
 
   for (std::size_t i = 0; i < fits.size(); ++i) {
@@ -829,15 +1237,53 @@ inline void ff_write_fit_metadata(TFile* fout,
         << "  \"label\": \"" << ff_json_escape(fit.label) << "\",\n"
         << "  \"is_primary\": " << (static_cast<int>(i) == primary_idx ? "true" : "false") << ",\n"
         << "  \"fit_ok\": " << (fit.ok ? "true" : "false") << ",\n"
-        << "  \"fit_min_GeV\": " << fit.fit_min << ",\n"
-        << "  \"fit_max_GeV\": " << fit.fit_max << ",\n"
+        << "  \"fit_min_GeV\": " << ff_json_double(fit.fit_min) << ",\n"
+        << "  \"fit_max_GeV\": " << ff_json_double(fit.fit_max) << ",\n"
         << "  \"trial_index\": " << fit.trial_index << ",\n"
         << "  \"trial_label\": \"" << ff_json_escape(fit.trial_label) << "\",\n"
-        << "  \"root_chi2ndf\": " << fit.chi2ndf_root << ",\n"
-        << "  \"pearson_chi2ndf\": " << fit.eval.pearson_chi2ndf << ",\n"
-        << "  \"neyman_chi2ndf\": " << fit.eval.neyman_chi2ndf << ",\n"
+        << "  \"root_chi2ndf\": " << ff_json_double(fit.chi2ndf_root) << ",\n"
+        << "  \"pearson_chi2ndf\": " << ff_json_double(fit.eval.pearson_chi2ndf) << ",\n"
+        << "  \"neyman_chi2ndf\": " << ff_json_double(fit.eval.neyman_chi2ndf) << ",\n"
         << "  \"nbin_used\": " << fit.eval.nbin_used << ",\n"
-        << "  \"ndf_sel\": " << fit.eval.ndf_sel << "\n"
+        << "  \"ndf_sel\": " << fit.eval.ndf_sel << ",\n"
+        << "  \"validation\": {\n"
+        << "    \"selection_score\": " << ff_json_double(fit.validation.selection_score) << ",\n"
+        << "    \"selection_pass\": " << (fit.validation.selection_pass ? "true" : "false") << ",\n"
+        << "    \"support_range_GeV\": [" << ff_json_double(fit.validation.support_min) << ", "
+        << ff_json_double(fit.validation.support_max) << "],\n"
+        << "    \"scan_range_GeV\": [" << ff_json_double(fit.validation.scan_min) << ", "
+        << ff_json_double(fit.validation.scan_max) << "],\n"
+        << "    \"normalization_target_count\": " << fit.validation.normalization_target_count << ",\n"
+        << "    \"n_toys\": " << fit.validation.n_toys << ",\n"
+        << "    \"full_range\": {\n"
+        << "      \"observed\": " << ff_json_double(fit.validation.full_range.observed) << ",\n"
+        << "      \"fit_expected\": " << ff_json_double(fit.validation.full_range.fit_expected) << ",\n"
+        << "      \"toy_mean\": " << ff_json_double(fit.validation.full_range.toy_mean) << "\n"
+        << "    },\n"
+        << "    \"scan_range\": {\n"
+        << "      \"observed\": " << ff_json_double(fit.validation.scan_range.observed) << ",\n"
+        << "      \"fit_expected\": " << ff_json_double(fit.validation.scan_range.fit_expected) << ",\n"
+        << "      \"toy_mean\": " << ff_json_double(fit.validation.scan_range.toy_mean) << "\n"
+        << "    },\n"
+        << "    \"low_sideband_fraction\": {\n"
+        << "      \"observed\": " << ff_json_double(fit.validation.low_sideband_fraction.observed) << ",\n"
+        << "      \"fit_expected\": " << ff_json_double(fit.validation.low_sideband_fraction.fit_expected) << ",\n"
+        << "      \"toy_mean\": " << ff_json_double(fit.validation.low_sideband_fraction.toy_mean) << "\n"
+        << "    },\n"
+        << "    \"high_sideband_fraction\": {\n"
+        << "      \"observed\": " << ff_json_double(fit.validation.high_sideband_fraction.observed) << ",\n"
+        << "      \"fit_expected\": " << ff_json_double(fit.validation.high_sideband_fraction.fit_expected) << ",\n"
+        << "      \"toy_mean\": " << ff_json_double(fit.validation.high_sideband_fraction.toy_mean) << "\n"
+        << "    },\n"
+        << "    \"scan_peak\": {\n"
+        << "      \"observed_height\": " << ff_json_double(fit.validation.scan_peak.observed_height) << ",\n"
+        << "      \"observed_mass_GeV\": " << ff_json_double(fit.validation.scan_peak.observed_mass) << ",\n"
+        << "      \"fit_expected_height\": " << ff_json_double(fit.validation.scan_peak.fit_expected_height) << ",\n"
+        << "      \"fit_expected_mass_GeV\": " << ff_json_double(fit.validation.scan_peak.fit_expected_mass) << ",\n"
+        << "      \"toy_mean_height\": " << ff_json_double(fit.validation.scan_peak.toy_mean_height) << ",\n"
+        << "      \"toy_mean_mass_GeV\": " << ff_json_double(fit.validation.scan_peak.toy_mean_mass) << "\n"
+        << "    }\n"
+        << "  }\n"
         << "}";
     TNamed named((fit.tag + "_metadata").c_str(), one.str().c_str());
     named.Write();
@@ -852,34 +1298,93 @@ inline void ff_write_fit_metadata(TFile* fout,
 
   TNamed summary("fit_summary_json", all_json.str().c_str());
   summary.Write();
+  TNamed generation("toy_generation_metadata_json", all_json.str().c_str());
+  generation.Write();
   TNamed primary("primary_function_tag", primary_idx >= 0 ? fits[primary_idx].tag.c_str() : "");
   primary.Write();
+  ff_write_text_file(job.output_root + ".metadata.json", all_json.str());
 }
 
-inline void ff_make_toys_for_fit(TFile* fout, const FuncFormFitSummary& fit,
-                                 TH1* h_in, double fit_min, double fit_max, int n_toys) {
+inline FuncFormToyAggregate ff_make_toys_for_fit(TFile* fout, const FuncFormFitSummary& fit,
+                                                 TH1* h_in, const FuncFormJobConfig& job) {
+  FuncFormToyAggregate out;
   if (!ff_is_usable(fit)) {
-    return;
+    return out;
   }
 
+  const FuncFormResolvedRanges rr = ff_resolve_ranges(h_in, job);
   const int nb = h_in->GetNbinsX();
   const double hxmin = h_in->GetXaxis()->GetXmin();
   const double hxmax = h_in->GetXaxis()->GetXmax();
   const long long nfill = static_cast<long long>(
-      std::llround(h_in->Integral(h_in->FindBin(fit.fit_min + 1e-9), h_in->FindBin(fit.fit_max - 1e-9))));
+      std::llround(ff_hist_count_in_center_range(h_in, rr.support_min, rr.support_max, true, true)));
+  out.normalization_target_count = nfill;
+  out.n_toys = std::max(0, job.n_toys);
+  const std::vector<double> expected =
+      ff_expected_bins_normalized(h_in, fit.func, rr.support_min, rr.support_max, static_cast<double>(nfill));
+  out.mean_bins.assign(static_cast<std::size_t>(nb), 0.0);
 
-  fit.func->SetRange(fit.fit_min, fit.fit_max);
+  fit.func->SetRange(rr.support_min, rr.support_max);
   if (gROOT->GetListOfFunctions()->FindObject(fit.func->GetName()) == nullptr) {
     gROOT->GetListOfFunctions()->Add(fit.func);
   }
   TDirectory* d = fout->mkdir(fit.tag.c_str());
   TDirectory::TContext ctx(d);
-  for (int itoy = 0; itoy < n_toys; ++itoy) {
+  for (int itoy = 0; itoy < job.n_toys; ++itoy) {
     const std::string hname = fit.tag + "_toy_" + std::to_string(itoy);
     TH1D htoy(hname.c_str(), hname.c_str(), nb, hxmin, hxmax);
     htoy.Sumw2(false);
-    htoy.FillRandom(fit.func->GetName(), std::max<long long>(1, nfill));
+    for (int ib = 1; ib <= nb; ++ib) {
+      const double mean = expected[static_cast<std::size_t>(ib - 1)];
+      const double count = (std::isfinite(mean) && mean > 0.0) ? gRandom->PoissonD(mean) : 0.0;
+      htoy.SetBinContent(ib, count);
+      htoy.SetBinError(ib, std::sqrt(std::max(0.0, count)));
+    }
     htoy.Write();
+    for (int ib = 1; ib <= nb; ++ib) {
+      out.mean_bins[static_cast<std::size_t>(ib - 1)] += htoy.GetBinContent(ib);
+    }
+  }
+  if (job.n_toys > 0) {
+    for (double& val : out.mean_bins) {
+      val /= static_cast<double>(job.n_toys);
+    }
+  }
+  return out;
+}
+
+inline void ff_write_validation_histograms(TFile* fout,
+                                           const std::vector<FuncFormFitSummary>& fits,
+                                           const std::vector<FuncFormToyAggregate>& toy_summaries,
+                                           const TH1* h_in,
+                                           const FuncFormJobConfig& job) {
+  TDirectory* val_dir = fout->mkdir("validation");
+  TDirectory::TContext ctx(val_dir);
+  const FuncFormResolvedRanges rr = ff_resolve_ranges(h_in, job);
+  for (std::size_t i = 0; i < fits.size(); ++i) {
+    if (!ff_is_usable(fits[i])) {
+      continue;
+    }
+    const double target_total = ff_hist_count_in_center_range(h_in, rr.support_min, rr.support_max, true, true);
+    const std::vector<double> expected = ff_expected_bins_normalized(
+        h_in, fits[i].func, rr.support_min, rr.support_max, target_total);
+    TH1D* h_expected = ff_make_hist_from_values(
+        h_in,
+        expected,
+        fits[i].tag + "_expected_counts",
+        fits[i].tag + " expected counts");
+    h_expected->Write();
+    delete h_expected;
+
+    if (i < toy_summaries.size() && !toy_summaries[i].mean_bins.empty()) {
+      TH1D* h_mean = ff_make_hist_from_values(
+          h_in,
+          toy_summaries[i].mean_bins,
+          fits[i].tag + "_toy_mean",
+          fits[i].tag + " toy ensemble mean");
+      h_mean->Write();
+      delete h_mean;
+    }
   }
 }
 
@@ -925,12 +1430,10 @@ inline void ff_make_overlay_plot(TH1* h_in,
 
   TH1* hdraw = dynamic_cast<TH1*>(h_in->Clone("hdraw_funcform"));
   hdraw->SetDirectory(nullptr);
-  double plot_min = job.fit_min;
-  const std::vector<double> fit_mins = ff_fit_min_scan_values(job);
-  if (!fit_mins.empty()) {
-    plot_min = *std::min_element(fit_mins.begin(), fit_mins.end());
-  }
-  hdraw->GetXaxis()->SetRangeUser(plot_min, job.fit_max);
+  const FuncFormResolvedRanges rr = ff_resolve_ranges(h_in, job);
+  const double plot_min = rr.support_min;
+  const double plot_max = rr.support_max;
+  hdraw->GetXaxis()->SetRangeUser(plot_min, plot_max);
   hdraw->SetMarkerStyle(20);
   hdraw->SetMarkerSize(0.8);
   hdraw->SetLineColor(kBlack);
@@ -941,7 +1444,7 @@ inline void ff_make_overlay_plot(TH1* h_in,
   double ymax = 0.0;
   double ymin = std::numeric_limits<double>::infinity();
   const int b1 = hdraw->GetXaxis()->FindBin(plot_min + 1e-12);
-  const int b2 = hdraw->GetXaxis()->FindBin(job.fit_max - 1e-12);
+  const int b2 = hdraw->GetXaxis()->FindBin(plot_max - 1e-12);
   for (int i = b1; i <= b2; ++i) {
     const double y = hdraw->GetBinContent(i);
     if (y > 0.0) {
@@ -970,7 +1473,7 @@ inline void ff_make_overlay_plot(TH1* h_in,
     if (fits[i].func == nullptr) {
       continue;
     }
-    fits[i].func->SetRange(fits[i].fit_min, fits[i].fit_max);
+    fits[i].func->SetRange(rr.support_min, rr.support_max);
     fits[i].func->SetLineColor(colors[color_idx % (sizeof(colors) / sizeof(colors[0]))]);
     fits[i].func->SetLineWidth(static_cast<int>(i) == primary_idx ? 4 : 2);
     fits[i].func->Draw("SAME");
@@ -1022,7 +1525,10 @@ inline void ff_run_job(const FuncFormJobConfig& job,
   const int primary_idx = ff_choose_primary_index(fits, job, defs);
   if (primary_idx >= 0) {
     std::cout << "[funcform][" << job.dataset_key << "] primary function = "
-              << fits[primary_idx].tag << "  metric=" << ff_metric(fits[primary_idx]) << "\n";
+              << fits[primary_idx].tag
+              << "  metric=" << ff_metric(fits[primary_idx])
+              << "  validation=" << (fits[primary_idx].validation.selection_pass ? "pass" : "fail")
+              << "\n";
   } else {
     std::cout << "[funcform][" << job.dataset_key << "] no valid primary function found\n";
   }
@@ -1059,13 +1565,16 @@ inline void ff_run_job(const FuncFormJobConfig& job,
     }
   }
 
-  ff_write_fit_metadata(fout, fits, primary_idx, job);
+  std::vector<FuncFormToyAggregate> toy_summaries(fits.size());
   for (std::size_t i = 0; i < fits.size(); ++i) {
     if (!ff_is_usable(fits[i])) {
       continue;
     }
-    ff_make_toys_for_fit(fout, fits[i], h0, job.fit_min, job.fit_max, job.n_toys);
+    toy_summaries[i] = ff_make_toys_for_fit(fout, fits[i], h0, job);
+    fits[i].validation = ff_build_validation_summary(h0, fits[i].func, job, &toy_summaries[i]);
   }
+  ff_write_validation_histograms(fout, fits, toy_summaries, h0, job);
+  ff_write_fit_metadata(fout, fits, primary_idx, job, h0);
 
   fout->Write();
   fout->Close();
