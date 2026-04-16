@@ -29,7 +29,7 @@ void make_func_data_output_2016(
   FuncFormJobConfig job;
   job.dataset_key = "2016";
   job.dataset_label = "HPS 2016 Functional-Form Fits";
-  job.input_file = "/Users/emryspeets/research_plots/2016_IMD/EventSelection_Data_10Percent.root";
+  job.input_file = "/sdf/home/e/epeets/move/EventSelection_Data_10Percent.root";
   job.hist_name = "h_Minv_General_Final_1";
   job.output_root = outfile;
   job.note_plot_stem = "hps_gpr_analysis_note/toy_generation_figs/funcform_fit_2016";

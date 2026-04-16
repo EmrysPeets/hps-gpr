@@ -6,7 +6,7 @@ void make_func_data_output_2021(
   FuncFormJobConfig job;
   job.dataset_key = "2021";
   job.dataset_label = "HPS 2021 Functional-Form Fits";
-  job.input_file = "/Users/emryspeets/root_files/tc_1pct/preselection_invM_psumlt2p8_hists.root";
+  job.input_file = "/sdf/home/e/epeets/run/2021_bump/preselection_invM_psumlt2p8_hists.root";
   job.hist_name = "preselection/h_invM_8000";
   job.output_root = outfile;
   job.note_plot_stem = "hps_gpr_analysis_note/toy_generation_figs/funcform_fit_2021";

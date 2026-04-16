@@ -30,7 +30,7 @@ void make_func_data_output_2015(
   FuncFormJobConfig job;
   job.dataset_key = "2015";
   job.dataset_label = "HPS 2015 Functional-Form Fits";
-  job.input_file = "/Users/emryspeets/research_plots/2015_data/invariant_mass_0pt5mm_full.root";
+  job.input_file = "/sdf/home/e/epeets/move/2015_IMD.root";
   job.hist_name = "invariant_mass";
   job.output_root = outfile;
   job.note_plot_stem = "hps_gpr_analysis_note/toy_generation_figs/funcform_fit_2015";
