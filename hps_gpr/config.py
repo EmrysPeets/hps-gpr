@@ -132,6 +132,7 @@ class Config:
     mass_step_gev: float = 0.001
     blind_nsigma: float = 1.64
     gp_train_exclude_nsigma: Optional[float] = None  # defaults to blind_nsigma when None
+    eps2_density_nsigma: Optional[float] = None  # defaults to blind_nsigma when None
     neighborhood_rebin: int = 5
     n_restarts: int = 12
     # Scan parallelization
@@ -172,6 +173,7 @@ class Config:
     ul_bands_refit_gp_restarts: int = 0
     ul_bands_refit_gp_optimize: bool = True
     ul_bands_train_exclude_nsigma: Optional[float] = None  # defaults to gp_train_exclude_nsigma
+    full_toy_bkg_mode: str = "poisson"  # "poisson" | "fixed_total_multinomial"
     # Combined bands settings
     do_combined_bands: bool = False
     combined_bands_n_toys: int = 100

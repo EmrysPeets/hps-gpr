@@ -550,6 +550,210 @@ def toy_scan(
     print(f"Wrote {len(written)} toy scan directories under {os.path.join(cfg.output_dir, 'toy_scans', ds.key)}")
 
 
+@main.command("gp-toy-scan")
+@click.option(
+    "--config",
+    "-c",
+    required=True,
+    type=click.Path(exists=True),
+    help="Path to configuration YAML file",
+)
+@click.option(
+    "--dataset",
+    "-d",
+    required=True,
+    help="Dataset key (2015, 2016, or 2021)",
+)
+@click.option(
+    "--n-toys",
+    type=int,
+    default=1000,
+    show_default=True,
+    help="Number of GP-generated toys to scan when --toy-index is not supplied",
+)
+@click.option(
+    "--toy-index",
+    "toy_indices",
+    multiple=True,
+    type=int,
+    help="Optional explicit toy indices to run (repeatable, primarily for SLURM jobs)",
+)
+@click.option(
+    "--seed",
+    type=int,
+    help="Optional base RNG seed for GP-generated toys",
+)
+@click.option(
+    "--output-dir",
+    "-o",
+    type=click.Path(),
+    help="Override output directory from config",
+)
+@click.option(
+    "--mass-min",
+    type=float,
+    help="Minimum mass to scan (GeV)",
+)
+@click.option(
+    "--mass-max",
+    type=float,
+    help="Maximum mass to scan (GeV)",
+)
+@click.option(
+    "--save-plots/--no-save-plots",
+    default=False,
+    show_default=False,
+    help="Override the config value and write or skip per-toy scan plots and summary plots",
+)
+@click.option(
+    "--save-fit-json/--no-save-fit-json",
+    default=False,
+    show_default=False,
+    help="Override the config value and write or skip per-toy fit JSON sidecars",
+)
+@click.option(
+    "--save-per-mass-folders/--no-save-per-mass-folders",
+    default=False,
+    show_default=False,
+    help="Override the config value and write or skip nested mass folders for each toy scan",
+)
+@click.option(
+    "--scan-parallel/--no-scan-parallel",
+    default=None,
+    show_default=False,
+    help="Override toy-scan inner mass parallelism",
+)
+@click.option(
+    "--scan-n-workers",
+    type=int,
+    help="Override toy-scan inner mass workers",
+)
+@click.option(
+    "--scan-backend",
+    type=str,
+    help="Override toy-scan joblib backend",
+)
+@click.option(
+    "--scan-threads-per-worker",
+    type=int,
+    help="Override toy-scan threads per worker",
+)
+@click.pass_context
+def gp_toy_scan(
+    ctx,
+    config,
+    dataset,
+    n_toys,
+    toy_indices,
+    seed,
+    output_dir,
+    mass_min,
+    mass_max,
+    save_plots,
+    save_fit_json,
+    save_per_mass_folders,
+    scan_parallel,
+    scan_n_workers,
+    scan_backend,
+    scan_threads_per_worker,
+):
+    """Run the mass scan once per GP-generated full-range background toy."""
+    from .config import load_config
+    from .dataset import make_datasets
+    from .gp_toys import run_gp_toy_scans, _source_model_name
+    from .scan import union_scan_grid
+    from .toy_backgrounds import normalize_full_toy_bkg_mode
+
+    cfg = load_config(config)
+    if output_dir:
+        cfg.output_dir = output_dir
+    cfg.ensure_output_dir()
+
+    datasets = make_datasets(cfg)
+    if dataset not in datasets:
+        available = list(datasets.keys())
+        print(f"Dataset '{dataset}' not found or not enabled. Available: {available}")
+        sys.exit(1)
+    ds = datasets[dataset]
+
+    resolved_save_plots = bool(_resolve_cli_override(
+        ctx, "save_plots", save_plots, getattr(cfg, "toy_scan_save_plots", False)
+    ))
+    resolved_save_fit_json = bool(_resolve_cli_override(
+        ctx, "save_fit_json", save_fit_json, getattr(cfg, "toy_scan_save_fit_json", False)
+    ))
+    resolved_save_per_mass_folders = bool(_resolve_cli_override(
+        ctx,
+        "save_per_mass_folders",
+        save_per_mass_folders,
+        getattr(cfg, "toy_scan_save_per_mass_folders", False),
+    ))
+    resolved_scan_parallel = bool(_resolve_cli_override(
+        ctx, "scan_parallel", scan_parallel, getattr(cfg, "toy_scan_parallel", False)
+    ))
+    resolved_scan_n_workers = max(
+        1,
+        int(_resolve_cli_override(
+            ctx, "scan_n_workers", scan_n_workers, getattr(cfg, "toy_scan_n_workers", 1)
+        )),
+    )
+    resolved_scan_backend = str(_resolve_cli_override(
+        ctx, "scan_backend", scan_backend, getattr(cfg, "toy_scan_parallel_backend", "threading")
+    ))
+    resolved_scan_threads_per_worker = max(
+        1,
+        int(_resolve_cli_override(
+            ctx,
+            "scan_threads_per_worker",
+            scan_threads_per_worker,
+            getattr(cfg, "toy_scan_threads_per_worker", 1),
+        )),
+    )
+
+    masses = union_scan_grid({str(ds.key): ds}, cfg.mass_step_gev)
+    if mass_min is not None:
+        masses = masses[masses >= float(mass_min)]
+    if mass_max is not None:
+        masses = masses[masses <= float(mass_max)]
+
+    resolved_indices = sorted({int(idx) for idx in toy_indices}) if toy_indices else []
+    toy_count_for_print = len(resolved_indices) if resolved_indices else int(n_toys)
+
+    print(f"Running GP-propagated toy scans for {ds.label}")
+    toy_mode = normalize_full_toy_bkg_mode(getattr(cfg, "full_toy_bkg_mode", "poisson"))
+    print(f"Toy source model: {_source_model_name(toy_mode)}")
+    print(f"Full-range toy generation mode: {toy_mode}")
+    print(f"Toys requested: {toy_count_for_print}")
+    print(f"Mass hypotheses per toy: {len(masses)}")
+    print("Effective toy-scan settings:")
+    print(f"  scan_parallel={resolved_scan_parallel}")
+    print(f"  scan_n_workers={resolved_scan_n_workers}")
+    print(f"  scan_backend={resolved_scan_backend}")
+    print(f"  scan_threads_per_worker={resolved_scan_threads_per_worker}")
+    print(f"  save_plots={resolved_save_plots}")
+    print(f"  save_fit_json={resolved_save_fit_json}")
+    print(f"  save_per_mass_folders={resolved_save_per_mass_folders}")
+
+    written = run_gp_toy_scans(
+        ds,
+        cfg,
+        n_toys=int(n_toys),
+        base_output_dir=cfg.output_dir,
+        mass_min=mass_min,
+        mass_max=mass_max,
+        seed=seed,
+        toy_indices=resolved_indices if resolved_indices else None,
+        save_plots=resolved_save_plots,
+        save_fit_json=resolved_save_fit_json,
+        save_per_mass_folders=resolved_save_per_mass_folders,
+        scan_parallel=resolved_scan_parallel,
+        scan_n_workers=resolved_scan_n_workers,
+        scan_parallel_backend=resolved_scan_backend,
+        scan_threads_per_worker=resolved_scan_threads_per_worker,
+    )
+    print(f"Wrote {len(written)} toy scan directories under {os.path.join(cfg.output_dir, 'toy_scans', ds.key)}")
+
+
 @main.command("toy-scan-merge")
 @click.option(
     "--input-dir",
@@ -1098,6 +1302,98 @@ def slurm_gen_toy_scan(config, dataset, toy_root, container, toy_pattern, output
         extra_sbatch=extra,
     )
     print(f"\nPrepared {n_jobs} toy-scan jobs.")
+    print(f"CPUs per task: {resolved_cpus_per_task}")
+    print("To submit all jobs, run:")
+    print(f"  bash {submit_script}")
+    print("If your site needs different submission-time charging flags, append them to the submit helper.")
+
+
+@main.command("slurm-gen-gp-toy-scan")
+@click.option(
+    "--config",
+    "-c",
+    required=True,
+    type=click.Path(exists=True),
+    help="Path to configuration YAML file",
+)
+@click.option(
+    "--dataset",
+    required=True,
+    help="Dataset key (2015, 2016, or 2021)",
+)
+@click.option(
+    "--n-toys",
+    type=int,
+    default=1000,
+    show_default=True,
+    help="Number of GP-generated toys to submit",
+)
+@click.option(
+    "--output",
+    "-o",
+    default="submit_gp_toy_scan.slurm",
+    help="Output SLURM script path",
+)
+@click.option(
+    "--job-name",
+    default="hps-gpr-gp-toys",
+    help="SLURM job name",
+)
+@click.option(
+    "--partition",
+    default="batch",
+    help="SLURM partition",
+)
+@click.option(
+    "--time",
+    default="4:00:00",
+    help="Time limit per task",
+)
+@click.option(
+    "--memory",
+    default="4G",
+    help="Memory per task",
+)
+@click.option(
+    "--cpus-per-task",
+    type=int,
+    help="SLURM CPUs per task; defaults to toy_scan_n_workers * toy_scan_threads_per_worker from the config",
+)
+@click.option(
+    "--conda-env",
+    help="Conda environment to activate",
+)
+@click.option(
+    "--account",
+    help="SLURM account/project to charge",
+)
+@click.option(
+    "--qos",
+    help="Optional SLURM QOS to request",
+)
+def slurm_gen_gp_toy_scan(config, dataset, n_toys, output, job_name, partition, time, memory, cpus_per_task, conda_env, account, qos):
+    """Generate SLURM scripts for one GP-generated toy scan per job."""
+    from .config import load_config
+    from .slurm import generate_gp_toy_scan_slurm_scripts
+
+    cfg = load_config(config)
+    extra = _build_extra_sbatch(account=account, qos=qos)
+    resolved_cpus_per_task = _infer_toy_scan_cpus_per_task(cfg, override=cpus_per_task)
+    job_script, submit_script, n_jobs = generate_gp_toy_scan_slurm_scripts(
+        config_path=config,
+        output_path=output,
+        dataset=dataset,
+        n_toys=int(n_toys),
+        output_root=cfg.output_dir,
+        job_name=job_name,
+        partition=partition,
+        time_limit=time,
+        memory=memory,
+        cpus_per_task=resolved_cpus_per_task,
+        conda_env=conda_env,
+        extra_sbatch=extra,
+    )
+    print(f"\nPrepared {n_jobs} GP toy-scan jobs.")
     print(f"CPUs per task: {resolved_cpus_per_task}")
     print("To submit all jobs, run:")
     print(f"  bash {submit_script}")

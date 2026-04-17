@@ -339,12 +339,18 @@ invariant-mass spectrum, the package converts between $A_d$ and $\eps^2$ through
 \label{eq:eps2-conversion}
 \end{equation}
 where $\rho_d(m)$ is estimated from the observed histogram as a local counts-per-GeV
-density in the separate normalization interval $m\pm2\sigma_d(m)$. That interval is
-intentionally not tied to the nominal $1.64\,\sigma_d$ extraction window: it is used
-only for the local yield-to-$\eps^2$ conversion, not for the GP training mask or the
-profiled likelihood window. Because the prompt spectrum is smooth on this scale, using
-a fixed $\pm2\,\sigma_d$ density estimator keeps the coupling normalization distinct
-from the optimization of the blind-window half-width. It is convenient to define the
+density in the same mass interval used for the nominal blind window,
+\begin{equation}
+\rho_d(m)\equiv
+\frac{N_d\!\left[m-n_{\mathrm{blind}}\sigma_d(m),\,m+n_{\mathrm{blind}}\sigma_d(m)\right]}
+{2\,n_{\mathrm{blind}}\sigma_d(m)},
+\end{equation}
+with $n_{\mathrm{blind}}=1.64$ in the current 95\% CL studies. This keeps the local
+yield-to-$\eps^2$ normalization aligned with the actual search window rather than with
+a separate fixed $\pm2\,\sigma_d$ convention. The code still exposes
+\texttt{eps2\_density\_nsigma} as an audit knob, so the legacy $m\pm2\sigma_d(m)$
+normalization can be reproduced when needed, but it is no longer the default analysis
+definition. It is convenient to define the
 dataset-specific conversion factor
 \begin{equation}
 K_d(m) \equiv A_d(\eps^2 = 1)

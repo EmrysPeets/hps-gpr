@@ -22,6 +22,7 @@ from .io import estimate_background_for_dataset
 from .template import build_window_template_from_full, cls_limit_for_template
 from .statistics import draw_bkg_mvn_nonneg, p0_profiled_gaussian_LRT
 from .gpr import make_kernel_for_dataset, fit_gpr, predict_counts_from_log_gpr
+from .toy_backgrounds import draw_full_background_toy, normalize_full_toy_bkg_mode, observed_total_count
 from .evaluation import (
     build_combined_components,
     combined_cls_limit_epsilon2_from_vectors,
@@ -103,6 +104,9 @@ def expected_ul_bands_for_dataset(
     threads_per_worker = int(getattr(config, "ul_bands_threads_per_worker", 1))
     mvn_method = str(getattr(config, "mvn_trunc_method", "reject_then_clip"))
     mvn_max_tries = int(getattr(config, "mvn_trunc_max_tries", 80))
+    full_toy_bkg_mode = normalize_full_toy_bkg_mode(
+        getattr(config, "full_toy_bkg_mode", "poisson")
+    )
 
     compute_obs = (_dataset_visibility(ds, config) == "observed")
     child_ss = np.random.SeedSequence(int(seed)).spawn(len(masses))
@@ -196,6 +200,7 @@ def expected_ul_bands_for_dataset(
             if int(np.sum(msk_blind)) <= 0:
                 raise RuntimeError(f"[bands][{ds.key}] m={m:.6g}: blind window has no bins")
             x_win = x_full[msk_blind]
+            total_full = observed_total_count(pred.y_full)
             blind_train = (
                 float(m) - float(train_exclude_nsigma) * float(pred.sigma_val),
                 float(m) + float(train_exclude_nsigma) * float(pred.sigma_val),
@@ -204,7 +209,12 @@ def expected_ul_bands_for_dataset(
             ker = make_kernel_for_dataset(ds, config, mass=m)
 
             for _ in range(int(n_toys)):
-                y_full_toy = rng.poisson(np.clip(mu_full, 0.0, None)).astype(int)
+                y_full_toy = draw_full_background_toy(
+                    mu_full,
+                    rng,
+                    mode=full_toy_bkg_mode,
+                    total_count=total_full,
+                )
                 obs_toy = y_full_toy[msk_blind].astype(int)
                 mu_fit, cov_fit = mu, cov
                 try:
@@ -309,6 +319,7 @@ def expected_ul_bands_for_dataset(
             bands_train_exclude_nsigma=float(train_exclude_nsigma),
             bands_refit_restarts=int(refit_restarts),
             bands_refit_optimize=bool(refit_optimize),
+            bands_full_toy_bkg_mode=str(full_toy_bkg_mode),
         )
 
     if n_workers <= 1 or not _HAVE_JOBLIB:
