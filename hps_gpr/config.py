@@ -111,6 +111,8 @@ class Config:
     kernel_ls_res_npts: int = 200
     kernel_ls_local_hi_floor_mode: str = "none"   # "none" | "dataset_stat"
     kernel_ls_local_hi_floor_factor: float = 1.0
+    # Legacy opt-in ceiling on the local-policy upper bound. Leave unset for
+    # pure sigma(mass)-scaled bounds, otherwise ls_hi can become mass-independent.
     kernel_ls_local_hi_cap_xrange_frac: Optional[float] = None
 
     # Per-dataset kernel overrides (empty dicts = use global factors)

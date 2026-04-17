@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+import subprocess
 from types import SimpleNamespace
 
 from click.testing import CliRunner
@@ -19,6 +20,7 @@ from hps_gpr.funcform_toys import (
     merge_toy_scan_results,
     run_funcform_toy_scans,
 )
+from hps_gpr.gpr import compute_kernel_ls_bounds
 from hps_gpr.io import _build_model
 from hps_gpr.slurm import generate_toy_scan_slurm_scripts
 
@@ -181,6 +183,35 @@ def test_estimate_background_uses_mean_only_full_prediction(monkeypatch):
     assert pred.cov.shape[0] == pred.cov.shape[1]
     assert np.allclose(pred.mu, 11.0)
     assert np.allclose(pred.mu_full, 22.0)
+
+
+def test_resolution_scaled_local_bounds_vary_with_mass_when_cap_disabled():
+    ds = DatasetConfig(
+        key="2021",
+        label="HPS 2021",
+        root_path="unused.root",
+        hist_name="unused",
+        m_low=0.03,
+        m_high=0.25,
+        sigma_coeffs=[0.00286957, -0.00851449, 0.25362319],
+        frad_coeffs=[0.1],
+    )
+    cfg = Config(
+        kernel_ls_policy="resolution_scaled_local",
+        kernel_ls_res_upper_factor=8.0,
+        kernel_ls_res_lower_factor=0.5,
+        kernel_ls_local_hi_floor_mode="none",
+        kernel_ls_local_hi_cap_xrange_frac=None,
+        pre_log=True,
+    )
+
+    info_lo = compute_kernel_ls_bounds(ds, cfg, mass=0.040)
+    info_hi = compute_kernel_ls_bounds(ds, cfg, mass=0.044)
+
+    assert info_lo["policy_used"] == "resolution_scaled_local"
+    assert info_hi["policy_used"] == "resolution_scaled_local"
+    assert info_lo["ls_hi"] != pytest.approx(info_hi["ls_hi"])
+    assert info_lo["ls_hi"] > info_hi["ls_hi"]
 
 
 def test_merge_toy_scan_results_preserves_toy_identity(tmp_path):
@@ -763,3 +794,26 @@ def test_2016_only_configs_use_2016_dataset_selectors(config_path):
     assert cfg.enable_2016 is True
     assert cfg.inj_dataset_key == "2016"
     assert cfg.run_limit_bands_on == "2016"
+
+
+def test_local_resolution_configs_do_not_set_constant_hi_cap():
+    repo_root = Path(__file__).resolve().parents[1]
+    try:
+        tracked = subprocess.check_output(
+            "git ls-files '*.yaml' 'study_configs/*.yaml'",
+            cwd=repo_root,
+            shell=True,
+            text=True,
+        ).splitlines()
+    except Exception as exc:
+        pytest.skip(f"git ls-files unavailable: {exc}")
+
+    offenders = []
+    for rel_path in tracked:
+        text = (repo_root / rel_path).read_text()
+        if "kernel_ls_policy: resolution_scaled_local" not in text:
+            continue
+        if "kernel_ls_local_hi_cap_xrange_frac:" in text:
+            offenders.append(rel_path)
+
+    assert offenders == []
