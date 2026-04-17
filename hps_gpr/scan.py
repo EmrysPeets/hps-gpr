@@ -112,6 +112,8 @@ def run_scan(
         rows_s: List[dict] = []
         rows_c: List[dict] = []
 
+        print(f"[scan] testing mass hypothesis {float(m):.3f} GeV", flush=True)
+
         ds_here = active_datasets_for_mass(float(m), datasets, config)
         if not ds_here:
             return rows_s, rows_c
@@ -300,9 +302,6 @@ def run_scan(
                     "Z_analytic": float("nan"),
                     "error": str(e),
                 })
-
-        print(f"[scan] testing mass hypothesis {float(m):.3f} GeV", flush=True)
-
         return rows_s, rows_c
 
     # Run (parallel or sequential)
