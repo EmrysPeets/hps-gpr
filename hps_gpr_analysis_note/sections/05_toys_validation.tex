@@ -178,6 +178,29 @@ appropriate mode for diagnosing signal absorption, because it directly tests how
 of the injected signal may be absorbed by the refitted background model or by the
 profiled nuisance treatment.
 
+\subsubsection{Fixed-total GP-propagated toy-scan study}
+
+The new background-only validation study used for the individual 2015, 2016, and 2021
+checks starts from a single full-range GP fit to the observed spectrum of that
+dataset, takes the propagated count-space mean over the full histogram support, and
+generates \num{1000} pseudoexperiments from that mean while preserving the exact total
+event count of the original full input histogram range. The resulting toy histogram is
+then passed through the ordinary mass-scan workflow, so the GP is refit on the toy
+sidebands at every mass hypothesis with the same $1.64\,\sigma_d$ exclusion used in
+the study configuration. In other words, the toy source is GP-derived, but the scan
+itself is not simplified or shortcut.
+
+This study is designed to be compared directly with the functional-form toy scans. The
+functional-form ensemble tests closure with respect to an analytic smooth-spectrum
+ansatz, whereas the fixed-total GP ensemble tests whether the sideband-refit GP
+machinery remains well behaved when the toy truth is itself the propagated GP mean.
+Because the ensemble size is large, the merged validation plots are summarized by the
+toy median together with central 68\% and 95\% bands rather than by overlaying all
+\num{1000} toy curves. The same fixed-total toy source also feeds a matched
+refit-on-toy expected upper-limit band, but that band should be interpreted as a
+background-modeling validation product rather than as the canonical expected-band
+overlay for the observed limit.
+
 \subsection{Asimov calibration and background-only pseudoexperiments}
 
 When toy strengths are specified in units of $\sigma_A$, the package first constructs a

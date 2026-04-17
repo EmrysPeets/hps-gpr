@@ -328,6 +328,10 @@ if you want a different SLURM reservation.
 - `OUTPUT_DIR/merged/toy_scan_validation_<dataset>_<function>_summary.{png,pdf}`:
   compact dashboard of toy identity, peak-significance location, and minimum local p-value
 
+For large ensembles, `toy-scan-merge` now switches automatically from full
+"spaghetti" overlays to reviewer-facing summary plots with the median plus central
+68% and 95% bands. Small smoke tests still draw every toy curve.
+
 For large productions, validate the workflow in three steps:
 
 1. run a one-toy local smoke with a narrow mass window
@@ -337,6 +341,100 @@ For large productions, validate the workflow in three steps:
 The corrected 2015 baseline-plus-audit workflow, including exact regeneration,
 closure-study, pseudoexperiment, and full-production commands, is documented in
 [`study_configs/README_2015_toy_study_workflows.md`](study_configs/README_2015_toy_study_workflows.md).
+
+### GP-Propagated Fixed-Total Toy Scans
+
+Use `gp-toy-scan` when you want the background-only validation study generated from
+the GP propagated full-range mean rather than from an analytic functional form. This
+workflow is implemented only for the individual `2015`, `2016`, and `2021` datasets.
+Each toy:
+
+- is generated from the full-range GP propagated mean
+- preserves the exact total event count of the original full input histogram range
+- is scanned with the normal sideband refit at every mass hypothesis
+- writes the same `results_single.csv` / `toy_metadata.json` layout consumed by
+  `toy-scan-merge`
+
+Ready-made configs are included:
+
+- `study_configs/config_2015_blind1p64_95CL_1k_gp_toyscan_fixedtotal.yaml`
+- `study_configs/config_2016_10pct_blind1p64_95CL_1k_gp_toyscan_fixedtotal.yaml`
+- `study_configs/config_2021_1pct_blind1p64_95CL_1k_gp_toyscan_fixedtotal.yaml`
+
+Copy/paste:
+
+```bash
+# 2015 GP propagated-mean toy-scan study
+hps-gpr gp-toy-scan \
+  --config study_configs/config_2015_blind1p64_95CL_1k_gp_toyscan_fixedtotal.yaml \
+  --dataset 2015 \
+  --n-toys 1000
+
+hps-gpr toy-scan-merge \
+  --input-dir outputs/study_2015_w1p64_95CL_gp_toyscan_fixedtotal \
+  --output-dir outputs/study_2015_w1p64_95CL_gp_toyscan_fixedtotal/merged
+
+# 2016 10% GP propagated-mean toy-scan study
+hps-gpr gp-toy-scan \
+  --config study_configs/config_2016_10pct_blind1p64_95CL_1k_gp_toyscan_fixedtotal.yaml \
+  --dataset 2016 \
+  --n-toys 1000
+
+# 2021 1% GP propagated-mean toy-scan study
+hps-gpr gp-toy-scan \
+  --config study_configs/config_2021_1pct_blind1p64_95CL_1k_gp_toyscan_fixedtotal.yaml \
+  --dataset 2021 \
+  --n-toys 1000
+```
+
+Batch production uses one job per toy:
+
+```bash
+hps-gpr slurm-gen-gp-toy-scan \
+  --config study_configs/config_2015_blind1p64_95CL_1k_gp_toyscan_fixedtotal.yaml \
+  --dataset 2015 \
+  --n-toys 1000 \
+  --job-name hps2015_gp_toyscan \
+  --partition roma \
+  --account hps:hps-prod \
+  --time 4:00:00 \
+  --memory 8G \
+  --output submit_gp_toy_scan_2015.slurm
+
+bash submit_gp_toy_scan_all.sh
+```
+
+The GP-generated toy trees live under:
+
+- `OUTPUT_DIR/toy_scans/<dataset>/gp_propagated_mean_refit_fixedtotal/toy_XXXX/`
+
+To compare this study with the functional-form closure ensemble:
+
+1. run `toy-scan-merge` on the functional-form study output
+2. run `toy-scan-merge` on the GP-generated study output
+3. compare the merged `toy_scan_summary.csv` tables and the median/band validation
+   plots side by side
+
+To build the matching refit-on-toy upper-limit validation band:
+
+```bash
+hps-gpr bands \
+  --config study_configs/config_2015_blind1p64_95CL_1k_gp_toyscan_fixedtotal.yaml \
+  --dataset 2015 \
+  --n-toys 1000
+```
+
+Interpretation:
+
+- the standard observed/expected UL band from the nominal workflow is still the
+  canonical curve to overlay with the observed limit
+- the refit-on-toy GP band is the background-modeling validation product to compare
+  against the functional-form toy closure study
+- `full_toy_bkg_mode: fixed_total_multinomial` is the fixed-total setting used in
+  these configs
+- `eps2_density_nsigma` now defaults to `blind_nsigma`, so the local
+  yield-to-`epsilon^2` conversion uses the same half-width as the blind window unless
+  you explicitly set `eps2_density_nsigma: 2.0` to reproduce the older convention
 
 If your site requires separate submission-time charging flags, pass them through when
 you run the submit helper:
@@ -473,6 +571,13 @@ For reviewer-facing extraction displays there is a second, separate switch:
 These settings answer different questions:
 - `inj_refit_gp_on_toy` controls how large toy ensembles are generated for summary/closure studies.
 - `extraction_display_refit_gp_on_toy` controls the one-pseudoexperiment reviewer plots used in the note.
+- `full_toy_bkg_mode` controls whether full-range background pseudoexperiments use
+  bin-by-bin Poisson totals or fixed-total multinomial draws; the new GP toy-scan
+  study configs use `fixed_total_multinomial`.
+- `eps2_density_nsigma` controls the local prompt-density interval used in the
+  `A <-> epsilon^2` conversion. By default it follows `blind_nsigma`; set it to `2.0`
+  only when you want to reproduce the legacy `m ± 2 sigma(m)` normalization for
+  comparison.
 
 The second mode corresponds to the requested "GP mean/global fit" pseudoexperiment workflow and is the closest match to the v15_8 notebook methodology.
 

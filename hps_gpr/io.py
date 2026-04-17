@@ -137,13 +137,20 @@ def _blind_pred_detail(
     )
 
 
-def _compute_integral_density(model, mass: float, sigma_val: float) -> float:
-    """Compute counts per GeV in +/- 2*sigma region."""
+def _compute_integral_density(
+    model,
+    mass: float,
+    sigma_val: float,
+    *,
+    density_nsigma: float,
+) -> float:
+    """Compute counts per GeV in the configured signal-density normalization window."""
     ax = model.histogram.axes[0]
     vals = model.histogram.values().astype(float)
     nb = ax.size
 
-    lo, hi = mass - 2.0 * sigma_val, mass + 2.0 * sigma_val
+    half_width = float(density_nsigma) * float(sigma_val)
+    lo, hi = float(mass) - half_width, float(mass) + half_width
     i0 = max(0, int(ax.index(lo)))
     i1 = min(int(nb), int(ax.index(hi)) + 1)
 
@@ -228,7 +235,15 @@ def estimate_background_for_dataset(
 
     mu_full = predict_counts_mean_from_log_gpr(gpr, X, config)
 
-    integral_density = _compute_integral_density(model, mass, sigma_val)
+    density_nsigma = float(
+        getattr(config, "eps2_density_nsigma", None) or config.blind_nsigma
+    )
+    integral_density = _compute_integral_density(
+        model,
+        mass,
+        sigma_val,
+        density_nsigma=density_nsigma,
+    )
 
     # Kernel diagnostics for scan summary outputs
     ls_lo = ls_hi = ls_init = sigma_x = float("nan")
