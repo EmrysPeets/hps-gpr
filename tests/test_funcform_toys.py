@@ -115,25 +115,72 @@ def test_build_model_accepts_hist_override(monkeypatch):
     )
     cfg = Config(neighborhood_rebin=1)
 
-    calls = []
-
-    def fake_gp_model(h, kernel, **kwargs):
-        hist_obj = h
-        if kwargs.get("modify_histogram") is not None:
-            hist_obj = kwargs["modify_histogram"](hist_obj)
-        calls.append(h)
-        return SimpleNamespace(histogram=hist_obj)
-
     import hps_gpr.io as io
 
-    monkeypatch.setattr(io, "_gp_model", fake_gp_model)
-    monkeypatch.setattr(io, "make_kernel_for_dataset", lambda *args, **kwargs: object())
+    monkeypatch.setattr(
+        io,
+        "_gp_model",
+        lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError("_gp_model should not be used")),
+    )
 
     model = _build_model(ds, blind=(0.05, 0.06), rebin=1, config=cfg, mass=0.055)
 
-    assert calls[0] is toy_hist
-    assert calls[1] is toy_hist
     assert np.allclose(model.histogram.axes[0].edges, toy_hist.axes[0].edges)
+    assert np.allclose(model.histogram.values(), toy_hist.values())
+
+
+def test_estimate_background_uses_mean_only_full_prediction(monkeypatch):
+    toy_hist = _make_hist([5, 6, 7, 8], lo=0.02, hi=0.06)
+    ds = DatasetConfig(
+        key="2015",
+        label="HPS 2015",
+        root_path="unused.root",
+        hist_name="unused",
+        m_low=0.02,
+        m_high=0.06,
+        sigma_coeffs=[0.001],
+        frad_coeffs=[0.1],
+        hist_override=toy_hist,
+    )
+    cfg = Config(neighborhood_rebin=1, n_restarts=0)
+
+    import hps_gpr.io as io
+
+    fake_model = SimpleNamespace(histogram=toy_hist)
+    fake_gpr = SimpleNamespace(kernel_=None, kernel=None, log_marginal_likelihood_value_=0.5)
+    calls = {"blind": [], "full": []}
+
+    monkeypatch.setattr(io, "_build_model", lambda *args, **kwargs: fake_model)
+    monkeypatch.setattr(io, "fit_gpr", lambda *args, **kwargs: fake_gpr)
+    monkeypatch.setattr(
+        io,
+        "predict_counts_from_log_gpr",
+        lambda gpr, X_query, config: (
+            calls["blind"].append(np.asarray(X_query, float).copy()) or np.full(len(np.asarray(X_query)), 11.0),
+            np.eye(len(np.asarray(X_query)), dtype=float),
+        ),
+    )
+    monkeypatch.setattr(
+        io,
+        "predict_counts_mean_from_log_gpr",
+        lambda gpr, X_query, config: (
+            calls["full"].append(np.asarray(X_query, float).copy()) or np.full(len(np.asarray(X_query)), 22.0)
+        ),
+    )
+    monkeypatch.setattr(
+        io,
+        "compute_kernel_ls_bounds",
+        lambda *args, **kwargs: {"ls_lo": 0.1, "ls_hi": 0.2, "ls_init": 0.15, "sigma_x": 0.01},
+    )
+    monkeypatch.setattr(io, "_extract_rbf_bounds_and_scale", lambda kernel: (0.1, 0.2, 0.15))
+
+    pred = io.estimate_background_for_dataset(ds, 0.045, cfg)
+
+    assert len(calls["blind"]) == 1
+    assert len(calls["full"]) == 1
+    assert pred.cov.shape[0] == pred.cov.shape[1]
+    assert np.allclose(pred.mu, 11.0)
+    assert np.allclose(pred.mu_full, 22.0)
 
 
 def test_merge_toy_scan_results_preserves_toy_identity(tmp_path):
@@ -631,6 +678,72 @@ def test_slurm_gen_toy_scan_cli_infers_cpus_per_task(monkeypatch, tmp_path):
     assert "CPUs per task: 1" in result.output
     job_text = output_path.read_text()
     assert "#SBATCH --cpus-per-task=1" in job_text
+
+
+def test_slurm_gen_cli_infers_scan_cpus_per_task(monkeypatch, tmp_path):
+    config_path = tmp_path / "config.yaml"
+    output_path = tmp_path / "submit_scan.slurm"
+    config_path.write_text("output_dir: outputs/test\n")
+
+    def fake_load_config(path):
+        assert str(path) == str(config_path)
+        return Config(
+            output_dir=str(tmp_path / "out"),
+            scan_parallel=True,
+            scan_n_workers=3,
+            scan_threads_per_worker=2,
+        )
+
+    import hps_gpr.config as cfg_mod
+
+    monkeypatch.setattr(cfg_mod, "load_config", fake_load_config)
+
+    runner = CliRunner()
+    result = runner.invoke(
+        main,
+        [
+            "slurm-gen",
+            "--config", str(config_path),
+            "--n-jobs", "4",
+            "--output", str(output_path),
+        ],
+    )
+    assert result.exit_code == 0, result.output
+    assert "CPUs per task: 6" in result.output
+    assert "#SBATCH --cpus-per-task=6" in output_path.read_text()
+
+
+def test_slurm_gen_cli_explicit_scan_cpus_override_config(monkeypatch, tmp_path):
+    config_path = tmp_path / "config.yaml"
+    output_path = tmp_path / "submit_scan_override.slurm"
+    config_path.write_text("output_dir: outputs/test\n")
+
+    def fake_load_config(path):
+        return Config(
+            output_dir=str(tmp_path / "out"),
+            scan_parallel=True,
+            scan_n_workers=5,
+            scan_threads_per_worker=4,
+        )
+
+    import hps_gpr.config as cfg_mod
+
+    monkeypatch.setattr(cfg_mod, "load_config", fake_load_config)
+
+    runner = CliRunner()
+    result = runner.invoke(
+        main,
+        [
+            "slurm-gen",
+            "--config", str(config_path),
+            "--n-jobs", "4",
+            "--cpus-per-task", "7",
+            "--output", str(output_path),
+        ],
+    )
+    assert result.exit_code == 0, result.output
+    assert "CPUs per task: 7" in result.output
+    assert "#SBATCH --cpus-per-task=7" in output_path.read_text()
 
 
 @pytest.mark.parametrize(

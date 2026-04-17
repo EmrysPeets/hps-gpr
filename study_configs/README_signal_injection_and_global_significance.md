@@ -6,6 +6,11 @@ This guide documents reproducible commands for:
 - 10k pseudoexperiment injection/extraction studies,
 - and 2015, 2016-10%, and combined submissions.
 
+Operational note for SDF:
+
+- Array-split scans and matrix-style injection jobs should prefer outer job parallelism over nested joblib workers inside each task.
+- `inject` with `inj_refit_gp_on_toy: true` is not comparable to an observed-data scan runtime; it regenerates full-range toy data and refits the GP for every toy point.
+
 ## Statistical choices
 
 1. **Global significance (LEE)**
@@ -105,6 +110,7 @@ bash submit_injection_all.sh
 Notes:
 - In `inj_strength_mode: sigmaA`, both `--strengths 1,2,3,5` and `--strengths s1,s2,s3,s5` are valid.
 - Each generated `(dataset, mass, strength)` job now runs only that requested strength (no implicit rerun of all configured strengths).
+- Each generated `(dataset, mass, strength)` job should usually keep `inj_n_workers=1` on SDF unless you are running a dedicated benchmark.
 - `inject-plot` can run in summary-only mode from `inj_extract_summary_*.csv`; pull histograms require `inj_extract_toys_*.csv`, while Z-calibration residual panels can use summary columns (`Zhat_mean`, `Zhat_q16`, `Zhat_q84`) when available.
 
 ## Injection output policy and file-size scaling

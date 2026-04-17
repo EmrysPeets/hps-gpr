@@ -147,7 +147,8 @@ class Config:
     toy_scan_save_plots: bool = False
     toy_scan_save_fit_json: bool = False
     toy_scan_save_per_mass_folders: bool = False
-    # Scan diagnostic plots
+    # Scan diagnostic plots. These knobs are currently inactive placeholders
+    # until the scan path writes a real diagnostic artifact from fit details.
     scan_diagnostic_plot_every_n: Optional[int] = None
     scan_diagnostic_zoom_half_sigma: float = 0.5
 

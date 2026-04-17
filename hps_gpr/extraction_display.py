@@ -13,7 +13,12 @@ from scipy import stats
 from .conversion import A_from_epsilon2, epsilon2_from_A
 from .dataset import DatasetConfig, make_datasets
 from .evaluation import combined_cls_limit_epsilon2, evaluate_combined
-from .gpr import fit_gpr, make_kernel_for_dataset, predict_counts_from_log_gpr
+from .gpr import (
+    fit_gpr,
+    make_kernel_for_dataset,
+    predict_counts_from_log_gpr,
+    predict_counts_mean_from_log_gpr,
+)
 from .injection import _inject_counts_from_template, _sigmaA_reference
 from .io import BlindPrediction, estimate_background_for_dataset
 from .plotting import (
@@ -406,7 +411,7 @@ def _simulate_single_display_from_context(
                 kernel=make_kernel_for_dataset(ctx.ds, config, mass=float(ctx.mass)),
                 optimize=bool(gp_optimize),
             )
-            mu_full_plot, _ = predict_counts_from_log_gpr(gpr, x_full, config)
+            mu_full_plot = predict_counts_mean_from_log_gpr(gpr, x_full, config)
             mu_win_fit, cov_win_fit = predict_counts_from_log_gpr(gpr, x_full[ctx.blind_mask], config)
             mu_full_plot = np.asarray(mu_full_plot, float).reshape(-1)
             mu_win_fit = np.asarray(mu_win_fit, float).reshape(-1)

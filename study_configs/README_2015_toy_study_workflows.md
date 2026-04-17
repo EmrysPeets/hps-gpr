@@ -11,6 +11,12 @@ The baseline configuration keeps the real-data-style full-range GP training.
 The audit configuration clips 2015 GP training to `20-130 MeV` so you can
 measure the sub-20 MeV impact directly.
 
+Runtime notes:
+
+- `toy-scan` runs one full mass scan per toy histogram, so its wall time is not directly comparable to a single observed-data scan chunk or one array-task slice.
+- `inject` with `inj_refit_gp_on_toy: true` does one full-range toy generation plus one GP refit per `(mass, strength, toy)` point.
+- On SDF, prefer outer job parallelism over nested joblib workers. The shipped production configs now default the inner scan/toy workers to serial settings for stability.
+
 ## 1. Regenerate The Toy ROOT Files
 
 Run the dataset macros from the repo root:
@@ -193,6 +199,8 @@ Check these summary products:
 - Z-calibration residuals
 - fixed-GP vs refit-GP summaries
 
+These GP-mean pseudoexperiments are intentionally heavier than a plain observed-data scan because each toy point regenerates full-range pseudo-data and refits the GP on toy sidebands.
+
 ## 4. Run The Full 2015 Scan / Bands Production
 
 ```bash
@@ -210,6 +218,8 @@ hps-gpr slurm-gen \
 
 hps-gpr slurm-combine --output-dir outputs/prod_2015_10k_3
 ```
+
+For these array-split scan productions, keep the inner scan parallelism off and let the job matrix provide the parallelism.
 
 Expected outputs:
 

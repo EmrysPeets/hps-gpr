@@ -1,6 +1,10 @@
 from pathlib import Path
 
-from hps_gpr.slurm import generate_extraction_display_slurm_scripts
+from hps_gpr.slurm import (
+    generate_extraction_display_slurm_scripts,
+    generate_injection_slurm_scripts,
+    generate_slurm_script,
+)
 
 
 def test_generate_extraction_display_slurm_scripts_writes_expected_commands(tmp_path):
@@ -28,3 +32,30 @@ def test_generate_extraction_display_slurm_scripts_writes_expected_commands(tmp_
     assert 'EXTRACT_DATASET="combined"' in submit_text
     assert 'EXTRACT_DATASET_KEYS="2015:2016:2021"' in submit_text
     assert "EXTRACT_MASS=0.08" in submit_text
+
+
+def test_generate_scan_slurm_script_writes_cpus_per_task(tmp_path):
+    job = tmp_path / "submit_scan.slurm"
+    job_script, _ = generate_slurm_script(
+        config_path="config_example.yaml",
+        n_jobs=3,
+        output_path=str(job),
+        cpus_per_task=6,
+    )
+    assert "#SBATCH --cpus-per-task=6" in Path(job_script).read_text()
+
+
+def test_generate_injection_slurm_script_writes_cpus_per_task(tmp_path):
+    job = tmp_path / "submit_inject.slurm"
+    job_script, _, n_jobs = generate_injection_slurm_scripts(
+        config_path="config_example.yaml",
+        output_path=str(job),
+        datasets=["2015"],
+        masses=[0.04],
+        strengths=[1.0, 2.0],
+        n_toys=10,
+        output_root="outputs/injection",
+        cpus_per_task=4,
+    )
+    assert n_jobs == 2
+    assert "#SBATCH --cpus-per-task=4" in Path(job_script).read_text()
