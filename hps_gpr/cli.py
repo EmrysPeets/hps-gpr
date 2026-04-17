@@ -94,6 +94,15 @@ def _infer_toy_scan_cpus_per_task(cfg, override=None):
     )
 
 
+def _infer_injection_cpus_per_task(cfg, override=None):
+    """Infer a CPU request matching injection worker parallelism."""
+    if override is not None:
+        return max(1, int(override))
+    threads_per_worker = int(getattr(cfg, "inj_threads_per_worker", 1) or 1)
+    n_workers = int(getattr(cfg, "inj_n_workers", 1) or 1)
+    return max(1, int(n_workers) * int(threads_per_worker))
+
+
 def _resolve_cli_override(ctx, param_name, explicit_value, default_value):
     """Return the explicit CLI value when provided, otherwise the supplied default."""
     if ctx.get_parameter_source(param_name) != ParameterSource.DEFAULT:
@@ -1137,6 +1146,11 @@ def slurm_gen_toy_scan(config, dataset, toy_root, container, toy_pattern, output
     help="Memory per task",
 )
 @click.option(
+    "--cpus-per-task",
+    type=int,
+    help="SLURM CPUs per task; defaults to scan_n_workers * scan_threads_per_worker when scan_parallel is enabled",
+)
+@click.option(
     "--conda-env",
     help="Conda environment to activate",
 )
@@ -1148,11 +1162,14 @@ def slurm_gen_toy_scan(config, dataset, toy_root, container, toy_pattern, output
     "--qos",
     help="Optional SLURM QOS to request",
 )
-def slurm_gen(config, n_jobs, output, job_name, partition, time, memory, conda_env, account, qos):
+def slurm_gen(config, n_jobs, output, job_name, partition, time, memory, cpus_per_task, conda_env, account, qos):
     """Generate SLURM array job script."""
+    from .config import load_config
     from .slurm import generate_slurm_script
 
+    cfg = load_config(config)
     extra = _build_extra_sbatch(account=account, qos=qos)
+    resolved_cpus_per_task = _infer_scan_cpus_per_task(cfg, override=cpus_per_task)
 
     job_script, submit_script = generate_slurm_script(
         config_path=config,
@@ -1162,11 +1179,13 @@ def slurm_gen(config, n_jobs, output, job_name, partition, time, memory, conda_e
         partition=partition,
         time_limit=time,
         memory=memory,
+        cpus_per_task=resolved_cpus_per_task,
         conda_env=conda_env,
         extra_sbatch=extra,
     )
     print(f"\nTo submit all {n_jobs} jobs, run:")
     print(f"  bash {submit_script}")
+    print(f"CPUs per task: {resolved_cpus_per_task}")
 
 
 
@@ -1228,6 +1247,11 @@ def slurm_gen(config, n_jobs, output, job_name, partition, time, memory, conda_e
     help="Memory per task",
 )
 @click.option(
+    "--cpus-per-task",
+    type=int,
+    help="SLURM CPUs per task; defaults to inj_n_workers * inj_threads_per_worker",
+)
+@click.option(
     "--conda-env",
     help="Conda environment to activate",
 )
@@ -1244,7 +1268,7 @@ def slurm_gen(config, n_jobs, output, job_name, partition, time, memory, conda_e
     "--qos",
     help="Optional SLURM QOS to request",
 )
-def slurm_gen_inject(config, datasets, masses, strengths, n_toys, output, job_name, partition, time, memory, conda_env, account, write_toy_csv, qos):
+def slurm_gen_inject(config, datasets, masses, strengths, n_toys, output, job_name, partition, time, memory, cpus_per_task, conda_env, account, write_toy_csv, qos):
     """Generate SLURM scripts for per-(dataset,mass,strength) injection jobs."""
     from .config import load_config
     from .slurm import generate_injection_slurm_scripts
@@ -1269,6 +1293,7 @@ def slurm_gen_inject(config, datasets, masses, strengths, n_toys, output, job_na
         raise click.BadParameter("No strengths provided", param_hint="--strengths")
 
     extra = _build_extra_sbatch(account=account, qos=qos)
+    resolved_cpus_per_task = _infer_injection_cpus_per_task(cfg, override=cpus_per_task)
 
     ds_ranges = {
         "2015": tuple(cfg.range_2015),
@@ -1288,12 +1313,14 @@ def slurm_gen_inject(config, datasets, masses, strengths, n_toys, output, job_na
         partition=partition,
         time_limit=time,
         memory=memory,
+        cpus_per_task=resolved_cpus_per_task,
         conda_env=conda_env,
         extra_sbatch=extra,
         mass_ranges_by_dataset=ds_ranges,
         write_toy_csv=write_toy_csv,
     )
     print(f"\nPrepared {n_jobs} injection jobs.")
+    print(f"CPUs per task: {resolved_cpus_per_task}")
     print("To submit all jobs, run:")
     print(f"  bash {submit_script}")
 

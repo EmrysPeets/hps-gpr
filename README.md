@@ -293,6 +293,7 @@ By default, `toy-scan` now uses lean closure-study settings:
 - inner scan parallelism off (`toy_scan_parallel: false`)
 - 1 worker / 1 thread when parallelism is re-enabled
 - no per-mass plots, fit JSON, or nested mass folders unless you opt in
+- one full mass scan per toy histogram, so runtime scales with both the number of toys and the number of scanned masses
 
 That default output tree contains:
 
@@ -454,6 +455,7 @@ Notes:
 - `inject` now defaults to streaming toy aggregation (`inj_stream_aggregate: true`) with per-point batching (`inj_aggregate_every`, default 100) and toy workers (`inj_n_workers`, default 5). Use `--legacy-toys` to force the old full toy-table path.
 - Use `--no-write-toy-csv` (or `inj_write_toy_csv: false`) for large productions when toy-level tables are not needed; this avoids multi-million-row `inj_extract_toys_*` files in `injection_flat`.
 - `inject-plot` supports summary-only inputs (from `inj_extract_summary_*.csv`) and still builds linearity/bias/pull-width/coverage/heatmap/pull-vs-mass summaries plus Z-calibration residual panels (using `Zhat_mean`/`Zhat_q16`/`Zhat_q84` when available); pull histograms still require toy CSVs.
+- On SDF, prefer outer job parallelism over nested joblib workers inside each task; the shipped heavy `gpmean_pseudoexp` configs now default their toy workers to serial settings for stability.
 
 
 ### GP-mean/global-fit pseudoexperiment mode (v15_8-style full procedural toys)
@@ -461,6 +463,8 @@ Notes:
 The injection framework already supports pseudoexperiments in two modes:
 - `inj_refit_gp_on_toy: false` (default fast mode): conditional GP toys in the blind window.
 - `inj_refit_gp_on_toy: true` (full procedural mode): build full-range pseudo-data from the GP global-fit mean, inject signal, and refit GP on sidebands toy-by-toy before extraction.
+
+The second mode is intentionally much heavier than an observed-data scan because it performs a full-range toy generation and a GP refit for every `(mass, strength, toy)` point.
 
 For reviewer-facing extraction displays there is a second, separate switch:
 - `extraction_display_refit_gp_on_toy: false`: make the closure-style no-refit display. This keeps the sideband-trained GP fixed and is the right choice when you want the pseudoexperiment display to match the observed-data validation display as closely as possible.

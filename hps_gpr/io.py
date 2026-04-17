@@ -1,6 +1,7 @@
 """Histogram loading and per-dataset background estimation."""
 
 from dataclasses import dataclass
+from types import SimpleNamespace
 from typing import Optional, Tuple, TYPE_CHECKING
 
 import numpy as np
@@ -8,6 +9,7 @@ import numpy as np
 from .gpr import (
     fit_gpr,
     predict_counts_from_log_gpr,
+    predict_counts_mean_from_log_gpr,
     make_kernel_for_dataset,
     compute_kernel_ls_bounds,
     _extract_rbf_bounds_and_scale,
@@ -82,15 +84,15 @@ def _build_model(
     *,
     mass: Optional[float] = None,
 ):
-    """Build the gp model for a dataset."""
+    """Prepare the rebinned/limited histogram used by the modern sklearn path."""
     import gp
 
-    kernel = make_kernel_for_dataset(ds, config, mass=mass)
     hist_source = ds.hist_override if getattr(ds, "hist_override", None) is not None else (ds.root_path, ds.hist_name)
+    histogram = gp._hist.io._deduce_histogram(hist_source)
 
-    # Probe histogram edges
-    probe = _gp_model(hist_source, kernel)
-    edges_all = np.asarray(probe.histogram.axes[0].edges, float)
+    del blind, config, mass
+
+    edges_all = np.asarray(histogram.axes[0].edges, float)
     first_edge = float(edges_all[0])
     last_edge = float(edges_all[-1])
 
@@ -102,15 +104,7 @@ def _build_model(
     upper = min(last_edge, float(data_hi)) if data_hi is not None else last_edge
 
     manip = gp._hist.manipulation.rebin_and_limit(int(rebin), lower, upper)
-
-    model = _gp_model(
-        hist_source,
-        kernel,
-        n_restarts_optimizer=0,
-        blind_range=blind,
-        modify_histogram=manip,
-    )
-    return model
+    return SimpleNamespace(histogram=manip(histogram))
 
 
 def _blind_pred_detail(
@@ -232,7 +226,7 @@ def estimate_background_for_dataset(
         model, gpr, blind, config
     )
 
-    mu_full, _ = predict_counts_from_log_gpr(gpr, X, config)
+    mu_full = predict_counts_mean_from_log_gpr(gpr, X, config)
 
     integral_density = _compute_integral_density(model, mass, sigma_val)
 

@@ -63,19 +63,6 @@ def _write_json(path: str, payload: dict) -> None:
         json.dump(payload, f, indent=2, sort_keys=True)
 
 
-def _should_make_scan_diag(
-    m: float,
-    *,
-    diag_every_n: Optional[int] = None,
-    step_gev: float = 0.001,
-) -> bool:
-    """Return True if a diagnostic plot should be made at this mass point."""
-    if diag_every_n is not None and int(diag_every_n) > 0:
-        idx = int(round(float(m) / float(step_gev)))
-        return (idx % int(diag_every_n)) == 0
-    return False
-
-
 def run_scan(
     datasets: Dict[str, "DatasetConfig"],
     config: "Config",
@@ -107,8 +94,10 @@ def run_scan(
     n_workers = int(getattr(config, "scan_n_workers", 1) or 1)
     backend = str(getattr(config, "scan_parallel_backend", "loky"))
     threads_per_worker = int(getattr(config, "scan_threads_per_worker", 1) or 1)
-    diag_every_n = getattr(config, "scan_diagnostic_plot_every_n", None)
     do_combined = bool(getattr(config, "do_combined", False))
+
+    # scan_diagnostic_* is currently a no-op performance knob until a real
+    # diagnostic writer consumes fit details.
 
     # Apply publication-style plotting defaults once for the full scan.
     if bool(getattr(config, "save_plots", False)):
@@ -140,17 +129,14 @@ def run_scan(
             ds_dir = os.path.join(mass_dir, ds.key)
             ensure_dir(ds_dir)
             compute_obs = (_dataset_visibility(ds, config) == "observed")
-            make_diag = _should_make_scan_diag(
-                m, diag_every_n=diag_every_n, step_gev=float(config.mass_step_gev)
-            )
 
             try:
                 with _threadpool_limits(limits=int(threads_per_worker)):
-                    res, pred, fitd = evaluate_single_dataset(
+                    res, pred, _ = evaluate_single_dataset(
                         ds, float(m), config,
                         do_extraction=True,
                         compute_observed=compute_obs,
-                        return_fit_details=make_diag,
+                        return_fit_details=False,
                     )
 
                 preds_here.append(pred)

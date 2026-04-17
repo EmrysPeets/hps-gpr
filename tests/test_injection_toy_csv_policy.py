@@ -1,8 +1,10 @@
 from types import SimpleNamespace
 
+from click.testing import CliRunner
 import numpy as np
 import pandas as pd
 
+from hps_gpr.cli import main
 from hps_gpr.config import Config
 from hps_gpr.dataset import DatasetConfig
 from hps_gpr.injection import (
@@ -246,3 +248,71 @@ def test_streaming_combined_writes_compact_summaries_without_toy_csv(tmp_path, m
     assert not (tmp_path / "injection_extraction" / "inj_extract_toys_2015.csv").exists()
     assert not (tmp_path / "injection_extraction" / "inj_extract_toys_2016.csv").exists()
     assert not (tmp_path / "injection_extraction" / "inj_extract_toys_combined.csv").exists()
+
+
+def test_slurm_gen_inject_cli_infers_cpus_per_task(monkeypatch, tmp_path):
+    config_path = tmp_path / "config.yaml"
+    output_path = tmp_path / "submit_inject.slurm"
+    config_path.write_text("output_dir: outputs/test\n")
+
+    def fake_load_config(path):
+        assert str(path) == str(config_path)
+        return Config(
+            output_dir=str(tmp_path / "out"),
+            inj_n_workers=3,
+            inj_threads_per_worker=2,
+        )
+
+    import hps_gpr.config as cfg_mod
+
+    monkeypatch.setattr(cfg_mod, "load_config", fake_load_config)
+
+    runner = CliRunner()
+    result = runner.invoke(
+        main,
+        [
+            "slurm-gen-inject",
+            "--config", str(config_path),
+            "--datasets", "2015",
+            "--masses", "0.04",
+            "--strengths", "1,2",
+            "--output", str(output_path),
+        ],
+    )
+    assert result.exit_code == 0, result.output
+    assert "CPUs per task: 6" in result.output
+    assert "#SBATCH --cpus-per-task=6" in output_path.read_text()
+
+
+def test_slurm_gen_inject_cli_explicit_cpus_override_config(monkeypatch, tmp_path):
+    config_path = tmp_path / "config.yaml"
+    output_path = tmp_path / "submit_inject_override.slurm"
+    config_path.write_text("output_dir: outputs/test\n")
+
+    def fake_load_config(path):
+        return Config(
+            output_dir=str(tmp_path / "out"),
+            inj_n_workers=5,
+            inj_threads_per_worker=4,
+        )
+
+    import hps_gpr.config as cfg_mod
+
+    monkeypatch.setattr(cfg_mod, "load_config", fake_load_config)
+
+    runner = CliRunner()
+    result = runner.invoke(
+        main,
+        [
+            "slurm-gen-inject",
+            "--config", str(config_path),
+            "--datasets", "2015",
+            "--masses", "0.04",
+            "--strengths", "1",
+            "--cpus-per-task", "7",
+            "--output", str(output_path),
+        ],
+    )
+    assert result.exit_code == 0, result.output
+    assert "CPUs per task: 7" in result.output
+    assert "#SBATCH --cpus-per-task=7" in output_path.read_text()

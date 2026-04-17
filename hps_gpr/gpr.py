@@ -463,3 +463,13 @@ def predict_counts_mean_var_from_log_gpr(
     mean_y = np.exp(mu + 0.5 * var_z)
     var_y = (np.exp(var_z) - 1.0) * np.exp(2.0 * mu + var_z)
     return np.asarray(mean_y, float), np.asarray(var_y, float)
+
+
+def predict_counts_mean_from_log_gpr(
+    gpr: GaussianProcessRegressor,
+    X_query: np.ndarray,
+    config: "Config",
+) -> np.ndarray:
+    """Fast mean-only prediction in count space."""
+    mean_y, _ = predict_counts_mean_var_from_log_gpr(gpr, X_query, config)
+    return np.asarray(mean_y, float).reshape(-1)
