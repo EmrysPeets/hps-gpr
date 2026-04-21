@@ -73,7 +73,7 @@ class Config:
     sigma_tail_slope_floor_2016: float = 0.0
     sigma_tail_slope_override_2016: Optional[float] = 0.0239
     sigma_coeffs_2021: List[float] = field(
-        default_factory=lambda: [0.00286957, -0.00851449, 0.25362319]
+        default_factory=lambda: [0.0014786, -0.0011, 0.0687]
     )
 
     # Radiative fraction f_rad(m) polynomial coefficients

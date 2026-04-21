@@ -168,34 +168,35 @@ main detector effects limiting prompt sensitivity at higher mass.}
 \label{sec:massres-2021}
 
 The 2021 prompt workflow uses the upgraded 2019/2021 detector configuration and
-therefore requires a separate resolution parameterization. The current GPR
-implementation uses
+therefore requires a separate resolution parameterization. For the current prompt
+analysis we adopt the inclusive target-constrained V0 fit without hit requirements
+shown in Figure~\ref{fig:2021-resolution}; in that panel, the red fitted curve is the
+mass-resolution model propagated through the signal template and blind-window
+definitions. The current GPR implementation therefore uses
 \begin{equation}
 \sigma_{2021}(m)
-= 2.86957\times10^{-3} - 8.51449\times10^{-3}m + 2.5362319\times10^{-1}m^2,
+= 1.4786\times10^{-3} - 1.1\times10^{-3}m + 6.87\times10^{-2}m^2,
 \label{eq:sigma2021}
 \end{equation}
-again with $m$ and $\sigma_{2021}$ in GeV. In contrast to 2015 and 2016, the present
-note does not yet bundle a standalone M{\o}ller-validation figure or a dedicated 2021
-internal selection note for this parameterization. That absence should be stated
-explicitly for reviewers: the 2021 resolution input is already implemented and used in
-the current 1\% combination, but its detector-response documentation is not yet as
-mature in this note as the engineering-run case. Even in this provisional state, the
-search consequence is the same as for the earlier data sets: the 2021 curve sets the
-signal width, the blind-window width, and therefore the local prompt-background burden
-under each mass hypothesis. Because the upgraded front tracker changes the low-mass
-response, it is also a direct ingredient in the improved shared-coupling reach.
-Figure~\ref{fig:2021-resolution} should therefore be read as an implementation-facing
-summary of the current response model, not as a claim that the full 2021 detector-note
-validation is already complete in this manuscript.
+again with $m$ and $\sigma_{2021}$ in GeV. The search consequence is the same as for
+the earlier data sets: the 2021 curve sets the signal width, the blind-window width,
+and therefore the local prompt-background burden under each mass hypothesis. Because
+the upgraded front tracker changes the low-mass response, it is also a direct
+ingredient in the improved shared-coupling reach. In contrast to 2015 and 2016, the
+present note still does not bundle a dedicated 2021 internal selection note or a
+standalone M{\o}ller cross-check page for this parameterization. Figure~\ref{fig:2021-resolution}
+should therefore be read as the implementation-facing provenance record for the
+current response model, not as a claim that the full 2021 detector-note validation is
+already complete in this manuscript.
 
 \begin{figure}[H]
 \centering
-\graphicorplaceholder{0.70\linewidth}{resolution_figs/hps2021_mass_resolution_parameterization.png}
-\caption{Current 2021 prompt-analysis mass-resolution parameterization used by the GPR
-package for the 1\% upgraded-detector workflow. Relative to the 2015/2016 baseline
-configuration, the upgraded front tracker changes the low-mass prompt response and is a
-key ingredient in the improved shared-coupling reach.}
+\graphicorplaceholder{0.78\linewidth}{resolution_figs/hps2021_mass_resolution_target_constrained_nohitreq.png}
+\caption{2021 mass-resolution summary used for the prompt analysis. The red curve is
+the inclusive target-constrained V0 quadratic fit without hit requirements, and that
+red parameterization is the one implemented in the GPR package for the upgraded
+detector workflow. The blue curve shows the corresponding unconstrained V0 reference
+fit included in the underlying study for comparison.}
 \label{fig:2021-resolution}
 \end{figure}
 

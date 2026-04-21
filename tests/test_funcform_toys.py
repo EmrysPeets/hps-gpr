@@ -193,7 +193,7 @@ def test_resolution_scaled_local_bounds_vary_with_mass_when_cap_disabled():
         hist_name="unused",
         m_low=0.03,
         m_high=0.25,
-        sigma_coeffs=[0.00286957, -0.00851449, 0.25362319],
+        sigma_coeffs=[0.0014786, -0.0011, 0.0687],
         frad_coeffs=[0.1],
     )
     cfg = Config(

@@ -53,7 +53,8 @@ standalone project.
 | `resolution_figs/hps2016_mass_resolution_internal_fig29.png` | Cropped from bundled PDF `HPS_2016_Bump_Hunt_Internal_Note_note.pdf` | stable | Internal-note 2016 mass-resolution figure. |
 | `normalization_figs/hps2016_radiative_fraction_internal_fig30.png` | Cropped from bundled PDF `HPS_2016_Bump_Hunt_Internal_Note_note.pdf` | stable | Internal-note 2016 radiative-fraction figure. |
 | `resolution_figs/hps2021_resolution_and_frad.png` | Generated from `config_2015_2016_10pct_2021_1pct_10k_rpen7.yaml` by `scripts/generate_note_figures.py` | stable | Note-native summary of the 2021 resolution parameterization and radiative-fraction penalty inputs. |
-| `resolution_figs/hps2021_mass_resolution_parameterization.png` | Generated from `config_2015_2016_10pct_2021_1pct_10k_rpen7.yaml` by `scripts/generate_note_figures.py` | stable | Standalone 2021 mass-resolution panel used in the dedicated resolution subsection. |
+| `resolution_figs/hps2021_mass_resolution_parameterization.png` | Generated from `config_2015_2016_10pct_2021_1pct_10k_rpen7.yaml` by `scripts/generate_note_figures.py` | stable | Legacy note-native standalone 2021 mass-resolution panel retained as a compact cross-check figure. |
+| `resolution_figs/hps2021_mass_resolution_target_constrained_nohitreq.png` | User-provided asset `/Users/emryspeets/Desktop/Spring_2026/2021_mass_resolution.png` | stable | Primary 2021 mass-resolution figure used in the dedicated resolution subsection; the red target-constrained V0 fit without hit requirements is the parameterization propagated in the prompt analysis. |
 | `normalization_figs/hps2021_radiative_fraction_inputs.png` | Generated from `config_2015_2016_10pct_2021_1pct_10k_rpen7.yaml` by `scripts/generate_note_figures.py` | stable | Standalone 2021 radiative-fraction input panel used in the provisional 2021 radiative-fraction discussion. |
 
 ## Upper-limit figures
@@ -179,8 +180,8 @@ standalone project.
 | --- | --- | --- | --- |
 | `kernel_lengthscale_figs/ls_hi_bounds_logm_overlay.png` | `ls_bound_plots/ls_hi_bounds_logm_overlay.png` | stable | Length-scale upper bound in log-mass units. |
 | `kernel_lengthscale_figs/dm_equiv_from_lhi_overlay.png` | `ls_bound_plots/dm_equiv_from_lhi_overlay.png` | stable | Equivalent mass-scale interpretation of the upper bound. |
-| `kernel_lengthscale_figs/ls_bounds_band_logm_overlay.png` | `ls_bound_plots/ls_bounds_band_logm_overlay.png` | stable | Allowed RBF length-scale band implied by the chosen lower and upper factors. |
-| `kernel_lengthscale_figs/sigma_x_logm_overlay.png` | `ls_bound_plots/sigma_x_logm_overlay.png` | stable | Signal-template width in the GP coordinate $x=\ln m$. |
+| `kernel_lengthscale_figs/ls_bounds_band_logm_overlay.png` | `ls_bound_plots/ls_bounds_band_logm_overlay.png` | stable | Allowed RBF length-scale band implied by the current production factors, including the corrected 2016 lower factor $k_{\min}=0.5$. |
+| `kernel_lengthscale_figs/sigma_x_logm_overlay.png` | `ls_bound_plots/sigma_x_logm_overlay.png` | stable | Signal-template width in the GP coordinate $x=\ln m$ using the updated 2021 mass-resolution parameterization. |
 | `kernel_lengthscale_figs/ls_hi_vs_k_2021.png` | `ls_bound_plots/ls_hi_vs_k_2021.png` | stable | Additional 2021 length-scale study retained for later use. |
 
 ## Reserved folders currently without exported figures
