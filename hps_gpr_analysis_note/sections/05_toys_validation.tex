@@ -10,7 +10,7 @@ mass-strength point. The staged suites now cover the fully unblinded 2015 sample
 shared-$\eps^2$ combinations built from those inputs. Throughout this section, the
 combined interpretation is focused on the mass intervals where multiple data sets
 contribute meaningfully to the prompt-resonance search, with the two-dataset
-2015+2016 overlap anchored near \SIrange{35}{130}{MeV} and the three-dataset examples
+2015+2016 overlap anchored near \SIrange{42}{130}{MeV} and the three-dataset examples
 drawn from the common subset used by the current injection configs.
 
 Many of the toy-validation figures were produced before the final adoption of the
@@ -31,16 +31,19 @@ The first class of toys starts from an analytic fit to the smooth $e^+e^-$
 invariant-mass spectrum and fluctuates pseudo-data around that closed-form background
 model. These studies isolate the question of gross spectral smoothness from the later
 question of GP conditioning. They are therefore useful as the first closure test before
-the full inference chain is exercised. Figure~\ref{fig:analytic-fit-toys} shows the
-three dataset-specific seed spectra currently exported by the repo-local ROOT macros.
-The current retuning pass is organized around one portable shifted
+the full inference chain is exercised. Figure~\ref{fig:analytic-fit-publication-overview}
+now packages the publication-facing overview year by year: the candidate-family
+overlay appears on the left of each row, and the selected primary fit together with
+the generated toy-ensemble mean appears on the right. The current retuning pass is
+organized around one portable shifted
 sigmoid$\times$power$\times$exponential family plus a normalized tail modifier, with
 generalized-gamma variants retained as cross-checks in the lower-mass years. In each
-panel, the legend reports the same bin-integral $\chi^2/\mathrm{ndof}$ convention used
-by the macro when ranking the candidate functions. The present seeds reach the target
-selection region of $\chi^2/\mathrm{ndof}<2$ for the 2016 and 2021 primaries, while
-the 2015 turn-on remains provisionally acceptable at $\chi^2/\mathrm{ndof}<4$ pending a
-later dedicated low-mass iteration.
+left-hand panel, the legend reports the same bin-integral
+$\chi^2/\mathrm{ndof}$ convention used by the macro when ranking the candidate
+functions. The present seeds reach the target selection region of
+$\chi^2/\mathrm{ndof}<2$ for the 2016 and 2021 primaries, while the 2015 turn-on
+remains provisionally acceptable at $\chi^2/\mathrm{ndof}<4$ pending a later dedicated
+low-mass iteration.
 
 The corrected toy workflow now keeps three mass intervals explicit in every export:
 the full histogram support used for toy normalization, the fit interval used to
@@ -51,113 +54,97 @@ full support range. This avoids both the center-value approximation and the earl
 fixed-total construction in which every toy inherited exactly the same event count.
 It also leaves the blind-window slice un-renormalized: the search interval inherits
 the normalization implied by the full histogram rather than by an isolated scan-window
-fit.
+fit. The 2015 study keeps the scan hypotheses at \SIrange{20}{130}{MeV}; the 2016
+toy-validation pass is now displayed with the updated \SIrange{42}{210}{MeV} scan
+window to suppress the low-mass mismodeling that biased the earlier 35--42~MeV region;
+and the 2021 row remains a provisional 1\% placeholder until the next export is
+frozen. The right-hand panels in Figure~\ref{fig:analytic-fit-publication-overview}
+show the most direct visualization of the corrected generation rule: the toy mean
+follows the selected fit while the toy totals fluctuate around, rather than being
+pinned to, the observed support-range event count.
 
 \begin{figure}[p]
 \centering
-\begin{subfigure}[t]{0.60\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{toy_generation_figs/funcform_fit_2015.png}
-  \caption{2015 shifted-tail candidate-family overlay.}
-\end{subfigure}
-
-\vspace{0.4em}
-
-\begin{subfigure}[t]{0.60\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{toy_generation_figs/funcform_fit_2016.png}
-  \caption{2016 thresholded-family and shifted-tail overlay.}
-\end{subfigure}
-
-\vspace{0.4em}
-
-\begin{subfigure}[t]{0.60\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{toy_generation_figs/funcform_fit_2021.png}
-  \caption{2021 1\% candidate-family overlay.}
-\end{subfigure}
-\caption{Analytic background fits used to seed functional-form pseudoexperiments. The
-2015, 2016, and 2021 panels are now produced directly by the dataset-specific
-functional-form macros in this repository. These overlays document the candidate
-families considered for toy generation and make the primary-versus-alternate choice
-visible at the spectrum level before the GPR scan is run over the resulting toys. The
-shared shifted-sigmoid family provides the portable baseline across all three years,
-while the dataset-specific alternates show where extra tail flexibility or a
-generalized-gamma shoulder is still informative.}
-\label{fig:analytic-fit-toys}
+\graphicorplaceholder{0.99\linewidth}{toy_generation_figs/funcform_publication_overview.png}
+\caption{Publication-facing overview of the functional-form toy seeds. Each row
+pairs the dataset-specific candidate-family overlay on the left with the selected
+primary seed and toy-ensemble mean on the right. The right-panel titles report the
+dataset, chosen primary family, analysis scan window, and full-support normalization
+target. The 2016 toy displays are shown with the updated 42--210~MeV scan range,
+while the shaded sidebands denote support-only regions that still contribute to the
+toy normalization even though they lie outside the analysis scan. In every row, the
+toy-ensemble mean is computed from pseudoexperiments generated with bin-integrated
+Poisson expectations normalized to the full support-range event count of the real
+dataset.}
+\label{fig:analytic-fit-publication-overview}
 \end{figure}
 
-The currently selected primaries are the shifted-tail family in both 2015 and 2016
-and the sigmoid$\times$power$\times$expquad family in the 2021 1\% stream. The 2015
-study keeps the scan hypotheses at \SIrange{20}{130}{MeV} while normalizing the toys
-on the full exported support, so sub-\SI{20}{MeV} events can inform the background
-normalization without changing the search window itself. Figure~\ref{fig:analytic-fit-primary-summary}
-compresses the same information to the chosen primary fit in each year and overlays the
-toy-ensemble mean from the generated ROOT file. This is the most direct visualization
-of the corrected generation rule: the toy mean follows the selected fit while the toy
-totals fluctuate around, rather than being pinned to, the observed support-range event
-count.
+The current end-to-end toy-scan validation suites for the 2015 and 2016
+\texttt{fShiftSigPowTail} studies are retained as provisional placeholders in the note
+until the corrected reruns are frozen. They are already useful to the review because
+they show the merged local-significance scans, the corresponding upper-limit scans,
+and the compact per-toy dashboard in exactly the form that will be regenerated after
+the updated production pass.
 
 \begin{figure}[p]
 \centering
-\graphicorplaceholder{0.98\linewidth}{toy_generation_figs/funcform_primary_fit_summary.png}
-\caption{Selected primary functional-form seed in each dataset together with the mean
-of the generated toy ensemble. The shaded regions indicate support-only sidebands that
-remain part of the toy normalization even when they lie outside the scan range. The
-2015 and 2016 seeds currently choose the shifted sigmoid$\times$power$\times$exp
-family with the normalized tail modifier, while the 2021 1\% stream selects the
-sigmoid$\times$power$\times$expquad form. In every panel, the toy-ensemble mean is
-computed from pseudoexperiments generated with bin-integrated Poisson expectations
-normalized to the full support-range event count of the real dataset.}
-\label{fig:analytic-fit-primary-summary}
+\begin{subfigure}[t]{0.49\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{toy_generation_figs/toy_scan_validation_2015_fShiftSigPowTail_local_significance.png}
+  \caption{Local-significance scans.}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.49\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{toy_generation_figs/toy_scan_validation_2015_fShiftSigPowTail_upper_limits.png}
+  \caption{Observed-limit scans.}
+\end{subfigure}
+
+\vspace{0.6em}
+
+\begin{subfigure}[t]{0.72\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{toy_generation_figs/toy_scan_validation_2015_fShiftSigPowTail_summary.png}
+  \caption{Per-toy summary dashboard.}
+\end{subfigure}
+\caption{Current 2015 functional-form toy-scan validation suite for the
+\texttt{fShiftSigPowTail} seed. The merged local-significance panel shows the toy
+median together with the central spread of the ensemble, the upper-limit panel
+displays the corresponding variation in $\eps^2_{95}$ across the scan, and the summary
+dashboard identifies the toy index, scan coverage, and the location and size of the
+strongest local upward fluctuation. This suite is retained as a provisional placeholder
+for the review committee while the updated publication-rerun displays are prepared.}
+\label{fig:toy-scan-validation-2015-funcform}
 \end{figure}
 
-\subsubsection{Illustrative smoke test: 2015 toy-scan merge}
-
-The first end-to-end validation product from the new functional-form toy-scan workflow
-is a compact 2015 smoke test built from \num{10} toys,
-\texttt{fShiftSigPowTail\_toy\_0} through
-\texttt{fShiftSigPowTail\_toy\_9}. This sample is included here strictly for
-illustrative purposes: it is not the final high-statistics closure ensemble, but it is
-large enough to show what the merged toy-scan outputs look like once the scans
-complete cleanly and the per-toy results are summarized automatically. The key point
-for the note is that the same merge step now produces reviewer-facing validation plots
-alongside the CSVs, with the toy identity, source functional-form family, merged mass
-range, and summary fluctuation metrics embedded directly in the displays.
-
 \begin{figure}[p]
 \centering
-\begin{subfigure}[t]{0.88\linewidth}
+\begin{subfigure}[t]{0.49\linewidth}
   \centering
-  \graphicorplaceholder{\linewidth}{toy_generation_figs/toy_scan_smoke_2015_fShiftSigPowTail_local_significance.png}
-  \caption{Per-toy local-significance scans with the merged median and central 68\%
-  band.}
+  \graphicorplaceholder{\linewidth}{toy_generation_figs/toy_scan_validation_2016_fShiftSigPowTail_local_significance.png}
+  \caption{Local-significance scans.}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.49\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{toy_generation_figs/toy_scan_validation_2016_fShiftSigPowTail_upper_limits.png}
+  \caption{Observed-limit scans.}
 \end{subfigure}
 
-\vspace{0.8em}
+\vspace{0.6em}
 
-\begin{subfigure}[t]{0.88\linewidth}
+\begin{subfigure}[t]{0.72\linewidth}
   \centering
-  \graphicorplaceholder{\linewidth}{toy_generation_figs/toy_scan_smoke_2015_fShiftSigPowTail_upper_limits.png}
-  \caption{Per-toy $\eps^2$ upper-limit scans from the same merged toy ensemble.}
+  \graphicorplaceholder{\linewidth}{toy_generation_figs/toy_scan_validation_2016_fShiftSigPowTail_summary.png}
+  \caption{Per-toy summary dashboard.}
 \end{subfigure}
-
-\vspace{0.8em}
-
-\begin{subfigure}[t]{0.88\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{toy_generation_figs/toy_scan_smoke_2015_fShiftSigPowTail_summary.png}
-  \caption{Compact toy-by-toy summary dashboard showing the peak upward fluctuation,
-  the mass where it occurs, and the minimum local $p_0$ reached by each toy.}
-\end{subfigure}
-\caption{Illustrative 2015 toy-scan smoke test from the merged
-\texttt{fShiftSigPowTail} closure sample. These panels are included primarily to show
-the operational validation products of the new workflow rather than to claim a final
-physics conclusion from a \num{10}-toy sample. The annotation boxes record which toy
-histograms were used, the source ROOT container, the 20--130~MeV scan coverage, and
-the number of merged toys and failed mass fits, so the displays can double as an
-immediate batch-production sanity check.}
-\label{fig:toy-scan-smoke-2015}
+\caption{Current 2016 10\% functional-form toy-scan validation suite for the
+\texttt{fShiftSigPowTail} seed. The plotted scan window is now restricted to
+42--210~MeV in order to exclude the low-mass region where mismodeling biased the
+earlier toy validation. As in the 2015 placeholder suite, the three panels show the
+local-significance evolution, the observed-limit evolution, and the compact per-toy
+summary used to track the largest local upward fluctuation in the merged sample.}
+\label{fig:toy-scan-validation-2016-funcform}
 \end{figure}
 
 \subsubsection{Conditional blind-window GP toys}
@@ -173,10 +160,81 @@ background model preferred by the real data.
 
 The most realistic toy mode generates a full pseudoexperiment from the GP-derived
 background expectation, injects signal with the full Gaussian template, and then reruns
-the GP sideband-to-blind prediction on the toy before signal extraction. This is the
-appropriate mode for diagnosing signal absorption, because it directly tests how much
-of the injected signal may be absorbed by the refitted background model or by the
-profiled nuisance treatment.
+the GP sideband-to-blind prediction on the toy before signal extraction. Here ``GP
+mean'' means the full-range propagated count-space mean obtained from the sideband-fit
+GP model of the observed spectrum. That propagated mean is used as the toy-truth
+background source over the full histogram support; the toy is then fluctuated, signal
+is added, and the ordinary mass-scan workflow refits the GP on the toy sidebands at
+each scanned mass. This is the appropriate mode for diagnosing signal absorption,
+because it directly tests how much of the injected signal may be absorbed by the
+refitted background model or by the profiled nuisance treatment. The phrase
+``refit-on-toy'' is therefore literal: the search stage does not reuse the original
+data-conditioned blind-window prediction.
+
+\subsubsection{Fixed-total GP-propagated toy-scan study}
+
+The new background-only validation study used for the individual 2015, 2016, and 2021
+checks starts from a single full-range GP fit to the observed spectrum of that
+dataset, takes the propagated count-space mean over the full histogram support, and
+generates \num{1000} pseudoexperiments from that mean while preserving the exact total
+event count of the original full input histogram range. The resulting toy histogram is
+then passed through the ordinary mass-scan workflow, so the GP is refit on the toy
+sidebands at every mass hypothesis with the same $1.64\,\sigma_d$ exclusion used in
+the study configuration. In other words, the toy source is GP-derived, but the scan
+itself is not simplified or shortcut. In the notation used on the plots, this mode is
+described as ``GP propagated mean / fixed-total / refit-on-toy'' to make all three
+procedural ingredients explicit: the toy truth is the propagated GP mean, the full
+histogram total count is held fixed, and the sideband GP is refit on each toy before
+the extraction step is repeated.
+
+This study is designed to be compared directly with the functional-form toy scans. The
+functional-form ensemble tests closure with respect to an analytic smooth-spectrum
+ansatz, whereas the fixed-total GP ensemble tests whether the sideband-refit GP
+machinery remains well behaved when the toy truth is itself the propagated GP mean.
+Because the ensemble size is large, the merged validation plots are summarized by the
+toy median together with central 68\% and 95\% bands rather than by overlaying all
+\num{1000} toy curves. The same fixed-total toy source also feeds a matched
+refit-on-toy expected upper-limit band, but that band should be interpreted as a
+background-modeling validation product rather than as the canonical expected-band
+overlay for the observed limit. The first note-local pilot generated directly from the
+merged CSV is shown in Figure~\ref{fig:toy-scan-validation-2015-gpmean-pilot}. It uses
+\num{10} GP-mean pseudoexperiments from the 2015 study, so it should be read as a
+low-statistics procedural check rather than as a frozen closure statement. Even at
+that pilot scale, however, the figure is already useful for verifying that the merged
+plots carry the correct source description, right-side metadata panel, upper-left
+upper-limit legend, and thinned toy-index summary axis that will be used in the full
+rerun.
+
+\begin{figure}[p]
+\centering
+\begin{subfigure}[t]{0.49\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{toy_generation_figs/toy_scan_gpmean_pilot_2015_gp_propagated_mean_refit_fixedtotal_local_significance.png}
+  \caption{Local-significance scans.}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.49\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{toy_generation_figs/toy_scan_gpmean_pilot_2015_gp_propagated_mean_refit_fixedtotal_upper_limits.png}
+  \caption{Observed-limit scans.}
+\end{subfigure}
+
+\vspace{0.6em}
+
+\begin{subfigure}[t]{0.72\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{toy_generation_figs/toy_scan_gpmean_pilot_2015_gp_propagated_mean_refit_fixedtotal_summary.png}
+  \caption{Per-toy summary dashboard.}
+\end{subfigure}
+\caption{Low-statistics 2015 GP-mean toy-scan pilot generated directly from the
+merged CSV of \num{10} pseudoexperiments. The source label makes the procedure
+explicit: the toy truth is the propagated GP mean, the full-support total count is
+held fixed, and the GP is refit on the toy sidebands at each scanned mass before
+extracting the local significance and upper limit. The suite is included here as a
+procedural validation placeholder for the review committee, not as the final
+high-statistics closure result.}
+\label{fig:toy-scan-validation-2015-gpmean-pilot}
+\end{figure}
 
 \subsubsection{Fixed-total GP-propagated toy-scan study}
 

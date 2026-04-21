@@ -10,7 +10,7 @@ import pandas as pd
 from hps_gpr.cli import main
 from hps_gpr.config import Config, save_config
 from hps_gpr.dataset import DatasetConfig
-from hps_gpr.funcform_toys import write_toy_scan_validation_plots
+from hps_gpr.funcform_toys import summarize_toy_scan_results, write_toy_scan_validation_plots
 from hps_gpr.io import _compute_integral_density, estimate_background_for_dataset
 from hps_gpr.toy_backgrounds import draw_full_background_toy
 
@@ -259,3 +259,145 @@ def test_write_toy_scan_validation_plots_large_ensemble_avoids_spaghetti(monkeyp
 
     assert stems
     assert plot_calls["n"] < 20
+
+
+def test_toy_scan_plot_cli_derives_summary_from_merged_csv(tmp_path):
+    merged = pd.DataFrame(
+        [
+            {
+                "dataset": "2015",
+                "toy_index": 0,
+                "toy_hist": "gp_toy_0000",
+                "function_tag": "gp_propagated_mean_refit_fixedtotal",
+                "source_model": "gp_propagated_mean_refit_fixedtotal",
+                "source_label": "gp_propagated_mean_refit_fixedtotal",
+                "source_root": "",
+                "container": "generated",
+                "mass_GeV": 0.040,
+                "Z_analytic": 1.2,
+                "p0_analytic": 0.1,
+                "eps2_up": 1.0e-5,
+                "extract_success": True,
+            },
+            {
+                "dataset": "2015",
+                "toy_index": 0,
+                "toy_hist": "gp_toy_0000",
+                "function_tag": "gp_propagated_mean_refit_fixedtotal",
+                "source_model": "gp_propagated_mean_refit_fixedtotal",
+                "source_label": "gp_propagated_mean_refit_fixedtotal",
+                "source_root": "",
+                "container": "generated",
+                "mass_GeV": 0.050,
+                "Z_analytic": 2.2,
+                "p0_analytic": 0.02,
+                "eps2_up": 2.0e-5,
+                "extract_success": True,
+            },
+            {
+                "dataset": "2015",
+                "toy_index": 1,
+                "toy_hist": "gp_toy_0001",
+                "function_tag": "gp_propagated_mean_refit_fixedtotal",
+                "source_model": "gp_propagated_mean_refit_fixedtotal",
+                "source_label": "gp_propagated_mean_refit_fixedtotal",
+                "source_root": "",
+                "container": "generated",
+                "mass_GeV": 0.040,
+                "Z_analytic": 0.9,
+                "p0_analytic": 0.2,
+                "eps2_up": 1.3e-5,
+                "extract_success": True,
+            },
+            {
+                "dataset": "2015",
+                "toy_index": 1,
+                "toy_hist": "gp_toy_0001",
+                "function_tag": "gp_propagated_mean_refit_fixedtotal",
+                "source_model": "gp_propagated_mean_refit_fixedtotal",
+                "source_label": "gp_propagated_mean_refit_fixedtotal",
+                "source_root": "",
+                "container": "generated",
+                "mass_GeV": 0.050,
+                "Z_analytic": 1.4,
+                "p0_analytic": 0.08,
+                "eps2_up": 2.3e-5,
+                "extract_success": True,
+            },
+        ]
+    )
+    merged_csv = tmp_path / "toy_scan_merged.csv"
+    merged.to_csv(merged_csv, index=False)
+
+    outdir = tmp_path / "plots"
+    runner = CliRunner()
+    result = runner.invoke(
+        main,
+        [
+            "toy-scan-plot",
+            "--merged-csv", str(merged_csv),
+            "--output-dir", str(outdir),
+            "--stem-prefix", "toy_scan_gpmean_pilot",
+        ],
+    )
+    assert result.exit_code == 0, result.output
+    assert (outdir / "toy_scan_summary.csv").exists()
+    assert (outdir / "toy_scan_gpmean_pilot_2015_gp_propagated_mean_refit_fixedtotal_local_significance.png").exists()
+    assert (outdir / "toy_scan_gpmean_pilot_2015_gp_propagated_mean_refit_fixedtotal_upper_limits.png").exists()
+    assert (outdir / "toy_scan_gpmean_pilot_2015_gp_propagated_mean_refit_fixedtotal_summary.png").exists()
+
+
+def test_toy_scan_plot_cli_accepts_explicit_summary_csv(tmp_path):
+    merged = pd.DataFrame(
+        [
+            {
+                "dataset": "2015",
+                "toy_index": 0,
+                "toy_hist": "fShiftSigPowTail_toy_0",
+                "function_tag": "fShiftSigPowTail",
+                "source_model": "functional_form",
+                "source_label": "fShiftSigPowTail",
+                "source_root": "/tmp/funcform.root",
+                "container": "fShiftSigPowTail",
+                "mass_GeV": 0.040,
+                "Z_analytic": 1.2,
+                "p0_analytic": 0.1,
+                "eps2_up": 1.0e-5,
+                "extract_success": True,
+            },
+            {
+                "dataset": "2015",
+                "toy_index": 0,
+                "toy_hist": "fShiftSigPowTail_toy_0",
+                "function_tag": "fShiftSigPowTail",
+                "source_model": "functional_form",
+                "source_label": "fShiftSigPowTail",
+                "source_root": "/tmp/funcform.root",
+                "container": "fShiftSigPowTail",
+                "mass_GeV": 0.050,
+                "Z_analytic": 1.8,
+                "p0_analytic": 0.04,
+                "eps2_up": 1.4e-5,
+                "extract_success": True,
+            },
+        ]
+    )
+    summary = summarize_toy_scan_results(merged)
+    merged_csv = tmp_path / "toy_scan_merged.csv"
+    summary_csv = tmp_path / "toy_scan_summary.csv"
+    merged.to_csv(merged_csv, index=False)
+    summary.to_csv(summary_csv, index=False)
+
+    outdir = tmp_path / "plots"
+    runner = CliRunner()
+    result = runner.invoke(
+        main,
+        [
+            "toy-scan-plot",
+            "--merged-csv", str(merged_csv),
+            "--summary-csv", str(summary_csv),
+            "--output-dir", str(outdir),
+        ],
+    )
+    assert result.exit_code == 0, result.output
+    assert (outdir / "toy_scan_validation_2015_fShiftSigPowTail_local_significance.png").exists()

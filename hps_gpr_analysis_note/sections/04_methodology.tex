@@ -423,16 +423,13 @@ q_{0,d}(m) = -2\ln
 \label{eq:q0-single}
 \end{equation}
 with $\hat A_d\ge0$. The local one-sided discovery $p$-value and the corresponding
-Gaussian significance are then obtained with the asymptotic Cowan-et-al.\ mapping,
-\begin{equation}
-Z_{\mathrm{local},d}(m)=\sqrt{q_{0,d}(m)},
-\qquad
-p_{0,d}(m)=1-\Phi\!\left(Z_{\mathrm{local},d}(m)\right).
-\label{eq:p0-single}
-\end{equation}
-This profiled multi-bin test replaces the older sum-count approximation used in the
-earliest drafts and is the only local-significance definition treated as current in
-this note \cite{Cowan2011}.
+Gaussian significance are then obtained with the asymptotic Cowan-et-al.\ mapping
+\cite{Cowan2011}. The resulting local-significance definition is explicitly
+one-sided and discovery facing: downward fluctuations are allowed in the unconstrained
+fit used for closure studies, but they do not generate a positive local discovery
+significance. This profiled multi-bin test replaces the older sum-count approximation
+used in the earliest drafts and is the only local-significance definition treated as
+current in this note.
 
 \subsubsection{\texorpdfstring{\CLs}{CLs} upper limits}
 
@@ -491,8 +488,8 @@ dataset-specific conversion factor of Eq.~\eqref{eq:Kd-conversion}, in $\eps^2$ 
 
 \subsection{Asymptotic and toy calibration}
 
-The local-significance mapping of Eq.~\eqref{eq:p0-single} is treated asymptotically
-throughout the production scan. For upper limits, the same bounded statistic
+The local-significance mapping introduced above is treated asymptotically throughout
+the production scan. For upper limits, the same bounded statistic
 $\tilde q_{A_d}$ is calibrated in one of two ways. In asymptotic mode, the
 background-only Asimov data set is used to evaluate the reference quantity
 $\tilde q_{A_d,A}$, so that
@@ -548,14 +545,18 @@ p_{\mathrm{weak}}(m)
 \right], \\
 p_{\mathrm{two}}(m)
 &=
-2\min\!\left[p_{\mathrm{strong}}(m),\,p_{\mathrm{weak}}(m)\right].
+\min\!\left[1,\,
+2\min\!\left(p_{\mathrm{strong}}(m),\,p_{\mathrm{weak}}(m)\right)\right].
 \end{align}
 Here $p_{\mathrm{strong}}$ quantifies how unusually \emph{strong} the observed limit
 is relative to the background-only toy ensemble, while $p_{\mathrm{weak}}$ quantifies
 how unusually \emph{weak} it is. The two-sided quantity $p_{\mathrm{two}}$ is retained
 only as a symmetric reviewer diagnostic; because it responds to both unusually strong
 and unusually weak limits, it is less targeted than the one-sided discovery or
-exclusion tests and is not used as a search statistic.
+exclusion tests and is not used as a search statistic. Figure~\ref{fig:pvalue-tail-schematic}
+gives the compact fixed-mass definition of these quantities, while
+Figure~\ref{fig:pvalue-tail-examples} shows representative strong-limit, weak-limit,
+and bounded median-case examples from the same toy-limit logic.
 
 \begin{figure}[H]
 \centering
@@ -564,9 +565,22 @@ exclusion tests and is not used as a search statistic.
 background-only ensemble of observed \CLs{} upper limits, and the right panel shows the
 corresponding empirical cumulative distribution. The vertical line marks the observed
 limit. The lower-tail area defines $p_{\mathrm{strong}}$, the upper-tail area defines
-$p_{\mathrm{weak}}$, and $p_{\mathrm{two}}=2\min(p_{\mathrm{strong}},p_{\mathrm{weak}})$
-is used only as a symmetric diagnostic summary.}
+$p_{\mathrm{weak}}$, and
+$p_{\mathrm{two}}=\min[1,2\min(p_{\mathrm{strong}},p_{\mathrm{weak}})]$ is used only
+as a symmetric diagnostic summary.}
 \label{fig:pvalue-tail-schematic}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.98\linewidth}{methodology_figs/pvalue_tail_examples.png}
+\caption{Representative fixed-mass observed-limit toy diagnostics. The left panel
+shows an unusually strong observed limit relative to the background-only toy
+ensemble, the middle panel shows an unusually weak observed limit, and the right
+panel shows a near-median case where the bounded symmetric summary saturates at
+$p_{\mathrm{two}}=1$. These are reviewer-facing limit diagnostics, not discovery
+statistics.}
+\label{fig:pvalue-tail-examples}
 \end{figure}
 
 These quantities are therefore limit diagnostics rather than discovery-significance
@@ -576,7 +590,7 @@ below it, making both $p_{\mathrm{strong}}$ and $p_{\mathrm{weak}}$ naturally
 $\mathcal{O}(0.5)$. With $N_{\mathrm{toys}}=\num{10000}$, the smallest non-zero
 empirical tail probability is still only of order $10^{-4}$, so these toy-limit
 diagnostics cannot by themselves establish or refute a high-significance local excess
-in the discovery statistic.
+in the discovery statistic defined by the one-sided local $p_0$ mapping above.
 
 \subsection{Shared-\texorpdfstring{$\eps^2$}{epsilon2} combination across datasets}
 \label{sec:combination}

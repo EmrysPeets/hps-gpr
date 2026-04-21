@@ -447,8 +447,10 @@ def _summarize_one_toy(group: pd.DataFrame) -> dict:
         "function_tag": str(grp["function_tag"].iloc[0]),
         "source_model": str(grp.get("source_model", pd.Series(["functional_form"])).iloc[0]),
         "source_label": str(grp.get("source_label", grp["function_tag"]).iloc[0]),
-        "source_root": str(grp["source_root"].iloc[0]),
-        "container": str(grp["container"].iloc[0]) if "container" in grp.columns else "",
+        "source_root": np.nan if pd.isna(grp["source_root"].iloc[0]) else str(grp["source_root"].iloc[0]),
+        "container": (
+            "" if pd.isna(grp["container"].iloc[0]) else str(grp["container"].iloc[0])
+        ) if "container" in grp.columns else "",
         "n_fail": int(fail_mask.sum()),
         "max_Z_analytic": max_z,
         "mass_at_max_Z": mass_at_max,
@@ -506,7 +508,9 @@ def _toy_scan_group_metadata(merged_grp: pd.DataFrame, summary_grp: pd.DataFrame
         else function_tag
     )
     container = str(merged_grp["container"].iloc[0]) if "container" in merged_grp.columns else ""
-    source_root = str(merged_grp["source_root"].iloc[0]) if "source_root" in merged_grp.columns else ""
+    source_root = (
+        "" if pd.isna(merged_grp["source_root"].iloc[0]) else str(merged_grp["source_root"].iloc[0])
+    ) if "source_root" in merged_grp.columns else ""
     source_name = Path(source_root).name if source_root else "unknown"
 
     toy_names = summary_grp["toy_hist"].astype(str).tolist() if "toy_hist" in summary_grp.columns else []
@@ -582,15 +586,17 @@ def _toy_scan_info_text(meta: dict) -> str:
     else:
         idx_text = "unknown"
 
-    container = str(meta.get("container", "")).strip()
-    source_label = str(meta.get("source_name", "unknown"))
-    if container:
-        source_label = f"{source_label} :: {container}"
+    source_model_raw = str(meta.get("source_model", "functional_form"))
+    source_model = _toy_scan_prettify_source_label(source_model_raw)
+    source_label = _toy_scan_prettify_source_label(
+        str(meta.get("source_label", meta.get("function_tag", "funcform"))),
+        source_model=source_model_raw,
+    )
+    source_detail = _toy_scan_source_detail(meta)
 
     lines = [
         f"Dataset: {meta.get('dataset', 'dataset')}",
-        f"Toy source: {meta.get('source_model', 'functional_form')}",
-        f"Source label: {meta.get('source_label', meta.get('function_tag', 'funcform'))}",
+        f"Toy source: {source_model}",
         f"Toy sample: {meta.get('toy_label', 'unknown')}",
         f"Toy indices: {idx_text} ({int(meta.get('n_toys', 0))} toys)",
         (
@@ -599,8 +605,11 @@ def _toy_scan_info_text(meta: dict) -> str:
             f"({int(meta.get('n_mass', 0))} hypotheses/toy)"
         ),
         f"Total failed mass fits: {int(meta.get('fail_total', 0))}",
-        f"Source: {source_label}",
     ]
+    if source_label != source_model:
+        lines.insert(2, f"Source label: {source_label}")
+    if source_detail:
+        lines.append(f"Source: {source_detail}")
 
     med_max_z = float(meta.get("median_max_z", float("nan")))
     med_peak_mass_mev = float(meta.get("median_peak_mass_mev", float("nan")))
@@ -610,6 +619,88 @@ def _toy_scan_info_text(meta: dict) -> str:
     if np.isfinite(med_min_p0):
         lines.append(f"Median min p0: {med_min_p0:.3g}")
     return "\n".join(lines)
+
+
+def _toy_scan_prettify_source_label(text: object, *, source_model: str | None = None) -> str:
+    """Map internal toy-source identifiers to publication-facing labels."""
+    raw = str(text or "").strip()
+    key = raw.lower().replace("-", "_")
+    if key == "functional_form":
+        return "Analytic functional-form closure"
+    if key == "gp_propagated_mean_refit_fixedtotal":
+        return "GP propagated mean / fixed-total / refit-on-toy"
+    if key == "gp_propagated_mean_refit_poisson":
+        return "GP propagated mean / Poisson-total / refit-on-toy"
+    if source_model and str(source_model).strip().lower() == "functional_form":
+        return raw
+    return raw
+
+
+def _toy_scan_source_detail(meta: dict) -> str:
+    """Return a concise provenance line for toy-scan validation displays."""
+    source_root = str(meta.get("source_root", "")).strip()
+    container = str(meta.get("container", "")).strip()
+    source_model = str(meta.get("source_model", "")).strip().lower()
+    if source_root:
+        source_name = Path(source_root).name
+        if container and container != "generated":
+            return f"{source_name} :: {container}"
+        return source_name
+    if container and container != "generated":
+        return container
+    if source_model.startswith("gp_propagated_mean"):
+        return "Generated in-repo from the propagated GP mean"
+    if source_model == "functional_form":
+        return "Merged functional-form closure ensemble"
+    return ""
+
+
+def summarize_toy_scan_results(merged: pd.DataFrame) -> pd.DataFrame:
+    """Build compact per-toy summaries from a merged toy-scan table."""
+    if merged is None or merged.empty:
+        return pd.DataFrame()
+
+    merged = merged.copy()
+    sort_cols = [
+        c for c in ["dataset", "source_model", "source_label", "function_tag", "toy_index", "mass_GeV"]
+        if c in merged.columns
+    ]
+    if sort_cols:
+        merged = merged.sort_values(sort_cols).reset_index(drop=True)
+
+    summary_rows = []
+    group_cols = [
+        c for c in ["dataset", "source_model", "source_label", "function_tag", "toy_index", "toy_hist", "source_root"]
+        if c in merged.columns
+    ]
+    if "container" in merged.columns:
+        group_cols.append("container")
+    for _, grp in merged.groupby(group_cols, sort=True, dropna=False):
+        summary_rows.append(_summarize_one_toy(grp))
+
+    summary = pd.DataFrame(summary_rows)
+    summary_sort_cols = [
+        c for c in ["dataset", "source_model", "source_label", "function_tag", "toy_index"]
+        if c in summary.columns
+    ]
+    if summary_sort_cols:
+        summary = summary.sort_values(summary_sort_cols)
+    return summary.reset_index(drop=True)
+
+
+def _draw_toy_scan_info_panel(ax, info_text: str) -> None:
+    """Render the metadata side panel used by publication-facing toy-scan plots."""
+    ax.axis("off")
+    ax.text(
+        0.0,
+        1.0,
+        info_text,
+        ha="left",
+        va="top",
+        fontsize=8.8,
+        bbox=dict(boxstyle="round,pad=0.35", fc="white", ec="0.75", alpha=0.98),
+        transform=ax.transAxes,
+    )
 
 
 def _save_toy_scan_plot(fig, stem: str) -> None:
@@ -669,6 +760,10 @@ def write_toy_scan_validation_plots(
         tag = _toy_scan_slug([meta["dataset"], meta["source_label"]]) or "toy_scan"
         info_text = _toy_scan_info_text(meta)
         draw_traces = int(meta.get("n_toys", 0)) <= int(trace_limit)
+        title_source = _toy_scan_prettify_source_label(
+            meta.get("source_label", meta.get("function_tag", "funcform")),
+            source_model=str(meta.get("source_model", "")),
+        )
 
         z_pivot = (
             merged_grp.pivot_table(index="mass_GeV", columns="toy_index", values="Z_analytic", aggfunc="first")
@@ -688,7 +783,13 @@ def write_toy_scan_validation_plots(
             z_q84 = _toy_scan_row_quantile(z_vals, 84.0)
             z_q97 = _toy_scan_row_quantile(z_vals, 97.5)
 
-            fig, ax = plt.subplots(figsize=(9.4, 5.6), constrained_layout=True)
+            fig, (ax, ax_info) = plt.subplots(
+                1,
+                2,
+                figsize=(12.2, 5.6),
+                gridspec_kw={"width_ratios": [4.8, 1.75]},
+                constrained_layout=True,
+            )
             if draw_traces:
                 for col in z_pivot.columns:
                     ax.plot(masses_mev, z_pivot[col].to_numpy(float), color="0.78", alpha=0.55, lw=0.9)
@@ -700,20 +801,11 @@ def write_toy_scan_validation_plots(
             ax.set_xlabel("Mass hypothesis [MeV]")
             ax.set_ylabel(r"Local significance $Z$")
             ax.set_title(
-                f"Toy-scan validation: {meta['dataset']} {meta['source_label']} local-significance scans",
+                f"Toy-scan validation: {meta['dataset']} {title_source} local-significance scans",
                 pad=10.0,
             )
             ax.legend(loc="upper right", frameon=True)
-            ax.text(
-                0.02,
-                0.98,
-                info_text,
-                transform=ax.transAxes,
-                ha="left",
-                va="top",
-                fontsize=8.6,
-                bbox=dict(boxstyle="round,pad=0.35", fc="white", ec="0.75", alpha=0.95),
-            )
+            _draw_toy_scan_info_panel(ax_info, info_text)
             stem = os.path.join(str(output_dir), f"{stem_prefix}_{tag}_local_significance")
             _save_toy_scan_plot(fig, stem)
             plt.close(fig)
@@ -728,7 +820,13 @@ def write_toy_scan_validation_plots(
             eps2_q84 = _toy_scan_row_quantile(eps2_vals, 84.0)
             eps2_q97 = _toy_scan_row_quantile(eps2_vals, 97.5)
 
-            fig, ax = plt.subplots(figsize=(9.4, 5.6), constrained_layout=True)
+            fig, (ax, ax_info) = plt.subplots(
+                1,
+                2,
+                figsize=(12.2, 5.6),
+                gridspec_kw={"width_ratios": [4.8, 1.75]},
+                constrained_layout=True,
+            )
             if draw_traces:
                 for col in eps2_pivot.columns:
                     ax.plot(masses_mev, eps2_pivot[col].to_numpy(float), color="0.78", alpha=0.55, lw=0.9)
@@ -739,20 +837,11 @@ def write_toy_scan_validation_plots(
             ax.set_ylabel(r"Upper limit on $\epsilon^2$")
             ax.set_yscale("log")
             ax.set_title(
-                f"Toy-scan validation: {meta['dataset']} {meta['source_label']} upper-limit scans",
+                f"Toy-scan validation: {meta['dataset']} {title_source} upper-limit scans",
                 pad=10.0,
             )
-            ax.legend(loc="upper right", frameon=True)
-            ax.text(
-                0.02,
-                0.98,
-                info_text,
-                transform=ax.transAxes,
-                ha="left",
-                va="top",
-                fontsize=8.6,
-                bbox=dict(boxstyle="round,pad=0.35", fc="white", ec="0.75", alpha=0.95),
-            )
+            ax.legend(loc="upper left", frameon=True)
+            _draw_toy_scan_info_panel(ax_info, info_text)
             stem = os.path.join(str(output_dir), f"{stem_prefix}_{tag}_upper_limits")
             _save_toy_scan_plot(fig, stem)
             plt.close(fig)
@@ -771,18 +860,6 @@ def write_toy_scan_validation_plots(
             bbox=dict(boxstyle="round,pad=0.4", fc="white", ec="0.75", alpha=0.98),
             transform=ax_text.transAxes,
         )
-        ax_text.text(
-            0.02,
-            0.12,
-            "Reviewer-facing smoke-test summary:\n"
-            "use this dashboard to confirm toy identity, scan coverage,\n"
-            "and the size/location of the strongest local upward fluctuation.",
-            ha="left",
-            va="bottom",
-            fontsize=8.6,
-            transform=ax_text.transAxes,
-        )
-
         scatter_x = summary_grp["toy_index"].to_numpy(int)
         scatter_y = summary_grp["max_Z_analytic"].to_numpy(float)
         scatter_c = 1000.0 * summary_grp["mass_at_max_Z"].to_numpy(float)
@@ -795,21 +872,28 @@ def write_toy_scan_validation_plots(
             edgecolors="black",
             linewidths=0.45,
         )
-        offset = 0.04 * max(1.0, float(np.nanmax(scatter_y)) if np.isfinite(scatter_y).any() else 1.0)
-        for row in summary_grp.itertuples(index=False):
-            ax_scatter.text(
-                int(row.toy_index),
-                float(row.max_Z_analytic) + offset,
-                str(int(row.toy_index)),
-                ha="center",
-                va="bottom",
-                fontsize=8.0,
-            )
+        annotate_points = len(summary_grp) <= 25
+        if annotate_points:
+            offset = 0.04 * max(1.0, float(np.nanmax(scatter_y)) if np.isfinite(scatter_y).any() else 1.0)
+            for row in summary_grp.itertuples(index=False):
+                ax_scatter.text(
+                    int(row.toy_index),
+                    float(row.max_Z_analytic) + offset,
+                    str(int(row.toy_index)),
+                    ha="center",
+                    va="bottom",
+                    fontsize=8.0,
+                )
         ax_scatter.set_xlabel("Toy index")
         ax_scatter.set_ylabel(r"Max local significance $Z_{\max}$")
         ax_scatter.set_title("Peak upward fluctuation by toy")
         if len(scatter_x):
-            ax_scatter.set_xticks(sorted(np.unique(scatter_x)))
+            xticks = sorted(np.unique(scatter_x))
+            if len(xticks) > 20:
+                xticks = xticks[::20]
+                if xticks[-1] != int(np.max(scatter_x)):
+                    xticks.append(int(np.max(scatter_x)))
+            ax_scatter.set_xticks(xticks)
         cbar = fig.colorbar(sc, ax=ax_scatter)
         cbar.set_label("Mass at max Z [MeV]")
 
@@ -853,8 +937,8 @@ def write_toy_scan_validation_plots(
         ax_p0.legend(loc="upper right", frameon=True)
 
         fig.suptitle(
-            f"Toy-scan validation summary: {meta['dataset']} {meta['source_label']}",
-            y=1.01,
+            f"Toy-scan validation summary: {meta['dataset']} {title_source}",
+            y=1.03,
         )
         stem = os.path.join(str(output_dir), f"{stem_prefix}_{tag}_summary")
         _save_toy_scan_plot(fig, stem)
@@ -890,23 +974,7 @@ def merge_toy_scan_results(
     if sort_cols:
         merged = merged.sort_values(sort_cols).reset_index(drop=True)
 
-    summary_rows = []
-    group_cols = [
-        c for c in ["dataset", "source_model", "source_label", "function_tag", "toy_index", "toy_hist", "source_root"]
-        if c in merged.columns
-    ]
-    if "container" in merged.columns:
-        group_cols.append("container")
-    for _, grp in merged.groupby(group_cols, sort=True, dropna=False):
-        summary_rows.append(_summarize_one_toy(grp))
-    summary = pd.DataFrame(summary_rows)
-    summary_sort_cols = [
-        c for c in ["dataset", "source_model", "source_label", "function_tag", "toy_index"]
-        if c in summary.columns
-    ]
-    if summary_sort_cols:
-        summary = summary.sort_values(summary_sort_cols)
-    summary = summary.reset_index(drop=True)
+    summary = summarize_toy_scan_results(merged)
 
     merged_path = os.path.join(outdir, "toy_scan_merged.csv")
     summary_path = os.path.join(outdir, "toy_scan_summary.csv")

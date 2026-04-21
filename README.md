@@ -322,11 +322,29 @@ if you want a different SLURM reservation.
 - `OUTPUT_DIR/merged/toy_scan_summary.csv`: compact per-toy summary with `n_fail`, `max_Z_analytic`,
   `mass_at_max_Z`, and `min_p0_analytic`
 - `OUTPUT_DIR/merged/toy_scan_validation_<dataset>_<function>_local_significance.{png,pdf}`:
-  per-toy local-significance scans with the merged median/band and toy metadata box
+  per-toy local-significance scans with the merged median/band and a dedicated right-side metadata panel
 - `OUTPUT_DIR/merged/toy_scan_validation_<dataset>_<function>_upper_limits.{png,pdf}`:
-  per-toy upper-limit scans with the merged median/band and toy metadata box
+  per-toy upper-limit scans with the merged median/band, a dedicated right-side metadata panel, and the legend anchored in the upper-left of the plotting panel
 - `OUTPUT_DIR/merged/toy_scan_validation_<dataset>_<function>_summary.{png,pdf}`:
-  compact dashboard of toy identity, peak-significance location, and minimum local p-value
+  compact dashboard of toy identity, peak-significance location, and minimum local p-value, with dense toy-index labels thinned automatically for large ensembles
+
+For large ensembles, `toy-scan-merge` now switches automatically from full
+"spaghetti" overlays to reviewer-facing summary plots with the median plus central
+68% and 95% bands. Small smoke tests still draw every toy curve.
+
+You can also regenerate the same validation suite directly from merged CSV files:
+
+```bash
+hps-gpr toy-scan-plot \
+  --merged-csv outputs/prod_2015_10k_3/merged/toy_scan_merged.csv \
+  --summary-csv outputs/prod_2015_10k_3/merged/toy_scan_summary.csv \
+  --output-dir outputs/prod_2015_10k_3/merged
+```
+
+If `--summary-csv` is omitted, `toy-scan-plot` derives the per-toy summary from the
+merged table, writes `toy_scan_summary.csv` into `--output-dir`, and then renders the
+same publication-style validation figures. That path is especially useful for
+GP-mean pilot studies where only the merged CSV has been copied locally.
 
 For large ensembles, `toy-scan-merge` now switches automatically from full
 "spaghetti" overlays to reviewer-facing summary plots with the median plus central
@@ -563,6 +581,11 @@ The injection framework already supports pseudoexperiments in two modes:
 - `inj_refit_gp_on_toy: true` (full procedural mode): build full-range pseudo-data from the GP global-fit mean, inject signal, and refit GP on sidebands toy-by-toy before extraction.
 
 The second mode is intentionally much heavier than an observed-data scan because it performs a full-range toy generation and a GP refit for every `(mass, strength, toy)` point.
+By "GP mean/global fit" here we mean the propagated full-range count-space mean from a
+single sideband-conditioned GP fit to the observed dataset. That propagated mean is
+used as the background truth for toy generation over the full support range; signal is
+then injected, and the GP is retrained on the toy sidebands before the blind-window
+extraction is repeated at each scanned mass.
 
 For reviewer-facing extraction displays there is a second, separate switch:
 - `extraction_display_refit_gp_on_toy: false`: make the closure-style no-refit display. This keeps the sideband-trained GP fixed and is the right choice when you want the pseudoexperiment display to match the observed-data validation display as closely as possible.
@@ -595,7 +618,7 @@ Example runs:
 hps-gpr inject --config study_configs/config_2015_blind1p64_95CL_10k_injection_gpmean_pseudoexp.yaml --dataset 2015 --masses 0.025,0.030,0.040,0.050,0.065,0.080,0.095,0.115,0.135 --strengths 1,2,3,5 --n-toys 10000
 
 # 2016 10% full procedural pseudoexperiments
-hps-gpr inject --config study_configs/config_2016_10pct_blind1p64_95CL_10k_injection_gpmean_pseudoexp.yaml --dataset 2016 --masses 0.040,0.050,0.065,0.080,0.095,0.115,0.135,0.150,0.170,0.200 --strengths 1,2,3,5 --n-toys 10000
+hps-gpr inject --config study_configs/config_2016_10pct_blind1p64_95CL_10k_injection_gpmean_pseudoexp.yaml --dataset 2016 --masses 0.050,0.065,0.080,0.095,0.115,0.135,0.150,0.170,0.200 --strengths 1,2,3,5 --n-toys 10000
 
 # 2021 1% full procedural pseudoexperiments
 hps-gpr inject --config study_configs/config_2021_1pct_blind1p64_95CL_10k_injection_gpmean_pseudoexp.yaml --dataset 2021 --masses 0.040,0.060,0.080,0.100,0.120,0.160 --strengths 1,2,3,5 --n-toys 10000
@@ -611,9 +634,9 @@ bash submit_injection_all.sh
 hps-gpr inject-plot --input-dir outputs/study_2015_2016_10pct_2021_1pct_w1p64_95CL_gpmean_pseudoexp/injection_flat --output-dir outputs/study_2015_2016_10pct_2021_1pct_w1p64_95CL_gpmean_pseudoexp/injection_summary
 ```
 
-Mass-range convention in all production configs:
+Mass-range convention in the current GP toy-study configs:
 - 2015: **20–130 MeV**
-- 2016: **35–210 MeV**
+- 2016: **42–210 MeV**
 - 2021: **30–250 MeV**
 - Combined scan window: **20–250 MeV** (combined-fit significance populated only where the enabled dataset set contributes)
 

@@ -20,7 +20,11 @@ except ImportError:
 
 from .io import estimate_background_for_dataset
 from .template import build_window_template_from_full, cls_limit_for_template
-from .statistics import draw_bkg_mvn_nonneg, p0_profiled_gaussian_LRT
+from .statistics import (
+    bounded_two_sided_tail_pvalue,
+    draw_bkg_mvn_nonneg,
+    p0_profiled_gaussian_LRT,
+)
 from .gpr import make_kernel_for_dataset, fit_gpr, predict_counts_from_log_gpr
 from .toy_backgrounds import draw_full_background_toy, normalize_full_toy_bkg_mode, observed_total_count
 from .evaluation import (
@@ -269,7 +273,7 @@ def expected_ul_bands_for_dataset(
             if te.size > 0:
                 p_strong = float(np.mean(te <= float(eps2_obs)))
                 p_weak = float(np.mean(te >= float(eps2_obs)))
-                p_two = float(2.0 * min(p_strong, p_weak))
+                p_two = bounded_two_sided_tail_pvalue(p_strong, p_weak)
             else:
                 p_strong = p_weak = p_two = np.nan
         else:
@@ -593,7 +597,7 @@ def expected_ul_bands_for_combination(
             if te.size > 0:
                 p_strong = float(np.mean(te <= float(eps2_obs)))
                 p_weak = float(np.mean(te >= float(eps2_obs)))
-                p_two = float(2.0 * min(p_strong, p_weak))
+                p_two = bounded_two_sided_tail_pvalue(p_strong, p_weak)
             else:
                 p_strong = p_weak = p_two = nan
         else:
