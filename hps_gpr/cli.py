@@ -786,6 +786,60 @@ def toy_scan_merge(input_dir, output_dir):
     print(f"Toy summaries: {len(summary)}")
 
 
+@main.command("toy-scan-plot")
+@click.option(
+    "--merged-csv",
+    required=True,
+    type=click.Path(exists=True),
+    help="Merged toy-scan CSV table, typically toy_scan_merged.csv",
+)
+@click.option(
+    "--summary-csv",
+    type=click.Path(exists=True),
+    help="Optional compact per-toy summary table, typically toy_scan_summary.csv",
+)
+@click.option(
+    "--output-dir",
+    "-o",
+    required=True,
+    type=click.Path(),
+    help="Directory to write publication-facing validation plots",
+)
+@click.option(
+    "--stem-prefix",
+    default="toy_scan_validation",
+    show_default=True,
+    help="Filename stem prefix for the rendered validation plots",
+)
+def toy_scan_plot(merged_csv, summary_csv, output_dir, stem_prefix):
+    """Render toy-scan validation plots from merged CSV inputs."""
+    import pandas as pd
+
+    from .funcform_toys import summarize_toy_scan_results, write_toy_scan_validation_plots
+    from .plotting import ensure_dir
+
+    merged = pd.read_csv(merged_csv)
+    if summary_csv:
+        summary = pd.read_csv(summary_csv)
+    else:
+        summary = summarize_toy_scan_results(merged)
+        summary_out = os.path.join(output_dir, "toy_scan_summary.csv")
+        ensure_dir(str(output_dir))
+        summary.to_csv(summary_out, index=False)
+        print(f"Wrote {summary_out}")
+
+    plot_stems = write_toy_scan_validation_plots(
+        merged,
+        summary,
+        output_dir,
+        stem_prefix=stem_prefix,
+    )
+    for stem in plot_stems:
+        print(f"Wrote {stem}.png/.pdf")
+    print(f"Merged rows: {len(merged)}")
+    print(f"Toy summaries: {len(summary)}")
+
+
 @main.command()
 @click.option(
     "--config",
