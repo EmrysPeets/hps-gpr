@@ -165,7 +165,10 @@ and uses this local physical scale to set the RBF bounds. In the default
 \qquad
 \ell_{\max}(m) = k_{\max}\sigma_x(m),
 \end{equation}
-with the baseline lower factor $k_{\min}=0.5$.
+with the baseline lower factor $k_{\min}=0.5$ for all three datasets. The practical
+bookkeeping point is worth stating explicitly because an older diagnostic overlay
+showed a stale 2016 value of 0.05; that lower-bound curve was incorrect and is not the
+baseline used in the current production configs.
 
 The physics-facing ceiling adopted in this note is
 \begin{equation}
@@ -184,13 +187,13 @@ problem: the optimizer rides the boundary and the background model becomes visib
 rigid. The adopted 8$\sigma_d$ and 9$\sigma_d$ ceilings are therefore presented as
 stability choices anchored to detector resolution, not as arbitrary tune points.
 
-Two additional guards appear in the current configurations and remain part of the
-method definition. First, a dataset-statistics floor on $\ell_{\max}$ prevents the
-ceiling from becoming artificially small where the local resolution is exceptionally
-tight. Second, an optional cap at a fixed fraction of the training xrange prevents the
-GP from drifting toward an effectively global polynomial interpolant. Together these
-controls keep the kernel flexible enough to describe the smooth spectrum while
-preventing it from becoming either too stiff or too unconstrained.
+The current production configs retain one additional guard: a dataset-statistics floor
+on $\ell_{\max}$ prevents the ceiling from becoming artificially small where the local
+resolution is exceptionally tight. The older fixed-xrange cap remains available only as
+an opt-in diagnostic knob in the code and is not enabled in the baseline results shown
+here. A mass-independent lower floor is likewise a reasonable follow-up robustness
+study, but it would constitute a deliberate method variation rather than the bound
+prescription used for the results documented in this note.
 
 Figure~\ref{fig:lengthscale-bounds} makes the bound prescription explicit. Panel (a)
 shows the detector-resolution scale in the GP coordinate, and panel (b) shows the
@@ -213,10 +216,10 @@ single mass-independent smoothing length.
 \end{subfigure}
 \caption{Length-scale parameterization used in the GPR fit. Panel (a) shows the local
 signal-template width in the GP coordinate, while panel (b) shows the allowed
-length-scale band obtained by multiplying that physical width by the chosen lower and
-upper factors. The purpose of the bound is to permit smooth background variation
-without allowing the optimizer to drift into an unphysically unconstrained smoothing
-regime.}
+length-scale band obtained in the current implementation by applying the common
+$k_{\min}=0.5$ lower factor together with the dataset-specific upper factors. The
+purpose of the bound is to permit smooth background variation without allowing the
+optimizer to drift into an unphysically unconstrained smoothing regime.}
 \label{fig:lengthscale-bounds}
 \end{figure}
 
