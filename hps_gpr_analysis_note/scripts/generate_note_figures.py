@@ -11,8 +11,30 @@ from PIL import Image, ImageOps
 import uproot
 import yaml
 
+from hps_gpr.statistics import bounded_two_sided_tail_pvalue
+
 
 NOTE_DIR = Path(__file__).resolve().parents[1]
+FUNCFORM_ROOT_SPECS = [
+    ("2015", NOTE_DIR.parent / "outputs" / "funcform_toys" / "funcform_2015_dataset_mod_toys.root"),
+    ("2016", NOTE_DIR.parent / "outputs" / "funcform_toys" / "funcform_2016_dataset_mod_toys.root"),
+    ("2021", NOTE_DIR.parent / "outputs" / "funcform_toys" / "funcform_2021_dataset_mod_toys.root"),
+]
+FUNCFORM_TITLES = {
+    "2015": "HPS 2015",
+    "2016": "HPS 2016 10%",
+    "2021": "HPS 2021 1%",
+}
+FUNCFORM_SCAN_RANGE_OVERRIDES_MEV = {
+    "2016": (42.0, 210.0),
+}
+FUNCFORM_COLORS = {
+    "data": "#222222",
+    "fit": "#C44E52",
+    "toy": "#4C72B0",
+    "sideband": "#D9D9D9",
+}
+FUNCFORM_CANDIDATE_COLORS = ["#4C72B0", "#DD8452", "#55A868", "#8172B3", "#937860"]
 
 
 def ensure_dir(path: Path) -> None:
@@ -93,91 +115,197 @@ def _read_named_json(root_path: Path, object_path: str) -> dict:
         return json.loads(obj.member("fTitle"))
 
 
+def _funcform_scan_range_mev(dataset: str, scan_range_gev: tuple[float, float] | list[float]) -> tuple[float, float]:
+    if dataset in FUNCFORM_SCAN_RANGE_OVERRIDES_MEV:
+        return FUNCFORM_SCAN_RANGE_OVERRIDES_MEV[dataset]
+    return float(scan_range_gev[0]) * 1.0e3, float(scan_range_gev[1]) * 1.0e3
+
+
+def _funcform_step_xy(values: np.ndarray, edges: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    return np.r_[edges[:-1], edges[-1]] * 1.0e3, np.r_[values, values[-1]]
+
+
+def _funcform_positive_bounds(*arrays: np.ndarray) -> tuple[float, float]:
+    positives = [np.asarray(arr, dtype=float)[np.asarray(arr, dtype=float) > 0.0] for arr in arrays]
+    positives = [arr for arr in positives if arr.size]
+    if not positives:
+        return 0.08, 1.0
+    merged = np.concatenate(positives)
+    ymin = max(float(np.min(merged)) * 0.7, 0.08)
+    ymax = max(float(np.max(merged)) * 1.5, ymin * 5.0)
+    return ymin, ymax
+
+
+def _load_funcform_payload(dataset: str, root_path: Path) -> dict:
+    meta = _read_named_json(root_path, "fit_metadata/fit_summary_json")
+    primary_tag = meta["primary_function"]
+    fits_by_tag = {fit["tag"]: fit for fit in meta["fits"]}
+
+    with uproot.open(root_path) as fin:
+        data_vals, edges = fin["input_hist"].to_numpy()
+        fit_curves = {}
+        for fit in meta["fits"]:
+            fit_curves[fit["tag"]], _ = fin[f"validation/{fit['tag']}_expected_counts"].to_numpy()
+        toy_vals, _ = fin[f"validation/{primary_tag}_toy_mean"].to_numpy()
+
+    support_lo, support_hi = meta["toy_support_range_GeV"]
+    occupied = np.flatnonzero(data_vals > 0.0)
+    display_hi = float(edges[occupied[-1] + 1]) if occupied.size else float(support_hi)
+    return {
+        "dataset": dataset,
+        "title": FUNCFORM_TITLES.get(dataset, dataset),
+        "meta": meta,
+        "primary_tag": primary_tag,
+        "primary_fit": fits_by_tag[primary_tag],
+        "data_vals": np.asarray(data_vals, dtype=float),
+        "edges": np.asarray(edges, dtype=float),
+        "fit_curves": fit_curves,
+        "toy_vals": np.asarray(toy_vals, dtype=float),
+        "support_range_mev": (float(support_lo) * 1.0e3, float(support_hi) * 1.0e3),
+        "display_xlim_mev": (float(support_lo) * 1.0e3, display_hi * 1.0e3),
+        "scan_range_mev": _funcform_scan_range_mev(dataset, meta["scan_range_GeV"]),
+    }
+
+
+def _draw_funcform_support_guides(ax: plt.Axes, payload: dict) -> None:
+    x_lo, x_hi = payload["display_xlim_mev"]
+    support_lo, support_hi = payload["support_range_mev"]
+    scan_lo, scan_hi = payload["scan_range_mev"]
+    if support_lo < scan_lo:
+        ax.axvspan(support_lo, scan_lo, color=FUNCFORM_COLORS["sideband"], alpha=0.55, zorder=0)
+    hi_sideband_hi = min(max(x_hi, scan_hi), support_hi)
+    if scan_hi < hi_sideband_hi:
+        ax.axvspan(scan_hi, hi_sideband_hi, color=FUNCFORM_COLORS["sideband"], alpha=0.55, zorder=0)
+    ax.axvline(scan_lo, color="0.45", lw=1.0, ls=":")
+    ax.axvline(scan_hi, color="0.45", lw=1.0, ls=":")
+
+
+def _draw_funcform_candidate_panel(ax: plt.Axes, payload: dict, *, show_ylabel: bool = False) -> None:
+    x_plot, y_data = _funcform_step_xy(payload["data_vals"], payload["edges"])
+    ax.step(x_plot, y_data, where="post", color=FUNCFORM_COLORS["data"], lw=1.35, label="Input histogram")
+    for color, fit in zip(FUNCFORM_CANDIDATE_COLORS, payload["meta"]["fits"]):
+        fit_vals = payload["fit_curves"][fit["tag"]]
+        _, y_fit = _funcform_step_xy(fit_vals, payload["edges"])
+        label = f"{fit['label']} (chi2/ndof={fit['pearson_chi2ndf']:.2f})"
+        lw = 1.9 if fit["tag"] == payload["primary_tag"] else 1.3
+        ax.step(x_plot, y_fit, where="post", color=color, lw=lw, alpha=0.95, label=label)
+
+    _draw_funcform_support_guides(ax, payload)
+    ymin, ymax = _funcform_positive_bounds(payload["data_vals"], *payload["fit_curves"].values())
+    ax.set_yscale("log")
+    ax.set_ylim(ymin, ymax)
+    ax.set_xlim(*payload["display_xlim_mev"])
+    ax.grid(alpha=0.22, which="both")
+    ax.set_xlabel(r"$m_{e^+e^-}$ [MeV]")
+    if show_ylabel:
+        ax.set_ylabel("Counts / bin")
+    ax.set_title(f"{payload['title']} candidate-family overlay", fontsize=10.8)
+    ax.legend(loc="upper right", fontsize=7.2, framealpha=0.96)
+
+
+def _draw_funcform_primary_panel(
+    ax: plt.Axes,
+    payload: dict,
+    *,
+    show_ylabel: bool = False,
+    show_legend: bool = False,
+) -> None:
+    x_plot, y_data = _funcform_step_xy(payload["data_vals"], payload["edges"])
+    fit_vals = payload["fit_curves"][payload["primary_tag"]]
+    _, y_fit = _funcform_step_xy(fit_vals, payload["edges"])
+    _, y_toy = _funcform_step_xy(payload["toy_vals"], payload["edges"])
+
+    _draw_funcform_support_guides(ax, payload)
+    ax.step(x_plot, y_data, where="post", color=FUNCFORM_COLORS["data"], lw=1.5, label="Observed data")
+    ax.step(x_plot, y_fit, where="post", color=FUNCFORM_COLORS["fit"], lw=1.75, label="Selected fit")
+    ax.step(
+        x_plot,
+        y_toy,
+        where="post",
+        color=FUNCFORM_COLORS["toy"],
+        lw=1.55,
+        ls="--",
+        label="Toy-ensemble mean",
+    )
+
+    ymin, ymax = _funcform_positive_bounds(payload["data_vals"], fit_vals, payload["toy_vals"])
+    ax.set_yscale("log")
+    ax.set_ylim(ymin, ymax)
+    ax.set_xlim(*payload["display_xlim_mev"])
+    ax.grid(alpha=0.22, which="both")
+    ax.set_xlabel(r"$m_{e^+e^-}$ [MeV]")
+    if show_ylabel:
+        ax.set_ylabel("Counts / bin")
+
+    scan_lo, scan_hi = payload["scan_range_mev"]
+    ax.set_title(
+        f"{payload['title']} / {payload['primary_fit']['label']}\n"
+        f"Scan [{scan_lo:.0f}, {scan_hi:.0f}] MeV / N events = {payload['meta']['normalization_target_count']:.3e}",
+        fontsize=9.0,
+    )
+    if show_legend:
+        ax.legend(loc="upper left", fontsize=8.0, framealpha=0.96)
+
+
 def make_funcform_primary_fit_summary(out_path: Path) -> None:
-    root_specs = [
-        ("2015", NOTE_DIR.parent / "outputs" / "funcform_toys" / "funcform_2015_dataset_mod_toys.root"),
-        ("2016", NOTE_DIR.parent / "outputs" / "funcform_toys" / "funcform_2016_dataset_mod_toys.root"),
-        ("2021", NOTE_DIR.parent / "outputs" / "funcform_toys" / "funcform_2021_dataset_mod_toys.root"),
-    ]
+    payloads = [_load_funcform_payload(dataset, root_path) for dataset, root_path in FUNCFORM_ROOT_SPECS]
+    fig, axes = plt.subplots(1, 3, figsize=(13.8, 4.8), constrained_layout=True)
 
-    colors = {
-        "data": "#222222",
-        "fit": "#C44E52",
-        "toy": "#4C72B0",
-        "sideband": "#D9D9D9",
-    }
-    titles = {
-        "2015": "HPS 2015",
-        "2016": "HPS 2016 10%",
-        "2021": "HPS 2021 1%",
-    }
-
-    fig, axes = plt.subplots(1, 3, figsize=(13.6, 4.2), constrained_layout=True)
-
-    for iax, (dataset, root_path) in enumerate(root_specs):
-        meta = _read_named_json(root_path, "fit_metadata/fit_summary_json")
-        primary = meta["primary_function"]
-        fit_meta = next(item for item in meta["fits"] if item["tag"] == primary)
-
-        with uproot.open(root_path) as fin:
-            data_vals, edges = fin["input_hist"].to_numpy()
-            fit_vals, _ = fin[f"validation/{primary}_expected_counts"].to_numpy()
-            toy_vals, _ = fin[f"validation/{primary}_toy_mean"].to_numpy()
-
-        ax = axes[iax]
-        x_lo = edges[:-1] * 1.0e3
-        x_hi = edges[1:] * 1.0e3
-        x_plot = np.r_[x_lo, x_hi[-1]]
-
-        support_lo, support_hi = meta["toy_support_range_GeV"]
-        scan_lo, scan_hi = meta["scan_range_GeV"]
-        occupied = np.flatnonzero(data_vals > 0.0)
-        display_hi = edges[occupied[-1] + 1] if occupied.size else support_hi
-        if support_lo < scan_lo:
-            ax.axvspan(support_lo * 1.0e3, scan_lo * 1.0e3, color=colors["sideband"], alpha=0.55)
-        if scan_hi < support_hi:
-            ax.axvspan(scan_hi * 1.0e3, support_hi * 1.0e3, color=colors["sideband"], alpha=0.55)
-        ax.axvline(scan_lo * 1.0e3, color="0.45", lw=1.0, ls=":")
-        ax.axvline(scan_hi * 1.0e3, color="0.45", lw=1.0, ls=":")
-
-        ax.step(x_plot, np.r_[data_vals, data_vals[-1]], where="post", color=colors["data"], lw=1.55,
-                label="Observed data")
-        ax.step(x_plot, np.r_[fit_vals, fit_vals[-1]], where="post", color=colors["fit"], lw=1.75,
-                label="Selected fit")
-        ax.step(x_plot, np.r_[toy_vals, toy_vals[-1]], where="post", color=colors["toy"], lw=1.55, ls="--",
-                label="Toy-ensemble mean")
-
-        positive = np.concatenate([data_vals[data_vals > 0], fit_vals[fit_vals > 0], toy_vals[toy_vals > 0]])
-        ymin = max(np.min(positive) * 0.7 if positive.size else 0.5, 0.08)
-        ymax = np.max([data_vals.max(), fit_vals.max(), toy_vals.max()]) * 1.5
-        ax.set_yscale("log")
-        ax.set_ylim(ymin, ymax)
-        ax.set_xlim(support_lo * 1.0e3, display_hi * 1.0e3)
-        ax.grid(alpha=0.22, which="both")
-        ax.set_xlabel(r"$m_{e^+e^-}$ [MeV]")
-        if iax == 0:
-            ax.set_ylabel("Counts / bin")
-        ax.set_title(titles.get(dataset, dataset), fontsize=11.2)
-        ax.text(
-            0.03,
-            0.97,
-            f"Primary: {fit_meta['label']}\n"
-            f"scan: {scan_lo * 1.0e3:.0f}-{scan_hi * 1.0e3:.0f} MeV\n"
-            f"target N: {meta['normalization_target_count']:.3e}",
-            transform=ax.transAxes,
-            va="top",
-            fontsize=8.4,
-            bbox=dict(boxstyle="round,pad=0.28", fc="white", ec="0.75", alpha=0.94),
+    for iax, payload in enumerate(payloads):
+        _draw_funcform_primary_panel(
+            axes[iax],
+            payload,
+            show_ylabel=(iax == 0),
+            show_legend=(iax == 0),
         )
 
-    handles, labels = axes[0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 1.06), ncol=3, frameon=False)
     fig.text(
         0.5,
-        -0.01,
-        "Shaded sidebands denote the visible support-only regions outside the scan range.",
+        0.01,
+        "Shaded sidebands contribute to the toy normalization but lie outside the analysis scan range.",
         ha="center",
         fontsize=9.0,
+    )
+    save_figure(fig, out_path)
+    plt.close(fig)
+
+
+def make_funcform_publication_overview(out_path: Path) -> None:
+    payloads = [_load_funcform_payload(dataset, root_path) for dataset, root_path in FUNCFORM_ROOT_SPECS]
+    fig = plt.figure(figsize=(13.6, 12.2))
+    grid = fig.add_gridspec(3, 2, width_ratios=[1.08, 1.0], hspace=0.42, wspace=0.18)
+    right_handles = None
+    right_labels = None
+
+    for row, payload in enumerate(payloads):
+        ax_left = fig.add_subplot(grid[row, 0])
+        ax_right = fig.add_subplot(grid[row, 1])
+        _draw_funcform_candidate_panel(ax_left, payload, show_ylabel=True)
+        _draw_funcform_primary_panel(
+            ax_right,
+            payload,
+            show_ylabel=False,
+            show_legend=(row == 0),
+        )
+        if row == 0:
+            right_handles, right_labels = ax_right.get_legend_handles_labels()
+
+    if right_handles and right_labels:
+        fig.legend(
+            right_handles,
+            right_labels,
+            loc="upper center",
+            bbox_to_anchor=(0.73, 0.995),
+            ncol=3,
+            frameon=False,
+            fontsize=9.0,
+        )
+    fig.text(
+        0.5,
+        0.02,
+        "Shaded sidebands contribute to the toy normalization but lie outside the analysis scan range.",
+        ha="center",
+        fontsize=9.2,
     )
     save_figure(fig, out_path)
     plt.close(fig)
@@ -189,7 +317,7 @@ def make_pvalue_schematic(out_path: Path) -> None:
     obs = float(np.quantile(toys, 0.32))
     p_strong = float(np.mean(toys <= obs))
     p_weak = float(np.mean(toys >= obs))
-    p_two = float(2.0 * min(p_strong, p_weak))
+    p_two = bounded_two_sided_tail_pvalue(p_strong, p_weak)
 
     bins = np.linspace(np.quantile(toys, 0.002), np.quantile(toys, 0.998), 36)
     counts, edges = np.histogram(toys, bins=bins, density=True)
@@ -247,6 +375,73 @@ def make_pvalue_schematic(out_path: Path) -> None:
 
     ensure_dir(out_path.parent)
     fig.savefig(out_path, dpi=220)
+    plt.close(fig)
+
+
+def _pvalue_tail_components(toys: np.ndarray, obs: float) -> tuple[float, float, float]:
+    p_strong = float(np.mean(toys <= obs))
+    p_weak = float(np.mean(toys >= obs))
+    p_two = bounded_two_sided_tail_pvalue(p_strong, p_weak)
+    return p_strong, p_weak, p_two
+
+
+def _draw_pvalue_example_panel(ax: plt.Axes, toys: np.ndarray, obs: float, title: str) -> None:
+    p_strong, p_weak, p_two = _pvalue_tail_components(toys, obs)
+    bins = np.linspace(np.quantile(toys, 0.002), np.quantile(toys, 0.998), 34)
+    counts, edges = np.histogram(toys, bins=bins, density=True)
+    centers = 0.5 * (edges[:-1] + edges[1:])
+    widths = np.diff(edges)
+
+    ax.bar(centers, counts, width=widths, color="0.86", edgecolor="white", linewidth=0.8)
+    ax.bar(
+        centers[centers <= obs],
+        counts[centers <= obs],
+        width=widths[centers <= obs],
+        color="#4C72B0",
+        alpha=0.88,
+        edgecolor="white",
+        linewidth=0.8,
+    )
+    ax.bar(
+        centers[centers >= obs],
+        counts[centers >= obs],
+        width=widths[centers >= obs],
+        color="#DD8452",
+        alpha=0.72,
+        edgecolor="white",
+        linewidth=0.8,
+    )
+    ax.axvline(obs, color="black", lw=1.6, ls="--")
+    ax.set_title(title, fontsize=11.0)
+    ax.set_xlabel(r"Toy upper limit $\epsilon^2_{95,t}$ at fixed mass")
+    ax.grid(alpha=0.22)
+    ax.text(
+        0.04,
+        0.94,
+        rf"$p_{{\rm strong}}={p_strong:.2f}$" "\n"
+        rf"$p_{{\rm weak}}={p_weak:.2f}$" "\n"
+        rf"$p_{{\rm two}}=\min(1,2\min)= {p_two:.2f}$",
+        transform=ax.transAxes,
+        va="top",
+        fontsize=9.1,
+        bbox=dict(boxstyle="round,pad=0.28", fc="white", ec="0.75", alpha=0.95),
+    )
+
+
+def make_pvalue_tail_examples(out_path: Path) -> None:
+    rng = np.random.default_rng(31415)
+    toys = rng.lognormal(mean=np.log(1.0), sigma=0.20, size=6000)
+    observations = [
+        ("Strong observed limit", float(np.quantile(toys, 0.14))),
+        ("Weak observed limit", float(np.quantile(toys, 0.86))),
+        ("Median-case symmetric diagnostic", float(np.quantile(toys, 0.50))),
+    ]
+
+    fig, axes = plt.subplots(1, 3, figsize=(14.0, 3.9), constrained_layout=True, sharey=True)
+    for ax, (title, obs) in zip(axes, observations):
+        _draw_pvalue_example_panel(ax, toys, obs, title)
+    axes[0].set_ylabel("Density")
+    save_figure(fig, out_path)
     plt.close(fig)
 
 
@@ -513,6 +708,9 @@ def main(argv: list[str] | None = None) -> None:
         make_funcform_primary_fit_summary(
             NOTE_DIR / "toy_generation_figs" / "funcform_primary_fit_summary.png"
         )
+        make_funcform_publication_overview(
+            NOTE_DIR / "toy_generation_figs" / "funcform_publication_overview.png"
+        )
         return
 
     crop_pdf(
@@ -589,6 +787,7 @@ def main(argv: list[str] | None = None) -> None:
         NOTE_DIR / "normalization_figs" / "hps2016_radiative_fraction_internal_fig30.png",
     )
     make_pvalue_schematic(NOTE_DIR / "methodology_figs" / "pvalue_tail_schematic.png")
+    make_pvalue_tail_examples(NOTE_DIR / "methodology_figs" / "pvalue_tail_examples.png")
     make_prompt_visible_eps2_placeholder(NOTE_DIR / "context_figs" / "prompt_visible_constraints_panel.png")
     make_prompt_visible_eps2_placeholder(NOTE_DIR / "context_figs" / "prompt_visible_eps2_placeholder.png")
     make_2021_parameterization_fig(NOTE_DIR / "resolution_figs" / "hps2021_resolution_and_frad.png")
@@ -607,6 +806,9 @@ def main(argv: list[str] | None = None) -> None:
     )
     make_funcform_primary_fit_summary(
         NOTE_DIR / "toy_generation_figs" / "funcform_primary_fit_summary.png"
+    )
+    make_funcform_publication_overview(
+        NOTE_DIR / "toy_generation_figs" / "funcform_publication_overview.png"
     )
 
 

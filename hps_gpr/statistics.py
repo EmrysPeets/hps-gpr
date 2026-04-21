@@ -806,6 +806,12 @@ def _p_from_z_one_sided(z: float) -> float:
     return float(norm.sf(float(z)))
 
 
+def bounded_two_sided_tail_pvalue(p_low: float, p_high: float) -> float:
+    """Return the bounded symmetric two-sided diagnostic 2*min(p_low, p_high)."""
+    pmin = min(float(p_low), float(p_high))
+    return float(np.clip(2.0 * pmin, 0.0, 1.0))
+
+
 def _p_global_from_local(
     p_local: np.ndarray, *, Neff: float, method: str = "sidak"
 ) -> np.ndarray:

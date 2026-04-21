@@ -2,6 +2,7 @@ import numpy as np
 
 from hps_gpr.plotting import _scan_global_pvalue_and_excess_z
 from hps_gpr.statistics import (
+    bounded_two_sided_tail_pvalue,
     global_p_from_max_q0_toys,
     max_q0_from_local_p0_curve,
     q0_from_local_p0,
@@ -40,3 +41,9 @@ def test_scan_global_overlay_allows_p_above_half_but_clips_excess_z():
     assert np.isclose(z_global[0], 0.0, atol=1e-12)
     assert np.all((z_global >= 0.0) | ~np.isfinite(z_global))
     assert np.all(p_global[np.isfinite(p_global)] >= p_local[np.isfinite(p_local)])
+
+
+def test_bounded_two_sided_tail_pvalue_caps_at_unity():
+    assert np.isclose(bounded_two_sided_tail_pvalue(0.5, 0.5), 1.0)
+    assert np.isclose(bounded_two_sided_tail_pvalue(0.7, 0.5), 1.0)
+    assert np.isclose(bounded_two_sided_tail_pvalue(0.08, 0.92), 0.16)
