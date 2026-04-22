@@ -143,6 +143,26 @@ def test_resolve_funcform_closure_helpers_align_common_indices(tmp_path):
     assert mass_ranges["2016"] == pytest.approx((0.042, 0.21))
 
 
+def test_resolve_funcform_toy_root_path_requires_dataset_mod_by_default(tmp_path):
+    root_dir = tmp_path / "funcform_toys"
+    root_dir.mkdir()
+
+    legacy_root = root_dir / "funcform_2021_toys.root"
+    _write_toy_root(legacy_root)
+
+    with pytest.raises(FileNotFoundError):
+        resolve_funcform_toy_root_path("2021", root_dir=str(root_dir))
+
+    assert (
+        resolve_funcform_toy_root_path("2021", root_dir=str(root_dir), include_legacy=True)
+        == str(legacy_root)
+    )
+
+    dataset_mod_root = root_dir / "funcform_2021_dataset_mod_toys.root"
+    _write_toy_root(dataset_mod_root)
+    assert resolve_funcform_toy_root_path("2021", root_dir=str(root_dir)) == str(dataset_mod_root)
+
+
 def test_build_model_accepts_hist_override(monkeypatch):
     toy_hist = _make_hist([5, 6, 7, 8, 9, 10], lo=0.02, hi=0.14)
     ds = DatasetConfig(

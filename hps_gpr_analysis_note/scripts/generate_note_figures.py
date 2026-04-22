@@ -11,6 +11,7 @@ from PIL import Image, ImageOps
 import uproot
 import yaml
 
+from hps_gpr.funcform_toys import resolve_funcform_toy_root_path
 from hps_gpr.statistics import bounded_two_sided_tail_pvalue
 
 
@@ -125,20 +126,60 @@ def _read_named_json(root_path: Path, object_path: str) -> dict:
         return json.loads(payload)
 
 
-def _resolve_funcform_root_path(dataset: str) -> Path:
-    candidates = [
-        NOTE_DIR.parent / "outputs" / "funcform_toys" / f"funcform_{dataset}_dataset_mod_toys.root",
-        NOTE_DIR.parent / "outputs" / "funcform_toys" / f"funcform_{dataset}_toys.root",
+def _parse_funcform_root_overrides(raw_overrides: list[str] | None) -> dict[str, Path]:
+    out: dict[str, Path] = {}
+    for raw in raw_overrides or []:
+        text = str(raw or "").strip()
+        if "=" not in text:
+            raise ValueError(
+                f"Invalid --funcform-root-override value '{text}'. "
+                "Expected DATASET=/absolute/or/relative/path.root"
+            )
+        dataset, path_text = text.split("=", 1)
+        dataset = str(dataset).strip()
+        path = Path(path_text).expanduser()
+        if not dataset or not str(path).strip():
+            raise ValueError(
+                f"Invalid --funcform-root-override value '{text}'. "
+                "Expected DATASET=/absolute/or/relative/path.root"
+            )
+        out[dataset] = path.resolve()
+    return out
+
+
+def _resolve_funcform_root_path(
+    dataset: str,
+    *,
+    root_dir: Path | None = None,
+    root_overrides: dict[str, Path] | None = None,
+) -> Path:
+    override = None
+    if root_overrides and dataset in root_overrides:
+        override = str(root_overrides[dataset])
+    resolved = resolve_funcform_toy_root_path(
+        dataset,
+        configured_root=override,
+        root_dir=str(root_dir) if root_dir is not None else None,
+    )
+    return Path(resolved)
+
+
+def _funcform_root_specs(
+    *,
+    root_dir: Path | None = None,
+    root_overrides: dict[str, Path] | None = None,
+) -> list[tuple[str, Path]]:
+    return [
+        (
+            dataset,
+            _resolve_funcform_root_path(
+                dataset,
+                root_dir=root_dir,
+                root_overrides=root_overrides,
+            ),
+        )
+        for dataset in FUNCFORM_DATASETS
     ]
-    for path in candidates:
-        if path.exists():
-            return path
-    tried = ", ".join(str(path) for path in candidates)
-    raise FileNotFoundError(f"Could not locate functional-form ROOT export for {dataset}. Tried: {tried}")
-
-
-def _funcform_root_specs() -> list[tuple[str, Path]]:
-    return [(dataset, _resolve_funcform_root_path(dataset)) for dataset in FUNCFORM_DATASETS]
 
 
 def _funcform_scan_range_mev(dataset: str, scan_range_gev: tuple[float, float] | list[float]) -> tuple[float, float]:
@@ -394,8 +435,16 @@ def _draw_funcform_primary_panel(
         ax.legend(loc="upper left", fontsize=8.0, framealpha=0.96)
 
 
-def make_funcform_primary_fit_summary(out_path: Path) -> None:
-    payloads = [_load_funcform_payload(dataset, root_path) for dataset, root_path in _funcform_root_specs()]
+def make_funcform_primary_fit_summary(
+    out_path: Path,
+    *,
+    root_dir: Path | None = None,
+    root_overrides: dict[str, Path] | None = None,
+) -> None:
+    payloads = [
+        _load_funcform_payload(dataset, root_path)
+        for dataset, root_path in _funcform_root_specs(root_dir=root_dir, root_overrides=root_overrides)
+    ]
     fig, axes = plt.subplots(1, 3, figsize=(13.8, 4.8), constrained_layout=True)
 
     for iax, payload in enumerate(payloads):
@@ -417,8 +466,16 @@ def make_funcform_primary_fit_summary(out_path: Path) -> None:
     plt.close(fig)
 
 
-def make_funcform_publication_overview(out_path: Path) -> None:
-    payloads = [_load_funcform_payload(dataset, root_path) for dataset, root_path in _funcform_root_specs()]
+def make_funcform_publication_overview(
+    out_path: Path,
+    *,
+    root_dir: Path | None = None,
+    root_overrides: dict[str, Path] | None = None,
+) -> None:
+    payloads = [
+        _load_funcform_payload(dataset, root_path)
+        for dataset, root_path in _funcform_root_specs(root_dir=root_dir, root_overrides=root_overrides)
+    ]
     fig = plt.figure(figsize=(13.6, 12.2))
     grid = fig.add_gridspec(3, 2, width_ratios=[1.08, 1.0], hspace=0.42, wspace=0.18)
     right_handles = None
@@ -506,10 +563,15 @@ def _load_funcform_parameter_payload(dataset: str, root_path: Path) -> dict:
     }
 
 
-def make_funcform_parameterization_summary(out_path: Path) -> None:
+def make_funcform_parameterization_summary(
+    out_path: Path,
+    *,
+    root_dir: Path | None = None,
+    root_overrides: dict[str, Path] | None = None,
+) -> None:
     payloads = [
         _load_funcform_parameter_payload(dataset, root_path)
-        for dataset, root_path in _funcform_root_specs()
+        for dataset, root_path in _funcform_root_specs(root_dir=root_dir, root_overrides=root_overrides)
     ]
     fig, axes = plt.subplots(3, 1, figsize=(13.6, 10.5), constrained_layout=True)
 
@@ -974,17 +1036,36 @@ def main(argv: list[str] | None = None) -> None:
         action="store_true",
         help="Only regenerate the functional-form toy-fit comparison figure.",
     )
+    parser.add_argument(
+        "--funcform-root-dir",
+        type=Path,
+        help="Directory containing the functional-form ROOT exports to use for the note figures.",
+    )
+    parser.add_argument(
+        "--funcform-root-override",
+        action="append",
+        metavar="DATASET=PATH",
+        help="Explicit per-dataset functional-form ROOT override. May be repeated.",
+    )
     args = parser.parse_args(argv)
+    root_dir = args.funcform_root_dir.expanduser().resolve() if args.funcform_root_dir else None
+    root_overrides = _parse_funcform_root_overrides(args.funcform_root_override)
 
     if args.funcform_only:
         make_funcform_primary_fit_summary(
-            NOTE_DIR / "toy_generation_figs" / "funcform_primary_fit_summary.png"
+            NOTE_DIR / "toy_generation_figs" / "funcform_primary_fit_summary.png",
+            root_dir=root_dir,
+            root_overrides=root_overrides,
         )
         make_funcform_publication_overview(
-            NOTE_DIR / "toy_generation_figs" / "funcform_publication_overview.png"
+            NOTE_DIR / "toy_generation_figs" / "funcform_publication_overview.png",
+            root_dir=root_dir,
+            root_overrides=root_overrides,
         )
         make_funcform_parameterization_summary(
-            NOTE_DIR / "toy_generation_figs" / "funcform_parameterization_summary.png"
+            NOTE_DIR / "toy_generation_figs" / "funcform_parameterization_summary.png",
+            root_dir=root_dir,
+            root_overrides=root_overrides,
         )
         return
 
