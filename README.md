@@ -378,10 +378,12 @@ sidebands at each mass hypothesis, and the only additional randomness is the
 injected signal realization. That is the statistically correct model-specific
 closure construction for this study.
 
-Make scratch copies of the listed YAML configs with dedicated `output_dir`
-values, because both `slurm-gen-inject` and `slurm-gen-extract-display` write
-under `config.output_dir`. Add the following block to each copied config. The
-closure helpers now require the `*_dataset_mod_toys.root` exports by default.
+Ready-to-run closure-study configs now live in `study_configs/` with the
+`*_funcform100.yaml` suffix. They already point at dedicated `_funcform100`
+output directories, so the 100-toy closure jobs stay separate from the wider
+10k pseudoexperiment campaign. The closure helpers require the
+`*_dataset_mod_toys.root` exports by default, and each provided config includes
+the following block:
 
 ```yaml
 funcform_closure_enable: true
@@ -461,8 +463,8 @@ bash submit_injection_all.sh
 
 # After the 2015 jobs finish, build the ensemble closure plots
 hps-gpr inject-plot \
-  --input-dir outputs/study_2015_w1p64_95CL/injection_flat \
-  --output-dir outputs/study_2015_w1p64_95CL/injection_summary_funcform100
+  --input-dir outputs/study_2015_w1p64_95CL_funcform100/injection_flat \
+  --output-dir outputs/study_2015_w1p64_95CL_funcform100/injection_summary
 
 # 2015 reviewer extraction displays: the same 28 (mass, strength) points
 hps-gpr slurm-gen-extract-display \
@@ -499,8 +501,8 @@ hps-gpr slurm-gen-inject \
 bash submit_injection_all.sh
 
 hps-gpr inject-plot \
-  --input-dir outputs/study_2016_10pct_w1p64_95CL/injection_flat \
-  --output-dir outputs/study_2016_10pct_w1p64_95CL/injection_summary_funcform100
+  --input-dir outputs/study_2016_10pct_w1p64_95CL_funcform100/injection_flat \
+  --output-dir outputs/study_2016_10pct_w1p64_95CL_funcform100/injection_summary
 
 hps-gpr slurm-gen-extract-display \
   --config study_configs/config_2016_extraction_display_v15p8_funcform100.yaml \
@@ -536,8 +538,8 @@ hps-gpr slurm-gen-inject \
 bash submit_injection_all.sh
 
 hps-gpr inject-plot \
-  --input-dir outputs/study_2021_1pct_w1p64_95CL/injection_flat \
-  --output-dir outputs/study_2021_1pct_w1p64_95CL/injection_summary_funcform100
+  --input-dir outputs/study_2021_1pct_w1p64_95CL_funcform100/injection_flat \
+  --output-dir outputs/study_2021_1pct_w1p64_95CL_funcform100/injection_summary
 
 hps-gpr slurm-gen-extract-display \
   --config study_configs/config_2021_1pct_extraction_display_v15p8_funcform100.yaml \
@@ -576,8 +578,8 @@ hps-gpr slurm-gen-inject \
 bash submit_injection_all.sh
 
 hps-gpr inject-plot \
-  --input-dir outputs/study_2015_2016_10pct_2021_1pct_w1p64_95CL/injection_flat \
-  --output-dir outputs/study_2015_2016_10pct_2021_1pct_w1p64_95CL/injection_summary_funcform100
+  --input-dir outputs/study_2015_2016_10pct_2021_1pct_w1p64_95CL_funcform100/injection_flat \
+  --output-dir outputs/study_2015_2016_10pct_2021_1pct_w1p64_95CL_funcform100/injection_summary
 
 hps-gpr slurm-gen-extract-display \
   --config study_configs/config_2015_2016_2021_1pct_combined_extraction_display_v15p8_funcform100.yaml \
@@ -598,14 +600,14 @@ bash submit_extract_display_all.sh
 
 Review these products before moving on to the full 10k pseudoexperiment campaign:
 
-- `outputs/study_*_w1p64_95CL/injection_summary_funcform100/linearity_*`
-- `outputs/study_*_w1p64_95CL/injection_summary_funcform100/bias_*`
-- `outputs/study_*_w1p64_95CL/injection_summary_funcform100/pull_width_*`
-- `outputs/study_*_w1p64_95CL/injection_summary_funcform100/coverage_*`
-- `outputs/study_*_w1p64_95CL/injection_summary_funcform100/heatmap_pull_mean_*`
-- `outputs/study_*_w1p64_95CL/injection_summary_funcform100/heatmap_pull_width_*`
-- `outputs/study_*_w1p64_95CL/injection_summary_funcform100/pull_vs_mass_*`
-- `outputs/study_*_w1p64_95CL/injection_summary_funcform100/z_calibration_residual_*`
+- `outputs/study_*_w1p64_95CL_funcform100/injection_summary/linearity_*`
+- `outputs/study_*_w1p64_95CL_funcform100/injection_summary/bias_*`
+- `outputs/study_*_w1p64_95CL_funcform100/injection_summary/pull_width_*`
+- `outputs/study_*_w1p64_95CL_funcform100/injection_summary/coverage_*`
+- `outputs/study_*_w1p64_95CL_funcform100/injection_summary/heatmap_pull_mean_*`
+- `outputs/study_*_w1p64_95CL_funcform100/injection_summary/heatmap_pull_width_*`
+- `outputs/study_*_w1p64_95CL_funcform100/injection_summary/pull_vs_mass_*`
+- `outputs/study_*_w1p64_95CL_funcform100/injection_summary/z_calibration_residual_*`
 - `outputs/*/extraction_display_jobs/<dataset-or-combined>/m_*/s_*/` for the
   representative PNG/PDF/JSON extraction displays at each injected strength
 
