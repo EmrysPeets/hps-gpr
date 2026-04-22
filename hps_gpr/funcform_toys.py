@@ -198,15 +198,24 @@ def build_funcform_toy_dataset(ds: "DatasetConfig", toy_hist: hist.Hist) -> "Dat
     return replace(ds, hist_override=toy_hist)
 
 
-def _funcform_root_candidates(dataset_key: str, configured_root: Optional[str] = None) -> List[str]:
+def _funcform_root_candidates(
+    dataset_key: str,
+    configured_root: Optional[str] = None,
+    *,
+    root_dir: Optional[str] = None,
+    include_legacy: bool = False,
+) -> List[str]:
     """Return candidate ROOT paths for one dataset's functional-form toy export."""
     ds = str(dataset_key).strip()
+    base_dir = os.path.join(str(root_dir).strip(), "") if str(root_dir or "").strip() else os.path.join("outputs", "funcform_toys", "")
     out: List[str] = []
-    for candidate in [
+    candidates = [
         configured_root,
-        f"outputs/funcform_toys/funcform_{ds}_dataset_mod_toys.root",
-        f"outputs/funcform_toys/funcform_{ds}_toys.root",
-    ]:
+        os.path.join(base_dir, f"funcform_{ds}_dataset_mod_toys.root"),
+    ]
+    if include_legacy:
+        candidates.append(os.path.join(base_dir, f"funcform_{ds}_toys.root"))
+    for candidate in candidates:
         text = str(candidate or "").strip()
         if not text or text in out:
             continue
@@ -214,15 +223,29 @@ def _funcform_root_candidates(dataset_key: str, configured_root: Optional[str] =
     return out
 
 
-def resolve_funcform_toy_root_path(dataset_key: str, configured_root: Optional[str] = None) -> str:
+def resolve_funcform_toy_root_path(
+    dataset_key: str,
+    configured_root: Optional[str] = None,
+    *,
+    root_dir: Optional[str] = None,
+    include_legacy: bool = False,
+) -> str:
     """Resolve the first existing functional-form ROOT path for a dataset."""
-    for candidate in _funcform_root_candidates(dataset_key, configured_root=configured_root):
+    candidates = _funcform_root_candidates(
+        dataset_key,
+        configured_root=configured_root,
+        root_dir=root_dir,
+        include_legacy=include_legacy,
+    )
+    for candidate in candidates:
         if os.path.exists(candidate):
             return str(candidate)
-    tried = ", ".join(_funcform_root_candidates(dataset_key, configured_root=configured_root))
+    tried = ", ".join(candidates)
     raise FileNotFoundError(
         f"Could not locate a functional-form toy ROOT file for dataset '{dataset_key}'. "
-        f"Tried: {tried}"
+        f"Tried: {tried}. "
+        "The functional-form closure workflow expects the dataset_mod export by default; "
+        "set an explicit per-dataset override only if you intentionally want a different source."
     )
 
 

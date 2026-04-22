@@ -197,8 +197,11 @@ Default outputs:
 - `outputs/funcform_toys/funcform_2016_dataset_mod_toys.root`
 - `outputs/funcform_toys/funcform_2021_dataset_mod_toys.root`
 
-The figure-generation and closure helpers also fall back to the legacy filenames
-`funcform_{year}_toys.root` when those are the only functional-form exports present.
+These `*_dataset_mod_toys.root` exports are the default inputs for the
+functional-form closure studies and note figures. If you intentionally want to
+compare against an older functional-form export (for example the earlier 2021
+trial), pass that ROOT file explicitly as an override instead of relying on a
+silent fallback.
 
 ROOT layout conventions:
 
@@ -378,8 +381,7 @@ closure construction for this study.
 Make scratch copies of the listed YAML configs with dedicated `output_dir`
 values, because both `slurm-gen-inject` and `slurm-gen-extract-display` write
 under `config.output_dir`. Add the following block to each copied config. The
-path resolver accepts both the newer `*_dataset_mod_toys.root` exports and the
-legacy `*_toys.root` filenames already carried in the repo.
+closure helpers now require the `*_dataset_mod_toys.root` exports by default.
 
 ```yaml
 funcform_closure_enable: true
@@ -396,6 +398,14 @@ funcform_closure_toy_pattern_by_dataset:
   2016: fShiftSigPowTail_toy_*
   2021: fSigPowExpQ_toy_*
 extraction_display_funcform_toy_index: 0
+```
+
+If you want to repeat the earlier 2021 comparison on purpose, override only
+that dataset explicitly:
+
+```yaml
+funcform_closure_root_by_dataset:
+  2021: outputs/funcform_toys/funcform_2021_toys.root
 ```
 
 Keep `--n-toys 100` so each injection job loops over the first 100 common toy
