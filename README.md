@@ -197,6 +197,9 @@ Default outputs:
 - `outputs/funcform_toys/funcform_2016_dataset_mod_toys.root`
 - `outputs/funcform_toys/funcform_2021_dataset_mod_toys.root`
 
+The figure-generation and closure helpers also fall back to the legacy filenames
+`funcform_{year}_toys.root` when those are the only functional-form exports present.
+
 ROOT layout conventions:
 
 - one directory per function tag
@@ -207,6 +210,7 @@ ROOT layout conventions:
 - sidecar metadata JSON written beside each ROOT output as `*.metadata.json`
 - note-local overlays `hps_gpr_analysis_note/toy_generation_figs/funcform_fit_{year}.{png,pdf}`
 - note-local primary-fit summary `hps_gpr_analysis_note/toy_generation_figs/funcform_primary_fit_summary.{png,pdf}`
+- note-local parameter summary `hps_gpr_analysis_note/toy_generation_figs/funcform_parameterization_summary.{png,pdf}`
 
 Each toy ROOT now records three distinct ranges for reproducibility:
 
@@ -363,35 +367,63 @@ closure-study, pseudoexperiment, and full-production commands, is documented in
 ### 100-Toy Injection/Extraction Closure Follow-Up
 
 Once the functional-form `toy-scan` 100-toy study merges cleanly, run the matching
-injection/extraction closure pass at the same ensemble size. The current `inject`
-workflow does not read the functional-form ROOT toy containers directly, so the
-matching prescription is to keep `--n-toys 100` and run the dataset-level
-injection/extraction configs immediately after the functional-form closure tests.
-If you want this pass isolated from any existing injection production, make
-scratch copies of the listed YAML configs with a dedicated `output_dir`, because
-both `slurm-gen-inject` and `slurm-gen-extract-display` write under
-`config.output_dir`.
+injection/extraction closure pass at the same ensemble size. The updated
+`inject` and `extract-display` workflows now support that directly: when
+`funcform_closure_enable: true`, each stored functional-form toy histogram is
+treated as the background pseudoexperiment, the GP is trained on that toy's
+sidebands at each mass hypothesis, and the only additional randomness is the
+injected signal realization. That is the statistically correct model-specific
+closure construction for this study.
+
+Make scratch copies of the listed YAML configs with dedicated `output_dir`
+values, because both `slurm-gen-inject` and `slurm-gen-extract-display` write
+under `config.output_dir`. Add the following block to each copied config. The
+path resolver accepts both the newer `*_dataset_mod_toys.root` exports and the
+legacy `*_toys.root` filenames already carried in the repo.
+
+```yaml
+funcform_closure_enable: true
+funcform_closure_root_by_dataset:
+  2015: outputs/funcform_toys/funcform_2015_dataset_mod_toys.root
+  2016: outputs/funcform_toys/funcform_2016_dataset_mod_toys.root
+  2021: outputs/funcform_toys/funcform_2021_dataset_mod_toys.root
+funcform_closure_container_by_dataset:
+  2015: fShiftSigPowTail
+  2016: fShiftSigPowTail
+  2021: fSigPowExpQ
+funcform_closure_toy_pattern_by_dataset:
+  2015: fShiftSigPowTail_toy_*
+  2016: fShiftSigPowTail_toy_*
+  2021: fSigPowExpQ_toy_*
+extraction_display_funcform_toy_index: 0
+```
+
+Keep `--n-toys 100` so each injection job loops over the first 100 common toy
+indices from the configured functional-form exports. For this functional-form
+closure pass, prefer outer batch parallelism only: one SLURM job per
+`(dataset,mass,strength)` point and `--cpus-per-task 1`. The streaming
+aggregator is bypassed automatically in functional-form closure mode, so there
+is no gain from reserving extra cores per task.
 
 Recommended closure masses:
 
-- `2015`: `30, 40, 60, 80, 90, 105, 120 MeV`
-- `2016`: `40, 60, 80, 90, 120, 150, 180, 200 MeV`
-- `2021`: `40, 60, 80, 90, 120, 150, 180, 220 MeV`
-- later three-way follow-up after the single-dataset closure checks: `40, 60, 80, 90, 120 MeV`
+- `2015`: `30, 45, 60, 75, 90, 105, 120 MeV`
+- `2016`: `45, 60, 75, 90, 105, 120, 150, 180 MeV`
+- `2021`: `45, 60, 75, 90, 105, 120, 150, 180, 220 MeV`
+- later three-way follow-up after the single-dataset closure checks: `60, 90, 120 MeV`
 
 Use `--strengths 1,2,3,5` everywhere. That gives:
 
 - `2015`: `7 x 4 = 28` injection jobs and `28` extraction-display jobs
 - `2016`: `8 x 4 = 32` injection jobs and `32` extraction-display jobs
-- `2021`: `8 x 4 = 32` injection jobs and `32` extraction-display jobs
-- `2015+2016+2021` follow-up: `4 datasets x 5 masses x 4 strengths = 80` injection jobs plus `20` combined extraction-display jobs
+- `2021`: `9 x 4 = 36` injection jobs and `36` extraction-display jobs
+- `2015+2016+2021` follow-up: `4 datasets x 3 masses x 4 strengths = 48` injection jobs plus `12` combined extraction-display jobs
 
-For SDF/`roma`, prefer outer job parallelism and leave the config defaults at
-`inj_n_workers: 5` and `inj_threads_per_worker: 1`, so `--cpus-per-task 5`
-matches the actual worker footprint. Keep `--write-toy-csv` enabled for this
-100-toy pass; `inject-plot` can then build pull histograms in addition to the
-usual linearity, bias, pull-width, coverage, heatmap, pull-vs-mass, and
-`z_calibration_residual_*` panels.
+Keep `--write-toy-csv` enabled for this 100-toy pass; `inject-plot` can then
+build pull histograms in addition to the usual linearity, bias, pull-width,
+coverage, heatmap, pull-vs-mass, and `z_calibration_residual_*` panels. For the
+representative extraction displays, pin `--toy-index 0` unless you want a
+different toy highlighted in the note.
 
 Both SLURM generators write a helper named `submit_injection_all.sh` or
 `submit_extract_display_all.sh` beside the chosen `--output` path. Submit right
@@ -401,18 +433,18 @@ want to keep every helper simultaneously.
 ```bash
 # 2015 closure matrix: 7 masses x 4 strengths = 28 injection jobs
 hps-gpr slurm-gen-inject \
-  --config study_configs/config_2015_blind1p64_95CL_10k_injection.yaml \
+  --config study_configs/config_2015_blind1p64_95CL_10k_injection_funcform100.yaml \
   --datasets 2015 \
-  --masses 0.030,0.040,0.060,0.080,0.090,0.105,0.120 \
+  --masses 0.030,0.045,0.060,0.075,0.090,0.105,0.120 \
   --strengths 1,2,3,5 \
   --n-toys 100 \
   --write-toy-csv \
-  --cpus-per-task 5 \
+  --cpus-per-task 1 \
   --job-name hps2015_func100_inj \
   --partition roma \
   --account hps:hps-prod \
   --time 06:00:00 \
-  --memory 8G \
+  --memory 4G \
   --output submit_2015_func100_inject.slurm
 
 bash submit_injection_all.sh
@@ -424,33 +456,34 @@ hps-gpr inject-plot \
 
 # 2015 reviewer extraction displays: the same 28 (mass, strength) points
 hps-gpr slurm-gen-extract-display \
-  --config study_configs/config_2015_extraction_display_v15p8.yaml \
+  --config study_configs/config_2015_extraction_display_v15p8_funcform100.yaml \
   --dataset 2015 \
-  --masses 0.030,0.040,0.060,0.080,0.090,0.105,0.120 \
+  --masses 0.030,0.045,0.060,0.075,0.090,0.105,0.120 \
   --strengths 1,2,3,5 \
+  --toy-index 0 \
   --job-name hps2015_func100_exdisp \
   --partition roma \
   --account hps:hps-prod \
   --time 04:00:00 \
-  --memory 8G \
+  --memory 4G \
   --output submit_2015_func100_exdisp.slurm
 
 bash submit_extract_display_all.sh
 
 # 2016 10% closure matrix: 8 masses x 4 strengths = 32 injection jobs
 hps-gpr slurm-gen-inject \
-  --config study_configs/config_2016_10pct_blind1p64_95CL_10k_injection.yaml \
+  --config study_configs/config_2016_10pct_blind1p64_95CL_10k_injection_funcform100.yaml \
   --datasets 2016 \
-  --masses 0.040,0.060,0.080,0.090,0.120,0.150,0.180,0.200 \
+  --masses 0.045,0.060,0.075,0.090,0.105,0.120,0.150,0.180 \
   --strengths 1,2,3,5 \
   --n-toys 100 \
   --write-toy-csv \
-  --cpus-per-task 5 \
+  --cpus-per-task 1 \
   --job-name hps2016_func100_inj \
   --partition roma \
   --account hps:hps-prod \
   --time 06:00:00 \
-  --memory 8G \
+  --memory 4G \
   --output submit_2016_func100_inject.slurm
 
 bash submit_injection_all.sh
@@ -460,33 +493,34 @@ hps-gpr inject-plot \
   --output-dir outputs/study_2016_10pct_w1p64_95CL/injection_summary_funcform100
 
 hps-gpr slurm-gen-extract-display \
-  --config study_configs/config_2016_extraction_display_v15p8.yaml \
+  --config study_configs/config_2016_extraction_display_v15p8_funcform100.yaml \
   --dataset 2016 \
-  --masses 0.040,0.060,0.080,0.090,0.120,0.150,0.180,0.200 \
+  --masses 0.045,0.060,0.075,0.090,0.105,0.120,0.150,0.180 \
   --strengths 1,2,3,5 \
+  --toy-index 0 \
   --job-name hps2016_func100_exdisp \
   --partition roma \
   --account hps:hps-prod \
   --time 04:00:00 \
-  --memory 8G \
+  --memory 4G \
   --output submit_2016_func100_exdisp.slurm
 
 bash submit_extract_display_all.sh
 
-# 2021 1% closure matrix: 8 masses x 4 strengths = 32 injection jobs
+# 2021 1% closure matrix: 9 masses x 4 strengths = 36 injection jobs
 hps-gpr slurm-gen-inject \
-  --config study_configs/config_2021_1pct_blind1p64_95CL_10k_injection.yaml \
+  --config study_configs/config_2021_1pct_blind1p64_95CL_10k_injection_funcform100.yaml \
   --datasets 2021 \
-  --masses 0.040,0.060,0.080,0.090,0.120,0.150,0.180,0.220 \
+  --masses 0.045,0.060,0.075,0.090,0.105,0.120,0.150,0.180,0.220 \
   --strengths 1,2,3,5 \
   --n-toys 100 \
   --write-toy-csv \
-  --cpus-per-task 5 \
+  --cpus-per-task 1 \
   --job-name hps2021_func100_inj \
   --partition roma \
   --account hps:hps-prod \
   --time 06:00:00 \
-  --memory 8G \
+  --memory 4G \
   --output submit_2021_func100_inject.slurm
 
 bash submit_injection_all.sh
@@ -496,15 +530,16 @@ hps-gpr inject-plot \
   --output-dir outputs/study_2021_1pct_w1p64_95CL/injection_summary_funcform100
 
 hps-gpr slurm-gen-extract-display \
-  --config study_configs/config_2021_1pct_extraction_display_v15p8.yaml \
+  --config study_configs/config_2021_1pct_extraction_display_v15p8_funcform100.yaml \
   --dataset 2021 \
-  --masses 0.040,0.060,0.080,0.090,0.120,0.150,0.180,0.220 \
+  --masses 0.045,0.060,0.075,0.090,0.105,0.120,0.150,0.180,0.220 \
   --strengths 1,2,3,5 \
+  --toy-index 0 \
   --job-name hps2021_func100_exdisp \
   --partition roma \
   --account hps:hps-prod \
   --time 04:00:00 \
-  --memory 8G \
+  --memory 4G \
   --output submit_2021_func100_exdisp.slurm
 
 bash submit_extract_display_all.sh
@@ -514,18 +549,18 @@ bash submit_extract_display_all.sh
 # Keep all four dataset labels here so injection_flat contains both the
 # constituent-dataset summaries and the combined rows needed by inject-plot.
 hps-gpr slurm-gen-inject \
-  --config study_configs/config_2015_2016_10pct_2021_1pct_blind1p64_95CL_10k_injection.yaml \
+  --config study_configs/config_2015_2016_10pct_2021_1pct_blind1p64_95CL_10k_injection_funcform100.yaml \
   --datasets 2015,2016,2021,combined \
-  --masses 0.040,0.060,0.080,0.090,0.120 \
+  --masses 0.060,0.090,0.120 \
   --strengths 1,2,3,5 \
   --n-toys 100 \
   --write-toy-csv \
-  --cpus-per-task 5 \
+  --cpus-per-task 1 \
   --job-name hps2015_2016_2021_func100_inj \
   --partition roma \
   --account hps:hps-prod \
   --time 06:00:00 \
-  --memory 8G \
+  --memory 4G \
   --output submit_2015_2016_2021_func100_inject.slurm
 
 bash submit_injection_all.sh
@@ -535,16 +570,17 @@ hps-gpr inject-plot \
   --output-dir outputs/study_2015_2016_10pct_2021_1pct_w1p64_95CL/injection_summary_funcform100
 
 hps-gpr slurm-gen-extract-display \
-  --config study_configs/config_2015_2016_2021_1pct_combined_extraction_display_v15p8.yaml \
+  --config study_configs/config_2015_2016_2021_1pct_combined_extraction_display_v15p8_funcform100.yaml \
   --dataset combined \
   --datasets 2015,2016,2021 \
-  --masses 0.040,0.060,0.080,0.090,0.120 \
+  --masses 0.060,0.090,0.120 \
   --strengths 1,2,3,5 \
+  --toy-index 0 \
   --job-name hps2015_2016_2021_func100_exdisp \
   --partition roma \
   --account hps:hps-prod \
   --time 04:00:00 \
-  --memory 8G \
+  --memory 4G \
   --output submit_2015_2016_2021_func100_exdisp.slurm
 
 bash submit_extract_display_all.sh

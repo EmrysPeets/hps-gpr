@@ -15,9 +15,13 @@ from hps_gpr.config import Config, load_config
 from hps_gpr.dataset import DatasetConfig
 from hps_gpr.funcform_toys import (
     FuncFormToySpec,
+    align_funcform_closure_toys,
     discover_funcform_toys,
+    discover_dataset_funcform_closure_toys,
     load_funcform_toy_hist,
     merge_toy_scan_results,
+    resolve_funcform_closure_mass_ranges,
+    resolve_funcform_toy_root_path,
     run_funcform_toy_scans,
 )
 from hps_gpr.gpr import compute_kernel_ls_bounds
@@ -100,6 +104,43 @@ def test_discover_funcform_toys_preserves_actual_indices_and_fallbacks(tmp_path)
     )
     assert [s.toy_name for s in fallback_specs] == ["custom_shape"]
     assert [s.toy_index for s in fallback_specs] == [0]
+
+
+def test_resolve_funcform_closure_helpers_align_common_indices(tmp_path):
+    root_2015 = tmp_path / "funcform_2015.root"
+    root_2016 = tmp_path / "funcform_2016.root"
+    with uproot.recreate(root_2015) as f:
+        f["fShiftSigPowTail/fShiftSigPowTail_toy_0"] = _make_hist([5, 6, 7, 8])
+        f["fShiftSigPowTail/fShiftSigPowTail_toy_1"] = _make_hist([6, 7, 8, 9])
+        f["fit_metadata/fit_summary_json"] = uproot.writing.identify.to_TObjString(
+            json.dumps({"scan_range_GeV": [0.02, 0.13], "primary_function": "fShiftSigPowTail", "fits": []})
+        )
+    with uproot.recreate(root_2016) as f:
+        f["fShiftSigPowTail/fShiftSigPowTail_toy_1"] = _make_hist([7, 8, 9, 10])
+        f["fShiftSigPowTail/fShiftSigPowTail_toy_2"] = _make_hist([8, 9, 10, 11])
+        f["fit_metadata/fit_summary_json"] = uproot.writing.identify.to_TObjString(
+            json.dumps({"scan_range_GeV": [0.04, 0.21], "primary_function": "fShiftSigPowTail", "fits": []})
+        )
+
+    cfg = Config(
+        funcform_closure_enable=True,
+        funcform_closure_root_by_dataset={
+            "2015": str(root_2015),
+            "2016": str(root_2016),
+        },
+    )
+
+    assert resolve_funcform_toy_root_path("2015", configured_root=str(root_2015)) == str(root_2015)
+    specs_2015 = discover_dataset_funcform_closure_toys(cfg, "2015")
+    assert [spec.toy_index for spec in specs_2015] == [0, 1]
+
+    aligned = align_funcform_closure_toys(cfg, ["2015", "2016"])
+    assert [spec.toy_index for spec in aligned["2015"]] == [1]
+    assert [spec.toy_index for spec in aligned["2016"]] == [1]
+
+    mass_ranges = resolve_funcform_closure_mass_ranges(cfg, ["2015", "2016"])
+    assert mass_ranges["2015"] == pytest.approx((0.02, 0.13))
+    assert mass_ranges["2016"] == pytest.approx((0.042, 0.21))
 
 
 def test_build_model_accepts_hist_override(monkeypatch):

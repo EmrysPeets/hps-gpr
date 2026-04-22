@@ -13,6 +13,13 @@ from scipy import stats
 from .conversion import A_from_epsilon2, epsilon2_from_A
 from .dataset import DatasetConfig, make_datasets
 from .evaluation import combined_cls_limit_epsilon2, evaluate_combined
+from .funcform_toys import (
+    FuncFormToySpec,
+    build_funcform_toy_dataset,
+    load_funcform_toy_hist,
+    resolve_funcform_scan_range_gev,
+    select_funcform_closure_toy,
+)
 from .gpr import (
     fit_gpr,
     make_kernel_for_dataset,
@@ -52,6 +59,8 @@ class _SingleDisplayContext:
     raw_signal_full: np.ndarray
     signal_per_blind_amp_full: np.ndarray
     blind_fraction: float
+    source_model: str = "gp_mean_poisson"
+    toy_spec: Optional[FuncFormToySpec] = None
 
 
 @dataclass
@@ -143,6 +152,22 @@ class SingleExtractionDisplay:
             "refit_ok": bool(self.refit_ok),
             "fit_success": bool(self.fit_success),
             "seed": int(self.seed),
+            "background_source": str(self.ctx.source_model),
+            "toy_index": (
+                int(self.ctx.toy_spec.toy_index)
+                if self.ctx.toy_spec is not None
+                else None
+            ),
+            "toy_hist": (
+                str(self.ctx.toy_spec.toy_name)
+                if self.ctx.toy_spec is not None
+                else ""
+            ),
+            "function_tag": (
+                str(self.ctx.toy_spec.function_tag)
+                if self.ctx.toy_spec is not None
+                else ""
+            ),
         }
 
 
@@ -169,6 +194,16 @@ class CombinedExtractionDisplay:
             "Zhat_combined": float(self.Zhat_combined),
             "eps2_up_obs": float(self.eps2_up_obs),
             "datasets": list(self.dataset_keys),
+            "background_source": (
+                str(self.displays[0].ctx.source_model)
+                if self.displays
+                else ""
+            ),
+            "toy_index": (
+                int(self.displays[0].ctx.toy_spec.toy_index)
+                if self.displays and self.displays[0].ctx.toy_spec is not None
+                else None
+            ),
             "per_dataset": [d.to_metadata() for d in self.displays],
         }
 
@@ -241,6 +276,22 @@ class SingleObservedDisplay:
             "sigmaA_ref": float(self.ctx.sigmaA_ref),
             "blind_fraction": float(self.ctx.blind_fraction),
             "fit_success": bool(self.fit_success),
+            "background_source": str(self.ctx.source_model),
+            "toy_index": (
+                int(self.ctx.toy_spec.toy_index)
+                if self.ctx.toy_spec is not None
+                else None
+            ),
+            "toy_hist": (
+                str(self.ctx.toy_spec.toy_name)
+                if self.ctx.toy_spec is not None
+                else ""
+            ),
+            "function_tag": (
+                str(self.ctx.toy_spec.function_tag)
+                if self.ctx.toy_spec is not None
+                else ""
+            ),
         }
 
 
@@ -281,12 +332,53 @@ def _strength_tag(z: float) -> str:
     return str(float(z)).replace("-", "m").replace(".", "p")
 
 
+def _toy_tag(spec: Optional[FuncFormToySpec]) -> str:
+    if spec is None:
+        return ""
+    return f"_toy{int(spec.toy_index):04d}"
+
+
 def _zoom_mask(display: SingleExtractionDisplay, zoom_half_sigma: float) -> np.ndarray:
     pred = display.ctx.pred
     zlo = float(pred.blind[0] - float(zoom_half_sigma) * float(pred.sigma_val))
     zhi = float(pred.blind[1] + float(zoom_half_sigma) * float(pred.sigma_val))
     x_full = display.x_full
     return (x_full >= zlo) & (x_full <= zhi)
+
+
+def _build_funcform_display_context(
+    ds: DatasetConfig,
+    config,
+    *,
+    mass: float,
+    sigma_source: str,
+    train_exclude_nsigma: Optional[float],
+    toy_spec: FuncFormToySpec,
+    toy_hist_cache: Dict[tuple, object],
+) -> _SingleDisplayContext:
+    scan_lo, scan_hi = resolve_funcform_scan_range_gev(ds.key, toy_spec.source_root)
+    if float(mass) < float(scan_lo) or float(mass) > float(scan_hi):
+        raise RuntimeError(
+            f"[extract-display][funcform] {ds.key} mass {float(mass):.6g} GeV lies outside the "
+            f"functional-form closure scan range [{float(scan_lo):.6g}, {float(scan_hi):.6g}] GeV"
+        )
+    spec_key = (str(toy_spec.source_root), str(toy_spec.container), str(toy_spec.toy_name))
+    if spec_key not in toy_hist_cache:
+        toy_hist_cache[spec_key] = load_funcform_toy_hist(
+            toy_spec.source_root,
+            container=(toy_spec.container or None),
+            toy_name=toy_spec.toy_name,
+        )
+    toy_ds = build_funcform_toy_dataset(ds, toy_hist_cache[spec_key])
+    return _build_single_context(
+        toy_ds,
+        config,
+        mass=float(mass),
+        sigma_source=str(sigma_source),
+        train_exclude_nsigma=train_exclude_nsigma,
+        source_model="functional_form",
+        toy_spec=toy_spec,
+    )
 
 
 def _build_single_context(
@@ -296,6 +388,8 @@ def _build_single_context(
     mass: float,
     sigma_source: str,
     train_exclude_nsigma: Optional[float],
+    source_model: str = "gp_mean_poisson",
+    toy_spec: Optional[FuncFormToySpec] = None,
 ) -> _SingleDisplayContext:
     pred = estimate_background_for_dataset(
         ds,
@@ -364,6 +458,8 @@ def _build_single_context(
         raw_signal_full=np.asarray(raw_signal_full, float),
         signal_per_blind_amp_full=np.asarray(signal_per_blind_amp_full, float),
         blind_fraction=float(blind_fraction),
+        source_model=str(source_model),
+        toy_spec=toy_spec,
     )
 
 
@@ -384,7 +480,10 @@ def _simulate_single_display_from_context(
     x_full = np.asarray(pred.x_full, float).reshape(-1)
     mu_full = np.asarray(pred.mu_full, float).reshape(-1)
 
-    bkg_full = rng.poisson(np.clip(mu_full, 0.0, None)).astype(int)
+    if str(ctx.source_model) == "functional_form":
+        bkg_full = np.rint(np.clip(np.asarray(pred.y_full, float).reshape(-1), 0.0, None)).astype(int)
+    else:
+        bkg_full = rng.poisson(np.clip(mu_full, 0.0, None)).astype(int)
     expected_total_strength = float(A_inj_total)
     sig_full, n_sig_realized_total, _ = _inject_counts_from_template(
         ctx.raw_signal_full,
@@ -1156,6 +1255,7 @@ def run_extraction_display_suite(
     output_dir: Optional[str] = None,
     masses: Optional[Sequence[float]] = None,
     sigma_multipliers: Optional[Sequence[float]] = None,
+    toy_index: Optional[int] = None,
 ) -> List[str]:
     datasets = make_datasets(config)
     if not datasets:
@@ -1180,6 +1280,13 @@ def run_extraction_display_suite(
     blind_shade_color = str(getattr(config, "extraction_display_blind_shade_color", "0.88"))
     zoom_half_sigma = float(getattr(config, "extraction_display_zoom_half_sigma", 0.5))
     base_seed = int(getattr(config, "extraction_display_seed", 271828))
+    funcform_mode = bool(getattr(config, "funcform_closure_enable", False))
+    requested_toy_index = int(
+        toy_index
+        if toy_index is not None
+        else getattr(config, "extraction_display_funcform_toy_index", 0)
+    )
+    toy_hist_cache: Dict[tuple, object] = {}
     written: List[str] = []
 
     if target == "combined":
@@ -1188,19 +1295,44 @@ def run_extraction_display_suite(
         ds_list = [datasets[k] for k in requested if k in datasets]
         if len(ds_list) < 2:
             raise RuntimeError("Combined extraction display needs at least two enabled datasets")
-        context_cache = {
-            float(mass): [
-                _build_single_context(
-                    ds,
+        if funcform_mode:
+            toy_specs = {
+                str(ds.key): select_funcform_closure_toy(
                     config,
-                    mass=float(mass),
-                    sigma_source=str(getattr(config, "extraction_display_sigma_source", "asimov")),
-                    train_exclude_nsigma=getattr(config, "extraction_display_train_exclude_nsigma", None),
+                    str(ds.key),
+                    toy_index=int(requested_toy_index),
                 )
                 for ds in ds_list
-            ]
-            for mass in masses
-        }
+            }
+            context_cache = {
+                float(mass): [
+                    _build_funcform_display_context(
+                        ds,
+                        config,
+                        mass=float(mass),
+                        sigma_source=str(getattr(config, "extraction_display_sigma_source", "asimov")),
+                        train_exclude_nsigma=getattr(config, "extraction_display_train_exclude_nsigma", None),
+                        toy_spec=toy_specs[str(ds.key)],
+                        toy_hist_cache=toy_hist_cache,
+                    )
+                    for ds in ds_list
+                ]
+                for mass in masses
+            }
+        else:
+            context_cache = {
+                float(mass): [
+                    _build_single_context(
+                        ds,
+                        config,
+                        mass=float(mass),
+                        sigma_source=str(getattr(config, "extraction_display_sigma_source", "asimov")),
+                        train_exclude_nsigma=getattr(config, "extraction_display_train_exclude_nsigma", None),
+                    )
+                    for ds in ds_list
+                ]
+                for mass in masses
+            }
         for mass in masses:
             contexts = context_cache[float(mass)]
             for z in sigmas:
@@ -1213,7 +1345,10 @@ def run_extraction_display_suite(
                     seed=int(seed),
                     contexts=contexts,
                 )
-                stem = os.path.join(out_root, f"extract_display_combined_m{int(round(float(mass) * 1e3)):03d}MeV_z{_strength_tag(z)}")
+                stem = os.path.join(
+                    out_root,
+                    f"extract_display_combined_m{int(round(float(mass) * 1e3)):03d}MeV_z{_strength_tag(z)}{_toy_tag(contexts[0].toy_spec if contexts else None)}",
+                )
                 plot_combined_extraction_display(
                     display,
                     outpath=stem + ".png",
@@ -1228,16 +1363,35 @@ def run_extraction_display_suite(
         raise RuntimeError(f"Dataset '{target}' is not enabled; enabled datasets: {sorted(datasets)}")
 
     ds = datasets[target]
-    context_cache = {
-        float(mass): _build_single_context(
-            ds,
+    if funcform_mode:
+        toy_spec = select_funcform_closure_toy(
             config,
-            mass=float(mass),
-            sigma_source=str(getattr(config, "extraction_display_sigma_source", "asimov")),
-            train_exclude_nsigma=getattr(config, "extraction_display_train_exclude_nsigma", None),
+            str(ds.key),
+            toy_index=int(requested_toy_index),
         )
-        for mass in masses
-    }
+        context_cache = {
+            float(mass): _build_funcform_display_context(
+                ds,
+                config,
+                mass=float(mass),
+                sigma_source=str(getattr(config, "extraction_display_sigma_source", "asimov")),
+                train_exclude_nsigma=getattr(config, "extraction_display_train_exclude_nsigma", None),
+                toy_spec=toy_spec,
+                toy_hist_cache=toy_hist_cache,
+            )
+            for mass in masses
+        }
+    else:
+        context_cache = {
+            float(mass): _build_single_context(
+                ds,
+                config,
+                mass=float(mass),
+                sigma_source=str(getattr(config, "extraction_display_sigma_source", "asimov")),
+                train_exclude_nsigma=getattr(config, "extraction_display_train_exclude_nsigma", None),
+            )
+            for mass in masses
+        }
     for mass in masses:
         ctx = context_cache[float(mass)]
         for z in sigmas:
@@ -1250,7 +1404,10 @@ def run_extraction_display_suite(
                 seed=int(seed),
                 ctx=ctx,
             )
-            stem = os.path.join(out_root, f"extract_display_{ds.key}_m{int(round(float(mass) * 1e3)):03d}MeV_z{_strength_tag(z)}")
+            stem = os.path.join(
+                out_root,
+                f"extract_display_{ds.key}_m{int(round(float(mass) * 1e3)):03d}MeV_z{_strength_tag(z)}{_toy_tag(ctx.toy_spec)}",
+            )
             plot_single_extraction_display(
                 display,
                 outpath=stem + ".png",

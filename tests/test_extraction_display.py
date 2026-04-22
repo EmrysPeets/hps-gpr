@@ -244,6 +244,72 @@ def test_extraction_display_reuses_mass_context_across_sigma_levels(tmp_path, mo
     assert calls == [("2015", 0.04)]
 
 
+def test_funcform_extraction_display_uses_fixed_toy_background_and_tags_output(tmp_path, monkeypatch):
+    import hps_gpr.extraction_display as exd
+    from hps_gpr.funcform_toys import FuncFormToySpec
+
+    def _funcform_prediction(ds, mass, config, train_exclude_nsigma=None):
+        pred = _fake_prediction(ds, mass, config, train_exclude_nsigma=train_exclude_nsigma)
+        pred.mu_full = np.full_like(pred.mu_full, 99.0)
+        pred.y_full = np.full_like(pred.y_full, 4)
+        pred.obs = np.full_like(pred.obs, 4)
+        pred.mu = np.full_like(pred.mu, 99.0)
+        pred.cov = np.eye(pred.mu.shape[0])
+        return pred
+
+    monkeypatch.setattr(exd, "estimate_background_for_dataset", _funcform_prediction)
+    monkeypatch.setattr(exd, "_sigmaA_reference", lambda pred, mass, source="asimov", rng=None: 10.0)
+    monkeypatch.setattr(exd, "cls_limit_for_amplitude", lambda **kwargs: (18.0, None))
+    monkeypatch.setattr(
+        exd,
+        "fit_A_profiled_gaussian_details",
+        lambda obs, mu, cov, tmpl, allow_negative: {
+            "A_hat": float(np.sum(obs)),
+            "sigma_A": 2.0,
+            "success": True,
+            "b_fit": np.asarray(mu, float),
+            "lambda_hat": np.asarray(mu, float),
+        },
+    )
+    monkeypatch.setattr(
+        exd,
+        "select_funcform_closure_toy",
+        lambda config, dataset_key, toy_index: FuncFormToySpec(
+            source_root="funcform.root",
+            container="fShiftSigPowTail",
+            function_tag="fShiftSigPowTail",
+            toy_name="fShiftSigPowTail_toy_7",
+            toy_index=7,
+        ),
+    )
+    monkeypatch.setattr(exd, "load_funcform_toy_hist", lambda *args, **kwargs: object())
+    monkeypatch.setattr(exd, "resolve_funcform_scan_range_gev", lambda dataset_key, root_path: (0.02, 0.13))
+
+    cfg = Config(
+        enable_2015=True,
+        enable_2016=False,
+        enable_2021=False,
+        output_dir=str(tmp_path),
+        extraction_display_dataset_key="2015",
+        extraction_display_masses_gev=[0.040],
+        extraction_display_sigma_multipliers=[0.0],
+        extraction_display_refit_gp_on_toy=False,
+        funcform_closure_enable=True,
+        extraction_display_funcform_toy_index=7,
+    )
+
+    written = exd.run_extraction_display_suite(cfg)
+
+    assert len(written) == 1
+    png = tmp_path / "extraction_display" / "2015" / "extract_display_2015_m040MeV_z0p0_toy0007.png"
+    meta = tmp_path / "extraction_display" / "2015" / "extract_display_2015_m040MeV_z0p0_toy0007.json"
+    assert png.exists()
+    payload = json.loads(meta.read_text())
+    assert payload["background_source"] == "functional_form"
+    assert payload["toy_index"] == 7
+    assert payload["A_hat"] < 50.0
+
+
 def test_combined_extraction_display_draws_residual_band_and_reports_zhat(tmp_path, monkeypatch):
     import hps_gpr.extraction_display as exd
 
