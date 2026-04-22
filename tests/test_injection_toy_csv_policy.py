@@ -8,11 +8,13 @@ from hps_gpr.cli import main
 from hps_gpr.config import Config
 from hps_gpr.dataset import DatasetConfig
 from hps_gpr.injection import (
+    run_funcform_injection_extraction_toys,
     run_injection_extraction_toys,
     run_injection_extraction_streaming,
     run_injection_extraction_streaming_combined,
     summarize_injection_grid,
 )
+from hps_gpr.funcform_toys import FuncFormToySpec
 
 
 def _make_dataset():
@@ -126,6 +128,66 @@ def test_sigma_mode_uses_explicit_strength_overrides(tmp_path, monkeypatch):
 
     assert len(df) == 2
     assert sorted(df["inj_nsigma"].unique().tolist()) == [1.0]
+
+
+def test_funcform_injection_uses_fixed_toy_background_counts(tmp_path, monkeypatch):
+    import hps_gpr.injection as inj
+
+    monkeypatch.setattr(inj, "load_funcform_toy_hist", lambda *args, **kwargs: object())
+    monkeypatch.setattr(inj, "resolve_funcform_scan_range_gev", lambda dataset_key, root_path: (0.02, 0.13))
+    monkeypatch.setattr(
+        inj,
+        "estimate_background_for_dataset",
+        lambda ds, m, config, train_exclude_nsigma=None: SimpleNamespace(
+            sigma_val=1.0,
+            mu=np.array([99.0, 99.0]),
+            cov=np.eye(2),
+            mu_full=np.array([99.0, 99.0]),
+            y_full=np.array([5.0, 7.0]),
+            edges_full=np.array([0.0, 1.0, 2.0]),
+            x_full=np.array([0.5, 1.5]),
+            blind=(0.0, 2.0),
+            blind_mask=np.array([True, True]),
+            integral_density=10.0,
+            sigma_x=1.0,
+            train_exclude_nsigma=1.64,
+        ),
+    )
+    monkeypatch.setattr(inj, "_sigmaA_reference", lambda *args, **kwargs: 2.0)
+    monkeypatch.setattr(
+        inj,
+        "fit_A_profiled_gaussian",
+        lambda obs, mu, cov, tmpl_win, allow_negative: {
+            "A_hat": float(np.sum(obs)),
+            "sigma_A": 1.5,
+            "success": True,
+            "nll": 0.0,
+        },
+    )
+
+    cfg = Config(output_dir=str(tmp_path), inj_write_toy_csv=False, inj_strength_mode="sigmaA")
+    specs = [
+        FuncFormToySpec(
+            source_root="funcform.root",
+            container="fShiftSigPowTail",
+            function_tag="fShiftSigPowTail",
+            toy_name="fShiftSigPowTail_toy_0",
+            toy_index=0,
+        )
+    ]
+
+    df = run_funcform_injection_extraction_toys(
+        _make_dataset(),
+        cfg,
+        specs=specs,
+        masses=[0.05],
+        strengths=[0.0],
+    )
+
+    assert len(df) == 1
+    assert df.loc[0, "A_hat"] == 12.0
+    assert df.loc[0, "source_model"] == "functional_form"
+    assert df.loc[0, "toy_hist"] == "fShiftSigPowTail_toy_0"
 
 
 def test_streaming_skips_writing_toy_csv_when_disabled(tmp_path, monkeypatch):

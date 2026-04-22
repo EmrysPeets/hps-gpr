@@ -912,8 +912,10 @@ def inject(config, dataset, masses, strengths, n_toys, output_dir, write_toy_csv
 
     from .config import load_config
     from .dataset import make_datasets
+    from .funcform_toys import align_funcform_closure_toys
     from .injection import (
         run_injection_extraction_toys,
+        run_funcform_injection_extraction_toys,
         run_injection_extraction_streaming,
         run_injection_extraction_streaming_combined,
         summarize_injection_grid,
@@ -967,6 +969,7 @@ def inject(config, dataset, masses, strengths, n_toys, output_dir, write_toy_csv
     outdir = os.path.join(cfg.output_dir, "injection_extraction")
     ensure_dir(outdir)
     strengths_mode = str(getattr(cfg, "inj_strength_mode", "absolute")).lower().strip()
+    funcform_mode = bool(getattr(cfg, "funcform_closure_enable", False))
 
     if dataset == "combined":
         print("Running combined injection study over all enabled datasets")
@@ -976,7 +979,69 @@ def inject(config, dataset, masses, strengths, n_toys, output_dir, write_toy_csv
         zcal_input = pd.DataFrame()
         zcal_semantic = "summary q16--q84"
 
-        if stream_aggregate:
+        if funcform_mode:
+            print(
+                "[inj] funcform_closure_enable=true: "
+                "using the aligned functional-form toy ensemble as the background truth"
+            )
+            spec_map = align_funcform_closure_toys(
+                cfg,
+                list(datasets.keys()),
+                n_toys=int(n_toys),
+            )
+            df_map = {}
+            for key, ds in datasets.items():
+                print(f"  -> {ds.label}")
+                df_map[key] = run_funcform_injection_extraction_toys(
+                    ds,
+                    cfg,
+                    specs=spec_map[str(key)],
+                    masses=mass_list,
+                    strengths=[float(x) for x in strength_list],
+                    strengths_mode=strengths_mode,
+                    write_toy_csv=cfg.inj_write_toy_csv,
+                )
+
+            mass_policy = str(getattr(cfg, "inj_combined_mass_policy", "intersection")).strip().lower()
+            min_n_contrib = int(getattr(cfg, "inj_combined_min_n_contrib", 2))
+            support = _combined_mass_support_summary(
+                df_map,
+                mass_policy=mass_policy,
+                min_n_contrib=min_n_contrib,
+            )
+            print(format_combined_mass_support_summary(support))
+
+            df_comb_toys = combine_injection_toy_tables(
+                df_map,
+                mass_policy=mass_policy,
+                min_n_contrib=min_n_contrib,
+            )
+            if not df_comb_toys.empty and bool(cfg.inj_write_toy_csv):
+                comb_toys_path = os.path.join(outdir, "inj_extract_toys_combined.csv")
+                df_comb_toys.to_csv(comb_toys_path, index=False)
+                print(f"Wrote {comb_toys_path}")
+            elif not df_comb_toys.empty:
+                print("Skipped writing inj_extract_toys_combined.csv (--no-write-toy-csv)")
+
+            for key, dfi in df_map.items():
+                dsum = summarize_injection_grid(dfi)
+                dsum["dataset"] = str(key)
+                summary_frames.append(dsum)
+                dsum.to_csv(os.path.join(outdir, f"inj_extract_summary_{key}.csv"), index=False)
+
+            if not df_comb_toys.empty:
+                dsum_c = summarize_injection_grid(df_comb_toys)
+                dsum_c["dataset"] = "combined"
+                summary_frames.append(dsum_c)
+                dsum_c.to_csv(os.path.join(outdir, "inj_extract_summary_combined.csv"), index=False)
+
+            zcal_input = (
+                pd.concat([*df_map.values(), df_comb_toys], ignore_index=True)
+                if not df_comb_toys.empty
+                else pd.concat([*df_map.values()], ignore_index=True)
+            )
+            zcal_semantic = "toy spread"
+        elif stream_aggregate:
             print(
                 "[inj] streaming aggregation enabled: "
                 f"aggregate_every={int(cfg.inj_aggregate_every)}, "
@@ -1101,7 +1166,29 @@ def inject(config, dataset, masses, strengths, n_toys, output_dir, write_toy_csv
         print(f"Running injection study for {ds.label}")
         print(f"Masses: {mass_list}")
         print(f"Strengths: {strength_list}")
-        if stream_aggregate:
+        if funcform_mode:
+            print(
+                "[inj] funcform_closure_enable=true: "
+                "using the stored functional-form toy histograms as the background truth"
+            )
+            spec_map = align_funcform_closure_toys(
+                cfg,
+                [str(ds.key)],
+                n_toys=int(n_toys),
+            )
+            df = run_funcform_injection_extraction_toys(
+                ds,
+                cfg,
+                specs=spec_map[str(ds.key)],
+                masses=mass_list,
+                strengths=[float(x) for x in strength_list],
+                strengths_mode=strengths_mode,
+                write_toy_csv=cfg.inj_write_toy_csv,
+            )
+            df_sum = summarize_injection_grid(df)
+            zcal_input = df
+            zcal_semantic = "toy spread"
+        elif stream_aggregate:
             print(
                 "[inj] streaming aggregation enabled: "
                 f"aggregate_every={int(cfg.inj_aggregate_every)}, "
@@ -1621,6 +1708,7 @@ def slurm_gen(config, n_jobs, output, job_name, partition, time, memory, cpus_pe
 def slurm_gen_inject(config, datasets, masses, strengths, n_toys, output, job_name, partition, time, memory, cpus_per_task, conda_env, account, write_toy_csv, qos):
     """Generate SLURM scripts for per-(dataset,mass,strength) injection jobs."""
     from .config import load_config
+    from .funcform_toys import resolve_funcform_closure_mass_ranges
     from .slurm import generate_injection_slurm_scripts
 
     cfg = load_config(config)
@@ -1650,6 +1738,8 @@ def slurm_gen_inject(config, datasets, masses, strengths, n_toys, output, job_na
         "2016": tuple(cfg.range_2016),
         "2021": tuple(cfg.range_2021),
     }
+    if bool(getattr(cfg, "funcform_closure_enable", False)):
+        ds_ranges.update(resolve_funcform_closure_mass_ranges(cfg, ["2015", "2016", "2021"]))
 
     job_script, submit_script, n_jobs = generate_injection_slurm_scripts(
         config_path=config,
@@ -1742,9 +1832,15 @@ def slurm_gen_inject(config, datasets, masses, strengths, n_toys, output, job_na
     "--qos",
     help="Optional SLURM QOS to request",
 )
-def slurm_gen_extract_display(config, dataset, datasets, masses, strengths, output, job_name, partition, time, memory, conda_env, account, qos):
+@click.option(
+    "--toy-index",
+    type=int,
+    help="Representative functional-form toy index for extraction-display closure jobs.",
+)
+def slurm_gen_extract_display(config, dataset, datasets, masses, strengths, output, job_name, partition, time, memory, conda_env, account, qos, toy_index):
     """Generate SLURM scripts for per-(dataset set,mass,strength) extraction-display jobs."""
     from .config import load_config
+    from .funcform_toys import resolve_funcform_closure_mass_ranges
     from .slurm import generate_extraction_display_slurm_scripts
 
     cfg = load_config(config)
@@ -1769,6 +1865,8 @@ def slurm_gen_extract_display(config, dataset, datasets, masses, strengths, outp
         "2016": tuple(cfg.range_2016),
         "2021": tuple(cfg.range_2021),
     }
+    if bool(getattr(cfg, "funcform_closure_enable", False)):
+        ds_ranges.update(resolve_funcform_closure_mass_ranges(cfg, ["2015", "2016", "2021"]))
     target = str(dataset).strip().lower()
     combined_keys = [d.strip() for d in str(datasets or "").split(",") if d.strip()]
 
@@ -1813,6 +1911,7 @@ def slurm_gen_extract_display(config, dataset, datasets, masses, strengths, outp
         conda_env=conda_env,
         extra_sbatch=extra,
         mass_range=mass_range,
+        toy_index=toy_index,
     )
     print(f"\nPrepared {n_jobs} extraction-display jobs.")
     print("To submit all jobs, run:")
@@ -2124,7 +2223,12 @@ def inject_plot(input_dir, output_dir, dataset, write_merged_toys):
     type=str,
     help="Optional comma-separated dataset list for combined displays (for example: 2015,2016,2021).",
 )
-def extract_display(config, dataset, output_dir, strengths, masses, datasets):
+@click.option(
+    "--toy-index",
+    type=int,
+    help="Representative functional-form toy index for extraction-display closure plots.",
+)
+def extract_display(config, dataset, output_dir, strengths, masses, datasets, toy_index):
     """Generate reviewer-facing extraction displays from one pseudoexperiment per point."""
     from .config import load_config
     from .extraction_display import run_extraction_display_suite
@@ -2141,6 +2245,7 @@ def extract_display(config, dataset, output_dir, strengths, masses, datasets):
         output_dir=(os.path.join(cfg.output_dir, "extraction_display", dataset.lower()) if dataset and output_dir else None),
         masses=(_parse_mass_tokens(masses) if masses else None),
         sigma_multipliers=(_parse_strength_tokens(strengths) if strengths else None),
+        toy_index=toy_index,
     )
     print(f"Wrote {len(written)} extraction display plot(s)")
     for path in written:

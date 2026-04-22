@@ -242,6 +242,15 @@ class Config:
     run_limit_bands_on: str = "2015"
     make_eps2_bands: bool = True
 
+    # Functional-form closure toy inputs
+    funcform_closure_enable: bool = False
+    funcform_closure_root_by_dataset: Dict[str, str] = field(default_factory=dict)
+    funcform_closure_container_by_dataset: Dict[str, str] = field(default_factory=dict)
+    funcform_closure_toy_pattern_by_dataset: Dict[str, str] = field(default_factory=dict)
+    funcform_closure_toy_name_fmt_by_dataset: Dict[str, str] = field(default_factory=dict)
+    funcform_closure_toy_indices: List[int] = field(default_factory=list)
+    extraction_display_funcform_toy_index: int = 0
+
     # Outputs
     output_dir: str = "outputs/hps_gpr"
 
@@ -295,6 +304,10 @@ def load_config(path: str) -> Config:
         "kernel_ls_bounds_by_dataset",
         "kernel_ls_init_by_dataset",
         "data_visibility",
+        "funcform_closure_root_by_dataset",
+        "funcform_closure_container_by_dataset",
+        "funcform_closure_toy_pattern_by_dataset",
+        "funcform_closure_toy_name_fmt_by_dataset",
     ]
     for field_name in dict_fields:
         if field_name in data and data[field_name] is None:

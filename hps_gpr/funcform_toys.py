@@ -9,7 +9,7 @@ import os
 import re
 from dataclasses import asdict, dataclass, replace
 from pathlib import Path
-from typing import List, Optional, Sequence, TYPE_CHECKING
+from typing import Dict, List, Optional, Sequence, TYPE_CHECKING
 
 import hist
 import numpy as np
@@ -36,6 +36,17 @@ class FuncFormToySpec:
     @property
     def output_tag(self) -> str:
         return f"toy_{int(self.toy_index):04d}"
+
+
+DEFAULT_FUNCFORM_CLOSURE_CONTAINERS = {
+    "2015": "fShiftSigPowTail",
+    "2016": "fShiftSigPowTail",
+    "2021": "fSigPowExpQ",
+}
+
+DEFAULT_FUNCFORM_SCAN_RANGE_OVERRIDES_GEV = {
+    "2016": (0.042, 0.210),
+}
 
 
 def _clean_key_name(key: str) -> str:
@@ -126,11 +137,18 @@ def discover_funcform_toys(
     names = _iter_hist_names(root_path, container=container or None)
     names = [n for n in names if fnmatch.fnmatch(n, str(toy_pattern))]
     names = sorted(dict.fromkeys(names), key=_natural_sort_key)
+    allowed_indices = (
+        {int(i) for i in toy_indices}
+        if toy_indices is not None
+        else None
+    )
     specs = []
     for fallback_index, name in enumerate(names):
         toy_index = _extract_toy_index(name)
         if toy_index is None:
             toy_index = int(fallback_index)
+        if allowed_indices is not None and int(toy_index) not in allowed_indices:
+            continue
         specs.append(
             FuncFormToySpec(
                 source_root=root_path,
@@ -178,6 +196,163 @@ def load_funcform_toy_hist(
 def build_funcform_toy_dataset(ds: "DatasetConfig", toy_hist: hist.Hist) -> "DatasetConfig":
     """Clone a dataset config and swap in an in-memory toy histogram."""
     return replace(ds, hist_override=toy_hist)
+
+
+def _funcform_root_candidates(dataset_key: str, configured_root: Optional[str] = None) -> List[str]:
+    """Return candidate ROOT paths for one dataset's functional-form toy export."""
+    ds = str(dataset_key).strip()
+    out: List[str] = []
+    for candidate in [
+        configured_root,
+        f"outputs/funcform_toys/funcform_{ds}_dataset_mod_toys.root",
+        f"outputs/funcform_toys/funcform_{ds}_toys.root",
+    ]:
+        text = str(candidate or "").strip()
+        if not text or text in out:
+            continue
+        out.append(text)
+    return out
+
+
+def resolve_funcform_toy_root_path(dataset_key: str, configured_root: Optional[str] = None) -> str:
+    """Resolve the first existing functional-form ROOT path for a dataset."""
+    for candidate in _funcform_root_candidates(dataset_key, configured_root=configured_root):
+        if os.path.exists(candidate):
+            return str(candidate)
+    tried = ", ".join(_funcform_root_candidates(dataset_key, configured_root=configured_root))
+    raise FileNotFoundError(
+        f"Could not locate a functional-form toy ROOT file for dataset '{dataset_key}'. "
+        f"Tried: {tried}"
+    )
+
+
+def load_funcform_fit_summary(root_path: str) -> dict:
+    """Load the ROOT-side fit summary JSON for one functional-form export."""
+    with uproot.open(str(root_path)) as fin:
+        obj = fin["fit_metadata/fit_summary_json"]
+        try:
+            payload = obj.member("fTitle")
+        except Exception:
+            payload = str(obj)
+        return json.loads(payload)
+
+
+def resolve_funcform_scan_range_gev(dataset_key: str, root_path: str) -> tuple[float, float]:
+    """Resolve the scan range used for closure selections."""
+    override = DEFAULT_FUNCFORM_SCAN_RANGE_OVERRIDES_GEV.get(str(dataset_key))
+    if override is not None:
+        return float(override[0]), float(override[1])
+    meta = load_funcform_fit_summary(root_path)
+    scan_range = meta.get("scan_range_GeV") or meta.get("toy_support_range_GeV")
+    if not scan_range or len(scan_range) < 2:
+        raise KeyError(f"Could not resolve scan_range_GeV from {root_path}")
+    return float(scan_range[0]), float(scan_range[1])
+
+
+def discover_dataset_funcform_closure_toys(config: "Config", dataset_key: str) -> List[FuncFormToySpec]:
+    """Discover the configured functional-form closure toys for one dataset."""
+    root_map = getattr(config, "funcform_closure_root_by_dataset", {}) or {}
+    container_map = getattr(config, "funcform_closure_container_by_dataset", {}) or {}
+    toy_pattern_map = getattr(config, "funcform_closure_toy_pattern_by_dataset", {}) or {}
+    toy_name_fmt_map = getattr(config, "funcform_closure_toy_name_fmt_by_dataset", {}) or {}
+
+    root_path = resolve_funcform_toy_root_path(dataset_key, configured_root=root_map.get(str(dataset_key)))
+    container = str(
+        container_map.get(str(dataset_key), DEFAULT_FUNCFORM_CLOSURE_CONTAINERS.get(str(dataset_key), ""))
+    ).strip()
+    toy_name_fmt = str(toy_name_fmt_map.get(str(dataset_key), "")).strip() or None
+    toy_pattern = str(
+        toy_pattern_map.get(
+            str(dataset_key),
+            f"{container}_toy_*" if container else "*",
+        )
+    ).strip() or "*"
+
+    raw_indices = getattr(config, "funcform_closure_toy_indices", []) or None
+    toy_indices = [int(i) for i in raw_indices] if raw_indices else None
+
+    specs = discover_funcform_toys(
+        root_path,
+        container=(container or None),
+        toy_pattern=str(toy_pattern),
+        toy_name_fmt=toy_name_fmt,
+        toy_indices=toy_indices,
+    )
+    if not specs:
+        raise RuntimeError(
+            f"No functional-form toys matched dataset '{dataset_key}' "
+            f"(root={root_path}, container={container or '<root>'}, pattern={toy_pattern})"
+        )
+    return specs
+
+
+def align_funcform_closure_toys(
+    config: "Config",
+    dataset_keys: Sequence[str],
+    *,
+    n_toys: Optional[int] = None,
+) -> Dict[str, List[FuncFormToySpec]]:
+    """Align functional-form closure toys across datasets by common toy index."""
+    keys = [str(k).strip() for k in dataset_keys if str(k).strip()]
+    if not keys:
+        return {}
+
+    per_dataset = {
+        key: discover_dataset_funcform_closure_toys(config, key)
+        for key in keys
+    }
+    spec_maps = {
+        key: {int(spec.toy_index): spec for spec in specs}
+        for key, specs in per_dataset.items()
+    }
+    all_index_sets = [set(spec_map.keys()) for spec_map in spec_maps.values()]
+    common_index_set = set(all_index_sets[0])
+    for idx_set in all_index_sets[1:]:
+        common_index_set &= idx_set
+    common_indices = sorted(common_index_set)
+    if n_toys is not None:
+        n_req = int(n_toys)
+        if len(common_indices) < n_req:
+            raise RuntimeError(
+                f"Requested {n_req} functional-form closure toys for {keys}, "
+                f"but only {len(common_indices)} common toy indices are available."
+            )
+        common_indices = common_indices[:n_req]
+    if not common_indices:
+        raise RuntimeError(f"No common functional-form toy indices found for datasets {keys}")
+    return {
+        key: [spec_maps[key][idx] for idx in common_indices]
+        for key in keys
+    }
+
+
+def select_funcform_closure_toy(
+    config: "Config",
+    dataset_key: str,
+    *,
+    toy_index: int,
+) -> FuncFormToySpec:
+    """Select one functional-form closure toy by explicit toy index."""
+    index = int(toy_index)
+    for spec in discover_dataset_funcform_closure_toys(config, dataset_key):
+        if int(spec.toy_index) == index:
+            return spec
+    raise RuntimeError(
+        f"Could not find functional-form closure toy {index} for dataset '{dataset_key}'"
+    )
+
+
+def resolve_funcform_closure_mass_ranges(
+    config: "Config",
+    dataset_keys: Sequence[str],
+) -> Dict[str, tuple[float, float]]:
+    """Return the dataset-specific closure scan ranges from the toy exports."""
+    out: Dict[str, tuple[float, float]] = {}
+    root_map = getattr(config, "funcform_closure_root_by_dataset", {}) or {}
+    for key in [str(k).strip() for k in dataset_keys if str(k).strip()]:
+        root_path = resolve_funcform_toy_root_path(key, configured_root=root_map.get(key))
+        out[key] = resolve_funcform_scan_range_gev(key, root_path)
+    return out
 
 
 def _sanitize_toy_path_component(text: object) -> str:

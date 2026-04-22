@@ -21,6 +21,12 @@ except ImportError:
     _threadpool_limits = contextlib.nullcontext  # type: ignore[assignment]
 
 from .io import estimate_background_for_dataset
+from .funcform_toys import (
+    FuncFormToySpec,
+    build_funcform_toy_dataset,
+    load_funcform_toy_hist,
+    resolve_funcform_scan_range_gev,
+)
 from .template import build_template, build_window_template_from_full
 from .conversion import A_from_epsilon2
 from .statistics import (
@@ -842,6 +848,247 @@ def _build_injection_mass_context(
         mvn_method=str(mvn_method),
         mvn_max_tries=int(mvn_max_tries),
     )
+
+
+def run_funcform_injection_extraction_toys(
+    ds: "DatasetConfig",
+    config: "Config",
+    *,
+    specs: List[FuncFormToySpec],
+    masses: List[float],
+    strengths: Optional[List[float]] = None,
+    outdir: Optional[str] = None,
+    seed: int = 314159,
+    inj_mode: Optional[str] = None,
+    strengths_mode: Optional[str] = None,
+    sigma_multipliers: Optional[List[float]] = None,
+    sigma_source: Optional[str] = None,
+    refit_gp_on_toy: Optional[bool] = None,
+    refit_restarts: Optional[int] = None,
+    refit_optimize: Optional[bool] = None,
+    inj_shape_mode: Optional[str] = None,
+    train_exclude_nsigma: Optional[float] = None,
+    write_toy_csv: Optional[bool] = None,
+) -> pd.DataFrame:
+    """Run injection/extraction closure using fixed functional-form toy histograms."""
+    if outdir is None:
+        outdir = os.path.join(config.output_dir, "injection_extraction")
+    ensure_dir(outdir)
+
+    if write_toy_csv is None:
+        write_toy_csv = bool(getattr(config, "inj_write_toy_csv", True))
+
+    inj_mode = (inj_mode or getattr(config, "inj_mode", "poisson")).lower().strip()
+    sigma_source = (sigma_source or getattr(config, "inj_sigma_a_source", "asimov")).lower().strip()
+    if refit_gp_on_toy is None:
+        refit_gp_on_toy = bool(getattr(config, "inj_refit_gp_on_toy", False))
+    if refit_restarts is None:
+        refit_restarts = int(getattr(config, "inj_refit_gp_restarts", 0))
+    if refit_optimize is None:
+        refit_optimize = bool(getattr(config, "inj_refit_gp_optimize", True))
+    inj_shape_mode = (inj_shape_mode or getattr(config, "inj_shape_mode", "full")).lower().strip()
+    if inj_shape_mode not in ("full", "window"):
+        inj_shape_mode = "full"
+
+    strengths_mode_resolved, strength_tags = _resolve_injection_strength_tags(
+        config=config,
+        strengths=strengths,
+        strengths_mode=strengths_mode,
+        sigma_multipliers=sigma_multipliers,
+    )
+    train_nsig_default = float(
+        getattr(config, "gp_train_exclude_nsigma", None) or config.blind_nsigma
+    )
+
+    hist_cache: Dict[tuple, Any] = {}
+    rows: List[Dict[str, Any]] = []
+
+    for spec in specs:
+        spec_key = (str(spec.source_root), str(spec.container), str(spec.toy_name))
+        if spec_key not in hist_cache:
+            hist_cache[spec_key] = load_funcform_toy_hist(
+                spec.source_root,
+                container=(spec.container or None),
+                toy_name=spec.toy_name,
+            )
+        toy_ds = build_funcform_toy_dataset(ds, hist_cache[spec_key])
+        scan_lo, scan_hi = resolve_funcform_scan_range_gev(ds.key, spec.source_root)
+
+        for m in [float(x) for x in masses]:
+            if float(m) < float(scan_lo) or float(m) > float(scan_hi):
+                raise RuntimeError(
+                    f"[inj][funcform] {ds.key} mass {float(m):.6g} GeV lies outside the "
+                    f"functional-form closure scan range [{float(scan_lo):.6g}, {float(scan_hi):.6g}] GeV"
+                )
+            pred = estimate_background_for_dataset(
+                toy_ds,
+                float(m),
+                config,
+                train_exclude_nsigma=train_exclude_nsigma,
+            )
+            blind_mask = _prediction_blind_mask(pred)
+            integral_density = _prediction_integral_density(pred)
+            tmpl_win, tmpl_full = build_window_template_from_full(
+                pred.edges_full, blind_mask, float(m), pred.sigma_val
+            )
+            f_win = float(np.sum(tmpl_win))
+            x_full = np.asarray(pred.x_full, float).reshape(-1)
+            f_full = float(np.sum(tmpl_full))
+
+            sigma_seed = _stable_point_seed(int(seed), str(ds.key), float(m), float(spec.toy_index))
+            sigma_rng = np.random.default_rng(int(sigma_seed))
+            sigmaA_ref = _sigmaA_reference(pred, float(m), source=str(sigma_source), rng=sigma_rng)
+
+            if strengths_mode_resolved == "sigmaa":
+                A_inj_list = [float(tag) * float(sigmaA_ref) for tag in strength_tags]
+                inj_nsigma_list = [float(tag) for tag in strength_tags]
+            else:
+                A_inj_list = [float(tag) for tag in strength_tags]
+                inj_nsigma_list = [
+                    float(A) / float(sigmaA_ref)
+                    if np.isfinite(sigmaA_ref) and sigmaA_ref > 0
+                    else float("nan")
+                    for A in A_inj_list
+                ]
+
+            blind = tuple(pred.blind)
+            msk_blind = (x_full >= float(blind[0])) & (x_full <= float(blind[1]))
+            if int(np.sum(msk_blind)) == 0:
+                raise RuntimeError(f"[inj][{ds.key}] m={float(m):.6g}: blind window has no bins")
+
+            tn = (
+                float(train_exclude_nsigma)
+                if train_exclude_nsigma is not None
+                else float(getattr(pred, "train_exclude_nsigma", train_nsig_default))
+            )
+            blind_train = (
+                float(m) - tn * float(pred.sigma_val),
+                float(m) + tn * float(pred.sigma_val),
+            )
+            msk_train = (x_full < blind_train[0]) | (x_full > blind_train[1])
+            f_train = (
+                float(np.sum(tmpl_full[msk_train]))
+                if tmpl_full.shape[0] == x_full.shape[0]
+                else float("nan")
+            )
+            f_train_frac = float(f_train / f_full) if np.isfinite(f_train) and f_full > 0 else float("nan")
+
+            y_full_base = np.rint(np.clip(np.asarray(pred.y_full, float).reshape(-1), 0.0, None)).astype(int)
+            if bool(refit_gp_on_toy):
+                ker = make_kernel_for_dataset(ds, config, mass=float(m))
+                x_win = x_full[msk_blind]
+
+            for A_inj, inj_nsigma in zip(A_inj_list, inj_nsigma_list):
+                point_seed = _stable_point_seed(int(seed), str(ds.key), float(m), float(A_inj))
+                rng = np.random.default_rng(_stable_toy_seed(int(point_seed), int(spec.toy_index)))
+
+                if inj_shape_mode == "window":
+                    sig_full = np.zeros_like(y_full_base, dtype=int)
+                    s_win, Nsig_win, _ = _inject_counts_from_template(tmpl_win, float(A_inj), rng, inj_mode)
+                    blind_idx = np.where(msk_blind)[0]
+                    n_blind = min(len(s_win), len(blind_idx))
+                    sig_full[blind_idx[:n_blind]] = np.asarray(s_win[:n_blind], int)
+                    Nsig_full = int(np.sum(sig_full))
+                else:
+                    s_full, Nsig_full, _ = _inject_counts_from_template(tmpl_full, float(A_inj), rng, inj_mode)
+                    sig_full = np.asarray(s_full, dtype=int)
+                    Nsig_win = int(np.sum(sig_full[msk_blind]))
+
+                y_full_toy = (y_full_base + sig_full).astype(int)
+                obs = y_full_toy[msk_blind].astype(int)
+                Nsig_train = int(np.sum(sig_full[msk_train]))
+
+                mu_fit = np.asarray(pred.mu, float)
+                cov_fit = np.asarray(pred.cov, float)
+                refit_ok = float("nan")
+                if bool(refit_gp_on_toy):
+                    try:
+                        gpr = fit_gpr(
+                            x_full[msk_train],
+                            y_full_toy[msk_train].astype(float),
+                            config,
+                            restarts=int(refit_restarts),
+                            kernel=ker,
+                            optimize=bool(refit_optimize),
+                        )
+                        mu_fit, cov_fit = predict_counts_from_log_gpr(gpr, x_win, config)
+                        refit_ok = 1.0
+                    except Exception:
+                        refit_ok = 0.0
+
+                fit = fit_A_profiled_gaussian(
+                    obs,
+                    mu_fit,
+                    cov_fit,
+                    tmpl_win,
+                    allow_negative=bool(getattr(config, "extract_allow_negative", True)),
+                )
+                A_hat = float(fit["A_hat"])
+                sigma_A = float(fit["sigma_A"])
+                pull = (
+                    (A_hat - float(A_inj)) / sigma_A
+                    if np.isfinite(sigma_A) and sigma_A > 0
+                    else float("nan")
+                )
+                Zhat = float(A_hat / sigma_A) if np.isfinite(sigma_A) and sigma_A > 0 else float("nan")
+
+                rows.append(
+                    dict(
+                        dataset=ds.key,
+                        mass_GeV=float(m),
+                        toy=int(spec.toy_index),
+                        toy_index=int(spec.toy_index),
+                        toy_hist=str(spec.toy_name),
+                        function_tag=str(spec.function_tag),
+                        source_model="functional_form",
+                        source_label=str(spec.function_tag),
+                        source_root=str(spec.source_root),
+                        container=str(spec.container),
+                        strength=float(A_inj),
+                        inj_nsigma=float(inj_nsigma),
+                        sigmaA_ref=float(sigmaA_ref),
+                        sigma_val=float(pred.sigma_val),
+                        integral_density=float(integral_density),
+                        A_per_eps2_unit=float(A_from_epsilon2(ds, float(m), 1.0, integral_density)),
+                        sigma_x=float(getattr(pred, "sigma_x", float("nan"))),
+                        f_win=float(f_win),
+                        f_full=float(f_full),
+                        f_train=float(f_train),
+                        f_train_frac=float(f_train_frac),
+                        blind_nsigma=float(config.blind_nsigma),
+                        train_exclude_nsigma=float(tn),
+                        inj_shape_mode=inj_shape_mode,
+                        A_hat=float(A_hat),
+                        sigma_A=float(sigma_A),
+                        Zhat=float(Zhat),
+                        pull_param=float(pull),
+                        Nsig_win=int(Nsig_win),
+                        Nsig_train=int(Nsig_train),
+                        Nsig_full=int(Nsig_full),
+                        success=bool(fit["success"]),
+                        nll=float(fit.get("nll", float("nan"))),
+                        toy_mode="functional_form_refit" if bool(refit_gp_on_toy) else "functional_form_fixed_bg",
+                        refit_gp_on_toy=bool(refit_gp_on_toy),
+                        refit_ok=float(refit_ok),
+                        refit_restarts=int(refit_restarts),
+                        refit_optimize=bool(refit_optimize),
+                    )
+                )
+
+        print(
+            "[inj][funcform] "
+            f"{ds.key} toy={int(spec.toy_index):04d} done "
+            f"({len(masses)} masses x {len(strength_tags)} strengths)"
+        )
+
+    df = pd.DataFrame(rows)
+    if bool(write_toy_csv):
+        out_csv = os.path.join(outdir, f"inj_extract_toys_{ds.key}.csv")
+        df.to_csv(out_csv, index=False)
+        print("[inj] wrote", out_csv)
+    else:
+        print(f"[inj] skipped writing toy CSV for {ds.key} (write_toy_csv=False)")
+    return df
 
 
 def run_injection_extraction_streaming(

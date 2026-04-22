@@ -554,6 +554,7 @@ def generate_extraction_display_slurm_scripts(
     output_root: str,
     *,
     dataset_keys: Optional[List[str]] = None,
+    toy_index: Optional[int] = None,
     mass_range: Optional[tuple] = None,
     job_name: str = "hps-gpr-exdisp",
     partition: str = "batch",
@@ -606,7 +607,12 @@ def generate_extraction_display_slurm_scripts(
         '  --dataset "${EXTRACT_DATASET}"',
         '  --masses "${EXTRACT_MASS}"',
         '  --strengths "${EXTRACT_STRENGTH}"',
-        '  --output-dir "${JOB_OUTDIR}")',
+        '  --output-dir "${JOB_OUTDIR}"',
+    ])
+    if toy_index is not None:
+        job_lines.append(f'  --toy-index "{int(toy_index)}"')
+    job_lines.extend([
+        ')',
         'if [ -n "${EXTRACT_DATASET_KEYS_CSV}" ]; then',
         '  CMD+=(--datasets "${EXTRACT_DATASET_KEYS_CSV}")',
         "fi",

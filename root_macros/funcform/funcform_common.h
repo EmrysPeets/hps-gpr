@@ -1246,6 +1246,31 @@ inline void ff_write_fit_metadata(TFile* fout,
         << "  \"neyman_chi2ndf\": " << ff_json_double(fit.eval.neyman_chi2ndf) << ",\n"
         << "  \"nbin_used\": " << fit.eval.nbin_used << ",\n"
         << "  \"ndf_sel\": " << fit.eval.ndf_sel << ",\n"
+        << "  \"function_title\": \"" << ff_json_escape(fit.func != nullptr ? fit.func->GetTitle() : fit.label) << "\",\n"
+        << "  \"parameters\": [\n";
+    if (fit.func != nullptr) {
+      for (int ip = 0; ip < fit.func->GetNpar(); ++ip) {
+        const double pval = fit.func->GetParameter(ip);
+        const double perr = fit.func->GetParError(ip);
+        double pmin = 0.0;
+        double pmax = 0.0;
+        fit.func->GetParLimits(ip, pmin, pmax);
+        const bool is_fixed = std::fabs(pmax - pmin) <= 1e-12;
+        one << "    {\n"
+            << "      \"name\": \"" << ff_json_escape(fit.func->GetParName(ip)) << "\",\n"
+            << "      \"value\": " << ff_json_double(pval) << ",\n"
+            << "      \"error\": " << ff_json_double(perr) << ",\n"
+            << "      \"min\": " << ff_json_double(pmin) << ",\n"
+            << "      \"max\": " << ff_json_double(pmax) << ",\n"
+            << "      \"fixed\": " << (is_fixed ? "true" : "false") << "\n"
+            << "    }";
+        if (ip + 1 != fit.func->GetNpar()) {
+          one << ",";
+        }
+        one << "\n";
+      }
+    }
+    one << "  ],\n"
         << "  \"validation\": {\n"
         << "    \"selection_score\": " << ff_json_double(fit.validation.selection_score) << ",\n"
         << "    \"selection_pass\": " << (fit.validation.selection_pass ? "true" : "false") << ",\n"

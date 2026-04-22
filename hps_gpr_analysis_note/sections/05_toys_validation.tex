@@ -43,7 +43,10 @@ $\chi^2/\mathrm{ndof}$ convention used by the macro when ranking the candidate
 functions. The present seeds reach the target selection region of
 $\chi^2/\mathrm{ndof}<2$ for the 2016 and 2021 primaries, while the 2015 turn-on
 remains provisionally acceptable at $\chi^2/\mathrm{ndof}<4$ pending a later dedicated
-low-mass iteration.
+low-mass iteration. The exact parameterizations used to generate the current closure
+toys are collected in Figure~\ref{fig:analytic-fit-parameter-summary}, which lists the
+selected family, fit and scan windows, goodness-of-fit diagnostics, and the fitted
+parameter values for the 2015, 2016, and 2021 primaries.
 
 The corrected toy workflow now keeps three mass intervals explicit in every export:
 the full histogram support used for toy normalization, the fit interval used to
@@ -77,6 +80,18 @@ toy-ensemble mean is computed from pseudoexperiments generated with bin-integrat
 Poisson expectations normalized to the full support-range event count of the real
 dataset.}
 \label{fig:analytic-fit-publication-overview}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.96\linewidth}{toy_generation_figs/funcform_parameterization_summary.png}
+\caption{Explicit parameter summary for the selected functional-form toy seeds. Each
+row lists the primary family used to generate the stored functional-form toy ensemble,
+the fit and scan windows relevant to the closure study, the bin-integral
+goodness-of-fit metrics, and the fitted parameter values extracted from the stored
+\texttt{TF1} object. The 2016 row is shown with the corrected 42--210~MeV scan
+interpretation used for the functional-form closure tests.}
+\label{fig:analytic-fit-parameter-summary}
 \end{figure}
 
 The current end-to-end toy-scan validation suites for the 2015 and 2016

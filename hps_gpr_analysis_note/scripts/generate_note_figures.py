@@ -15,11 +15,7 @@ from hps_gpr.statistics import bounded_two_sided_tail_pvalue
 
 
 NOTE_DIR = Path(__file__).resolve().parents[1]
-FUNCFORM_ROOT_SPECS = [
-    ("2015", NOTE_DIR.parent / "outputs" / "funcform_toys" / "funcform_2015_dataset_mod_toys.root"),
-    ("2016", NOTE_DIR.parent / "outputs" / "funcform_toys" / "funcform_2016_dataset_mod_toys.root"),
-    ("2021", NOTE_DIR.parent / "outputs" / "funcform_toys" / "funcform_2021_dataset_mod_toys.root"),
-]
+FUNCFORM_DATASETS = ["2015", "2016", "2021"]
 FUNCFORM_TITLES = {
     "2015": "HPS 2015",
     "2016": "HPS 2016 10%",
@@ -35,6 +31,16 @@ FUNCFORM_COLORS = {
     "sideband": "#D9D9D9",
 }
 FUNCFORM_CANDIDATE_COLORS = ["#4C72B0", "#DD8452", "#55A868", "#8172B3", "#937860"]
+FUNCFORM_FORMULA_TEXT = {
+    "fShiftSigPowTail": (
+        r"$f(x)=A\,S(x;x_t,w)\,(x-x_0)^a \exp(-(x-x_0)/\theta)\,\exp(c_1 u + c_2 u^2)$",
+        r"$u=(x-x_{\rm mid})/x_{\rm scale}$, with $f(x)=0$ for $x\leq x_0$.",
+    ),
+    "fSigPowExpQ": (
+        r"$f(x)=A\,S(x;x_t,w)\,x^a \exp(-x/\theta)\,\exp(c_1 x + c_2 x^2)$",
+        r"Threshold factor $S(x;x_t,w)=\left[1+\exp(-(x-x_t)/w)\right]^{-1}$.",
+    ),
+}
 
 
 def ensure_dir(path: Path) -> None:
@@ -112,7 +118,27 @@ def tile_images_horizontal(paths: list[Path], out_path: Path, *, bg: str = "whit
 def _read_named_json(root_path: Path, object_path: str) -> dict:
     with uproot.open(root_path) as fin:
         obj = fin[object_path]
-        return json.loads(obj.member("fTitle"))
+        try:
+            payload = obj.member("fTitle")
+        except Exception:
+            payload = str(obj)
+        return json.loads(payload)
+
+
+def _resolve_funcform_root_path(dataset: str) -> Path:
+    candidates = [
+        NOTE_DIR.parent / "outputs" / "funcform_toys" / f"funcform_{dataset}_dataset_mod_toys.root",
+        NOTE_DIR.parent / "outputs" / "funcform_toys" / f"funcform_{dataset}_toys.root",
+    ]
+    for path in candidates:
+        if path.exists():
+            return path
+    tried = ", ".join(str(path) for path in candidates)
+    raise FileNotFoundError(f"Could not locate functional-form ROOT export for {dataset}. Tried: {tried}")
+
+
+def _funcform_root_specs() -> list[tuple[str, Path]]:
+    return [(dataset, _resolve_funcform_root_path(dataset)) for dataset in FUNCFORM_DATASETS]
 
 
 def _funcform_scan_range_mev(dataset: str, scan_range_gev: tuple[float, float] | list[float]) -> tuple[float, float]:
@@ -136,6 +162,101 @@ def _funcform_positive_bounds(*arrays: np.ndarray) -> tuple[float, float]:
     return ymin, ymax
 
 
+def _tf1_param_payload(fit_obj) -> tuple[list[str], np.ndarray]:
+    params = fit_obj.member("fParams")
+    names = [str(name) for name in params.member("fParNames")]
+    values = np.asarray([float(val) for val in params.member("fParameters")], dtype=float)
+    return names, values
+
+
+def _safe_exp(values: np.ndarray) -> np.ndarray:
+    return np.exp(np.clip(np.asarray(values, dtype=float), -700.0, 700.0))
+
+
+def _sigmoid(x: np.ndarray, xt: float, w: float) -> np.ndarray:
+    if float(w) <= 0.0:
+        return np.zeros_like(np.asarray(x, dtype=float))
+    return 1.0 / (1.0 + _safe_exp(-(np.asarray(x, dtype=float) - float(xt)) / float(w)))
+
+
+def _evaluate_funcform_counts(tag: str, values: np.ndarray, edges: np.ndarray) -> np.ndarray:
+    x = 0.5 * (np.asarray(edges[:-1], dtype=float) + np.asarray(edges[1:], dtype=float))
+    p = np.asarray(values, dtype=float)
+    out = np.zeros_like(x, dtype=float)
+
+    if tag == "fSigPowExpQ":
+        A, a, theta, xt, w, c1, c2 = p
+        positive = x > 0.0
+        out[positive] = (
+            float(A)
+            * _sigmoid(x[positive], xt, w)
+            * np.power(x[positive], float(a))
+            * _safe_exp(-x[positive] / float(theta))
+            * _safe_exp(float(c1) * x[positive] + float(c2) * np.square(x[positive]))
+        )
+        return out
+
+    if tag == "fShiftSigPow":
+        A, a, theta, x0, xt, w = p
+        z = x - float(x0)
+        valid = (x > 0.0) & (z > 0.0) & (float(theta) > 0.0) & (float(w) > 0.0)
+        out[valid] = (
+            float(A)
+            * _sigmoid(x[valid], xt, w)
+            * np.power(np.maximum(z[valid], 1.0e-9), float(a))
+            * _safe_exp(-np.maximum(z[valid], 1.0e-9) / float(theta))
+        )
+        return out
+
+    if tag == "fShiftSigPowTail":
+        A, a, theta, x0, xt, w, c1, c2, xmid, xscale = p
+        z = x - float(x0)
+        valid = (
+            (x > 0.0)
+            & (z > 0.0)
+            & (float(theta) > 0.0)
+            & (float(w) > 0.0)
+            & (float(xscale) > 0.0)
+        )
+        u = (x[valid] - float(xmid)) / float(xscale)
+        safe_z = np.maximum(z[valid], 1.0e-9)
+        out[valid] = (
+            float(A)
+            * _sigmoid(x[valid], xt, w)
+            * np.power(safe_z, float(a))
+            * _safe_exp(-safe_z / float(theta))
+            * _safe_exp(float(c1) * u + float(c2) * np.square(u))
+        )
+        return out
+
+    if tag == "fGenGammaShift":
+        A, a, lam, power, x0 = p
+        z = x - float(x0)
+        valid = (z > 0.0) & (float(lam) > 0.0) & (float(power) > 0.0)
+        safe_z = np.maximum(z[valid], 1.0e-9)
+        out[valid] = (
+            float(A)
+            * np.power(safe_z, float(a))
+            * _safe_exp(-np.power(safe_z / float(lam), float(power)))
+        )
+        return out
+
+    if tag == "fGenGammaThresh":
+        A, a, lam, power, x0, xt, w = p
+        z = x - float(x0)
+        valid = (z > 0.0) & (float(lam) > 0.0) & (float(power) > 0.0) & (float(w) > 0.0)
+        safe_z = np.maximum(z[valid], 1.0e-9)
+        out[valid] = (
+            float(A)
+            * _sigmoid(x[valid], xt, w)
+            * np.power(safe_z, float(a))
+            * _safe_exp(-np.power(safe_z / float(lam), float(power)))
+        )
+        return out
+
+    raise KeyError(f"Unsupported functional-form tag for figure fallback: {tag}")
+
+
 def _load_funcform_payload(dataset: str, root_path: Path) -> dict:
     meta = _read_named_json(root_path, "fit_metadata/fit_summary_json")
     primary_tag = meta["primary_function"]
@@ -145,10 +266,36 @@ def _load_funcform_payload(dataset: str, root_path: Path) -> dict:
         data_vals, edges = fin["input_hist"].to_numpy()
         fit_curves = {}
         for fit in meta["fits"]:
-            fit_curves[fit["tag"]], _ = fin[f"validation/{fit['tag']}_expected_counts"].to_numpy()
-        toy_vals, _ = fin[f"validation/{primary_tag}_toy_mean"].to_numpy()
+            tag = str(fit["tag"])
+            validation_key = f"validation/{tag}_expected_counts"
+            if validation_key in fin:
+                fit_curves[tag], _ = fin[validation_key].to_numpy()
+            else:
+                fit_obj = fin[f"fit_functions/{tag}_fit"]
+                _, par_values = _tf1_param_payload(fit_obj)
+                fit_curves[tag] = _evaluate_funcform_counts(tag, par_values, edges)
 
-    support_lo, support_hi = meta["toy_support_range_GeV"]
+        toy_mean_key = f"validation/{primary_tag}_toy_mean"
+        if toy_mean_key in fin:
+            toy_vals, _ = fin[toy_mean_key].to_numpy()
+        else:
+            toy_dir = fin[str(primary_tag)]
+            toy_arrays = []
+            for toy_name in toy_dir.keys(cycle=False):
+                vals, _ = toy_dir[str(toy_name)].to_numpy()
+                toy_arrays.append(np.asarray(vals, dtype=float))
+            if not toy_arrays:
+                raise RuntimeError(f"No toy histograms found under {primary_tag} in {root_path}")
+            toy_vals = np.mean(np.stack(toy_arrays, axis=0), axis=0)
+
+    support_range = meta.get("toy_support_range_GeV") or meta.get("input_histogram_range_GeV")
+    if not support_range:
+        support_range = [float(edges[0]), float(edges[-1])]
+    scan_range = meta.get("scan_range_GeV") or [
+        float(meta.get("fit_min_GeV", float(edges[0]))),
+        float(meta.get("fit_max_GeV", float(edges[-1]))),
+    ]
+    support_lo, support_hi = support_range
     occupied = np.flatnonzero(data_vals > 0.0)
     display_hi = float(edges[occupied[-1] + 1]) if occupied.size else float(support_hi)
     return {
@@ -163,7 +310,7 @@ def _load_funcform_payload(dataset: str, root_path: Path) -> dict:
         "toy_vals": np.asarray(toy_vals, dtype=float),
         "support_range_mev": (float(support_lo) * 1.0e3, float(support_hi) * 1.0e3),
         "display_xlim_mev": (float(support_lo) * 1.0e3, display_hi * 1.0e3),
-        "scan_range_mev": _funcform_scan_range_mev(dataset, meta["scan_range_GeV"]),
+        "scan_range_mev": _funcform_scan_range_mev(dataset, scan_range),
     }
 
 
@@ -240,7 +387,7 @@ def _draw_funcform_primary_panel(
     scan_lo, scan_hi = payload["scan_range_mev"]
     ax.set_title(
         f"{payload['title']} / {payload['primary_fit']['label']}\n"
-        f"Scan [{scan_lo:.0f}, {scan_hi:.0f}] MeV / N events = {payload['meta']['normalization_target_count']:.3e}",
+        f"Scan [{scan_lo:.0f}, {scan_hi:.0f}] MeV / N events = {float(payload['meta'].get('normalization_target_count', np.sum(payload['data_vals']))):.3e}",
         fontsize=9.0,
     )
     if show_legend:
@@ -248,7 +395,7 @@ def _draw_funcform_primary_panel(
 
 
 def make_funcform_primary_fit_summary(out_path: Path) -> None:
-    payloads = [_load_funcform_payload(dataset, root_path) for dataset, root_path in FUNCFORM_ROOT_SPECS]
+    payloads = [_load_funcform_payload(dataset, root_path) for dataset, root_path in _funcform_root_specs()]
     fig, axes = plt.subplots(1, 3, figsize=(13.8, 4.8), constrained_layout=True)
 
     for iax, payload in enumerate(payloads):
@@ -271,7 +418,7 @@ def make_funcform_primary_fit_summary(out_path: Path) -> None:
 
 
 def make_funcform_publication_overview(out_path: Path) -> None:
-    payloads = [_load_funcform_payload(dataset, root_path) for dataset, root_path in FUNCFORM_ROOT_SPECS]
+    payloads = [_load_funcform_payload(dataset, root_path) for dataset, root_path in _funcform_root_specs()]
     fig = plt.figure(figsize=(13.6, 12.2))
     grid = fig.add_gridspec(3, 2, width_ratios=[1.08, 1.0], hspace=0.42, wspace=0.18)
     right_handles = None
@@ -307,6 +454,131 @@ def make_funcform_publication_overview(out_path: Path) -> None:
         ha="center",
         fontsize=9.2,
     )
+    save_figure(fig, out_path)
+    plt.close(fig)
+
+
+def _format_param_value(value: float) -> str:
+    aval = abs(float(value))
+    if aval >= 1.0e4 or (aval > 0.0 and aval < 1.0e-3):
+        return f"{float(value):.3e}"
+    if aval >= 100.0:
+        return f"{float(value):.2f}"
+    if aval >= 1.0:
+        return f"{float(value):.4f}"
+    return f"{float(value):.5f}"
+
+
+def _load_funcform_parameter_payload(dataset: str, root_path: Path) -> dict:
+    meta = _read_named_json(root_path, "fit_metadata/fit_summary_json")
+    primary_tag = str(meta["primary_function"])
+    primary_fit = next(fit for fit in meta["fits"] if str(fit["tag"]) == primary_tag)
+    with uproot.open(root_path) as fin:
+        fit_obj = fin[f"fit_functions/{primary_tag}_fit"]
+        params = fit_obj.member("fParams")
+        par_names = [str(name) for name in params.member("fParNames")]
+        par_values = [float(val) for val in params.member("fParameters")]
+        par_mins = [float(val) for val in fit_obj.member("fParMin")]
+        par_maxs = [float(val) for val in fit_obj.member("fParMax")]
+
+    param_rows = []
+    for name, value, lo, hi in zip(par_names, par_values, par_mins, par_maxs):
+        is_fixed = abs(float(hi) - float(lo)) <= 1.0e-12
+        label = f"{name} = {_format_param_value(value)}"
+        if is_fixed:
+            label += " (fixed)"
+        param_rows.append(label)
+
+    return {
+        "dataset": dataset,
+        "title": FUNCFORM_TITLES.get(dataset, dataset),
+        "root_path": root_path,
+        "meta": meta,
+        "primary_tag": primary_tag,
+        "primary_fit": primary_fit,
+        "formula_lines": FUNCFORM_FORMULA_TEXT.get(primary_tag, (primary_fit["label"], "")),
+        "param_rows": param_rows,
+        "scan_range_mev": _funcform_scan_range_mev(
+            dataset,
+            meta.get("scan_range_GeV")
+            or [float(primary_fit["fit_min_GeV"]), float(primary_fit["fit_max_GeV"])],
+        ),
+    }
+
+
+def make_funcform_parameterization_summary(out_path: Path) -> None:
+    payloads = [
+        _load_funcform_parameter_payload(dataset, root_path)
+        for dataset, root_path in _funcform_root_specs()
+    ]
+    fig, axes = plt.subplots(3, 1, figsize=(13.6, 10.5), constrained_layout=True)
+
+    for ax, payload in zip(axes, payloads):
+        ax.set_axis_off()
+        scan_lo, scan_hi = payload["scan_range_mev"]
+        primary_fit = payload["primary_fit"]
+        formula_lines = [line for line in payload["formula_lines"] if str(line).strip()]
+        params = payload["param_rows"]
+        split = max(1, int(np.ceil(len(params) / 2.0)))
+        left_params = params[:split]
+        right_params = params[split:]
+
+        header = (
+            f"{payload['title']}  |  primary seed: {payload['primary_tag']}  |  "
+            f"trial: {primary_fit['trial_label']}  |  "
+            f"fit [{float(primary_fit['fit_min_GeV']) * 1e3:.0f}, {float(primary_fit['fit_max_GeV']) * 1e3:.0f}] MeV  |  "
+            f"scan [{scan_lo:.0f}, {scan_hi:.0f}] MeV"
+        )
+        stats_line = (
+            f"Pearson chi2/ndof = {float(primary_fit['pearson_chi2ndf']):.3f}  |  "
+            f"Neyman chi2/ndof = {float(primary_fit['neyman_chi2ndf']):.3f}  |  "
+            f"ROOT chi2/ndof = {float(primary_fit['root_chi2ndf']):.3f}"
+        )
+        root_line = f"Source: {payload['root_path'].name}"
+
+        ax.text(
+            0.01,
+            0.93,
+            header,
+            ha="left",
+            va="top",
+            fontsize=11.6,
+            weight="bold",
+        )
+        ax.text(0.01, 0.80, stats_line, ha="left", va="top", fontsize=10.0, color="#333333")
+        ax.text(0.01, 0.72, root_line, ha="left", va="top", fontsize=9.2, color="#555555")
+
+        formula_text = "\n".join(formula_lines)
+        ax.text(
+            0.01,
+            0.57,
+            formula_text,
+            ha="left",
+            va="top",
+            fontsize=11.0,
+            bbox=dict(boxstyle="round,pad=0.35", fc="#F6F6F6", ec="#D0D0D0", alpha=0.98),
+        )
+        ax.text(
+            0.03,
+            0.34,
+            "\n".join(left_params),
+            ha="left",
+            va="top",
+            fontsize=10.2,
+            family="monospace",
+        )
+        if right_params:
+            ax.text(
+                0.52,
+                0.34,
+                "\n".join(right_params),
+                ha="left",
+                va="top",
+                fontsize=10.2,
+                family="monospace",
+            )
+        ax.axhline(0.02, color="0.82", lw=1.0)
+
     save_figure(fig, out_path)
     plt.close(fig)
 
@@ -711,6 +983,9 @@ def main(argv: list[str] | None = None) -> None:
         make_funcform_publication_overview(
             NOTE_DIR / "toy_generation_figs" / "funcform_publication_overview.png"
         )
+        make_funcform_parameterization_summary(
+            NOTE_DIR / "toy_generation_figs" / "funcform_parameterization_summary.png"
+        )
         return
 
     crop_pdf(
@@ -809,6 +1084,9 @@ def main(argv: list[str] | None = None) -> None:
     )
     make_funcform_publication_overview(
         NOTE_DIR / "toy_generation_figs" / "funcform_publication_overview.png"
+    )
+    make_funcform_parameterization_summary(
+        NOTE_DIR / "toy_generation_figs" / "funcform_parameterization_summary.png"
     )
 
 
