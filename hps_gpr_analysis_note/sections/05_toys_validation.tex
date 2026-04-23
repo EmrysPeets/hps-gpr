@@ -293,6 +293,16 @@ bins. The injected strength axis is then defined by
 A_{\mathrm{inj}}(m) = Z_{\mathrm{inj}}\,\sigma_{A,\mathrm{ref}}(m).
 \end{equation}
 
+It is useful to state explicitly what $\sigma_{A,\mathrm{ref}}$ is \emph{not}. It is
+not the uncertainty extracted from an individual toy after signal injection. Rather, it
+is a calibration quantity computed once from a background-only reference problem at each
+mass hypothesis. In the code this is exactly the object returned by evaluating the local
+fit on the reference spectrum and reading off its fitted $\sigma_A$
+\cite{Cowan1998,Cowan2011}. Its role is to define what is meant by an injected
+``$1\sigma$,'' ``$2\sigma$,'' or ``$5\sigma$'' signal through
+$A_{\mathrm{inj}}=Z_{\mathrm{inj}}\sigma_{A,\mathrm{ref}}$ before any toy-by-toy
+fluctuations are generated.
+
 In \textbf{Asimov mode}, the reference spectrum is deterministic,
 \begin{equation}
 n_{\mathrm{ref},i} = b_i,
@@ -316,6 +326,15 @@ asymptotic approximation. Put differently: the Asimov dataset calibrates the inj
 axis, but the pseudoexperiments remain the mechanism that profiles the background model
 and measures how realistic background-only fluctuations propagate through the
 extraction chain.
+
+The later toy summaries therefore involve two related but different uncertainty scales.
+The reference quantity $\sigma_{A,\mathrm{ref}}$ fixes the horizontal injection axis and
+the nominal target significance $Z_{\mathrm{inj}}$. By contrast, the toy-level
+$\sigma_A$ is the uncertainty returned by the fit \emph{for that specific toy} after the
+background and signal fluctuations have been realized. Pulls use the toy-level
+$\sigma_A$, while $Z_{\mathrm{inj}}$ is defined from $\sigma_{A,\mathrm{ref}}$. This is
+precisely why pull curves and $\Delta Z$ curves need not overlay one another
+point-by-point even in a well-calibrated study.
 
 \subsection{Poisson versus multinomial signal injection}
 
@@ -397,6 +416,15 @@ whether the estimator is biased, whether the quoted uncertainty is correctly cal
 and whether the reported intervals achieve the claimed frequentist coverage
 \cite{Cowan1998,Cowan2011}.
 
+The note now separates two uses of these diagnostics. The figures immediately below are
+generated with the GP-based injection/extraction pseudoexperiment workflow described
+earlier in this section, so they should be read as GP-conditioned closure and calibration
+checks of the extraction layer. The later functional-form closure block reuses the same
+summary observables, but with pseudo-data whose smooth-spectrum truth comes from the
+analytic toy seeds rather than from a GP-generated background ensemble.
+
+\subsubsection{GP-generated pseudoexperiment diagnostics}
+
 In practice the validation outputs are organized so that each product answers one
 statistical question cleanly. The linearity and bias panels test estimator closure;
 the pull-width and coverage panels test uncertainty calibration; the pull-mean and
@@ -449,7 +477,9 @@ together.
 studies. The top row shows the 2015 and 2016 10\% validations; the bottom row is
 reserved for the 2021 1\% export and the current combined summary. These panels test
 estimator closure directly: the pull mean tracks bias while the pull width tests
-whether the quoted $\sigma_A$ is correctly calibrated as an uncertainty scale.}
+whether the quoted $\sigma_A$ is correctly calibrated as an uncertainty scale. In this
+figure set, the underlying ensembles are GP-generated injection/extraction
+pseudoexperiments rather than analytic functional-form toy scans.}
 \label{fig:pull-vs-mass}
 \end{figure}
 
@@ -492,7 +522,8 @@ Figure~\ref{fig:coverage} makes that interval-level test explicit.
 intervals. The top row shows the 2015 and 2016 10\% single-dataset studies, while the
 bottom row is reserved for the 2021 1\% export and the current combined summary. These
 panels test whether the extracted uncertainty $\sigma_A$ is correctly calibrated as an
-interval statement, not only as a width parameter.}
+interval statement, not only as a width parameter. As above, the ensemble source here is
+the GP-based pseudoexperiment workflow.}
 \label{fig:coverage}
 \end{figure}
 
@@ -513,8 +544,137 @@ median $\Delta Z$ becomes positive in the overlap region because statistically
 independent inputs add coherently in the shared-$\eps^2$ fit; in the current
 2015+2016 summary the enhancement is strongest near \SIrange{50}{70}{MeV}, where a
 $Z_{\rm inj}=5$ signal gains about two additional significance units in the median
-combined response.}
+combined response. These panels are likewise produced from the GP-generated
+injection/extraction pseudoexperiment summaries.}
 \label{fig:z-calibration-residual}
+\end{figure}
+
+\subsubsection{Functional-form closure studies}
+
+The functional-form closure studies answer a related but distinct question: whether the
+blind-window extraction closes when the toy truth is a smooth analytic spectrum rather
+than a GP-derived background realization. The plots included here were produced with the
+functional-form \texttt{inject} workflow, not with \texttt{toy-scan}: each toy starts
+from a pre-generated functional-form histogram, the nominal signal strength
+$A_{\mathrm{inj}}$ or $Z_{\mathrm{inj}}$ defines the mean injected yield, and the
+realized signal contribution is then Poisson-sampled template-bin by template-bin so the
+total injected signal fluctuates toy by toy around that mean rather than being held
+fixed exactly.
+
+This distinction matters for the sideband question. In the \texttt{funcform100}
+injection configs used for the figures below, \texttt{inj\_refit\_gp\_on\_toy=false}, so
+these panels are a \textbf{fixed-background / no-refit} closure test on top of a
+functional-form toy truth. They validate whether the local extraction fit recovers the
+injected signal once the sideband-conditioned GP prediction for that toy is held fixed.
+They do \emph{not} by themselves prove closure of the full toy-by-toy sideband-refit scan.
+That stronger statement belongs either to the dedicated functional-form
+\texttt{toy-scan} ladder or to an injection workflow rerun with
+\texttt{inj\_refit\_gp\_on\_toy=true}. The separate GP-mean/refit pseudoexperiments
+therefore remain the complementary absorption stress test, not an automatic consequence
+of these particular functional-form injection plots.
+
+The pull and $Z$-calibration summaries should also not be expected to match
+point-by-point. The pull compresses the mean and width of
+$(\hat A-A_{\mathrm{inj}})/\sigma_A$, while the significance residual uses
+$\Delta Z=\hat Z-Z_{\mathrm{inj}}$ with $\hat Z=\hat A/\sigma_A$ but
+$Z_{\mathrm{inj}}=A_{\mathrm{inj}}/\sigma_{A,\mathrm{ref}}$. Since the extracted toy
+significance uses the toy-level $\sigma_A$ whereas the injected significance is defined
+with the reference scale $\sigma_{A,\mathrm{ref}}$, modest differences between the pull
+curves and the $\Delta Z$ curves are expected even when the study is behaving well.
+
+\paragraph{2015 functional-form closure.}
+
+The 2015 functional-form closure outputs are already mature enough to include directly in
+the note. Here the pull panel tests extracted-amplitude closure and uncertainty
+calibration in the no-refit functional-form injection workflow, while the
+$Z$-calibration panel asks whether the injected significance is recovered without a
+mass-dependent drift in that same fixed-background setup. The two summaries do not
+coincide bin by bin, especially toward the upper end of the 2015 scan range, but that
+is acceptable here because they are testing different combinations of the fitted
+amplitude and uncertainty scales. What matters for this closure mode is that the pull
+mean stays reasonably near zero, the pull width stays near unity, and the corresponding
+$\Delta Z$ residuals remain centered close to zero without a runaway trend.
+
+\begin{figure}[p]
+\centering
+\begin{subfigure}[t]{0.86\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{injection_extraction_figs/funcform_pull_vs_mass_2015.png}
+  \caption{2015 functional-form pull mean and width versus mass.}
+\end{subfigure}
+
+\vspace{0.8em}
+
+\begin{subfigure}[t]{0.86\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{injection_extraction_figs/funcform_z_calibration_residual_2015.png}
+  \caption{2015 functional-form $Z$-calibration residual versus mass.}
+\end{subfigure}
+\caption{2015 functional-form no-refit closure diagnostics. The upper panel summarizes
+estimator closure and uncertainty calibration through the pull mean and pull width. The
+lower panel tests significance calibration through $\Delta Z=\hat Z-Z_{\mathrm{inj}}$.
+The two views need not match point-by-point because the pull uses the toy-level
+$\sigma_A$ in both the estimator and the subtraction term, whereas $Z_{\mathrm{inj}}$ is
+defined with the reference scale $\sigma_{A,\mathrm{ref}}$. The present 2015 mismatch in
+detail is therefore not, by itself, a sign of failed closure.}
+\label{fig:funcform-closure-2015}
+\end{figure}
+
+\paragraph{2016 functional-form closure.}
+
+The 2016 10\% functional-form pull summary is available now and already serves as the
+correct top-panel closure diagnostic for this no-refit injection study. The matching
+$Z$-calibration export has not yet been frozen, so the lower slot is intentionally left
+as a placeholder in the same stacked layout that will be used for the final note
+version.
+
+\begin{figure}[p]
+\centering
+\begin{subfigure}[t]{0.86\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{injection_extraction_figs/funcform_pull_vs_mass_2016.png}
+  \caption{2016 10\% functional-form pull mean and width versus mass.}
+\end{subfigure}
+
+\vspace{0.8em}
+
+\begin{subfigure}[t]{0.86\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{injection_extraction_figs/funcform_z_calibration_residual_2016.png}
+  \caption{Reserved slot for the 2016 10\% functional-form $Z$-calibration residual.}
+\end{subfigure}
+\caption{2016 10\% functional-form no-refit closure block. The pull diagnostic is
+already bundled for note use; the $Z$-calibration residual will be inserted in the lower
+slot once the corresponding export is produced.}
+\label{fig:funcform-closure-2016}
+\end{figure}
+
+\paragraph{2021 functional-form closure.}
+
+The same stacked no-refit closure layout is reserved for the 2021 1\% sample. Both the
+pull and $Z$-calibration panels are kept as placeholders here so that the subsection
+structure and figure flow are already fixed before the final 2021 functional-form export
+is added.
+
+\begin{figure}[p]
+\centering
+\begin{subfigure}[t]{0.86\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{injection_extraction_figs/funcform_pull_vs_mass_2021.png}
+  \caption{Reserved slot for the 2021 1\% functional-form pull summary.}
+\end{subfigure}
+
+\vspace{0.8em}
+
+\begin{subfigure}[t]{0.86\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{injection_extraction_figs/funcform_z_calibration_residual_2021.png}
+  \caption{Reserved slot for the 2021 1\% functional-form $Z$-calibration residual.}
+\end{subfigure}
+\caption{Reserved 2021 1\% functional-form no-refit closure block. The final note
+version should replace these placeholders with the corresponding 2021 pull and
+significance-calibration exports once the study is complete.}
+\label{fig:funcform-closure-2021}
 \end{figure}
 
 \subsection{Combined search-power studies}
