@@ -139,6 +139,9 @@ standalone project.
 | `injection_extraction_figs/coverage_all.png` | `injection_summary_9/coverage_all.png` | provisional | Cross-dataset empirical coverage summary. |
 | `injection_extraction_figs/pull_vs_mass_2015.png` | `injection_summary_9/pull_vs_mass_2015.png` | provisional | 2015 pull mean and width versus mass. |
 | `injection_extraction_figs/pull_vs_mass_2016.png` | `injection_summary_9/pull_vs_mass_2016.png` | provisional | 2016 10% pull mean and width versus mass. |
+| `injection_extraction_figs/funcform_pull_vs_mass_2015.png` | `/Users/emryspeets/Desktop/gp_mods/2015_gpr/closure/pull_vs_mass_2015.png` | provisional | 2015 functional-form closure pull summary used in the dedicated Section 5.7 stacked closure panel. |
+| `injection_extraction_figs/funcform_pull_vs_mass_2016.png` | `/Users/emryspeets/Desktop/gp_mods/2016_gpr/closure/pull_vs_mass_2016.png` | provisional | 2016 10% functional-form closure pull summary used in the dedicated Section 5.7 stacked closure panel. |
+| `injection_extraction_figs/funcform_z_calibration_residual_2015.png` | `/Users/emryspeets/Desktop/gp_mods/2015_gpr/closure/z_calibration_residual_2015.png` | provisional | 2015 functional-form closure significance-calibration residual used as the lower panel of the dedicated Section 5.7 stacked closure figure. |
 | `injection_extraction_figs/coverage_2015.png` | `injection_summary_9/coverage_2015.png` | provisional | 2015 interval coverage versus mass and injected strength. |
 | `injection_extraction_figs/coverage_2016.png` | `injection_summary_9/coverage_2016.png` | provisional | 2016 10% interval coverage versus mass and injected strength. |
 | `injection_extraction_figs/heatmap_pull_mean_2015.png` | `injection_summary_9/heatmap_pull_mean_2015.png` | provisional | 2015 mean-pull heatmap. |
