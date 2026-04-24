@@ -51,6 +51,7 @@ def test_inject_plot_runs_with_summary_csvs_only(tmp_path: Path):
     assert (outdir / "coverage_2015.png").exists()
     assert (outdir / "pull_vs_mass_2015.png").exists()
     assert (outdir / "z_calibration_residual_2015.png").exists()
+    assert not (outdir / "pull_hist_2015").exists()
 
 
 def test_inject_plot_handles_toy_rows_mislabeled_as_summary(tmp_path: Path):
@@ -93,3 +94,50 @@ def test_inject_plot_handles_toy_rows_mislabeled_as_summary(tmp_path: Path):
     assert res.exit_code == 0, res.output
     assert (outdir / "inj_extract_summary_2015.csv").exists()
     assert (outdir / "z_calibration_residual_2015.png").exists()
+
+
+def test_inject_plot_handles_fragmented_single_toy_summary_rows(tmp_path: Path):
+    rows = []
+    for pull, zhat in ((0.5, 1.4), (-0.3, 0.7), (0.1, 1.1)):
+        rows.append(
+            {
+                "dataset": "2015",
+                "mass_GeV": 0.050,
+                "strength": 10.0,
+                "inj_nsigma": 1.0,
+                "n_toys": 1,
+                "A_hat_mean": 10.0 + 2.0 * pull,
+                "sigma_A_mean": 2.0,
+                "pull_mean": pull,
+                "pull_std": float("nan"),
+                "cov_1sigma": 1.0,
+                "cov_2sigma": 1.0,
+                "Zhat_mean": zhat,
+                "Zhat_q16": zhat,
+                "Zhat_q84": zhat,
+                "sigmaA_ref": 2.0,
+            }
+        )
+
+    inp = tmp_path / "injection_flat"
+    inp.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame(rows).to_csv(inp / "inj_extract_summary_2015__jobds_2015__m_0p05__s_s1.csv", index=False)
+
+    outdir = tmp_path / "injection_summary"
+    runner = CliRunner()
+    res = runner.invoke(
+        main,
+        [
+            "inject-plot",
+            "--input-dir",
+            str(inp),
+            "--output-dir",
+            str(outdir),
+        ],
+    )
+
+    assert res.exit_code == 0, res.output
+    assert (outdir / "inj_extract_summary_2015.csv").exists()
+    assert (outdir / "pull_vs_mass_2015.png").exists()
+    assert (outdir / "z_calibration_residual_2015.png").exists()
+    assert not (outdir / "pull_hist_2015").exists()
