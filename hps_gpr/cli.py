@@ -1952,6 +1952,7 @@ def inject_plot(input_dir, output_dir, dataset, write_merged_toys):
     from .injection import summarize_injection_grid, combine_injection_toy_tables, _combined_mass_support_summary, format_combined_mass_support_summary
     from .plotting import (
         ensure_dir,
+        _looks_like_single_toy_summary_rows,
         plot_linearity,
         plot_bias_vs_injected_strength,
         plot_pull_width,
@@ -2093,8 +2094,10 @@ def inject_plot(input_dir, output_dir, dataset, write_merged_toys):
         for ds, frames in sorted(by_dataset_summary.items()):
             dsum = pd.concat(frames, ignore_index=True)
             dsum = dsum.sort_values([c for c in ["mass_GeV", "strength", "inj_nsigma"] if c in dsum.columns]).reset_index(drop=True)
+            fragment_group_cols = [c for c in ["dataset", "mass_GeV", "inj_nsigma"] if c in dsum.columns]
+            looks_like_fragments = _looks_like_single_toy_summary_rows(dsum, fragment_group_cols)
             dedup_cols = [c for c in ["dataset", "mass_GeV", "strength"] if c in dsum.columns]
-            if dedup_cols:
+            if dedup_cols and not looks_like_fragments:
                 dsum = dsum.drop_duplicates(subset=dedup_cols, keep="last")
             if "dataset" not in dsum.columns:
                 dsum["dataset"] = str(ds)

@@ -281,6 +281,43 @@ def test_streaming_summary_schema_matches_legacy_summary(tmp_path, monkeypatch):
     assert set(stream_sum.columns) == set(legacy_sum.columns)
 
 
+def test_summarize_injection_grid_computes_delta_z_minus_pull_from_delta_z():
+    toys = pd.DataFrame(
+        [
+            {
+                "dataset": "2015",
+                "mass_GeV": 0.05,
+                "strength": 10.0,
+                "inj_nsigma": 2.0,
+                "sigmaA_ref": 5.0,
+                "A_hat": 12.0,
+                "sigma_A": 2.0,
+                "pull_param": 1.0,
+                "Zhat": 6.0,
+                "success": True,
+            },
+            {
+                "dataset": "2015",
+                "mass_GeV": 0.05,
+                "strength": 10.0,
+                "inj_nsigma": 2.0,
+                "sigmaA_ref": 5.0,
+                "A_hat": 8.0,
+                "sigma_A": 2.0,
+                "pull_param": -1.0,
+                "Zhat": 4.0,
+                "success": True,
+            },
+        ]
+    )
+
+    out = summarize_injection_grid(toys)
+    row = out.iloc[0]
+    expected = (float(row["Zhat_mean"]) - float(row["inj_nsigma"])) - float(row["pull_mean"])
+
+    assert float(row["delta_z_minus_pull"]) == expected
+
+
 def test_streaming_combined_writes_compact_summaries_without_toy_csv(tmp_path, monkeypatch):
     _install_fast_injection_mocks(monkeypatch)
     cfg = Config(
