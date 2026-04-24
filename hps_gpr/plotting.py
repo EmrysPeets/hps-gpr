@@ -1570,9 +1570,18 @@ def plot_delta_z_minus_pull_vs_injected_sigma(
         return
 
     work = df_sum.copy()
-    if "delta_z_minus_pull" not in work.columns:
+    if {"Zhat_mean", "pull_mean", "inj_nsigma"}.issubset(work.columns):
+        work["delta_z_minus_pull"] = (
+            pd.to_numeric(work["Zhat_mean"], errors="coerce").to_numpy(float)
+            - pd.to_numeric(work["inj_nsigma"], errors="coerce").to_numpy(float)
+            - pd.to_numeric(work["pull_mean"], errors="coerce").to_numpy(float)
+        )
+    elif "delta_z_minus_pull" not in work.columns:
         if {"Zhat_mean", "pull_mean"}.issubset(work.columns):
-            work["delta_z_minus_pull"] = work["Zhat_mean"].to_numpy(float) - work["pull_mean"].to_numpy(float)
+            work["delta_z_minus_pull"] = (
+                pd.to_numeric(work["Zhat_mean"], errors="coerce").to_numpy(float)
+                - pd.to_numeric(work["pull_mean"], errors="coerce").to_numpy(float)
+            )
         else:
             return
 
@@ -1630,6 +1639,106 @@ def plot_delta_z_minus_pull_vs_injected_sigma(
 
     fig.suptitle(r"$\langle\hat{Z}\rangle-\langle pull\rangle$ vs expected injection significance", y=1.02)
     _save_plot_outputs(fig, outpath)
+
+
+def _looks_like_single_toy_summary_rows(
+    df: pd.DataFrame,
+    group_cols: List[str],
+) -> bool:
+    """Detect summary tables that are actually one-toy rows repeated by group."""
+    if df is None or df.empty or not set(group_cols).issubset(set(df.columns)):
+        return False
+    for _, sub in df.groupby(group_cols, dropna=False):
+        if len(sub) <= 1:
+            continue
+        if "n_toys" in sub.columns:
+            n_toys_vals = pd.to_numeric(sub["n_toys"], errors="coerce").to_numpy(float)
+        else:
+            n_toys_vals = np.full(len(sub), np.nan, float)
+        if n_toys_vals.size == 0 or not np.any(np.isfinite(n_toys_vals)):
+            continue
+        if bool(np.nanmax(n_toys_vals) <= 1.0):
+            return True
+    return False
+
+
+def _summarize_pull_vs_mass_rows(
+    dft: pd.DataFrame,
+    *,
+    has_toy_pull: bool,
+) -> pd.DataFrame:
+    """Return grouped pull moments for either toy rows or fragmented summary rows."""
+    rows: List[Dict[str, float]] = []
+    group_cols = ["mass_GeV", "_inj_level"]
+
+    for (m, level), sub in dft.groupby(group_cols, dropna=False):
+        if "n_toys" in sub.columns:
+            n_toys_vals = pd.to_numeric(sub["n_toys"], errors="coerce").to_numpy(float)
+        else:
+            n_toys_vals = np.full(len(sub), np.nan, float)
+        treat_as_fragmented_summary = (
+            not has_toy_pull
+            and len(sub) > 1
+            and n_toys_vals.size > 0
+            and np.any(np.isfinite(n_toys_vals))
+            and bool(np.nanmax(n_toys_vals) <= 1.0)
+        )
+
+        if has_toy_pull or treat_as_fragmented_summary:
+            pull_col = "pull_param" if has_toy_pull else "pull_mean"
+            pull = pd.to_numeric(sub[pull_col], errors="coerce").to_numpy(float)
+            pull = pull[np.isfinite(pull)]
+            if pull.size == 0:
+                continue
+            mu = float(np.mean(pull))
+            sd = float(np.std(pull, ddof=1)) if pull.size > 1 else float("nan")
+            sem = float(sd / np.sqrt(pull.size)) if pull.size > 1 else float("nan")
+            sd_err = float(sd / np.sqrt(2 * (pull.size - 1))) if pull.size > 2 and np.isfinite(sd) else float("nan")
+            rows.append(
+                dict(
+                    mass_GeV=float(m),
+                    inj_level=float(level),
+                    pull_mean=mu,
+                    pull_sem=sem,
+                    pull_std=sd,
+                    pull_std_err=sd_err,
+                )
+            )
+            continue
+
+        pull_mean = pd.to_numeric(sub["pull_mean"], errors="coerce").to_numpy(float)
+        pull_std = pd.to_numeric(sub["pull_std"], errors="coerce").to_numpy(float)
+        if "pull_sem" in sub.columns:
+            pull_sem = pd.to_numeric(sub["pull_sem"], errors="coerce").to_numpy(float)
+        elif "n_toys" in sub.columns:
+            n = np.clip(pd.to_numeric(sub["n_toys"], errors="coerce").to_numpy(float), 1.0, None)
+            pull_sem = pull_std / np.sqrt(n)
+        else:
+            pull_sem = np.full(len(sub), np.nan, float)
+        if "pull_std_err" in sub.columns:
+            pull_std_err = pd.to_numeric(sub["pull_std_err"], errors="coerce").to_numpy(float)
+        elif "n_toys" in sub.columns:
+            n = np.clip(pd.to_numeric(sub["n_toys"], errors="coerce").to_numpy(float), 2.0, None)
+            pull_std_err = pull_std / np.sqrt(2.0 * (n - 1.0))
+        else:
+            pull_std_err = np.full(len(sub), np.nan, float)
+
+        finite = np.isfinite(pull_mean) & np.isfinite(pull_std)
+        if not np.any(finite):
+            continue
+        rows.append(
+            dict(
+                mass_GeV=float(m),
+                inj_level=float(level),
+                pull_mean=float(np.nanmean(pull_mean[finite])),
+                pull_sem=float(np.nanmean(pull_sem[finite])) if np.any(np.isfinite(pull_sem[finite])) else float("nan"),
+                pull_std=float(np.nanmean(pull_std[finite])),
+                pull_std_err=float(np.nanmean(pull_std_err[finite])) if np.any(np.isfinite(pull_std_err[finite])) else float("nan"),
+            )
+        )
+
+    return pd.DataFrame(rows).sort_values(["inj_level", "mass_GeV"]).reset_index(drop=True) if rows else pd.DataFrame()
+
 
 def plot_injection_heatmap(
 
@@ -1713,6 +1822,10 @@ def plot_z_calibration_residual(
     toy_needed = {"dataset", "mass_GeV", "inj_nsigma", "Zhat"}
     summary_needed = {"dataset", "mass_GeV", "inj_nsigma", "Zhat_mean"}
 
+    def q(v: np.ndarray, p: float) -> float:
+        arr = np.asarray(v, float)
+        return float(np.nanquantile(arr, p)) if np.any(np.isfinite(arr)) else float("nan")
+
     if toy_needed.issubset(set(work.columns)):
         work["delta_z"] = work["Zhat"].to_numpy(float) - work["inj_nsigma"].to_numpy(float)
         finite = np.isfinite(work["delta_z"].to_numpy(float)) & np.isfinite(work["mass_GeV"].to_numpy(float))
@@ -1720,10 +1833,6 @@ def plot_z_calibration_residual(
         if work.empty:
             print("[plot_z_calibration_residual] skipped: no finite ΔZ values")
             return
-
-        def q(v: np.ndarray, p: float) -> float:
-            arr = np.asarray(v, float)
-            return float(np.nanquantile(arr, p)) if np.any(np.isfinite(arr)) else float("nan")
 
         rows: List[Dict[str, float]] = []
         gcols = ["dataset", "mass_GeV", "inj_nsigma"]
@@ -1758,17 +1867,41 @@ def plot_z_calibration_residual(
         if work.empty:
             print("[plot_z_calibration_residual] skipped: no finite ΔZ values")
             return
+        gcols = ["dataset", "mass_GeV", "inj_nsigma"]
         rows = []
-        for _, r in work.iterrows():
-            rows.append(dict(
-                dataset=str(r.get("dataset", "all")),
-                mass_GeV=float(r["mass_GeV"]),
-                inj_nsigma=float(r["inj_nsigma"]),
-                n_toys=int(r["n_toys"]) if "n_toys" in work.columns and np.isfinite(float(r.get("n_toys", np.nan))) else np.nan,
-                dz_med=float(r["dz_med"]),
-                dz_q16=float(r["dz_q16"]),
-                dz_q84=float(r["dz_q84"]),
-            ))
+        for (ds, m, z_inj), sub in work.groupby(gcols, dropna=False):
+            if "n_toys" in sub.columns:
+                n_toys_vals = pd.to_numeric(sub["n_toys"], errors="coerce").to_numpy(float)
+            else:
+                n_toys_vals = np.full(len(sub), np.nan, float)
+            looks_like_single_toy_rows = (
+                len(sub) > 1
+                and n_toys_vals.size > 0
+                and np.any(np.isfinite(n_toys_vals))
+                and bool(np.nanmax(n_toys_vals) <= 1.0)
+            )
+            if looks_like_single_toy_rows:
+                dz = sub["delta_z"].to_numpy(float)
+                rows.append(dict(
+                    dataset=str(ds),
+                    mass_GeV=float(m),
+                    inj_nsigma=float(z_inj),
+                    n_toys=int(len(sub)),
+                    dz_med=q(dz, 0.50),
+                    dz_q16=q(dz, 0.16),
+                    dz_q84=q(dz, 0.84),
+                ))
+                continue
+            for _, r in sub.iterrows():
+                rows.append(dict(
+                    dataset=str(r.get("dataset", "all")),
+                    mass_GeV=float(r["mass_GeV"]),
+                    inj_nsigma=float(r["inj_nsigma"]),
+                    n_toys=int(r["n_toys"]) if "n_toys" in work.columns and np.isfinite(float(r.get("n_toys", np.nan))) else np.nan,
+                    dz_med=float(r["dz_med"]),
+                    dz_q16=float(r["dz_q16"]),
+                    dz_q84=float(r["dz_q84"]),
+                ))
         df_sum = pd.DataFrame(rows)
     else:
         print("[plot_z_calibration_residual] skipped: missing required toy- or summary-level columns")
@@ -1951,7 +2084,7 @@ def plot_pull_histogram_by_mass(
     title_prefix: str = "",
     outdir: Optional[str] = None,
 ) -> List[str]:
-    """Plot toy pull histograms per mass (and optional strength), with N(0,1) reference."""
+    """Plot toy pull histograms per mass and injected level, with N(0,1) reference."""
     if df_toys.empty or "pull_param" not in df_toys.columns or "mass_GeV" not in df_toys.columns:
         return []
 
@@ -1961,16 +2094,25 @@ def plot_pull_histogram_by_mass(
     if dft.empty:
         return []
 
+    dft["mass_GeV"] = pd.to_numeric(dft["mass_GeV"], errors="coerce")
+    dft["strength"] = pd.to_numeric(dft.get("strength", np.nan), errors="coerce")
+    dft["inj_nsigma"] = pd.to_numeric(dft.get("inj_nsigma", np.nan), errors="coerce")
     ensure_dir(outdir or ".")
     paths: List[str] = []
-    grp_cols = ["mass_GeV"] + (["strength"] if group_by_strength and "strength" in dft.columns else [])
+    use_sigma_labels = bool(group_by_strength and np.isfinite(dft["inj_nsigma"].to_numpy(float)).any())
+    if use_sigma_labels:
+        dft["_inj_level"] = np.round(dft["inj_nsigma"].to_numpy(float), 8)
+        grp_cols = ["mass_GeV", "_inj_level"]
+    else:
+        grp_cols = ["mass_GeV"] + (["strength"] if group_by_strength and "strength" in dft.columns else [])
     base = str(dataset_key) if dataset_key is not None else "all"
 
     for keys, sub in dft.groupby(grp_cols, dropna=False):
         if not isinstance(keys, tuple):
             keys = (keys,)
         mass = float(keys[0])
-        strength = float(keys[1]) if len(keys) > 1 else None
+        inj_level = float(keys[1]) if use_sigma_labels and len(keys) > 1 else None
+        strength = float(keys[1]) if (not use_sigma_labels and len(keys) > 1) else None
         pull = sub["pull_param"].to_numpy(float)
         pull = pull[np.isfinite(pull)]
         if pull.size == 0:
@@ -2003,14 +2145,19 @@ def plot_pull_histogram_by_mass(
         ax.set_xlabel(r"pull = $(\hat{A}-A_{inj})/\sigma_A$")
         ax.set_ylabel("density")
         t_bits = [f"m={mass*1e3:.1f} MeV"]
-        if strength is not None:
+        if inj_level is not None:
+            t_bits.append(fr"$Z_{{inj}}={inj_level:.3g}$")
+        elif strength is not None:
             t_bits.append(f"A_inj={strength:.3g}")
         _set_title_above(ax, f"{title_prefix}{base}: pull histogram ({', '.join(t_bits)})".strip())
         ax.legend(loc="best", frameon=True)
         _grid(ax)
 
         mtag = mass_tag(mass)
-        stag = f"_A{strength:.3g}".replace("+", "").replace("-", "m").replace(".", "p") if strength is not None else ""
+        if inj_level is not None:
+            stag = f"_Z{inj_level:.3g}".replace("+", "").replace("-", "m").replace(".", "p")
+        else:
+            stag = f"_A{strength:.3g}".replace("+", "").replace("-", "m").replace(".", "p") if strength is not None else ""
         outpath = os.path.join(outdir or ".", f"pull_hist_{base}_{mtag}{stag}.png")
         plt.savefig(outpath, dpi=220)
         plt.close(fig)
@@ -2049,68 +2196,14 @@ def plot_pull_vs_mass(
     use_sigma_labels = bool(np.isfinite(dft["inj_nsigma"].to_numpy(float)).any())
     if use_sigma_labels:
         dft["_inj_level"] = np.round(dft["inj_nsigma"].to_numpy(float), 8)
-        legend_title = r"Injected level ($A_{\mathrm{inj}}/\sigma_A$)"
+        legend_title = r"Injected level ($A_{\mathrm{inj}}/\sigma_{A,\mathrm{ref}}$)"
     else:
         dft["_inj_level"] = dft["strength"].to_numpy(float)
         legend_title = r"Injected $A_{\mathrm{inj}}$"
 
-    if has_toy_pull:
-        rows = []
-        for (m, level), sub in dft.groupby(["mass_GeV", "_inj_level"], dropna=False):
-            pull = sub["pull_param"].to_numpy(float)
-            pull = pull[np.isfinite(pull)]
-            if pull.size == 0:
-                continue
-            mu = float(np.mean(pull))
-            sd = float(np.std(pull, ddof=1)) if pull.size > 1 else float("nan")
-            sem = float(sd / np.sqrt(pull.size)) if pull.size > 1 else float("nan")
-            sd_err = float(sd / np.sqrt(2 * (pull.size - 1))) if pull.size > 2 and np.isfinite(sd) else float("nan")
-            rows.append(
-                dict(
-                    mass_GeV=float(m),
-                    inj_level=float(level),
-                    pull_mean=mu,
-                    pull_sem=sem,
-                    pull_std=sd,
-                    pull_std_err=sd_err,
-                )
-            )
-        if not rows:
-            return
-        dsum = pd.DataFrame(rows).sort_values(["inj_level", "mass_GeV"]).reset_index(drop=True)
-    else:
-        dsum = dft.copy()
-        dsum["inj_level"] = dsum["_inj_level"].to_numpy(float)
-        dsum["pull_mean"] = pd.to_numeric(dsum["pull_mean"], errors="coerce")
-        dsum["pull_std"] = pd.to_numeric(dsum["pull_std"], errors="coerce")
-        if "pull_sem" in dsum.columns:
-            dsum["pull_sem"] = pd.to_numeric(dsum["pull_sem"], errors="coerce")
-        elif "n_toys" in dsum.columns:
-            n = np.clip(pd.to_numeric(dsum["n_toys"], errors="coerce").to_numpy(float), 1.0, None)
-            dsum["pull_sem"] = dsum["pull_std"].to_numpy(float) / np.sqrt(n)
-        else:
-            dsum["pull_sem"] = np.nan
-        if "pull_std_err" in dsum.columns:
-            dsum["pull_std_err"] = pd.to_numeric(dsum["pull_std_err"], errors="coerce")
-        elif "n_toys" in dsum.columns:
-            n = np.clip(pd.to_numeric(dsum["n_toys"], errors="coerce").to_numpy(float), 2.0, None)
-            dsum["pull_std_err"] = dsum["pull_std"].to_numpy(float) / np.sqrt(2.0 * (n - 1.0))
-        else:
-            dsum["pull_std_err"] = np.nan
-        dsum = dsum[np.isfinite(dsum["pull_mean"].to_numpy(float)) & np.isfinite(dsum["pull_std"].to_numpy(float))].copy()
-        dsum = (
-            dsum.groupby(["mass_GeV", "inj_level"], as_index=False)
-            .agg(
-                pull_mean=("pull_mean", "mean"),
-                pull_sem=("pull_sem", "mean"),
-                pull_std=("pull_std", "mean"),
-                pull_std_err=("pull_std_err", "mean"),
-            )
-            .sort_values(["inj_level", "mass_GeV"])
-            .reset_index(drop=True)
-        )
-        if dsum.empty:
-            return
+    dsum = _summarize_pull_vs_mass_rows(dft, has_toy_pull=has_toy_pull)
+    if dsum.empty:
+        return
 
     fig, (ax0, ax1) = plt.subplots(
         2,

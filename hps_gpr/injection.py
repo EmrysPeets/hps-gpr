@@ -1825,7 +1825,7 @@ def summarize_injection_grid(df_toys: pd.DataFrame) -> pd.DataFrame:
             cov_1sigma=float(np.nanmean(np.abs(pull) < 1.0)),
             cov_2sigma=float(np.nanmean(np.abs(pull) < 2.0)),
             Zhat_mean=zhat_mean,
-            delta_z_minus_pull=float(zhat_mean - pull_mean),
+            delta_z_minus_pull=float((zhat_mean - float(np.nanmean(inj_nsigma_vals))) - pull_mean),
             ainj_over_sigmaAref=(float(A) / sigmaA_ref_mean if np.isfinite(sigmaA_ref_mean) and sigmaA_ref_mean > 0 else float("nan")),
             Zhat_q16=q(Zhat, 0.16), Zhat_q84=q(Zhat, 0.84),
             success_rate=_mean_col(sub, "success"),
