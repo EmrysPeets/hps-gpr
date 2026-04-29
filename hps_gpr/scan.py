@@ -150,16 +150,19 @@ def run_scan(
                             ds, float(m), pred,
                             os.path.join(ds_dir, "fit_full.png"),
                             A_show=res.A_up,
+                            config=config,
                         )
                         plot_blind_window(
                             ds, float(m), pred,
                             os.path.join(ds_dir, "blind_fit.png"),
                             A_up=res.A_up,
                             A_hat=res.A_hat,
+                            config=config,
                         )
                         plot_s_over_b(
                             ds, float(m), pred, res.A_up,
                             os.path.join(ds_dir, "s_over_b_ul.png"),
+                            config=config,
                         )
                     except Exception as pe:
                         if config.debug_print:
@@ -183,6 +186,7 @@ def run_scan(
                             "integral_density": _jfloat(pred.integral_density),
                             "cls_statistic": "tilde_q_mu",
                             "cls_calibration": str(config.cls_mode).lower().strip(),
+                            "signal_model": str(getattr(config, "signal_model", "default")),
                             "global_method": "sidak_approx",
                             "visibility": "observed" if compute_obs else "expected_only",
                         },
@@ -203,6 +207,7 @@ def run_scan(
                     "extract_success": bool(res.extract_success),
                     "cls_statistic": "tilde_q_mu",
                     "cls_calibration": str(config.cls_mode).lower().strip(),
+                    "signal_model": str(getattr(config, "signal_model", "default")),
                     "global_method": "sidak_approx",
                     "visibility": "observed" if compute_obs else "expected_only",
                     "kernel_str": str(getattr(pred, "kernel_str", "")),
@@ -276,6 +281,7 @@ def run_scan(
                             "Z_analytic": _jfloat(comb.Z_analytic),
                             "cls_statistic": "tilde_q_mu",
                             "cls_calibration": str(config.cls_mode).lower().strip(),
+                            "signal_model": str(getattr(config, "signal_model", "default")),
                             "global_method": "sidak_approx",
                         },
                     )
@@ -289,6 +295,7 @@ def run_scan(
                     "Z_analytic": float(comb.Z_analytic),
                     "cls_statistic": "tilde_q_mu",
                     "cls_calibration": str(config.cls_mode).lower().strip(),
+                    "signal_model": str(getattr(config, "signal_model", "default")),
                     "global_method": "sidak_approx",
                 })
 

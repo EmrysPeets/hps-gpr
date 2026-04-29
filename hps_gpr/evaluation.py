@@ -176,7 +176,7 @@ def evaluate_single_dataset(
 
     # --- p0/Z via profiled LRT (v15) ---
     tmpl, _ = build_window_template_from_full(
-        pred.edges_full, pred.blind_mask, mass, pred.sigma_val
+        pred.edges_full, pred.blind_mask, mass, pred.sigma_val, config=config
     )
     p0, Z, _, _ = p0_profiled_gaussian_LRT(pred.obs, pred.mu, pred.cov, tmpl)
 
@@ -231,6 +231,7 @@ def build_combined_components(
     mass: float,
     ds_list: List["DatasetConfig"],
     preds: List[BlindPrediction],
+    config: Optional["Config"] = None,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Build concatenated (obs, b, cov, s_unit) for a shared mass hypothesis.
 
@@ -240,7 +241,7 @@ def build_combined_components(
     b = np.concatenate([p.mu for p in preds]).astype(float)
     cov = _concat_block_diag([p.cov for p in preds]).astype(float)
     templates = [
-        build_window_template_from_full(p.edges_full, p.blind_mask, mass, p.sigma_val)[0]
+        build_window_template_from_full(p.edges_full, p.blind_mask, mass, p.sigma_val, config=config)[0]
         for p in preds
     ]
     Ks = [A_from_epsilon2(ds, mass, 1.0, p.integral_density) for ds, p in zip(ds_list, preds)]
@@ -328,7 +329,7 @@ def combined_cls_limit_epsilon2(
     seed: int = 1,
 ) -> float:
     """Compute combined CLs limit on epsilon^2."""
-    obs, b, cov, s_unit = build_combined_components(float(mass), ds_list, preds)
+    obs, b, cov, s_unit = build_combined_components(float(mass), ds_list, preds, config=config)
     return combined_cls_limit_epsilon2_from_vectors(obs, b, cov, s_unit, config, seed=seed)
 
 
@@ -339,7 +340,7 @@ def evaluate_combined(
     config: "Config",
 ) -> CombinedResult:
     """Evaluate combined datasets at one mass hypothesis."""
-    obs, b, cov, s_unit = build_combined_components(float(mass), ds_list, preds)
+    obs, b, cov, s_unit = build_combined_components(float(mass), ds_list, preds, config=config)
     eps2_up = combined_cls_limit_epsilon2(mass, ds_list, preds, config)
 
     # Profiled LRT p0 on ε² scale

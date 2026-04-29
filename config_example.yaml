@@ -116,6 +116,13 @@ inj_strengths: [0, 100, 200, 500, 1000, 2000, 5000]
 inj_mode: "multinomial"  # "multinomial" or "poisson"
 extract_allow_negative: true
 
+# Signal extraction model
+# "default": nominal fixed Gaussian template with width from mass resolution.
+# "kernel": opt-in localized signal-kernel template for robustness studies.
+signal_model: "default"
+signal_kernel_width_factor: 1.0
+signal_kernel_length_scale_factor: 1.0
+
 # =====================
 # Limit band settings
 # =====================

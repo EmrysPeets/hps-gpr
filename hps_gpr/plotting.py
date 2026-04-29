@@ -175,7 +175,7 @@ def _mass_color_map(masses: np.ndarray) -> dict:
 
 
 def _inj_xlabel(xvar: str) -> str:
-    return r"Injected strength $A_{\mathrm{inj}}$" if xvar == "strength" else r"Injected strength $A_{\mathrm{inj}}/\sigma_A$"
+    return r"Injected strength $A_{\mathrm{inj}}$" if xvar == "strength" else r"Injected strength $A_{\mathrm{inj}}/\sigma_{A,\mathrm{ref}}$"
 
 
 def _sigma_level_label(z: float) -> str:
@@ -292,6 +292,7 @@ def plot_full_range(
     outpath: str,
     title_extra: str = "",
     A_show: Optional[float] = None,
+    config: Optional["Config"] = None,
 ) -> None:
     """Plot full range data vs background fit.
 
@@ -314,7 +315,7 @@ def plot_full_range(
 
     if A_show is not None and np.isfinite(A_show):
         try:
-            w_full = build_full_template(np.asarray(pred.edges_full, float), mass, pred.sigma_val)
+            w_full = build_full_template(np.asarray(pred.edges_full, float), mass, pred.sigma_val, config=config)
             if w_full.size == mu.size:
                 ax.plot(x, mu + float(A_show) * w_full, "--", color="C3", lw=1.7,
                         label=rf"GPR + $A w$ ($A={float(A_show):.2g}$)", zorder=5)
@@ -344,6 +345,7 @@ def plot_blind_window(
     A_show: Optional[float] = None,
     title_extra: str = "",
     zoom_half_sigma: float = 0.5,
+    config: Optional["Config"] = None,
 ) -> None:
     """Plot blind-window region with Ahat and UL overlays.
 
@@ -362,7 +364,7 @@ def plot_blind_window(
     zhi = float(pred.blind[1] + float(zoom_half_sigma) * pred.sigma_val)
     m_zoom = (x_full >= zlo) & (x_full <= zhi)
 
-    w_full = build_full_template(edges_full, mass, pred.sigma_val)
+    w_full = build_full_template(edges_full, mass, pred.sigma_val, config=config)
 
     fig, ax = plt.subplots(figsize=(8.6, 5.0))
     yz = y_full[m_zoom]
@@ -451,6 +453,7 @@ def plot_s_over_b(
     pred: "BlindPrediction",
     A_show: float,
     outpath: str,
+    config: Optional["Config"] = None,
 ) -> None:
     """Plot signal over background ratio in the blind window.
 
@@ -464,7 +467,7 @@ def plot_s_over_b(
     edges = pred.edges
     centers = 0.5 * (edges[:-1] + edges[1:])
     w, _ = build_window_template_from_full(
-        pred.edges_full, pred.blind_mask, mass, pred.sigma_val
+        pred.edges_full, pred.blind_mask, mass, pred.sigma_val, config=config
     )
     s = float(A_show) * w
     b = np.clip(pred.mu.astype(float), 1e-12, None)
@@ -490,6 +493,7 @@ def plot_scan_diagnostic_panels(
     A_hat: Optional[float] = None,
     sigma_A: Optional[float] = None,
     zoom_half_sigma: float = 2.0,
+    config: Optional["Config"] = None,
 ) -> None:
     """Multi-panel scan diagnostic plot for a single mass hypothesis.
 
@@ -511,7 +515,7 @@ def plot_scan_diagnostic_panels(
     edges = pred.edges
     centers = 0.5 * (edges[:-1] + edges[1:])
     w, w_full = build_window_template_from_full(
-        pred.edges_full, pred.blind_mask, mass, pred.sigma_val
+        pred.edges_full, pred.blind_mask, mass, pred.sigma_val, config=config
     )
     obs = pred.obs.astype(float)
     mu = pred.mu.astype(float)
@@ -1560,7 +1564,7 @@ def plot_delta_z_minus_pull_vs_injected_sigma(
     outpath: Optional[str] = None,
     panel_ncols: int = 2,
 ) -> None:
-    r"""Plot :math:`\langle\hat{Z}\rangle-\langle pull\rangle` vs expected injected sigma-level.
+    r"""Plot :math:`(\langle\hat{Z}\rangle-Z_{inj})-\langle pull\rangle` vs expected injected sigma-level.
 
     Uses summary-level columns from :func:`summarize_injection_grid` and supports
     either ``ainj_over_sigmaAref`` or ``inj_nsigma`` on the x-axis.
@@ -1632,12 +1636,12 @@ def plot_delta_z_minus_pull_vs_injected_sigma(
         if i // ncols == (nrows - 1):
             ax.set_xlabel(r"Expected injected sigma-level $A_{inj}/\sigma_{A,ref}$")
         if i % ncols == 0:
-            ax.set_ylabel(r"$\langle\hat{Z}\rangle - \langle(\hat{A}-A_{inj})/\sigma_A\rangle$")
+            ax.set_ylabel(r"$(\langle\hat{Z}\rangle-Z_{inj})-\langle(\hat{A}-A_{inj})/\sigma_A\rangle$")
 
     for j in range(len(ds_order), len(axes_arr)):
         axes_arr[j].axis("off")
 
-    fig.suptitle(r"$\langle\hat{Z}\rangle-\langle pull\rangle$ vs expected injection significance", y=1.02)
+    fig.suptitle(r"$(\langle\hat{Z}\rangle-Z_{inj})-\langle pull\rangle$ vs expected injection significance", y=1.02)
     _save_plot_outputs(fig, outpath)
 
 
@@ -1669,7 +1673,12 @@ def _summarize_pull_vs_mass_rows(
 ) -> pd.DataFrame:
     """Return grouped pull moments for either toy rows or fragmented summary rows."""
     rows: List[Dict[str, float]] = []
-    group_cols = ["mass_GeV", "_inj_level"]
+    mass_col = "_mass_plot" if "_mass_plot" in dft.columns else "mass_GeV"
+    group_cols = [mass_col, "_inj_level"]
+
+    def q(values: np.ndarray, prob: float) -> float:
+        arr = np.asarray(values, float)
+        return float(np.nanquantile(arr, prob)) if np.any(np.isfinite(arr)) else float("nan")
 
     for (m, level), sub in dft.groupby(group_cols, dropna=False):
         if "n_toys" in sub.columns:
@@ -1702,6 +1711,8 @@ def _summarize_pull_vs_mass_rows(
                     pull_sem=sem,
                     pull_std=sd,
                     pull_std_err=sd_err,
+                    pull_q16=q(pull, 0.16),
+                    pull_q84=q(pull, 0.84),
                 )
             )
             continue
@@ -1722,6 +1733,16 @@ def _summarize_pull_vs_mass_rows(
             pull_std_err = pull_std / np.sqrt(2.0 * (n - 1.0))
         else:
             pull_std_err = np.full(len(sub), np.nan, float)
+        pull_q16 = (
+            pd.to_numeric(sub["pull_q16"], errors="coerce").to_numpy(float)
+            if "pull_q16" in sub.columns
+            else np.full(len(sub), np.nan, float)
+        )
+        pull_q84 = (
+            pd.to_numeric(sub["pull_q84"], errors="coerce").to_numpy(float)
+            if "pull_q84" in sub.columns
+            else np.full(len(sub), np.nan, float)
+        )
 
         finite = np.isfinite(pull_mean) & np.isfinite(pull_std)
         if not np.any(finite):
@@ -1734,6 +1755,8 @@ def _summarize_pull_vs_mass_rows(
                 pull_sem=float(np.nanmean(pull_sem[finite])) if np.any(np.isfinite(pull_sem[finite])) else float("nan"),
                 pull_std=float(np.nanmean(pull_std[finite])),
                 pull_std_err=float(np.nanmean(pull_std_err[finite])) if np.any(np.isfinite(pull_std_err[finite])) else float("nan"),
+                pull_q16=float(np.nanmean(pull_q16[finite])) if np.any(np.isfinite(pull_q16[finite])) else float("nan"),
+                pull_q84=float(np.nanmean(pull_q84[finite])) if np.any(np.isfinite(pull_q84[finite])) else float("nan"),
             )
         )
 
@@ -1759,7 +1782,21 @@ def plot_injection_heatmap(
     for ds, sub in groups:
         if dataset_filter is not None and str(ds) != str(dataset_filter):
             continue
-        piv = sub.pivot_table(index=ycol, columns=xcol, values=value_col, aggfunc="mean")
+        plot_sub = sub.copy()
+        plot_sub[xcol] = pd.to_numeric(plot_sub[xcol], errors="coerce")
+        plot_sub[ycol] = pd.to_numeric(plot_sub[ycol], errors="coerce")
+        plot_sub[value_col] = pd.to_numeric(plot_sub[value_col], errors="coerce")
+        finite = (
+            np.isfinite(plot_sub[xcol].to_numpy(float))
+            & np.isfinite(plot_sub[ycol].to_numpy(float))
+            & np.isfinite(plot_sub[value_col].to_numpy(float))
+        )
+        plot_sub = plot_sub[finite].copy()
+        if plot_sub.empty:
+            continue
+        plot_sub["_mass_plot"] = np.round(plot_sub[xcol].to_numpy(float), 10)
+        plot_sub["_inj_plot"] = np.round(plot_sub[ycol].to_numpy(float), 10)
+        piv = plot_sub.pivot_table(index="_inj_plot", columns="_mass_plot", values=value_col, aggfunc="mean")
         piv = piv.sort_index(axis=0).sort_index(axis=1)
         if piv.empty:
             continue
@@ -1774,7 +1811,7 @@ def plot_injection_heatmap(
         idx = np.arange(len(cols))[::max(1, len(cols)//8)]
         ax.set_xticklabels([f"{cols[i]*1e3:.0f}" for i in idx])
         ax.set_xlabel("Mass hypothesis [MeV]")
-        ax.set_ylabel(r"Injected strength $A_{\mathrm{inj}}/\sigma_A$")
+        ax.set_ylabel(r"Injected strength $A_{\mathrm{inj}}/\sigma_{A,\mathrm{ref}}$")
         _set_title_above(ax, title or f"{ds}: injection/extraction heatmap ({value_col})")
         cbar = fig.colorbar(im, ax=ax)
         cbar.set_label(value_col)
@@ -1970,8 +2007,9 @@ def plot_z_calibration_residual(
         ax.text(0.01, 0.01, note, transform=ax.transAxes, va="bottom", ha="left", fontsize=8,
                 bbox=dict(boxstyle="round,pad=0.25", fc="white", ec="0.7", alpha=0.9))
         fig.subplots_adjust(right=0.78, bottom=0.14, top=0.90)
-        out = os.path.join(outdir, f"z_calibration_residual_{ds}.png")
-        fig.savefig(out, dpi=220)
+        out_root = os.path.join(outdir, f"z_calibration_residual_{ds}")
+        fig.savefig(f"{out_root}.png", dpi=220)
+        fig.savefig(f"{out_root}.pdf")
         plt.close(fig)
 
     if not ds_order:
@@ -2040,7 +2078,9 @@ def plot_z_calibration_residual(
         fontsize=9,
     )
     fig.subplots_adjust(right=0.82, bottom=0.13, top=0.90, wspace=0.22, hspace=0.28)
-    fig.savefig(os.path.join(outdir, "z_calibration_residual_comparison.png"), dpi=220)
+    out_root = os.path.join(outdir, "z_calibration_residual_comparison")
+    fig.savefig(f"{out_root}.png", dpi=220)
+    fig.savefig(f"{out_root}.pdf")
     plt.close(fig)
     print(
         "[plot_z_calibration_residual] "
@@ -2192,6 +2232,7 @@ def plot_pull_vs_mass(
     dft = dft[np.isfinite(dft["mass_GeV"].to_numpy(float))].copy()
     if dft.empty:
         return
+    dft["_mass_plot"] = np.round(dft["mass_GeV"].to_numpy(float), 10)
 
     use_sigma_labels = bool(np.isfinite(dft["inj_nsigma"].to_numpy(float)).any())
     if use_sigma_labels:
@@ -2222,6 +2263,11 @@ def plot_pull_vs_mass(
             lbl = _sigma_level_label(float(level))
         else:
             lbl = rf"$A_{{inj}}={float(level):.3g}$"
+        if {"pull_q16", "pull_q84"}.issubset(sub.columns):
+            qlo = sub["pull_q16"].to_numpy(float)
+            qhi = sub["pull_q84"].to_numpy(float)
+            if np.any(np.isfinite(qlo) & np.isfinite(qhi)):
+                ax0.fill_between(x, qlo, qhi, color=color, alpha=0.07, linewidth=0.0)
         ax0.plot(x, y, "o-", color=color, label=lbl)
         if np.any(np.isfinite(yerr)):
             ax0.fill_between(x, y - yerr, y + yerr, color=color, alpha=0.16)
@@ -2234,10 +2280,20 @@ def plot_pull_vs_mass(
 
     ax0.axhline(0.0, color="k", lw=0.8, ls="--")
     ax1.axhline(1.0, color="k", lw=0.8, ls="--")
-    ax0.set_ylabel(r"Pull $(\hat{A}-A_{inj})/\langle\sigma\rangle$ Mean")
+    ax0.set_ylabel(r"mean pull $\langle(\hat{A}-A_{inj})/\sigma_A\rangle$")
     ax1.set_ylabel("pull width")
     ax1.set_xlabel("mass hypothesis [MeV]")
     _set_title_above(ax0, title or f"{dataset_key or 'all'}: pull moments vs mass")
+    ax0.text(
+        0.01,
+        0.02,
+        "wide pale bands: toy q16--q84; narrow bands: SEM on mean",
+        transform=ax0.transAxes,
+        va="bottom",
+        ha="left",
+        fontsize=8,
+        bbox=dict(boxstyle="round,pad=0.25", fc="white", ec="0.7", alpha=0.85),
+    )
     ax0.legend(
         loc="upper left",
         bbox_to_anchor=(1.01, 1.00),

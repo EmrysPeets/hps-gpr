@@ -2,7 +2,9 @@
 
 void make_func_data_output_2021(
     const char* outfile = "outputs/funcform_toys/funcform_2021_dataset_mod_toys.root",
-    int n_toys = 100) {
+    int n_toys = 100,
+    double toy_lumi_scale = 1.0,
+    bool primary_plus_alt_only = false) {
   FuncFormJobConfig job;
   job.dataset_key = "2021";
   job.dataset_label = "HPS 2021 Functional-Form Fits";
@@ -15,6 +17,7 @@ void make_func_data_output_2021(
   job.scan_min = 0.030;
   job.scan_max = 0.250;
   job.n_toys = n_toys;
+  job.toy_lumi_scale = toy_lumi_scale;
   job.primary_target_chi2ndf = 2.0;
   job.validation_max_rel_diff_full = 0.05;
   job.validation_max_rel_diff_scan = 0.05;
@@ -25,10 +28,22 @@ void make_func_data_output_2021(
 
   std::vector<FuncFormCandidateDef> defs;
   defs.push_back({"fSigPowExpQ", "sigmoid*power*exp + raw expquad", true, true, ff_make_sigpowexp_expquad});
-  defs.push_back({"fShiftSigPowTail", "shifted sigmoid*power*exp + tail", true, true, ff_make_shift_sigpowexp_tail});
-  defs.push_back({"fShiftSigPow", "shifted sigmoid*power*exp", false, true, ff_make_shift_sigpowexp});
+  defs.push_back({"fShiftSigPowTail", "shifted sigmoid*power*exp + tail", true, !primary_plus_alt_only, ff_make_shift_sigpowexp_tail});
+  defs.push_back({"fShiftSigPow", "shifted sigmoid*power*exp", primary_plus_alt_only, true, ff_make_shift_sigpowexp});
   defs.push_back({"fSigPow", "sigmoid*x^{a}*exp(-x/theta)", false, false, ff_make_sigpowexp});
   defs.push_back({"fBern5", "positive Bernstein fallback", false, false, ff_make_bern5});
 
   ff_run_job(job, defs);
+}
+
+void make_func_data_output_2021_true_lumi_x10(
+    const char* outfile = "outputs/funcform_toys/funcform_2021_true_lumi_x10_toys.root",
+    int n_toys = 100) {
+  make_func_data_output_2021(outfile, n_toys, 10.0, true);
+}
+
+void make_func_data_output_2021_true_lumi_x100(
+    const char* outfile = "outputs/funcform_toys/funcform_2021_true_lumi_x100_toys.root",
+    int n_toys = 100) {
+  make_func_data_output_2021(outfile, n_toys, 100.0, true);
 }

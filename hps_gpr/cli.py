@@ -565,6 +565,23 @@ def toy_scan(
     help="Dataset key (2015, 2016, or 2021)",
 )
 @click.option(
+    "--seed-root",
+    type=click.Path(exists=True),
+    help="Optional ROOT file containing a frozen analytic background seed histogram.",
+)
+@click.option(
+    "--seed-container",
+    help="Optional ROOT directory containing --seed-hist.",
+)
+@click.option(
+    "--seed-hist",
+    help="Histogram name to use as the full-range background expectation for seeded GP toys.",
+)
+@click.option(
+    "--seed-label",
+    help="Optional source label for seeded GP toys; defaults to the seed function tag.",
+)
+@click.option(
     "--n-toys",
     type=int,
     default=1000,
@@ -643,6 +660,10 @@ def gp_toy_scan(
     ctx,
     config,
     dataset,
+    seed_root,
+    seed_container,
+    seed_hist,
+    seed_label,
     n_toys,
     toy_indices,
     seed,
@@ -663,6 +684,7 @@ def gp_toy_scan(
     from .gp_toys import run_gp_toy_scans, _source_model_name
     from .scan import union_scan_grid
     from .toy_backgrounds import normalize_full_toy_bkg_mode
+    from .funcform_toys import _infer_function_tag, load_funcform_toy_hist
 
     cfg = load_config(config)
     if output_dir:
@@ -675,6 +697,21 @@ def gp_toy_scan(
         print(f"Dataset '{dataset}' not found or not enabled. Available: {available}")
         sys.exit(1)
     ds = datasets[dataset]
+
+    seed_hist_obj = None
+    seed_label_resolved = None
+    if seed_root or seed_hist or seed_container or seed_label:
+        if not seed_root:
+            raise click.BadParameter("--seed-root is required when using seeded GP toys", param_hint="--seed-root")
+        if not seed_hist:
+            raise click.BadParameter("--seed-hist is required when using seeded GP toys", param_hint="--seed-hist")
+        seed_hist_obj = load_funcform_toy_hist(
+            seed_root,
+            container=seed_container,
+            toy_name=seed_hist,
+        )
+        seed_function_tag = _infer_function_tag(seed_container, seed_hist)
+        seed_label_resolved = str(seed_label or seed_function_tag)
 
     resolved_save_plots = bool(_resolve_cli_override(
         ctx, "save_plots", save_plots, getattr(cfg, "toy_scan_save_plots", False)
@@ -721,7 +758,11 @@ def gp_toy_scan(
 
     print(f"Running GP-propagated toy scans for {ds.label}")
     toy_mode = normalize_full_toy_bkg_mode(getattr(cfg, "full_toy_bkg_mode", "poisson"))
-    print(f"Toy source model: {_source_model_name(toy_mode)}")
+    if seed_hist_obj is None:
+        print(f"Toy source model: {_source_model_name(toy_mode)}")
+    else:
+        print(f"Toy source model: seeded analytic background ({seed_label_resolved})")
+        print(f"Seed histogram: {seed_root}:{str(seed_container or '').strip()}/{seed_hist}")
     print(f"Full-range toy generation mode: {toy_mode}")
     print(f"Toys requested: {toy_count_for_print}")
     print(f"Mass hypotheses per toy: {len(masses)}")
@@ -739,6 +780,11 @@ def gp_toy_scan(
         cfg,
         n_toys=int(n_toys),
         base_output_dir=cfg.output_dir,
+        seed_hist=seed_hist_obj,
+        seed_source_label=seed_label_resolved,
+        seed_source_root=str(seed_root or ""),
+        seed_container=str(seed_container or ""),
+        seed_hist_name=str(seed_hist or ""),
         mass_min=mass_min,
         mass_max=mass_max,
         seed=seed,
@@ -1949,7 +1995,13 @@ def inject_plot(input_dir, output_dir, dataset, write_merged_toys):
     import glob
     import pandas as pd
 
-    from .injection import summarize_injection_grid, combine_injection_toy_tables, _combined_mass_support_summary, format_combined_mass_support_summary
+    from .injection import (
+        summarize_injection_grid,
+        collapse_fragmented_injection_summary,
+        combine_injection_toy_tables,
+        _combined_mass_support_summary,
+        format_combined_mass_support_summary,
+    )
     from .plotting import (
         ensure_dir,
         _looks_like_single_toy_summary_rows,
@@ -2102,6 +2154,10 @@ def inject_plot(input_dir, output_dir, dataset, write_merged_toys):
             if "dataset" not in dsum.columns:
                 dsum["dataset"] = str(ds)
             dsum["dataset"] = dsum["dataset"].astype(str)
+            if looks_like_fragments:
+                before = len(dsum)
+                dsum = collapse_fragmented_injection_summary(dsum)
+                print(f"Collapsed fragmented one-toy summary rows for {ds}: {before} -> {len(dsum)}")
             sum_out = os.path.join(outdir, f"inj_extract_summary_{ds}.csv")
             dsum.to_csv(sum_out, index=False)
             all_summaries.append(dsum)
@@ -2179,6 +2235,10 @@ def inject_plot(input_dir, output_dir, dataset, write_merged_toys):
             outdir=outdir,
             acceptance_bands=[0.5, 1.0],
             band_semantic="summary q16--q84",
+        )
+        plot_delta_z_minus_pull_vs_injected_sigma(
+            df_sum,
+            outpath=os.path.join(outdir, "delta_z_minus_pull_vs_inj_sigma_all.png"),
         )
 
     if (not all_toys) and {"dataset", "mass_GeV", "sigmaA_ref"}.issubset(set(df_sum.columns)):

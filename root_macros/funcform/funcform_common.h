@@ -59,6 +59,7 @@ struct FuncFormJobConfig {
   double scan_min{std::numeric_limits<double>::quiet_NaN()};
   double scan_max{std::numeric_limits<double>::quiet_NaN()};
   int n_toys{100};
+  double toy_lumi_scale{1.0};
   double primary_target_chi2ndf{2.0};
   double validation_max_rel_diff_full{0.05};
   double validation_max_rel_diff_scan{0.05};
@@ -237,6 +238,14 @@ inline double ff_sum_values(const std::vector<double>& values) {
     sum += value;
   }
   return sum;
+}
+
+inline long long ff_scaled_count(long long base_count, double scale) {
+  if (!std::isfinite(scale)) {
+    scale = 1.0;
+  }
+  const double clipped_scale = std::max(0.0, scale);
+  return static_cast<long long>(std::llround(static_cast<double>(base_count) * clipped_scale));
 }
 
 inline std::vector<double> ff_normalize_expected_bins(const std::vector<double>& expected,
@@ -1200,6 +1209,8 @@ inline void ff_write_fit_metadata(TFile* fout,
   const FuncFormResolvedRanges rr = ff_resolve_ranges(h_in, job);
   const long long normalization_target_count = static_cast<long long>(
       std::llround(ff_hist_count_in_center_range(h_in, rr.support_min, rr.support_max, true, true)));
+  const long long normalization_target_count_scaled =
+      ff_scaled_count(normalization_target_count, job.toy_lumi_scale);
 
   std::ostringstream all_json;
   all_json << "{\n"
@@ -1218,7 +1229,10 @@ inline void ff_write_fit_metadata(TFile* fout,
            << ff_json_double(rr.scan_min) << ", "
            << ff_json_double(rr.scan_max) << "],\n"
            << "  \"n_toys\": " << job.n_toys << ",\n"
+           << "  \"toy_lumi_scale\": " << ff_json_double(job.toy_lumi_scale) << ",\n"
            << "  \"normalization_target_count\": " << normalization_target_count << ",\n"
+           << "  \"normalization_target_count_unscaled\": " << normalization_target_count << ",\n"
+           << "  \"normalization_target_count_scaled\": " << normalization_target_count_scaled << ",\n"
            << "  \"validation_thresholds\": {\n"
            << "    \"max_rel_diff_full\": " << ff_json_double(job.validation_max_rel_diff_full) << ",\n"
            << "    \"max_rel_diff_scan\": " << ff_json_double(job.validation_max_rel_diff_scan) << ",\n"
@@ -1241,6 +1255,7 @@ inline void ff_write_fit_metadata(TFile* fout,
         << "  \"fit_max_GeV\": " << ff_json_double(fit.fit_max) << ",\n"
         << "  \"trial_index\": " << fit.trial_index << ",\n"
         << "  \"trial_label\": \"" << ff_json_escape(fit.trial_label) << "\",\n"
+        << "  \"toy_lumi_scale\": " << ff_json_double(job.toy_lumi_scale) << ",\n"
         << "  \"root_chi2ndf\": " << ff_json_double(fit.chi2ndf_root) << ",\n"
         << "  \"pearson_chi2ndf\": " << ff_json_double(fit.eval.pearson_chi2ndf) << ",\n"
         << "  \"neyman_chi2ndf\": " << ff_json_double(fit.eval.neyman_chi2ndf) << ",\n"
@@ -1341,8 +1356,9 @@ inline FuncFormToyAggregate ff_make_toys_for_fit(TFile* fout, const FuncFormFitS
   const int nb = h_in->GetNbinsX();
   const double hxmin = h_in->GetXaxis()->GetXmin();
   const double hxmax = h_in->GetXaxis()->GetXmax();
-  const long long nfill = static_cast<long long>(
+  const long long nfill_unscaled = static_cast<long long>(
       std::llround(ff_hist_count_in_center_range(h_in, rr.support_min, rr.support_max, true, true)));
+  const long long nfill = ff_scaled_count(nfill_unscaled, job.toy_lumi_scale);
   out.normalization_target_count = nfill;
   out.n_toys = std::max(0, job.n_toys);
   const std::vector<double> expected =
@@ -1355,6 +1371,14 @@ inline FuncFormToyAggregate ff_make_toys_for_fit(TFile* fout, const FuncFormFitS
   }
   TDirectory* d = fout->mkdir(fit.tag.c_str());
   TDirectory::TContext ctx(d);
+  TH1D* h_seed = ff_make_hist_from_values(
+      h_in,
+      expected,
+      fit.tag + "_analytic_seed_lumi_scaled",
+      fit.tag + " analytic seed lumi-scaled");
+  h_seed->Write();
+  delete h_seed;
+
   for (int itoy = 0; itoy < job.n_toys; ++itoy) {
     const std::string hname = fit.tag + "_toy_" + std::to_string(itoy);
     TH1D htoy(hname.c_str(), hname.c_str(), nb, hxmin, hxmax);
@@ -1393,6 +1417,14 @@ inline void ff_write_validation_histograms(TFile* fout,
     const double target_total = ff_hist_count_in_center_range(h_in, rr.support_min, rr.support_max, true, true);
     const std::vector<double> expected = ff_expected_bins_normalized(
         h_in, fits[i].func, rr.support_min, rr.support_max, target_total);
+    const std::vector<double> expected_scaled = ff_expected_bins_normalized(
+        h_in,
+        fits[i].func,
+        rr.support_min,
+        rr.support_max,
+        static_cast<double>(ff_scaled_count(
+            static_cast<long long>(std::llround(target_total)),
+            job.toy_lumi_scale)));
     TH1D* h_expected = ff_make_hist_from_values(
         h_in,
         expected,
@@ -1400,6 +1432,14 @@ inline void ff_write_validation_histograms(TFile* fout,
         fits[i].tag + " expected counts");
     h_expected->Write();
     delete h_expected;
+
+    TH1D* h_expected_scaled = ff_make_hist_from_values(
+        h_in,
+        expected_scaled,
+        fits[i].tag + "_expected_counts_lumi_scaled",
+        fits[i].tag + " expected counts lumi-scaled");
+    h_expected_scaled->Write();
+    delete h_expected_scaled;
 
     if (i < toy_summaries.size() && !toy_summaries[i].mean_bins.empty()) {
       TH1D* h_mean = ff_make_hist_from_values(
