@@ -400,7 +400,7 @@ def _build_single_context(
     sigma_rng = np.random.default_rng(
         _stable_display_seed(int(getattr(config, "extraction_display_seed", 271828)), ds.key, float(mass), "sigmaA")
     )
-    sigmaA_ref = _sigmaA_reference(pred, float(mass), source=str(sigma_source), rng=sigma_rng)
+    sigmaA_ref = _sigmaA_reference(pred, float(mass), source=str(sigma_source), rng=sigma_rng, config=config)
     A_per_eps2_unit = float(A_from_epsilon2(ds, float(mass), 1.0, pred.integral_density))
 
     seed_cls = None
@@ -424,7 +424,7 @@ def _build_single_context(
     blind = tuple(pred.blind)
     blind_mask = np.asarray(pred.blind_mask, bool)
     raw_signal_full = build_full_template(
-        np.asarray(pred.edges_full, float), float(mass), float(pred.sigma_val)
+        np.asarray(pred.edges_full, float), float(mass), float(pred.sigma_val), config=config
     )
     blind_fraction = float(np.sum(raw_signal_full[blind_mask]))
     if not np.isfinite(blind_fraction) or blind_fraction <= 0:
@@ -524,7 +524,7 @@ def _simulate_single_display_from_context(
         mu_win_fit,
         cov_win_fit,
         build_window_template_from_full(
-            pred.edges_full, pred.blind_mask, float(ctx.mass), float(pred.sigma_val)
+            pred.edges_full, pred.blind_mask, float(ctx.mass), float(pred.sigma_val), config=config
         )[0],
         allow_negative=bool(getattr(config, "extract_allow_negative", True)),
     )
@@ -677,7 +677,7 @@ def make_single_observed_display(
     )
     pred = ctx.pred
     tmpl = build_window_template_from_full(
-        pred.edges_full, pred.blind_mask, float(ctx.mass), float(pred.sigma_val)
+        pred.edges_full, pred.blind_mask, float(ctx.mass), float(pred.sigma_val), config=config
     )[0]
     fitd = fit_A_profiled_gaussian_details(
         pred.obs,

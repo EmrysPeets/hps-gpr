@@ -24,8 +24,25 @@ def test_summarize_pull_vs_mass_rows_regroups_fragmented_single_toy_summaries():
 
     assert np.isclose(row_1["pull_mean"], np.mean([0.5, -0.3, 0.1]))
     assert np.isclose(row_1["pull_std"], np.std([0.5, -0.3, 0.1], ddof=1))
+    assert np.isclose(row_1["pull_q16"], np.quantile([0.5, -0.3, 0.1], 0.16))
+    assert np.isclose(row_1["pull_q84"], np.quantile([0.5, -0.3, 0.1], 0.84))
     assert np.isclose(row_3["pull_mean"], np.mean([-1.0, -0.4]))
     assert np.isclose(row_3["pull_std"], np.std([-1.0, -0.4], ddof=1))
+
+
+def test_summarize_pull_vs_mass_rows_uses_canonical_mass_key_when_present():
+    df = pd.DataFrame(
+        [
+            {"mass_GeV": 0.04499999999999999, "_mass_plot": 0.045, "_inj_level": 1.0, "pull_mean": 0.5, "pull_std": np.nan, "n_toys": 1},
+            {"mass_GeV": 0.045, "_mass_plot": 0.045, "_inj_level": 1.0, "pull_mean": -0.3, "pull_std": np.nan, "n_toys": 1},
+        ]
+    )
+
+    out = _summarize_pull_vs_mass_rows(df, has_toy_pull=False)
+
+    assert len(out) == 1
+    assert np.isclose(out.iloc[0]["mass_GeV"], 0.045)
+    assert np.isclose(out.iloc[0]["pull_mean"], 0.1)
 
 
 def test_plot_pull_histogram_by_mass_groups_sigma_scaled_toys_by_injected_level(tmp_path: Path):

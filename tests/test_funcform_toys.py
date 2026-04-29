@@ -163,6 +163,31 @@ def test_resolve_funcform_toy_root_path_requires_dataset_mod_by_default(tmp_path
     assert resolve_funcform_toy_root_path("2021", root_dir=str(root_dir)) == str(dataset_mod_root)
 
 
+def test_discover_funcform_toys_infers_analytic_seed_function_tag(tmp_path):
+    root_path = tmp_path / "funcform_seed.root"
+    with uproot.recreate(root_path) as f:
+        f["fGenGammaThresh/fGenGammaThresh_analytic_seed_lumi_scaled"] = _make_hist([10, 9, 8, 7])
+        f["validation/fShiftSigPow_expected_counts_lumi_scaled"] = _make_hist([6, 5, 4, 3])
+
+    specs = discover_funcform_toys(
+        str(root_path),
+        container="fGenGammaThresh",
+        toy_pattern="*_analytic_seed_lumi_scaled",
+    )
+    assert len(specs) == 1
+    assert specs[0].function_tag == "fGenGammaThresh"
+    assert specs[0].toy_index == 0
+
+    validation_specs = discover_funcform_toys(
+        str(root_path),
+        container="validation",
+        toy_pattern="*_expected_counts_lumi_scaled",
+    )
+    assert len(validation_specs) == 1
+    assert validation_specs[0].function_tag == "fShiftSigPow"
+    assert validation_specs[0].toy_index == 0
+
+
 def test_build_model_accepts_hist_override(monkeypatch):
     toy_hist = _make_hist([5, 6, 7, 8, 9, 10], lo=0.02, hi=0.14)
     ds = DatasetConfig(

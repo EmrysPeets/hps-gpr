@@ -137,7 +137,7 @@ def expected_ul_bands_for_dataset(
             )
 
         tmpl, _ = build_window_template_from_full(
-            pred.edges_full, pred.blind_mask, m, pred.sigma_val
+            pred.edges_full, pred.blind_mask, m, pred.sigma_val, config=config
         )
         obs = np.asarray(pred.obs, int)
         mu = np.asarray(pred.mu, float)
@@ -464,7 +464,7 @@ def expected_ul_bands_for_combination(
             for k in ds_here
         ]
 
-        obs_vec0, b_vec, cov_mat, s_unit = build_combined_components(float(m), ds_list, preds_list)
+        obs_vec0, b_vec, cov_mat, s_unit = build_combined_components(float(m), ds_list, preds_list, config=config)
 
         alpha = float(config.cls_alpha)
         mode = str(getattr(config, "ul_bands_cls_mode", None) or config.cls_mode)
@@ -500,7 +500,7 @@ def expected_ul_bands_for_combination(
                 # Single-dataset fallback: use single-dataset CLs
                 k = ds_here[0]
                 tmpl, _ = build_window_template_from_full(
-                    preds[k].edges_full, preds[k].blind_mask, m, preds[k].sigma_val
+                    preds[k].edges_full, preds[k].blind_mask, m, preds[k].sigma_val, config=config
                 )
                 for t in range(int(n_toys)):
                     eps2_t, _ = cls_limit_for_template(
@@ -581,7 +581,7 @@ def expected_ul_bands_for_combination(
                         integral_density=float(preds[k].integral_density),
                     ))
 
-                obs_v, b_v, cov_v, s_v = build_combined_components(float(m), ds_list, preds_toy_list)
+                obs_v, b_v, cov_v, s_v = build_combined_components(float(m), ds_list, preds_toy_list, config=config)
                 eps2_t = combined_cls_limit_epsilon2_from_vectors(
                     obs_v, b_v, cov_v, s_v, config,
                     seed=int(rng.integers(1, 2**31 - 1)),

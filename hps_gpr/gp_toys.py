@@ -116,6 +116,11 @@ def run_gp_toy_scans(
     *,
     n_toys: int,
     base_output_dir: str,
+    seed_hist: Optional[hist.Hist] = None,
+    seed_source_label: Optional[str] = None,
+    seed_source_root: str = "",
+    seed_container: str = "",
+    seed_hist_name: str = "",
     mass_min: Optional[float] = None,
     mass_max: Optional[float] = None,
     seed: Optional[int] = None,
@@ -142,9 +147,23 @@ def run_gp_toy_scans(
     full_toy_bkg_mode = normalize_full_toy_bkg_mode(
         getattr(config, "full_toy_bkg_mode", "poisson")
     )
-    source_model = _source_model_name(full_toy_bkg_mode)
-
-    edges_full, y_full_obs, mu_full = build_gp_propagated_mean(ds, config)
+    mode_suffix = "fixedtotal" if full_toy_bkg_mode == "fixed_total_multinomial" else "poisson"
+    if seed_hist is None:
+        source_model = _source_model_name(full_toy_bkg_mode)
+        source_label = source_model
+        source_root = ""
+        source_container = "generated"
+        source_histogram = ""
+        edges_full, y_full_obs, mu_full = build_gp_propagated_mean(ds, config)
+    else:
+        source_label = str(seed_source_label or seed_hist_name or "secondary_background_seed")
+        source_model = f"seeded_{_sanitize_toy_path_component(source_label)}_{mode_suffix}"
+        source_root = str(seed_source_root or "")
+        source_container = str(seed_container or "")
+        source_histogram = str(seed_hist_name or "")
+        edges_full = np.asarray(seed_hist.axes[0].edges, float).reshape(-1)
+        y_full_obs = np.asarray(seed_hist.values(), float).reshape(-1)
+        mu_full = np.clip(y_full_obs, 0.0, None)
     total_full = observed_total_count(y_full_obs)
 
     written: List[str] = []
@@ -212,9 +231,9 @@ def run_gp_toy_scans(
             toy_name=toy_name,
             dataset=str(ds.key),
             source_model=source_model,
-            source_label=source_model,
-            source_root="",
-            container="generated",
+            source_label=source_label,
+            source_root=source_root,
+            container=source_container or "generated",
             function_tag=source_model,
         )
         df_comb = _augment_scan_table_metadata(
@@ -223,9 +242,9 @@ def run_gp_toy_scans(
             toy_name=toy_name,
             dataset=str(ds.key),
             source_model=source_model,
-            source_label=source_model,
-            source_root="",
-            container="generated",
+            source_label=source_label,
+            source_root=source_root,
+            container=source_container or "generated",
             function_tag=source_model,
         )
 
@@ -244,9 +263,10 @@ def run_gp_toy_scans(
                 "toy_name": toy_name,
                 "function_tag": source_model,
                 "source_model": source_model,
-                "source_label": source_model,
-                "source_root": "",
-                "container": "generated",
+                "source_label": source_label,
+                "source_root": source_root,
+                "container": source_container or "generated",
+                "seed_hist": source_histogram,
                 "output_dir": str(toy_cfg.output_dir),
                 "toy_seed": int(_toy_seed(base_seed, int(toy_index))),
                 "full_toy_bkg_mode": str(full_toy_bkg_mode),
