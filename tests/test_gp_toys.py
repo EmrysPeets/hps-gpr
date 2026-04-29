@@ -6,6 +6,7 @@ import hist
 import matplotlib.axes
 import numpy as np
 import pandas as pd
+import uproot
 
 from hps_gpr.cli import main
 from hps_gpr.config import Config, save_config
@@ -197,6 +198,84 @@ def test_gp_toy_scan_cli_writes_compatible_outputs_and_merge(monkeypatch, tmp_pa
     merged = pd.read_csv(tmp_path / "merged" / "toy_scan_merged.csv")
     assert set(["source_model", "source_label", "toy_index", "toy_hist"]).issubset(merged.columns)
     assert set(merged["source_model"].astype(str)) == {"gp_propagated_mean_refit_fixedtotal"}
+
+
+def test_gp_toy_scan_cli_can_use_frozen_analytic_seed(monkeypatch, tmp_path):
+    cfg = Config(
+        enable_2015=True,
+        enable_2016=False,
+        enable_2021=False,
+        output_dir=str(tmp_path / "seeded_gp_toys"),
+        full_toy_bkg_mode="fixed_total_multinomial",
+        blind_nsigma=1.64,
+    )
+    cfg_path = tmp_path / "config.yaml"
+    save_config(cfg, str(cfg_path))
+
+    seed_root = tmp_path / "funcform_seed.root"
+    with uproot.recreate(seed_root) as f:
+        f["fAlt/fAlt_analytic_seed_lumi_scaled"] = _make_hist([10, 11, 12, 9, 8, 7], lo=0.02, hi=0.14)
+
+    import hps_gpr.gp_toys as gp_toys_mod
+    import hps_gpr.scan as scan_mod
+
+    def unexpected_observed_fit(*args, **kwargs):
+        raise AssertionError("seeded GP toys should not fit the observed data seed")
+
+    monkeypatch.setattr(gp_toys_mod, "build_gp_propagated_mean", unexpected_observed_fit)
+
+    def fake_run_scan(datasets, toy_cfg, mass_min=None, mass_max=None):
+        ds_key = list(datasets.keys())[0]
+        return (
+            pd.DataFrame(
+                [
+                    {
+                        "dataset": ds_key,
+                        "mass_GeV": 0.040,
+                        "Z_analytic": 0.1,
+                        "p0_analytic": 0.45,
+                        "eps2_up": 1.0e-5,
+                        "extract_success": True,
+                    },
+                ]
+            ),
+            pd.DataFrame(),
+        )
+
+    monkeypatch.setattr(scan_mod, "run_scan", fake_run_scan)
+
+    runner = CliRunner()
+    result = runner.invoke(
+        main,
+        [
+            "gp-toy-scan",
+            "--config", str(cfg_path),
+            "--dataset", "2015",
+            "--seed-root", str(seed_root),
+            "--seed-container", "fAlt",
+            "--seed-hist", "fAlt_analytic_seed_lumi_scaled",
+            "--seed-label", "secondary_alt",
+            "--n-toys", "1",
+        ],
+    )
+    assert result.exit_code == 0, result.output
+
+    toy0 = (
+        tmp_path
+        / "seeded_gp_toys"
+        / "toy_scans"
+        / "2015"
+        / "seeded_secondary_alt_fixedtotal"
+        / "toy_0000"
+    )
+    assert (toy0 / "results_single.csv").exists()
+    with open(toy0 / "toy_metadata.json", "r", encoding="utf-8") as f:
+        meta = json.load(f)
+    assert meta["source_model"] == "seeded_secondary_alt_fixedtotal"
+    assert meta["source_label"] == "secondary_alt"
+    assert meta["container"] == "fAlt"
+    assert meta["seed_hist"] == "fAlt_analytic_seed_lumi_scaled"
+    assert meta["full_input_total_count"] == 57
 
 
 def test_write_toy_scan_validation_plots_large_ensemble_avoids_spaghetti(monkeypatch, tmp_path):

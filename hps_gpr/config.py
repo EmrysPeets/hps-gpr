@@ -202,6 +202,7 @@ class Config:
     inj_refit_gp_on_toy: bool = False
     inj_refit_gp_restarts: int = 0
     inj_refit_gp_optimize: bool = True
+    inj_refit_fail_on_error: bool = False
     inj_train_exclude_nsigma: Optional[float] = None  # defaults to gp_train_exclude_nsigma
     inj_sigma_multipliers: List[float] = field(
         default_factory=lambda: [0.0, 1.0, 2.0, 3.0, 5.0]
@@ -215,6 +216,12 @@ class Config:
     inj_n_workers: int = 5
     inj_parallel_backend: str = "loky"
     inj_threads_per_worker: int = 1
+    # Signal template model. "default" is the nominal detector-resolution
+    # Gaussian line shape. "kernel" is an opt-in localized signal-kernel study
+    # template with width and correlation length tied to the mass resolution.
+    signal_model: str = "default"
+    signal_kernel_width_factor: float = 1.0
+    signal_kernel_length_scale_factor: float = 1.0
     # Reviewer-facing extraction display plots (single representative pseudoexperiments)
     extraction_display_dataset_key: str = ""
     extraction_display_dataset_keys: List[str] = field(default_factory=lambda: ["2015", "2016"])

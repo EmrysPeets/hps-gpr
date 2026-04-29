@@ -76,9 +76,16 @@ def _extract_toy_index(toy_name: str) -> Optional[int]:
 
 def _infer_function_tag(container: Optional[str], toy_name: str) -> str:
     """Infer the function tag from the container or toy name."""
+    name = str(toy_name)
+    seed_like = re.match(
+        r"(.+?)_(?:analytic_seed_lumi_scaled|expected_counts(?:_lumi_scaled)?|toy_mean)$",
+        name,
+    )
+    if seed_like:
+        return str(seed_like.group(1))
     if container:
         return os.path.basename(str(container).rstrip("/"))
-    m = re.match(r"(.+?)_toy_\d+$", str(toy_name))
+    m = re.match(r"(.+?)_toy_\d+$", name)
     if m:
         return str(m.group(1))
     return "funcform"

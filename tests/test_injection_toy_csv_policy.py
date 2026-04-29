@@ -3,11 +3,13 @@ from types import SimpleNamespace
 from click.testing import CliRunner
 import numpy as np
 import pandas as pd
+import pytest
 
 from hps_gpr.cli import main
 from hps_gpr.config import Config
 from hps_gpr.dataset import DatasetConfig
 from hps_gpr.injection import (
+    collapse_fragmented_injection_summary,
     run_funcform_injection_extraction_toys,
     run_injection_extraction_toys,
     run_injection_extraction_streaming,
@@ -281,6 +283,69 @@ def test_streaming_summary_schema_matches_legacy_summary(tmp_path, monkeypatch):
     assert set(stream_sum.columns) == set(legacy_sum.columns)
 
 
+def test_refit_failure_is_flagged_instead_of_hidden_fallback(tmp_path, monkeypatch):
+    _install_fast_injection_mocks(monkeypatch)
+    import hps_gpr.injection as inj
+
+    def raise_fit(*args, **kwargs):
+        raise RuntimeError("forced refit failure")
+
+    monkeypatch.setattr(inj, "fit_gpr", raise_fit)
+    cfg = Config(
+        output_dir=str(tmp_path),
+        inj_write_toy_csv=False,
+        inj_refit_gp_on_toy=True,
+        inj_refit_fail_on_error=False,
+    )
+
+    df = run_injection_extraction_toys(
+        _make_dataset(),
+        cfg,
+        masses=[0.05],
+        strengths=[1.0],
+        n_toys=1,
+        refit_gp_on_toy=True,
+    )
+
+    row = df.iloc[0]
+    assert bool(row["refit_fallback_used"])
+    assert float(row["refit_ok"]) == 0.0
+    assert "RuntimeError: forced refit failure" in row["refit_error"]
+    assert "kernel_ls_res_lower_factor" in df.columns
+    assert "ls_lo" in df.columns
+    assert "n_train" in df.columns
+
+    summary = summarize_injection_grid(df).iloc[0]
+    assert float(summary["refit_fallback_rate"]) == 1.0
+    assert float(summary["refit_ok_rate"]) == 0.0
+
+
+def test_refit_failure_can_be_promoted_to_exception(tmp_path, monkeypatch):
+    _install_fast_injection_mocks(monkeypatch)
+    import hps_gpr.injection as inj
+
+    def raise_fit(*args, **kwargs):
+        raise RuntimeError("forced refit failure")
+
+    monkeypatch.setattr(inj, "fit_gpr", raise_fit)
+    cfg = Config(
+        output_dir=str(tmp_path),
+        inj_write_toy_csv=False,
+        inj_refit_gp_on_toy=True,
+        inj_refit_fail_on_error=True,
+    )
+
+    with pytest.raises(RuntimeError, match="failed for 2015"):
+        run_injection_extraction_toys(
+            _make_dataset(),
+            cfg,
+            masses=[0.05],
+            strengths=[1.0],
+            n_toys=1,
+            refit_gp_on_toy=True,
+        )
+
+
 def test_summarize_injection_grid_computes_delta_z_minus_pull_from_delta_z():
     toys = pd.DataFrame(
         [
@@ -316,6 +381,124 @@ def test_summarize_injection_grid_computes_delta_z_minus_pull_from_delta_z():
     expected = (float(row["Zhat_mean"]) - float(row["inj_nsigma"])) - float(row["pull_mean"])
 
     assert float(row["delta_z_minus_pull"]) == expected
+
+
+def test_collapse_fragmented_summary_groups_one_toy_rows_by_injected_sigma():
+    fragments = pd.DataFrame(
+        [
+            {
+                "dataset": "2015",
+                "mass_GeV": 0.05,
+                "strength": 10.0,
+                "n_toys": 1,
+                "inj_nsigma": 1.0,
+                "sigmaA_ref": 10.0,
+                "A_hat_mean": 8.0,
+                "A_hat_std": np.nan,
+                "sigma_A_mean": 5.0,
+                "pull_mean": -0.4,
+                "pull_std": np.nan,
+                "cov_1sigma": 1.0,
+                "cov_2sigma": 1.0,
+                "Zhat_mean": 1.6,
+                "Zhat_q16": 1.6,
+                "Zhat_q84": 1.6,
+                "success_rate": 1.0,
+            },
+            {
+                "dataset": "2015",
+                "mass_GeV": 0.05,
+                "strength": 12.0,
+                "n_toys": 1,
+                "inj_nsigma": 1.0,
+                "sigmaA_ref": 12.0,
+                "A_hat_mean": 6.0,
+                "A_hat_std": np.nan,
+                "sigma_A_mean": 6.0,
+                "pull_mean": -1.0,
+                "pull_std": np.nan,
+                "cov_1sigma": 0.0,
+                "cov_2sigma": 1.0,
+                "Zhat_mean": 1.0,
+                "Zhat_q16": 1.0,
+                "Zhat_q84": 1.0,
+                "success_rate": 1.0,
+            },
+        ]
+    )
+
+    out = collapse_fragmented_injection_summary(fragments)
+
+    assert len(out) == 1
+    row = out.iloc[0]
+    assert int(row["n_toys"]) == 2
+    assert float(row["inj_nsigma"]) == 1.0
+    assert float(row["strength"]) == 11.0
+    assert float(row["A_hat_mean"]) == 7.0
+    assert float(row["pull_mean"]) == -0.7
+    assert float(row["Zhat_mean"]) == 1.3
+    assert float(row["delta_z_minus_pull"]) == pytest.approx(1.3 - 1.0 + 0.7)
+    assert float(row["cov_1sigma"]) == 0.5
+
+
+def test_collapse_fragmented_summary_canonicalizes_mass_keys():
+    df = pd.DataFrame(
+        [
+            {
+                "dataset": "2015",
+                "mass_GeV": 0.105,
+                "strength": 0.0,
+                "n_toys": 100,
+                "inj_nsigma": 0.0,
+                "pull_mean": 0.0,
+                "pull_std": 1.0,
+                "Zhat_mean": 0.0,
+            },
+            {
+                "dataset": "2015",
+                "mass_GeV": 0.10500000000000002,
+                "strength": 1.0,
+                "n_toys": 1,
+                "inj_nsigma": 1.0,
+                "sigmaA_ref": 1.0,
+                "A_hat_mean": 0.5,
+                "sigma_A_mean": 1.0,
+                "pull_mean": -0.5,
+                "Zhat_mean": 0.5,
+            },
+            {
+                "dataset": "2015",
+                "mass_GeV": 0.10500000000000002,
+                "strength": 1.0,
+                "n_toys": 1,
+                "inj_nsigma": 1.0,
+                "sigmaA_ref": 1.0,
+                "A_hat_mean": 1.5,
+                "sigma_A_mean": 1.0,
+                "pull_mean": 0.5,
+                "Zhat_mean": 1.5,
+            },
+        ]
+    )
+
+    out = collapse_fragmented_injection_summary(df)
+
+    assert sorted(f"{m:.12f}" for m in out["mass_GeV"].unique()) == ["0.105000000000"]
+
+
+def test_collapse_fragmented_summary_does_not_leak_internal_keys_for_regular_summary():
+    df = pd.DataFrame(
+        [
+            {"dataset": "2015", "mass_GeV": 0.04500000000000001, "strength": 0.0, "n_toys": 100, "inj_nsigma": 0.0},
+            {"dataset": "2015", "mass_GeV": 0.04500000000000001, "strength": 1.0, "n_toys": 100, "inj_nsigma": 1.0},
+        ]
+    )
+
+    out = collapse_fragmented_injection_summary(df)
+
+    assert "_mass_key" not in out.columns
+    assert "_inj_key" not in out.columns
+    assert sorted(f"{m:.12f}" for m in out["mass_GeV"].unique()) == ["0.045000000000"]
 
 
 def test_streaming_combined_writes_compact_summaries_without_toy_csv(tmp_path, monkeypatch):
