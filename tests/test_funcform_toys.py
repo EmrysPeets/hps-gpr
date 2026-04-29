@@ -22,11 +22,12 @@ from hps_gpr.funcform_toys import (
     merge_toy_scan_results,
     resolve_funcform_closure_mass_ranges,
     resolve_funcform_toy_root_path,
+    run_funcform_injection_extraction,
     run_funcform_toy_scans,
 )
 from hps_gpr.gpr import compute_kernel_ls_bounds
 from hps_gpr.io import _build_model
-from hps_gpr.slurm import generate_toy_scan_slurm_scripts
+from hps_gpr.slurm import generate_funcform_injection_slurm_scripts, generate_toy_scan_slurm_scripts
 
 
 def _make_hist(values, lo=0.0, hi=0.3):
@@ -522,6 +523,99 @@ def test_run_funcform_toy_scans_applies_toy_runtime_and_output_overrides(monkeyp
     assert captured["output_dir"].endswith("toy_scans/2015/toy_0000")
 
 
+def test_run_funcform_injection_extraction_merges_source_metadata(monkeypatch, tmp_path):
+    root_path = tmp_path / "funcform.root"
+    _write_toy_root(root_path)
+    base_output_dir = tmp_path / "funcform_inj"
+
+    ds = DatasetConfig(
+        key="2015",
+        label="HPS 2015",
+        root_path="unused.root",
+        hist_name="unused",
+        m_low=0.02,
+        m_high=0.13,
+        sigma_coeffs=[0.001],
+        frad_coeffs=[0.1],
+    )
+    cfg = Config(output_dir=str(base_output_dir), inj_strength_mode="sigmaA")
+    spec = FuncFormToySpec(
+        source_root=str(root_path),
+        container="primary",
+        function_tag="primary",
+        toy_name="primary_toy_0",
+        toy_index=7,
+    )
+
+    def fake_run_streaming(toy_ds, config, *, masses, strengths, n_toys, outdir, write_toy_csv, **kwargs):
+        assert toy_ds.hist_override is not None
+        assert getattr(toy_ds, "source_model") == "functional_form"
+        assert getattr(toy_ds, "toy_hist") == "primary_toy_0"
+        Path(outdir).mkdir(parents=True, exist_ok=True)
+        rows = pd.DataFrame(
+            [
+                {
+                    "dataset": "2015",
+                    "mass_GeV": float(masses[0]),
+                    "toy": 0,
+                    "strength": 10.0,
+                    "inj_nsigma": 1.0,
+                    "sigmaA_ref": 10.0,
+                    "A_hat": 9.0,
+                    "sigma_A": 2.0,
+                    "pull_param": -0.5,
+                    "Zhat": 4.5,
+                    "success": True,
+                    "refit_ok": 1.0,
+                    "refit_fallback_used": False,
+                }
+            ]
+        )
+        rows.to_csv(Path(outdir) / "inj_extract_toys_2015.csv", index=False)
+        return pd.DataFrame(
+            [
+                {
+                    "dataset": "2015",
+                    "mass_GeV": float(masses[0]),
+                    "strength": 10.0,
+                    "n_toys": int(n_toys),
+                    "inj_nsigma": 1.0,
+                    "sigmaA_ref": 10.0,
+                    "A_hat_mean": 9.0,
+                    "sigma_A_mean": 2.0,
+                    "pull_mean": -0.5,
+                    "Zhat_mean": 4.5,
+                    "success_rate": 1.0,
+                }
+            ]
+        )
+
+    import hps_gpr.injection as injection_mod
+
+    monkeypatch.setattr(injection_mod, "run_injection_extraction_streaming", fake_run_streaming)
+
+    toys, summary = run_funcform_injection_extraction(
+        ds,
+        cfg,
+        [spec],
+        base_output_dir=str(base_output_dir),
+        masses=[0.06],
+        strengths=[1.0],
+        n_injection_toys=1,
+        write_toy_csv=True,
+    )
+
+    assert len(toys) == 1
+    assert len(summary) == 1
+    assert int(toys.loc[0, "toy"]) == 7_000_000
+    assert int(toys.loc[0, "injection_toy"]) == 0
+    assert int(toys.loc[0, "toy_index"]) == 7
+    assert toys.loc[0, "toy_hist"] == "primary_toy_0"
+    assert toys.loc[0, "source_model"] == "functional_form"
+    assert (base_output_dir / "injection_extraction" / "inj_extract_toys_2015.csv").exists()
+    assert (base_output_dir / "injection_extraction" / "inj_extract_summary_2015.csv").exists()
+
+
 def test_toy_scan_cli_uses_toy_defaults_and_prints_effective_settings(monkeypatch, tmp_path):
     config_path = tmp_path / "config.yaml"
     toy_root = tmp_path / "toys.root"
@@ -740,6 +834,42 @@ def test_generate_toy_scan_slurm_scripts_writes_expected_commands(tmp_path):
     assert "TOY_INDEX=1" in submit_text
     assert "TOY_DIR_NAME=primary_toy_1" in submit_text
     assert 'REPO_ROOT="' in submit_text
+
+
+def test_generate_funcform_injection_slurm_scripts_writes_expected_commands(tmp_path):
+    job = tmp_path / "submit_funcform_injection.slurm"
+
+    job_script, submit_script, n_jobs = generate_funcform_injection_slurm_scripts(
+        config_path="study_configs/config_2015_funcform.yaml",
+        output_path=str(job),
+        dataset="2015",
+        toy_root="outputs/funcform_toys/funcform_2015_dataset_mod_toys_2.root",
+        toy_names=["primary_toy_0"],
+        toy_indices=[0],
+        output_root="outputs/study_2015_funcform",
+        container="primary",
+        masses=[0.03, 0.06],
+        strengths=["s0", "s1", "s2"],
+        n_injection_toys=1,
+        write_qmu=True,
+        cpus_per_task=1,
+        extra_sbatch=["--account=testacct"],
+    )
+
+    assert n_jobs == 1
+    job_text = Path(job_script).read_text()
+    submit_text = Path(submit_script).read_text()
+    assert "python -m hps_gpr.cli funcform-inject" in job_text
+    assert "#SBATCH --account=testacct" in job_text
+    assert "#SBATCH --cpus-per-task=1" in job_text
+    assert '--masses "0.03,0.06"' in job_text
+    assert '--strengths "s0,s1,s2"' in job_text
+    assert "--n-injection-toys 1" in job_text
+    assert "--write-qmu" in job_text
+    assert '--toy-name-fmt "${TOY_NAME}"' in job_text
+    assert 'FILE_GLOB="${JOB_OUTDIR}/injection_extraction/*_${TOY_DATASET}.csv"' in job_text
+    assert "submit_funcform_injection_all.sh" in submit_script
+    assert "TOY_NAME=primary_toy_0" in submit_text
 
 
 def test_slurm_gen_toy_scan_cli_infers_cpus_per_task(monkeypatch, tmp_path):

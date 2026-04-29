@@ -210,6 +210,7 @@ class Config:
     inj_combined_mass_policy: str = "intersection"  # "intersection" | "union_min_n"
     inj_combined_min_n_contrib: int = 2
     inj_write_toy_csv: bool = True
+    inj_write_qmu: bool = False
     # Streaming injection aggregation (default-on)
     inj_stream_aggregate: bool = True
     inj_aggregate_every: int = 100
