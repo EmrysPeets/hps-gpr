@@ -110,6 +110,16 @@ def _resolve_cli_override(ctx, param_name, explicit_value, default_value):
     return default_value
 
 
+def _funcform_config_value(cfg, attr_name, dataset_key, explicit_value=None, default=""):
+    """Resolve a functional-form source option from CLI or per-dataset config."""
+    if explicit_value:
+        return explicit_value
+    mapping = getattr(cfg, attr_name, {}) or {}
+    if isinstance(mapping, dict):
+        return mapping.get(str(dataset_key), default)
+    return default
+
+
 @main.command()
 @click.option(
     "--config",
@@ -565,6 +575,23 @@ def toy_scan(
     help="Dataset key (2015, 2016, or 2021)",
 )
 @click.option(
+    "--seed-root",
+    type=click.Path(exists=True),
+    help="Optional ROOT file containing a frozen analytic background seed histogram.",
+)
+@click.option(
+    "--seed-container",
+    help="Optional ROOT directory containing --seed-hist.",
+)
+@click.option(
+    "--seed-hist",
+    help="Histogram name to use as the full-range background expectation for seeded GP toys.",
+)
+@click.option(
+    "--seed-label",
+    help="Optional source label for seeded GP toys; defaults to the seed function tag.",
+)
+@click.option(
     "--n-toys",
     type=int,
     default=1000,
@@ -643,6 +670,10 @@ def gp_toy_scan(
     ctx,
     config,
     dataset,
+    seed_root,
+    seed_container,
+    seed_hist,
+    seed_label,
     n_toys,
     toy_indices,
     seed,
@@ -663,6 +694,7 @@ def gp_toy_scan(
     from .gp_toys import run_gp_toy_scans, _source_model_name
     from .scan import union_scan_grid
     from .toy_backgrounds import normalize_full_toy_bkg_mode
+    from .funcform_toys import _infer_function_tag, load_funcform_toy_hist
 
     cfg = load_config(config)
     if output_dir:
@@ -675,6 +707,21 @@ def gp_toy_scan(
         print(f"Dataset '{dataset}' not found or not enabled. Available: {available}")
         sys.exit(1)
     ds = datasets[dataset]
+
+    seed_hist_obj = None
+    seed_label_resolved = None
+    if seed_root or seed_hist or seed_container or seed_label:
+        if not seed_root:
+            raise click.BadParameter("--seed-root is required when using seeded GP toys", param_hint="--seed-root")
+        if not seed_hist:
+            raise click.BadParameter("--seed-hist is required when using seeded GP toys", param_hint="--seed-hist")
+        seed_hist_obj = load_funcform_toy_hist(
+            seed_root,
+            container=seed_container,
+            toy_name=seed_hist,
+        )
+        seed_function_tag = _infer_function_tag(seed_container, seed_hist)
+        seed_label_resolved = str(seed_label or seed_function_tag)
 
     resolved_save_plots = bool(_resolve_cli_override(
         ctx, "save_plots", save_plots, getattr(cfg, "toy_scan_save_plots", False)
@@ -721,7 +768,11 @@ def gp_toy_scan(
 
     print(f"Running GP-propagated toy scans for {ds.label}")
     toy_mode = normalize_full_toy_bkg_mode(getattr(cfg, "full_toy_bkg_mode", "poisson"))
-    print(f"Toy source model: {_source_model_name(toy_mode)}")
+    if seed_hist_obj is None:
+        print(f"Toy source model: {_source_model_name(toy_mode)}")
+    else:
+        print(f"Toy source model: seeded analytic background ({seed_label_resolved})")
+        print(f"Seed histogram: {seed_root}:{str(seed_container or '').strip()}/{seed_hist}")
     print(f"Full-range toy generation mode: {toy_mode}")
     print(f"Toys requested: {toy_count_for_print}")
     print(f"Mass hypotheses per toy: {len(masses)}")
@@ -739,6 +790,11 @@ def gp_toy_scan(
         cfg,
         n_toys=int(n_toys),
         base_output_dir=cfg.output_dir,
+        seed_hist=seed_hist_obj,
+        seed_source_label=seed_label_resolved,
+        seed_source_root=str(seed_root or ""),
+        seed_container=str(seed_container or ""),
+        seed_hist_name=str(seed_hist or ""),
         mass_min=mass_min,
         mass_max=mass_max,
         seed=seed,
@@ -1167,6 +1223,181 @@ def inject(config, dataset, masses, strengths, n_toys, output_dir, write_toy_csv
         print(df_sum.head(20).to_string())
 
 
+@main.command("funcform-inject")
+@click.option(
+    "--config",
+    "-c",
+    required=True,
+    type=click.Path(exists=True),
+    help="Path to configuration YAML file",
+)
+@click.option(
+    "--dataset",
+    "-d",
+    required=True,
+    help="Dataset key (2015, 2016, or 2021)",
+)
+@click.option(
+    "--toy-root",
+    type=click.Path(exists=True),
+    help="ROOT file containing functional-form toy histograms; defaults to config funcform_closure_root_by_dataset.",
+)
+@click.option(
+    "--container",
+    help="ROOT directory containing the toy histograms; defaults to config funcform_closure_container_by_dataset.",
+)
+@click.option(
+    "--toy-pattern",
+    default=None,
+    help="Shell-style pattern selecting toy histograms; defaults to config funcform_closure_toy_pattern_by_dataset.",
+)
+@click.option(
+    "--toy-name-fmt",
+    help="Format string for explicit toy names, e.g. fShiftSigPowTail_toy_{i}.",
+)
+@click.option(
+    "--toy-index",
+    multiple=True,
+    type=int,
+    help="Toy index to run with --toy-name-fmt; repeatable.",
+)
+@click.option(
+    "--max-toys",
+    type=int,
+    help="Maximum number of matched functional-form toys to process.",
+)
+@click.option(
+    "--masses",
+    "-m",
+    help="Comma-separated masses in GeV; defaults to config inj_masses_gev.",
+)
+@click.option(
+    "--strengths",
+    "-s",
+    help="Comma-separated strengths, e.g. s0,s1,s2,s3,s5; defaults to config injection strengths.",
+)
+@click.option(
+    "--n-injection-toys",
+    type=int,
+    default=1,
+    show_default=True,
+    help="Signal/background replicas per functional-form pseudo-data histogram.",
+)
+@click.option(
+    "--output-dir",
+    "-o",
+    type=click.Path(),
+    help="Override output directory from config.",
+)
+@click.option(
+    "--write-toy-csv/--no-write-toy-csv",
+    default=True,
+    show_default=True,
+    help="Write merged and per-toy injection toy CSV tables.",
+)
+@click.option(
+    "--write-qmu/--no-write-qmu",
+    default=None,
+    help="Write exact tilde-q_mu diagnostics in toy rows; defaults to config inj_write_qmu.",
+)
+def funcform_inject(
+    config,
+    dataset,
+    toy_root,
+    container,
+    toy_pattern,
+    toy_name_fmt,
+    toy_index,
+    max_toys,
+    masses,
+    strengths,
+    n_injection_toys,
+    output_dir,
+    write_toy_csv,
+    write_qmu,
+):
+    """Run injection/refit closure on functional-form ROOT toy histograms."""
+    from .config import load_config
+    from .dataset import make_datasets
+    from .funcform_toys import discover_funcform_toys, run_funcform_injection_extraction
+
+    cfg = load_config(config)
+    if output_dir:
+        cfg.output_dir = output_dir
+    if write_qmu is not None:
+        cfg.inj_write_qmu = bool(write_qmu)
+    cfg.ensure_output_dir()
+
+    datasets = make_datasets(cfg)
+    if dataset not in datasets:
+        print(f"Dataset '{dataset}' not found or not enabled. Available: {list(datasets.keys())}")
+        sys.exit(1)
+    ds = datasets[dataset]
+
+    toy_root = _funcform_config_value(cfg, "funcform_closure_root_by_dataset", dataset, toy_root)
+    container = _funcform_config_value(cfg, "funcform_closure_container_by_dataset", dataset, container)
+    toy_pattern = _funcform_config_value(
+        cfg,
+        "funcform_closure_toy_pattern_by_dataset",
+        dataset,
+        toy_pattern,
+        default="*",
+    )
+    if not toy_root:
+        raise click.BadParameter(
+            "--toy-root is required unless funcform_closure_root_by_dataset contains the dataset",
+            param_hint="--toy-root",
+        )
+
+    specs = discover_funcform_toys(
+        toy_root,
+        container=container,
+        toy_pattern=toy_pattern or "*",
+        toy_name_fmt=toy_name_fmt,
+        toy_indices=list(toy_index) if toy_index else None,
+    )
+    if max_toys is not None:
+        specs = specs[: int(max_toys)]
+    if not specs:
+        print("No functional-form toy histograms matched the requested selection.")
+        sys.exit(1)
+
+    mass_list = _parse_mass_tokens(masses) if masses else [float(x) for x in getattr(cfg, "inj_masses_gev", [])]
+    if not mass_list:
+        raise click.BadParameter("No masses were supplied and config inj_masses_gev is empty", param_hint="--masses")
+    if strengths:
+        strength_list = _parse_strength_tokens(strengths)
+    elif str(getattr(cfg, "inj_strength_mode", "absolute")).lower().strip() == "sigmaa":
+        strength_list = [float(x) for x in getattr(cfg, "inj_sigma_multipliers", [])]
+    else:
+        strength_list = [float(x) for x in getattr(cfg, "inj_strengths", [])]
+
+    print(f"Running functional-form injection/refit study for {ds.label}")
+    print(f"Toy source: {toy_root}")
+    if container:
+        print(f"Container: {container}")
+    print(f"Toy pattern: {toy_pattern}")
+    print(f"Matched toys: {len(specs)}")
+    print(f"Masses: {mass_list}")
+    print(f"Strengths: {strength_list}")
+    print(f"n_injection_toys per functional-form histogram: {int(n_injection_toys)}")
+    print(f"write_qmu={bool(getattr(cfg, 'inj_write_qmu', False))}")
+
+    _, df_summary = run_funcform_injection_extraction(
+        ds,
+        cfg,
+        specs,
+        base_output_dir=cfg.output_dir,
+        masses=mass_list,
+        strengths=strength_list,
+        n_injection_toys=int(n_injection_toys),
+        write_toy_csv=bool(write_toy_csv),
+    )
+    print(f"Summary rows: {len(df_summary)}")
+    if not df_summary.empty:
+        print(df_summary.head(20).to_string())
+
+
 
 @main.command()
 @click.option(
@@ -1540,6 +1771,185 @@ def slurm_gen(config, n_jobs, output, job_name, partition, time, memory, cpus_pe
 
 
 
+@main.command("slurm-gen-funcform-inject")
+@click.option(
+    "--config",
+    "-c",
+    required=True,
+    type=click.Path(exists=True),
+    help="Path to configuration YAML file",
+)
+@click.option(
+    "--dataset",
+    required=True,
+    help="Dataset key (2015, 2016, or 2021)",
+)
+@click.option(
+    "--toy-root",
+    type=click.Path(exists=True),
+    help="ROOT file containing functional-form toy histograms; defaults to config funcform_closure_root_by_dataset.",
+)
+@click.option(
+    "--container",
+    help="ROOT directory containing the toy histograms; defaults to config funcform_closure_container_by_dataset.",
+)
+@click.option(
+    "--toy-pattern",
+    default=None,
+    help="Shell-style pattern selecting toy histograms; defaults to config funcform_closure_toy_pattern_by_dataset.",
+)
+@click.option(
+    "--masses",
+    required=True,
+    help="Comma-separated masses (GeV)",
+)
+@click.option(
+    "--strengths",
+    required=True,
+    help="Comma-separated injection strengths (e.g. s0,s1,s2,s3,s5)",
+)
+@click.option(
+    "--n-injection-toys",
+    type=int,
+    default=1,
+    show_default=True,
+    help="Signal/background replicas per functional-form pseudo-data histogram.",
+)
+@click.option(
+    "--write-qmu/--no-write-qmu",
+    default=None,
+    help="Write exact tilde-q_mu diagnostics in generated jobs; defaults to config inj_write_qmu.",
+)
+@click.option(
+    "--output",
+    "-o",
+    default="submit_funcform_injection.slurm",
+    help="Output SLURM script path",
+)
+@click.option(
+    "--job-name",
+    default="hps-gpr-ffinj",
+    help="SLURM job name",
+)
+@click.option(
+    "--partition",
+    default="batch",
+    help="SLURM partition",
+)
+@click.option(
+    "--time",
+    default="4:00:00",
+    help="Time limit per task",
+)
+@click.option(
+    "--memory",
+    default="4G",
+    help="Memory per task",
+)
+@click.option(
+    "--cpus-per-task",
+    type=int,
+    help="SLURM CPUs per task; defaults to inj_n_workers * inj_threads_per_worker",
+)
+@click.option(
+    "--conda-env",
+    help="Conda environment to activate",
+)
+@click.option(
+    "--account",
+    help="SLURM account/project to charge",
+)
+@click.option(
+    "--qos",
+    help="Optional SLURM QOS to request",
+)
+def slurm_gen_funcform_inject(
+    config,
+    dataset,
+    toy_root,
+    container,
+    toy_pattern,
+    masses,
+    strengths,
+    n_injection_toys,
+    write_qmu,
+    output,
+    job_name,
+    partition,
+    time,
+    memory,
+    cpus_per_task,
+    conda_env,
+    account,
+    qos,
+):
+    """Generate SLURM jobs for functional-form toy injection/refit closure."""
+    from .config import load_config
+    from .funcform_toys import discover_funcform_toys
+    from .slurm import generate_funcform_injection_slurm_scripts
+
+    cfg = load_config(config)
+    toy_root = _funcform_config_value(cfg, "funcform_closure_root_by_dataset", dataset, toy_root)
+    container = _funcform_config_value(cfg, "funcform_closure_container_by_dataset", dataset, container)
+    toy_pattern = _funcform_config_value(
+        cfg,
+        "funcform_closure_toy_pattern_by_dataset",
+        dataset,
+        toy_pattern,
+        default="*",
+    )
+    if not toy_root:
+        raise click.BadParameter(
+            "--toy-root is required unless funcform_closure_root_by_dataset contains the dataset",
+            param_hint="--toy-root",
+        )
+
+    specs = discover_funcform_toys(
+        toy_root,
+        container=container,
+        toy_pattern=toy_pattern or "*",
+    )
+    if not specs:
+        raise click.BadParameter("No toy histograms matched the requested selection", param_hint="--toy-pattern")
+
+    mass_list = _parse_mass_tokens(masses)
+    strength_tokens = [tok.strip() for tok in str(strengths).split(",") if tok.strip()]
+    if not mass_list:
+        raise click.BadParameter("No masses provided", param_hint="--masses")
+    if not strength_tokens:
+        raise click.BadParameter("No strengths provided", param_hint="--strengths")
+
+    extra = _build_extra_sbatch(account=account, qos=qos)
+    resolved_cpus_per_task = _infer_injection_cpus_per_task(cfg, override=cpus_per_task)
+    write_qmu_resolved = bool(getattr(cfg, "inj_write_qmu", False) if write_qmu is None else write_qmu)
+
+    job_script, submit_script, n_jobs = generate_funcform_injection_slurm_scripts(
+        config_path=config,
+        output_path=output,
+        dataset=dataset,
+        toy_root=toy_root,
+        toy_names=[spec.toy_name for spec in specs],
+        toy_indices=[spec.toy_index for spec in specs],
+        output_root=cfg.output_dir,
+        container=container,
+        masses=mass_list,
+        strengths=strength_tokens,
+        n_injection_toys=int(n_injection_toys),
+        write_qmu=bool(write_qmu_resolved),
+        job_name=job_name,
+        partition=partition,
+        time_limit=time,
+        memory=memory,
+        cpus_per_task=resolved_cpus_per_task,
+        conda_env=conda_env,
+        extra_sbatch=extra,
+    )
+    print(f"\nPrepared {n_jobs} functional-form injection jobs.")
+    print(f"CPUs per task: {resolved_cpus_per_task}")
+    print("To submit all jobs, run:")
+    print(f"  bash {submit_script}")
+
+
 @main.command("slurm-gen-inject")
 @click.option(
     "--config",
@@ -1850,7 +2260,13 @@ def inject_plot(input_dir, output_dir, dataset, write_merged_toys):
     import glob
     import pandas as pd
 
-    from .injection import summarize_injection_grid, combine_injection_toy_tables, _combined_mass_support_summary, format_combined_mass_support_summary
+    from .injection import (
+        summarize_injection_grid,
+        collapse_fragmented_injection_summary,
+        combine_injection_toy_tables,
+        _combined_mass_support_summary,
+        format_combined_mass_support_summary,
+    )
     from .plotting import (
         ensure_dir,
         _looks_like_single_toy_summary_rows,
@@ -2003,6 +2419,10 @@ def inject_plot(input_dir, output_dir, dataset, write_merged_toys):
             if "dataset" not in dsum.columns:
                 dsum["dataset"] = str(ds)
             dsum["dataset"] = dsum["dataset"].astype(str)
+            if looks_like_fragments:
+                before = len(dsum)
+                dsum = collapse_fragmented_injection_summary(dsum)
+                print(f"Collapsed fragmented one-toy summary rows for {ds}: {before} -> {len(dsum)}")
             sum_out = os.path.join(outdir, f"inj_extract_summary_{ds}.csv")
             dsum.to_csv(sum_out, index=False)
             all_summaries.append(dsum)
@@ -2080,6 +2500,10 @@ def inject_plot(input_dir, output_dir, dataset, write_merged_toys):
             outdir=outdir,
             acceptance_bands=[0.5, 1.0],
             band_semantic="summary q16--q84",
+        )
+        plot_delta_z_minus_pull_vs_injected_sigma(
+            df_sum,
+            outpath=os.path.join(outdir, "delta_z_minus_pull_vs_inj_sigma_all.png"),
         )
 
     if (not all_toys) and {"dataset", "mass_GeV", "sigmaA_ref"}.issubset(set(df_sum.columns)):

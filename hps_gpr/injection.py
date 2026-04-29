@@ -26,9 +26,16 @@ from .conversion import A_from_epsilon2
 from .statistics import (
     fit_A_profiled_gaussian,
     fit_A_profiled_gaussian_details,
+    qmu_tilde_profiled_gaussian,
     draw_bkg_mvn_nonneg,
 )
-from .gpr import make_kernel_for_dataset, fit_gpr, predict_counts_from_log_gpr
+from .gpr import (
+    make_kernel_for_dataset,
+    fit_gpr,
+    predict_counts_from_log_gpr,
+    compute_kernel_ls_bounds,
+    _extract_rbf_bounds_and_scale,
+)
 from .plotting import ensure_dir
 
 if TYPE_CHECKING:
@@ -159,6 +166,134 @@ def _prediction_integral_density(pred: Any) -> float:
     return float(np.sum(np.clip(arr, 0.0, None)))
 
 
+def _dataset_kernel_factor(config: "Config", ds_key: str, base_attr: str, by_attr: str) -> float:
+    """Resolve a scalar kernel-factor knob after per-dataset overrides."""
+    by_ds = dict(getattr(config, by_attr, {}) or {})
+    return float(by_ds.get(str(ds_key), getattr(config, base_attr)))
+
+
+def _kernel_static_diagnostics(ds: "DatasetConfig", config: "Config", mass: float) -> Dict[str, Any]:
+    """Return configuration-level kernel diagnostics for one dataset/mass point."""
+    out: Dict[str, Any] = dict(
+        kernel_ls_policy=str(getattr(config, "kernel_ls_policy", "")),
+        kernel_ls_res_lower_factor=_dataset_kernel_factor(
+            config,
+            str(ds.key),
+            "kernel_ls_res_lower_factor",
+            "kernel_ls_res_lower_factor_by_dataset",
+        ),
+        kernel_ls_res_upper_factor=_dataset_kernel_factor(
+            config,
+            str(ds.key),
+            "kernel_ls_res_upper_factor",
+            "kernel_ls_res_upper_factor_by_dataset",
+        ),
+        ls_lo=float("nan"),
+        ls_hi=float("nan"),
+        ls_init=float("nan"),
+    )
+    try:
+        info = compute_kernel_ls_bounds(ds, config, mass=float(mass))
+        out.update(
+            ls_lo=float(info.get("ls_lo", float("nan"))),
+            ls_hi=float(info.get("ls_hi", float("nan"))),
+            ls_init=float(info.get("ls_init", float("nan"))),
+        )
+    except Exception:
+        pass
+    return out
+
+
+def _gpr_fit_diagnostics(gpr: Any) -> Dict[str, float]:
+    """Extract optimized kernel diagnostics from a fitted sklearn GP."""
+    out = dict(ls_opt=float("nan"), const_opt=float("nan"))
+    try:
+        kopt = getattr(gpr, "kernel_", None)
+        if kopt is not None and hasattr(kopt, "k1"):
+            out["const_opt"] = float(getattr(kopt.k1, "constant_value", float("nan")))
+        _, _, ls_opt = _extract_rbf_bounds_and_scale(kopt if kopt is not None else getattr(gpr, "kernel", None))
+        out["ls_opt"] = float(ls_opt)
+    except Exception:
+        pass
+    return out
+
+
+def _handle_refit_failure(config: "Config", label: str, exc: Exception) -> str:
+    """Return a compact error string, optionally escalating failed toy refits."""
+    msg = f"{type(exc).__name__}: {exc}"
+    print(f"[inj][refit] WARNING {label}: {msg}")
+    if bool(getattr(config, "inj_refit_fail_on_error", False)) or bool(getattr(config, "fail_fast", False)):
+        raise RuntimeError(f"[inj][refit] failed for {label}: {msg}") from exc
+    return msg[:240]
+
+
+def _dataset_source_metadata(ds: "DatasetConfig") -> Dict[str, Any]:
+    """Return optional pseudo-data source metadata attached to a dataset clone."""
+    out: Dict[str, Any] = {}
+    for name in [
+        "source_model",
+        "source_label",
+        "source_root",
+        "container",
+        "function_tag",
+        "toy_hist",
+        "toy_index",
+    ]:
+        if hasattr(ds, name):
+            out[name] = getattr(ds, name)
+    return out
+
+
+def _qmu_tilde_fields(
+    config: "Config",
+    obs: np.ndarray,
+    mu_fit: np.ndarray,
+    cov_fit: np.ndarray,
+    tmpl_win: np.ndarray,
+    A_test: float,
+) -> Dict[str, Any]:
+    """Compute optional exact profiled ``tilde q_mu`` diagnostics for toy rows."""
+    if not bool(getattr(config, "inj_write_qmu", False)):
+        return {}
+
+    try:
+        qmu, info = qmu_tilde_profiled_gaussian(
+            obs,
+            np.asarray(mu_fit, float),
+            np.asarray(cov_fit, float),
+            np.asarray(tmpl_win, float),
+            float(A_test),
+        )
+        qmu = float(qmu)
+        sqrt_qmu = float(np.sqrt(max(qmu, 0.0))) if np.isfinite(qmu) else float("nan")
+        return dict(
+            qmu_tilde=float(qmu),
+            tmu_tilde=float(qmu),
+            sqrt_qmu_tilde=float(sqrt_qmu),
+            sqrt_tmu_tilde=float(sqrt_qmu),
+            qmu_A_test=float(info.get("A_test", A_test)),
+            qmu_branch=str(info.get("branch", "")),
+            qmu_ok=bool(info.get("ok", False)),
+            qmu_nll_fixed=float(info.get("nll_fixed", float("nan"))),
+            qmu_nll_unbounded=float(info.get("nll_unbounded", float("nan"))),
+            qmu_nll_null=float(info.get("nll_null", float("nan"))),
+        )
+    except Exception as exc:
+        return dict(
+            qmu_tilde=float("nan"),
+            tmu_tilde=float("nan"),
+            sqrt_qmu_tilde=float("nan"),
+            sqrt_tmu_tilde=float("nan"),
+            qmu_A_test=float(A_test),
+            qmu_branch="error",
+            qmu_ok=False,
+            qmu_nll_fixed=float("nan"),
+            qmu_nll_unbounded=float("nan"),
+            qmu_nll_null=float("nan"),
+            qmu_error=f"{type(exc).__name__}: {exc}"[:240],
+        )
+
+
 # ---------------------------------------------------------------------------
 # Reference sigma_A for strength scaling
 # ---------------------------------------------------------------------------
@@ -169,11 +304,12 @@ def _sigmaA_reference(
     *,
     source: str = "asimov",
     rng: Optional[np.random.Generator] = None,
+    config: Optional["Config"] = None,
 ) -> float:
     """Estimate σ_A(m) under B-only for 'sigma-level' injection scaling."""
     blind_mask = _prediction_blind_mask(pred)
     tmpl, _ = build_window_template_from_full(
-        pred.edges_full, blind_mask, mass, pred.sigma_val
+        pred.edges_full, blind_mask, mass, pred.sigma_val, config=config
     )
     b = np.asarray(pred.mu, float)
     if source == "poisson":
@@ -281,15 +417,18 @@ def run_injection_extraction_toys(
         integral_density = _prediction_integral_density(pred)
 
         tmpl_win, tmpl_full = build_window_template_from_full(
-            pred.edges_full, blind_mask, m, pred.sigma_val
+            pred.edges_full, blind_mask, m, pred.sigma_val, config=config
         )
         f_win = float(np.sum(tmpl_win))
 
         # Full-range template for leakage diagnostics
         x_full = np.asarray(pred.x_full, float).reshape(-1)
         f_full = float(np.sum(tmpl_full))
+        kernel_diag = _kernel_static_diagnostics(ds, config, m)
+        initial_ls_opt = float(getattr(pred, "ls_opt", float("nan")))
+        initial_const_opt = float(getattr(pred, "const_opt", float("nan")))
 
-        sigmaA_ref = _sigmaA_reference(pred, m, source=sigma_source, rng=rng)
+        sigmaA_ref = _sigmaA_reference(pred, m, source=sigma_source, rng=rng, config=config)
 
         if strengths_mode == "sigmaa":
             A_inj_list = [float(t) * float(sigmaA_ref) for t in strength_tags]
@@ -312,6 +451,10 @@ def run_injection_extraction_toys(
             tn = float(getattr(pred, "train_exclude_nsigma", train_nsig_default))
         blind_train = (m - tn * float(pred.sigma_val), m + tn * float(pred.sigma_val))
         msk_train = (x_full < blind_train[0]) | (x_full > blind_train[1])
+        n_train_low = int(np.count_nonzero(x_full < blind_train[0]))
+        n_train_high = int(np.count_nonzero(x_full > blind_train[1]))
+        n_train = int(np.count_nonzero(msk_train))
+        n_blind = int(np.count_nonzero(msk_blind))
 
         f_train = float(np.sum(tmpl_full[msk_train])) if tmpl_full.shape[0] == x_full.shape[0] else float("nan")
         f_train_frac = float(f_train / f_full) if np.isfinite(f_train) and f_full > 0 else float("nan")
@@ -334,6 +477,9 @@ def run_injection_extraction_toys(
 
             for i in range(int(n_toys)):
                 refit_ok = float("nan")
+                refit_fallback_used = False
+                refit_error = ""
+                refit_diag = dict(refit_ls_opt=float("nan"), refit_const_opt=float("nan"))
 
                 if refit_gp_on_toy:
                     bkg_full = rng.poisson(np.clip(mu_full_arr, 0.0, None)).astype(int)
@@ -360,9 +506,20 @@ def run_injection_extraction_toys(
                         y_tr = y_toy[msk_train].astype(float)
                         gpr = fit_gpr(X_tr, y_tr, config, restarts=refit_restarts, kernel=ker, optimize=refit_optimize)
                         mu_fit, cov_fit = predict_counts_from_log_gpr(gpr, x_win, config)
+                        diag = _gpr_fit_diagnostics(gpr)
+                        refit_diag.update(
+                            refit_ls_opt=float(diag["ls_opt"]),
+                            refit_const_opt=float(diag["const_opt"]),
+                        )
                         refit_ok = 1.0
-                    except Exception:
+                    except Exception as exc:
                         refit_ok = 0.0
+                        refit_fallback_used = True
+                        refit_error = _handle_refit_failure(
+                            config,
+                            f"{ds.key} m={m:.6g} toy={i} A={A_inj:.6g}",
+                            exc,
+                        )
 
                 else:
                     b = b_draws[draw_idx % b_draws.shape[0]]
@@ -373,6 +530,17 @@ def run_injection_extraction_toys(
                     Nsig_train = 0
                     mu_fit, cov_fit = pred.mu, pred.cov
 
+                ls_opt_effective = (
+                    float(refit_diag["refit_ls_opt"])
+                    if bool(refit_gp_on_toy) and refit_ok == 1.0
+                    else float(initial_ls_opt)
+                )
+                const_opt_effective = (
+                    float(refit_diag["refit_const_opt"])
+                    if bool(refit_gp_on_toy) and refit_ok == 1.0
+                    else float(initial_const_opt)
+                )
+
                 fit = fit_A_profiled_gaussian(
                     obs, mu_fit, cov_fit, tmpl_win,
                     allow_negative=bool(getattr(config, "extract_allow_negative", True)),
@@ -382,16 +550,31 @@ def run_injection_extraction_toys(
                 pull = (A_hat - A_inj) / sigma_A if np.isfinite(sigma_A) and sigma_A > 0 else float("nan")
                 Zhat = A_hat / sigma_A if np.isfinite(sigma_A) and sigma_A > 0 else float("nan")
 
-                rows.append(dict(
+                row = dict(
                     dataset=ds.key, mass_GeV=m, toy=int(i),
                     strength=float(A_inj), inj_nsigma=float(inj_nsigma),
                     sigmaA_ref=float(sigmaA_ref), sigma_val=float(pred.sigma_val),
                     integral_density=float(integral_density),
                     A_per_eps2_unit=float(A_from_epsilon2(ds, float(m), 1.0, integral_density)),
                     sigma_x=float(getattr(pred, "sigma_x", float("nan"))),
+                    kernel_ls_policy=str(kernel_diag["kernel_ls_policy"]),
+                    kernel_ls_res_lower_factor=float(kernel_diag["kernel_ls_res_lower_factor"]),
+                    kernel_ls_res_upper_factor=float(kernel_diag["kernel_ls_res_upper_factor"]),
+                    ls_lo=float(kernel_diag["ls_lo"]),
+                    ls_hi=float(kernel_diag["ls_hi"]),
+                    ls_init=float(kernel_diag["ls_init"]),
+                    initial_ls_opt=float(initial_ls_opt),
+                    initial_const_opt=float(initial_const_opt),
+                    refit_ls_opt=float(refit_diag["refit_ls_opt"]),
+                    refit_const_opt=float(refit_diag["refit_const_opt"]),
+                    ls_opt=float(ls_opt_effective),
+                    const_opt=float(const_opt_effective),
                     f_win=float(f_win), f_full=float(f_full),
                     f_train=float(f_train), f_train_frac=float(f_train_frac),
+                    n_train=int(n_train), n_train_low=int(n_train_low),
+                    n_train_high=int(n_train_high), n_blind=int(n_blind),
                     blind_nsigma=float(config.blind_nsigma), train_exclude_nsigma=float(tn),
+                    signal_model=str(getattr(config, "signal_model", "default")),
                     inj_shape_mode=inj_shape_mode,
                     A_hat=float(A_hat), sigma_A=float(sigma_A),
                     Zhat=float(Zhat), pull_param=float(pull),
@@ -400,7 +583,12 @@ def run_injection_extraction_toys(
                     toy_mode=toy_mode, refit_gp_on_toy=bool(refit_gp_on_toy),
                     refit_ok=float(refit_ok), refit_restarts=int(refit_restarts),
                     refit_optimize=bool(refit_optimize),
-                ))
+                    refit_fallback_used=bool(refit_fallback_used),
+                    refit_error=str(refit_error),
+                )
+                row.update(_dataset_source_metadata(ds))
+                row.update(_qmu_tilde_fields(config, obs, mu_fit, cov_fit, tmpl_win, A_inj))
+                rows.append(row)
 
         print(f"[inj] {ds.key} m={m:.6g} GeV done ({toy_mode}; {len(strength_tags)} strengths × {n_toys} toys)")
 
@@ -431,14 +619,27 @@ class _InjectionMassContext:
     sigmaA_ref: float
     sigma_val: float
     sigma_x: float
+    kernel_ls_policy: str
+    kernel_ls_res_lower_factor: float
+    kernel_ls_res_upper_factor: float
+    ls_lo: float
+    ls_hi: float
+    ls_init: float
+    initial_ls_opt: float
+    initial_const_opt: float
     integral_density: float
     A_per_eps2_unit: float
     f_win: float
     f_full: float
     f_train: float
     f_train_frac: float
+    n_train: int
+    n_train_low: int
+    n_train_high: int
+    n_blind: int
     blind_nsigma: float
     train_exclude_nsigma: float
+    signal_model: str
     inj_mode: str
     inj_shape_mode: str
     refit_gp_on_toy: bool
@@ -461,12 +662,32 @@ class _ToyPointAccumulator:
     A_per_eps2_unit: float
     f_win: float
     f_train_frac: float
+    kernel_ls_policy: str = ""
+    signal_model: str = ""
+    kernel_ls_res_lower_factor: float = float("nan")
+    kernel_ls_res_upper_factor: float = float("nan")
+    ls_lo: float = float("nan")
+    ls_hi: float = float("nan")
+    ls_init: float = float("nan")
+    initial_ls_opt: float = float("nan")
+    initial_const_opt: float = float("nan")
+    n_train: int = 0
+    n_train_low: int = 0
+    n_train_high: int = 0
+    n_blind: int = 0
     pull_vals: List[float] = field(default_factory=list)
     zhat_vals: List[float] = field(default_factory=list)
     ahat_vals: List[float] = field(default_factory=list)
     sigma_a_vals: List[float] = field(default_factory=list)
     inj_nsigma_vals: List[float] = field(default_factory=list)
     success_vals: List[float] = field(default_factory=list)
+    refit_ok_vals: List[float] = field(default_factory=list)
+    refit_fallback_vals: List[float] = field(default_factory=list)
+    refit_ls_opt_vals: List[float] = field(default_factory=list)
+    refit_const_opt_vals: List[float] = field(default_factory=list)
+    ls_opt_vals: List[float] = field(default_factory=list)
+    const_opt_vals: List[float] = field(default_factory=list)
+    qmu_vals: List[float] = field(default_factory=list)
 
     def update(self, row: Dict[str, Any]) -> None:
         self.pull_vals.append(float(row.get("pull_param", np.nan)))
@@ -475,6 +696,13 @@ class _ToyPointAccumulator:
         self.sigma_a_vals.append(float(row.get("sigma_A", np.nan)))
         self.inj_nsigma_vals.append(float(row.get("inj_nsigma", np.nan)))
         self.success_vals.append(1.0 if bool(row.get("success", False)) else 0.0)
+        self.refit_ok_vals.append(float(row.get("refit_ok", np.nan)))
+        self.refit_fallback_vals.append(1.0 if bool(row.get("refit_fallback_used", False)) else 0.0)
+        self.refit_ls_opt_vals.append(float(row.get("refit_ls_opt", np.nan)))
+        self.refit_const_opt_vals.append(float(row.get("refit_const_opt", np.nan)))
+        self.ls_opt_vals.append(float(row.get("ls_opt", np.nan)))
+        self.const_opt_vals.append(float(row.get("const_opt", np.nan)))
+        self.qmu_vals.append(float(row.get("qmu_tilde", np.nan)))
 
     def update_many(self, rows: List[Dict[str, Any]]) -> None:
         for row in rows:
@@ -487,6 +715,13 @@ class _ToyPointAccumulator:
         siga = np.asarray(self.sigma_a_vals, float)
         inj = np.asarray(self.inj_nsigma_vals, float)
         succ = np.asarray(self.success_vals, float)
+        refit_ok = np.asarray(self.refit_ok_vals, float)
+        refit_fb = np.asarray(self.refit_fallback_vals, float)
+        refit_ls_opt = np.asarray(self.refit_ls_opt_vals, float)
+        refit_const_opt = np.asarray(self.refit_const_opt_vals, float)
+        ls_opt = np.asarray(self.ls_opt_vals, float)
+        const_opt = np.asarray(self.const_opt_vals, float)
+        qmu = np.asarray(self.qmu_vals, float)
         n_toys = int(len(pull))
         pull_finite = pull[np.isfinite(pull)]
 
@@ -495,6 +730,7 @@ class _ToyPointAccumulator:
             return float(np.nanquantile(v, p)) if np.any(np.isfinite(v)) else float("nan")
 
         inj_std = float(np.nanstd(inj, ddof=1)) if np.sum(np.isfinite(inj)) > 1 else 0.0
+        inj_level = float(np.nanmean(inj)) if n_toys else float("nan")
         pull_mean = float(np.nanmean(pull)) if n_toys else float("nan")
         zhat_mean = float(np.nanmean(zhat)) if n_toys else float("nan")
 
@@ -503,16 +739,43 @@ class _ToyPointAccumulator:
             mass_GeV=float(self.mass_GeV),
             strength=float(self.strength),
             n_toys=n_toys,
-            inj_nsigma=float(np.nanmean(inj)) if n_toys else float("nan"),
+            inj_nsigma=inj_level,
             inj_nsigma_xerr=float(inj_std),
             sigmaA_ref=float(self.sigmaA_ref),
             integral_density=float(self.integral_density),
             A_per_eps2_unit=float(self.A_per_eps2_unit),
             f_win=float(self.f_win),
             f_train_frac=float(self.f_train_frac),
+            kernel_ls_policy=str(self.kernel_ls_policy),
+            signal_model=str(getattr(self, "signal_model", "")),
+            kernel_ls_res_lower_factor=float(self.kernel_ls_res_lower_factor),
+            kernel_ls_res_upper_factor=float(self.kernel_ls_res_upper_factor),
+            ls_lo=float(self.ls_lo),
+            ls_hi=float(self.ls_hi),
+            ls_init=float(self.ls_init),
+            initial_ls_opt=float(self.initial_ls_opt),
+            initial_const_opt=float(self.initial_const_opt),
+            refit_ls_opt=float(np.nanmean(refit_ls_opt)) if np.any(np.isfinite(refit_ls_opt)) else float("nan"),
+            refit_const_opt=float(np.nanmean(refit_const_opt)) if np.any(np.isfinite(refit_const_opt)) else float("nan"),
+            ls_opt=float(np.nanmean(ls_opt)) if np.any(np.isfinite(ls_opt)) else float("nan"),
+            const_opt=float(np.nanmean(const_opt)) if np.any(np.isfinite(const_opt)) else float("nan"),
+            n_train=int(self.n_train),
+            n_train_low=int(self.n_train_low),
+            n_train_high=int(self.n_train_high),
+            n_blind=int(self.n_blind),
             A_hat_mean=float(np.nanmean(ahat)) if n_toys else float("nan"),
             A_hat_std=float(np.nanstd(ahat, ddof=1)) if n_toys > 1 else float("nan"),
             sigma_A_mean=float(np.nanmean(siga)) if n_toys else float("nan"),
+            Ahat_over_Ainj=(
+                float(np.nanmean(ahat)) / float(self.strength)
+                if n_toys and np.isfinite(float(self.strength)) and abs(float(self.strength)) > 0
+                else float("nan")
+            ),
+            sigmaA_over_sigmaAref=(
+                float(np.nanmean(siga)) / float(self.sigmaA_ref)
+                if n_toys and np.isfinite(float(self.sigmaA_ref)) and float(self.sigmaA_ref) > 0
+                else float("nan")
+            ),
             pull_mean=float(pull_mean),
             pull_std=float(np.nanstd(pull, ddof=1)) if n_toys > 1 else float("nan"),
             pull_std_err=(
@@ -527,7 +790,11 @@ class _ToyPointAccumulator:
             cov_1sigma=float(np.nanmean(np.abs(pull) < 1.0)) if n_toys else float("nan"),
             cov_2sigma=float(np.nanmean(np.abs(pull) < 2.0)) if n_toys else float("nan"),
             Zhat_mean=float(zhat_mean),
-            delta_z_minus_pull=float(zhat_mean - pull_mean) if np.isfinite(zhat_mean) and np.isfinite(pull_mean) else float("nan"),
+            delta_z_minus_pull=(
+                float((zhat_mean - inj_level) - pull_mean)
+                if np.isfinite(zhat_mean) and np.isfinite(inj_level) and np.isfinite(pull_mean)
+                else float("nan")
+            ),
             ainj_over_sigmaAref=(
                 float(self.strength) / float(self.sigmaA_ref)
                 if np.isfinite(self.sigmaA_ref) and float(self.sigmaA_ref) > 0
@@ -535,7 +802,18 @@ class _ToyPointAccumulator:
             ),
             Zhat_q16=q(zhat, 0.16),
             Zhat_q84=q(zhat, 0.84),
+            qmu_tilde_mean=float(np.nanmean(qmu)) if np.any(np.isfinite(qmu)) else float("nan"),
+            qmu_tilde_q16=q(qmu, 0.16),
+            qmu_tilde_q84=q(qmu, 0.84),
+            n_source_toys=0,
+            source_model="",
+            source_label="",
+            source_root="",
+            container="",
+            function_tag="",
             success_rate=float(np.nanmean(succ)) if succ.size else float("nan"),
+            refit_ok_rate=float(np.nanmean(refit_ok)) if np.any(np.isfinite(refit_ok)) else float("nan"),
+            refit_fallback_rate=float(np.nanmean(refit_fb)) if refit_fb.size else float("nan"),
         )
 
 
@@ -597,6 +875,9 @@ def _simulate_toy_rows_chunk(
         for toy_idx in toy_indices:
             rng = np.random.default_rng(_stable_toy_seed(point_seed, int(toy_idx)))
             refit_ok = float("nan")
+            refit_fallback_used = False
+            refit_error = ""
+            refit_diag = dict(refit_ls_opt=float("nan"), refit_const_opt=float("nan"))
 
             if bool(ctx.refit_gp_on_toy):
                 bkg_full = rng.poisson(np.clip(ctx.mu_full, 0.0, None)).astype(int)
@@ -628,9 +909,20 @@ def _simulate_toy_rows_chunk(
                         optimize=bool(ctx.refit_optimize),
                     )
                     mu_fit, cov_fit = predict_counts_from_log_gpr(gpr, x_win, config)
+                    diag = _gpr_fit_diagnostics(gpr)
+                    refit_diag.update(
+                        refit_ls_opt=float(diag["ls_opt"]),
+                        refit_const_opt=float(diag["const_opt"]),
+                    )
                     refit_ok = 1.0
-                except Exception:
+                except Exception as exc:
                     refit_ok = 0.0
+                    refit_fallback_used = True
+                    refit_error = _handle_refit_failure(
+                        config,
+                        f"{ctx.ds.key} m={float(ctx.mass):.6g} toy={int(toy_idx)} A={float(A_inj):.6g}",
+                        exc,
+                    )
             else:
                 b = draw_bkg_mvn_nonneg(
                     ctx.mu,
@@ -646,6 +938,17 @@ def _simulate_toy_rows_chunk(
                 Nsig_train = 0
                 mu_fit, cov_fit = ctx.mu, ctx.cov
 
+            ls_opt_effective = (
+                float(refit_diag["refit_ls_opt"])
+                if bool(ctx.refit_gp_on_toy) and refit_ok == 1.0
+                else float(ctx.initial_ls_opt)
+            )
+            const_opt_effective = (
+                float(refit_diag["refit_const_opt"])
+                if bool(ctx.refit_gp_on_toy) and refit_ok == 1.0
+                else float(ctx.initial_const_opt)
+            )
+
             fit = fit_A_profiled_gaussian(
                 obs,
                 np.asarray(mu_fit, float),
@@ -658,40 +961,60 @@ def _simulate_toy_rows_chunk(
             pull = (A_hat - float(A_inj)) / sigma_A if np.isfinite(sigma_A) and sigma_A > 0 else float("nan")
             Zhat = A_hat / sigma_A if np.isfinite(sigma_A) and sigma_A > 0 else float("nan")
 
-            out_rows.append(
-                dict(
-                    dataset=str(ctx.ds.key),
-                    mass_GeV=float(ctx.mass),
-                    toy=int(toy_idx),
-                    strength=float(A_inj),
-                    inj_nsigma=float(inj_nsigma),
-                    sigmaA_ref=float(ctx.sigmaA_ref),
-                    integral_density=float(ctx.integral_density),
-                    A_per_eps2_unit=float(ctx.A_per_eps2_unit),
-                    sigma_val=float(ctx.sigma_val),
-                    sigma_x=float(ctx.sigma_x),
-                    f_win=float(ctx.f_win),
-                    f_full=float(ctx.f_full),
-                    f_train=float(ctx.f_train),
-                    f_train_frac=float(ctx.f_train_frac),
-                    blind_nsigma=float(ctx.blind_nsigma),
-                    train_exclude_nsigma=float(ctx.train_exclude_nsigma),
-                    inj_shape_mode=str(ctx.inj_shape_mode),
-                    A_hat=float(A_hat),
-                    sigma_A=float(sigma_A),
-                    Zhat=float(Zhat),
-                    pull_param=float(pull),
-                    Nsig_win=int(Nsig_win),
-                    Nsig_train=int(Nsig_train),
-                    success=bool(fit["success"]),
-                    nll=float(fit.get("nll", float("nan"))),
-                    toy_mode=str(toy_mode),
-                    refit_gp_on_toy=bool(ctx.refit_gp_on_toy),
-                    refit_ok=float(refit_ok),
-                    refit_restarts=int(ctx.refit_restarts),
-                    refit_optimize=bool(ctx.refit_optimize),
-                )
+            row = dict(
+                dataset=str(ctx.ds.key),
+                mass_GeV=float(ctx.mass),
+                toy=int(toy_idx),
+                strength=float(A_inj),
+                inj_nsigma=float(inj_nsigma),
+                sigmaA_ref=float(ctx.sigmaA_ref),
+                integral_density=float(ctx.integral_density),
+                A_per_eps2_unit=float(ctx.A_per_eps2_unit),
+                sigma_val=float(ctx.sigma_val),
+                sigma_x=float(ctx.sigma_x),
+                kernel_ls_policy=str(ctx.kernel_ls_policy),
+                kernel_ls_res_lower_factor=float(ctx.kernel_ls_res_lower_factor),
+                kernel_ls_res_upper_factor=float(ctx.kernel_ls_res_upper_factor),
+                ls_lo=float(ctx.ls_lo),
+                ls_hi=float(ctx.ls_hi),
+                ls_init=float(ctx.ls_init),
+                initial_ls_opt=float(ctx.initial_ls_opt),
+                initial_const_opt=float(ctx.initial_const_opt),
+                refit_ls_opt=float(refit_diag["refit_ls_opt"]),
+                refit_const_opt=float(refit_diag["refit_const_opt"]),
+                ls_opt=float(ls_opt_effective),
+                const_opt=float(const_opt_effective),
+                f_win=float(ctx.f_win),
+                f_full=float(ctx.f_full),
+                f_train=float(ctx.f_train),
+                f_train_frac=float(ctx.f_train_frac),
+                n_train=int(ctx.n_train),
+                n_train_low=int(ctx.n_train_low),
+                n_train_high=int(ctx.n_train_high),
+                n_blind=int(ctx.n_blind),
+                blind_nsigma=float(ctx.blind_nsigma),
+                train_exclude_nsigma=float(ctx.train_exclude_nsigma),
+                signal_model=str(ctx.signal_model),
+                inj_shape_mode=str(ctx.inj_shape_mode),
+                A_hat=float(A_hat),
+                sigma_A=float(sigma_A),
+                Zhat=float(Zhat),
+                pull_param=float(pull),
+                Nsig_win=int(Nsig_win),
+                Nsig_train=int(Nsig_train),
+                success=bool(fit["success"]),
+                nll=float(fit.get("nll", float("nan"))),
+                toy_mode=str(toy_mode),
+                refit_gp_on_toy=bool(ctx.refit_gp_on_toy),
+                refit_ok=float(refit_ok),
+                refit_restarts=int(ctx.refit_restarts),
+                refit_optimize=bool(ctx.refit_optimize),
+                refit_fallback_used=bool(refit_fallback_used),
+                refit_error=str(refit_error),
             )
+            row.update(_dataset_source_metadata(ctx.ds))
+            row.update(_qmu_tilde_fields(config, obs, mu_fit, cov_fit, ctx.tmpl_win, A_inj))
+            out_rows.append(row)
 
     return out_rows
 
@@ -784,15 +1107,18 @@ def _build_injection_mass_context(
     blind_mask = _prediction_blind_mask(pred)
 
     tmpl_win, tmpl_full = build_window_template_from_full(
-        pred.edges_full, blind_mask, float(mass), pred.sigma_val
+        pred.edges_full, blind_mask, float(mass), pred.sigma_val, config=config
     )
     f_win = float(np.sum(tmpl_win))
     x_full = np.asarray(pred.x_full, float).reshape(-1)
     f_full = float(np.sum(tmpl_full))
+    kernel_diag = _kernel_static_diagnostics(ds, config, float(mass))
+    initial_ls_opt = float(getattr(pred, "ls_opt", float("nan")))
+    initial_const_opt = float(getattr(pred, "const_opt", float("nan")))
 
     sigma_seed = _stable_point_seed(int(seed), str(ds.key), float(mass), -1.0)
     sigma_rng = np.random.default_rng(int(sigma_seed))
-    sigmaA_ref = _sigmaA_reference(pred, float(mass), source=str(sigma_source), rng=sigma_rng)
+    sigmaA_ref = _sigmaA_reference(pred, float(mass), source=str(sigma_source), rng=sigma_rng, config=config)
     integral_density = _prediction_integral_density(pred)
     A_per_eps2_unit = float(A_from_epsilon2(ds, float(mass), 1.0, integral_density))
 
@@ -808,6 +1134,10 @@ def _build_injection_mass_context(
         raise RuntimeError(f"[inj][{ds.key}] m={float(mass):.6g}: blind window has no bins")
     blind_train = (float(mass) - tn * float(pred.sigma_val), float(mass) + tn * float(pred.sigma_val))
     msk_train = (x_full < blind_train[0]) | (x_full > blind_train[1])
+    n_train_low = int(np.count_nonzero(x_full < blind_train[0]))
+    n_train_high = int(np.count_nonzero(x_full > blind_train[1]))
+    n_train = int(np.count_nonzero(msk_train))
+    n_blind = int(np.count_nonzero(msk_blind))
     f_train = float(np.sum(tmpl_full[msk_train])) if tmpl_full.shape[0] == x_full.shape[0] else float("nan")
     f_train_frac = float(f_train / f_full) if np.isfinite(f_train) and f_full > 0 else float("nan")
 
@@ -825,14 +1155,27 @@ def _build_injection_mass_context(
         sigmaA_ref=float(sigmaA_ref),
         sigma_val=float(pred.sigma_val),
         sigma_x=float(getattr(pred, "sigma_x", float("nan"))),
+        kernel_ls_policy=str(kernel_diag["kernel_ls_policy"]),
+        kernel_ls_res_lower_factor=float(kernel_diag["kernel_ls_res_lower_factor"]),
+        kernel_ls_res_upper_factor=float(kernel_diag["kernel_ls_res_upper_factor"]),
+        ls_lo=float(kernel_diag["ls_lo"]),
+        ls_hi=float(kernel_diag["ls_hi"]),
+        ls_init=float(kernel_diag["ls_init"]),
+        initial_ls_opt=float(initial_ls_opt),
+        initial_const_opt=float(initial_const_opt),
         integral_density=float(integral_density),
         A_per_eps2_unit=float(A_per_eps2_unit),
         f_win=float(f_win),
         f_full=float(f_full),
         f_train=float(f_train),
         f_train_frac=float(f_train_frac),
+        n_train=int(n_train),
+        n_train_low=int(n_train_low),
+        n_train_high=int(n_train_high),
+        n_blind=int(n_blind),
         blind_nsigma=float(config.blind_nsigma),
         train_exclude_nsigma=float(tn),
+        signal_model=str(getattr(config, "signal_model", "default")),
         inj_mode=str(inj_mode),
         inj_shape_mode=str(inj_shape_mode),
         refit_gp_on_toy=bool(refit_gp_on_toy),
@@ -958,6 +1301,19 @@ def run_injection_extraction_streaming(
                 A_per_eps2_unit=float(ctx.A_per_eps2_unit),
                 f_win=float(ctx.f_win),
                 f_train_frac=float(ctx.f_train_frac),
+                kernel_ls_policy=str(ctx.kernel_ls_policy),
+                signal_model=str(ctx.signal_model),
+                kernel_ls_res_lower_factor=float(ctx.kernel_ls_res_lower_factor),
+                kernel_ls_res_upper_factor=float(ctx.kernel_ls_res_upper_factor),
+                ls_lo=float(ctx.ls_lo),
+                ls_hi=float(ctx.ls_hi),
+                ls_init=float(ctx.ls_init),
+                initial_ls_opt=float(ctx.initial_ls_opt),
+                initial_const_opt=float(ctx.initial_const_opt),
+                n_train=int(ctx.n_train),
+                n_train_low=int(ctx.n_train_low),
+                n_train_high=int(ctx.n_train_high),
+                n_blind=int(ctx.n_blind),
             )
             point_seed = _stable_point_seed(int(seed), str(ds.key), float(m), float(A_inj))
             done = 0
@@ -1188,6 +1544,19 @@ def run_injection_extraction_streaming_combined(
                     A_per_eps2_unit=float(ctxs_m[ds_key].A_per_eps2_unit),
                     f_win=float(ctxs_m[ds_key].f_win),
                     f_train_frac=float(ctxs_m[ds_key].f_train_frac),
+                    kernel_ls_policy=str(ctxs_m[ds_key].kernel_ls_policy),
+                    kernel_ls_res_lower_factor=float(ctxs_m[ds_key].kernel_ls_res_lower_factor),
+                    kernel_ls_res_upper_factor=float(ctxs_m[ds_key].kernel_ls_res_upper_factor),
+                    ls_lo=float(ctxs_m[ds_key].ls_lo),
+                    ls_hi=float(ctxs_m[ds_key].ls_hi),
+                    ls_init=float(ctxs_m[ds_key].ls_init),
+                    initial_ls_opt=float(ctxs_m[ds_key].initial_ls_opt),
+                    initial_const_opt=float(ctxs_m[ds_key].initial_const_opt),
+                    n_train=int(ctxs_m[ds_key].n_train),
+                    n_train_low=int(ctxs_m[ds_key].n_train_low),
+                    n_train_high=int(ctxs_m[ds_key].n_train_high),
+                    n_blind=int(ctxs_m[ds_key].n_blind),
+                    signal_model=str(ctxs_m[ds_key].signal_model),
                 )
                 for ds_key in ctxs_m.keys()
             }
@@ -1542,6 +1911,17 @@ def summarize_injection_grid(df_toys: pd.DataFrame) -> pd.DataFrame:
         arr = sub[name].to_numpy(float)
         return float(np.nanmean(arr)) if np.any(np.isfinite(arr)) else float("nan")
 
+    def _first_col(sub: pd.DataFrame, name: str) -> str:
+        if name not in sub.columns or sub[name].empty:
+            return ""
+        vals = sub[name].dropna().astype(str)
+        return str(vals.iloc[0]) if len(vals) else ""
+
+    def _mean_bool_col(sub: pd.DataFrame, name: str) -> float:
+        if name not in sub.columns:
+            return float("nan")
+        return float(np.nanmean(sub[name].astype(bool).to_numpy(float))) if len(sub) else float("nan")
+
     rows = []
     for (ds, m, A), sub in df_toys.groupby(["dataset", "mass_GeV", "strength"], dropna=False):
         Ahat = sub["A_hat"].to_numpy(float)
@@ -1567,9 +1947,36 @@ def summarize_injection_grid(df_toys: pd.DataFrame) -> pd.DataFrame:
             A_per_eps2_unit=_mean_col(sub, "A_per_eps2_unit"),
             f_win=_mean_col(sub, "f_win"),
             f_train_frac=_mean_col(sub, "f_train_frac"),
+            kernel_ls_policy=_first_col(sub, "kernel_ls_policy"),
+            signal_model=_first_col(sub, "signal_model"),
+            kernel_ls_res_lower_factor=_mean_col(sub, "kernel_ls_res_lower_factor"),
+            kernel_ls_res_upper_factor=_mean_col(sub, "kernel_ls_res_upper_factor"),
+            ls_lo=_mean_col(sub, "ls_lo"),
+            ls_hi=_mean_col(sub, "ls_hi"),
+            ls_init=_mean_col(sub, "ls_init"),
+            initial_ls_opt=_mean_col(sub, "initial_ls_opt"),
+            initial_const_opt=_mean_col(sub, "initial_const_opt"),
+            refit_ls_opt=_mean_col(sub, "refit_ls_opt"),
+            refit_const_opt=_mean_col(sub, "refit_const_opt"),
+            ls_opt=_mean_col(sub, "ls_opt"),
+            const_opt=_mean_col(sub, "const_opt"),
+            n_train=int(round(_mean_col(sub, "n_train"))) if np.isfinite(_mean_col(sub, "n_train")) else 0,
+            n_train_low=int(round(_mean_col(sub, "n_train_low"))) if np.isfinite(_mean_col(sub, "n_train_low")) else 0,
+            n_train_high=int(round(_mean_col(sub, "n_train_high"))) if np.isfinite(_mean_col(sub, "n_train_high")) else 0,
+            n_blind=int(round(_mean_col(sub, "n_blind"))) if np.isfinite(_mean_col(sub, "n_blind")) else 0,
             A_hat_mean=float(np.nanmean(Ahat)),
             A_hat_std=float(np.nanstd(Ahat, ddof=1)),
             sigma_A_mean=float(np.nanmean(sigA)),
+            Ahat_over_Ainj=(
+                float(np.nanmean(Ahat)) / float(A)
+                if np.isfinite(float(A)) and abs(float(A)) > 0
+                else float("nan")
+            ),
+            sigmaA_over_sigmaAref=(
+                float(np.nanmean(sigA)) / sigmaA_ref_mean
+                if np.isfinite(sigmaA_ref_mean) and sigmaA_ref_mean > 0
+                else float("nan")
+            ),
             pull_mean=pull_mean,
             pull_std=float(np.nanstd(pull, ddof=1)),
             pull_std_err=float(np.nanstd(pull_finite, ddof=1) / np.sqrt(max(1, 2*(len(pull_finite)-1)))) if len(pull_finite) > 1 else float("nan"),
@@ -1581,7 +1988,199 @@ def summarize_injection_grid(df_toys: pd.DataFrame) -> pd.DataFrame:
             delta_z_minus_pull=float((zhat_mean - float(np.nanmean(inj_nsigma_vals))) - pull_mean),
             ainj_over_sigmaAref=(float(A) / sigmaA_ref_mean if np.isfinite(sigmaA_ref_mean) and sigmaA_ref_mean > 0 else float("nan")),
             Zhat_q16=q(Zhat, 0.16), Zhat_q84=q(Zhat, 0.84),
+            qmu_tilde_mean=_mean_col(sub, "qmu_tilde"),
+            qmu_tilde_q16=q(sub["qmu_tilde"].to_numpy(float), 0.16) if "qmu_tilde" in sub.columns else float("nan"),
+            qmu_tilde_q84=q(sub["qmu_tilde"].to_numpy(float), 0.84) if "qmu_tilde" in sub.columns else float("nan"),
+            n_source_toys=int(sub["toy_index"].nunique()) if "toy_index" in sub.columns else 0,
+            source_model=_first_col(sub, "source_model"),
+            source_label=_first_col(sub, "source_label"),
+            source_root=_first_col(sub, "source_root"),
+            container=_first_col(sub, "container"),
+            function_tag=_first_col(sub, "function_tag"),
             success_rate=_mean_col(sub, "success"),
+            refit_ok_rate=_mean_col(sub, "refit_ok"),
+            refit_fallback_rate=_mean_bool_col(sub, "refit_fallback_used"),
         ))
 
     return pd.DataFrame(rows).sort_values(["dataset", "mass_GeV", "strength"]).reset_index(drop=True)
+
+
+def collapse_fragmented_injection_summary(df_sum: pd.DataFrame) -> pd.DataFrame:
+    """Collapse one-toy summary fragments into ordinary injection summary rows.
+
+    Distributed refit studies sometimes concatenate many ``inj_extract_summary``
+    files produced with one toy per job.  Those rows are summary-shaped, but
+    statistically they are toy-level fragments: ``pull_mean`` and ``Zhat_mean``
+    are single-toy values and ``strength`` can jitter when sigma-scaled
+    injections use a stochastic ``sigmaA_ref``.  Collapse by injected sigma level
+    so downstream plots see one row per (dataset, mass, injection level).
+    """
+    if df_sum is None or df_sum.empty:
+        return pd.DataFrame() if df_sum is None else df_sum
+    if "n_toys" not in df_sum.columns:
+        return df_sum
+
+    work = df_sum.copy()
+    if "dataset" not in work.columns:
+        work["dataset"] = "all"
+    if "mass_GeV" not in work.columns:
+        return work
+    work["mass_GeV"] = pd.to_numeric(work["mass_GeV"], errors="coerce")
+    work["_mass_key"] = np.round(work["mass_GeV"].to_numpy(float), 10)
+    internal_cols = ["_mass_key", "_inj_key", "_strength_key"]
+    if "inj_nsigma" in work.columns:
+        work["inj_nsigma"] = pd.to_numeric(work["inj_nsigma"], errors="coerce")
+        work["_inj_key"] = np.round(work["inj_nsigma"].to_numpy(float), 10)
+        gcols = ["dataset", "_mass_key", "_inj_key"]
+        sort_cols = ["dataset", "mass_GeV", "inj_nsigma"]
+    elif "strength" in work.columns:
+        work["strength"] = pd.to_numeric(work["strength"], errors="coerce")
+        work["_strength_key"] = np.round(work["strength"].to_numpy(float), 10)
+        gcols = ["dataset", "_mass_key", "_strength_key"]
+        sort_cols = ["dataset", "mass_GeV", "strength"]
+    else:
+        return work.drop(columns=[c for c in internal_cols if c in work.columns])
+
+    n_toys_vals = pd.to_numeric(work["n_toys"], errors="coerce")
+    grouped_sizes = work.groupby(gcols, dropna=False).size()
+    repeated_groups = bool((grouped_sizes > 1).any())
+    if not repeated_groups or not np.any(np.isfinite(n_toys_vals.to_numpy(float))):
+        out = work.copy()
+        out["mass_GeV"] = np.round(pd.to_numeric(out["mass_GeV"], errors="coerce").to_numpy(float), 10)
+        if "inj_nsigma" in out.columns:
+            out["inj_nsigma"] = np.round(pd.to_numeric(out["inj_nsigma"], errors="coerce").to_numpy(float), 10)
+        return out.drop(columns=[c for c in internal_cols if c in out.columns])
+
+    def _mean_col(sub: pd.DataFrame, name: str) -> float:
+        if name not in sub.columns:
+            return float("nan")
+        arr = pd.to_numeric(sub[name], errors="coerce").to_numpy(float)
+        return float(np.nanmean(arr)) if np.any(np.isfinite(arr)) else float("nan")
+
+    def _sum_col(sub: pd.DataFrame, name: str) -> float:
+        if name not in sub.columns:
+            return float("nan")
+        arr = pd.to_numeric(sub[name], errors="coerce").to_numpy(float)
+        return float(np.nansum(arr)) if np.any(np.isfinite(arr)) else float("nan")
+
+    def _first_col(sub: pd.DataFrame, name: str, default: Any = "") -> Any:
+        if name not in sub.columns or sub[name].empty:
+            return default
+        vals = sub[name].dropna()
+        return vals.iloc[0] if len(vals) else default
+
+    def _q(values: np.ndarray, p: float) -> float:
+        arr = np.asarray(values, float)
+        return float(np.nanquantile(arr, p)) if np.any(np.isfinite(arr)) else float("nan")
+
+    def _std(values: np.ndarray) -> float:
+        arr = np.asarray(values, float)
+        arr = arr[np.isfinite(arr)]
+        return float(np.nanstd(arr, ddof=1)) if arr.size > 1 else float("nan")
+
+    passthrough: List[pd.DataFrame] = []
+    rows: List[Dict[str, Any]] = []
+
+    for key, sub in work.groupby(gcols, dropna=False):
+        sub = sub.copy()
+        nt = pd.to_numeric(sub["n_toys"], errors="coerce").to_numpy(float)
+        is_fragment_group = len(sub) > 1 and np.any(np.isfinite(nt)) and bool(np.nanmax(nt) <= 1.0)
+        if not is_fragment_group:
+            passthrough.append(sub)
+            continue
+
+        pulls = pd.to_numeric(sub.get("pull_mean", pd.Series(np.nan, index=sub.index)), errors="coerce").to_numpy(float)
+        zhats = pd.to_numeric(sub.get("Zhat_mean", pd.Series(np.nan, index=sub.index)), errors="coerce").to_numpy(float)
+        ahats = pd.to_numeric(sub.get("A_hat_mean", pd.Series(np.nan, index=sub.index)), errors="coerce").to_numpy(float)
+        sigas = pd.to_numeric(sub.get("sigma_A_mean", pd.Series(np.nan, index=sub.index)), errors="coerce").to_numpy(float)
+        inj_vals = pd.to_numeric(sub.get("inj_nsigma", pd.Series(np.nan, index=sub.index)), errors="coerce").to_numpy(float)
+        inj_level = float(np.nanmean(inj_vals)) if np.any(np.isfinite(inj_vals)) else float("nan")
+        strength = _mean_col(sub, "strength")
+        sigma_ref = _mean_col(sub, "sigmaA_ref")
+        zhat_mean = float(np.nanmean(zhats)) if np.any(np.isfinite(zhats)) else float("nan")
+        pull_mean = float(np.nanmean(pulls)) if np.any(np.isfinite(pulls)) else float("nan")
+        n_frag = int(len(sub))
+
+        row: Dict[str, Any] = dict(
+            dataset=str(_first_col(sub, "dataset", key[0] if isinstance(key, tuple) else "all")),
+            mass_GeV=float(_mean_col(sub, "mass_GeV")),
+            strength=float(strength),
+            n_toys=n_frag,
+            inj_nsigma=inj_level,
+            inj_nsigma_xerr=_std(inj_vals) if np.any(np.isfinite(inj_vals)) else float("nan"),
+            sigmaA_ref=float(sigma_ref),
+            integral_density=_mean_col(sub, "integral_density"),
+            A_per_eps2_unit=_mean_col(sub, "A_per_eps2_unit"),
+            f_win=_mean_col(sub, "f_win"),
+            f_train_frac=_mean_col(sub, "f_train_frac"),
+            A_hat_mean=float(np.nanmean(ahats)) if np.any(np.isfinite(ahats)) else float("nan"),
+            A_hat_std=_std(ahats),
+            sigma_A_mean=float(np.nanmean(sigas)) if np.any(np.isfinite(sigas)) else float("nan"),
+            pull_mean=pull_mean,
+            pull_std=_std(pulls),
+            pull_std_err=(
+                _std(pulls) / np.sqrt(max(1, 2 * (n_frag - 1)))
+                if n_frag > 2 and np.isfinite(_std(pulls))
+                else float("nan")
+            ),
+            pull_q16=_q(pulls, 0.16),
+            pull_q84=_q(pulls, 0.84),
+            pull_q02=_q(pulls, 0.025),
+            pull_q97=_q(pulls, 0.975),
+            cov_1sigma=_mean_col(sub, "cov_1sigma"),
+            cov_2sigma=_mean_col(sub, "cov_2sigma"),
+            Zhat_mean=zhat_mean,
+            delta_z_minus_pull=(
+                float((zhat_mean - inj_level) - pull_mean)
+                if np.isfinite(zhat_mean) and np.isfinite(inj_level) and np.isfinite(pull_mean)
+                else float("nan")
+            ),
+            ainj_over_sigmaAref=(
+                float(strength) / float(sigma_ref)
+                if np.isfinite(strength) and np.isfinite(sigma_ref) and sigma_ref > 0
+                else inj_level
+            ),
+            Zhat_q16=_q(zhats, 0.16),
+            Zhat_q84=_q(zhats, 0.84),
+            success_rate=_mean_col(sub, "success_rate"),
+        )
+
+        for col in [
+            "kernel_ls_res_lower_factor",
+            "kernel_ls_res_upper_factor",
+            "ls_lo",
+            "ls_hi",
+            "ls_init",
+            "initial_ls_opt",
+            "initial_const_opt",
+            "refit_ls_opt",
+            "refit_const_opt",
+            "ls_opt",
+            "const_opt",
+            "refit_ok_rate",
+            "refit_fallback_rate",
+        ]:
+            if col in sub.columns:
+                row[col] = _mean_col(sub, col)
+        if "kernel_ls_policy" in sub.columns:
+            row["kernel_ls_policy"] = str(_first_col(sub, "kernel_ls_policy", ""))
+        if "signal_model" in sub.columns:
+            row["signal_model"] = str(_first_col(sub, "signal_model", ""))
+        for col in ["n_train", "n_train_low", "n_train_high", "n_blind"]:
+            if col in sub.columns:
+                val = _mean_col(sub, col)
+                row[col] = int(round(val)) if np.isfinite(val) else 0
+
+        rows.append(row)
+
+    out_parts = passthrough[:]
+    if rows:
+        out_parts.append(pd.DataFrame(rows))
+    if not out_parts:
+        return work
+    out = pd.concat(out_parts, ignore_index=True, sort=False)
+    out["mass_GeV"] = np.round(pd.to_numeric(out["mass_GeV"], errors="coerce").to_numpy(float), 10)
+    if "inj_nsigma" in out.columns:
+        out["inj_nsigma"] = np.round(pd.to_numeric(out["inj_nsigma"], errors="coerce").to_numpy(float), 10)
+    out = out.drop(columns=[c for c in internal_cols if c in out.columns])
+    return out.sort_values([c for c in sort_cols if c in out.columns]).reset_index(drop=True)

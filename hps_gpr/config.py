@@ -73,7 +73,7 @@ class Config:
     sigma_tail_slope_floor_2016: float = 0.0
     sigma_tail_slope_override_2016: Optional[float] = 0.0239
     sigma_coeffs_2021: List[float] = field(
-        default_factory=lambda: [0.00286957, -0.00851449, 0.25362319]
+        default_factory=lambda: [0.0014786, -0.0011, 0.0687]
     )
 
     # Radiative fraction f_rad(m) polynomial coefficients
@@ -202,6 +202,7 @@ class Config:
     inj_refit_gp_on_toy: bool = False
     inj_refit_gp_restarts: int = 0
     inj_refit_gp_optimize: bool = True
+    inj_refit_fail_on_error: bool = False
     inj_train_exclude_nsigma: Optional[float] = None  # defaults to gp_train_exclude_nsigma
     inj_sigma_multipliers: List[float] = field(
         default_factory=lambda: [0.0, 1.0, 2.0, 3.0, 5.0]
@@ -209,12 +210,19 @@ class Config:
     inj_combined_mass_policy: str = "intersection"  # "intersection" | "union_min_n"
     inj_combined_min_n_contrib: int = 2
     inj_write_toy_csv: bool = True
+    inj_write_qmu: bool = False
     # Streaming injection aggregation (default-on)
     inj_stream_aggregate: bool = True
     inj_aggregate_every: int = 100
     inj_n_workers: int = 5
     inj_parallel_backend: str = "loky"
     inj_threads_per_worker: int = 1
+    # Signal template model. "default" is the nominal detector-resolution
+    # Gaussian line shape. "kernel" is an opt-in localized signal-kernel study
+    # template with width and correlation length tied to the mass resolution.
+    signal_model: str = "default"
+    signal_kernel_width_factor: float = 1.0
+    signal_kernel_length_scale_factor: float = 1.0
     # Reviewer-facing extraction display plots (single representative pseudoexperiments)
     extraction_display_dataset_key: str = ""
     extraction_display_dataset_keys: List[str] = field(default_factory=lambda: ["2015", "2016"])
@@ -227,9 +235,16 @@ class Config:
     extraction_display_gp_restarts: int = 0
     extraction_display_gp_optimize: bool = True
     extraction_display_train_exclude_nsigma: Optional[float] = None
+    extraction_display_funcform_toy_index: int = 0
     extraction_display_zoom_half_sigma: float = 0.5
     extraction_display_blind_shade_alpha: float = 0.18
     extraction_display_blind_shade_color: str = "0.88"
+    # Functional-form closure toy sources. These are intentionally separate
+    # from ordinary `inject`; use `funcform-inject` or `toy-scan` to consume them.
+    funcform_closure_enable: bool = False
+    funcform_closure_root_by_dataset: Dict[str, str] = field(default_factory=dict)
+    funcform_closure_container_by_dataset: Dict[str, str] = field(default_factory=dict)
+    funcform_closure_toy_pattern_by_dataset: Dict[str, str] = field(default_factory=dict)
     # MVN non-negative sampling
     mvn_trunc_method: str = "reject_then_clip"  # "clip" | "reject" | "reject_then_clip"
     mvn_trunc_max_tries: int = 80
@@ -295,6 +310,9 @@ def load_config(path: str) -> Config:
         "kernel_ls_bounds_by_dataset",
         "kernel_ls_init_by_dataset",
         "data_visibility",
+        "funcform_closure_root_by_dataset",
+        "funcform_closure_container_by_dataset",
+        "funcform_closure_toy_pattern_by_dataset",
     ]
     for field_name in dict_fields:
         if field_name in data and data[field_name] is None:
