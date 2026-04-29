@@ -9,7 +9,7 @@ import os
 import re
 from dataclasses import asdict, dataclass, replace
 from pathlib import Path
-from typing import Dict, List, Optional, Sequence, TYPE_CHECKING
+from typing import Dict, List, Optional, Sequence, Tuple, TYPE_CHECKING
 
 import hist
 import numpy as np
@@ -200,9 +200,22 @@ def load_funcform_toy_hist(
     return hout
 
 
-def build_funcform_toy_dataset(ds: "DatasetConfig", toy_hist: hist.Hist) -> "DatasetConfig":
+def build_funcform_toy_dataset(
+    ds: "DatasetConfig",
+    toy_hist: hist.Hist,
+    spec: Optional[FuncFormToySpec] = None,
+) -> "DatasetConfig":
     """Clone a dataset config and swap in an in-memory toy histogram."""
-    return replace(ds, hist_override=toy_hist)
+    toy_ds = replace(ds, hist_override=toy_hist)
+    if spec is not None:
+        setattr(toy_ds, "source_model", "functional_form")
+        setattr(toy_ds, "source_label", str(spec.function_tag))
+        setattr(toy_ds, "source_root", str(spec.source_root))
+        setattr(toy_ds, "container", str(spec.container))
+        setattr(toy_ds, "function_tag", str(spec.function_tag))
+        setattr(toy_ds, "toy_hist", str(spec.toy_name))
+        setattr(toy_ds, "toy_index", int(spec.toy_index))
+    return toy_ds
 
 
 def _funcform_root_candidates(
@@ -441,6 +454,32 @@ def _augment_scan_table(df: pd.DataFrame, dataset_key: str, spec: FuncFormToySpe
     )
 
 
+def _augment_injection_table(df: pd.DataFrame, dataset_key: str, spec: FuncFormToySpec) -> pd.DataFrame:
+    """Add functional-form toy identity to injection rows or summaries."""
+    out = _augment_scan_table_metadata(
+        df,
+        toy_index=int(spec.toy_index),
+        toy_name=str(spec.toy_name),
+        dataset=str(dataset_key),
+        source_model="functional_form",
+        source_label=str(spec.function_tag),
+        source_root=str(spec.source_root),
+        container=str(spec.container),
+        function_tag=str(spec.function_tag),
+    )
+    if out.empty or "toy" not in out.columns:
+        return out
+
+    injection_toy = pd.to_numeric(out["toy"], errors="coerce").fillna(0).astype(int)
+    if "injection_toy" not in out.columns:
+        insert_at = min(len(out.columns), list(out.columns).index("toy") + 1)
+        out.insert(insert_at, "injection_toy", injection_toy)
+    else:
+        out["injection_toy"] = injection_toy
+    out["toy"] = int(spec.toy_index) * 1_000_000 + injection_toy
+    return out
+
+
 def _toy_output_dir(base_output_dir: str, dataset_key: str, spec: FuncFormToySpec) -> str:
     """Return the output directory for one toy scan."""
     return os.path.join(str(base_output_dir), "toy_scans", str(dataset_key), spec.output_tag)
@@ -491,7 +530,7 @@ def run_funcform_toy_scans(
             container=(spec.container or None),
             toy_name=spec.toy_name,
         )
-        toy_ds = build_funcform_toy_dataset(ds, toy_hist)
+        toy_ds = build_funcform_toy_dataset(ds, toy_hist, spec)
 
         toy_cfg = copy.deepcopy(config)
         toy_cfg.output_dir = _toy_output_dir(base_output_dir, ds.key, spec)
@@ -551,6 +590,101 @@ def run_funcform_toy_scans(
         written.append(toy_cfg.output_dir)
 
     return written
+
+
+def run_funcform_injection_extraction(
+    ds: "DatasetConfig",
+    config: "Config",
+    specs: Sequence[FuncFormToySpec],
+    *,
+    base_output_dir: str,
+    masses: Sequence[float],
+    strengths: Optional[Sequence[float]] = None,
+    n_injection_toys: int = 1,
+    seed: int = 314159,
+    write_toy_csv: bool = True,
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """Run injection/refit closure using functional-form histograms as pseudo-data.
+
+    Each functional-form ROOT histogram is loaded as ``DatasetConfig.hist_override``.
+    The merged output uses the same injection toy/summary schema as ordinary
+    ``hps-gpr inject``, with additional source metadata columns.
+    """
+    from .injection import run_injection_extraction_streaming, summarize_injection_grid
+
+    base_output_dir = str(base_output_dir)
+    ensure_dir(base_output_dir)
+    merged_outdir = os.path.join(base_output_dir, "injection_extraction")
+    ensure_dir(merged_outdir)
+
+    all_toys: List[pd.DataFrame] = []
+    all_summaries: List[pd.DataFrame] = []
+    n_injection_toys = max(1, int(n_injection_toys))
+
+    for spec in specs:
+        toy_hist = load_funcform_toy_hist(
+            spec.source_root,
+            container=(spec.container or None),
+            toy_name=spec.toy_name,
+        )
+        toy_ds = build_funcform_toy_dataset(ds, toy_hist, spec)
+        toy_outdir = os.path.join(base_output_dir, "funcform_injection_jobs", str(ds.key), spec.output_tag)
+        ensure_dir(toy_outdir)
+
+        print(
+            "[funcform-inj] "
+            f"{ds.key} toy={spec.toy_name} index={int(spec.toy_index)} "
+            f"source={spec.source_root}:{spec.container}"
+        )
+        dsum = run_injection_extraction_streaming(
+            toy_ds,
+            config,
+            masses=[float(x) for x in masses],
+            strengths=[float(x) for x in strengths] if strengths is not None else None,
+            n_toys=int(n_injection_toys),
+            outdir=toy_outdir,
+            seed=int(seed) + int(spec.toy_index),
+            write_toy_csv=bool(write_toy_csv),
+            aggregate_every=int(getattr(config, "inj_aggregate_every", 100)),
+            n_workers=int(getattr(config, "inj_n_workers", 1)),
+            parallel_backend=str(getattr(config, "inj_parallel_backend", "loky")),
+            threads_per_worker=int(getattr(config, "inj_threads_per_worker", 1)),
+        )
+
+        dsum = _augment_injection_table(dsum, ds.key, spec)
+        dsum_path = os.path.join(toy_outdir, f"inj_extract_summary_{ds.key}.csv")
+        dsum.to_csv(dsum_path, index=False)
+        all_summaries.append(dsum)
+
+        toy_csv_path = os.path.join(toy_outdir, f"inj_extract_toys_{ds.key}.csv")
+        if bool(write_toy_csv) and os.path.exists(toy_csv_path):
+            dft = pd.read_csv(toy_csv_path)
+            dft = _augment_injection_table(dft, ds.key, spec)
+            dft.to_csv(toy_csv_path, index=False)
+            all_toys.append(dft)
+
+        _write_toy_metadata(toy_outdir, ds.key, spec)
+
+    df_toys = pd.concat(all_toys, ignore_index=True, sort=False) if all_toys else pd.DataFrame()
+    if not df_toys.empty:
+        df_summary = summarize_injection_grid(df_toys)
+    elif all_summaries:
+        df_summary = pd.concat(all_summaries, ignore_index=True, sort=False)
+    else:
+        df_summary = pd.DataFrame()
+
+    if not df_toys.empty:
+        toy_out = os.path.join(merged_outdir, f"inj_extract_toys_{ds.key}.csv")
+        df_toys.to_csv(toy_out, index=False)
+        print(f"[funcform-inj] wrote {toy_out}")
+    if not df_summary.empty:
+        summary_out = os.path.join(merged_outdir, f"inj_extract_summary_{ds.key}.csv")
+        df_summary.to_csv(summary_out, index=False)
+        all_out = os.path.join(merged_outdir, "inj_extract_summary_all.csv")
+        df_summary.to_csv(all_out, index=False)
+        print(f"[funcform-inj] wrote {summary_out}")
+
+    return df_toys, df_summary
 
 
 def _load_toy_scan_frames(input_dir: str) -> List[pd.DataFrame]:

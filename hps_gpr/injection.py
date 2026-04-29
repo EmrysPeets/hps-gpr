@@ -32,6 +32,7 @@ from .conversion import A_from_epsilon2
 from .statistics import (
     fit_A_profiled_gaussian,
     fit_A_profiled_gaussian_details,
+    qmu_tilde_profiled_gaussian,
     draw_bkg_mvn_nonneg,
 )
 from .gpr import (
@@ -230,6 +231,72 @@ def _handle_refit_failure(config: "Config", label: str, exc: Exception) -> str:
     if bool(getattr(config, "inj_refit_fail_on_error", False)) or bool(getattr(config, "fail_fast", False)):
         raise RuntimeError(f"[inj][refit] failed for {label}: {msg}") from exc
     return msg[:240]
+
+def _dataset_source_metadata(ds: "DatasetConfig") -> Dict[str, Any]:
+    """Return optional pseudo-data source metadata attached to a dataset clone."""
+    out: Dict[str, Any] = {}
+    for name in [
+        "source_model",
+        "source_label",
+        "source_root",
+        "container",
+        "function_tag",
+        "toy_hist",
+        "toy_index",
+    ]:
+        if hasattr(ds, name):
+            out[name] = getattr(ds, name)
+    return out
+
+
+def _qmu_tilde_fields(
+    config: "Config",
+    obs: np.ndarray,
+    mu_fit: np.ndarray,
+    cov_fit: np.ndarray,
+    tmpl_win: np.ndarray,
+    A_test: float,
+) -> Dict[str, Any]:
+    """Compute optional exact profiled ``tilde q_mu`` diagnostics for toy rows."""
+    if not bool(getattr(config, "inj_write_qmu", False)):
+        return {}
+
+    try:
+        qmu, info = qmu_tilde_profiled_gaussian(
+            obs,
+            np.asarray(mu_fit, float),
+            np.asarray(cov_fit, float),
+            np.asarray(tmpl_win, float),
+            float(A_test),
+        )
+        qmu = float(qmu)
+        sqrt_qmu = float(np.sqrt(max(qmu, 0.0))) if np.isfinite(qmu) else float("nan")
+        return dict(
+            qmu_tilde=float(qmu),
+            tmu_tilde=float(qmu),
+            sqrt_qmu_tilde=float(sqrt_qmu),
+            sqrt_tmu_tilde=float(sqrt_qmu),
+            qmu_A_test=float(info.get("A_test", A_test)),
+            qmu_branch=str(info.get("branch", "")),
+            qmu_ok=bool(info.get("ok", False)),
+            qmu_nll_fixed=float(info.get("nll_fixed", float("nan"))),
+            qmu_nll_unbounded=float(info.get("nll_unbounded", float("nan"))),
+            qmu_nll_null=float(info.get("nll_null", float("nan"))),
+        )
+    except Exception as exc:
+        return dict(
+            qmu_tilde=float("nan"),
+            tmu_tilde=float("nan"),
+            sqrt_qmu_tilde=float("nan"),
+            sqrt_tmu_tilde=float("nan"),
+            qmu_A_test=float(A_test),
+            qmu_branch="error",
+            qmu_ok=False,
+            qmu_nll_fixed=float("nan"),
+            qmu_nll_unbounded=float("nan"),
+            qmu_nll_null=float("nan"),
+            qmu_error=f"{type(exc).__name__}: {exc}"[:240],
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -488,7 +555,7 @@ def run_injection_extraction_toys(
                 pull = (A_hat - A_inj) / sigma_A if np.isfinite(sigma_A) and sigma_A > 0 else float("nan")
                 Zhat = A_hat / sigma_A if np.isfinite(sigma_A) and sigma_A > 0 else float("nan")
 
-                rows.append(dict(
+                row = dict(
                     dataset=ds.key, mass_GeV=m, toy=int(i),
                     strength=float(A_inj), inj_nsigma=float(inj_nsigma),
                     sigmaA_ref=float(sigmaA_ref), sigma_val=float(pred.sigma_val),
@@ -523,7 +590,10 @@ def run_injection_extraction_toys(
                     refit_optimize=bool(refit_optimize),
                     refit_fallback_used=bool(refit_fallback_used),
                     refit_error=str(refit_error),
-                ))
+                )
+                row.update(_dataset_source_metadata(ds))
+                row.update(_qmu_tilde_fields(config, obs, mu_fit, cov_fit, tmpl_win, A_inj))
+                rows.append(row)
 
         print(f"[inj] {ds.key} m={m:.6g} GeV done ({toy_mode}; {len(strength_tags)} strengths × {n_toys} toys)")
 
@@ -622,6 +692,7 @@ class _ToyPointAccumulator:
     refit_const_opt_vals: List[float] = field(default_factory=list)
     ls_opt_vals: List[float] = field(default_factory=list)
     const_opt_vals: List[float] = field(default_factory=list)
+    qmu_vals: List[float] = field(default_factory=list)
 
     def update(self, row: Dict[str, Any]) -> None:
         self.pull_vals.append(float(row.get("pull_param", np.nan)))
@@ -636,6 +707,7 @@ class _ToyPointAccumulator:
         self.refit_const_opt_vals.append(float(row.get("refit_const_opt", np.nan)))
         self.ls_opt_vals.append(float(row.get("ls_opt", np.nan)))
         self.const_opt_vals.append(float(row.get("const_opt", np.nan)))
+        self.qmu_vals.append(float(row.get("qmu_tilde", np.nan)))
 
     def update_many(self, rows: List[Dict[str, Any]]) -> None:
         for row in rows:
@@ -654,6 +726,7 @@ class _ToyPointAccumulator:
         refit_const_opt = np.asarray(self.refit_const_opt_vals, float)
         ls_opt = np.asarray(self.ls_opt_vals, float)
         const_opt = np.asarray(self.const_opt_vals, float)
+        qmu = np.asarray(self.qmu_vals, float)
         n_toys = int(len(pull))
         pull_finite = pull[np.isfinite(pull)]
 
@@ -698,6 +771,16 @@ class _ToyPointAccumulator:
             A_hat_mean=float(np.nanmean(ahat)) if n_toys else float("nan"),
             A_hat_std=float(np.nanstd(ahat, ddof=1)) if n_toys > 1 else float("nan"),
             sigma_A_mean=float(np.nanmean(siga)) if n_toys else float("nan"),
+            Ahat_over_Ainj=(
+                float(np.nanmean(ahat)) / float(self.strength)
+                if n_toys and np.isfinite(float(self.strength)) and abs(float(self.strength)) > 0
+                else float("nan")
+            ),
+            sigmaA_over_sigmaAref=(
+                float(np.nanmean(siga)) / float(self.sigmaA_ref)
+                if n_toys and np.isfinite(float(self.sigmaA_ref)) and float(self.sigmaA_ref) > 0
+                else float("nan")
+            ),
             pull_mean=float(pull_mean),
             pull_std=float(np.nanstd(pull, ddof=1)) if n_toys > 1 else float("nan"),
             pull_std_err=(
@@ -724,6 +807,15 @@ class _ToyPointAccumulator:
             ),
             Zhat_q16=q(zhat, 0.16),
             Zhat_q84=q(zhat, 0.84),
+            qmu_tilde_mean=float(np.nanmean(qmu)) if np.any(np.isfinite(qmu)) else float("nan"),
+            qmu_tilde_q16=q(qmu, 0.16),
+            qmu_tilde_q84=q(qmu, 0.84),
+            n_source_toys=0,
+            source_model="",
+            source_label="",
+            source_root="",
+            container="",
+            function_tag="",
             success_rate=float(np.nanmean(succ)) if succ.size else float("nan"),
             refit_ok_rate=float(np.nanmean(refit_ok)) if np.any(np.isfinite(refit_ok)) else float("nan"),
             refit_fallback_rate=float(np.nanmean(refit_fb)) if refit_fb.size else float("nan"),
@@ -874,59 +966,60 @@ def _simulate_toy_rows_chunk(
             pull = (A_hat - float(A_inj)) / sigma_A if np.isfinite(sigma_A) and sigma_A > 0 else float("nan")
             Zhat = A_hat / sigma_A if np.isfinite(sigma_A) and sigma_A > 0 else float("nan")
 
-            out_rows.append(
-                dict(
-                    dataset=str(ctx.ds.key),
-                    mass_GeV=float(ctx.mass),
-                    toy=int(toy_idx),
-                    strength=float(A_inj),
-                    inj_nsigma=float(inj_nsigma),
-                    sigmaA_ref=float(ctx.sigmaA_ref),
-                    integral_density=float(ctx.integral_density),
-                    A_per_eps2_unit=float(ctx.A_per_eps2_unit),
-                    sigma_val=float(ctx.sigma_val),
-                    sigma_x=float(ctx.sigma_x),
-                    kernel_ls_policy=str(ctx.kernel_ls_policy),
-                    kernel_ls_res_lower_factor=float(ctx.kernel_ls_res_lower_factor),
-                    kernel_ls_res_upper_factor=float(ctx.kernel_ls_res_upper_factor),
-                    ls_lo=float(ctx.ls_lo),
-                    ls_hi=float(ctx.ls_hi),
-                    ls_init=float(ctx.ls_init),
-                    initial_ls_opt=float(ctx.initial_ls_opt),
-                    initial_const_opt=float(ctx.initial_const_opt),
-                    refit_ls_opt=float(refit_diag["refit_ls_opt"]),
-                    refit_const_opt=float(refit_diag["refit_const_opt"]),
-                    ls_opt=float(ls_opt_effective),
-                    const_opt=float(const_opt_effective),
-                    f_win=float(ctx.f_win),
-                    f_full=float(ctx.f_full),
-                    f_train=float(ctx.f_train),
-                    f_train_frac=float(ctx.f_train_frac),
-                    n_train=int(ctx.n_train),
-                    n_train_low=int(ctx.n_train_low),
-                    n_train_high=int(ctx.n_train_high),
-                    n_blind=int(ctx.n_blind),
-                    blind_nsigma=float(ctx.blind_nsigma),
-                    train_exclude_nsigma=float(ctx.train_exclude_nsigma),
-                    signal_model=str(ctx.signal_model),
-                    inj_shape_mode=str(ctx.inj_shape_mode),
-                    A_hat=float(A_hat),
-                    sigma_A=float(sigma_A),
-                    Zhat=float(Zhat),
-                    pull_param=float(pull),
-                    Nsig_win=int(Nsig_win),
-                    Nsig_train=int(Nsig_train),
-                    success=bool(fit["success"]),
-                    nll=float(fit.get("nll", float("nan"))),
-                    toy_mode=str(toy_mode),
-                    refit_gp_on_toy=bool(ctx.refit_gp_on_toy),
-                    refit_ok=float(refit_ok),
-                    refit_restarts=int(ctx.refit_restarts),
-                    refit_optimize=bool(ctx.refit_optimize),
-                    refit_fallback_used=bool(refit_fallback_used),
-                    refit_error=str(refit_error),
-                )
+            row = dict(
+                dataset=str(ctx.ds.key),
+                mass_GeV=float(ctx.mass),
+                toy=int(toy_idx),
+                strength=float(A_inj),
+                inj_nsigma=float(inj_nsigma),
+                sigmaA_ref=float(ctx.sigmaA_ref),
+                integral_density=float(ctx.integral_density),
+                A_per_eps2_unit=float(ctx.A_per_eps2_unit),
+                sigma_val=float(ctx.sigma_val),
+                sigma_x=float(ctx.sigma_x),
+                kernel_ls_policy=str(ctx.kernel_ls_policy),
+                kernel_ls_res_lower_factor=float(ctx.kernel_ls_res_lower_factor),
+                kernel_ls_res_upper_factor=float(ctx.kernel_ls_res_upper_factor),
+                ls_lo=float(ctx.ls_lo),
+                ls_hi=float(ctx.ls_hi),
+                ls_init=float(ctx.ls_init),
+                initial_ls_opt=float(ctx.initial_ls_opt),
+                initial_const_opt=float(ctx.initial_const_opt),
+                refit_ls_opt=float(refit_diag["refit_ls_opt"]),
+                refit_const_opt=float(refit_diag["refit_const_opt"]),
+                ls_opt=float(ls_opt_effective),
+                const_opt=float(const_opt_effective),
+                f_win=float(ctx.f_win),
+                f_full=float(ctx.f_full),
+                f_train=float(ctx.f_train),
+                f_train_frac=float(ctx.f_train_frac),
+                n_train=int(ctx.n_train),
+                n_train_low=int(ctx.n_train_low),
+                n_train_high=int(ctx.n_train_high),
+                n_blind=int(ctx.n_blind),
+                blind_nsigma=float(ctx.blind_nsigma),
+                train_exclude_nsigma=float(ctx.train_exclude_nsigma),
+                signal_model=str(ctx.signal_model),
+                inj_shape_mode=str(ctx.inj_shape_mode),
+                A_hat=float(A_hat),
+                sigma_A=float(sigma_A),
+                Zhat=float(Zhat),
+                pull_param=float(pull),
+                Nsig_win=int(Nsig_win),
+                Nsig_train=int(Nsig_train),
+                success=bool(fit["success"]),
+                nll=float(fit.get("nll", float("nan"))),
+                toy_mode=str(toy_mode),
+                refit_gp_on_toy=bool(ctx.refit_gp_on_toy),
+                refit_ok=float(refit_ok),
+                refit_restarts=int(ctx.refit_restarts),
+                refit_optimize=bool(ctx.refit_optimize),
+                refit_fallback_used=bool(refit_fallback_used),
+                refit_error=str(refit_error),
             )
+            row.update(_dataset_source_metadata(ctx.ds))
+            row.update(_qmu_tilde_fields(config, obs, mu_fit, cov_fit, ctx.tmpl_win, A_inj))
+            out_rows.append(row)
 
     return out_rows
 
@@ -1455,6 +1548,7 @@ def run_injection_extraction_streaming(
                 f_win=float(ctx.f_win),
                 f_train_frac=float(ctx.f_train_frac),
                 kernel_ls_policy=str(ctx.kernel_ls_policy),
+                signal_model=str(ctx.signal_model),
                 kernel_ls_res_lower_factor=float(ctx.kernel_ls_res_lower_factor),
                 kernel_ls_res_upper_factor=float(ctx.kernel_ls_res_upper_factor),
                 ls_lo=float(ctx.ls_lo),
@@ -2119,6 +2213,16 @@ def summarize_injection_grid(df_toys: pd.DataFrame) -> pd.DataFrame:
             A_hat_mean=float(np.nanmean(Ahat)),
             A_hat_std=float(np.nanstd(Ahat, ddof=1)),
             sigma_A_mean=float(np.nanmean(sigA)),
+            Ahat_over_Ainj=(
+                float(np.nanmean(Ahat)) / float(A)
+                if np.isfinite(float(A)) and abs(float(A)) > 0
+                else float("nan")
+            ),
+            sigmaA_over_sigmaAref=(
+                float(np.nanmean(sigA)) / sigmaA_ref_mean
+                if np.isfinite(sigmaA_ref_mean) and sigmaA_ref_mean > 0
+                else float("nan")
+            ),
             pull_mean=pull_mean,
             pull_std=float(np.nanstd(pull, ddof=1)),
             pull_std_err=float(np.nanstd(pull_finite, ddof=1) / np.sqrt(max(1, 2*(len(pull_finite)-1)))) if len(pull_finite) > 1 else float("nan"),
@@ -2130,6 +2234,15 @@ def summarize_injection_grid(df_toys: pd.DataFrame) -> pd.DataFrame:
             delta_z_minus_pull=float((zhat_mean - float(np.nanmean(inj_nsigma_vals))) - pull_mean),
             ainj_over_sigmaAref=(float(A) / sigmaA_ref_mean if np.isfinite(sigmaA_ref_mean) and sigmaA_ref_mean > 0 else float("nan")),
             Zhat_q16=q(Zhat, 0.16), Zhat_q84=q(Zhat, 0.84),
+            qmu_tilde_mean=_mean_col(sub, "qmu_tilde"),
+            qmu_tilde_q16=q(sub["qmu_tilde"].to_numpy(float), 0.16) if "qmu_tilde" in sub.columns else float("nan"),
+            qmu_tilde_q84=q(sub["qmu_tilde"].to_numpy(float), 0.84) if "qmu_tilde" in sub.columns else float("nan"),
+            n_source_toys=int(sub["toy_index"].nunique()) if "toy_index" in sub.columns else 0,
+            source_model=_first_col(sub, "source_model"),
+            source_label=_first_col(sub, "source_label"),
+            source_root=_first_col(sub, "source_root"),
+            container=_first_col(sub, "container"),
+            function_tag=_first_col(sub, "function_tag"),
             success_rate=_mean_col(sub, "success"),
             refit_ok_rate=_mean_col(sub, "refit_ok"),
             refit_fallback_rate=_mean_bool_col(sub, "refit_fallback_used"),

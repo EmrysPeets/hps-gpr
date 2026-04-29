@@ -426,6 +426,163 @@ def generate_toy_scan_slurm_scripts(
     return output_path, submit_path, n_jobs
 
 
+def generate_funcform_injection_slurm_scripts(
+    config_path: str,
+    output_path: str,
+    dataset: str,
+    toy_root: str,
+    toy_names: List[str],
+    output_root: str,
+    *,
+    masses: List[float],
+    strengths: List[str],
+    toy_indices: Optional[List[int]] = None,
+    container: Optional[str] = None,
+    n_injection_toys: int = 1,
+    write_qmu: bool = False,
+    job_name: str = "hps-gpr-ffinj",
+    partition: str = "batch",
+    time_limit: str = "4:00:00",
+    memory: str = "4G",
+    cpus_per_task: Optional[int] = None,
+    conda_env: Optional[str] = None,
+    extra_sbatch: Optional[List[str]] = None,
+) -> tuple:
+    """Generate SLURM scripts for one functional-form injection job per toy histogram."""
+    dataset_key = str(dataset).strip()
+    toy_container = str(container or "").strip()
+    repo_root = str(Path(__file__).resolve().parents[1])
+    config_abs = os.path.abspath(config_path)
+    toy_root_abs = os.path.abspath(toy_root)
+    output_root_abs = os.path.abspath(output_root)
+    masses_arg = ",".join(f"{float(m):.12g}" for m in masses)
+    strengths_arg = ",".join(str(s) for s in strengths)
+
+    if toy_indices is not None and len(toy_indices) != len(toy_names):
+        raise ValueError("toy_indices must have the same length as toy_names")
+    if toy_indices is None:
+        resolved_toy_indices = []
+        for fallback_index, toy_name in enumerate(toy_names):
+            m = re.search(r"_toy_(\d+)$", str(toy_name))
+            resolved_toy_indices.append(int(m.group(1)) if m is not None else int(fallback_index))
+    else:
+        resolved_toy_indices = [int(idx) for idx in toy_indices]
+
+    job_lines = [
+        "#!/bin/bash",
+        "set -euo pipefail",
+        f"#SBATCH --job-name={job_name}",
+        f"#SBATCH --partition={partition}",
+        f"#SBATCH --time={time_limit}",
+        f"#SBATCH --mem={memory}",
+        "#SBATCH --output=logs/%j.out",
+        "#SBATCH --error=logs/%j.err",
+    ]
+    if cpus_per_task is not None:
+        job_lines.append(f"#SBATCH --cpus-per-task={int(cpus_per_task)}")
+    if extra_sbatch:
+        for directive in extra_sbatch:
+            job_lines.append(f"#SBATCH {directive}")
+
+    qmu_flag = "--write-qmu" if bool(write_qmu) else "--no-write-qmu"
+    job_lines.extend([
+        "",
+        "mkdir -p logs",
+        "",
+        "# REPO_ROOT, TOY_* and BASE_OUTPUT_DIR are passed via --export at submission time",
+        'cd "${REPO_ROOT}"',
+        'if [ -f "${REPO_ROOT}/startup.sh" ]; then',
+        '  source "${REPO_ROOT}/startup.sh"',
+        'elif [ -n "${TOY_CONDA_ENV}" ]; then',
+        "  source $(conda info --base)/etc/profile.d/conda.sh",
+        '  conda activate "${TOY_CONDA_ENV}"',
+        "fi",
+        "",
+        'JOB_OUTDIR="${BASE_OUTPUT_DIR}/jobs/${TOY_DIR_NAME}"',
+        'FLAT_OUTDIR="${BASE_OUTPUT_DIR}/injection_flat"',
+        'mkdir -p "${JOB_OUTDIR}" "${FLAT_OUTDIR}"',
+        "",
+        "export PYTHONUNBUFFERED=1",
+        'echo "[funcform-inj] dataset=${TOY_DATASET} toy=${TOY_NAME} output=${JOB_OUTDIR}"',
+        "",
+        'CMD=(python -m hps_gpr.cli funcform-inject',
+        f'  --config "{config_abs}"',
+        '  --dataset "${TOY_DATASET}"',
+        '  --toy-root "${TOY_ROOT}"',
+        '  --output-dir "${JOB_OUTDIR}"',
+        f'  --masses "{masses_arg}"',
+        f'  --strengths "{strengths_arg}"',
+        f'  --n-injection-toys {int(n_injection_toys)}',
+        '  --write-toy-csv',
+        f'  {qmu_flag}',
+        '  --toy-name-fmt "${TOY_NAME}"',
+        '  --toy-index "${TOY_INDEX}")',
+        'if [ -n "${TOY_CONTAINER}" ]; then',
+        '  CMD+=(--container "${TOY_CONTAINER}")',
+        "fi",
+        '"${CMD[@]}"',
+        "",
+        'FILE_GLOB="${JOB_OUTDIR}/injection_extraction/*_${TOY_DATASET}.csv"',
+        "for f in ${FILE_GLOB}; do",
+        "  [ -f \"$f\" ] || continue",
+        "  b=$(basename \"$f\" .csv)",
+        '  cp "$f" "${FLAT_OUTDIR}/${b}__toy_${TOY_INDEX}.csv"',
+        "done",
+    ])
+
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(job_lines) + "\n")
+    os.chmod(output_path, 0o755)
+    print(f"Wrote functional-form injection SLURM job script to {output_path}")
+
+    submit_path = os.path.join(os.path.dirname(os.path.abspath(output_path)), "submit_funcform_injection_all.sh")
+    abs_job = os.path.abspath(output_path)
+    submit_lines = [
+        "#!/bin/bash",
+        "set -euo pipefail",
+        "# Submit one SLURM job per functional-form injection toy histogram",
+        'SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"',
+        f'JOB_SCRIPT="{abs_job}"',
+        f'REPO_ROOT="{repo_root}"',
+        f'BASE_OUTPUT_DIR="{output_root_abs}"',
+        f'TOY_DATASET="{dataset_key}"',
+        f'TOY_ROOT="{toy_root_abs}"',
+        f'TOY_CONTAINER="{toy_container}"',
+        f'TOY_CONDA_ENV="{str(conda_env or "").strip()}"',
+        'SBATCH_ARGS=("$@")',
+        "",
+        'cd "${SCRIPT_DIR}"',
+        "mkdir -p logs",
+        "",
+    ]
+
+    n_jobs = 0
+    for toy_name, toy_index in zip(toy_names, resolved_toy_indices):
+        toy_dir_name = re.sub(r"[^A-Za-z0-9._-]+", "_", str(toy_name)).strip("._-") or "toy"
+        submit_lines.append(
+            'sbatch "${SBATCH_ARGS[@]}" --export=ALL,'
+            "REPO_ROOT=${REPO_ROOT},"
+            "TOY_DATASET=${TOY_DATASET},"
+            "TOY_ROOT=${TOY_ROOT},"
+            "TOY_CONTAINER=${TOY_CONTAINER},"
+            f"TOY_NAME={toy_name},"
+            f"TOY_INDEX={int(toy_index)},"
+            f"TOY_DIR_NAME={toy_dir_name},"
+            "TOY_CONDA_ENV=${TOY_CONDA_ENV},"
+            "BASE_OUTPUT_DIR=${BASE_OUTPUT_DIR} "
+            "\"${JOB_SCRIPT}\""
+        )
+        n_jobs += 1
+
+    submit_lines.extend(["", f'echo "Submitted {n_jobs} functional-form injection jobs."'])
+    with open(submit_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(submit_lines) + "\n")
+    os.chmod(submit_path, 0o755)
+    print(f"Wrote functional-form injection submission loop script to {submit_path}")
+
+    return output_path, submit_path, n_jobs
+
+
 def generate_gp_toy_scan_slurm_scripts(
     config_path: str,
     output_path: str,
