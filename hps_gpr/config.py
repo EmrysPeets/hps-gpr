@@ -199,6 +199,7 @@ class Config:
     inj_strength_mode: str = "absolute"   # "absolute" | "sigmaA"
     inj_sigma_a_source: str = "asimov"    # "asimov" | "poisson"
     inj_shape_mode: str = "full"          # "full" | "window"
+    inj_background_mode: str = "gp_resample"  # "gp_resample" | "fixed_hist"
     inj_refit_gp_on_toy: bool = False
     inj_refit_gp_restarts: int = 0
     inj_refit_gp_optimize: bool = True

@@ -172,6 +172,47 @@ def _prediction_integral_density(pred: Any) -> float:
     return float(np.sum(np.clip(arr, 0.0, None)))
 
 
+def _resolve_inj_background_mode(config: "Config", *, refit_gp_on_toy: bool) -> str:
+    """Resolve how full-refit injection toys choose their pre-signal background."""
+    mode = str(getattr(config, "inj_background_mode", "gp_resample") or "gp_resample").lower().strip()
+    aliases = {
+        "poisson": "gp_resample",
+        "gp": "gp_resample",
+        "gpmean": "gp_resample",
+        "gp_resample": "gp_resample",
+        "fixed": "fixed_hist",
+        "hist": "fixed_hist",
+        "fixed_hist": "fixed_hist",
+    }
+    if mode not in aliases:
+        raise ValueError(
+            "inj_background_mode must be one of 'gp_resample' or 'fixed_hist' "
+            f"(got {mode!r})"
+        )
+    resolved = aliases[mode]
+    if resolved == "fixed_hist" and not bool(refit_gp_on_toy):
+        raise ValueError("inj_background_mode='fixed_hist' requires inj_refit_gp_on_toy=True")
+    return resolved
+
+
+def _fixed_hist_background_counts(y_full: np.ndarray, *, dataset_key: str, mass: float) -> np.ndarray:
+    """Return integer source-histogram counts for fixed-histogram refit toys."""
+    y = np.asarray(y_full, float).reshape(-1)
+    if y.size == 0:
+        raise ValueError(f"[inj][{dataset_key}] m={float(mass):.6g}: fixed_hist source histogram is empty")
+    if not np.all(np.isfinite(y)):
+        raise ValueError(f"[inj][{dataset_key}] m={float(mass):.6g}: fixed_hist source histogram has nonfinite bins")
+    if np.any(y < -1e-6):
+        raise ValueError(f"[inj][{dataset_key}] m={float(mass):.6g}: fixed_hist source histogram has negative bins")
+    rounded = np.rint(np.clip(y, 0.0, None))
+    if not np.allclose(np.clip(y, 0.0, None), rounded, atol=1e-6, rtol=0.0):
+        raise ValueError(
+            f"[inj][{dataset_key}] m={float(mass):.6g}: "
+            "inj_background_mode='fixed_hist' requires integer-like source histogram counts"
+        )
+    return rounded.astype(int)
+
+
 def _dataset_kernel_factor(config: "Config", ds_key: str, base_attr: str, by_attr: str) -> float:
     """Resolve a scalar kernel-factor knob after per-dataset overrides."""
     by_ds = dict(getattr(config, by_attr, {}) or {})
@@ -391,6 +432,7 @@ def run_injection_extraction_toys(
         inj_shape_mode = "full"
     if train_exclude_nsigma is None:
         train_exclude_nsigma = getattr(config, "inj_train_exclude_nsigma", None)
+    inj_background_mode = _resolve_inj_background_mode(config, refit_gp_on_toy=bool(refit_gp_on_toy))
 
     mvn_method = str(getattr(config, "mvn_trunc_method", "reject_then_clip"))
     mvn_max_tries = int(getattr(config, "mvn_trunc_max_tries", 80))
@@ -468,6 +510,7 @@ def run_injection_extraction_toys(
 
         if refit_gp_on_toy:
             mu_full_arr = np.asarray(pred.mu_full, float).reshape(-1)
+            y_full_arr = np.asarray(pred.y_full, float).reshape(-1)
             ker = make_kernel_for_dataset(ds, config, mass=m)
             x_win = x_full[msk_blind]
         else:
@@ -487,7 +530,10 @@ def run_injection_extraction_toys(
                 refit_diag = dict(refit_ls_opt=float("nan"), refit_const_opt=float("nan"))
 
                 if refit_gp_on_toy:
-                    bkg_full = rng.poisson(np.clip(mu_full_arr, 0.0, None)).astype(int)
+                    if inj_background_mode == "fixed_hist":
+                        bkg_full = _fixed_hist_background_counts(y_full_arr, dataset_key=str(ds.key), mass=float(m))
+                    else:
+                        bkg_full = rng.poisson(np.clip(mu_full_arr, 0.0, None)).astype(int)
                     if inj_shape_mode == "window":
                         sig_full = np.zeros_like(bkg_full, dtype=int)
                         s_win, Nsig_win, _ = _inject_counts_from_template(tmpl_win, A_inj, rng, inj_mode)
@@ -581,6 +627,7 @@ def run_injection_extraction_toys(
                     blind_nsigma=float(config.blind_nsigma), train_exclude_nsigma=float(tn),
                     signal_model=str(getattr(config, "signal_model", "default")),
                     inj_shape_mode=inj_shape_mode,
+                    inj_background_mode=str(inj_background_mode),
                     A_hat=float(A_hat), sigma_A=float(sigma_A),
                     Zhat=float(Zhat), pull_param=float(pull),
                     Nsig_win=int(Nsig_win), Nsig_train=int(Nsig_train),
@@ -616,6 +663,7 @@ class _InjectionMassContext:
     mu: np.ndarray
     cov: np.ndarray
     mu_full: np.ndarray
+    y_full: np.ndarray
     x_full: np.ndarray
     msk_blind: np.ndarray
     msk_train: np.ndarray
@@ -647,6 +695,7 @@ class _InjectionMassContext:
     signal_model: str
     inj_mode: str
     inj_shape_mode: str
+    inj_background_mode: str
     refit_gp_on_toy: bool
     refit_restarts: int
     refit_optimize: bool
@@ -669,6 +718,7 @@ class _ToyPointAccumulator:
     f_train_frac: float
     kernel_ls_policy: str = ""
     signal_model: str = ""
+    inj_background_mode: str = ""
     kernel_ls_res_lower_factor: float = float("nan")
     kernel_ls_res_upper_factor: float = float("nan")
     ls_lo: float = float("nan")
@@ -753,6 +803,7 @@ class _ToyPointAccumulator:
             f_train_frac=float(self.f_train_frac),
             kernel_ls_policy=str(self.kernel_ls_policy),
             signal_model=str(getattr(self, "signal_model", "")),
+            inj_background_mode=str(getattr(self, "inj_background_mode", "")),
             kernel_ls_res_lower_factor=float(self.kernel_ls_res_lower_factor),
             kernel_ls_res_upper_factor=float(self.kernel_ls_res_upper_factor),
             ls_lo=float(self.ls_lo),
@@ -885,7 +936,14 @@ def _simulate_toy_rows_chunk(
             refit_diag = dict(refit_ls_opt=float("nan"), refit_const_opt=float("nan"))
 
             if bool(ctx.refit_gp_on_toy):
-                bkg_full = rng.poisson(np.clip(ctx.mu_full, 0.0, None)).astype(int)
+                if str(ctx.inj_background_mode) == "fixed_hist":
+                    bkg_full = _fixed_hist_background_counts(
+                        ctx.y_full,
+                        dataset_key=str(ctx.ds.key),
+                        mass=float(ctx.mass),
+                    )
+                else:
+                    bkg_full = rng.poisson(np.clip(ctx.mu_full, 0.0, None)).astype(int)
                 if str(ctx.inj_shape_mode) == "window":
                     sig_full = np.zeros_like(bkg_full, dtype=int)
                     s_win, Nsig_win, _ = _inject_counts_from_template(ctx.tmpl_win, A_inj, rng, ctx.inj_mode)
@@ -1001,6 +1059,7 @@ def _simulate_toy_rows_chunk(
                 train_exclude_nsigma=float(ctx.train_exclude_nsigma),
                 signal_model=str(ctx.signal_model),
                 inj_shape_mode=str(ctx.inj_shape_mode),
+                inj_background_mode=str(ctx.inj_background_mode),
                 A_hat=float(A_hat),
                 sigma_A=float(sigma_A),
                 Zhat=float(Zhat),
@@ -1103,6 +1162,7 @@ def _build_injection_mass_context(
     refit_restarts: int,
     refit_optimize: bool,
     inj_shape_mode: str,
+    inj_background_mode: str,
     train_exclude_nsigma: Optional[float],
     mvn_method: str,
     mvn_max_tries: int,
@@ -1152,6 +1212,7 @@ def _build_injection_mass_context(
         mu=np.asarray(pred.mu, float),
         cov=np.asarray(pred.cov, float),
         mu_full=np.asarray(pred.mu_full, float).reshape(-1),
+        y_full=np.asarray(pred.y_full, float).reshape(-1),
         x_full=x_full,
         msk_blind=msk_blind,
         msk_train=msk_train,
@@ -1183,6 +1244,7 @@ def _build_injection_mass_context(
         signal_model=str(getattr(config, "signal_model", "default")),
         inj_mode=str(inj_mode),
         inj_shape_mode=str(inj_shape_mode),
+        inj_background_mode=str(inj_background_mode),
         refit_gp_on_toy=bool(refit_gp_on_toy),
         refit_restarts=int(refit_restarts),
         refit_optimize=bool(refit_optimize),
@@ -1400,6 +1462,7 @@ def run_funcform_injection_extraction_toys(
                         blind_nsigma=float(config.blind_nsigma),
                         train_exclude_nsigma=float(tn),
                         inj_shape_mode=inj_shape_mode,
+                        inj_background_mode="fixed_hist",
                         A_hat=float(A_hat),
                         sigma_A=float(sigma_A),
                         Zhat=float(Zhat),
@@ -1494,6 +1557,7 @@ def run_injection_extraction_streaming(
         inj_shape_mode = "full"
     if train_exclude_nsigma is None:
         train_exclude_nsigma = getattr(config, "inj_train_exclude_nsigma", None)
+    inj_background_mode = _resolve_inj_background_mode(config, refit_gp_on_toy=bool(refit_gp_on_toy))
 
     mvn_method = str(getattr(config, "mvn_trunc_method", "reject_then_clip"))
     mvn_max_tries = int(getattr(config, "mvn_trunc_max_tries", 80))
@@ -1522,6 +1586,7 @@ def run_injection_extraction_streaming(
             refit_restarts=int(refit_restarts),
             refit_optimize=bool(refit_optimize),
             inj_shape_mode=str(inj_shape_mode),
+            inj_background_mode=str(inj_background_mode),
             train_exclude_nsigma=train_exclude_nsigma,
             mvn_method=str(mvn_method),
             mvn_max_tries=int(mvn_max_tries),
@@ -1549,6 +1614,7 @@ def run_injection_extraction_streaming(
                 f_train_frac=float(ctx.f_train_frac),
                 kernel_ls_policy=str(ctx.kernel_ls_policy),
                 signal_model=str(ctx.signal_model),
+                inj_background_mode=str(ctx.inj_background_mode),
                 kernel_ls_res_lower_factor=float(ctx.kernel_ls_res_lower_factor),
                 kernel_ls_res_upper_factor=float(ctx.kernel_ls_res_upper_factor),
                 ls_lo=float(ctx.ls_lo),
@@ -1617,6 +1683,7 @@ def _combine_toy_rows(rows: List[Dict[str, Any]], *, mass: float, toy_idx: int) 
     st = np.array([float(r.get("strength", np.nan)) for r in valid], float)
     zinj = np.array([float(r.get("inj_nsigma", np.nan)) for r in valid], float)
     sref = np.array([float(r.get("sigmaA_ref", np.nan)) for r in valid], float)
+    bg_modes = sorted({str(r.get("inj_background_mode", "")) for r in valid if str(r.get("inj_background_mode", ""))})
 
     A_hat = float(np.nansum(w * ah) / sum_w)
     sigma_A = float(1.0 / np.sqrt(sum_w))
@@ -1639,6 +1706,7 @@ def _combine_toy_rows(rows: List[Dict[str, Any]], *, mass: float, toy_idx: int) 
         Zhat=float(zhat),
         n_contrib=int(len(valid)),
         contrib_datasets="+".join(sorted({str(r.get("dataset", "")) for r in valid})),
+        inj_background_mode="+".join(bg_modes),
         success=bool(all(bool(r.get("success", False)) for r in valid)),
     )
 
@@ -1708,6 +1776,7 @@ def run_injection_extraction_streaming_combined(
         inj_shape_mode = "full"
     if train_exclude_nsigma is None:
         train_exclude_nsigma = getattr(config, "inj_train_exclude_nsigma", None)
+    inj_background_mode = _resolve_inj_background_mode(config, refit_gp_on_toy=bool(refit_gp_on_toy))
 
     mvn_method = str(getattr(config, "mvn_trunc_method", "reject_then_clip"))
     mvn_max_tries = int(getattr(config, "mvn_trunc_max_tries", 80))
@@ -1732,6 +1801,7 @@ def run_injection_extraction_streaming_combined(
                 refit_restarts=int(refit_restarts),
                 refit_optimize=bool(refit_optimize),
                 inj_shape_mode=str(inj_shape_mode),
+                inj_background_mode=str(inj_background_mode),
                 train_exclude_nsigma=train_exclude_nsigma,
                 mvn_method=str(mvn_method),
                 mvn_max_tries=int(mvn_max_tries),
@@ -1803,6 +1873,7 @@ def run_injection_extraction_streaming_combined(
                     n_train_high=int(ctxs_m[ds_key].n_train_high),
                     n_blind=int(ctxs_m[ds_key].n_blind),
                     signal_model=str(ctxs_m[ds_key].signal_model),
+                    inj_background_mode=str(ctxs_m[ds_key].inj_background_mode),
                 )
                 for ds_key in ctxs_m.keys()
             }
@@ -1830,6 +1901,7 @@ def run_injection_extraction_streaming_combined(
                         A_per_eps2_unit=float("nan"),
                         f_win=float("nan"),
                         f_train_frac=float("nan"),
+                        inj_background_mode=str(inj_background_mode),
                     )
                 else:
                     can_combine = False
@@ -2195,6 +2267,7 @@ def summarize_injection_grid(df_toys: pd.DataFrame) -> pd.DataFrame:
             f_train_frac=_mean_col(sub, "f_train_frac"),
             kernel_ls_policy=_first_col(sub, "kernel_ls_policy"),
             signal_model=_first_col(sub, "signal_model"),
+            inj_background_mode=_first_col(sub, "inj_background_mode"),
             kernel_ls_res_lower_factor=_mean_col(sub, "kernel_ls_res_lower_factor"),
             kernel_ls_res_upper_factor=_mean_col(sub, "kernel_ls_res_upper_factor"),
             ls_lo=_mean_col(sub, "ls_lo"),
@@ -2412,6 +2485,8 @@ def collapse_fragmented_injection_summary(df_sum: pd.DataFrame) -> pd.DataFrame:
             row["kernel_ls_policy"] = str(_first_col(sub, "kernel_ls_policy", ""))
         if "signal_model" in sub.columns:
             row["signal_model"] = str(_first_col(sub, "signal_model", ""))
+        if "inj_background_mode" in sub.columns:
+            row["inj_background_mode"] = str(_first_col(sub, "inj_background_mode", ""))
         for col in ["n_train", "n_train_low", "n_train_high", "n_blind"]:
             if col in sub.columns:
                 val = _mean_col(sub, col)

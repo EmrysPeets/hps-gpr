@@ -9,6 +9,8 @@ from hps_gpr.cli import main
 from hps_gpr.config import Config
 from hps_gpr.dataset import DatasetConfig
 from hps_gpr.injection import (
+    _InjectionMassContext,
+    _simulate_toy_rows_chunk,
     collapse_fragmented_injection_summary,
     run_funcform_injection_extraction_toys,
     run_injection_extraction_toys,
@@ -59,6 +61,7 @@ def _install_fast_injection_mocks(monkeypatch):
             blind=(0.0, 2.0),
             train_exclude_nsigma=1.64,
             mu_full=np.array([2.0, 3.0]),
+            y_full=np.array([2.0, 3.0]),
             sigma_x=1.0,
         )
 
@@ -281,6 +284,93 @@ def test_streaming_summary_schema_matches_legacy_summary(tmp_path, monkeypatch):
     )
 
     assert set(stream_sum.columns) == set(legacy_sum.columns)
+
+
+def test_fixed_hist_refit_uses_source_histogram_for_training(monkeypatch):
+    import hps_gpr.injection as inj
+
+    captured = {}
+
+    def fake_fit_gpr(X, y, config, restarts, kernel, optimize):
+        captured["X"] = np.asarray(X, float)
+        captured["y"] = np.asarray(y, float)
+        return SimpleNamespace()
+
+    monkeypatch.setattr(inj, "make_kernel_for_dataset", lambda *args, **kwargs: None)
+    monkeypatch.setattr(inj, "fit_gpr", fake_fit_gpr)
+    monkeypatch.setattr(inj, "predict_counts_from_log_gpr", lambda gpr, x_win, config: (np.array([20.0]), np.eye(1)))
+    monkeypatch.setattr(inj, "_gpr_fit_diagnostics", lambda gpr: {"ls_opt": 0.25, "const_opt": 1.0})
+    monkeypatch.setattr(
+        inj,
+        "fit_A_profiled_gaussian",
+        lambda obs, mu, cov, tmpl_win, allow_negative: {
+            "A_hat": 0.0,
+            "sigma_A": 1.0,
+            "success": True,
+            "nll": 0.0,
+        },
+    )
+
+    ctx = _InjectionMassContext(
+        ds=_make_dataset(),
+        mass=0.0,
+        mu=np.array([20.0]),
+        cov=np.eye(1),
+        mu_full=np.array([1000.0, 1000.0, 1000.0]),
+        y_full=np.array([10.0, 20.0, 30.0]),
+        x_full=np.array([-3.0, 0.0, 3.0]),
+        msk_blind=np.array([False, True, False]),
+        msk_train=np.array([True, False, True]),
+        tmpl_win=np.array([1.0]),
+        tmpl_full=np.array([0.0, 1.0, 0.0]),
+        sigmaA_ref=1.0,
+        sigma_val=1.0,
+        sigma_x=1.0,
+        kernel_ls_policy="",
+        kernel_ls_res_lower_factor=0.5,
+        kernel_ls_res_upper_factor=8.0,
+        ls_lo=0.1,
+        ls_hi=1.0,
+        ls_init=0.2,
+        initial_ls_opt=0.2,
+        initial_const_opt=1.0,
+        integral_density=1.0,
+        A_per_eps2_unit=1.0,
+        f_win=1.0,
+        f_full=1.0,
+        f_train=0.0,
+        f_train_frac=0.0,
+        n_train=2,
+        n_train_low=1,
+        n_train_high=1,
+        n_blind=1,
+        blind_nsigma=1.64,
+        train_exclude_nsigma=1.64,
+        signal_model="default",
+        inj_mode="poisson",
+        inj_shape_mode="full",
+        inj_background_mode="fixed_hist",
+        refit_gp_on_toy=True,
+        refit_restarts=0,
+        refit_optimize=True,
+        allow_negative=True,
+        mvn_method="reject_then_clip",
+        mvn_max_tries=80,
+    )
+
+    rows = _simulate_toy_rows_chunk(
+        ctx,
+        Config(inj_background_mode="fixed_hist"),
+        toy_indices=[0],
+        A_inj=0.0,
+        inj_nsigma=0.0,
+        point_seed=123,
+        threads_per_worker=1,
+    )
+
+    np.testing.assert_allclose(captured["X"], np.array([-3.0, 3.0]))
+    np.testing.assert_allclose(captured["y"], np.array([10.0, 30.0]))
+    assert rows[0]["inj_background_mode"] == "fixed_hist"
 
 
 def test_refit_failure_is_flagged_instead_of_hidden_fallback(tmp_path, monkeypatch):
