@@ -20,11 +20,20 @@ The nominal signal model remains `signal_model: default`; kernel locking and
 signal-tail alpha inflation are diagnostic knobs in the code, not enabled by
 these primary configs.
 
+Default SDF layout:
+
+- run outputs: `/sdf/data/hps/users/epeets/run/gpr_out/2015_closure/funcform_studies/<run_tag>/`
+- compiled plots: `/sdf/data/hps/users/epeets/run/gpr_out/2015_closure/funcform_studies/compiled_plots/<run_tag>/`
+- SLURM logs: `/sdf/data/hps/users/epeets/scratch/2015_gpr_logs/<run_tag>/`
+
 Generate the YAMLs:
 
 ```bash
 python3 study_configs/final_configs_2015/make_final_2015_fixedhist_configs.py
 ```
+
+Set `GPR_FUNCFORM_OUTPUT_BASE` before generation only if you intentionally want
+a different output base.
 
 Generate SLURM scripts:
 
@@ -39,6 +48,7 @@ CONFIG_GLOB='config_2015_blind1p64_train3p0_lslb1p0_primary_95CL_funcform100_fix
 TOY_ROOT=/sdf/home/e/epeets/src/hps-gpr-main/outputs/funcform_toys/funcform_2015_dataset_mod_toys_2.root \
 CONTAINER=fShiftSigPowTail \
 TOY_PATTERN='fShiftSigPowTail_toy_*' \
+LOG_ROOT=/sdf/data/hps/users/epeets/scratch/2015_gpr_logs \
 bash study_configs/final_configs_2015/generate_slurm_all.sh
 ```
 
@@ -57,5 +67,6 @@ Compile plots after jobs finish:
 
 ```bash
 CONFIG_GLOB='config_2015_blind1p64_train3p0_lslb1p0_primary_95CL_funcform100_fixedhist.yaml' \
+COMPILED_DIR=/sdf/data/hps/users/epeets/run/gpr_out/2015_closure/funcform_studies/compiled_plots \
 bash study_configs/final_configs_2015/compile_all.sh
 ```

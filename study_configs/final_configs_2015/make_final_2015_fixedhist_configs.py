@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import os
 from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
@@ -18,6 +19,8 @@ MASS_GRID = [0.030, 0.045, 0.060, 0.075, 0.090, 0.105, 0.120]
 SIGMA_MULTIPLIERS = [0.0, 1.0, 2.0, 3.0, 5.0]
 BLIND_WIDTHS = [1.64, 1.96]
 GUARD_WIDTHS = [2.58, 3.0]
+DEFAULT_OUTPUT_BASE = "/sdf/data/hps/users/epeets/run/gpr_out/2015_closure/funcform_studies"
+OUTPUT_BASE = os.environ.get("GPR_FUNCFORM_OUTPUT_BASE", DEFAULT_OUTPUT_BASE).rstrip("/")
 
 
 @dataclass(frozen=True)
@@ -52,7 +55,7 @@ class ClosureStudy:
 
     @property
     def output_dir(self) -> str:
-        return f"outputs/final_2015_funcform_fixedhist_{self.tag}"
+        return f"{OUTPUT_BASE}/{self.tag}"
 
     @property
     def config_name(self) -> str:

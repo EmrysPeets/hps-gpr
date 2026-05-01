@@ -19,6 +19,7 @@ MEMORY="${MEMORY:-8G}"
 CPUS_PER_TASK="${CPUS_PER_TASK:-1}"
 CONDA_ENV="${CONDA_ENV:-}"
 HPS_GPR_BIN="${HPS_GPR_BIN:-hps-gpr}"
+LOG_ROOT="${LOG_ROOT:-/sdf/data/hps/users/epeets/scratch/2015_gpr_logs}"
 read -r -a hps_gpr_cmd <<< "${HPS_GPR_BIN}"
 
 configs=(${CONFIG_DIR}/${CONFIG_GLOB})
@@ -49,6 +50,7 @@ for config_path in "${configs[@]}"; do
     --account "${ACCOUNT}" \
     --time "${TIME}" \
     --memory "${MEMORY}" \
+    --log-dir "${LOG_ROOT}/${tag}" \
     --output "${slurm_dir}/submit_funcform_injection_${tag}.slurm"
   )
   if [[ -n "${TOY_ROOT}" ]]; then
@@ -67,6 +69,6 @@ for config_path in "${configs[@]}"; do
     args+=(--conda-env "${CONDA_ENV}")
   fi
 
-  echo "[generate] dataset=${DATASET} config=${config_name} masses=${MASSES} strengths=${STRENGTHS}"
+  echo "[generate] dataset=${DATASET} config=${config_name} masses=${MASSES} strengths=${STRENGTHS} logs=${LOG_ROOT}/${tag}"
   "${args[@]}"
 done

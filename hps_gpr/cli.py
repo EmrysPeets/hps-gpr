@@ -1943,6 +1943,10 @@ def slurm_gen(config, n_jobs, output, job_name, partition, time, memory, cpus_pe
     help="Conda environment to activate",
 )
 @click.option(
+    "--log-dir",
+    help="Directory for generated SLURM stdout/stderr logs.",
+)
+@click.option(
     "--account",
     help="SLURM account/project to charge",
 )
@@ -1967,6 +1971,7 @@ def slurm_gen_funcform_inject(
     memory,
     cpus_per_task,
     conda_env,
+    log_dir,
     account,
     qos,
 ):
@@ -2029,6 +2034,7 @@ def slurm_gen_funcform_inject(
         memory=memory,
         cpus_per_task=resolved_cpus_per_task,
         conda_env=conda_env,
+        log_dir=log_dir,
         extra_sbatch=extra,
     )
     print(f"\nPrepared {n_jobs} functional-form injection jobs.")

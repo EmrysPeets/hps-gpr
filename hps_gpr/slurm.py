@@ -446,6 +446,7 @@ def generate_funcform_injection_slurm_scripts(
     memory: str = "4G",
     cpus_per_task: Optional[int] = None,
     conda_env: Optional[str] = None,
+    log_dir: Optional[str] = None,
     extra_sbatch: Optional[List[str]] = None,
 ) -> tuple:
     """Generate SLURM scripts for one functional-form injection job per toy histogram."""
@@ -457,6 +458,7 @@ def generate_funcform_injection_slurm_scripts(
     output_root_abs = os.path.abspath(output_root)
     masses_arg = ",".join(f"{float(m):.12g}" for m in masses)
     strengths_arg = ",".join(str(s) for s in strengths)
+    log_dir_resolved = str(log_dir or "logs").strip() or "logs"
 
     if toy_indices is not None and len(toy_indices) != len(toy_names):
         raise ValueError("toy_indices must have the same length as toy_names")
@@ -475,8 +477,8 @@ def generate_funcform_injection_slurm_scripts(
         f"#SBATCH --partition={partition}",
         f"#SBATCH --time={time_limit}",
         f"#SBATCH --mem={memory}",
-        "#SBATCH --output=logs/%j.out",
-        "#SBATCH --error=logs/%j.err",
+        f"#SBATCH --output={log_dir_resolved}/%j.out",
+        f"#SBATCH --error={log_dir_resolved}/%j.err",
     ]
     if cpus_per_task is not None:
         job_lines.append(f"#SBATCH --cpus-per-task={int(cpus_per_task)}")
@@ -487,7 +489,7 @@ def generate_funcform_injection_slurm_scripts(
     qmu_flag = "--write-qmu" if bool(write_qmu) else "--no-write-qmu"
     job_lines.extend([
         "",
-        "mkdir -p logs",
+        f'mkdir -p "{log_dir_resolved}"',
         "",
         "# REPO_ROOT, TOY_* and BASE_OUTPUT_DIR are passed via --export at submission time",
         'cd "${REPO_ROOT}"',
@@ -549,10 +551,11 @@ def generate_funcform_injection_slurm_scripts(
         f'TOY_ROOT="{toy_root_abs}"',
         f'TOY_CONTAINER="{toy_container}"',
         f'TOY_CONDA_ENV="{str(conda_env or "").strip()}"',
+        f'JOB_LOG_DIR="{log_dir_resolved}"',
         'SBATCH_ARGS=("$@")',
         "",
         'cd "${SCRIPT_DIR}"',
-        "mkdir -p logs",
+        'mkdir -p "${JOB_LOG_DIR}"',
         "",
     ]
 
