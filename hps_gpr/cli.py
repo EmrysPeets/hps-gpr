@@ -48,9 +48,9 @@ def _build_extra_sbatch(account=None, qos=None):
     """Build optional extra SBATCH directives from CLI charging flags."""
     extra = []
     if account:
-        extra.append(f"--account={account}")
+        extra.append(f"--account {account}")
     if qos:
-        extra.append(f"--qos={qos}")
+        extra.append(f"--qos {qos}")
     return extra or None
 
 

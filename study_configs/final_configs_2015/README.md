@@ -63,6 +63,10 @@ SLURM_GLOB='slurm_blind1p64_train3p0_lslb1p0_primary' \
 bash study_configs/final_configs_2015/submit_all.sh
 ```
 
+The submit helper defaults to the SDF style that has worked for this workflow:
+`--account hps:hps-prod --partition roma`. Override with `SBATCH_ACCOUNT`,
+`SBATCH_PARTITION`, `SBATCH_QOS`, or by passing explicit `sbatch` arguments.
+
 Compile plots after jobs finish:
 
 ```bash
