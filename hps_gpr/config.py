@@ -199,10 +199,17 @@ class Config:
     inj_strength_mode: str = "absolute"   # "absolute" | "sigmaA"
     inj_sigma_a_source: str = "asimov"    # "asimov" | "poisson"
     inj_shape_mode: str = "full"          # "full" | "window"
+    inj_background_mode: str = "gp_resample"  # "gp_resample" | "fixed_hist"
     inj_refit_gp_on_toy: bool = False
     inj_refit_gp_restarts: int = 0
     inj_refit_gp_optimize: bool = True
     inj_refit_fail_on_error: bool = False
+    # Diagnostic-only refit stabilization knobs. The nominal path should remain
+    # a predeclared guard band unless these modes are separately validated.
+    inj_refit_kernel_lock_mode: str = "none"  # "none" | "initial_fit" | "ensemble_file"
+    inj_refit_kernel_lock_file: str = ""
+    inj_refit_signal_tail_alpha_scale: float = 0.0
+    inj_refit_signal_tail_alpha_threshold: float = 0.0
     inj_train_exclude_nsigma: Optional[float] = None  # defaults to gp_train_exclude_nsigma
     inj_sigma_multipliers: List[float] = field(
         default_factory=lambda: [0.0, 1.0, 2.0, 3.0, 5.0]
