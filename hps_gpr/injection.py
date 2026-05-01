@@ -37,6 +37,7 @@ from .statistics import (
 )
 from .gpr import (
     make_kernel_for_dataset,
+    make_fixed_kernel,
     fit_gpr,
     predict_counts_from_log_gpr,
     compute_kernel_ls_bounds,
@@ -172,6 +173,59 @@ def _prediction_integral_density(pred: Any) -> float:
     return float(np.sum(np.clip(arr, 0.0, None)))
 
 
+def _prediction_y_full(pred: Any) -> np.ndarray:
+    """Return full-range source counts, with fallbacks for lightweight test doubles."""
+    for attr in ("y_full", "obs_full", "counts_full"):
+        arr = getattr(pred, attr, None)
+        if arr is not None:
+            return np.asarray(arr, float).reshape(-1)
+
+    # Real fixed-histogram closure predictions carry y_full. Some unit-test
+    # doubles only model the GP mean, which is sufficient for non-fixed modes.
+    mu_full = getattr(pred, "mu_full", None)
+    if mu_full is not None:
+        return np.asarray(mu_full, float).reshape(-1)
+    return np.asarray(getattr(pred, "mu"), float).reshape(-1)
+
+
+def _resolve_inj_background_mode(config: "Config", *, refit_gp_on_toy: bool) -> str:
+    """Resolve how full-refit injection toys choose their pre-signal background."""
+    mode = str(getattr(config, "inj_background_mode", "gp_resample") or "gp_resample").lower().strip()
+    aliases = {
+        "poisson": "gp_resample",
+        "gp": "gp_resample",
+        "gpmean": "gp_resample",
+        "gp_resample": "gp_resample",
+        "fixed": "fixed_hist",
+        "hist": "fixed_hist",
+        "fixed_hist": "fixed_hist",
+    }
+    if mode not in aliases:
+        raise ValueError(
+            "inj_background_mode must be one of 'gp_resample' or 'fixed_hist' "
+            f"(got {mode!r})"
+        )
+    return aliases[mode]
+
+
+def _fixed_hist_background_counts(y_full: np.ndarray, *, dataset_key: str, mass: float) -> np.ndarray:
+    """Return integer source-histogram counts for fixed-histogram refit toys."""
+    y = np.asarray(y_full, float).reshape(-1)
+    if y.size == 0:
+        raise ValueError(f"[inj][{dataset_key}] m={float(mass):.6g}: fixed_hist source histogram is empty")
+    if not np.all(np.isfinite(y)):
+        raise ValueError(f"[inj][{dataset_key}] m={float(mass):.6g}: fixed_hist source histogram has nonfinite bins")
+    if np.any(y < -1e-6):
+        raise ValueError(f"[inj][{dataset_key}] m={float(mass):.6g}: fixed_hist source histogram has negative bins")
+    rounded = np.rint(np.clip(y, 0.0, None))
+    if not np.allclose(np.clip(y, 0.0, None), rounded, atol=1e-6, rtol=0.0):
+        raise ValueError(
+            f"[inj][{dataset_key}] m={float(mass):.6g}: "
+            "inj_background_mode='fixed_hist' requires integer-like source histogram counts"
+        )
+    return rounded.astype(int)
+
+
 def _dataset_kernel_factor(config: "Config", ds_key: str, base_attr: str, by_attr: str) -> float:
     """Resolve a scalar kernel-factor knob after per-dataset overrides."""
     by_ds = dict(getattr(config, by_attr, {}) or {})
@@ -222,6 +276,165 @@ def _gpr_fit_diagnostics(gpr: Any) -> Dict[str, float]:
     except Exception:
         pass
     return out
+
+
+_KERNEL_LOCK_CACHE: Dict[str, Dict[Tuple[str, float], Tuple[float, float]]] = {}
+
+
+def _resolve_refit_kernel_lock_mode(config: "Config") -> str:
+    """Normalize the requested refit kernel-lock diagnostic mode."""
+    raw = str(getattr(config, "inj_refit_kernel_lock_mode", "none") or "none").lower().strip()
+    aliases = {
+        "": "none",
+        "none": "none",
+        "off": "none",
+        "false": "none",
+        "initial": "initial_fit",
+        "initial_fit": "initial_fit",
+        "preinj": "initial_fit",
+        "pre_injection": "initial_fit",
+        "ensemble": "ensemble_file",
+        "ensemble_file": "ensemble_file",
+        "file": "ensemble_file",
+    }
+    if raw not in aliases:
+        raise ValueError(
+            "inj_refit_kernel_lock_mode must be one of "
+            "'none', 'initial_fit', or 'ensemble_file'"
+        )
+    return aliases[raw]
+
+
+def _kernel_value_columns(df: pd.DataFrame) -> Tuple[str, str]:
+    """Return best-effort constant and length-scale columns from a lock table."""
+    const_candidates = ("const_opt", "initial_const_opt", "refit_const_opt")
+    ls_candidates = ("ls_opt", "initial_ls_opt", "refit_ls_opt")
+    const_col = next((c for c in const_candidates if c in df.columns), "")
+    ls_col = next((c for c in ls_candidates if c in df.columns), "")
+    if not const_col or not ls_col:
+        raise ValueError(
+            "Kernel-lock ensemble file must contain constant and length-scale columns "
+            f"(looked for {const_candidates} and {ls_candidates})"
+        )
+    return const_col, ls_col
+
+
+def _load_kernel_lock_file(path: str) -> Dict[Tuple[str, float], Tuple[float, float]]:
+    """Load median fixed-kernel values keyed by (dataset, rounded mass)."""
+    resolved = os.path.abspath(os.path.expanduser(str(path)))
+    if resolved in _KERNEL_LOCK_CACHE:
+        return _KERNEL_LOCK_CACHE[resolved]
+    if not resolved or not os.path.exists(resolved):
+        raise FileNotFoundError(f"inj_refit_kernel_lock_file does not exist: {path}")
+
+    df = pd.read_csv(resolved)
+    if df.empty:
+        raise ValueError(f"Kernel-lock ensemble file is empty: {path}")
+    if "dataset" not in df.columns or "mass_GeV" not in df.columns:
+        raise ValueError("Kernel-lock ensemble file must contain dataset and mass_GeV columns")
+
+    const_col, ls_col = _kernel_value_columns(df)
+    work = df[["dataset", "mass_GeV", const_col, ls_col]].copy()
+    work["dataset"] = work["dataset"].astype(str)
+    work["mass_key"] = pd.to_numeric(work["mass_GeV"], errors="coerce").round(12)
+    work["const_val"] = pd.to_numeric(work[const_col], errors="coerce")
+    work["ls_val"] = pd.to_numeric(work[ls_col], errors="coerce")
+    work = work[
+        np.isfinite(work["mass_key"].to_numpy(float))
+        & np.isfinite(work["const_val"].to_numpy(float))
+        & np.isfinite(work["ls_val"].to_numpy(float))
+        & (work["const_val"].to_numpy(float) > 0.0)
+        & (work["ls_val"].to_numpy(float) > 0.0)
+    ]
+    if work.empty:
+        raise ValueError(f"Kernel-lock ensemble file has no usable finite rows: {path}")
+
+    med = (
+        work.groupby(["dataset", "mass_key"], dropna=False)[["const_val", "ls_val"]]
+        .median()
+        .reset_index()
+    )
+    out = {
+        (str(row["dataset"]), float(row["mass_key"])): (
+            float(row["const_val"]),
+            float(row["ls_val"]),
+        )
+        for _, row in med.iterrows()
+    }
+    _KERNEL_LOCK_CACHE[resolved] = out
+    return out
+
+
+def _resolve_refit_kernel_lock_values(
+    config: "Config",
+    *,
+    dataset_key: str,
+    mass: float,
+    initial_const_opt: float,
+    initial_ls_opt: float,
+) -> Tuple[str, float, float]:
+    """Resolve fixed-kernel diagnostic values for one dataset/mass point."""
+    mode = _resolve_refit_kernel_lock_mode(config)
+    if mode == "none":
+        return mode, float("nan"), float("nan")
+    if mode == "initial_fit":
+        const = float(initial_const_opt)
+        ls = float(initial_ls_opt)
+    else:
+        path = str(getattr(config, "inj_refit_kernel_lock_file", "") or "").strip()
+        table = _load_kernel_lock_file(path)
+        key = (str(dataset_key), float(np.round(float(mass), 12)))
+        if key not in table:
+            raise KeyError(
+                f"No kernel-lock row for dataset={dataset_key!r}, mass_GeV={float(mass):.12g}"
+            )
+        const, ls = table[key]
+    make_fixed_kernel(const, ls)
+    return mode, float(const), float(ls)
+
+
+def _kernel_for_refit(
+    *,
+    base_kernel: Any,
+    lock_mode: str,
+    lock_const_opt: float,
+    lock_ls_opt: float,
+) -> Tuple[Any, bool]:
+    """Return the refit kernel and whether sklearn optimization should run."""
+    if str(lock_mode) == "none":
+        return base_kernel, True
+    return make_fixed_kernel(lock_const_opt, lock_ls_opt), False
+
+
+def _signal_tail_alpha_multiplier(
+    tmpl_full: np.ndarray,
+    msk_train: np.ndarray,
+    *,
+    scale: float,
+    threshold: float,
+) -> Tuple[Optional[np.ndarray], Dict[str, float]]:
+    """Build a training-bin alpha multiplier from full-template tail weights.
+
+    This is diagnostic-only: bins with signal-template weight above threshold get
+    inflated alpha, making them less influential in the sideband refit.
+    """
+    scale = float(scale)
+    threshold = float(threshold)
+    stats = dict(n_bins=0.0, max=1.0, mean=1.0)
+    if not np.isfinite(scale) or scale <= 0.0 or not np.isfinite(threshold) or threshold <= 0.0:
+        return None, stats
+
+    train_weights = np.asarray(tmpl_full, float).reshape(-1)[np.asarray(msk_train, bool).reshape(-1)]
+    mult = np.ones_like(train_weights, dtype=float)
+    affected = np.isfinite(train_weights) & (train_weights > threshold)
+    if np.any(affected):
+        mult[affected] += scale * ((train_weights[affected] / threshold) - 1.0)
+    stats = dict(
+        n_bins=float(np.count_nonzero(affected)),
+        max=float(np.max(mult)) if mult.size else 1.0,
+        mean=float(np.mean(mult)) if mult.size else 1.0,
+    )
+    return mult, stats
 
 
 def _handle_refit_failure(config: "Config", label: str, exc: Exception) -> str:
@@ -391,6 +604,7 @@ def run_injection_extraction_toys(
         inj_shape_mode = "full"
     if train_exclude_nsigma is None:
         train_exclude_nsigma = getattr(config, "inj_train_exclude_nsigma", None)
+    inj_background_mode = _resolve_inj_background_mode(config, refit_gp_on_toy=bool(refit_gp_on_toy))
 
     mvn_method = str(getattr(config, "mvn_trunc_method", "reject_then_clip"))
     mvn_max_tries = int(getattr(config, "mvn_trunc_max_tries", 80))
@@ -464,18 +678,42 @@ def run_injection_extraction_toys(
         f_train = float(np.sum(tmpl_full[msk_train])) if tmpl_full.shape[0] == x_full.shape[0] else float("nan")
         f_train_frac = float(f_train / f_full) if np.isfinite(f_train) and f_full > 0 else float("nan")
 
-        toy_mode = "full_refit" if refit_gp_on_toy else "conditional_gp"
+        lock_mode, lock_const_opt, lock_ls_opt = ("none", float("nan"), float("nan"))
+        tail_alpha_multiplier, tail_alpha_stats = _signal_tail_alpha_multiplier(
+            tmpl_full,
+            msk_train,
+            scale=float(getattr(config, "inj_refit_signal_tail_alpha_scale", 0.0)),
+            threshold=float(getattr(config, "inj_refit_signal_tail_alpha_threshold", 0.0)),
+        )
+        if refit_gp_on_toy:
+            lock_mode, lock_const_opt, lock_ls_opt = _resolve_refit_kernel_lock_values(
+                config,
+                dataset_key=str(ds.key),
+                mass=float(m),
+                initial_const_opt=float(initial_const_opt),
+                initial_ls_opt=float(initial_ls_opt),
+            )
+
+        if refit_gp_on_toy:
+            toy_mode = "full_refit"
+        elif inj_background_mode == "fixed_hist":
+            toy_mode = "fixed_hist_no_refit"
+        else:
+            toy_mode = "conditional_gp"
 
         if refit_gp_on_toy:
             mu_full_arr = np.asarray(pred.mu_full, float).reshape(-1)
+            y_full_arr = _prediction_y_full(pred)
             ker = make_kernel_for_dataset(ds, config, mass=m)
             x_win = x_full[msk_blind]
-        else:
+        elif inj_background_mode != "fixed_hist":
             b_draws = draw_bkg_mvn_nonneg(
                 pred.mu, pred.cov, int(n_toys) * len(strength_tags),
                 rng, method=mvn_method, max_tries=mvn_max_tries,
             )
             draw_idx = 0
+        else:
+            y_full_arr = _prediction_y_full(pred)
 
         for A_inj, inj_nsigma in zip(A_inj_list, inj_nsigma_list):
             A_inj = float(A_inj)
@@ -487,7 +725,10 @@ def run_injection_extraction_toys(
                 refit_diag = dict(refit_ls_opt=float("nan"), refit_const_opt=float("nan"))
 
                 if refit_gp_on_toy:
-                    bkg_full = rng.poisson(np.clip(mu_full_arr, 0.0, None)).astype(int)
+                    if inj_background_mode == "fixed_hist":
+                        bkg_full = _fixed_hist_background_counts(y_full_arr, dataset_key=str(ds.key), mass=float(m))
+                    else:
+                        bkg_full = rng.poisson(np.clip(mu_full_arr, 0.0, None)).astype(int)
                     if inj_shape_mode == "window":
                         sig_full = np.zeros_like(bkg_full, dtype=int)
                         s_win, Nsig_win, _ = _inject_counts_from_template(tmpl_win, A_inj, rng, inj_mode)
@@ -509,7 +750,20 @@ def run_injection_extraction_toys(
                     try:
                         X_tr = x_full[msk_train]
                         y_tr = y_toy[msk_train].astype(float)
-                        gpr = fit_gpr(X_tr, y_tr, config, restarts=refit_restarts, kernel=ker, optimize=refit_optimize)
+                        ker_fit, optimize_allowed = _kernel_for_refit(
+                            base_kernel=ker,
+                            lock_mode=lock_mode,
+                            lock_const_opt=lock_const_opt,
+                            lock_ls_opt=lock_ls_opt,
+                        )
+                        fit_kwargs = dict(
+                            restarts=refit_restarts,
+                            kernel=ker_fit,
+                            optimize=bool(refit_optimize) and bool(optimize_allowed),
+                        )
+                        if tail_alpha_multiplier is not None:
+                            fit_kwargs["alpha_multiplier"] = tail_alpha_multiplier
+                        gpr = fit_gpr(X_tr, y_tr, config, **fit_kwargs)
                         mu_fit, cov_fit = predict_counts_from_log_gpr(gpr, x_win, config)
                         diag = _gpr_fit_diagnostics(gpr)
                         refit_diag.update(
@@ -527,12 +781,27 @@ def run_injection_extraction_toys(
                         )
 
                 else:
-                    b = b_draws[draw_idx % b_draws.shape[0]]
-                    draw_idx += 1
-                    sig, Nsig_win, _ = _inject_counts_from_template(tmpl_win, A_inj, rng, inj_mode)
-                    lam = np.clip(b, 0.0, None) + np.clip(sig.astype(float), 0.0, None)
-                    obs = rng.poisson(lam).astype(int)
-                    Nsig_train = 0
+                    if inj_background_mode == "fixed_hist":
+                        bkg_full = _fixed_hist_background_counts(y_full_arr, dataset_key=str(ds.key), mass=float(m))
+                        if inj_shape_mode == "window":
+                            sig_full = np.zeros_like(bkg_full, dtype=int)
+                            sig, Nsig_win, _ = _inject_counts_from_template(tmpl_win, A_inj, rng, inj_mode)
+                            idx_blind = np.where(msk_blind)[0]
+                            n = min(len(sig), len(idx_blind))
+                            sig_full[idx_blind[:n]] = sig[:n]
+                        else:
+                            s_full, _, _ = _inject_counts_from_template(tmpl_full, A_inj, rng, inj_mode)
+                            sig_full = np.asarray(s_full, dtype=int)
+                            Nsig_win = int(np.sum(sig_full[msk_blind]))
+                        obs = (bkg_full + sig_full)[msk_blind].astype(int)
+                        Nsig_train = int(np.sum(sig_full[msk_train]))
+                    else:
+                        b = b_draws[draw_idx % b_draws.shape[0]]
+                        draw_idx += 1
+                        sig, Nsig_win, _ = _inject_counts_from_template(tmpl_win, A_inj, rng, inj_mode)
+                        lam = np.clip(b, 0.0, None) + np.clip(sig.astype(float), 0.0, None)
+                        obs = rng.poisson(lam).astype(int)
+                        Nsig_train = 0
                     mu_fit, cov_fit = pred.mu, pred.cov
 
                 ls_opt_effective = (
@@ -581,6 +850,7 @@ def run_injection_extraction_toys(
                     blind_nsigma=float(config.blind_nsigma), train_exclude_nsigma=float(tn),
                     signal_model=str(getattr(config, "signal_model", "default")),
                     inj_shape_mode=inj_shape_mode,
+                    inj_background_mode=str(inj_background_mode),
                     A_hat=float(A_hat), sigma_A=float(sigma_A),
                     Zhat=float(Zhat), pull_param=float(pull),
                     Nsig_win=int(Nsig_win), Nsig_train=int(Nsig_train),
@@ -588,6 +858,14 @@ def run_injection_extraction_toys(
                     toy_mode=toy_mode, refit_gp_on_toy=bool(refit_gp_on_toy),
                     refit_ok=float(refit_ok), refit_restarts=int(refit_restarts),
                     refit_optimize=bool(refit_optimize),
+                    refit_kernel_lock_mode=str(lock_mode),
+                    refit_lock_const_opt=float(lock_const_opt),
+                    refit_lock_ls_opt=float(lock_ls_opt),
+                    refit_tail_alpha_scale=float(getattr(config, "inj_refit_signal_tail_alpha_scale", 0.0)),
+                    refit_tail_alpha_threshold=float(getattr(config, "inj_refit_signal_tail_alpha_threshold", 0.0)),
+                    refit_tail_alpha_n_bins=int(tail_alpha_stats["n_bins"]),
+                    refit_tail_alpha_max=float(tail_alpha_stats["max"]),
+                    refit_tail_alpha_mean=float(tail_alpha_stats["mean"]),
                     refit_fallback_used=bool(refit_fallback_used),
                     refit_error=str(refit_error),
                 )
@@ -616,6 +894,7 @@ class _InjectionMassContext:
     mu: np.ndarray
     cov: np.ndarray
     mu_full: np.ndarray
+    y_full: np.ndarray
     x_full: np.ndarray
     msk_blind: np.ndarray
     msk_train: np.ndarray
@@ -647,12 +926,22 @@ class _InjectionMassContext:
     signal_model: str
     inj_mode: str
     inj_shape_mode: str
+    inj_background_mode: str
     refit_gp_on_toy: bool
     refit_restarts: int
     refit_optimize: bool
     allow_negative: bool
     mvn_method: str
     mvn_max_tries: int
+    refit_kernel_lock_mode: str = "none"
+    refit_lock_const_opt: float = float("nan")
+    refit_lock_ls_opt: float = float("nan")
+    refit_tail_alpha_scale: float = 0.0
+    refit_tail_alpha_threshold: float = 0.0
+    refit_tail_alpha_multiplier: Optional[np.ndarray] = None
+    refit_tail_alpha_n_bins: int = 0
+    refit_tail_alpha_max: float = 1.0
+    refit_tail_alpha_mean: float = 1.0
 
 
 @dataclass
@@ -669,6 +958,15 @@ class _ToyPointAccumulator:
     f_train_frac: float
     kernel_ls_policy: str = ""
     signal_model: str = ""
+    inj_background_mode: str = ""
+    refit_kernel_lock_mode: str = "none"
+    refit_lock_const_opt: float = float("nan")
+    refit_lock_ls_opt: float = float("nan")
+    refit_tail_alpha_scale: float = 0.0
+    refit_tail_alpha_threshold: float = 0.0
+    refit_tail_alpha_n_bins: int = 0
+    refit_tail_alpha_max: float = 1.0
+    refit_tail_alpha_mean: float = 1.0
     kernel_ls_res_lower_factor: float = float("nan")
     kernel_ls_res_upper_factor: float = float("nan")
     ls_lo: float = float("nan")
@@ -753,6 +1051,15 @@ class _ToyPointAccumulator:
             f_train_frac=float(self.f_train_frac),
             kernel_ls_policy=str(self.kernel_ls_policy),
             signal_model=str(getattr(self, "signal_model", "")),
+            inj_background_mode=str(getattr(self, "inj_background_mode", "")),
+            refit_kernel_lock_mode=str(getattr(self, "refit_kernel_lock_mode", "none")),
+            refit_lock_const_opt=float(getattr(self, "refit_lock_const_opt", float("nan"))),
+            refit_lock_ls_opt=float(getattr(self, "refit_lock_ls_opt", float("nan"))),
+            refit_tail_alpha_scale=float(getattr(self, "refit_tail_alpha_scale", 0.0)),
+            refit_tail_alpha_threshold=float(getattr(self, "refit_tail_alpha_threshold", 0.0)),
+            refit_tail_alpha_n_bins=int(getattr(self, "refit_tail_alpha_n_bins", 0)),
+            refit_tail_alpha_max=float(getattr(self, "refit_tail_alpha_max", 1.0)),
+            refit_tail_alpha_mean=float(getattr(self, "refit_tail_alpha_mean", 1.0)),
             kernel_ls_res_lower_factor=float(self.kernel_ls_res_lower_factor),
             kernel_ls_res_upper_factor=float(self.kernel_ls_res_upper_factor),
             ls_lo=float(self.ls_lo),
@@ -872,7 +1179,12 @@ def _simulate_toy_rows_chunk(
         return []
 
     out_rows: List[Dict[str, Any]] = []
-    toy_mode = "full_refit" if bool(ctx.refit_gp_on_toy) else "conditional_gp"
+    if bool(ctx.refit_gp_on_toy):
+        toy_mode = "full_refit"
+    elif str(ctx.inj_background_mode) == "fixed_hist":
+        toy_mode = "fixed_hist_no_refit"
+    else:
+        toy_mode = "conditional_gp"
 
     with _threadpool_limits(limits=int(max(1, threads_per_worker))):
         ker = make_kernel_for_dataset(ctx.ds, config, mass=float(ctx.mass)) if bool(ctx.refit_gp_on_toy) else None
@@ -885,7 +1197,14 @@ def _simulate_toy_rows_chunk(
             refit_diag = dict(refit_ls_opt=float("nan"), refit_const_opt=float("nan"))
 
             if bool(ctx.refit_gp_on_toy):
-                bkg_full = rng.poisson(np.clip(ctx.mu_full, 0.0, None)).astype(int)
+                if str(ctx.inj_background_mode) == "fixed_hist":
+                    bkg_full = _fixed_hist_background_counts(
+                        ctx.y_full,
+                        dataset_key=str(ctx.ds.key),
+                        mass=float(ctx.mass),
+                    )
+                else:
+                    bkg_full = rng.poisson(np.clip(ctx.mu_full, 0.0, None)).astype(int)
                 if str(ctx.inj_shape_mode) == "window":
                     sig_full = np.zeros_like(bkg_full, dtype=int)
                     s_win, Nsig_win, _ = _inject_counts_from_template(ctx.tmpl_win, A_inj, rng, ctx.inj_mode)
@@ -905,13 +1224,24 @@ def _simulate_toy_rows_chunk(
                 try:
                     X_tr = ctx.x_full[ctx.msk_train]
                     y_tr = y_toy[ctx.msk_train].astype(float)
+                    ker_fit, optimize_allowed = _kernel_for_refit(
+                        base_kernel=ker,
+                        lock_mode=str(ctx.refit_kernel_lock_mode),
+                        lock_const_opt=float(ctx.refit_lock_const_opt),
+                        lock_ls_opt=float(ctx.refit_lock_ls_opt),
+                    )
+                    fit_kwargs = dict(
+                        restarts=int(ctx.refit_restarts),
+                        kernel=ker_fit,
+                        optimize=bool(ctx.refit_optimize) and bool(optimize_allowed),
+                    )
+                    if ctx.refit_tail_alpha_multiplier is not None:
+                        fit_kwargs["alpha_multiplier"] = ctx.refit_tail_alpha_multiplier
                     gpr = fit_gpr(
                         X_tr,
                         y_tr,
                         config,
-                        restarts=int(ctx.refit_restarts),
-                        kernel=ker,
-                        optimize=bool(ctx.refit_optimize),
+                        **fit_kwargs,
                     )
                     mu_fit, cov_fit = predict_counts_from_log_gpr(gpr, x_win, config)
                     diag = _gpr_fit_diagnostics(gpr)
@@ -929,18 +1259,37 @@ def _simulate_toy_rows_chunk(
                         exc,
                     )
             else:
-                b = draw_bkg_mvn_nonneg(
-                    ctx.mu,
-                    ctx.cov,
-                    1,
-                    rng,
-                    method=str(ctx.mvn_method),
-                    max_tries=int(ctx.mvn_max_tries),
-                )[0]
-                sig, Nsig_win, _ = _inject_counts_from_template(ctx.tmpl_win, A_inj, rng, ctx.inj_mode)
-                lam = np.clip(b, 0.0, None) + np.clip(sig.astype(float), 0.0, None)
-                obs = rng.poisson(lam).astype(int)
-                Nsig_train = 0
+                if str(ctx.inj_background_mode) == "fixed_hist":
+                    bkg_full = _fixed_hist_background_counts(
+                        ctx.y_full,
+                        dataset_key=str(ctx.ds.key),
+                        mass=float(ctx.mass),
+                    )
+                    if str(ctx.inj_shape_mode) == "window":
+                        sig_full = np.zeros_like(bkg_full, dtype=int)
+                        sig, Nsig_win, _ = _inject_counts_from_template(ctx.tmpl_win, A_inj, rng, ctx.inj_mode)
+                        idx_blind = np.where(ctx.msk_blind)[0]
+                        n = min(len(sig), len(idx_blind))
+                        sig_full[idx_blind[:n]] = sig[:n]
+                    else:
+                        s_full, _, _ = _inject_counts_from_template(ctx.tmpl_full, A_inj, rng, ctx.inj_mode)
+                        sig_full = np.asarray(s_full, dtype=int)
+                        Nsig_win = int(np.sum(sig_full[ctx.msk_blind]))
+                    obs = (bkg_full + sig_full)[ctx.msk_blind].astype(int)
+                    Nsig_train = int(np.sum(sig_full[ctx.msk_train]))
+                else:
+                    b = draw_bkg_mvn_nonneg(
+                        ctx.mu,
+                        ctx.cov,
+                        1,
+                        rng,
+                        method=str(ctx.mvn_method),
+                        max_tries=int(ctx.mvn_max_tries),
+                    )[0]
+                    sig, Nsig_win, _ = _inject_counts_from_template(ctx.tmpl_win, A_inj, rng, ctx.inj_mode)
+                    lam = np.clip(b, 0.0, None) + np.clip(sig.astype(float), 0.0, None)
+                    obs = rng.poisson(lam).astype(int)
+                    Nsig_train = 0
                 mu_fit, cov_fit = ctx.mu, ctx.cov
 
             ls_opt_effective = (
@@ -1001,6 +1350,7 @@ def _simulate_toy_rows_chunk(
                 train_exclude_nsigma=float(ctx.train_exclude_nsigma),
                 signal_model=str(ctx.signal_model),
                 inj_shape_mode=str(ctx.inj_shape_mode),
+                inj_background_mode=str(ctx.inj_background_mode),
                 A_hat=float(A_hat),
                 sigma_A=float(sigma_A),
                 Zhat=float(Zhat),
@@ -1014,6 +1364,14 @@ def _simulate_toy_rows_chunk(
                 refit_ok=float(refit_ok),
                 refit_restarts=int(ctx.refit_restarts),
                 refit_optimize=bool(ctx.refit_optimize),
+                refit_kernel_lock_mode=str(ctx.refit_kernel_lock_mode),
+                refit_lock_const_opt=float(ctx.refit_lock_const_opt),
+                refit_lock_ls_opt=float(ctx.refit_lock_ls_opt),
+                refit_tail_alpha_scale=float(ctx.refit_tail_alpha_scale),
+                refit_tail_alpha_threshold=float(ctx.refit_tail_alpha_threshold),
+                refit_tail_alpha_n_bins=int(ctx.refit_tail_alpha_n_bins),
+                refit_tail_alpha_max=float(ctx.refit_tail_alpha_max),
+                refit_tail_alpha_mean=float(ctx.refit_tail_alpha_mean),
                 refit_fallback_used=bool(refit_fallback_used),
                 refit_error=str(refit_error),
             )
@@ -1103,6 +1461,7 @@ def _build_injection_mass_context(
     refit_restarts: int,
     refit_optimize: bool,
     inj_shape_mode: str,
+    inj_background_mode: str,
     train_exclude_nsigma: Optional[float],
     mvn_method: str,
     mvn_max_tries: int,
@@ -1146,12 +1505,29 @@ def _build_injection_mass_context(
     f_train = float(np.sum(tmpl_full[msk_train])) if tmpl_full.shape[0] == x_full.shape[0] else float("nan")
     f_train_frac = float(f_train / f_full) if np.isfinite(f_train) and f_full > 0 else float("nan")
 
+    lock_mode, lock_const_opt, lock_ls_opt = ("none", float("nan"), float("nan"))
+    tail_alpha_multiplier, tail_alpha_stats = _signal_tail_alpha_multiplier(
+        tmpl_full,
+        msk_train,
+        scale=float(getattr(config, "inj_refit_signal_tail_alpha_scale", 0.0)),
+        threshold=float(getattr(config, "inj_refit_signal_tail_alpha_threshold", 0.0)),
+    )
+    if bool(refit_gp_on_toy):
+        lock_mode, lock_const_opt, lock_ls_opt = _resolve_refit_kernel_lock_values(
+            config,
+            dataset_key=str(ds.key),
+            mass=float(mass),
+            initial_const_opt=float(initial_const_opt),
+            initial_ls_opt=float(initial_ls_opt),
+        )
+
     return _InjectionMassContext(
         ds=ds,
         mass=float(mass),
         mu=np.asarray(pred.mu, float),
         cov=np.asarray(pred.cov, float),
         mu_full=np.asarray(pred.mu_full, float).reshape(-1),
+        y_full=_prediction_y_full(pred),
         x_full=x_full,
         msk_blind=msk_blind,
         msk_train=msk_train,
@@ -1183,12 +1559,22 @@ def _build_injection_mass_context(
         signal_model=str(getattr(config, "signal_model", "default")),
         inj_mode=str(inj_mode),
         inj_shape_mode=str(inj_shape_mode),
+        inj_background_mode=str(inj_background_mode),
         refit_gp_on_toy=bool(refit_gp_on_toy),
         refit_restarts=int(refit_restarts),
         refit_optimize=bool(refit_optimize),
         allow_negative=bool(getattr(config, "extract_allow_negative", True)),
         mvn_method=str(mvn_method),
         mvn_max_tries=int(mvn_max_tries),
+        refit_kernel_lock_mode=str(lock_mode),
+        refit_lock_const_opt=float(lock_const_opt),
+        refit_lock_ls_opt=float(lock_ls_opt),
+        refit_tail_alpha_scale=float(getattr(config, "inj_refit_signal_tail_alpha_scale", 0.0)),
+        refit_tail_alpha_threshold=float(getattr(config, "inj_refit_signal_tail_alpha_threshold", 0.0)),
+        refit_tail_alpha_multiplier=tail_alpha_multiplier,
+        refit_tail_alpha_n_bins=int(tail_alpha_stats["n_bins"]),
+        refit_tail_alpha_max=float(tail_alpha_stats["max"]),
+        refit_tail_alpha_mean=float(tail_alpha_stats["mean"]),
     )
 
 
@@ -1315,7 +1701,7 @@ def run_funcform_injection_extraction_toys(
             )
             f_train_frac = float(f_train / f_full) if np.isfinite(f_train) and f_full > 0 else float("nan")
 
-            y_full_base = np.rint(np.clip(np.asarray(pred.y_full, float).reshape(-1), 0.0, None)).astype(int)
+            y_full_base = np.rint(np.clip(_prediction_y_full(pred), 0.0, None)).astype(int)
             if bool(refit_gp_on_toy):
                 ker = make_kernel_for_dataset(ds, config, mass=float(m))
                 x_win = x_full[msk_blind]
@@ -1494,6 +1880,7 @@ def run_injection_extraction_streaming(
         inj_shape_mode = "full"
     if train_exclude_nsigma is None:
         train_exclude_nsigma = getattr(config, "inj_train_exclude_nsigma", None)
+    inj_background_mode = _resolve_inj_background_mode(config, refit_gp_on_toy=bool(refit_gp_on_toy))
 
     mvn_method = str(getattr(config, "mvn_trunc_method", "reject_then_clip"))
     mvn_max_tries = int(getattr(config, "mvn_trunc_max_tries", 80))
@@ -1522,6 +1909,7 @@ def run_injection_extraction_streaming(
             refit_restarts=int(refit_restarts),
             refit_optimize=bool(refit_optimize),
             inj_shape_mode=str(inj_shape_mode),
+            inj_background_mode=str(inj_background_mode),
             train_exclude_nsigma=train_exclude_nsigma,
             mvn_method=str(mvn_method),
             mvn_max_tries=int(mvn_max_tries),
@@ -1549,6 +1937,15 @@ def run_injection_extraction_streaming(
                 f_train_frac=float(ctx.f_train_frac),
                 kernel_ls_policy=str(ctx.kernel_ls_policy),
                 signal_model=str(ctx.signal_model),
+                inj_background_mode=str(ctx.inj_background_mode),
+                refit_kernel_lock_mode=str(ctx.refit_kernel_lock_mode),
+                refit_lock_const_opt=float(ctx.refit_lock_const_opt),
+                refit_lock_ls_opt=float(ctx.refit_lock_ls_opt),
+                refit_tail_alpha_scale=float(ctx.refit_tail_alpha_scale),
+                refit_tail_alpha_threshold=float(ctx.refit_tail_alpha_threshold),
+                refit_tail_alpha_n_bins=int(ctx.refit_tail_alpha_n_bins),
+                refit_tail_alpha_max=float(ctx.refit_tail_alpha_max),
+                refit_tail_alpha_mean=float(ctx.refit_tail_alpha_mean),
                 kernel_ls_res_lower_factor=float(ctx.kernel_ls_res_lower_factor),
                 kernel_ls_res_upper_factor=float(ctx.kernel_ls_res_upper_factor),
                 ls_lo=float(ctx.ls_lo),
@@ -1617,6 +2014,7 @@ def _combine_toy_rows(rows: List[Dict[str, Any]], *, mass: float, toy_idx: int) 
     st = np.array([float(r.get("strength", np.nan)) for r in valid], float)
     zinj = np.array([float(r.get("inj_nsigma", np.nan)) for r in valid], float)
     sref = np.array([float(r.get("sigmaA_ref", np.nan)) for r in valid], float)
+    bg_modes = sorted({str(r.get("inj_background_mode", "")) for r in valid if str(r.get("inj_background_mode", ""))})
 
     A_hat = float(np.nansum(w * ah) / sum_w)
     sigma_A = float(1.0 / np.sqrt(sum_w))
@@ -1639,6 +2037,7 @@ def _combine_toy_rows(rows: List[Dict[str, Any]], *, mass: float, toy_idx: int) 
         Zhat=float(zhat),
         n_contrib=int(len(valid)),
         contrib_datasets="+".join(sorted({str(r.get("dataset", "")) for r in valid})),
+        inj_background_mode="+".join(bg_modes),
         success=bool(all(bool(r.get("success", False)) for r in valid)),
     )
 
@@ -1708,6 +2107,7 @@ def run_injection_extraction_streaming_combined(
         inj_shape_mode = "full"
     if train_exclude_nsigma is None:
         train_exclude_nsigma = getattr(config, "inj_train_exclude_nsigma", None)
+    inj_background_mode = _resolve_inj_background_mode(config, refit_gp_on_toy=bool(refit_gp_on_toy))
 
     mvn_method = str(getattr(config, "mvn_trunc_method", "reject_then_clip"))
     mvn_max_tries = int(getattr(config, "mvn_trunc_max_tries", 80))
@@ -1732,6 +2132,7 @@ def run_injection_extraction_streaming_combined(
                 refit_restarts=int(refit_restarts),
                 refit_optimize=bool(refit_optimize),
                 inj_shape_mode=str(inj_shape_mode),
+                inj_background_mode=str(inj_background_mode),
                 train_exclude_nsigma=train_exclude_nsigma,
                 mvn_method=str(mvn_method),
                 mvn_max_tries=int(mvn_max_tries),
@@ -1803,6 +2204,15 @@ def run_injection_extraction_streaming_combined(
                     n_train_high=int(ctxs_m[ds_key].n_train_high),
                     n_blind=int(ctxs_m[ds_key].n_blind),
                     signal_model=str(ctxs_m[ds_key].signal_model),
+                    inj_background_mode=str(ctxs_m[ds_key].inj_background_mode),
+                    refit_kernel_lock_mode=str(ctxs_m[ds_key].refit_kernel_lock_mode),
+                    refit_lock_const_opt=float(ctxs_m[ds_key].refit_lock_const_opt),
+                    refit_lock_ls_opt=float(ctxs_m[ds_key].refit_lock_ls_opt),
+                    refit_tail_alpha_scale=float(ctxs_m[ds_key].refit_tail_alpha_scale),
+                    refit_tail_alpha_threshold=float(ctxs_m[ds_key].refit_tail_alpha_threshold),
+                    refit_tail_alpha_n_bins=int(ctxs_m[ds_key].refit_tail_alpha_n_bins),
+                    refit_tail_alpha_max=float(ctxs_m[ds_key].refit_tail_alpha_max),
+                    refit_tail_alpha_mean=float(ctxs_m[ds_key].refit_tail_alpha_mean),
                 )
                 for ds_key in ctxs_m.keys()
             }
@@ -1830,6 +2240,7 @@ def run_injection_extraction_streaming_combined(
                         A_per_eps2_unit=float("nan"),
                         f_win=float("nan"),
                         f_train_frac=float("nan"),
+                        inj_background_mode=str(inj_background_mode),
                     )
                 else:
                     can_combine = False
@@ -2195,6 +2606,19 @@ def summarize_injection_grid(df_toys: pd.DataFrame) -> pd.DataFrame:
             f_train_frac=_mean_col(sub, "f_train_frac"),
             kernel_ls_policy=_first_col(sub, "kernel_ls_policy"),
             signal_model=_first_col(sub, "signal_model"),
+            inj_background_mode=_first_col(sub, "inj_background_mode"),
+            refit_kernel_lock_mode=_first_col(sub, "refit_kernel_lock_mode"),
+            refit_lock_const_opt=_mean_col(sub, "refit_lock_const_opt"),
+            refit_lock_ls_opt=_mean_col(sub, "refit_lock_ls_opt"),
+            refit_tail_alpha_scale=_mean_col(sub, "refit_tail_alpha_scale"),
+            refit_tail_alpha_threshold=_mean_col(sub, "refit_tail_alpha_threshold"),
+            refit_tail_alpha_n_bins=(
+                int(round(_mean_col(sub, "refit_tail_alpha_n_bins")))
+                if np.isfinite(_mean_col(sub, "refit_tail_alpha_n_bins"))
+                else 0
+            ),
+            refit_tail_alpha_max=_mean_col(sub, "refit_tail_alpha_max"),
+            refit_tail_alpha_mean=_mean_col(sub, "refit_tail_alpha_mean"),
             kernel_ls_res_lower_factor=_mean_col(sub, "kernel_ls_res_lower_factor"),
             kernel_ls_res_upper_factor=_mean_col(sub, "kernel_ls_res_upper_factor"),
             ls_lo=_mean_col(sub, "ls_lo"),
@@ -2403,6 +2827,13 @@ def collapse_fragmented_injection_summary(df_sum: pd.DataFrame) -> pd.DataFrame:
             "refit_const_opt",
             "ls_opt",
             "const_opt",
+            "refit_lock_const_opt",
+            "refit_lock_ls_opt",
+            "refit_tail_alpha_scale",
+            "refit_tail_alpha_threshold",
+            "refit_tail_alpha_n_bins",
+            "refit_tail_alpha_max",
+            "refit_tail_alpha_mean",
             "refit_ok_rate",
             "refit_fallback_rate",
         ]:
@@ -2412,6 +2843,10 @@ def collapse_fragmented_injection_summary(df_sum: pd.DataFrame) -> pd.DataFrame:
             row["kernel_ls_policy"] = str(_first_col(sub, "kernel_ls_policy", ""))
         if "signal_model" in sub.columns:
             row["signal_model"] = str(_first_col(sub, "signal_model", ""))
+        if "inj_background_mode" in sub.columns:
+            row["inj_background_mode"] = str(_first_col(sub, "inj_background_mode", ""))
+        if "refit_kernel_lock_mode" in sub.columns:
+            row["refit_kernel_lock_mode"] = str(_first_col(sub, "refit_kernel_lock_mode", "none"))
         for col in ["n_train", "n_train_low", "n_train_high", "n_blind"]:
             if col in sub.columns:
                 val = _mean_col(sub, col)

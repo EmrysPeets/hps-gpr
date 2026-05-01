@@ -400,7 +400,12 @@ def _build_single_context(
     sigma_rng = np.random.default_rng(
         _stable_display_seed(int(getattr(config, "extraction_display_seed", 271828)), ds.key, float(mass), "sigmaA")
     )
-    sigmaA_ref = _sigmaA_reference(pred, float(mass), source=str(sigma_source), rng=sigma_rng, config=config)
+    try:
+        sigmaA_ref = _sigmaA_reference(pred, float(mass), source=str(sigma_source), rng=sigma_rng, config=config)
+    except TypeError as exc:
+        if "config" not in str(exc):
+            raise
+        sigmaA_ref = _sigmaA_reference(pred, float(mass), source=str(sigma_source), rng=sigma_rng)
     A_per_eps2_unit = float(A_from_epsilon2(ds, float(mass), 1.0, pred.integral_density))
 
     seed_cls = None

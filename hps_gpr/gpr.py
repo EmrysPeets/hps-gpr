@@ -322,15 +322,34 @@ def make_kernel_for_dataset(
     )
 
 
+def make_fixed_kernel(const_value: float, length_scale: float):
+    """Create a Constant*RBF kernel with both hyperparameters fixed."""
+    const = float(const_value)
+    ls = float(length_scale)
+    if not np.isfinite(const) or const <= 0.0:
+        raise ValueError(f"Fixed kernel constant must be positive and finite; got {const_value!r}")
+    if not np.isfinite(ls) or ls <= 0.0:
+        raise ValueError(f"Fixed kernel length scale must be positive and finite; got {length_scale!r}")
+    return (
+        skgp.kernels.ConstantKernel(const, constant_value_bounds="fixed")
+        * skgp.kernels.RBF(length_scale=ls, length_scale_bounds="fixed")
+    )
+
+
 def _extract_rbf_bounds_and_scale(kernel) -> Tuple[float, float, float]:
     """Return (ls_lo, ls_hi, ls_init) from a Constant*RBF kernel (best-effort)."""
     try:
         rbf = kernel.k2 if hasattr(kernel, "k2") else kernel
         b = getattr(rbf, "length_scale_bounds", None)
         ls = getattr(rbf, "length_scale", None)
-        if b is None or ls is None:
+        if ls is None:
             return float("nan"), float("nan"), float("nan")
-        return float(b[0]), float(b[1]), float(np.atleast_1d(ls)[0])
+        ls_val = float(np.atleast_1d(ls)[0])
+        if b is None:
+            return float("nan"), float("nan"), ls_val
+        if isinstance(b, str) and b == "fixed":
+            return ls_val, ls_val, ls_val
+        return float(b[0]), float(b[1]), ls_val
     except Exception:
         return float("nan"), float("nan"), float("nan")
 
@@ -360,6 +379,7 @@ def fit_gpr(
     kernel=None,
     *,
     optimize: bool = True,
+    alpha_multiplier: Optional[np.ndarray] = None,
 ) -> GaussianProcessRegressor:
     """Fit a Gaussian Process Regressor.
 
@@ -370,6 +390,7 @@ def fit_gpr(
         restarts: Number of optimizer restarts (defaults to config.n_restarts)
         kernel: Kernel to use; if None, config.get_kernel() is used
         optimize: If False, freeze hyperparameters (no optimizer)
+        alpha_multiplier: Optional per-training-bin factor applied to alpha
 
     Returns:
         Fitted GaussianProcessRegressor
@@ -378,6 +399,15 @@ def fit_gpr(
         restarts = config.n_restarts
 
     X_in, y_in, alpha = preprocess_xy_for_gpr(X_train, y_train, config)
+    if alpha_multiplier is not None:
+        mult = np.asarray(alpha_multiplier, dtype=float).reshape(-1)
+        if mult.size != alpha.size:
+            raise ValueError(
+                f"alpha_multiplier size {mult.size} does not match training size {alpha.size}"
+            )
+        if not np.all(np.isfinite(mult)) or np.any(mult <= 0.0):
+            raise ValueError("alpha_multiplier must contain positive finite values")
+        alpha = alpha * mult
 
     ker = config.get_kernel() if kernel is None else kernel
     try:
