@@ -278,7 +278,7 @@ def _gpr_fit_diagnostics(gpr: Any) -> Dict[str, float]:
     return out
 
 
-_KERNEL_LOCK_CACHE: Dict[str, Dict[Tuple[str, float], Tuple[float, float]]] = {}
+_KERNEL_LOCK_CACHE: Dict[str, Dict[Tuple[Any, ...], Tuple[float, float]]] = {}
 
 
 def _resolve_refit_kernel_lock_mode(config: "Config") -> str:
@@ -319,8 +319,8 @@ def _kernel_value_columns(df: pd.DataFrame) -> Tuple[str, str]:
     return const_col, ls_col
 
 
-def _load_kernel_lock_file(path: str) -> Dict[Tuple[str, float], Tuple[float, float]]:
-    """Load median fixed-kernel values keyed by (dataset, rounded mass)."""
+def _load_kernel_lock_file(path: str) -> Dict[Tuple[Any, ...], Tuple[float, float]]:
+    """Load fixed-kernel values keyed by mass, with optional toy-specific rows."""
     resolved = os.path.abspath(os.path.expanduser(str(path)))
     if resolved in _KERNEL_LOCK_CACHE:
         return _KERNEL_LOCK_CACHE[resolved]
@@ -334,11 +334,17 @@ def _load_kernel_lock_file(path: str) -> Dict[Tuple[str, float], Tuple[float, fl
         raise ValueError("Kernel-lock ensemble file must contain dataset and mass_GeV columns")
 
     const_col, ls_col = _kernel_value_columns(df)
-    work = df[["dataset", "mass_GeV", const_col, ls_col]].copy()
+    cols = ["dataset", "mass_GeV", const_col, ls_col]
+    has_toy_index = "toy_index" in df.columns
+    if has_toy_index:
+        cols.append("toy_index")
+    work = df[cols].copy()
     work["dataset"] = work["dataset"].astype(str)
     work["mass_key"] = pd.to_numeric(work["mass_GeV"], errors="coerce").round(12)
     work["const_val"] = pd.to_numeric(work[const_col], errors="coerce")
     work["ls_val"] = pd.to_numeric(work[ls_col], errors="coerce")
+    if has_toy_index:
+        work["toy_key"] = pd.to_numeric(work["toy_index"], errors="coerce")
     work = work[
         np.isfinite(work["mass_key"].to_numpy(float))
         & np.isfinite(work["const_val"].to_numpy(float))
@@ -349,18 +355,38 @@ def _load_kernel_lock_file(path: str) -> Dict[Tuple[str, float], Tuple[float, fl
     if work.empty:
         raise ValueError(f"Kernel-lock ensemble file has no usable finite rows: {path}")
 
+    out: Dict[Tuple[Any, ...], Tuple[float, float]] = {}
+
     med = (
         work.groupby(["dataset", "mass_key"], dropna=False)[["const_val", "ls_val"]]
         .median()
         .reset_index()
     )
-    out = {
+    out.update({
         (str(row["dataset"]), float(row["mass_key"])): (
             float(row["const_val"]),
             float(row["ls_val"]),
         )
         for _, row in med.iterrows()
-    }
+    })
+
+    if has_toy_index:
+        toy_work = work[np.isfinite(work["toy_key"].to_numpy(float))].copy()
+        if not toy_work.empty:
+            toy_work["toy_key"] = toy_work["toy_key"].round().astype(int)
+            med_toy = (
+                toy_work.groupby(["dataset", "mass_key", "toy_key"], dropna=False)[["const_val", "ls_val"]]
+                .median()
+                .reset_index()
+            )
+            out.update({
+                (str(row["dataset"]), float(row["mass_key"]), int(row["toy_key"])): (
+                    float(row["const_val"]),
+                    float(row["ls_val"]),
+                )
+                for _, row in med_toy.iterrows()
+            })
+
     _KERNEL_LOCK_CACHE[resolved] = out
     return out
 
@@ -372,6 +398,7 @@ def _resolve_refit_kernel_lock_values(
     mass: float,
     initial_const_opt: float,
     initial_ls_opt: float,
+    toy_index: Optional[int] = None,
 ) -> Tuple[str, float, float]:
     """Resolve fixed-kernel diagnostic values for one dataset/mass point."""
     mode = _resolve_refit_kernel_lock_mode(config)
@@ -384,9 +411,15 @@ def _resolve_refit_kernel_lock_values(
         path = str(getattr(config, "inj_refit_kernel_lock_file", "") or "").strip()
         table = _load_kernel_lock_file(path)
         key = (str(dataset_key), float(np.round(float(mass), 12)))
+        toy_key = None
+        if toy_index is not None:
+            toy_key = (key[0], key[1], int(toy_index))
+        if toy_key is not None and toy_key in table:
+            key = toy_key
         if key not in table:
             raise KeyError(
-                f"No kernel-lock row for dataset={dataset_key!r}, mass_GeV={float(mass):.12g}"
+                f"No kernel-lock row for dataset={dataset_key!r}, "
+                f"mass_GeV={float(mass):.12g}, toy_index={toy_index!r}"
             )
         const, ls = table[key]
     make_fixed_kernel(const, ls)
@@ -540,6 +573,180 @@ def _sigmaA_reference(
     return float(d.get("sigma_A", np.nan))
 
 
+def _resolve_sigma_a_ref_mode(config: "Config") -> str:
+    """Normalize the sigma_A reference convention used to scale injections."""
+    raw = str(getattr(config, "inj_sigma_a_ref_mode", "prefit_asimov") or "prefit_asimov").lower().strip()
+    aliases = {
+        "": "prefit_asimov",
+        "prefit": "prefit_asimov",
+        "pre_fit": "prefit_asimov",
+        "prefit_asimov": "prefit_asimov",
+        "initial": "prefit_asimov",
+        "initial_fit": "prefit_asimov",
+        "current": "prefit_asimov",
+        "matched": "matched_refit_bonly",
+        "matched_refit": "matched_refit_bonly",
+        "matched_bonly": "matched_refit_bonly",
+        "matched_refit_bonly": "matched_refit_bonly",
+        "refit_bonly": "matched_refit_bonly",
+    }
+    if raw not in aliases:
+        raise ValueError(
+            "inj_sigma_a_ref_mode must be one of 'prefit_asimov' or "
+            f"'matched_refit_bonly' (got {raw!r})"
+        )
+    return aliases[raw]
+
+
+def _sigmaA_from_mu_cov(
+    mu: np.ndarray,
+    cov: np.ndarray,
+    tmpl_win: np.ndarray,
+    *,
+    source: str,
+    rng: Optional[np.random.Generator],
+) -> float:
+    """Compute sigma_A from an explicit B-only mean/covariance pair."""
+    b = np.asarray(mu, float)
+    if str(source).lower().strip() == "poisson":
+        if rng is None:
+            rng = np.random.default_rng(12345)
+        n_ref = rng.poisson(np.clip(b, 0.0, None))
+    else:
+        n_ref = b
+    d = fit_A_profiled_gaussian_details(
+        n_ref,
+        b,
+        np.asarray(cov, float),
+        np.asarray(tmpl_win, float),
+        allow_negative=True,
+    )
+    return float(d.get("sigma_A", np.nan))
+
+
+def _matched_refit_bonly_sigmaA_reference(
+    ds: "DatasetConfig",
+    config: "Config",
+    *,
+    mass: float,
+    x_full: np.ndarray,
+    msk_train: np.ndarray,
+    msk_blind: np.ndarray,
+    y_full_bonly: np.ndarray,
+    tmpl_win: np.ndarray,
+    source: str,
+    rng: Optional[np.random.Generator],
+    refit_restarts: int,
+    refit_optimize: bool,
+    lock_mode: str,
+    lock_const_opt: float,
+    lock_ls_opt: float,
+    tail_alpha_multiplier: Optional[np.ndarray],
+) -> float:
+    """Compute sigma_A after a signal-free refit with the injected-toy settings."""
+    base_kernel = make_kernel_for_dataset(ds, config, mass=float(mass))
+    ker_fit, optimize_allowed = _kernel_for_refit(
+        base_kernel=base_kernel,
+        lock_mode=str(lock_mode),
+        lock_const_opt=float(lock_const_opt),
+        lock_ls_opt=float(lock_ls_opt),
+    )
+    fit_kwargs = dict(
+        restarts=int(refit_restarts),
+        kernel=ker_fit,
+        optimize=bool(refit_optimize) and bool(optimize_allowed),
+    )
+    if tail_alpha_multiplier is not None:
+        fit_kwargs["alpha_multiplier"] = tail_alpha_multiplier
+    gpr = fit_gpr(
+        np.asarray(x_full, float)[np.asarray(msk_train, bool)],
+        np.asarray(y_full_bonly, float)[np.asarray(msk_train, bool)],
+        config,
+        **fit_kwargs,
+    )
+    mu_ref, cov_ref = predict_counts_from_log_gpr(gpr, np.asarray(x_full, float)[np.asarray(msk_blind, bool)], config)
+    return _sigmaA_from_mu_cov(mu_ref, cov_ref, tmpl_win, source=source, rng=rng)
+
+
+def _resolve_sigma_a_references(
+    pred: "BlindPrediction",
+    ds: "DatasetConfig",
+    config: "Config",
+    *,
+    mass: float,
+    source: str,
+    rng: Optional[np.random.Generator],
+    refit_gp_on_toy: bool,
+    refit_restarts: int,
+    refit_optimize: bool,
+    x_full: np.ndarray,
+    msk_train: np.ndarray,
+    msk_blind: np.ndarray,
+    y_full_bonly: np.ndarray,
+    tmpl_win: np.ndarray,
+    lock_mode: str,
+    lock_const_opt: float,
+    lock_ls_opt: float,
+    tail_alpha_multiplier: Optional[np.ndarray],
+) -> Dict[str, Any]:
+    """Return prefit, matched, and selected sigma_A references for one mass."""
+    prefit = _sigmaA_reference(pred, float(mass), source=str(source), rng=rng, config=config)
+    mode = _resolve_sigma_a_ref_mode(config)
+    matched = float("nan")
+    matched_ok = float("nan")
+    error = ""
+    effective_mode = mode
+
+    if mode == "matched_refit_bonly":
+        if not bool(refit_gp_on_toy):
+            matched = float(prefit)
+            matched_ok = 1.0
+        else:
+            try:
+                matched = _matched_refit_bonly_sigmaA_reference(
+                    ds,
+                    config,
+                    mass=float(mass),
+                    x_full=np.asarray(x_full, float),
+                    msk_train=np.asarray(msk_train, bool),
+                    msk_blind=np.asarray(msk_blind, bool),
+                    y_full_bonly=np.asarray(y_full_bonly, float),
+                    tmpl_win=np.asarray(tmpl_win, float),
+                    source=str(source),
+                    rng=rng,
+                    refit_restarts=int(refit_restarts),
+                    refit_optimize=bool(refit_optimize),
+                    lock_mode=str(lock_mode),
+                    lock_const_opt=float(lock_const_opt),
+                    lock_ls_opt=float(lock_ls_opt),
+                    tail_alpha_multiplier=tail_alpha_multiplier,
+                )
+                matched_ok = 1.0
+            except Exception as exc:
+                matched_ok = 0.0
+                error = _handle_refit_failure(
+                    config,
+                    f"{ds.key} m={float(mass):.6g} matched sigmaA_ref",
+                    exc,
+                )
+
+    if mode == "matched_refit_bonly" and np.isfinite(matched) and matched > 0.0:
+        used = float(matched)
+    else:
+        used = float(prefit)
+        if mode == "matched_refit_bonly" and bool(refit_gp_on_toy):
+            effective_mode = "matched_refit_bonly_fallback_prefit"
+
+    return dict(
+        sigmaA_ref=float(used),
+        sigmaA_ref_prefit=float(prefit),
+        sigmaA_ref_matched=float(matched),
+        sigmaA_ref_mode=str(effective_mode),
+        sigmaA_ref_matched_ok=float(matched_ok),
+        sigmaA_ref_error=str(error),
+    )
+
+
 # ---------------------------------------------------------------------------
 # Main injection/extraction study
 # ---------------------------------------------------------------------------
@@ -647,18 +854,6 @@ def run_injection_extraction_toys(
         initial_ls_opt = float(getattr(pred, "ls_opt", float("nan")))
         initial_const_opt = float(getattr(pred, "const_opt", float("nan")))
 
-        sigmaA_ref = _sigmaA_reference(pred, m, source=sigma_source, rng=rng, config=config)
-
-        if strengths_mode == "sigmaa":
-            A_inj_list = [float(t) * float(sigmaA_ref) for t in strength_tags]
-            inj_nsigma_list = list(strength_tags)
-        else:
-            A_inj_list = list(strength_tags)
-            inj_nsigma_list = [
-                float(A) / float(sigmaA_ref) if np.isfinite(sigmaA_ref) and sigmaA_ref > 0 else np.nan
-                for A in A_inj_list
-            ]
-
         blind = tuple(pred.blind)
         msk_blind = (x_full >= blind[0]) & (x_full <= blind[1])
         if int(np.sum(msk_blind)) == 0:
@@ -693,6 +888,46 @@ def run_injection_extraction_toys(
                 initial_const_opt=float(initial_const_opt),
                 initial_ls_opt=float(initial_ls_opt),
             )
+
+        if refit_gp_on_toy:
+            y_full_for_ref = _fixed_hist_background_counts(
+                _prediction_y_full(pred),
+                dataset_key=str(ds.key),
+                mass=float(m),
+            ) if inj_background_mode == "fixed_hist" else np.asarray(pred.mu_full, float).reshape(-1)
+        else:
+            y_full_for_ref = _prediction_y_full(pred)
+        sigma_refs = _resolve_sigma_a_references(
+            pred,
+            ds,
+            config,
+            mass=float(m),
+            source=str(sigma_source),
+            rng=rng,
+            refit_gp_on_toy=bool(refit_gp_on_toy),
+            refit_restarts=int(refit_restarts),
+            refit_optimize=bool(refit_optimize),
+            x_full=x_full,
+            msk_train=msk_train,
+            msk_blind=msk_blind,
+            y_full_bonly=y_full_for_ref,
+            tmpl_win=tmpl_win,
+            lock_mode=str(lock_mode),
+            lock_const_opt=float(lock_const_opt),
+            lock_ls_opt=float(lock_ls_opt),
+            tail_alpha_multiplier=tail_alpha_multiplier,
+        )
+        sigmaA_ref = float(sigma_refs["sigmaA_ref"])
+
+        if strengths_mode == "sigmaa":
+            A_inj_list = [float(t) * float(sigmaA_ref) for t in strength_tags]
+            inj_nsigma_list = list(strength_tags)
+        else:
+            A_inj_list = list(strength_tags)
+            inj_nsigma_list = [
+                float(A) / float(sigmaA_ref) if np.isfinite(sigmaA_ref) and sigmaA_ref > 0 else np.nan
+                for A in A_inj_list
+            ]
 
         if refit_gp_on_toy:
             toy_mode = "full_refit"
@@ -823,11 +1058,31 @@ def run_injection_extraction_toys(
                 sigma_A = float(fit["sigma_A"])
                 pull = (A_hat - A_inj) / sigma_A if np.isfinite(sigma_A) and sigma_A > 0 else float("nan")
                 Zhat = A_hat / sigma_A if np.isfinite(sigma_A) and sigma_A > 0 else float("nan")
+                sigma_A_over_ref = (
+                    float(sigma_A) / float(sigmaA_ref)
+                    if np.isfinite(sigma_A) and np.isfinite(sigmaA_ref) and sigmaA_ref > 0
+                    else float("nan")
+                )
+                delta_z = (
+                    float(Zhat) - float(inj_nsigma)
+                    if np.isfinite(Zhat) and np.isfinite(inj_nsigma)
+                    else float("nan")
+                )
+                delta_z_minus_pull = (
+                    float(delta_z) - float(pull)
+                    if np.isfinite(delta_z) and np.isfinite(pull)
+                    else float("nan")
+                )
 
                 row = dict(
                     dataset=ds.key, mass_GeV=m, toy=int(i),
                     strength=float(A_inj), inj_nsigma=float(inj_nsigma),
                     sigmaA_ref=float(sigmaA_ref), sigma_val=float(pred.sigma_val),
+                    sigmaA_ref_prefit=float(sigma_refs["sigmaA_ref_prefit"]),
+                    sigmaA_ref_matched=float(sigma_refs["sigmaA_ref_matched"]),
+                    sigmaA_ref_mode=str(sigma_refs["sigmaA_ref_mode"]),
+                    sigmaA_ref_matched_ok=float(sigma_refs["sigmaA_ref_matched_ok"]),
+                    sigmaA_ref_error=str(sigma_refs["sigmaA_ref_error"]),
                     integral_density=float(integral_density),
                     A_per_eps2_unit=float(A_from_epsilon2(ds, float(m), 1.0, integral_density)),
                     sigma_x=float(getattr(pred, "sigma_x", float("nan"))),
@@ -853,6 +1108,9 @@ def run_injection_extraction_toys(
                     inj_background_mode=str(inj_background_mode),
                     A_hat=float(A_hat), sigma_A=float(sigma_A),
                     Zhat=float(Zhat), pull_param=float(pull),
+                    sigma_A_over_sigmaA_ref=float(sigma_A_over_ref),
+                    delta_z=float(delta_z),
+                    delta_z_minus_pull=float(delta_z_minus_pull),
                     Nsig_win=int(Nsig_win), Nsig_train=int(Nsig_train),
                     success=bool(fit["success"]), nll=float(fit.get("nll", float("nan"))),
                     toy_mode=toy_mode, refit_gp_on_toy=bool(refit_gp_on_toy),
@@ -901,6 +1159,11 @@ class _InjectionMassContext:
     tmpl_win: np.ndarray
     tmpl_full: np.ndarray
     sigmaA_ref: float
+    sigmaA_ref_prefit: float
+    sigmaA_ref_matched: float
+    sigmaA_ref_mode: str
+    sigmaA_ref_matched_ok: float
+    sigmaA_ref_error: str
     sigma_val: float
     sigma_x: float
     kernel_ls_policy: str
@@ -952,6 +1215,10 @@ class _ToyPointAccumulator:
     mass_GeV: float
     strength: float
     sigmaA_ref: float
+    sigmaA_ref_prefit: float
+    sigmaA_ref_matched: float
+    sigmaA_ref_mode: str
+    sigmaA_ref_matched_ok: float
     integral_density: float
     A_per_eps2_unit: float
     f_win: float
@@ -1045,6 +1312,10 @@ class _ToyPointAccumulator:
             inj_nsigma=inj_level,
             inj_nsigma_xerr=float(inj_std),
             sigmaA_ref=float(self.sigmaA_ref),
+            sigmaA_ref_prefit=float(self.sigmaA_ref_prefit),
+            sigmaA_ref_matched=float(self.sigmaA_ref_matched),
+            sigmaA_ref_mode=str(self.sigmaA_ref_mode),
+            sigmaA_ref_matched_ok=float(self.sigmaA_ref_matched_ok),
             integral_density=float(self.integral_density),
             A_per_eps2_unit=float(self.A_per_eps2_unit),
             f_win=float(self.f_win),
@@ -1088,6 +1359,11 @@ class _ToyPointAccumulator:
                 if n_toys and np.isfinite(float(self.sigmaA_ref)) and float(self.sigmaA_ref) > 0
                 else float("nan")
             ),
+            sigma_A_over_sigmaA_ref=(
+                float(np.nanmean(siga)) / float(self.sigmaA_ref)
+                if n_toys and np.isfinite(float(self.sigmaA_ref)) and float(self.sigmaA_ref) > 0
+                else float("nan")
+            ),
             pull_mean=float(pull_mean),
             pull_std=float(np.nanstd(pull, ddof=1)) if n_toys > 1 else float("nan"),
             pull_std_err=(
@@ -1102,6 +1378,11 @@ class _ToyPointAccumulator:
             cov_1sigma=float(np.nanmean(np.abs(pull) < 1.0)) if n_toys else float("nan"),
             cov_2sigma=float(np.nanmean(np.abs(pull) < 2.0)) if n_toys else float("nan"),
             Zhat_mean=float(zhat_mean),
+            delta_z=(
+                float(zhat_mean - inj_level)
+                if np.isfinite(zhat_mean) and np.isfinite(inj_level)
+                else float("nan")
+            ),
             delta_z_minus_pull=(
                 float((zhat_mean - inj_level) - pull_mean)
                 if np.isfinite(zhat_mean) and np.isfinite(inj_level) and np.isfinite(pull_mean)
@@ -1134,6 +1415,13 @@ def _stable_point_seed(base_seed: int, dataset_key: str, mass: float, strength: 
     payload = f"{int(base_seed)}|{str(dataset_key)}|{float(mass):.9f}|{float(strength):.12g}"
     h = hashlib.blake2b(payload.encode("utf-8"), digest_size=8).digest()
     return int.from_bytes(h, "little") & 0xFFFFFFFF
+
+
+def _nanmean_finite(values: List[float]) -> float:
+    """Mean of finite values, returning NaN without emitting empty-slice warnings."""
+    arr = np.asarray(values, float)
+    arr = arr[np.isfinite(arr)]
+    return float(np.mean(arr)) if arr.size else float("nan")
 
 
 def _stable_toy_seed(point_seed: int, toy_index: int) -> int:
@@ -1314,6 +1602,21 @@ def _simulate_toy_rows_chunk(
             sigma_A = float(fit["sigma_A"])
             pull = (A_hat - float(A_inj)) / sigma_A if np.isfinite(sigma_A) and sigma_A > 0 else float("nan")
             Zhat = A_hat / sigma_A if np.isfinite(sigma_A) and sigma_A > 0 else float("nan")
+            sigma_A_over_ref = (
+                float(sigma_A) / float(ctx.sigmaA_ref)
+                if np.isfinite(sigma_A) and np.isfinite(ctx.sigmaA_ref) and float(ctx.sigmaA_ref) > 0
+                else float("nan")
+            )
+            delta_z = (
+                float(Zhat) - float(inj_nsigma)
+                if np.isfinite(Zhat) and np.isfinite(inj_nsigma)
+                else float("nan")
+            )
+            delta_z_minus_pull = (
+                float(delta_z) - float(pull)
+                if np.isfinite(delta_z) and np.isfinite(pull)
+                else float("nan")
+            )
 
             row = dict(
                 dataset=str(ctx.ds.key),
@@ -1322,6 +1625,11 @@ def _simulate_toy_rows_chunk(
                 strength=float(A_inj),
                 inj_nsigma=float(inj_nsigma),
                 sigmaA_ref=float(ctx.sigmaA_ref),
+                sigmaA_ref_prefit=float(ctx.sigmaA_ref_prefit),
+                sigmaA_ref_matched=float(ctx.sigmaA_ref_matched),
+                sigmaA_ref_mode=str(ctx.sigmaA_ref_mode),
+                sigmaA_ref_matched_ok=float(ctx.sigmaA_ref_matched_ok),
+                sigmaA_ref_error=str(ctx.sigmaA_ref_error),
                 integral_density=float(ctx.integral_density),
                 A_per_eps2_unit=float(ctx.A_per_eps2_unit),
                 sigma_val=float(ctx.sigma_val),
@@ -1355,6 +1663,9 @@ def _simulate_toy_rows_chunk(
                 sigma_A=float(sigma_A),
                 Zhat=float(Zhat),
                 pull_param=float(pull),
+                sigma_A_over_sigmaA_ref=float(sigma_A_over_ref),
+                delta_z=float(delta_z),
+                delta_z_minus_pull=float(delta_z_minus_pull),
                 Nsig_win=int(Nsig_win),
                 Nsig_train=int(Nsig_train),
                 success=bool(fit["success"]),
@@ -1480,9 +1791,6 @@ def _build_injection_mass_context(
     initial_ls_opt = float(getattr(pred, "ls_opt", float("nan")))
     initial_const_opt = float(getattr(pred, "const_opt", float("nan")))
 
-    sigma_seed = _stable_point_seed(int(seed), str(ds.key), float(mass), -1.0)
-    sigma_rng = np.random.default_rng(int(sigma_seed))
-    sigmaA_ref = _sigmaA_reference(pred, float(mass), source=str(sigma_source), rng=sigma_rng, config=config)
     integral_density = _prediction_integral_density(pred)
     A_per_eps2_unit = float(A_from_epsilon2(ds, float(mass), 1.0, integral_density))
 
@@ -1521,6 +1829,39 @@ def _build_injection_mass_context(
             initial_ls_opt=float(initial_ls_opt),
         )
 
+    sigma_seed = _stable_point_seed(int(seed), str(ds.key), float(mass), -1.0)
+    sigma_rng = np.random.default_rng(int(sigma_seed))
+    if bool(refit_gp_on_toy):
+        y_full_for_ref = _fixed_hist_background_counts(
+            _prediction_y_full(pred),
+            dataset_key=str(ds.key),
+            mass=float(mass),
+        ) if str(inj_background_mode) == "fixed_hist" else np.asarray(
+            getattr(pred, "mu_full", _prediction_y_full(pred)), float
+        ).reshape(-1)
+    else:
+        y_full_for_ref = _prediction_y_full(pred)
+    sigma_refs = _resolve_sigma_a_references(
+        pred,
+        ds,
+        config,
+        mass=float(mass),
+        source=str(sigma_source),
+        rng=sigma_rng,
+        refit_gp_on_toy=bool(refit_gp_on_toy),
+        refit_restarts=int(refit_restarts),
+        refit_optimize=bool(refit_optimize),
+        x_full=x_full,
+        msk_train=msk_train,
+        msk_blind=msk_blind,
+        y_full_bonly=y_full_for_ref,
+        tmpl_win=tmpl_win,
+        lock_mode=str(lock_mode),
+        lock_const_opt=float(lock_const_opt),
+        lock_ls_opt=float(lock_ls_opt),
+        tail_alpha_multiplier=tail_alpha_multiplier,
+    )
+
     return _InjectionMassContext(
         ds=ds,
         mass=float(mass),
@@ -1533,7 +1874,12 @@ def _build_injection_mass_context(
         msk_train=msk_train,
         tmpl_win=np.asarray(tmpl_win, float),
         tmpl_full=np.asarray(tmpl_full, float),
-        sigmaA_ref=float(sigmaA_ref),
+        sigmaA_ref=float(sigma_refs["sigmaA_ref"]),
+        sigmaA_ref_prefit=float(sigma_refs["sigmaA_ref_prefit"]),
+        sigmaA_ref_matched=float(sigma_refs["sigmaA_ref_matched"]),
+        sigmaA_ref_mode=str(sigma_refs["sigmaA_ref_mode"]),
+        sigmaA_ref_matched_ok=float(sigma_refs["sigmaA_ref_matched_ok"]),
+        sigmaA_ref_error=str(sigma_refs["sigmaA_ref_error"]),
         sigma_val=float(pred.sigma_val),
         sigma_x=float(getattr(pred, "sigma_x", float("nan"))),
         kernel_ls_policy=str(kernel_diag["kernel_ls_policy"]),
@@ -1657,27 +2003,14 @@ def run_funcform_injection_extraction_toys(
             blind_mask = _prediction_blind_mask(pred)
             integral_density = _prediction_integral_density(pred)
             tmpl_win, tmpl_full = build_window_template_from_full(
-                pred.edges_full, blind_mask, float(m), pred.sigma_val
+                pred.edges_full, blind_mask, float(m), pred.sigma_val, config=config
             )
             f_win = float(np.sum(tmpl_win))
             x_full = np.asarray(pred.x_full, float).reshape(-1)
             f_full = float(np.sum(tmpl_full))
-
-            sigma_seed = _stable_point_seed(int(seed), str(ds.key), float(m), float(spec.toy_index))
-            sigma_rng = np.random.default_rng(int(sigma_seed))
-            sigmaA_ref = _sigmaA_reference(pred, float(m), source=str(sigma_source), rng=sigma_rng)
-
-            if strengths_mode_resolved == "sigmaa":
-                A_inj_list = [float(tag) * float(sigmaA_ref) for tag in strength_tags]
-                inj_nsigma_list = [float(tag) for tag in strength_tags]
-            else:
-                A_inj_list = [float(tag) for tag in strength_tags]
-                inj_nsigma_list = [
-                    float(A) / float(sigmaA_ref)
-                    if np.isfinite(sigmaA_ref) and sigmaA_ref > 0
-                    else float("nan")
-                    for A in A_inj_list
-                ]
+            kernel_diag = _kernel_static_diagnostics(ds, config, float(m))
+            initial_ls_opt = float(getattr(pred, "ls_opt", float("nan")))
+            initial_const_opt = float(getattr(pred, "const_opt", float("nan")))
 
             blind = tuple(pred.blind)
             msk_blind = (x_full >= float(blind[0])) & (x_full <= float(blind[1]))
@@ -1694,6 +2027,10 @@ def run_funcform_injection_extraction_toys(
                 float(m) + tn * float(pred.sigma_val),
             )
             msk_train = (x_full < blind_train[0]) | (x_full > blind_train[1])
+            n_train_low = int(np.count_nonzero(x_full < blind_train[0]))
+            n_train_high = int(np.count_nonzero(x_full > blind_train[1]))
+            n_train = int(np.count_nonzero(msk_train))
+            n_blind = int(np.count_nonzero(msk_blind))
             f_train = (
                 float(np.sum(tmpl_full[msk_train]))
                 if tmpl_full.shape[0] == x_full.shape[0]
@@ -1701,10 +2038,65 @@ def run_funcform_injection_extraction_toys(
             )
             f_train_frac = float(f_train / f_full) if np.isfinite(f_train) and f_full > 0 else float("nan")
 
-            y_full_base = np.rint(np.clip(_prediction_y_full(pred), 0.0, None)).astype(int)
+            y_full_base = _fixed_hist_background_counts(
+                _prediction_y_full(pred),
+                dataset_key=str(ds.key),
+                mass=float(m),
+            )
+            lock_mode, lock_const_opt, lock_ls_opt = ("none", float("nan"), float("nan"))
+            tail_alpha_multiplier, tail_alpha_stats = _signal_tail_alpha_multiplier(
+                tmpl_full,
+                msk_train,
+                scale=float(getattr(config, "inj_refit_signal_tail_alpha_scale", 0.0)),
+                threshold=float(getattr(config, "inj_refit_signal_tail_alpha_threshold", 0.0)),
+            )
             if bool(refit_gp_on_toy):
+                lock_mode, lock_const_opt, lock_ls_opt = _resolve_refit_kernel_lock_values(
+                    config,
+                    dataset_key=str(ds.key),
+                    mass=float(m),
+                    initial_const_opt=float(initial_const_opt),
+                    initial_ls_opt=float(initial_ls_opt),
+                    toy_index=int(spec.toy_index),
+                )
                 ker = make_kernel_for_dataset(ds, config, mass=float(m))
                 x_win = x_full[msk_blind]
+
+            sigma_seed = _stable_point_seed(int(seed), str(ds.key), float(m), float(spec.toy_index))
+            sigma_rng = np.random.default_rng(int(sigma_seed))
+            sigma_refs = _resolve_sigma_a_references(
+                pred,
+                ds,
+                config,
+                mass=float(m),
+                source=str(sigma_source),
+                rng=sigma_rng,
+                refit_gp_on_toy=bool(refit_gp_on_toy),
+                refit_restarts=int(refit_restarts),
+                refit_optimize=bool(refit_optimize),
+                x_full=x_full,
+                msk_train=msk_train,
+                msk_blind=msk_blind,
+                y_full_bonly=y_full_base,
+                tmpl_win=tmpl_win,
+                lock_mode=str(lock_mode),
+                lock_const_opt=float(lock_const_opt),
+                lock_ls_opt=float(lock_ls_opt),
+                tail_alpha_multiplier=tail_alpha_multiplier,
+            )
+            sigmaA_ref = float(sigma_refs["sigmaA_ref"])
+
+            if strengths_mode_resolved == "sigmaa":
+                A_inj_list = [float(tag) * float(sigmaA_ref) for tag in strength_tags]
+                inj_nsigma_list = [float(tag) for tag in strength_tags]
+            else:
+                A_inj_list = [float(tag) for tag in strength_tags]
+                inj_nsigma_list = [
+                    float(A) / float(sigmaA_ref)
+                    if np.isfinite(sigmaA_ref) and sigmaA_ref > 0
+                    else float("nan")
+                    for A in A_inj_list
+                ]
 
             for A_inj, inj_nsigma in zip(A_inj_list, inj_nsigma_list):
                 point_seed = _stable_point_seed(int(seed), str(ds.key), float(m), float(A_inj))
@@ -1729,20 +2121,45 @@ def run_funcform_injection_extraction_toys(
                 mu_fit = np.asarray(pred.mu, float)
                 cov_fit = np.asarray(pred.cov, float)
                 refit_ok = float("nan")
+                refit_fallback_used = False
+                refit_error = ""
+                refit_diag = dict(refit_ls_opt=float("nan"), refit_const_opt=float("nan"))
                 if bool(refit_gp_on_toy):
                     try:
+                        ker_fit, optimize_allowed = _kernel_for_refit(
+                            base_kernel=ker,
+                            lock_mode=str(lock_mode),
+                            lock_const_opt=float(lock_const_opt),
+                            lock_ls_opt=float(lock_ls_opt),
+                        )
+                        fit_kwargs = dict(
+                            restarts=int(refit_restarts),
+                            kernel=ker_fit,
+                            optimize=bool(refit_optimize) and bool(optimize_allowed),
+                        )
+                        if tail_alpha_multiplier is not None:
+                            fit_kwargs["alpha_multiplier"] = tail_alpha_multiplier
                         gpr = fit_gpr(
                             x_full[msk_train],
                             y_full_toy[msk_train].astype(float),
                             config,
-                            restarts=int(refit_restarts),
-                            kernel=ker,
-                            optimize=bool(refit_optimize),
+                            **fit_kwargs,
                         )
                         mu_fit, cov_fit = predict_counts_from_log_gpr(gpr, x_win, config)
+                        diag = _gpr_fit_diagnostics(gpr)
+                        refit_diag.update(
+                            refit_ls_opt=float(diag["ls_opt"]),
+                            refit_const_opt=float(diag["const_opt"]),
+                        )
                         refit_ok = 1.0
-                    except Exception:
+                    except Exception as exc:
                         refit_ok = 0.0
+                        refit_fallback_used = True
+                        refit_error = _handle_refit_failure(
+                            config,
+                            f"{ds.key} funcform toy={int(spec.toy_index)} m={float(m):.6g} A={float(A_inj):.6g}",
+                            exc,
+                        )
 
                 fit = fit_A_profiled_gaussian(
                     obs,
@@ -1759,6 +2176,21 @@ def run_funcform_injection_extraction_toys(
                     else float("nan")
                 )
                 Zhat = float(A_hat / sigma_A) if np.isfinite(sigma_A) and sigma_A > 0 else float("nan")
+                sigma_A_over_ref = (
+                    float(sigma_A) / float(sigmaA_ref)
+                    if np.isfinite(sigma_A) and np.isfinite(sigmaA_ref) and sigmaA_ref > 0
+                    else float("nan")
+                )
+                delta_z = (
+                    float(Zhat) - float(inj_nsigma)
+                    if np.isfinite(Zhat) and np.isfinite(inj_nsigma)
+                    else float("nan")
+                )
+                delta_z_minus_pull = (
+                    float(delta_z) - float(pull)
+                    if np.isfinite(delta_z) and np.isfinite(pull)
+                    else float("nan")
+                )
 
                 rows.append(
                     dict(
@@ -1775,21 +2207,54 @@ def run_funcform_injection_extraction_toys(
                         strength=float(A_inj),
                         inj_nsigma=float(inj_nsigma),
                         sigmaA_ref=float(sigmaA_ref),
+                        sigmaA_ref_prefit=float(sigma_refs["sigmaA_ref_prefit"]),
+                        sigmaA_ref_matched=float(sigma_refs["sigmaA_ref_matched"]),
+                        sigmaA_ref_mode=str(sigma_refs["sigmaA_ref_mode"]),
+                        sigmaA_ref_matched_ok=float(sigma_refs["sigmaA_ref_matched_ok"]),
+                        sigmaA_ref_error=str(sigma_refs["sigmaA_ref_error"]),
                         sigma_val=float(pred.sigma_val),
                         integral_density=float(integral_density),
                         A_per_eps2_unit=float(A_from_epsilon2(ds, float(m), 1.0, integral_density)),
                         sigma_x=float(getattr(pred, "sigma_x", float("nan"))),
+                        kernel_ls_policy=str(kernel_diag["kernel_ls_policy"]),
+                        kernel_ls_res_lower_factor=float(kernel_diag["kernel_ls_res_lower_factor"]),
+                        kernel_ls_res_upper_factor=float(kernel_diag["kernel_ls_res_upper_factor"]),
+                        ls_lo=float(kernel_diag["ls_lo"]),
+                        ls_hi=float(kernel_diag["ls_hi"]),
+                        ls_init=float(kernel_diag["ls_init"]),
+                        initial_ls_opt=float(initial_ls_opt),
+                        initial_const_opt=float(initial_const_opt),
+                        refit_ls_opt=float(refit_diag["refit_ls_opt"]),
+                        refit_const_opt=float(refit_diag["refit_const_opt"]),
+                        ls_opt=(
+                            float(refit_diag["refit_ls_opt"])
+                            if bool(refit_gp_on_toy) and refit_ok == 1.0
+                            else float(initial_ls_opt)
+                        ),
+                        const_opt=(
+                            float(refit_diag["refit_const_opt"])
+                            if bool(refit_gp_on_toy) and refit_ok == 1.0
+                            else float(initial_const_opt)
+                        ),
                         f_win=float(f_win),
                         f_full=float(f_full),
                         f_train=float(f_train),
                         f_train_frac=float(f_train_frac),
+                        n_train=int(n_train),
+                        n_train_low=int(n_train_low),
+                        n_train_high=int(n_train_high),
+                        n_blind=int(n_blind),
                         blind_nsigma=float(config.blind_nsigma),
                         train_exclude_nsigma=float(tn),
                         inj_shape_mode=inj_shape_mode,
+                        inj_background_mode="fixed_hist",
                         A_hat=float(A_hat),
                         sigma_A=float(sigma_A),
                         Zhat=float(Zhat),
                         pull_param=float(pull),
+                        sigma_A_over_sigmaA_ref=float(sigma_A_over_ref),
+                        delta_z=float(delta_z),
+                        delta_z_minus_pull=float(delta_z_minus_pull),
                         Nsig_win=int(Nsig_win),
                         Nsig_train=int(Nsig_train),
                         Nsig_full=int(Nsig_full),
@@ -1800,6 +2265,16 @@ def run_funcform_injection_extraction_toys(
                         refit_ok=float(refit_ok),
                         refit_restarts=int(refit_restarts),
                         refit_optimize=bool(refit_optimize),
+                        refit_kernel_lock_mode=str(lock_mode),
+                        refit_lock_const_opt=float(lock_const_opt),
+                        refit_lock_ls_opt=float(lock_ls_opt),
+                        refit_tail_alpha_scale=float(getattr(config, "inj_refit_signal_tail_alpha_scale", 0.0)),
+                        refit_tail_alpha_threshold=float(getattr(config, "inj_refit_signal_tail_alpha_threshold", 0.0)),
+                        refit_tail_alpha_n_bins=int(tail_alpha_stats["n_bins"]),
+                        refit_tail_alpha_max=float(tail_alpha_stats["max"]),
+                        refit_tail_alpha_mean=float(tail_alpha_stats["mean"]),
+                        refit_fallback_used=bool(refit_fallback_used),
+                        refit_error=str(refit_error),
                     )
                 )
 
@@ -1931,6 +2406,10 @@ def run_injection_extraction_streaming(
                 mass_GeV=float(m),
                 strength=float(A_inj),
                 sigmaA_ref=float(ctx.sigmaA_ref),
+                sigmaA_ref_prefit=float(ctx.sigmaA_ref_prefit),
+                sigmaA_ref_matched=float(ctx.sigmaA_ref_matched),
+                sigmaA_ref_mode=str(ctx.sigmaA_ref_mode),
+                sigmaA_ref_matched_ok=float(ctx.sigmaA_ref_matched_ok),
                 integral_density=float(ctx.integral_density),
                 A_per_eps2_unit=float(ctx.A_per_eps2_unit),
                 f_win=float(ctx.f_win),
@@ -2014,7 +2493,11 @@ def _combine_toy_rows(rows: List[Dict[str, Any]], *, mass: float, toy_idx: int) 
     st = np.array([float(r.get("strength", np.nan)) for r in valid], float)
     zinj = np.array([float(r.get("inj_nsigma", np.nan)) for r in valid], float)
     sref = np.array([float(r.get("sigmaA_ref", np.nan)) for r in valid], float)
+    sref_prefit = np.array([float(r.get("sigmaA_ref_prefit", np.nan)) for r in valid], float)
+    sref_matched = np.array([float(r.get("sigmaA_ref_matched", np.nan)) for r in valid], float)
+    sref_matched_ok = np.array([float(r.get("sigmaA_ref_matched_ok", np.nan)) for r in valid], float)
     bg_modes = sorted({str(r.get("inj_background_mode", "")) for r in valid if str(r.get("inj_background_mode", ""))})
+    ref_modes = sorted({str(r.get("sigmaA_ref_mode", "")) for r in valid if str(r.get("sigmaA_ref_mode", ""))})
 
     A_hat = float(np.nansum(w * ah) / sum_w)
     sigma_A = float(1.0 / np.sqrt(sum_w))
@@ -2023,6 +2506,7 @@ def _combine_toy_rows(rows: List[Dict[str, Any]], *, mass: float, toy_idx: int) 
     sigmaA_ref = float(np.nanmean(sref)) if np.any(np.isfinite(sref)) else float("nan")
     pull = (A_hat - strength) / sigma_A if np.isfinite(sigma_A) and sigma_A > 0 else float("nan")
     zhat = A_hat / sigma_A if np.isfinite(sigma_A) and sigma_A > 0 else float("nan")
+    delta_z = zhat - inj_nsigma if np.isfinite(zhat) and np.isfinite(inj_nsigma) else float("nan")
 
     return dict(
         dataset="combined",
@@ -2031,10 +2515,17 @@ def _combine_toy_rows(rows: List[Dict[str, Any]], *, mass: float, toy_idx: int) 
         strength=float(strength),
         inj_nsigma=float(inj_nsigma),
         sigmaA_ref=float(sigmaA_ref),
+        sigmaA_ref_prefit=float(np.nanmean(sref_prefit)) if np.any(np.isfinite(sref_prefit)) else float("nan"),
+        sigmaA_ref_matched=float(np.nanmean(sref_matched)) if np.any(np.isfinite(sref_matched)) else float("nan"),
+        sigmaA_ref_mode="+".join(ref_modes),
+        sigmaA_ref_matched_ok=float(np.nanmean(sref_matched_ok)) if np.any(np.isfinite(sref_matched_ok)) else float("nan"),
         A_hat=float(A_hat),
         sigma_A=float(sigma_A),
+        sigma_A_over_sigmaA_ref=float(sigma_A / sigmaA_ref) if np.isfinite(sigmaA_ref) and sigmaA_ref > 0 else float("nan"),
         pull_param=float(pull),
         Zhat=float(zhat),
+        delta_z=float(delta_z),
+        delta_z_minus_pull=float(delta_z - pull) if np.isfinite(delta_z) and np.isfinite(pull) else float("nan"),
         n_contrib=int(len(valid)),
         contrib_datasets="+".join(sorted({str(r.get("dataset", "")) for r in valid})),
         inj_background_mode="+".join(bg_modes),
@@ -2187,6 +2678,10 @@ def run_injection_extraction_streaming_combined(
                     mass_GeV=float(m),
                     strength=float(A_inj_by_ds[ds_key]),
                     sigmaA_ref=float(ctxs_m[ds_key].sigmaA_ref),
+                    sigmaA_ref_prefit=float(ctxs_m[ds_key].sigmaA_ref_prefit),
+                    sigmaA_ref_matched=float(ctxs_m[ds_key].sigmaA_ref_matched),
+                    sigmaA_ref_mode=str(ctxs_m[ds_key].sigmaA_ref_mode),
+                    sigmaA_ref_matched_ok=float(ctxs_m[ds_key].sigmaA_ref_matched_ok),
                     integral_density=float(ctxs_m[ds_key].integral_density),
                     A_per_eps2_unit=float(ctxs_m[ds_key].A_per_eps2_unit),
                     f_win=float(ctxs_m[ds_key].f_win),
@@ -2236,6 +2731,10 @@ def run_injection_extraction_streaming_combined(
                         mass_GeV=float(m),
                         strength=float(comb_strength_nom),
                         sigmaA_ref=float(comb_sigma_ref),
+                        sigmaA_ref_prefit=_nanmean_finite([ctx.sigmaA_ref_prefit for ctx in ctxs_m.values()]),
+                        sigmaA_ref_matched=_nanmean_finite([ctx.sigmaA_ref_matched for ctx in ctxs_m.values()]),
+                        sigmaA_ref_mode="+".join(sorted({str(ctx.sigmaA_ref_mode) for ctx in ctxs_m.values()})),
+                        sigmaA_ref_matched_ok=_nanmean_finite([ctx.sigmaA_ref_matched_ok for ctx in ctxs_m.values()]),
                         integral_density=float("nan"),
                         A_per_eps2_unit=float("nan"),
                         f_win=float("nan"),
@@ -2496,6 +2995,10 @@ def combine_injection_toy_tables(
             sum_wS=("wS", "sum"),
             inj_nsigma=("inj_nsigma", "mean"),
             sigmaA_ref=("sigmaA_ref", "mean"),
+            sigmaA_ref_prefit=("sigmaA_ref_prefit", "mean") if "sigmaA_ref_prefit" in valid.columns else ("sigmaA_ref", "mean"),
+            sigmaA_ref_matched=("sigmaA_ref_matched", "mean") if "sigmaA_ref_matched" in valid.columns else ("sigmaA_ref", "mean"),
+            sigmaA_ref_matched_ok=("sigmaA_ref_matched_ok", "mean") if "sigmaA_ref_matched_ok" in valid.columns else ("sigmaA_ref", "count"),
+            sigmaA_ref_mode=("sigmaA_ref_mode", lambda s: "+".join(sorted(set(str(x) for x in s.dropna())))) if "sigmaA_ref_mode" in valid.columns else ("dataset", lambda s: ""),
             success=("success", "all"),
             n_contrib=("dataset", "nunique"),
             contrib_datasets=("dataset", lambda s: "+".join(sorted(set(s)))),
@@ -2526,6 +3029,9 @@ def combine_injection_toy_tables(
         agg["inj_nsigma"] = agg[sigma_group_col]
     agg["pull_param"] = (agg["A_hat"] - agg["strength"]) / agg["sigma_A"]
     agg["Zhat"] = agg["A_hat"] / agg["sigma_A"]
+    agg["sigma_A_over_sigmaA_ref"] = agg["sigma_A"] / agg["sigmaA_ref"]
+    agg["delta_z"] = agg["Zhat"] - agg["inj_nsigma"]
+    agg["delta_z_minus_pull"] = agg["delta_z"] - agg["pull_param"]
     agg["dataset"] = "combined"
     agg["toy"] = agg["toy"].astype(int)
     out = agg[
@@ -2536,10 +3042,17 @@ def combine_injection_toy_tables(
             "strength",
             "inj_nsigma",
             "sigmaA_ref",
+            "sigmaA_ref_prefit",
+            "sigmaA_ref_matched",
+            "sigmaA_ref_mode",
+            "sigmaA_ref_matched_ok",
             "A_hat",
             "sigma_A",
+            "sigma_A_over_sigmaA_ref",
             "pull_param",
             "Zhat",
+            "delta_z",
+            "delta_z_minus_pull",
             "n_contrib",
             "contrib_datasets",
             "success",
@@ -2593,6 +3106,11 @@ def summarize_injection_grid(df_toys: pd.DataFrame) -> pd.DataFrame:
         sigmaA_ref_mean = _mean_col(sub, "sigmaA_ref")
         pull_mean = float(np.nanmean(pull))
         zhat_mean = float(np.nanmean(Zhat))
+        delta_z = (
+            float(zhat_mean - float(np.nanmean(inj_nsigma_vals)))
+            if np.isfinite(zhat_mean) and np.any(np.isfinite(inj_nsigma_vals))
+            else float("nan")
+        )
 
         rows.append(dict(
             dataset=ds, mass_GeV=float(m), strength=float(A),
@@ -2600,6 +3118,10 @@ def summarize_injection_grid(df_toys: pd.DataFrame) -> pd.DataFrame:
             inj_nsigma=float(np.nanmean(inj_nsigma_vals)),
             inj_nsigma_xerr=float(inj_nsigma_std),
             sigmaA_ref=sigmaA_ref_mean,
+            sigmaA_ref_prefit=_mean_col(sub, "sigmaA_ref_prefit"),
+            sigmaA_ref_matched=_mean_col(sub, "sigmaA_ref_matched"),
+            sigmaA_ref_mode=_first_col(sub, "sigmaA_ref_mode"),
+            sigmaA_ref_matched_ok=_mean_col(sub, "sigmaA_ref_matched_ok"),
             integral_density=_mean_col(sub, "integral_density"),
             A_per_eps2_unit=_mean_col(sub, "A_per_eps2_unit"),
             f_win=_mean_col(sub, "f_win"),
@@ -2647,6 +3169,11 @@ def summarize_injection_grid(df_toys: pd.DataFrame) -> pd.DataFrame:
                 if np.isfinite(sigmaA_ref_mean) and sigmaA_ref_mean > 0
                 else float("nan")
             ),
+            sigma_A_over_sigmaA_ref=(
+                float(np.nanmean(sigA)) / sigmaA_ref_mean
+                if np.isfinite(sigmaA_ref_mean) and sigmaA_ref_mean > 0
+                else float("nan")
+            ),
             pull_mean=pull_mean,
             pull_std=float(np.nanstd(pull, ddof=1)),
             pull_std_err=float(np.nanstd(pull_finite, ddof=1) / np.sqrt(max(1, 2*(len(pull_finite)-1)))) if len(pull_finite) > 1 else float("nan"),
@@ -2655,7 +3182,8 @@ def summarize_injection_grid(df_toys: pd.DataFrame) -> pd.DataFrame:
             cov_1sigma=float(np.nanmean(np.abs(pull) < 1.0)),
             cov_2sigma=float(np.nanmean(np.abs(pull) < 2.0)),
             Zhat_mean=zhat_mean,
-            delta_z_minus_pull=float((zhat_mean - float(np.nanmean(inj_nsigma_vals))) - pull_mean),
+            delta_z=float(delta_z),
+            delta_z_minus_pull=float(delta_z - pull_mean) if np.isfinite(delta_z) and np.isfinite(pull_mean) else float("nan"),
             ainj_over_sigmaAref=(float(A) / sigmaA_ref_mean if np.isfinite(sigmaA_ref_mean) and sigmaA_ref_mean > 0 else float("nan")),
             Zhat_q16=q(Zhat, 0.16), Zhat_q84=q(Zhat, 0.84),
             qmu_tilde_mean=_mean_col(sub, "qmu_tilde"),
@@ -2769,6 +3297,11 @@ def collapse_fragmented_injection_summary(df_sum: pd.DataFrame) -> pd.DataFrame:
         sigma_ref = _mean_col(sub, "sigmaA_ref")
         zhat_mean = float(np.nanmean(zhats)) if np.any(np.isfinite(zhats)) else float("nan")
         pull_mean = float(np.nanmean(pulls)) if np.any(np.isfinite(pulls)) else float("nan")
+        delta_z = (
+            float(zhat_mean - inj_level)
+            if np.isfinite(zhat_mean) and np.isfinite(inj_level)
+            else float("nan")
+        )
         n_frag = int(len(sub))
 
         row: Dict[str, Any] = dict(
@@ -2779,6 +3312,10 @@ def collapse_fragmented_injection_summary(df_sum: pd.DataFrame) -> pd.DataFrame:
             inj_nsigma=inj_level,
             inj_nsigma_xerr=_std(inj_vals) if np.any(np.isfinite(inj_vals)) else float("nan"),
             sigmaA_ref=float(sigma_ref),
+            sigmaA_ref_prefit=_mean_col(sub, "sigmaA_ref_prefit"),
+            sigmaA_ref_matched=_mean_col(sub, "sigmaA_ref_matched"),
+            sigmaA_ref_mode=str(_first_col(sub, "sigmaA_ref_mode", "")),
+            sigmaA_ref_matched_ok=_mean_col(sub, "sigmaA_ref_matched_ok"),
             integral_density=_mean_col(sub, "integral_density"),
             A_per_eps2_unit=_mean_col(sub, "A_per_eps2_unit"),
             f_win=_mean_col(sub, "f_win"),
@@ -2800,9 +3337,10 @@ def collapse_fragmented_injection_summary(df_sum: pd.DataFrame) -> pd.DataFrame:
             cov_1sigma=_mean_col(sub, "cov_1sigma"),
             cov_2sigma=_mean_col(sub, "cov_2sigma"),
             Zhat_mean=zhat_mean,
+            delta_z=delta_z,
             delta_z_minus_pull=(
-                float((zhat_mean - inj_level) - pull_mean)
-                if np.isfinite(zhat_mean) and np.isfinite(inj_level) and np.isfinite(pull_mean)
+                float(delta_z - pull_mean)
+                if np.isfinite(delta_z) and np.isfinite(pull_mean)
                 else float("nan")
             ),
             ainj_over_sigmaAref=(
@@ -2836,6 +3374,7 @@ def collapse_fragmented_injection_summary(df_sum: pd.DataFrame) -> pd.DataFrame:
             "refit_tail_alpha_mean",
             "refit_ok_rate",
             "refit_fallback_rate",
+            "sigma_A_over_sigmaA_ref",
         ]:
             if col in sub.columns:
                 row[col] = _mean_col(sub, col)

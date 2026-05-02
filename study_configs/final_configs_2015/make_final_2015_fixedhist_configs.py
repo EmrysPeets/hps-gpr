@@ -21,6 +21,10 @@ BLIND_WIDTHS = [1.64, 1.96]
 GUARD_WIDTHS = [2.58, 3.0]
 DEFAULT_OUTPUT_BASE = "/sdf/data/hps/users/epeets/run/gpr_out/2015_closure/funcform_studies"
 OUTPUT_BASE = os.environ.get("GPR_FUNCFORM_OUTPUT_BASE", DEFAULT_OUTPUT_BASE).rstrip("/")
+KERNEL_LOCK_TABLE_DIR = os.environ.get(
+    "GPR_KERNEL_LOCK_TABLE_DIR",
+    f"{OUTPUT_BASE}/kernel_lock_tables",
+).rstrip("/")
 
 
 @dataclass(frozen=True)
@@ -32,11 +36,16 @@ class ClosureStudy:
     inj_shape_mode: str = "full"
     refit_gp_on_toy: bool = True
     kernel_lock_mode: str = "none"
+    kernel_lock_file: str = ""
+    sigma_ref_mode: str = "prefit_asimov"
     tail_alpha_scale: float = 0.0
     tail_alpha_threshold: float = 0.0
+    tag_override: str = ""
 
     @property
     def tag(self) -> str:
+        if self.tag_override:
+            return str(self.tag_override)
         parts = [
             f"blind{tag_float(self.blind_nsigma)}",
             f"train{tag_float(self.train_exclude_nsigma)}",
@@ -66,6 +75,18 @@ def tag_float(value: float) -> str:
     value = float(value)
     text = f"{value:.1f}" if value.is_integer() else f"{value:g}"
     return text.replace(".", "p")
+
+
+def guard_tag(train_nsigma: float) -> str:
+    labels = {
+        1.96: "1p96",
+        2.25: "2p25",
+        2.50: "2p50",
+        2.58: "2p58",
+        2.75: "2p75",
+        3.00: "3p0",
+    }
+    return labels.get(float(train_nsigma), tag_float(float(train_nsigma)))
 
 
 def build_studies() -> list[ClosureStudy]:
@@ -118,6 +139,107 @@ def build_studies() -> list[ClosureStudy]:
             )
         )
 
+    # Refit-matched sigmaA reference rescue matrix, focused on 2015 lslb=1.0.
+    for train_nsigma in (1.96, 2.25, 2.50, 2.58, 2.75, 3.0):
+        studies.append(
+            ClosureStudy(
+                blind_nsigma=1.64,
+                train_exclude_nsigma=float(train_nsigma),
+                lslb=1.0,
+                role="guard_refmatched",
+                sigma_ref_mode="matched_refit_bonly",
+                tag_override=f"blind1p64_train{guard_tag(float(train_nsigma))}_lslb1p0_guard_refmatched",
+            )
+        )
+
+    studies.extend(
+        [
+            ClosureStudy(
+                blind_nsigma=1.64,
+                train_exclude_nsigma=3.0,
+                lslb=1.0,
+                role="prefit_reference_control",
+                sigma_ref_mode="prefit_asimov",
+                tag_override="blind1p64_train3p0_lslb1p0_prefit_reference_control",
+            ),
+            ClosureStudy(
+                blind_nsigma=1.64,
+                train_exclude_nsigma=3.0,
+                lslb=1.0,
+                role="no_refit_control",
+                refit_gp_on_toy=False,
+                sigma_ref_mode="matched_refit_bonly",
+                tag_override="blind1p64_train3p0_lslb1p0_no_refit_control",
+            ),
+            ClosureStudy(
+                blind_nsigma=1.64,
+                train_exclude_nsigma=3.0,
+                lslb=1.0,
+                role="window_only_control",
+                inj_shape_mode="window",
+                sigma_ref_mode="matched_refit_bonly",
+                tag_override="blind1p64_train3p0_lslb1p0_window_only_control",
+            ),
+        ]
+    )
+
+    lock_files = {
+        "ensemble_p50_lock_refmatched": f"{KERNEL_LOCK_TABLE_DIR}/kernel_lock_p50_crossfit.csv",
+        "ensemble_p75ls_lock_refmatched": f"{KERNEL_LOCK_TABLE_DIR}/kernel_lock_p75ls_crossfit.csv",
+        "ensemble_p25ls_lock_refmatched": f"{KERNEL_LOCK_TABLE_DIR}/kernel_lock_p25ls_crossfit.csv",
+    }
+    studies.extend(
+        [
+            ClosureStudy(
+                blind_nsigma=1.64,
+                train_exclude_nsigma=3.0,
+                lslb=1.0,
+                role="none_refmatched",
+                sigma_ref_mode="matched_refit_bonly",
+                tag_override="blind1p64_train3p0_lslb1p0_none_refmatched",
+            ),
+            ClosureStudy(
+                blind_nsigma=1.64,
+                train_exclude_nsigma=3.0,
+                lslb=1.0,
+                role="initial_fit_lock_refmatched",
+                kernel_lock_mode="initial_fit",
+                sigma_ref_mode="matched_refit_bonly",
+                tag_override="blind1p64_train3p0_lslb1p0_initial_fit_lock_refmatched",
+            ),
+            ClosureStudy(
+                blind_nsigma=1.64,
+                train_exclude_nsigma=3.0,
+                lslb=1.0,
+                role="ensemble_p50_lock_refmatched",
+                kernel_lock_mode="ensemble_file",
+                kernel_lock_file=lock_files["ensemble_p50_lock_refmatched"],
+                sigma_ref_mode="matched_refit_bonly",
+                tag_override="blind1p64_train3p0_lslb1p0_ensemble_p50_lock_refmatched",
+            ),
+            ClosureStudy(
+                blind_nsigma=1.64,
+                train_exclude_nsigma=3.0,
+                lslb=1.0,
+                role="ensemble_p75ls_lock_refmatched",
+                kernel_lock_mode="ensemble_file",
+                kernel_lock_file=lock_files["ensemble_p75ls_lock_refmatched"],
+                sigma_ref_mode="matched_refit_bonly",
+                tag_override="blind1p64_train3p0_lslb1p0_ensemble_p75ls_lock_refmatched",
+            ),
+            ClosureStudy(
+                blind_nsigma=1.64,
+                train_exclude_nsigma=3.0,
+                lslb=1.0,
+                role="ensemble_p25ls_lock_refmatched",
+                kernel_lock_mode="ensemble_file",
+                kernel_lock_file=lock_files["ensemble_p25ls_lock_refmatched"],
+                sigma_ref_mode="matched_refit_bonly",
+                tag_override="blind1p64_train3p0_lslb1p0_ensemble_p25ls_lock_refmatched",
+            ),
+        ]
+    )
+
     return studies
 
 
@@ -142,12 +264,14 @@ def build_config(base: dict, study: ClosureStudy) -> dict:
             "inj_mode": "poisson",
             "inj_strength_mode": "sigmaA",
             "inj_sigma_a_source": "asimov",
+            "inj_sigma_a_ref_mode": str(study.sigma_ref_mode),
             "inj_shape_mode": str(study.inj_shape_mode),
             "inj_background_mode": "fixed_hist",
             "inj_refit_gp_on_toy": bool(study.refit_gp_on_toy),
             "inj_refit_gp_restarts": 0,
             "inj_refit_gp_optimize": True,
             "inj_refit_kernel_lock_mode": str(study.kernel_lock_mode),
+            "inj_refit_kernel_lock_file": str(study.kernel_lock_file),
             "inj_refit_signal_tail_alpha_scale": float(study.tail_alpha_scale),
             "inj_refit_signal_tail_alpha_threshold": float(study.tail_alpha_threshold),
             "inj_sigma_multipliers": list(SIGMA_MULTIPLIERS),
