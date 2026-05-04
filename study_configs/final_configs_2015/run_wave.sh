@@ -78,6 +78,7 @@ run_generate() {
 
 run_submit() {
   local tag="$1"
+  shift
   echo "[wave:${wave}] submit ${tag}"
   SLURM_GLOB="slurm_${tag}" \
     bash "${CONFIG_DIR}/submit_all.sh" "$@"
