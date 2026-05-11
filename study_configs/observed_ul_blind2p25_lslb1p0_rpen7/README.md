@@ -28,6 +28,8 @@ dataset-level band CSVs for all active datasets as well as
 `summary_combined_all/ul_observed_overlay_eps2.png`, overlaying the three observed
 dataset upper limits and the combined observed upper limit on a log scale.
 
+All four YAMLs write under `/sdf/data/hps/users/epeets/hps_gpr/observed_ul/` so the heavy task outputs land in the HPS data area rather than under `outputs/` in the source checkout.
+
 ## SDF Sync
 
 Run this in your SDF checkout before generating jobs:
@@ -107,10 +109,10 @@ hps-gpr slurm-gen \
 Run each compile after its jobs finish:
 
 ```bash
-hps-gpr slurm-combine --output-dir outputs/obsUL_2015_blind2p25_lslb1p0_rpen7_dens1p64_10k
-hps-gpr slurm-combine --output-dir outputs/obsUL_2016_10pct_blind2p25_lslb1p0_rpen7_dens1p64_10k
-hps-gpr slurm-combine --output-dir outputs/obsUL_2021_1pct_blind2p25_lslb1p0_rpen7_dens1p64_10k
-hps-gpr slurm-combine --output-dir outputs/obsUL_2015_2016_10pct_2021_1pct_blind2p25_lslb1p0_rpen7_dens1p64_10k
+hps-gpr slurm-combine --output-dir /sdf/data/hps/users/epeets/hps_gpr/observed_ul/obsUL_2015_blind2p25_lslb1p0_rpen7_dens1p64_10k
+hps-gpr slurm-combine --output-dir /sdf/data/hps/users/epeets/hps_gpr/observed_ul/obsUL_2016_10pct_blind2p25_lslb1p0_rpen7_dens1p64_10k
+hps-gpr slurm-combine --output-dir /sdf/data/hps/users/epeets/hps_gpr/observed_ul/obsUL_2021_1pct_blind2p25_lslb1p0_rpen7_dens1p64_10k
+hps-gpr slurm-combine --output-dir /sdf/data/hps/users/epeets/hps_gpr/observed_ul/obsUL_2015_2016_10pct_2021_1pct_blind2p25_lslb1p0_rpen7_dens1p64_10k
 ```
 
 Key plots to inspect in each `summary_combined_*` folder:
