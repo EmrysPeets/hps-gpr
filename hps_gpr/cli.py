@@ -219,8 +219,20 @@ def scan(config, output_dir, mass_min, mass_max, array_task, n_tasks):
         if mass_max is not None:
             masses_all = masses_all[masses_all <= float(mass_max)]
 
-        ds_key = str(getattr(cfg, "run_limit_bands_on", "2015"))
-        if ds_key in datasets:
+        run_limit_raw = getattr(cfg, "run_limit_bands_on", "2015")
+        if isinstance(run_limit_raw, (list, tuple, set)):
+            run_limit_keys = [str(k).strip() for k in run_limit_raw if str(k).strip()]
+        else:
+            run_limit_text = str(run_limit_raw).strip()
+            if run_limit_text.lower() in {"all", "enabled", "*"}:
+                run_limit_keys = list(datasets.keys())
+            else:
+                run_limit_keys = [tok.strip() for tok in run_limit_text.split(",") if tok.strip()]
+
+        for ds_key in run_limit_keys:
+            if ds_key not in datasets:
+                print(f"Warning: requested UL bands for disabled/unknown dataset '{ds_key}'")
+                continue
             ds = datasets[ds_key]
             masses_ds = [float(m) for m in masses_all if float(ds.m_low) <= float(m) <= float(ds.m_high)]
             if masses_ds:
@@ -2710,6 +2722,7 @@ def slurm_combine(output_dir, prefix):
         plot_observed_ul_only,
         plot_ul_pvalues,
         plot_ul_pvalue_components,
+        plot_observed_ul_overlay,
         plot_analytic_p0,
         plot_Z_local_global,
         plot_injection_heatmap,
@@ -2857,6 +2870,26 @@ def slurm_combine(output_dir, prefix):
                     )
                 except Exception as e:
                     print(f"Warning: dataset eps2 UL plot failed for {ds_name}: {e}")
+
+            overlay_curves = []
+            for ds_name, ds_path in sorted((bands_eps2 or {}).items()):
+                try:
+                    overlay_curves.append((str(ds_name), pd.read_csv(ds_path).sort_values("mass_GeV").reset_index(drop=True)))
+                except Exception as e:
+                    print(f"Warning: dataset observed-UL overlay input failed for {ds_name}: {e}")
+            for comb_name, comb_path in sorted((bands_comb or {}).items()):
+                try:
+                    comb_label = "combined" if str(comb_name) in {str(name), "all", "combined", "combined_all"} else f"combined {comb_name}"
+                    overlay_curves.append((comb_label, pd.read_csv(comb_path).sort_values("mass_GeV").reset_index(drop=True)))
+                except Exception as e:
+                    print(f"Warning: combined observed-UL overlay input failed for {comb_name}: {e}")
+            if len(overlay_curves) >= 2:
+                plot_observed_ul_overlay(
+                    overlay_curves,
+                    y="eps2",
+                    title=f"Observed {cl_pct}% CL upper limits on $\\epsilon^2$: datasets and combined ({tag})",
+                    outpath=os.path.join(suite_dir, "ul_observed_overlay_eps2.png"),
+                )
 
             support_masses_by_ds = {}
             if df_single is not None and len(df_single) and "dataset_set" in df.columns:

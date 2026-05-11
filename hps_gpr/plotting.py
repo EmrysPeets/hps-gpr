@@ -672,7 +672,7 @@ def plot_ul_pvalues(
     title: str = "",
     outpath: Optional[str] = None,
 ) -> None:
-    """Plot toy-limit diagnostic tail areas vs mass.
+    """Plot toy-limit diagnostic tail areas vs mass on a log p-value scale.
 
     Args:
         df: Bands DataFrame with toy-limit diagnostic columns
@@ -682,20 +682,90 @@ def plot_ul_pvalues(
     masses = df["mass_GeV"].to_numpy(float)
 
     fig, ax = plt.subplots(figsize=(9, 4))
+    plotted: List[np.ndarray] = []
     for col, label, color in [
         ("p_strong", r"$p_{\rm strong}$ (toy UL $\leq$ obs UL)", "C0"),
         ("p_weak", r"$p_{\rm weak}$ (toy UL $\geq$ obs UL)", "C1"),
         ("p_two", r"$p_{\rm two}$ (diagnostic 2$\times$min)", "C2"),
     ]:
         if col in df.columns:
-            v = df[col].to_numpy(float)
+            raw = df[col].to_numpy(float)
+            finite_pos = raw[np.isfinite(raw) & (raw > 0)]
+            floor = 0.5 * float(np.nanmin(finite_pos)) if finite_pos.size else 1e-6
+            floor = float(np.clip(floor, 1e-300, 1e-2))
+            v = np.clip(raw, floor, 1.0)
+            plotted.append(v[np.isfinite(v)])
             ax.plot(masses, v, label=label, color=color)
 
     ax.axhline(0.05, color="k", ls="--", lw=0.8, label="5%")
     ax.set_xlabel("m (GeV)")
     ax.set_ylabel("p-value")
-    ax.set_ylim(0, 1)
+    ax.set_yscale("log")
+    if any(v.size for v in plotted):
+        y_all = np.concatenate([v for v in plotted if v.size])
+        y_pos = y_all[np.isfinite(y_all) & (y_all > 0)]
+        ymin = max(1e-6, 0.8 * float(np.nanmin(y_pos))) if y_pos.size else 1e-6
+    else:
+        ymin = 1e-6
+    ax.set_ylim(ymin, 1.0)
     _set_title_above(ax, title or "Toy-limit diagnostic tail areas vs mass")
+    ax.legend(loc="best")
+    _grid(ax)
+    plt.tight_layout()
+
+    if outpath is not None:
+        plt.savefig(outpath, dpi=180)
+        plt.close(fig)
+    else:
+        plt.show()
+
+
+def plot_observed_ul_overlay(
+    curves: List[Tuple[str, pd.DataFrame]],
+    *,
+    y: str = "eps2",
+    title: str = "",
+    outpath: Optional[str] = None,
+) -> None:
+    """Overlay observed upper-limit curves from dataset and combined band tables."""
+    y = str(y).strip().lower()
+    if y == "eps2":
+        col, legacy = "eps2_obs", "ul_eps2_obs"
+        ylabel = r"Observed 95% CL upper limit on $\epsilon^2$"
+    elif y in {"yield", "signal_yield", "a"}:
+        col, legacy = "A_obs", "ul_A_obs"
+        ylabel = "Observed 95% CL upper limit on signal yield"
+    else:
+        raise ValueError("y must be 'eps2' or 'yield'")
+
+    fig, ax = plt.subplots(figsize=(10, 4.5))
+    n_plotted = 0
+    for label, frame in curves:
+        if frame is None or frame.empty or "mass_GeV" not in frame.columns:
+            continue
+        value_col = col if col in frame.columns else legacy if legacy in frame.columns else None
+        if value_col is None:
+            continue
+        sub = frame[["mass_GeV", value_col]].copy()
+        sub["mass_GeV"] = pd.to_numeric(sub["mass_GeV"], errors="coerce")
+        sub[value_col] = pd.to_numeric(sub[value_col], errors="coerce")
+        sub = sub[np.isfinite(sub["mass_GeV"].to_numpy(float)) & np.isfinite(sub[value_col].to_numpy(float))]
+        sub = sub[sub[value_col] > 0].sort_values("mass_GeV")
+        if sub.empty:
+            continue
+        lw = 2.4 if str(label).lower() == "combined" else 1.6
+        color = "k" if str(label).lower() == "combined" else None
+        ax.plot(sub["mass_GeV"], sub[value_col], label=str(label), lw=lw, color=color)
+        n_plotted += 1
+
+    if n_plotted == 0:
+        plt.close(fig)
+        return
+
+    ax.set_yscale("log")
+    ax.set_xlabel("Mass hypothesis m (GeV)")
+    ax.set_ylabel(ylabel)
+    _set_title_above(ax, title or "Observed upper limits: datasets and combined")
     ax.legend(loc="best")
     _grid(ax)
     plt.tight_layout()
