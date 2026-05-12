@@ -2646,6 +2646,357 @@ def project_eps2_reach(input_csv, output, scale_2015, scale_2016, scale_2021):
     print(f"Wrote projection table to {table_path}")
 
 
+@main.command("plot-band-summary")
+@click.option(
+    "--input-dir",
+    "-i",
+    required=True,
+    type=click.Path(exists=True, file_okay=False, dir_okay=True),
+    help="Directory containing combined_ul_bands_*.csv files.",
+)
+@click.option(
+    "--output-dir",
+    "-o",
+    type=click.Path(file_okay=False, dir_okay=True),
+    help="Directory for regenerated plots. Defaults to INPUT_DIR/csv_regenerated_plots.",
+)
+@click.option(
+    "--prefix",
+    default="",
+    show_default=True,
+    help="Optional filename prefix for generated plots.",
+)
+@click.option(
+    "--requested-masses-mev",
+    default="85,105,138,170,177,207",
+    show_default=True,
+    help="Comma-separated mass points to summarize in MeV.",
+)
+def plot_band_summary(input_dir, output_dir, prefix, requested_masses_mev):
+    """Regenerate publication-style band/discovery plots directly from merged CSVs."""
+    import ast
+    import pandas as pd
+    import matplotlib.pyplot as plt
+
+    from .plotting import (
+        ensure_dir,
+        plot_analytic_p0,
+        plot_observed_ul_only,
+        plot_observed_ul_overlay,
+        plot_ul_bands,
+        plot_ul_pvalue_components,
+        plot_ul_pvalues,
+        plot_Z_local_global,
+        set_plot_style,
+    )
+
+    in_dir = os.path.abspath(input_dir)
+    out_dir = os.path.abspath(output_dir or os.path.join(in_dir, "csv_regenerated_plots"))
+    ensure_dir(out_dir)
+    set_plot_style("paper")
+
+    def _read_csv(name):
+        path = os.path.join(in_dir, name)
+        if not os.path.exists(path):
+            return None
+        df = pd.read_csv(path)
+        if "mass_GeV" in df.columns:
+            df = df.sort_values("mass_GeV").reset_index(drop=True)
+        return df
+
+    def _stem(name: str) -> str:
+        pfx = str(prefix).strip()
+        return f"{pfx}_{name}" if pfx else str(name)
+
+    written = []
+
+    def _plot_pair(plotter, name: str, *args, **kwargs):
+        for ext in (".png", ".pdf"):
+            outpath = os.path.join(out_dir, f"{_stem(name)}{ext}")
+            plotter(*args, outpath=outpath, **kwargs)
+            if os.path.exists(outpath):
+                written.append(outpath)
+
+    combined = _read_csv("combined_ul_bands_combined_all.csv")
+    dataset_bands = {
+        ds: df for ds in ("2015", "2016", "2021")
+        if (df := _read_csv(f"combined_ul_bands_{ds}.csv")) is not None
+    }
+
+    if combined is not None and not combined.empty:
+        _plot_pair(
+            plot_ul_bands,
+            "combined_eps2_bands_observed_expected",
+            combined,
+            use_eps2=True,
+            title=r"Expected/observed 95% CL upper limits on $\epsilon^2$ (combined)",
+        )
+        _plot_pair(
+            plot_observed_ul_only,
+            "combined_observed_eps2_limit",
+            combined,
+            y="eps2",
+            title=r"Observed 95% CL upper limit on $\epsilon^2$ (combined)",
+        )
+        _plot_pair(
+            plot_ul_pvalues,
+            "combined_toy_limit_tail_areas",
+            combined,
+            title="Toy-limit diagnostic tail areas (combined)",
+        )
+        _plot_pair(
+            plot_ul_pvalue_components,
+            "combined_toy_limit_tail_areas_with_corrected_global_thresholds",
+            combined,
+            title="Toy-limit diagnostics with corrected global-threshold references",
+            indep_width_sigma=(
+                float(combined["bands_train_exclude_nsigma"].dropna().iloc[0])
+                if "bands_train_exclude_nsigma" in combined.columns and combined["bands_train_exclude_nsigma"].notna().any()
+                else 1.96
+            ),
+            sigma_col=("sigma_mass_res_min_GeV" if "sigma_mass_res_min_GeV" in combined.columns else "sigma_mass_res_GeV"),
+        )
+        if "p0_analytic" in combined.columns:
+            lee_width = (
+                float(combined["bands_train_exclude_nsigma"].dropna().iloc[0])
+                if "bands_train_exclude_nsigma" in combined.columns and combined["bands_train_exclude_nsigma"].notna().any()
+                else 1.96
+            )
+            sigma_col_combined = "sigma_mass_res_min_GeV" if "sigma_mass_res_min_GeV" in combined.columns else "sigma_mass_res_GeV"
+            _plot_pair(
+                plot_analytic_p0,
+                "combined_local_p0_with_global_p_overlay",
+                combined,
+                title="Local p0 and global p-value overlay (combined)",
+                apply_lee=True,
+                lee_method="sidak",
+                indep_width_sigma=lee_width,
+                sigma_col=sigma_col_combined,
+            )
+            _plot_pair(
+                plot_Z_local_global,
+                "combined_local_Z_with_global_Z_overlay",
+                combined,
+                title="Local Z and global Z overlay (combined)",
+                apply_lee=True,
+                lee_method="sidak",
+                indep_width_sigma=lee_width,
+                sigma_col=sigma_col_combined,
+            )
+
+    overlay_curves = [(ds, df) for ds, df in sorted(dataset_bands.items())]
+    if combined is not None and not combined.empty:
+        overlay_curves.append(("combined", combined))
+    if len(overlay_curves) >= 2:
+        _plot_pair(
+            plot_observed_ul_overlay,
+            "observed_eps2_limit_overlay_datasets_and_combined",
+            overlay_curves,
+            y="eps2",
+            title=r"Observed 95% CL upper limits on $\epsilon^2$: datasets and combined",
+        )
+
+    for ds, df in sorted(dataset_bands.items()):
+        _plot_pair(
+            plot_ul_bands,
+            f"{ds}_eps2_coupling_bands_observed_expected",
+            df,
+            use_eps2=True,
+            title=rf"{ds}: expected/observed 95% CL upper limits on $\epsilon^2$",
+        )
+        if "A_med" in df.columns:
+            _plot_pair(
+                plot_ul_bands,
+                f"{ds}_signal_yield_bands_observed_expected",
+                df,
+                use_eps2=False,
+                title=f"{ds}: expected/observed 95% CL upper limits on signal yield",
+            )
+        if "p0_analytic" in df.columns:
+            lee_width = (
+                float(df["bands_train_exclude_nsigma"].dropna().iloc[0])
+                if "bands_train_exclude_nsigma" in df.columns and df["bands_train_exclude_nsigma"].notna().any()
+                else 1.96
+            )
+            _plot_pair(
+                plot_analytic_p0,
+                f"{ds}_local_p0_with_global_p_overlay",
+                df,
+                title=f"{ds}: local p0 and global p-value overlay",
+                apply_lee=True,
+                lee_method="sidak",
+                indep_width_sigma=lee_width,
+                sigma_col="sigma_mass_res_GeV",
+            )
+            _plot_pair(
+                plot_Z_local_global,
+                f"{ds}_local_Z_with_global_Z_overlay",
+                df,
+                title=f"{ds}: local Z and global Z overlay",
+                apply_lee=True,
+                lee_method="sidak",
+                indep_width_sigma=lee_width,
+                sigma_col="sigma_mass_res_GeV",
+            )
+
+    if combined is not None and dataset_bands:
+        rows = []
+        for _, row in combined.iterrows():
+            mass = float(row["mass_GeV"])
+            singles = []
+            for ds, df in dataset_bands.items():
+                sub = df[np.isclose(pd.to_numeric(df["mass_GeV"], errors="coerce"), mass, rtol=0.0, atol=5e-10)]
+                if sub.empty:
+                    continue
+                sr = sub.iloc[0]
+                singles.append((ds, float(sr.get("eps2_med", np.nan)), float(sr.get("eps2_obs", sr.get("ul_eps2_obs", np.nan)))))
+            singles = [s for s in singles if np.isfinite(s[1])]
+            if not singles:
+                continue
+            best_med = min(s[1] for s in singles)
+            best_obs_vals = [s[2] for s in singles if np.isfinite(s[2])]
+            rows.append(
+                {
+                    "mass_GeV": mass,
+                    "mass_MeV": 1000.0 * mass,
+                    "dataset_set": row.get("dataset_set", ""),
+                    "combined_eps2_med": float(row.get("eps2_med", np.nan)),
+                    "best_single_eps2_med": best_med,
+                    "combined_over_best_single_median": float(row.get("eps2_med", np.nan)) / best_med if best_med > 0 else np.nan,
+                    "combined_eps2_obs": float(row.get("eps2_obs", row.get("ul_eps2_obs", np.nan))),
+                    "best_single_eps2_obs": min(best_obs_vals) if best_obs_vals else np.nan,
+                    "single_datasets": "+".join(s[0] for s in singles),
+                    "n_single_datasets": len(singles),
+                }
+            )
+        if rows:
+            overlap = pd.DataFrame(rows).sort_values("mass_GeV").reset_index(drop=True)
+            overlap_csv = os.path.join(out_dir, f"{_stem('combined_vs_best_single_limit_diagnostic')}.csv")
+            overlap.to_csv(overlap_csv, index=False)
+            written.append(overlap_csv)
+
+            fig, ax = plt.subplots(figsize=(9.5, 4.8))
+            ax.plot(
+                overlap["mass_MeV"],
+                overlap["combined_over_best_single_median"],
+                color="k",
+                lw=2.0,
+                label="combined median / best single median",
+            )
+            ax.axhline(1.0, color="0.35", ls="--", lw=1.0, label="parity")
+            ax.set_xlabel("Mass hypothesis [MeV]")
+            ax.set_ylabel(r"median $\epsilon^2$ limit ratio")
+            ax.set_title("Combined expected limit compared with best single-dataset limit")
+            ax.legend(loc="best", frameon=True)
+            ax.grid(True, alpha=0.25)
+            fig.tight_layout()
+            for ext in (".png", ".pdf"):
+                path = os.path.join(out_dir, f"{_stem('combined_vs_best_single_limit_diagnostic')}{ext}")
+                fig.savefig(path, dpi=220)
+                written.append(path)
+            plt.close(fig)
+
+    requested = []
+    try:
+        requested = [float(tok.strip()) for tok in str(requested_masses_mev).split(",") if tok.strip()]
+    except Exception:
+        requested = []
+    if requested:
+        summary_rows = []
+        sources = [(f"dataset_{ds}", df) for ds, df in sorted(dataset_bands.items())]
+        if combined is not None:
+            sources.append(("combined", combined))
+        for label, df in sources:
+            for mev in requested:
+                mass = float(mev) / 1000.0
+                sub = df[np.isclose(pd.to_numeric(df["mass_GeV"], errors="coerce"), mass, rtol=0.0, atol=5e-10)]
+                if sub.empty:
+                    continue
+                row = sub.iloc[0]
+                summary_rows.append(
+                    {
+                        "source": label,
+                        "mass_MeV": float(mev),
+                        "dataset_or_set": row.get("dataset", row.get("dataset_set", "")),
+                        "eps2_obs": row.get("eps2_obs", row.get("ul_eps2_obs", np.nan)),
+                        "eps2_med": row.get("eps2_med", np.nan),
+                        "eps2_lo1": row.get("eps2_lo1", np.nan),
+                        "eps2_hi1": row.get("eps2_hi1", np.nan),
+                        "eps2_lo2": row.get("eps2_lo2", np.nan),
+                        "eps2_hi2": row.get("eps2_hi2", np.nan),
+                        "p0_analytic": row.get("p0_analytic", np.nan),
+                        "Z_analytic": row.get("Z_analytic", np.nan),
+                    }
+                )
+        if summary_rows:
+            requested_csv = os.path.join(out_dir, f"{_stem('requested_mass_points_summary')}.csv")
+            pd.DataFrame(summary_rows).to_csv(requested_csv, index=False)
+            written.append(requested_csv)
+
+    if combined is not None and "meta" in combined.columns:
+        density_rows = []
+        for _, row in combined.iterrows():
+            try:
+                meta = ast.literal_eval(str(row["meta"]))
+            except Exception:
+                meta = []
+            for item in meta if isinstance(meta, list) else []:
+                density_rows.append(
+                    {
+                        "mass_GeV": float(row["mass_GeV"]),
+                        "mass_MeV": 1000.0 * float(row["mass_GeV"]),
+                        "dataset_set": row.get("dataset_set", ""),
+                        "dataset": item.get("key", ""),
+                        "sigma_GeV": item.get("sigma", np.nan),
+                        "density_counts_per_GeV": item.get("dens", np.nan),
+                    }
+                )
+        if density_rows:
+            density_csv = os.path.join(out_dir, f"{_stem('combined_density_metadata')}.csv")
+            pd.DataFrame(density_rows).to_csv(density_csv, index=False)
+            written.append(density_csv)
+
+    rerun_script = os.path.join(out_dir, f"{_stem('sdf_rerun_selected_mass_points')}.sh")
+    with open(rerun_script, "w", encoding="utf-8") as fh:
+        fh.write(
+            "#!/bin/bash\n"
+            "set -euo pipefail\n\n"
+            "# Run from the hps-gpr repository on SDF after pulling the merged code.\n"
+            "hps-gpr slurm-gen \\\n"
+            "  --config config_2015_2016_10pct_2021_1pct_10k.yaml \\\n"
+            "  --n-jobs 231 \\\n"
+            "  --job-name hps151621_10k_rerun6 \\\n"
+            "  --partition roma \\\n"
+            "  --account hps:hps-prod \\\n"
+            "  --time 24:00:00 \\\n"
+            "  --memory 8G \\\n"
+            "  --output submit_151621_10k_rerun6.slurm\n\n"
+            "for TASK_ID in 65 85 118 150 157 187; do\n"
+            "  sbatch --export=ALL,TASK_ID=${TASK_ID},N_TASKS=231 submit_151621_10k_rerun6.slurm\n"
+            "done\n\n"
+            "hps-gpr slurm-gen \\\n"
+            "  --config config_2015_2016_10pct_2021_1pct_10k_rpen7.yaml \\\n"
+            "  --n-jobs 231 \\\n"
+            "  --job-name hps151621_rpen7_rerun6 \\\n"
+            "  --partition roma \\\n"
+            "  --account hps:hps-prod \\\n"
+            "  --time 24:00:00 \\\n"
+            "  --memory 8G \\\n"
+            "  --output submit_151621_rpen7_rerun6.slurm\n\n"
+            "for TASK_ID in 65 85 118 150 157 187; do\n"
+            "  sbatch --export=ALL,TASK_ID=${TASK_ID},N_TASKS=231 submit_151621_rpen7_rerun6.slurm\n"
+            "done\n\n"
+            "hps-gpr slurm-combine --output-dir outputs/prod_2015_2016_10pct_2021_1pct_10k_bands\n"
+            "hps-gpr slurm-combine --output-dir outputs/prod_2015_2016_10pct_2021_1pct_10k_bands_rpen7\n"
+        )
+    os.chmod(rerun_script, 0o755)
+    written.append(rerun_script)
+
+    print(f"Wrote {len(written)} band-summary artifact(s) to {out_dir}")
+    for path in written:
+        print(path)
+
+
 @main.command("observed-display")
 @click.option(
     "--config",

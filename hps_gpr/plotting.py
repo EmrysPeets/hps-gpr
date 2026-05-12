@@ -18,6 +18,7 @@ from .statistics import (
     _z_from_p_one_sided,
     _p_from_z_one_sided,
     _p_global_from_local,
+    _p_local_from_global_summary,
 )
 
 if TYPE_CHECKING:
@@ -852,24 +853,43 @@ def plot_ul_pvalue_components(
             vals.append(v)
             ax.plot(masses, v, label=label, color=color)
 
+    ref_levels: List[float] = []
+    for z in [1.0, 2.0, 3.0]:
+        p_local = _p_from_z_one_sided(z)
+        p_global_threshold = _p_local_from_global_summary(
+            p_local,
+            neff=float(neff),
+            method=lee_method,
+        )
+        ref_levels.extend([float(p_local), float(p_global_threshold)])
+
     y_all = np.concatenate(vals) if vals else np.array([1.0])
     ymin_data = np.nanmin(y_all[np.isfinite(y_all)]) if np.isfinite(y_all).any() else 1e-3
-    ymin_plot = max(1e-6, min(0.8 * ymin_data, 0.2))
+    ref_arr = np.asarray(ref_levels, float)
+    ref_arr = ref_arr[np.isfinite(ref_arr) & (ref_arr > 0.0)]
+    ymin_ref = float(np.nanmin(ref_arr)) if ref_arr.size else 1e-3
+    ymin_plot = max(1e-8, min(0.8 * ymin_data, 0.8 * ymin_ref, 0.2))
 
     for z in [1.0, 2.0, 3.0]:
         p_local = _p_from_z_one_sided(z)
-        p_global, _ = _scan_global_pvalue_and_excess_z(
-            np.asarray([p_local], float),
+        p_global_threshold = _p_local_from_global_summary(
+            p_local,
             neff=float(neff),
-            lee_method=lee_method,
+            method=lee_method,
         )
-        p_global = float(p_global[0])
         if z <= 2.0 or ymin_plot <= p_local * 1.2:
             ax.axhline(p_local, color="0.35", ls=":", lw=0.9)
             ax.text(masses.max(), p_local, f" local {int(z)}σ", va="bottom", ha="right", fontsize=8)
-        if z <= 2.0 or ymin_plot <= p_global * 1.2:
-            ax.axhline(p_global, color="0.15", ls="--", lw=0.9)
-            ax.text(masses.min(), p_global, f"scan global {int(z)}σ ", va="bottom", ha="left", fontsize=8)
+        if z <= 2.0 or ymin_plot <= p_global_threshold * 1.2:
+            ax.axhline(p_global_threshold, color="0.15", ls="--", lw=0.9)
+            ax.text(
+                masses.min(),
+                p_global_threshold,
+                f"global {int(z)}σ threshold ",
+                va="bottom",
+                ha="left",
+                fontsize=8,
+            )
 
     ax.set_yscale("log")
     ax.set_ylim(min(1.0, max(ymin_plot, 1e-6)), 1.0)
@@ -1139,7 +1159,7 @@ def plot_Z_local_global(
 
     if apply_lee:
         p_local = np.asarray([_p_from_z_one_sided(float(z)) for z in Z_local], float)
-        _, Z_global, p_label, info_box = _resolve_global_overlay_from_local_p(
+        _, Z_global, p_label, _info_box = _resolve_global_overlay_from_local_p(
             df,
             p_local,
             masses=masses,
@@ -1149,7 +1169,6 @@ def plot_Z_local_global(
             sigma_col=sigma_col,
         )
         ax.plot(masses, Z_global, "--", label=p_label.replace("scan p-value", "Z"))
-        _add_info_box(ax, info_box, loc="upper right")
 
     for z in (z_lines or []):
         ax.axhline(float(z), color="k", ls=":", lw=0.8, label=f"{z:.0f}σ")
