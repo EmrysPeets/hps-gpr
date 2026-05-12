@@ -255,6 +255,9 @@ def combined_cls_limit_epsilon2_from_vectors(
     s_unit: np.ndarray,
     config: "Config",
     seed: int = 1,
+    *,
+    mode: Optional[str] = None,
+    num_toys: Optional[int] = None,
 ) -> float:
     """Compute combined CLs limit on epsilon^2 from pre-built concatenated vectors.
 
@@ -279,8 +282,8 @@ def combined_cls_limit_epsilon2_from_vectors(
 
     rng = np.random.default_rng(seed)
     alpha = float(config.cls_alpha)
-    mode = str(config.cls_mode).lower().strip()
-    num_toys = int(config.cls_num_toys)
+    mode = str(config.cls_mode if mode is None else mode).lower().strip()
+    num_toys = int(config.cls_num_toys if num_toys is None else num_toys)
 
     def cls_at_eps2(eps2: float) -> float:
         eps2 = float(max(eps2, 0.0))
@@ -307,14 +310,14 @@ def combined_cls_limit_epsilon2_from_vectors(
     for _ in range(80):
         mid = 0.5 * (eps_lo + eps_hi)
         c = cls_at_eps2(mid)
-        if abs(c - alpha) < 1e-2:
+        if abs(c - alpha) < 1e-8:
             eps_lo = eps_hi = mid
             break
         if c > alpha:
             eps_lo = mid
         else:
             eps_hi = mid
-        if abs(eps_hi - eps_lo) <= max(1e-16, 1e-3 * eps_hi):
+        if abs(eps_hi - eps_lo) <= max(1e-16, 1e-6 * eps_hi):
             break
 
     return float(0.5 * (eps_lo + eps_hi))

@@ -90,6 +90,83 @@ def test_combined_cls_matches_single_channel_limit_for_equivalent_vectors():
     assert np.isclose(eps2_up, amp_limit, rtol=1e-3, atol=1e-12)
 
 
+def test_combined_cls_limit_converges_to_requested_alpha():
+    cfg = Config(cls_mode="asymptotic", cls_alpha=0.05)
+    obs = np.array([50.0, 50.0, 50.0, 50.0, 50.0])
+    b = np.array([50.0, 50.0, 50.0, 50.0, 50.0])
+    cov = np.diag([10.0, 10.0, 10.0, 10.0, 10.0])
+    s_unit = np.array([0.05, 0.2, 0.5, 0.2, 0.05]) * 1.0e8
+
+    eps2_up = combined_cls_limit_epsilon2_from_vectors(obs, b, cov, s_unit, cfg)
+    cls, _, _, _ = asymptotic_cls_profiled_gaussian(eps2_up, obs, b, cov, s_unit)
+
+    assert abs(cls - cfg.cls_alpha) < 1e-5
+
+
+def test_combined_asimov_limit_is_not_degraded_by_weak_independent_channel():
+    cfg = Config(cls_mode="asymptotic", cls_alpha=0.05)
+    b_a = np.ones(5) * 50.0
+    obs_a = b_a.astype(int)
+    cov_a = np.diag(np.ones(5) * 10.0)
+    s_a = np.array([0.05, 0.2, 0.5, 0.2, 0.05]) * 1.0e8
+
+    b_b = np.ones(21) * 50.0
+    obs_b = b_b.astype(int)
+    cov_b = np.diag(np.ones(21) * 10.0)
+    x = np.linspace(-3.0, 3.0, 21)
+    s_b = np.exp(-0.5 * x * x)
+    s_b = s_b / np.sum(s_b) * 0.05e8
+
+    zeros_ab = np.zeros((cov_a.shape[0], cov_b.shape[0]))
+    cov_ab = np.block([[cov_a, zeros_ab], [zeros_ab.T, cov_b]])
+
+    lim_a = combined_cls_limit_epsilon2_from_vectors(obs_a, b_a, cov_a, s_a, cfg)
+    lim_b = combined_cls_limit_epsilon2_from_vectors(obs_b, b_b, cov_b, s_b, cfg)
+    lim_ab = combined_cls_limit_epsilon2_from_vectors(
+        np.concatenate([obs_a, obs_b]),
+        np.concatenate([b_a, b_b]),
+        cov_ab,
+        np.concatenate([s_a, s_b]),
+        cfg,
+    )
+
+    assert lim_ab <= min(lim_a, lim_b) * 1.001
+
+
+def test_combined_cls_limit_honors_explicit_mode_override(monkeypatch):
+    import hps_gpr.evaluation as eval_mod
+
+    calls = []
+
+    def fake_asymptotic(A_test, *args, **kwargs):
+        calls.append(float(A_test))
+        return (0.0, 0.0, 1.0)
+
+    def fail_toys(*args, **kwargs):
+        raise AssertionError("combined limit ignored the explicit mode override")
+
+    monkeypatch.setattr(eval_mod, "cls_amplitude_asymptotic", fake_asymptotic)
+    monkeypatch.setattr(eval_mod, "cls_amplitude_toys", fail_toys)
+
+    cfg = Config(cls_mode="toys", cls_alpha=0.05, cls_num_toys=3)
+    obs = np.array([10.0, 10.0, 10.0])
+    b = np.array([10.0, 10.0, 10.0])
+    cov = np.eye(3)
+    s_unit = np.array([1.0e8, 2.0e8, 1.0e8])
+
+    combined_cls_limit_epsilon2_from_vectors(
+        obs,
+        b,
+        cov,
+        s_unit,
+        cfg,
+        mode="asymptotic",
+        num_toys=7,
+    )
+
+    assert calls
+
+
 def _fake_prediction(ds, mass, config, train_exclude_nsigma=None):
     sigma = 0.0018
     edges_full = np.linspace(float(mass) - 0.010, float(mass) + 0.010, 21)
@@ -158,4 +235,3 @@ def test_expected_ul_bands_reports_profiled_cls_metadata(monkeypatch):
     assert list(df["cls_statistic"]) == ["tilde_q_mu"]
     assert list(df["cls_calibration"]) == ["asymptotic"]
     assert list(df["global_method"]) == ["sidak_approx"]
-

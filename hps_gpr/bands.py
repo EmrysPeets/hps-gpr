@@ -479,6 +479,8 @@ def expected_ul_bands_for_combination(
             eps2_obs = combined_cls_limit_epsilon2_from_vectors(
                 obs_vec0, b_vec, cov_mat, s_unit, config,
                 seed=int(rng.integers(1, 2**31 - 1)),
+                mode=mode,
+                num_toys=num_toys_cls,
             )
         else:
             eps2_obs = nan
@@ -521,6 +523,8 @@ def expected_ul_bands_for_combination(
                     eps2_t = combined_cls_limit_epsilon2_from_vectors(
                         obs_toy, b_vec, cov_mat, s_unit, config,
                         seed=int(rng.integers(1, 2**31 - 1)),
+                        mode=mode,
+                        num_toys=num_toys_cls,
                     )
                     toy_eps2.append(float(eps2_t))
 
@@ -585,6 +589,8 @@ def expected_ul_bands_for_combination(
                 eps2_t = combined_cls_limit_epsilon2_from_vectors(
                     obs_v, b_v, cov_v, s_v, config,
                     seed=int(rng.integers(1, 2**31 - 1)),
+                    mode=mode,
+                    num_toys=num_toys_cls,
                 )
                 toy_eps2.append(float(eps2_t))
 
