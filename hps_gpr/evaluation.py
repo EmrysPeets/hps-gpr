@@ -176,7 +176,7 @@ def evaluate_single_dataset(
 
     # --- p0/Z via profiled LRT (v15) ---
     tmpl, _ = build_window_template_from_full(
-        pred.edges_full, pred.blind_mask, mass, pred.sigma_val
+        pred.edges_full, pred.blind_mask, mass, pred.sigma_val, config=config
     )
     p0, Z, _, _ = p0_profiled_gaussian_LRT(pred.obs, pred.mu, pred.cov, tmpl)
 
@@ -227,10 +227,24 @@ def _concat_block_diag(covs: List[np.ndarray]) -> np.ndarray:
     return out
 
 
+def _combined_mode(config: "Config") -> str:
+    """Normalize the combined shared-coupling scan mode."""
+    raw = str(getattr(config, "combined_mode", "epsilon2") or "epsilon2").lower().strip()
+    mode = raw.replace("-", "_")
+    if mode in {"epsilon2", "eps2", "direct", "legacy"}:
+        return "epsilon2"
+    if mode in {"count_scale", "countscale", "count_scaled"}:
+        return "count_scale"
+    raise ValueError(
+        f"Unknown combined_mode={raw!r}; expected 'epsilon2' or 'count_scale'."
+    )
+
+
 def build_combined_components(
     mass: float,
     ds_list: List["DatasetConfig"],
     preds: List[BlindPrediction],
+    config: Optional["Config"] = None,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Build concatenated (obs, b, cov, s_unit) for a shared mass hypothesis.
 
@@ -240,7 +254,7 @@ def build_combined_components(
     b = np.concatenate([p.mu for p in preds]).astype(float)
     cov = _concat_block_diag([p.cov for p in preds]).astype(float)
     templates = [
-        build_window_template_from_full(p.edges_full, p.blind_mask, mass, p.sigma_val)[0]
+        build_window_template_from_full(p.edges_full, p.blind_mask, mass, p.sigma_val, config=config)[0]
         for p in preds
     ]
     Ks = [A_from_epsilon2(ds, mass, 1.0, p.integral_density) for ds, p in zip(ds_list, preds)]
@@ -255,6 +269,9 @@ def combined_cls_limit_epsilon2_from_vectors(
     s_unit: np.ndarray,
     config: "Config",
     seed: int = 1,
+    *,
+    mode: Optional[str] = None,
+    num_toys: Optional[int] = None,
 ) -> float:
     """Compute combined CLs limit on epsilon^2 from pre-built concatenated vectors.
 
@@ -279,19 +296,34 @@ def combined_cls_limit_epsilon2_from_vectors(
 
     rng = np.random.default_rng(seed)
     alpha = float(config.cls_alpha)
-    mode = str(config.cls_mode).lower().strip()
-    num_toys = int(config.cls_num_toys)
+    mode = str(config.cls_mode if mode is None else mode).lower().strip()
+    num_toys = int(config.cls_num_toys if num_toys is None else num_toys)
+    combined_mode = _combined_mode(config)
+
+    signal_scale = 1.0
+    signal_template = s_unit
+    if combined_mode == "count_scale":
+        # Coordinate change only:
+        #   eps2 * s_unit == (eps2 * sum(s_unit)) * (s_unit / sum(s_unit)).
+        # Dataset-specific mass resolution, density, and radiative factors are
+        # already encoded bin-by-bin in s_unit.
+        signal_template = np.clip(s_unit, 0.0, None)
+        signal_scale = float(np.sum(signal_template))
+        if not np.isfinite(signal_scale) or signal_scale <= 0.0:
+            return float("nan")
+        signal_template = signal_template / signal_scale
 
     def cls_at_eps2(eps2: float) -> float:
         eps2 = float(max(eps2, 0.0))
+        test_strength = eps2 * signal_scale
         if mode == "asymptotic":
-            return cls_amplitude_asymptotic(eps2, obs, b, cov, s_unit)[0]
+            return cls_amplitude_asymptotic(test_strength, obs, b, cov, signal_template)[0]
         return cls_amplitude_toys(
-            eps2,
+            test_strength,
             obs,
             b,
             cov,
-            s_unit,
+            signal_template,
             rng,
             max(1, int(num_toys)),
         )[0]
@@ -299,7 +331,13 @@ def combined_cls_limit_epsilon2_from_vectors(
     s_sum = float(np.sum(np.clip(s_unit, 0.0, None)))
     b_sum = float(np.sum(np.clip(b, 0.0, None)))
     eps_lo = 0.0
-    eps_hi = max(1e-10, 3.0 * math.sqrt(max(b_sum, 1.0)) / max(s_sum, 1e-12))
+    if combined_mode == "count_scale":
+        eps_hi = max(
+            1e-10,
+            max(1.0, 3.0 * math.sqrt(max(b_sum, 1.0))) / max(signal_scale, 1e-12),
+        )
+    else:
+        eps_hi = max(1e-10, 3.0 * math.sqrt(max(b_sum, 1.0)) / max(s_sum, 1e-12))
     it = 0
     while cls_at_eps2(eps_hi) > alpha and eps_hi < 1e12 and it < 80:
         eps_hi *= 2.0
@@ -307,14 +345,14 @@ def combined_cls_limit_epsilon2_from_vectors(
     for _ in range(80):
         mid = 0.5 * (eps_lo + eps_hi)
         c = cls_at_eps2(mid)
-        if abs(c - alpha) < 1e-2:
+        if abs(c - alpha) < 1e-8:
             eps_lo = eps_hi = mid
             break
         if c > alpha:
             eps_lo = mid
         else:
             eps_hi = mid
-        if abs(eps_hi - eps_lo) <= max(1e-16, 1e-3 * eps_hi):
+        if abs(eps_hi - eps_lo) <= max(1e-16, 1e-6 * eps_hi):
             break
 
     return float(0.5 * (eps_lo + eps_hi))
@@ -328,7 +366,7 @@ def combined_cls_limit_epsilon2(
     seed: int = 1,
 ) -> float:
     """Compute combined CLs limit on epsilon^2."""
-    obs, b, cov, s_unit = build_combined_components(float(mass), ds_list, preds)
+    obs, b, cov, s_unit = build_combined_components(float(mass), ds_list, preds, config=config)
     return combined_cls_limit_epsilon2_from_vectors(obs, b, cov, s_unit, config, seed=seed)
 
 
@@ -339,7 +377,7 @@ def evaluate_combined(
     config: "Config",
 ) -> CombinedResult:
     """Evaluate combined datasets at one mass hypothesis."""
-    obs, b, cov, s_unit = build_combined_components(float(mass), ds_list, preds)
+    obs, b, cov, s_unit = build_combined_components(float(mass), ds_list, preds, config=config)
     eps2_up = combined_cls_limit_epsilon2(mass, ds_list, preds, config)
 
     # Profiled LRT p0 on ε² scale

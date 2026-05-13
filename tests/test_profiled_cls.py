@@ -1,4 +1,5 @@
 import numpy as np
+from types import SimpleNamespace
 
 from hps_gpr.bands import expected_ul_bands_for_dataset
 from hps_gpr.config import Config
@@ -90,6 +91,132 @@ def test_combined_cls_matches_single_channel_limit_for_equivalent_vectors():
     assert np.isclose(eps2_up, amp_limit, rtol=1e-3, atol=1e-12)
 
 
+def test_combined_count_scale_is_equivalent_to_full_yield_single_channel():
+    cfg = Config(cls_mode="asymptotic", cls_alpha=0.05, combined_mode="count_scale")
+    obs = np.array([19.0, 22.0, 20.0, 18.0, 21.0])
+    b = np.array([20.0, 20.0, 20.0, 20.0, 20.0])
+    cov = np.diag([2.0, 2.0, 2.0, 2.0, 2.0])
+    # Window-sliced template is intentionally not normalized, matching the
+    # leakage-retaining single-dataset limit path.
+    template = np.array([0.04, 0.19, 0.38, 0.19, 0.04])
+    counts_per_eps2 = 3.7e8
+    s_unit = counts_per_eps2 * template
+
+    eps2_up = combined_cls_limit_epsilon2_from_vectors(obs, b, cov, s_unit, cfg)
+    A_full_up, _ = cls_limit_for_template(
+        obs,
+        b,
+        cov,
+        template,
+        alpha=cfg.cls_alpha,
+        mode=cfg.cls_mode,
+        use_eps2=False,
+    )
+
+    assert np.isclose(eps2_up, A_full_up / counts_per_eps2, rtol=1e-4, atol=1e-12)
+
+
+def test_combined_count_scale_matches_direct_epsilon2_scan():
+    obs = np.array([52.0, 50.0, 49.0, 51.0, 48.0, 50.0])
+    b = np.array([50.0, 50.0, 50.0, 50.0, 50.0, 50.0])
+    cov = np.diag([8.0, 8.0, 8.0, 8.0, 8.0, 8.0])
+    s_unit = np.array([0.02, 0.15, 0.33, 0.28, 0.12, 0.02]) * 1.2e9
+
+    direct = combined_cls_limit_epsilon2_from_vectors(
+        obs,
+        b,
+        cov,
+        s_unit,
+        Config(cls_mode="asymptotic", cls_alpha=0.05, combined_mode="epsilon2"),
+    )
+    count_scale = combined_cls_limit_epsilon2_from_vectors(
+        obs,
+        b,
+        cov,
+        s_unit,
+        Config(cls_mode="asymptotic", cls_alpha=0.05, combined_mode="count_scale"),
+    )
+
+    assert np.isclose(count_scale, direct, rtol=1e-4, atol=1e-12)
+
+
+def test_combined_cls_limit_converges_to_requested_alpha():
+    cfg = Config(cls_mode="asymptotic", cls_alpha=0.05)
+    obs = np.array([50.0, 50.0, 50.0, 50.0, 50.0])
+    b = np.array([50.0, 50.0, 50.0, 50.0, 50.0])
+    cov = np.diag([10.0, 10.0, 10.0, 10.0, 10.0])
+    s_unit = np.array([0.05, 0.2, 0.5, 0.2, 0.05]) * 1.0e8
+
+    eps2_up = combined_cls_limit_epsilon2_from_vectors(obs, b, cov, s_unit, cfg)
+    cls, _, _, _ = asymptotic_cls_profiled_gaussian(eps2_up, obs, b, cov, s_unit)
+
+    assert abs(cls - cfg.cls_alpha) < 1e-5
+
+
+def test_combined_asimov_limit_is_not_degraded_by_weak_independent_channel():
+    cfg = Config(cls_mode="asymptotic", cls_alpha=0.05)
+    b_a = np.ones(5) * 50.0
+    obs_a = b_a.astype(int)
+    cov_a = np.diag(np.ones(5) * 10.0)
+    s_a = np.array([0.05, 0.2, 0.5, 0.2, 0.05]) * 1.0e8
+
+    b_b = np.ones(21) * 50.0
+    obs_b = b_b.astype(int)
+    cov_b = np.diag(np.ones(21) * 10.0)
+    x = np.linspace(-3.0, 3.0, 21)
+    s_b = np.exp(-0.5 * x * x)
+    s_b = s_b / np.sum(s_b) * 0.05e8
+
+    zeros_ab = np.zeros((cov_a.shape[0], cov_b.shape[0]))
+    cov_ab = np.block([[cov_a, zeros_ab], [zeros_ab.T, cov_b]])
+
+    lim_a = combined_cls_limit_epsilon2_from_vectors(obs_a, b_a, cov_a, s_a, cfg)
+    lim_b = combined_cls_limit_epsilon2_from_vectors(obs_b, b_b, cov_b, s_b, cfg)
+    lim_ab = combined_cls_limit_epsilon2_from_vectors(
+        np.concatenate([obs_a, obs_b]),
+        np.concatenate([b_a, b_b]),
+        cov_ab,
+        np.concatenate([s_a, s_b]),
+        cfg,
+    )
+
+    assert lim_ab <= min(lim_a, lim_b) * 1.001
+
+
+def test_combined_cls_limit_honors_explicit_mode_override(monkeypatch):
+    import hps_gpr.evaluation as eval_mod
+
+    calls = []
+
+    def fake_asymptotic(A_test, *args, **kwargs):
+        calls.append(float(A_test))
+        return (0.0, 0.0, 1.0)
+
+    def fail_toys(*args, **kwargs):
+        raise AssertionError("combined limit ignored the explicit mode override")
+
+    monkeypatch.setattr(eval_mod, "cls_amplitude_asymptotic", fake_asymptotic)
+    monkeypatch.setattr(eval_mod, "cls_amplitude_toys", fail_toys)
+
+    cfg = Config(cls_mode="toys", cls_alpha=0.05, cls_num_toys=3)
+    obs = np.array([10.0, 10.0, 10.0])
+    b = np.array([10.0, 10.0, 10.0])
+    cov = np.eye(3)
+    s_unit = np.array([1.0e8, 2.0e8, 1.0e8])
+
+    combined_cls_limit_epsilon2_from_vectors(
+        obs,
+        b,
+        cov,
+        s_unit,
+        cfg,
+        mode="asymptotic",
+        num_toys=7,
+    )
+
+    assert calls
+
+
 def _fake_prediction(ds, mass, config, train_exclude_nsigma=None):
     sigma = 0.0018
     edges_full = np.linspace(float(mass) - 0.010, float(mass) + 0.010, 21)
@@ -159,3 +286,67 @@ def test_expected_ul_bands_reports_profiled_cls_metadata(monkeypatch):
     assert list(df["cls_calibration"]) == ["asymptotic"]
     assert list(df["global_method"]) == ["sidak_approx"]
 
+
+def test_expected_ul_bands_refit_reports_fixed_total_mode(monkeypatch):
+    import hps_gpr.bands as bands_mod
+
+    monkeypatch.setattr(bands_mod, "estimate_background_for_dataset", _fake_prediction)
+    monkeypatch.setattr(bands_mod, "fit_gpr", lambda *args, **kwargs: SimpleNamespace())
+    monkeypatch.setattr(
+        bands_mod,
+        "predict_counts_from_log_gpr",
+        lambda gpr, X_query, config: (
+            np.full(len(np.asarray(X_query).reshape(-1)), 42.0),
+            np.eye(len(np.asarray(X_query).reshape(-1)), dtype=float),
+        ),
+    )
+
+    seen = {}
+    real_draw = bands_mod.draw_full_background_toy
+
+    def wrapped_draw(mean_counts, rng, *, mode="poisson", total_count=None):
+        out = real_draw(mean_counts, rng, mode=mode, total_count=total_count)
+        seen["mode"] = str(mode)
+        seen["total_count"] = int(total_count)
+        seen["toy_total"] = int(np.sum(out))
+        return out
+
+    monkeypatch.setattr(bands_mod, "draw_full_background_toy", wrapped_draw)
+
+    ds = DatasetConfig(
+        key="2015",
+        label="HPS 2015",
+        root_path="unused.root",
+        hist_name="hist",
+        m_low=0.02,
+        m_high=0.13,
+        sigma_coeffs=[0.0018],
+        frad_coeffs=[0.085],
+    )
+    cfg = Config(
+        cls_mode="asymptotic",
+        cls_alpha=0.05,
+        ul_bands_toys=3,
+        blind_nsigma=1.64,
+        enable_2015=True,
+        full_toy_bkg_mode="fixed_total_multinomial",
+    )
+
+    df = expected_ul_bands_for_dataset(
+        ds,
+        [0.040],
+        cfg,
+        n_toys=3,
+        seed=11,
+        use_eps2=True,
+        refit_gp_on_toy=True,
+        refit_restarts=0,
+        refit_optimize=False,
+    )
+
+    assert list(df["bands_refit_gp_on_toy"]) == [True]
+    assert list(df["bands_full_toy_bkg_mode"]) == ["fixed_total_multinomial"]
+    assert seen["mode"] == "fixed_total_multinomial"
+    assert seen["toy_total"] == seen["total_count"]
+    for col in ["eps2_lo1", "eps2_med", "eps2_hi1", "A_lo1", "A_med", "A_hi1"]:
+        assert col in df.columns
