@@ -227,10 +227,24 @@ def _concat_block_diag(covs: List[np.ndarray]) -> np.ndarray:
     return out
 
 
+def _combined_mode(config: "Config") -> str:
+    """Normalize the combined shared-coupling scan mode."""
+    raw = str(getattr(config, "combined_mode", "epsilon2") or "epsilon2").lower().strip()
+    mode = raw.replace("-", "_")
+    if mode in {"epsilon2", "eps2", "direct", "legacy"}:
+        return "epsilon2"
+    if mode in {"count_scale", "countscale", "count_scaled"}:
+        return "count_scale"
+    raise ValueError(
+        f"Unknown combined_mode={raw!r}; expected 'epsilon2' or 'count_scale'."
+    )
+
+
 def build_combined_components(
     mass: float,
     ds_list: List["DatasetConfig"],
     preds: List[BlindPrediction],
+    config: Optional["Config"] = None,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Build concatenated (obs, b, cov, s_unit) for a shared mass hypothesis.
 
@@ -284,17 +298,32 @@ def combined_cls_limit_epsilon2_from_vectors(
     alpha = float(config.cls_alpha)
     mode = str(config.cls_mode if mode is None else mode).lower().strip()
     num_toys = int(config.cls_num_toys if num_toys is None else num_toys)
+    combined_mode = _combined_mode(config)
+
+    signal_scale = 1.0
+    signal_template = s_unit
+    if combined_mode == "count_scale":
+        # Coordinate change only:
+        #   eps2 * s_unit == (eps2 * sum(s_unit)) * (s_unit / sum(s_unit)).
+        # Dataset-specific mass resolution, density, and radiative factors are
+        # already encoded bin-by-bin in s_unit.
+        signal_template = np.clip(s_unit, 0.0, None)
+        signal_scale = float(np.sum(signal_template))
+        if not np.isfinite(signal_scale) or signal_scale <= 0.0:
+            return float("nan")
+        signal_template = signal_template / signal_scale
 
     def cls_at_eps2(eps2: float) -> float:
         eps2 = float(max(eps2, 0.0))
+        test_strength = eps2 * signal_scale
         if mode == "asymptotic":
-            return cls_amplitude_asymptotic(eps2, obs, b, cov, s_unit)[0]
+            return cls_amplitude_asymptotic(test_strength, obs, b, cov, signal_template)[0]
         return cls_amplitude_toys(
-            eps2,
+            test_strength,
             obs,
             b,
             cov,
-            s_unit,
+            signal_template,
             rng,
             max(1, int(num_toys)),
         )[0]
@@ -302,7 +331,13 @@ def combined_cls_limit_epsilon2_from_vectors(
     s_sum = float(np.sum(np.clip(s_unit, 0.0, None)))
     b_sum = float(np.sum(np.clip(b, 0.0, None)))
     eps_lo = 0.0
-    eps_hi = max(1e-10, 3.0 * math.sqrt(max(b_sum, 1.0)) / max(s_sum, 1e-12))
+    if combined_mode == "count_scale":
+        eps_hi = max(
+            1e-10,
+            max(1.0, 3.0 * math.sqrt(max(b_sum, 1.0))) / max(signal_scale, 1e-12),
+        )
+    else:
+        eps_hi = max(1e-10, 3.0 * math.sqrt(max(b_sum, 1.0)) / max(s_sum, 1e-12))
     it = 0
     while cls_at_eps2(eps_hi) > alpha and eps_hi < 1e12 and it < 80:
         eps_hi *= 2.0

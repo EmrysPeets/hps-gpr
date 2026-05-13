@@ -258,6 +258,10 @@ class Config:
 
     # Combined fit settings
     do_combined: bool = False
+    # "epsilon2" scans the shared coupling directly. "count_scale" is an
+    # equivalent shared-coupling parameterization that scans a normalized
+    # count-scale signal amplitude internally, then converts back to epsilon^2.
+    combined_mode: str = "epsilon2"
     eps2_lrt_scale: float = 1e10
 
     # Limit-band dataset selector

@@ -649,6 +649,7 @@ def expected_ul_bands_for_combination(
             meta=str(meta),
             cls_statistic="tilde_q_mu",
             cls_calibration=str(mode).lower().strip(),
+            combined_mode=str(getattr(config, "combined_mode", "epsilon2")).lower().strip(),
             global_method="sidak_approx",
             # Provenance
             bands_refit_gp_on_toy=bool(refit_gp_on_toy),

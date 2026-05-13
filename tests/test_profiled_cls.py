@@ -1,4 +1,5 @@
 import numpy as np
+from types import SimpleNamespace
 
 from hps_gpr.bands import expected_ul_bands_for_dataset
 from hps_gpr.config import Config
@@ -88,6 +89,55 @@ def test_combined_cls_matches_single_channel_limit_for_equivalent_vectors():
     )
 
     assert np.isclose(eps2_up, amp_limit, rtol=1e-3, atol=1e-12)
+
+
+def test_combined_count_scale_is_equivalent_to_full_yield_single_channel():
+    cfg = Config(cls_mode="asymptotic", cls_alpha=0.05, combined_mode="count_scale")
+    obs = np.array([19.0, 22.0, 20.0, 18.0, 21.0])
+    b = np.array([20.0, 20.0, 20.0, 20.0, 20.0])
+    cov = np.diag([2.0, 2.0, 2.0, 2.0, 2.0])
+    # Window-sliced template is intentionally not normalized, matching the
+    # leakage-retaining single-dataset limit path.
+    template = np.array([0.04, 0.19, 0.38, 0.19, 0.04])
+    counts_per_eps2 = 3.7e8
+    s_unit = counts_per_eps2 * template
+
+    eps2_up = combined_cls_limit_epsilon2_from_vectors(obs, b, cov, s_unit, cfg)
+    A_full_up, _ = cls_limit_for_template(
+        obs,
+        b,
+        cov,
+        template,
+        alpha=cfg.cls_alpha,
+        mode=cfg.cls_mode,
+        use_eps2=False,
+    )
+
+    assert np.isclose(eps2_up, A_full_up / counts_per_eps2, rtol=1e-4, atol=1e-12)
+
+
+def test_combined_count_scale_matches_direct_epsilon2_scan():
+    obs = np.array([52.0, 50.0, 49.0, 51.0, 48.0, 50.0])
+    b = np.array([50.0, 50.0, 50.0, 50.0, 50.0, 50.0])
+    cov = np.diag([8.0, 8.0, 8.0, 8.0, 8.0, 8.0])
+    s_unit = np.array([0.02, 0.15, 0.33, 0.28, 0.12, 0.02]) * 1.2e9
+
+    direct = combined_cls_limit_epsilon2_from_vectors(
+        obs,
+        b,
+        cov,
+        s_unit,
+        Config(cls_mode="asymptotic", cls_alpha=0.05, combined_mode="epsilon2"),
+    )
+    count_scale = combined_cls_limit_epsilon2_from_vectors(
+        obs,
+        b,
+        cov,
+        s_unit,
+        Config(cls_mode="asymptotic", cls_alpha=0.05, combined_mode="count_scale"),
+    )
+
+    assert np.isclose(count_scale, direct, rtol=1e-4, atol=1e-12)
 
 
 def test_combined_cls_limit_converges_to_requested_alpha():
@@ -235,3 +285,68 @@ def test_expected_ul_bands_reports_profiled_cls_metadata(monkeypatch):
     assert list(df["cls_statistic"]) == ["tilde_q_mu"]
     assert list(df["cls_calibration"]) == ["asymptotic"]
     assert list(df["global_method"]) == ["sidak_approx"]
+
+
+def test_expected_ul_bands_refit_reports_fixed_total_mode(monkeypatch):
+    import hps_gpr.bands as bands_mod
+
+    monkeypatch.setattr(bands_mod, "estimate_background_for_dataset", _fake_prediction)
+    monkeypatch.setattr(bands_mod, "fit_gpr", lambda *args, **kwargs: SimpleNamespace())
+    monkeypatch.setattr(
+        bands_mod,
+        "predict_counts_from_log_gpr",
+        lambda gpr, X_query, config: (
+            np.full(len(np.asarray(X_query).reshape(-1)), 42.0),
+            np.eye(len(np.asarray(X_query).reshape(-1)), dtype=float),
+        ),
+    )
+
+    seen = {}
+    real_draw = bands_mod.draw_full_background_toy
+
+    def wrapped_draw(mean_counts, rng, *, mode="poisson", total_count=None):
+        out = real_draw(mean_counts, rng, mode=mode, total_count=total_count)
+        seen["mode"] = str(mode)
+        seen["total_count"] = int(total_count)
+        seen["toy_total"] = int(np.sum(out))
+        return out
+
+    monkeypatch.setattr(bands_mod, "draw_full_background_toy", wrapped_draw)
+
+    ds = DatasetConfig(
+        key="2015",
+        label="HPS 2015",
+        root_path="unused.root",
+        hist_name="hist",
+        m_low=0.02,
+        m_high=0.13,
+        sigma_coeffs=[0.0018],
+        frad_coeffs=[0.085],
+    )
+    cfg = Config(
+        cls_mode="asymptotic",
+        cls_alpha=0.05,
+        ul_bands_toys=3,
+        blind_nsigma=1.64,
+        enable_2015=True,
+        full_toy_bkg_mode="fixed_total_multinomial",
+    )
+
+    df = expected_ul_bands_for_dataset(
+        ds,
+        [0.040],
+        cfg,
+        n_toys=3,
+        seed=11,
+        use_eps2=True,
+        refit_gp_on_toy=True,
+        refit_restarts=0,
+        refit_optimize=False,
+    )
+
+    assert list(df["bands_refit_gp_on_toy"]) == [True]
+    assert list(df["bands_full_toy_bkg_mode"]) == ["fixed_total_multinomial"]
+    assert seen["mode"] == "fixed_total_multinomial"
+    assert seen["toy_total"] == seen["total_count"]
+    for col in ["eps2_lo1", "eps2_med", "eps2_hi1", "A_lo1", "A_med", "A_hi1"]:
+        assert col in df.columns
