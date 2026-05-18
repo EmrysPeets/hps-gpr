@@ -198,6 +198,7 @@ class Config:
     # v15 injection extensions
     inj_strength_mode: str = "absolute"   # "absolute" | "sigmaA"
     inj_sigma_a_source: str = "asimov"    # "asimov" | "poisson"
+    inj_sigma_a_ref_mode: str = "prefit_asimov"  # "prefit_asimov" | "matched_refit_bonly"
     inj_shape_mode: str = "full"          # "full" | "window"
     inj_background_mode: str = "gp_resample"  # "gp_resample" | "fixed_hist"
     inj_refit_gp_on_toy: bool = False

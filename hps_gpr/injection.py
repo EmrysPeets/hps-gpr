@@ -368,6 +368,160 @@ def _sigmaA_reference(
     return float(d.get("sigma_A", np.nan))
 
 
+def _resolve_sigma_a_ref_mode(config: "Config") -> str:
+    """Normalize the sigma_A reference convention used to scale injections."""
+    raw = str(getattr(config, "inj_sigma_a_ref_mode", "prefit_asimov") or "prefit_asimov").lower().strip()
+    aliases = {
+        "": "prefit_asimov",
+        "prefit": "prefit_asimov",
+        "pre_fit": "prefit_asimov",
+        "prefit_asimov": "prefit_asimov",
+        "initial": "prefit_asimov",
+        "initial_fit": "prefit_asimov",
+        "matched": "matched_refit_bonly",
+        "matched_refit": "matched_refit_bonly",
+        "matched_bonly": "matched_refit_bonly",
+        "matched_refit_bonly": "matched_refit_bonly",
+        "refit_bonly": "matched_refit_bonly",
+    }
+    if raw not in aliases:
+        raise ValueError(
+            "inj_sigma_a_ref_mode must be one of 'prefit_asimov' or "
+            f"'matched_refit_bonly' (got {raw!r})"
+        )
+    return aliases[raw]
+
+
+def _sigmaA_from_mu_cov(
+    mu: np.ndarray,
+    cov: np.ndarray,
+    tmpl_win: np.ndarray,
+    *,
+    source: str,
+    rng: Optional[np.random.Generator],
+) -> float:
+    """Compute sigma_A from an explicit B-only mean/covariance pair."""
+    b = np.asarray(mu, float)
+    if str(source).lower().strip() == "poisson":
+        if rng is None:
+            rng = np.random.default_rng(12345)
+        n_ref = rng.poisson(np.clip(b, 0.0, None))
+    else:
+        n_ref = b
+    d = fit_A_profiled_gaussian_details(
+        n_ref,
+        b,
+        np.asarray(cov, float),
+        np.asarray(tmpl_win, float),
+        allow_negative=True,
+    )
+    return float(d.get("sigma_A", np.nan))
+
+
+def _matched_refit_bonly_sigmaA_reference(
+    ds: "DatasetConfig",
+    config: "Config",
+    *,
+    mass: float,
+    x_full: np.ndarray,
+    msk_train: np.ndarray,
+    msk_blind: np.ndarray,
+    y_full_bonly: np.ndarray,
+    tmpl_win: np.ndarray,
+    source: str,
+    rng: Optional[np.random.Generator],
+    refit_restarts: int,
+    refit_optimize: bool,
+) -> float:
+    """Compute sigma_A after a signal-free refit with the injected-toy settings."""
+    ker = make_kernel_for_dataset(ds, config, mass=float(mass))
+    gpr = fit_gpr(
+        np.asarray(x_full, float)[np.asarray(msk_train, bool)],
+        np.asarray(y_full_bonly, float)[np.asarray(msk_train, bool)],
+        config,
+        restarts=int(refit_restarts),
+        kernel=ker,
+        optimize=bool(refit_optimize),
+    )
+    mu_ref, cov_ref = predict_counts_from_log_gpr(
+        gpr,
+        np.asarray(x_full, float)[np.asarray(msk_blind, bool)],
+        config,
+    )
+    return _sigmaA_from_mu_cov(mu_ref, cov_ref, tmpl_win, source=source, rng=rng)
+
+
+def _resolve_sigma_a_references(
+    pred: "BlindPrediction",
+    ds: "DatasetConfig",
+    config: "Config",
+    *,
+    mass: float,
+    source: str,
+    rng: Optional[np.random.Generator],
+    refit_gp_on_toy: bool,
+    refit_restarts: int,
+    refit_optimize: bool,
+    x_full: np.ndarray,
+    msk_train: np.ndarray,
+    msk_blind: np.ndarray,
+    y_full_bonly: np.ndarray,
+    tmpl_win: np.ndarray,
+) -> Dict[str, Any]:
+    """Return prefit, matched, and selected sigma_A references for one mass."""
+    prefit = _sigmaA_reference(pred, float(mass), source=str(source), rng=rng, config=config)
+    mode = _resolve_sigma_a_ref_mode(config)
+    matched = float("nan")
+    matched_ok = float("nan")
+    error = ""
+    effective_mode = mode
+
+    if mode == "matched_refit_bonly":
+        if not bool(refit_gp_on_toy):
+            matched = float(prefit)
+            matched_ok = 1.0
+        else:
+            try:
+                matched = _matched_refit_bonly_sigmaA_reference(
+                    ds,
+                    config,
+                    mass=float(mass),
+                    x_full=np.asarray(x_full, float),
+                    msk_train=np.asarray(msk_train, bool),
+                    msk_blind=np.asarray(msk_blind, bool),
+                    y_full_bonly=np.asarray(y_full_bonly, float),
+                    tmpl_win=np.asarray(tmpl_win, float),
+                    source=str(source),
+                    rng=rng,
+                    refit_restarts=int(refit_restarts),
+                    refit_optimize=bool(refit_optimize),
+                )
+                matched_ok = 1.0
+            except Exception as exc:
+                matched_ok = 0.0
+                error = _handle_refit_failure(
+                    config,
+                    f"{ds.key} m={float(mass):.6g} matched sigmaA_ref",
+                    exc,
+                )
+
+    if mode == "matched_refit_bonly" and np.isfinite(matched) and matched > 0.0:
+        used = float(matched)
+    else:
+        used = float(prefit)
+        if mode == "matched_refit_bonly" and bool(refit_gp_on_toy):
+            effective_mode = "matched_refit_bonly_fallback_prefit"
+
+    return dict(
+        sigmaA_ref=float(used),
+        sigmaA_ref_prefit=float(prefit),
+        sigmaA_ref_matched=float(matched),
+        sigmaA_ref_mode=str(effective_mode),
+        sigmaA_ref_matched_ok=float(matched_ok),
+        sigmaA_ref_error=str(error),
+    )
+
+
 # ---------------------------------------------------------------------------
 # Main injection/extraction study
 # ---------------------------------------------------------------------------
@@ -702,6 +856,11 @@ class _InjectionMassContext:
     allow_negative: bool
     mvn_method: str
     mvn_max_tries: int
+    sigmaA_ref_prefit: float = float("nan")
+    sigmaA_ref_matched: float = float("nan")
+    sigmaA_ref_mode: str = "prefit_asimov"
+    sigmaA_ref_matched_ok: float = float("nan")
+    sigmaA_ref_error: str = ""
 
 
 @dataclass
@@ -716,6 +875,10 @@ class _ToyPointAccumulator:
     A_per_eps2_unit: float
     f_win: float
     f_train_frac: float
+    sigmaA_ref_prefit: float = float("nan")
+    sigmaA_ref_matched: float = float("nan")
+    sigmaA_ref_mode: str = "prefit_asimov"
+    sigmaA_ref_matched_ok: float = float("nan")
     kernel_ls_policy: str = ""
     signal_model: str = ""
     inj_background_mode: str = ""
@@ -1031,6 +1194,11 @@ def _simulate_toy_rows_chunk(
                 strength=float(A_inj),
                 inj_nsigma=float(inj_nsigma),
                 sigmaA_ref=float(ctx.sigmaA_ref),
+                sigmaA_ref_prefit=float(ctx.sigmaA_ref_prefit),
+                sigmaA_ref_matched=float(ctx.sigmaA_ref_matched),
+                sigmaA_ref_mode=str(ctx.sigmaA_ref_mode),
+                sigmaA_ref_matched_ok=float(ctx.sigmaA_ref_matched_ok),
+                sigmaA_ref_error=str(ctx.sigmaA_ref_error),
                 integral_density=float(ctx.integral_density),
                 A_per_eps2_unit=float(ctx.A_per_eps2_unit),
                 sigma_val=float(ctx.sigma_val),
@@ -1181,9 +1349,6 @@ def _build_injection_mass_context(
     initial_ls_opt = float(getattr(pred, "ls_opt", float("nan")))
     initial_const_opt = float(getattr(pred, "const_opt", float("nan")))
 
-    sigma_seed = _stable_point_seed(int(seed), str(ds.key), float(mass), -1.0)
-    sigma_rng = np.random.default_rng(int(sigma_seed))
-    sigmaA_ref = _sigmaA_reference(pred, float(mass), source=str(sigma_source), rng=sigma_rng, config=config)
     integral_density = _prediction_integral_density(pred)
     A_per_eps2_unit = float(A_from_epsilon2(ds, float(mass), 1.0, integral_density))
 
@@ -1205,6 +1370,25 @@ def _build_injection_mass_context(
     n_blind = int(np.count_nonzero(msk_blind))
     f_train = float(np.sum(tmpl_full[msk_train])) if tmpl_full.shape[0] == x_full.shape[0] else float("nan")
     f_train_frac = float(f_train / f_full) if np.isfinite(f_train) and f_full > 0 else float("nan")
+    sigma_seed = _stable_point_seed(int(seed), str(ds.key), float(mass), -1.0)
+    sigma_rng = np.random.default_rng(int(sigma_seed))
+    sigma_refs = _resolve_sigma_a_references(
+        pred,
+        ds,
+        config,
+        mass=float(mass),
+        source=str(sigma_source),
+        rng=sigma_rng,
+        refit_gp_on_toy=bool(refit_gp_on_toy),
+        refit_restarts=int(refit_restarts),
+        refit_optimize=bool(refit_optimize),
+        x_full=x_full,
+        msk_train=msk_train,
+        msk_blind=msk_blind,
+        y_full_bonly=np.asarray(pred.y_full, float).reshape(-1),
+        tmpl_win=tmpl_win,
+    )
+    sigmaA_ref = float(sigma_refs["sigmaA_ref"])
 
     return _InjectionMassContext(
         ds=ds,
@@ -1219,6 +1403,11 @@ def _build_injection_mass_context(
         tmpl_win=np.asarray(tmpl_win, float),
         tmpl_full=np.asarray(tmpl_full, float),
         sigmaA_ref=float(sigmaA_ref),
+        sigmaA_ref_prefit=float(sigma_refs["sigmaA_ref_prefit"]),
+        sigmaA_ref_matched=float(sigma_refs["sigmaA_ref_matched"]),
+        sigmaA_ref_mode=str(sigma_refs["sigmaA_ref_mode"]),
+        sigmaA_ref_matched_ok=float(sigma_refs["sigmaA_ref_matched_ok"]),
+        sigmaA_ref_error=str(sigma_refs["sigmaA_ref_error"]),
         sigma_val=float(pred.sigma_val),
         sigma_x=float(getattr(pred, "sigma_x", float("nan"))),
         kernel_ls_policy=str(kernel_diag["kernel_ls_policy"]),
@@ -1339,22 +1528,6 @@ def run_funcform_injection_extraction_toys(
             x_full = np.asarray(pred.x_full, float).reshape(-1)
             f_full = float(np.sum(tmpl_full))
 
-            sigma_seed = _stable_point_seed(int(seed), str(ds.key), float(m), float(spec.toy_index))
-            sigma_rng = np.random.default_rng(int(sigma_seed))
-            sigmaA_ref = _sigmaA_reference(pred, float(m), source=str(sigma_source), rng=sigma_rng)
-
-            if strengths_mode_resolved == "sigmaa":
-                A_inj_list = [float(tag) * float(sigmaA_ref) for tag in strength_tags]
-                inj_nsigma_list = [float(tag) for tag in strength_tags]
-            else:
-                A_inj_list = [float(tag) for tag in strength_tags]
-                inj_nsigma_list = [
-                    float(A) / float(sigmaA_ref)
-                    if np.isfinite(sigmaA_ref) and sigmaA_ref > 0
-                    else float("nan")
-                    for A in A_inj_list
-                ]
-
             blind = tuple(pred.blind)
             msk_blind = (x_full >= float(blind[0])) & (x_full <= float(blind[1]))
             if int(np.sum(msk_blind)) == 0:
@@ -1378,6 +1551,38 @@ def run_funcform_injection_extraction_toys(
             f_train_frac = float(f_train / f_full) if np.isfinite(f_train) and f_full > 0 else float("nan")
 
             y_full_base = np.rint(np.clip(np.asarray(pred.y_full, float).reshape(-1), 0.0, None)).astype(int)
+            sigma_seed = _stable_point_seed(int(seed), str(ds.key), float(m), float(spec.toy_index))
+            sigma_rng = np.random.default_rng(int(sigma_seed))
+            sigma_refs = _resolve_sigma_a_references(
+                pred,
+                ds,
+                config,
+                mass=float(m),
+                source=str(sigma_source),
+                rng=sigma_rng,
+                refit_gp_on_toy=bool(refit_gp_on_toy),
+                refit_restarts=int(refit_restarts),
+                refit_optimize=bool(refit_optimize),
+                x_full=x_full,
+                msk_train=msk_train,
+                msk_blind=msk_blind,
+                y_full_bonly=y_full_base,
+                tmpl_win=tmpl_win,
+            )
+            sigmaA_ref = float(sigma_refs["sigmaA_ref"])
+
+            if strengths_mode_resolved == "sigmaa":
+                A_inj_list = [float(tag) * float(sigmaA_ref) for tag in strength_tags]
+                inj_nsigma_list = [float(tag) for tag in strength_tags]
+            else:
+                A_inj_list = [float(tag) for tag in strength_tags]
+                inj_nsigma_list = [
+                    float(A) / float(sigmaA_ref)
+                    if np.isfinite(sigmaA_ref) and sigmaA_ref > 0
+                    else float("nan")
+                    for A in A_inj_list
+                ]
+
             if bool(refit_gp_on_toy):
                 ker = make_kernel_for_dataset(ds, config, mass=float(m))
                 x_win = x_full[msk_blind]
@@ -1451,6 +1656,11 @@ def run_funcform_injection_extraction_toys(
                         strength=float(A_inj),
                         inj_nsigma=float(inj_nsigma),
                         sigmaA_ref=float(sigmaA_ref),
+                        sigmaA_ref_prefit=float(sigma_refs["sigmaA_ref_prefit"]),
+                        sigmaA_ref_matched=float(sigma_refs["sigmaA_ref_matched"]),
+                        sigmaA_ref_mode=str(sigma_refs["sigmaA_ref_mode"]),
+                        sigmaA_ref_matched_ok=float(sigma_refs["sigmaA_ref_matched_ok"]),
+                        sigmaA_ref_error=str(sigma_refs["sigmaA_ref_error"]),
                         sigma_val=float(pred.sigma_val),
                         integral_density=float(integral_density),
                         A_per_eps2_unit=float(A_from_epsilon2(ds, float(m), 1.0, integral_density)),
@@ -1608,6 +1818,10 @@ def run_injection_extraction_streaming(
                 mass_GeV=float(m),
                 strength=float(A_inj),
                 sigmaA_ref=float(ctx.sigmaA_ref),
+                sigmaA_ref_prefit=float(ctx.sigmaA_ref_prefit),
+                sigmaA_ref_matched=float(ctx.sigmaA_ref_matched),
+                sigmaA_ref_mode=str(ctx.sigmaA_ref_mode),
+                sigmaA_ref_matched_ok=float(ctx.sigmaA_ref_matched_ok),
                 integral_density=float(ctx.integral_density),
                 A_per_eps2_unit=float(ctx.A_per_eps2_unit),
                 f_win=float(ctx.f_win),
@@ -1856,6 +2070,10 @@ def run_injection_extraction_streaming_combined(
                     mass_GeV=float(m),
                     strength=float(A_inj_by_ds[ds_key]),
                     sigmaA_ref=float(ctxs_m[ds_key].sigmaA_ref),
+                    sigmaA_ref_prefit=float(ctxs_m[ds_key].sigmaA_ref_prefit),
+                    sigmaA_ref_matched=float(ctxs_m[ds_key].sigmaA_ref_matched),
+                    sigmaA_ref_mode=str(ctxs_m[ds_key].sigmaA_ref_mode),
+                    sigmaA_ref_matched_ok=float(ctxs_m[ds_key].sigmaA_ref_matched_ok),
                     integral_density=float(ctxs_m[ds_key].integral_density),
                     A_per_eps2_unit=float(ctxs_m[ds_key].A_per_eps2_unit),
                     f_win=float(ctxs_m[ds_key].f_win),
