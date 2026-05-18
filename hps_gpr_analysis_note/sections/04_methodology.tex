@@ -735,19 +735,33 @@ The combined 2015$+$2016 10\%$+$2021 1\% radiative-penalty summary is the only p
 where the global conversion is interpreted as part of the final look-elsewhere
 discussion. The single-dataset overlays retained in
 Figure~\ref{fig:local-significances-across-datasets} are used only to show where each
-dataset has its largest \emph{local} upward fluctuation; any orange global overlays in
-those auxiliary PNGs should be read as approximations rather than as finalized
-toy-calibrated claims.
+dataset has its largest \emph{local} upward fluctuation; any global overlays in those
+auxiliary PNGs should be read as approximations rather than as finalized toy-calibrated
+claims.
 
 \begin{figure}[p]
 \centering
-\graphicorplaceholder{0.88\linewidth}{methodology_figs/local_significances_across_datasets.png}
-\caption{Local significances across datasets, shown here as the analytic one-sided
-$p_0(m)$ curves for 2015, 2016 10\%, and 2021 1\%. These panels are included to show
-where each input sample contributes upward local fluctuations to the combined search.
-Any orange global overlays in the auxiliary summary products represent
-\v{S}id\'ak-style approximations; the local blue curves are the quantities actually
-interpreted in this note.}
+\begin{subfigure}[t]{0.32\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/individual_datasets/2015_local_p0_with_global_p_overlay.png}
+  \caption{2015.}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.32\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/individual_datasets/2016_local_p0_with_global_p_overlay.png}
+  \caption{2016 10\%.}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.32\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/individual_datasets/2021_local_p0_with_global_p_overlay.png}
+  \caption{2021 1\%.}
+\end{subfigure}
+\caption{Local discovery p-value scans for the individual input datasets. The blue
+curves are the one-sided local $p_0(m)$ values entering the fixed-mass discovery
+interpretation. The global overlays are effective-trials diagnostics and are shown only
+to indicate the approximate local threshold required for a scan-level statement.}
 \label{fig:local-significances-across-datasets}
 \end{figure}
 
@@ -755,18 +769,18 @@ interpreted in this note.}
 \centering
 \begin{subfigure}[t]{0.48\linewidth}
   \centering
-  \graphicorplaceholder{\linewidth}{summary_combined_all_rad_penalty/p0_analytic_local_global.png}
+  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/diagnostics/combined_local_p0_with_global_p_overlay.png}
   \caption{Combined local $p_0$ curve with the current global approximation overlay.}
 \end{subfigure}
 \hfill
 \begin{subfigure}[t]{0.48\linewidth}
   \centering
-  \graphicorplaceholder{\linewidth}{summary_combined_all_rad_penalty/Z_local_global.png}
+  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/diagnostics/combined_local_Z_with_global_Z_overlay.png}
   \caption{Equivalent local-$Z$ representation with the current global approximation.}
 \end{subfigure}
-\caption{Analytic significance curves for the radiative-penalty three-dataset
-combination. When a full scan-level toy calibration of $q_{0,\max}$ is unavailable,
-the global curve shown here is the effective-trials approximation described by
+\caption{Analytic significance curves for the corrected three-dataset combination. When
+a full scan-level toy calibration of $q_{0,\max}$ is unavailable, the global curve
+shown here is the effective-trials approximation described by
 Eq.~\eqref{eq:sidak-global}; a toy-calibrated $q_{0,\max}$ distribution would take
 precedence for a final discovery claim.}
 \label{fig:combined-significance-rpen}
