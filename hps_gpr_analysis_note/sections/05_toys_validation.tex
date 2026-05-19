@@ -14,62 +14,64 @@ signal leakage into the sideband-training region before the guard width is selec
 \label{fig:hps-gpr-flowchart-section5}
 \end{figure}
 
-\subsection{Guard-band construction using 2015 pseudoexperiments}
+\subsection{Scope of the current validation campaign}
+
+Unless stated otherwise, the toy studies summarized here correspond to the 95\%
+confidence-level workflow and the current refit-based local extraction. The staged
+suites cover the fully unblinded 2015 sample, the 2016 10\% development sample, the
+2021 1\% validation stream, and the shared-$\eps^2$ combinations built from those
+inputs. Older GP-generated injection/extraction figures are retained where they answer
+a stable statistical question, while the newest functional-form closure and observed
+limit studies use the refmatched, widened blind-window convention discussed below.
+
+The validation material is organized around four reader questions. First, how far from
+the signal peak should the GP sideband training data begin? Second, after that training
+exclusion is fixed, should the $1.64$--$2.25\,\sigma_m$ signal tails be omitted as a
+guard band or included in the extraction likelihood through a wider blind window?
+Third, do the refmatched full-refit toys close for the 2015, 2016, and 2021 analysis
+streams? Finally, do the combined pseudoexperiments accumulate sensitivity as expected
+when statistically independent datasets share one coupling parameter?
+
+Throughout this section, the zero-injection row has a special interpretation. At
+$Z_{\mathrm{inj}}=0$ no signal is added, so the pull mean, pull width, and
+$\Delta Z=\hat Z-Z_{\mathrm{inj}}$ form a spurious-signal test. Centered pulls and
+near-zero $\Delta Z$ mean that the GP-plus-template extraction is not manufacturing a
+signal in a smooth background-only spectrum. Nonzero injected rows then test whether a
+real signal is recovered after the same sideband-refit prescription has been applied.
+
+\subsection{Training exclusion and blind-window width}
 \label{subsec:guard-band-construction}
 
-The current 2015 closure campaign separates the mass window around each hypothesis
-into three regions. The blind/extraction window is fixed at
-$|m_i-m_0|<1.64\,\sigma_m(m_0)$, where the signal amplitude is profiled. The training
-guard is the additional excluded interval between the blind edge and a scanned outer
-boundary, $1.64<|m_i-m_0|/\sigma_m(m_0)<k_{\mathrm{train}}$. Only bins satisfying
-$|m_i-m_0|>k_{\mathrm{train}}\sigma_m(m_0)$ are used in the GP sideband refit. For the
-selected candidate, $k_{\mathrm{train}}=2.25$, so the
-$1.64$--$2.25\,\sigma_m$ signal tails are deliberately kept out of the training data.
-This construction is the GP analogue of leaving signal-adjacent sidebands unused in a
-sideband analysis: it protects the background fit from signal leakage while retaining
-as much nearby smooth-background information as the closure tests allow. Similar
-contamination controls appear in resonance sideband and control-region analyses, and
-the same issue motivates explicit spurious-signal and signal-injection validations in
-smooth-background searches~\cite{CMSDiphotonHiggs2014,CranmerPracticalStats2015,FrateGP2017,BarrLiu2025,ATLASSpuriousSignal2024}.
-
-Figure~\ref{fig:guard-band-cartoon} shows the bookkeeping in the simplest possible
-form. The red central region is the blind/extraction window, the yellow bands are
-excluded from the GP training set, and the green sidebands are the training bins. The
-overlaid $1\sigma$, $3\sigma$, and $5\sigma$ signal shapes emphasize why the guard is
-needed: stronger signals have visible Gaussian tails that would otherwise be offered to
-the sideband-trained background model as ordinary smooth-background data.
+The first decision is the training exclusion: how far from the test mass the sideband
+bins used by the GP should begin. Figure~\ref{fig:blind225-cartoon} illustrates the
+adopted wide-blind geometry. For a large injected signal, Gaussian tails remain visible
+outside the central peak. The training-exclusion studies below show why training directly
+next to a narrow $1.64\,\sigma_m$ extraction window is unattractive: those tails can be
+offered to the GP as ordinary smooth-background information and then be partly absorbed
+by the refitted background.
 
 \begin{figure}[H]
 \centering
-\graphicorplaceholder{0.92\linewidth}{guard_band_figs/guard_band_signal_leakage_cartoon.png}
-\caption{Cartoon of the guard-band construction for a single invariant-mass
-hypothesis. The blind/extraction region covers $|m-m_0|<1.64\,\sigma_m$, the selected
-guard excludes $1.64<|m-m_0|/\sigma_m<2.25$ from the GP training set, and only the
-outer sidebands train the background. The shaded signal tail illustrates the part of a
-large Gaussian bump that would leak into the near sideband if the guard were not
-present; with the selected guard, those Gaussian tails are not used to train the GP.}
-\label{fig:guard-band-cartoon}
+\graphicorplaceholder{0.90\linewidth}{guard_band_figs/guard_band_5sigma_fake_data_gp_band_no_guard_2p25_extended2sigma.png}
+\caption{Illustration of the selected $2.25\,\sigma_m$ blind-window construction for a
+large injected signal. The GP is trained only outside the widened blinded region, so the
+near tails of a Gaussian resonance are not included in the sideband-training data. The
+same blinded region is then used by the local signal-extraction likelihood.}
+\label{fig:blind225-cartoon}
 \end{figure}
 
-The zero-injection row in these studies has a special interpretation. At
-$Z_{\mathrm{inj}}=0$ no signal is added, so the pull mean, pull width, and
-$\Delta Z=\hat Z-Z_{\mathrm{inj}}$ are a spurious-signal closure test. Centered pulls
-and near-zero $\Delta Z$ on this row mean that the GP-plus-template extraction is not
-manufacturing a signal in a smooth background-only spectrum. Nonzero injected rows then
-test the complementary question: whether a real signal is recovered without being
-absorbed into the refitted background.
-
-The train-$2.25$ option is not selected because it has the absolute lowest raw
-background-only expected reach. In the current CSV summaries, train-$1.96$ gives the
-lowest median Gaussian-equivalent $\eps^2_{95}$, but it also leaves a much larger
-fraction of the injected template in the GP training region and strongly
-under-recovers injected signals. The train-$2.25$ guard is the best balanced candidate:
-it sharply reduces train-region leakage and fixes the large under-recovery seen at
-$1.96$, while retaining better expected reach than the wider $2.58$ and $3.0$ guards.
-The compact evidence is summarized in Table~\ref{tab:guard-band-choice-summary}; for
-the selected guard, the mean recovery is about $0.961$ at $Z_{\mathrm{inj}}=3$ and
-$0.943$ at $Z_{\mathrm{inj}}=5$, with a maximum injected training fraction of about
-$0.0258$.
+The training-exclusion scan starts from the older $1.64\,\sigma_m$ blind window and
+varies the outer boundary of the bins excluded from GP training. The train-$2.25$
+option is not selected because it has the absolute lowest raw background-only expected
+reach. In the CSV summaries, train-$1.96$ gives the lowest median Gaussian-equivalent
+$\eps^2_{95}$, but it also leaves a much larger fraction of the injected template in the
+GP training region and strongly under-recovers injected signals. The train-$2.25$
+exclusion is the balanced candidate: it sharply reduces train-region leakage and fixes
+the large under-recovery seen at $1.96$, while retaining better expected reach than the
+wider $2.58$ and $3.0$ exclusions. The compact evidence is summarized in
+Table~\ref{tab:guard-band-choice-summary}; for the train-$2.25$ choice, the mean
+recovery is about $0.961$ at $Z_{\mathrm{inj}}=3$ and $0.943$ at
+$Z_{\mathrm{inj}}=5$, with a maximum injected training fraction of about $0.0258$.
 
 \begin{table}[H]
 \centering
@@ -86,11 +88,12 @@ max $f_{\mathrm{train}}$ \\
 3.00 & \num{1.19e-4} & 1.049 & 1.037 & 0.00288 \\
 \bottomrule
 \end{tabular}
-\caption{Guard-band comparison summary from the refmatched 2015 closure toys. The
-expected reach column is the background-only Gaussian-equivalent proxy
-$1.64\,\sigma_{A,\mathrm{ref}}/A_{\eps^2=1}$, not the final $CL_s$ limit. The selected
-$k_{\mathrm{train}}=2.25$ point trades a modest reach cost relative to $1.96$ for much
-smaller training leakage and substantially improved injected-signal recovery.}
+\caption{Training-exclusion comparison summary from the refmatched 2015 closure toys
+using the older $1.64\,\sigma_m$ blind window. The expected reach column is the
+background-only Gaussian-equivalent proxy $1.64\,\sigma_{A,\mathrm{ref}}/A_{\eps^2=1}$,
+not the final $CL_s$ limit. The train-$2.25$ point trades a modest reach cost relative
+to $1.96$ for much smaller training leakage and substantially improved injected-signal
+recovery.}
 \label{tab:guard-band-choice-summary}
 \end{table}
 
@@ -196,25 +199,66 @@ closer to unity before the wider-guard sensitivity cost becomes dominant.}
 \label{fig:guard-band-recovery-boxes}
 \end{figure}
 
-\subsection{Scope of the current validation campaign}
+Once the training exclusion is fixed at $2.25\,\sigma_m$, there are two clean
+blind-window geometries to compare. The older construction keeps the extraction
+likelihood at $1.64\,\sigma_m$ and treats the $1.64$--$2.25\,\sigma_m$ interval as a
+guard band. The newer construction uses a $2.25\,\sigma_m$ blind/extraction window, so
+the same bins are still excluded from training but are retained in the signal
+likelihood. The refmatched comparison holds the background-only reference convention
+fixed in both cases, so the remaining difference is the blind-window geometry itself.
 
-Unless stated otherwise, the toy studies summarized here correspond to the 95\%
-confidence-level workflow with blind width $1.64\,\sigma_m$ and \num{10000} toys per
-mass-strength point. The staged suites now cover the fully unblinded 2015 sample, the
-2016 10\% development sample, the 2021 1\% validation stream, and the current
-shared-$\eps^2$ combinations built from those inputs. Throughout this section, the
-combined interpretation is focused on the mass intervals where multiple data sets
-contribute meaningfully to the prompt-resonance search, with the two-dataset
-2015+2016 overlap anchored near \SIrange{42}{130}{MeV} and the three-dataset examples
-drawn from the common subset used by the current injection configs.
+\begin{figure}[!htbp]
+\centering
+\graphicorplaceholder{0.82\linewidth}{guard_band_figs/refmatched_blind_geometries_eps2_95_reach.png}
+\caption{Refmatched 2015 blind-geometry reach comparison. Both geometries exclude GP
+training data out to $2.25\,\sigma_m$ and define the injected strength with the matched
+background-only refit convention. The $2.25\,\sigma_m$ blind window has similar closure
+behavior but a lower expected $\eps^2_{95}$ proxy because the $1.64$--$2.25\,\sigma_m$
+signal tails are included in the extraction likelihood instead of being discarded as a
+guard band.}
+\label{fig:refmatched-blind-geometry-reach}
+\end{figure}
 
-Many of the toy-validation figures were produced before the final adoption of the
-leakage-retaining signal template and before the future likelihood refinements
-mentioned in Section~\ref{sec:methodology}. They are nevertheless already informative
-for the statistical questions that matter most: closure, bias, pull calibration,
-coverage, and the logic of the combined extraction. Where newer note-local products are
-available, especially for the no-refit three-dataset pseudoexperiment displays and the
-projected reach discussion, those updated exports are used explicitly below.
+\begin{figure}[!htbp]
+\centering
+\graphicorplaceholder{0.66\linewidth}{guard_band_figs/refmatched_blind_geometries_background_only_closure.png}
+\caption{Background-only spurious-signal closure for the two refmatched blind
+geometries. Both the guard-band construction and the $2.25\,\sigma_m$ blind/extraction
+window remain centered near zero pull in the tested 2015 functional-form ensemble.}
+\label{fig:refmatched-blind-geometry-background}
+\end{figure}
+
+\begin{figure}[!htbp]
+\centering
+\graphicorplaceholder{0.82\linewidth}{guard_band_figs/refmatched_blind_geometry_pull_summary_z0135.png}
+\caption{Compact pull-summary comparison for $Z_{\mathrm{inj}}=0,1,3,5$. The
+$2.25\,\sigma_m$ blind window preserves the same signal-recovery behavior as the
+guard-band construction within the tested 2015 functional-form ensemble.}
+\label{fig:refmatched-blind-geometry-pulls}
+\end{figure}
+
+\begin{figure}[!htbp]
+\centering
+\graphicorplaceholder{0.66\linewidth}{guard_band_figs/refmatched_blind_geometries_injected_amplitude_recovery.png}
+\caption{Injected-amplitude recovery for the two refmatched blind geometries. The
+recovered amplitudes follow the injected reference scale similarly for the guard-band
+and widened-blind constructions.}
+\label{fig:refmatched-blind-geometry-recovery}
+\end{figure}
+
+\begin{figure}[!htbp]
+\centering
+\graphicorplaceholder{0.66\linewidth}{guard_band_figs/refmatched_blind_geometries_z_calibration_residual.png}
+\caption{$Z$-calibration residual comparison for the two refmatched blind geometries.
+In this 2015 ensemble the $2.25\,\sigma_m$ blind window and the $1.64\,\sigma_m$ blind
+plus $2.25\,\sigma_m$ guard construction have very similar closure behavior. The
+widened blind window is therefore selected because it keeps the same training
+protection while recovering the signal tails in the extraction likelihood and improving
+the expected reach.}
+\label{fig:refmatched-blind-geometry-deltaz}
+\end{figure}
+
+\FloatBarrier
 
 \subsection{Three toy-generation modes}
 
@@ -708,53 +752,26 @@ injection/extraction pseudoexperiment summaries.}
 
 The functional-form closure studies answer a related but distinct question: whether the
 blind-window extraction closes when the toy truth is a smooth analytic spectrum rather
-than a GP-derived background realization. The plots included here were produced with the
-functional-form \texttt{inject} workflow, not with \texttt{toy-scan}: each toy starts
-from a pre-generated functional-form histogram, the nominal signal strength
-$A_{\mathrm{inj}}$ or $Z_{\mathrm{inj}}$ defines the mean injected yield, and the
-realized signal contribution is then Poisson-sampled template-bin by template-bin so the
-total injected signal fluctuates toy by toy around that mean rather than being held
-fixed exactly.
+than a GP-derived background realization. They are used for three checks:
+\begin{itemize}
+\item smooth-spectrum closure against analytic toy truth;
+\item spurious-signal behavior at $Z_{\mathrm{inj}}=0$;
+\item injected-signal recovery under fixed-background/no-refit and full-refit conditions.
+\end{itemize}
 
-This distinction matters for the sideband question. In the \texttt{funcform100}
-injection configs used for the figures below, \texttt{inj\_refit\_gp\_on\_toy=false}, so
-these panels are a \textbf{fixed-background / no-refit} closure test on top of a
-functional-form toy truth. They validate whether the local extraction fit recovers the
-injected signal once the sideband-conditioned GP prediction for that toy is held fixed.
-They do \emph{not} by themselves prove closure of the full toy-by-toy sideband-refit scan.
-That stronger statement belongs either to the dedicated functional-form
-\texttt{toy-scan} ladder or to an injection workflow rerun with
-\texttt{inj\_refit\_gp\_on\_toy=true}. The separate GP-mean/refit pseudoexperiments
-therefore remain the complementary absorption stress test, not an automatic consequence
-of these particular functional-form injection plots.
+The physics-relevant figures in the main text are the refmatched full-refit studies. In
+this context, ``refmatched'' means that the injected amplitude is set using the matched
+background-only refit reference for the same mass, geometry, kernel policy, and refit
+prescription before injection:
+\begin{equation}
+A_{\mathrm{inj}}=Z_{\mathrm{inj}}\sigma_{A,\mathrm{ref}}.
+\end{equation}
+That convention avoids defining the injected strength with a prefit uncertainty scale
+while testing recovery with a different refitted uncertainty scale. The $Z_{\mathrm{inj}}=0$
+row is the spurious-signal line; the nonzero rows test signal recovery after the same
+sideband refit has been applied to the injected toys.
 
-The pull and $Z$-calibration summaries should also not be expected to match
-point-by-point. The pull compresses the mean and width of
-$(\hat A-A_{\mathrm{inj}})/\sigma_A$, while the significance residual uses
-$\Delta Z=\hat Z-Z_{\mathrm{inj}}$ with $\hat Z=\hat A/\sigma_A$ but
-$Z_{\mathrm{inj}}=A_{\mathrm{inj}}/\sigma_{A,\mathrm{ref}}$. Since the extracted toy
-significance uses the toy-level $\sigma_A$ whereas the injected significance is defined
-with the reference scale $\sigma_{A,\mathrm{ref}}$, modest differences between the pull
-curves and the $\Delta Z$ curves are expected even when the study is behaving well.
-
-\paragraph{2015 train-$2.25$ refmatched full-refit closure.}
-
-The newest 2015 functional-form closure study uses the selected
-$k_{\mathrm{train}}=2.25$ guard and reruns the GP refit after injection. In this
-context, ``refmatched'' means that the injected amplitude is set using the matched
-background-only refit reference for the same mass, guard, kernel policy, and refit
-prescription before injection: $A_{\mathrm{inj}}=Z_{\mathrm{inj}}\,
-\sigma_{A,\mathrm{ref}}$. This avoids defining the injected strength with an
-uncertainty convention that is different from the one later used in the closure
-extraction.
-
-The $Z_{\mathrm{inj}}=0$ line is the spurious-signal/closure line. Because no signal is
-injected, centered pulls and near-zero $\Delta Z$ mean that the procedure is not
-manufacturing a signal from a smooth functional-form background. The nonzero injected
-rows then test signal recovery after the same sideband-refit and guard prescription has
-been applied to the injected toys.
-
-\begin{figure}[p]
+\begin{figure}[!htbp]
 \centering
 \begin{subfigure}[t]{0.32\linewidth}
   \centering
@@ -780,7 +797,7 @@ response under the same full-refit guard-band prescription.}
 \label{fig:refmatched-train225-pulls-2015}
 \end{figure}
 
-\begin{figure}[p]
+\begin{figure}[!htbp]
 \centering
 \begin{subfigure}[t]{0.86\linewidth}
   \centering
@@ -804,100 +821,56 @@ calibration after the full refit.}
 \label{fig:refmatched-train225-closure-2015}
 \end{figure}
 
-\paragraph{2015 functional-form closure.}
-
-The 2015 functional-form closure outputs are already mature enough to include directly in
-the note. Here the pull panel tests extracted-amplitude closure and uncertainty
-calibration in the no-refit functional-form injection workflow, while the
-$Z$-calibration panel asks whether the injected significance is recovered without a
-mass-dependent drift in that same fixed-background setup. The two summaries do not
-coincide bin by bin, especially toward the upper end of the 2015 scan range, but that
-is acceptable here because they are testing different combinations of the fitted
-amplitude and uncertainty scales. What matters for this closure mode is that the pull
-mean stays reasonably near zero, the pull width stays near unity, and the corresponding
-$\Delta Z$ residuals remain centered close to zero without a runaway trend.
-
-\begin{figure}[p]
+\begin{figure}[!htbp]
 \centering
 \begin{subfigure}[t]{0.86\linewidth}
   \centering
-  \graphicorplaceholder{\linewidth}{injection_extraction_figs/funcform_pull_vs_mass_2015.png}
-  \caption{2015 functional-form pull mean and width versus mass.}
+  \graphicorplaceholder{\linewidth}{injection_extraction_figs/refmatched_train2p25_pull_vs_mass_2016.png}
+  \caption{Pull mean and width versus mass.}
 \end{subfigure}
 
 \vspace{0.8em}
 
 \begin{subfigure}[t]{0.86\linewidth}
   \centering
-  \graphicorplaceholder{\linewidth}{injection_extraction_figs/funcform_z_calibration_residual_2015.png}
-  \caption{2015 functional-form $Z$-calibration residual versus mass.}
+  \graphicorplaceholder{\linewidth}{injection_extraction_figs/refmatched_train2p25_z_calibration_residual_2016.png}
+  \caption{$Z$-calibration residual versus mass.}
 \end{subfigure}
-\caption{2015 functional-form no-refit closure diagnostics. The upper panel summarizes
-estimator closure and uncertainty calibration through the pull mean and pull width. The
-lower panel tests significance calibration through $\Delta Z=\hat Z-Z_{\mathrm{inj}}$.
-The two views need not match point-by-point because the pull uses the toy-level
-$\sigma_A$ in both the estimator and the subtraction term, whereas $Z_{\mathrm{inj}}$ is
-defined with the reference scale $\sigma_{A,\mathrm{ref}}$. The present 2015 mismatch in
-detail is therefore not, by itself, a sign of failed closure.}
-\label{fig:funcform-closure-2015}
+\caption{2016 10\% refmatched functional-form closure diagnostics. The pull panel tests
+estimator closure and uncertainty calibration, while the $\Delta Z$ panel tests
+significance calibration. As in the 2015 study, these are full-refit closure tests with
+the injected strength defined from the matched background-only reference scale.}
+\label{fig:refmatched-train225-closure-2016}
 \end{figure}
 
-\paragraph{2016 functional-form closure.}
-
-The 2016 10\% functional-form pull summary is available now and already serves as the
-correct top-panel closure diagnostic for this no-refit injection study. The matching
-$Z$-calibration export has not yet been frozen, so the lower slot is intentionally left
-as a placeholder in the same stacked layout that will be used for the final note
-version.
-
-\begin{figure}[p]
+\begin{figure}[!htbp]
 \centering
 \begin{subfigure}[t]{0.86\linewidth}
   \centering
-  \graphicorplaceholder{\linewidth}{injection_extraction_figs/funcform_pull_vs_mass_2016.png}
-  \caption{2016 10\% functional-form pull mean and width versus mass.}
+  \graphicorplaceholder{\linewidth}{injection_extraction_figs/refmatched_train2p25_pull_vs_mass_2021.png}
+  \caption{Pull mean and width versus mass.}
 \end{subfigure}
 
 \vspace{0.8em}
 
 \begin{subfigure}[t]{0.86\linewidth}
   \centering
-  \graphicorplaceholder{\linewidth}{injection_extraction_figs/funcform_z_calibration_residual_2016.png}
-  \caption{Reserved slot for the 2016 10\% functional-form $Z$-calibration residual.}
+  \graphicorplaceholder{\linewidth}{injection_extraction_figs/refmatched_train2p25_z_calibration_residual_2021.png}
+  \caption{$Z$-calibration residual versus mass.}
 \end{subfigure}
-\caption{2016 10\% functional-form no-refit closure block. The pull diagnostic is
-already bundled for note use; the $Z$-calibration residual will be inserted in the lower
-slot once the corresponding export is produced.}
-\label{fig:funcform-closure-2016}
+\caption{2021 1\% refmatched functional-form closure diagnostics. The two panels mirror
+the 2015 and 2016 layouts so that the pull calibration and residual significance
+calibration can be compared dataset by dataset.}
+\label{fig:refmatched-train225-closure-2021}
 \end{figure}
 
-\paragraph{2021 functional-form closure.}
+\FloatBarrier
 
-The same stacked no-refit closure layout is reserved for the 2021 1\% sample. Both the
-pull and $Z$-calibration panels are kept as placeholders here so that the subsection
-structure and figure flow are already fixed before the final 2021 functional-form export
-is added.
-
-\begin{figure}[p]
-\centering
-\begin{subfigure}[t]{0.86\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{injection_extraction_figs/funcform_pull_vs_mass_2021.png}
-  \caption{Reserved slot for the 2021 1\% functional-form pull summary.}
-\end{subfigure}
-
-\vspace{0.8em}
-
-\begin{subfigure}[t]{0.86\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{injection_extraction_figs/funcform_z_calibration_residual_2021.png}
-  \caption{Reserved slot for the 2021 1\% functional-form $Z$-calibration residual.}
-\end{subfigure}
-\caption{Reserved 2021 1\% functional-form no-refit closure block. The final note
-version should replace these placeholders with the corresponding 2021 pull and
-significance-calibration exports once the study is complete.}
-\label{fig:funcform-closure-2021}
-\end{figure}
+The earlier fixed-background/no-refit functional-form plots remain useful as internal
+diagnostics because they isolate the local likelihood once the sideband-conditioned GP
+prediction is held fixed. They are not the main closure evidence in this note and are
+therefore not shown as headline figures here. The full-refit panels above are the
+appropriate studies for assessing signal absorption by the sideband refit.
 
 \subsection{Combined search-power studies}
 
@@ -921,7 +894,7 @@ inverse-variance bookkeeping. Figure~\ref{fig:combined-search-power} then shows 
 the combined search-power scan and the constituent-dataset allocations needed to reach
 a target shared significance.
 
-\begin{figure}[H]
+\begin{figure}[!htbp]
 \centering
 \begin{subfigure}[t]{0.66\linewidth}
   \centering
@@ -1029,3 +1002,5 @@ signal when the toy is regenerated over the full mass range and the GP backgroun
 is retrained on the toy sidebands before extraction.}
 \label{fig:combined-extract-displays-refit}
 \end{figure}
+
+\FloatBarrier

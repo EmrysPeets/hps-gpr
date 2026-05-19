@@ -1,43 +1,39 @@
 \section{Conclusions and Outlook}
 \label{sec:conclusions}
 
-This analysis note now presents a coherent GPR-based framework for the HPS narrow
-prompt $A^\prime \rightarrow e^+e^-$ search in the language expected for internal
-physics review. The physics target is stated explicitly in the minimal visible
-dark-photon model, the HPS detector changes between the 2015/2016 baseline
-configuration and the 2019/2021 upgraded configuration are documented explicitly, and
-the signal-yield-to-$\eps^2$ conversion is tied directly to the dataset-specific
-radiative-fraction inputs. The statistical workflow is likewise now more explicit: the
-note distinguishes local bump-hunt significance from toy-tail limit diagnostics,
-writes out the shared-$\eps^2$ likelihood used in the combined search, and makes the
-role of the radiative-fraction penalty transparent both for individual datasets and
-for the three-dataset combination.
+This note documents a coherent GPR-based framework for the HPS narrow prompt
+$A^\prime \rightarrow e^+e^-$ search. The workflow now ties the detector-era inputs,
+mass-resolution parameterizations, radiative-fraction normalization, log-count GP
+background model, local profiled signal extraction, \CLs\ limit setting, and
+shared-$\eps^2$ combination into one reviewable chain.
 
-The current physics-facing result is the systematic-penalized 2015$+$2016 10\%$+$2021
-1\% shared-$\eps^2$ combination. That result already shows the central strengths of the
-method: a smooth global GP background model, a leakage-retaining signal template, and a
-coherent likelihood-level combination across statistically independent spectra with
-different resolutions and normalizations. The updated note also makes clear which
-pieces are mature and which remain auxiliary. In particular, the combined global
-significance is the only look-elsewhere representation interpreted here, while the
-single-dataset global overlays are retained only as bookkeeping for local fluctuation
-context.
+The validation suite supports the current blind-window and extraction choices with
+several complementary studies. The training-exclusion scan shows why the GP sidebands
+should begin outside approximately $2.25\,\sigma_m$ rather than immediately outside a
+narrow $1.64\,\sigma_m$ blind region. The refmatched 2015 blind-geometry comparison
+then shows that a $2.25\,\sigma_m$ blind/extraction window gives similar closure to the
+$1.64\,\sigma_m$ blind plus $2.25\,\sigma_m$ guard construction while retaining better
+expected reach. The dataset-level refmatched full-refit closure panels for 2015, 2016
+10\%, and 2021 1\% document the corresponding pull calibration and residual
+significance calibration.
 
-The refreshed two-dataset inputs sharpen that statistical interpretation. The updated
-2015 and 2016 local-significance panels and the refreshed 2015$+$2016 combined suite
-are all consistent with the bounded one-sided profile-likelihood convention: the local
-$p_0$ curve never needs to exceed 0.5, while the dashed global overlay should be read
-as a scan-level p-value or its clipped excess-significance representation. Within that
-convention the two-dataset combined limit remains smooth, the 2016 panel still carries
-the sharpest local structure, and none of those features yet warrant a frozen global
-claim.
+The current staged internal-review result is the corrected
+2015$+$2016 10\%$+$2021 1\% simultaneous shared-$\eps^2$ analysis. The individual
+dataset limits and local $p_0$ scans are shown as diagnostic inputs, but the combined
+limit is obtained from the joint profiled likelihood rather than from an envelope of
+single-dataset curves. The observed extraction display at \SI{119}{MeV} provides a
+concrete check of how the dataset-level fits enter the shared-coupling result.
 
-The remaining work is now well bounded. The batch3 refresh was sufficient to replace
-the note-local 2015/2016 local-significance panels and the 2015$+$2016 combined suite,
-but the current export tree still does not bundle the full standalone toy-tail tables or
-the final scan-level max-$q_0$ calibration. The next frozen rerun should therefore
-propagate the corrected plotting convention through a complete table bundle, regenerate
-the \SI{119}{MeV} shared-signal display, and finalize the toy-based look-elsewhere
-evaluation in the same production pass. With those updates in place, the framework
-documented here is in a strong position to support the first fully combined HPS
-GPR-based prompt-resonance result.
+The full-statistics curves remain projections. They are useful for comparing the
+expected reach of the GPR strategy with the published HPS prompt result and the BaBar
+visible-dark-photon contour, but they are not observed full-statistics exclusions. The
+local/global significance overlays shown in the note are likewise review diagnostics;
+any final discovery statement should use a frozen scan-level toy calibration of the
+maximum discovery statistic.
+
+The remaining work is well bounded. The final production pass should freeze the full
+2016 and 2021 inputs, finalize the radiative-fraction and systematic-penalty model,
+regenerate the complete toy-tail and scan-level look-elsewhere calibration tables, and
+rerender the note figures from the same production outputs used for the final
+unblinding. With those pieces in place, the framework documented here is ready to
+support the first fully combined HPS GPR prompt-resonance result.
