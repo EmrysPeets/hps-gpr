@@ -77,7 +77,7 @@ A piecewise approach was introduced due to the unreliability of global fitting. 
 \end{figure}
 
 The kernel used by each section's model was selected from an ensemble using a procedure that chose the best performing kernel. For each section, every kernel as a part of the kernel ensemble was tested in an interpolation of the blinded region. Each kernel was given a score by log marginal likelihood, and this vector of scores was converted to weights via a softmax function. A kernel would be sampled from the distribution of these weights and used by a GP to determine the distribution of the blinded region. Poisson observed counts are sampled using this chosen distribution.
-\begin{figure}
+\begin{figure}[h!]
     \centering
     $w_k = \frac{e^{\ell_k - \max_j \ell_j}}{\sum_j e^{\ell_j - \max_j \ell_j}}$
     $\quad \text{with} \quad$
