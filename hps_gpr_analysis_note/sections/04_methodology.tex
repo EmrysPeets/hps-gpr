@@ -32,36 +32,35 @@ resolution,
 \left[m_0 - n_{\mathrm{blind}}\sigma_d(m_0),\,
       m_0 + n_{\mathrm{blind}}\sigma_d(m_0)\right].
 \end{equation}
-For the completed studies summarized in this note, the blind half-width is
-$n_{\mathrm{blind}}=1.64$. For an ideal Gaussian line shape this interval contains
+For the completed studies summarized in this note, the selected blind half-width is
+$n_{\mathrm{blind}}=2.25$, as motivated by the validation studies in
+Section~\ref{subsec:guard-band-construction}. For an ideal Gaussian line shape this
+interval contains
 \begin{equation}
 f_{\mathrm{blind}}^{\mathrm{ideal}}
-= \mathrm{erf}\!\left(\frac{1.64}{\sqrt{2}}\right)
-\simeq 0.899,
+= \mathrm{erf}\!\left(\frac{2.25}{\sqrt{2}}\right)
+\simeq 0.976,
 \end{equation}
-so roughly 10\% of the signal lies outside the blinded region. This point matters
+so only about 2.4\% of the signal lies outside the blinded region. This point matters
 conceptually and numerically: the current code does \emph{not} renormalize the signal
 template inside the blind window. Instead, it keeps the full Gaussian normalization and
-lets only the blinded subset enter the local likelihood. The same $1.64\,\sigma_d$
-scale is used for the nominal GP training exclusion in the current validation studies,
-although the package exposes the training exclusion and the extraction blind window as
+lets only the blinded subset enter the local likelihood. The same $2.25\,\sigma_d$
+scale is used for the GP training exclusion in the production configuration, although
+the package exposes the training exclusion and the extraction blind window as
 independent controls.
 
 The notation $\mathcal{B}_d(m_0)$ denotes the set of histogram bins that lie inside the
 blinded interval for dataset $d$ at test mass $m_0$. In the current production
-configuration there is no additional gap between the extraction window and the GP
-training sample: the nominal training exclusion starts immediately outside
-$\mathcal{B}_d(m_0)$. A wider exclusion, for example $1.96\,\sigma_d$ instead of
-$1.64\,\sigma_d$, would reduce signal leakage into the training region from about 10\%
-to about 5\%, but it would also increase the interpolation distance and therefore the
-GP predictive uncertainty. In the simple background-dominated proxy
-$S/\sqrt{B}\propto F(k)/\sqrt{k}$ with $F(k)=\mathrm{erf}(k/\sqrt{2})$, the optimum lies
-near $k\simeq1.4$, so the adopted $1.64\,\sigma_d$ choice remains close to the
-sensitivity optimum while still containing about 90\% of a Gaussian signal. The
-$1.96\,\sigma_d$ choice is therefore treated as a robustness option that prioritizes
-less training-region contamination over slightly better expected reach, not as a
-clearly superior default. Full-refit pseudoexperiments in Section~\ref{sec:toys} are
-the main guard against any residual signal-absorption bias from this choice.
+configuration there is no additional guard gap between the extraction window and the GP
+training sample: the training sample starts immediately outside
+$\mathcal{B}_d(m_0)$. The validation campaign in
+Section~\ref{subsec:guard-band-construction} compares the older $1.64\,\sigma_d$ blind
+window plus a $2.25\,\sigma_d$ guard with the selected $2.25\,\sigma_d$
+blind/extraction window. The latter keeps the same protection against near-tail signal
+leakage in the training sidebands while retaining the $1.64$--$2.25\,\sigma_d$ signal
+tails in the extraction likelihood. Full-refit pseudoexperiments in
+Section~\ref{sec:toys} are the main guard against any residual signal-absorption bias
+from this choice.
 
 \subsection{Log-space preprocessing and the choice \texorpdfstring{$\alpha=1/y$}{alpha=1/y}}
 
@@ -165,10 +164,10 @@ and uses this local physical scale to set the RBF bounds. In the default
 \qquad
 \ell_{\max}(m) = k_{\max}\sigma_x(m),
 \end{equation}
-with the baseline lower factor $k_{\min}=0.5$ for all three datasets. The practical
-bookkeeping point is worth stating explicitly because an older diagnostic overlay
-showed a stale 2016 value of 0.05; that lower-bound curve was incorrect and is not the
-baseline used in the current production configs.
+with the baseline lower factor $k_{\min}=1.0$ for all three datasets. This
+one-resolution lower bound is an additional stability choice: it prevents the optimizer
+from using length scales shorter than the detector resolution while still allowing the
+background model to follow detector-scale curvature.
 
 The physics-facing ceiling adopted in this note is
 \begin{equation}
@@ -185,15 +184,11 @@ aggressive in smoothing away signal-like structure, which could make the fit app
 better while reducing signal fidelity. Setting the ceiling too low creates the opposite
 problem: the optimizer rides the boundary and the background model becomes visibly too
 rigid. The adopted 8$\sigma_d$ and 9$\sigma_d$ ceilings are therefore presented as
-stability choices anchored to detector resolution, not as arbitrary tune points.
-
-The current production configs retain one additional guard: a dataset-statistics floor
-on $\ell_{\max}$ prevents the ceiling from becoming artificially small where the local
-resolution is exceptionally tight. The older fixed-xrange cap remains available only as
-an opt-in diagnostic knob in the code and is not enabled in the baseline results shown
-here. A mass-independent lower floor is likewise a reasonable follow-up robustness
-study, but it would constitute a deliberate method variation rather than the bound
-prescription used for the results documented in this note.
+stability choices anchored to detector resolution, not as arbitrary tune points. The
+current production configs also retain a dataset-statistics floor on $\ell_{\max}$ so
+the ceiling does not become artificially small where the local resolution is
+exceptionally tight. The older fixed-xrange cap remains available only as an opt-in
+diagnostic knob in the code and is not enabled in the baseline results shown here.
 
 Figure~\ref{fig:lengthscale-bounds} makes the bound prescription explicit. Panel (a)
 shows the detector-resolution scale in the GP coordinate, and panel (b) shows the
@@ -201,15 +196,17 @@ allowed interval for the fitted length scale in each dataset. The key point is t
 optimization band follows the detector scale across the scan rather than imposing a
 single mass-independent smoothing length.
 
-\begin{figure}[H]
+\begin{figure}[h!]
 \centering
-\begin{subfigure}[t]{0.48\linewidth}
+\begin{subfigure}[t]{0.82\linewidth}
   \centering
   \graphicorplaceholder{\linewidth}{kernel_lengthscale_figs/sigma_x_logm_overlay.png}
   \caption{Signal-template width $\sigma_x(m)$ in the GP coordinate $x=\ln m$.}
 \end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.48\linewidth}
+
+\vspace{0.4em}
+
+\begin{subfigure}[t]{0.82\linewidth}
   \centering
   \graphicorplaceholder{\linewidth}{kernel_lengthscale_figs/ls_bounds_band_logm_overlay.png}
   \caption{Allowed RBF length-scale band imposed for each dataset.}
@@ -217,10 +214,37 @@ single mass-independent smoothing length.
 \caption{Length-scale parameterization used in the GPR fit. Panel (a) shows the local
 signal-template width in the GP coordinate, while panel (b) shows the allowed
 length-scale band obtained in the current implementation by applying the common
-$k_{\min}=0.5$ lower factor together with the dataset-specific upper factors. The
+$k_{\min}=1.0$ lower factor together with the dataset-specific upper factors. The
 purpose of the bound is to permit smooth background variation without allowing the
 optimizer to drift into an unphysically unconstrained smoothing regime.}
 \label{fig:lengthscale-bounds}
+\end{figure}
+
+The lower-bound scan summarized in Figure~\ref{fig:lengthscale-lower-bound-stability}
+motivates the $1\sigma$ choice. Relative to a looser $0.5\sigma$ lower bound, the
+$1\sigma$ floor stabilizes the optimized length-scale behavior and keeps the pull-width
+response closer to the expected unit calibration without imposing the more rigid
+$1.5\sigma$ alternative.
+
+\begin{figure}[h!]
+\centering
+\begin{subfigure}[t]{0.88\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{kernel_lengthscale_figs/length_scale_diagnostics_by_lslb.png}
+  \caption{Optimized length-scale diagnostics for candidate lower bounds.}
+\end{subfigure}
+
+\vspace{0.8em}
+
+\begin{subfigure}[t]{0.88\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{kernel_lengthscale_figs/overall_pull_width_vs_injsigma_by_lslb.png}
+  \caption{Overall pull-width response versus injected significance.}
+\end{subfigure}
+\caption{Length-scale lower-bound stability comparison from the 2015 validation scan.
+The selected $1\sigma$ lower bound improves fit stability relative to the looser
+$0.5\sigma$ option while avoiding the extra rigidity of the $1.5\sigma$ alternative.}
+\label{fig:lengthscale-lower-bound-stability}
 \end{figure}
 
 Figure~\ref{fig:gpr-window-construction} summarizes the same construction in the
@@ -280,7 +304,9 @@ uses the Cholesky factorization
 \label{eq:Cd-cholesky}
 \end{equation}
 with $L_d(m)$ the lower-triangular Cholesky factor of the positive-semidefinite
-blind-window covariance. Introducing an auxiliary standard-normal nuisance vector
+blind-window covariance. In practice, the Cholesky factor is the matrix that turns
+independent unit-Gaussian nuisance coordinates into correlated bin-by-bin background
+shifts with covariance $\bm{C}_d$. Introducing an auxiliary standard-normal nuisance vector
 $\bm{\theta}_d\sim\mathcal{N}(0,I)$ and the background-deformation field
 $\Delta\bm{b}_d(m)=L_d(m)\bm{\theta}_d$ then gives
 $\Delta\bm{b}_d\sim\mathcal{N}(0,\bm{C}_d)$. This is the standard HEP construction for
@@ -293,6 +319,9 @@ background deformations rather than misinterpreting the GP uncertainty as indepe
 per-bin noise.
 
 \subsection{Signal model and conversion to \texorpdfstring{$\eps^2$}{epsilon2}}
+
+All expressions in this subsection use the selected $2.25\,\sigma_d$ blind-region
+convention introduced in Section~\ref{subsec:guard-band-construction}.
 
 For each dataset $d$ and mass hypothesis $m_0$, the package first constructs a
 full-range Gaussian line-shape template over the histogram binning,
@@ -324,7 +353,7 @@ Its blinded-bin sum is therefore
 \begin{equation}
 f_{\mathrm{blind},d}(m_0) = \sum_{i \in \mathcal{B}_d(m_0)} w_{d,i}(m_0) < 1,
 \end{equation}
-with a value near 0.90 for the nominal $1.64\,\sigma_d$ half-width. The signal
+with a value near 0.976 for the selected $2.25\,\sigma_d$ half-width. The signal
 amplitude $A_d$ is defined as the \emph{total} local Gaussian signal yield associated
 with the mass hypothesis, not merely the yield inside the blind window. The expected
 signal contribution entering bin $i$ of the local likelihood is therefore
@@ -375,7 +404,7 @@ density in the same mass interval used for the nominal blind window,
 \frac{N_d\!\left[m-n_{\mathrm{blind}}\sigma_d(m),\,m+n_{\mathrm{blind}}\sigma_d(m)\right]}
 {2\,n_{\mathrm{blind}}\sigma_d(m)},
 \end{equation}
-with $n_{\mathrm{blind}}=1.64$ in the current 95\% CL studies. This keeps the local
+with $n_{\mathrm{blind}}=2.25$ in the current 95\% CL studies. This keeps the local
 yield-to-$\eps^2$ normalization aligned with the actual search window rather than with
 a separate fixed $\pm2\,\sigma_d$ convention. The code still exposes
 \texttt{eps2\_density\_nsigma} as an audit knob, so the legacy $m\pm2\sigma_d(m)$
@@ -457,9 +486,7 @@ Gaussian significance are then obtained with the asymptotic Cowan-et-al.\ mappin
 \cite{Cowan2011}. The resulting local-significance definition is explicitly
 one-sided and discovery facing: downward fluctuations are allowed in the unconstrained
 fit used for closure studies, but they do not generate a positive local discovery
-significance. This profiled multi-bin test replaces the older sum-count approximation
-used in the earliest drafts and is the only local-significance definition treated as
-current in this note.
+significance.
 
 \subsubsection{\texorpdfstring{\CLs}{CLs} upper limits}
 
@@ -769,7 +796,7 @@ dataset has its largest \emph{local} upward fluctuation; any global overlays in 
 auxiliary PNGs should be read as approximations rather than as finalized toy-calibrated
 claims.
 
-\begin{figure}[p]
+\begin{figure}[h!]
 \centering
 \begin{subfigure}[t]{0.32\linewidth}
   \centering
@@ -815,23 +842,3 @@ Eq.~\eqref{eq:sidak-global}; a toy-calibrated $q_{0,\max}$ distribution would ta
 precedence for a final discovery claim.}
 \label{fig:combined-significance-rpen}
 \end{figure}
-
-\subsection{Signal absorption and alternative background-profile treatments}
-
-The production baseline documented here is the additive Gaussian-profile treatment of
-blind-window background uncertainty. That choice is natural because the GP delivers an
-additive mean vector and covariance matrix in the blinded bins, and the entire current
-toy-validation program is built around that object. At the same time, the remaining
-signal-absorption question should be stated explicitly. The newly adopted
-leakage-retaining signal model removes one obvious source of bias associated with
-blind-window renormalization, but it does not by itself prove that the full procedural
-toy workflow is free of absorption once the GP is refit toy by toy.
-
-The most likely residual sources are the refitting freedom of the GP hyperparameters,
-especially the effective length scale, and the flexibility of the Gaussian-profile
-background nuisance itself. For that reason, the current note keeps the
-Gaussian-profile model as the mainline baseline while reserving fixed-background and
-alternative Poisson-style treatments as targeted robustness studies. Those alternatives
-are not presented as equally mature production choices, but they remain important if
-future pseudoexperiments show that the current nuisance model still absorbs an
-unacceptable fraction of injected signal.
