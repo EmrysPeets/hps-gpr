@@ -379,12 +379,16 @@ dataset.}
 \label{fig:analytic-fit-publication-overview}
 \end{figure}
 
-The toy-scan validation suites shown in
-Figures~\ref{fig:toy-scan-validation-2015-funcform}--\ref{fig:toy-scan-validation-2021-funcform}
-use the same three-panel structure for all three datasets: merged local-significance
-scans, corresponding observed-limit scans, and a compact per-toy dashboard. Together
-they check that the scan machinery behaves coherently on smooth functional-form
-pseudoexperiments before the refmatched injection/recovery studies are interpreted.
+The 2015 and 2016 toy-scan validation suites shown in
+Figures~\ref{fig:toy-scan-validation-2015-funcform} and
+\ref{fig:toy-scan-validation-2016-funcform} use the same three-panel structure: merged
+local-significance scans, corresponding observed-limit scans, and a compact per-toy
+dashboard. The 2021 1\% validation in
+Figure~\ref{fig:closure-validation-2021-funcform} is instead built from the finalized
+\texttt{fSigPowExpQ} full-refit closure toys in the
+\path{2021_gpr/closure_1pct/injection_flat} export. That is the appropriate 2021 source
+for the selected $2.25\,\sigma_m$ blind/train geometry, so the figure summarizes closure
+quantities rather than reusing the older scan-dashboard assets.
 
 \begin{figure}[h!]
 \centering
@@ -448,29 +452,14 @@ summary used to track the largest local upward fluctuation in the merged sample.
 
 \begin{figure}[h!]
 \centering
-\begin{subfigure}[t]{0.49\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{toy_generation_figs/toy_scan_validation_2021_fShiftSigPowTail_local_significance.png}
-  \caption{Local-significance scans.}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.49\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{toy_generation_figs/toy_scan_validation_2021_fShiftSigPowTail_upper_limits.png}
-  \caption{Observed-limit scans.}
-\end{subfigure}
-
-\vspace{0.6em}
-
-\begin{subfigure}[t]{0.72\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{toy_generation_figs/toy_scan_validation_2021_fShiftSigPowTail_summary.png}
-  \caption{Per-toy summary dashboard.}
-\end{subfigure}
-\caption{2021 1\% functional-form toy-scan validation suite. The three panels mirror the
-2015 and 2016 layouts so that the 2021 pseudoexperiments can be checked with the same
-local-significance, observed-limit, and per-toy scan diagnostics.}
-\label{fig:toy-scan-validation-2021-funcform}
+\graphicorplaceholder{0.96\linewidth}{toy_generation_figs/closure_validation_suite_2021_fSigPowExpQ.png}
+\caption{2021 1\% \texttt{fSigPowExpQ} functional-form full-refit closure validation
+suite from the \texttt{closure\_1pct/injection\_flat} toys. The panels show pull mean, pull
+width, recovered amplitude, and residual significance versus mass for
+$Z_{\mathrm{inj}}=0,1,3,5$. Only ensemble summaries and their uncertainties are shown,
+so the figure remains readable while documenting the key 2021 closure behavior for the
+selected $2.25\,\sigma_m$ blind/train geometry.}
+\label{fig:closure-validation-2021-funcform}
 \end{figure}
 
 \subsubsection{Conditional blind-window GP toys}
