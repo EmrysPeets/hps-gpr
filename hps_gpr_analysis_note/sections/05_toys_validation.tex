@@ -379,88 +379,72 @@ dataset.}
 \label{fig:analytic-fit-publication-overview}
 \end{figure}
 
-The 2015 and 2016 toy-scan validation suites shown in
-Figures~\ref{fig:toy-scan-validation-2015-funcform} and
-\ref{fig:toy-scan-validation-2016-funcform} use the same three-panel structure: merged
-local-significance scans, corresponding observed-limit scans, and a compact per-toy
-dashboard. The 2021 1\% validation in
-Figure~\ref{fig:closure-validation-2021-funcform} is instead built from the finalized
-\texttt{fSigPowExpQ} full-refit closure toys in the
-\path{2021_gpr/closure_1pct/injection_flat} export. That is the appropriate 2021 source
-for the selected $2.25\,\sigma_m$ blind/train geometry, so the figure summarizes closure
-quantities rather than reusing the older scan-dashboard assets.
+Figures~\ref{fig:closure-validation-2015-funcform}--\ref{fig:closure-validation-2021-funcform}
+put the three dataset-specific functional-form closure suites on the same footing. Each
+figure uses the full-refit toy rows for the selected $2.25\,\sigma_m$ blind/train
+geometry, groups the toys by mass and injected significance, and displays the pull
+mean, pull width, recovered amplitude, and residual significance for
+$Z_{\mathrm{inj}}=0,1,3,5$. The 2015 suite uses the \texttt{wide\_refmatched} subset
+of the blind-\(2.25\,\sigma_m\) refmatch comparison suite, the 2016 suite uses the
+\texttt{2016\_gpr/closure\_final} full-refit toys, and the 2021 suite uses the finalized
+\texttt{closure\_1pct/injection\_flat} \texttt{fSigPowExpQ} toys.
 
 \begin{figure}[h!]
 \centering
-\begin{subfigure}[t]{0.49\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{toy_generation_figs/toy_scan_validation_2015_fShiftSigPowTail_local_significance.png}
-  \caption{Local-significance scans.}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.49\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{toy_generation_figs/toy_scan_validation_2015_fShiftSigPowTail_upper_limits.png}
-  \caption{Observed-limit scans.}
-\end{subfigure}
-
-\vspace{0.6em}
-
-\begin{subfigure}[t]{0.72\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{toy_generation_figs/toy_scan_validation_2015_fShiftSigPowTail_summary.png}
-  \caption{Per-toy summary dashboard.}
-\end{subfigure}
-\caption{2015 functional-form toy-scan validation suite for the
-\texttt{fShiftSigPowTail} seed. The merged local-significance panel shows the toy
-median together with the central spread of the ensemble, the upper-limit panel
-displays the corresponding variation in $\eps^2_{95}$ across the scan, and the summary
-dashboard identifies the toy index, scan coverage, and the location and size of the
-strongest local upward fluctuation.}
-\label{fig:toy-scan-validation-2015-funcform}
+\graphicorplaceholder{0.96\linewidth}{toy_generation_figs/closure_validation_suite_2015_fShiftSigPowTail.png}
+\caption{2015 \texttt{fShiftSigPowTail} functional-form full-refit closure validation
+suite for the selected $2.25\,\sigma_m$ blind/refmatched geometry. The rows are taken
+from the \texttt{wide\_refmatched} subset of the blind-geometry comparison suite, so the
+signal-strength reference is determined with the same refit convention used in the final
+window choice. The panels show, as a function of mass, the ensemble pull mean, pull
+width, recovered signal amplitude $\hat A/A_{\mathrm{inj}}$, and residual significance
+$\hat Z-Z_{\mathrm{inj}}$; error bars are the standard errors of the corresponding
+toy-ensemble means or widths.}
+\label{fig:closure-validation-2015-funcform}
 \end{figure}
 
 \begin{figure}[h!]
 \centering
-\begin{subfigure}[t]{0.49\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{toy_generation_figs/toy_scan_validation_2016_fShiftSigPowTail_local_significance.png}
-  \caption{Local-significance scans.}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.49\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{toy_generation_figs/toy_scan_validation_2016_fShiftSigPowTail_upper_limits.png}
-  \caption{Observed-limit scans.}
-\end{subfigure}
-
-\vspace{0.6em}
-
-\begin{subfigure}[t]{0.72\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{toy_generation_figs/toy_scan_validation_2016_fShiftSigPowTail_summary.png}
-  \caption{Per-toy summary dashboard.}
-\end{subfigure}
-\caption{2016 10\% functional-form toy-scan validation suite for the
-\texttt{fShiftSigPowTail} seed. The plotted scan window is now restricted to
-42--210~MeV in order to exclude the low-mass region where mismodeling biased the
-earlier toy validation. As in the 2015 suite, the three panels show the
-local-significance evolution, the observed-limit evolution, and the compact per-toy
-summary used to track the largest local upward fluctuation in the merged sample.}
-\label{fig:toy-scan-validation-2016-funcform}
+\graphicorplaceholder{0.96\linewidth}{toy_generation_figs/closure_validation_suite_2016_fShiftSigPowTail.png}
+\caption{2016 10\% \texttt{fShiftSigPowTail} functional-form full-refit closure
+validation suite from \texttt{2016\_gpr/closure\_final}. The same $2.25\,\sigma_m$
+blind/train configuration and matched-refit signal normalization are used at each mass.
+The pull-mean and pull-width panels test the calibration of the fitted signal amplitude,
+the recovered-amplitude panel tests linearity for injected signals, and the
+$\hat Z-Z_{\mathrm{inj}}$ panel shows the residual significance bias after the local
+refit and extraction procedure are repeated on each toy.}
+\label{fig:closure-validation-2016-funcform}
 \end{figure}
 
 \begin{figure}[h!]
 \centering
 \graphicorplaceholder{0.96\linewidth}{toy_generation_figs/closure_validation_suite_2021_fSigPowExpQ.png}
 \caption{2021 1\% \texttt{fSigPowExpQ} functional-form full-refit closure validation
-suite from the \texttt{closure\_1pct/injection\_flat} toys. The panels show pull mean, pull
-width, recovered amplitude, and residual significance versus mass for
-$Z_{\mathrm{inj}}=0,1,3,5$. Only ensemble summaries and their uncertainties are shown,
-so the figure remains readable while documenting the key 2021 closure behavior for the
-selected $2.25\,\sigma_m$ blind/train geometry.}
+suite from the \texttt{2021\_gpr/closure\_1pct/injection\_flat} toys. This suite uses the
+finalized 2021 functional family and the same $2.25\,\sigma_m$ blind/train geometry as
+the selected analysis configuration. The panels mirror the 2015 and 2016 closure
+summaries: pull mean and pull width assess background-only calibration, while recovered
+amplitude and $\hat Z-Z_{\mathrm{inj}}$ assess injected-signal linearity and significance
+calibration for $Z_{\mathrm{inj}}=1,3,5$.}
 \label{fig:closure-validation-2021-funcform}
 \end{figure}
+
+\begin{figure}[h!]
+\centering
+\graphicorplaceholder{0.99\linewidth}{toy_generation_figs/toy_upper_limit_proxy_2015_2016_2021.png}
+\caption{Toy upper-limit proxy for the three functional-form closure ensembles: 2015
+on the left, 2016 10\% in the center, and 2021 1\% on the right. The upper row shows a
+signal-yield proxy and the lower row shows the corresponding coupling-squared proxy.
+For each mass, the solid curve is computed from the background-only toy ensemble mean,
+$A^{\mathrm{proxy}}_{95}=\max(0,\langle\hat A\rangle)+1.64485\,\langle\sigma_A\rangle$,
+and converted with the mean $A(\eps^2=1)$ normalization for that mass. The shaded bands
+show the central 68\% and 95\% spreads obtained by applying the same proxy to the
+individual toy rows. This is a compact sensitivity diagnostic from the toy summaries,
+not a replacement for the final profile-\CLs{} scan used for the observed result.}
+\label{fig:toy-upper-limit-proxy-funcform}
+\end{figure}
+
+\FloatBarrier
 
 \subsubsection{Conditional blind-window GP toys}
 
