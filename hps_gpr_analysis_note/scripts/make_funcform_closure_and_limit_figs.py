@@ -155,19 +155,15 @@ def summarize_limit_proxy(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]
 
     rows = []
     for (mass_gev, mass_mev), group in zero.groupby(["mass_GeV", "mass_MeV"]):
-        ahat_mean = float(group["A_hat"].mean())
-        sigma_a_mean = float(group["sigma_A"].mean())
-        a_per_eps2_mean = float(group["A_per_eps2_unit"].mean())
-        a95_mean_proxy = max(0.0, ahat_mean) + ONE_SIDED_95 * sigma_a_mean
         row = {
             "mass_GeV": float(mass_gev),
             "mass_MeV": float(mass_mev),
             "n_toys": int(len(group)),
-            "A_hat_mean": ahat_mean,
-            "sigma_A_mean": sigma_a_mean,
-            "A_per_eps2_unit_mean": a_per_eps2_mean,
-            "A95_mean_Ahat_proxy": a95_mean_proxy,
-            "eps2_95_mean_Ahat_proxy": a95_mean_proxy / a_per_eps2_mean,
+            "A_hat_mean": float(group["A_hat"].mean()),
+            "sigma_A_mean": float(group["sigma_A"].mean()),
+            "A_per_eps2_unit_mean": float(group["A_per_eps2_unit"].mean()),
+            "A95_toy_proxy_mean": float(group["A95_toy_proxy"].mean()),
+            "eps2_95_toy_proxy_mean": float(group["eps2_95_toy_proxy"].mean()),
             "blind_nsigma": first_numeric(group, "blind_nsigma"),
             "train_exclude_nsigma": first_numeric(group, "train_exclude_nsigma"),
         }
@@ -258,10 +254,9 @@ def plot_closure_suite(spec: DatasetSpec, summary: pd.DataFrame) -> Path:
     ax_dz.set_ylim(-1.1, 1.1)
 
     handles, labels = ax_pull_mean.get_legend_handles_labels()
-    fig.legend(handles, labels, loc="upper center", ncol=len(labels), frameon=False, bbox_to_anchor=(0.5, 1.02))
+    ax_pull_width.legend(handles, labels, loc="upper right", frameon=False, fontsize=8)
     fig.suptitle(
-        f"{spec.label}: {spec.function_tag} full-refit closure "
-        f"(blind/train={blind:g}/{train:g} sigma, N~{n_per} toys per point)",
+        f"{spec.label}: {spec.function_tag} closure",
         y=1.055,
         fontsize=11,
         fontweight="semibold",
@@ -292,8 +287,8 @@ def plot_combined_limit_proxy(limit_summaries: dict[str, pd.DataFrame]) -> Path:
         x = summary["mass_MeV"].to_numpy(float)
         for row, (quantity, line_col, ylabel) in enumerate(
             [
-                ("A95_toy_proxy", "A95_mean_Ahat_proxy", r"$A_{95}$ proxy [events]"),
-                ("eps2_95_toy_proxy", "eps2_95_mean_Ahat_proxy", r"$\epsilon^2_{95}$ proxy"),
+                ("A95_toy_proxy", "A95_toy_proxy_mean", r"$A_{95}$ proxy [events]"),
+                ("eps2_95_toy_proxy", "eps2_95_toy_proxy_mean", r"$\epsilon^2_{95}$ proxy"),
             ]
         ):
             ax = axes[row, col]
@@ -315,7 +310,7 @@ def plot_combined_limit_proxy(limit_summaries: dict[str, pd.DataFrame]) -> Path:
                 linewidth=0,
                 label="central 68% toys",
             )
-            ax.plot(x, summary[line_col].to_numpy(float), color=line, lw=1.9, label=r"mean-$\hat A$ proxy")
+            ax.plot(x, summary[line_col].to_numpy(float), color=line, lw=1.9, label=r"mean toy proxy")
             ax.set_yscale("log")
             ax.grid(True, which="both", color="0.88", lw=0.7)
             ax.set_axisbelow(True)
