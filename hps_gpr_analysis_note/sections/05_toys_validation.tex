@@ -5,38 +5,33 @@
 \centering
 \graphicorplaceholder{0.98\linewidth}{guard_band_figs/hps_gpr_bump_hunt_flowchart.png}
 \caption{HPS GPR bump-hunt analysis and closure-validation flow. The shared
-per-mass setup defines the spectrum, signal template, blind/extraction window,
-sideband-training region, GP refit, and amplitude extraction. The nominal-data limit
-path converts the profiled yield limit to $\eps^2_{95}$, while the functional-form
-closure path injects known signals into matched smooth-background toys and tests
-signal recovery, pull calibration, $Z$ calibration, uncertainty consistency, and
-signal leakage into the sideband-training region before the blind-window geometry is
-selected.}
+per-mass setup defines the spectrum, signal template, blind/extraction window, sideband-training region, GP refit, and amplitude extraction. The nominal-data limit path converts the profiled yield limit to $\eps^2_{95}$, while the functional-form closure path injects known signals into matched smooth-background toys and tests signal recovery, pull calibration, $Z$ calibration, uncertainty consistency, and signal leakage into the sideband-training region before the blind-window geometry is selected.}
 \label{fig:hps-gpr-flowchart-section5}
 \end{figure}
 
 \subsection{Validation of the Statistical Framework}
 
-Unless stated otherwise, the toy studies summarized here correspond to the 95\%
-confidence-level workflow and the current refit-based local extraction. The staged
-suites cover the fully unblinded 2015 sample, the 2016 10\% development sample, the
-2021 1\% validation sample, and the shared-$\eps^2$ combinations built from those
-inputs. Older GP-generated injection/extraction figures are retained where they answer
-a stable statistical question, while the newest functional-form closure and observed
-limit studies use the refmatched, widened blind-window convention discussed below.
+Unless stated otherwise, the toy studies summarized here correspond to the 95\% confidence-level workflow and the current refit-based local extraction. The staged suites cover the fully unblinded 2015 sample, the 2016 10\% development sample, the 2021 1\% validation sample, and the shared-$\eps^2$ combinations built from those inputs. Older GP-generated injection/extraction figures are retained where they answer a stable statistical question, while the newest functional-form closure and observed limit studies use the refmatched, widened blind-window convention discussed below.
 
-The validation material is organized around four checks of analysis robustness. First,
-how far from the signal peak should the GP sideband training data begin? Second, after
-that training exclusion is fixed, should the $1.64$--$2.25\,\sigma_m$ signal tails be
-omitted as a guard band or included in the extraction likelihood through a wider blind
-window? Third, do the refmatched full-refit toys close for the 2015, 2016, and 2021
-datasets? Finally, do the combined pseudoexperiments accumulate sensitivity as expected
-when statistically independent datasets share one coupling parameter?
+The validation material is organized around four checks of analysis robustness: 
+
+\begin{itemize}
+    \item First, how far from the signal peak should the GP sideband training data begin?
+    
+    \item  Second, after that training exclusion is fixed, should the $1.64$--$2.25\,\sigma_m$ signal tails be omitted as a guard band or included in the extraction likelihood through a wider blind window?
+
+    \item Third, do the reference matched full-refit toys close for the 2015, 2016, and 2021 datasets?
+
+    \item   Finally, do the combined pseudoexperiments accumulate sensitivity as expected when statistically independent datasets share one coupling parameter?
+    
+\end{itemize}
+
+
 
 \subsubsection*{Terms used in the validation plots}
 
 \begin{description}
-\item[train-$k$] The GP sideband fit excludes bins with
+\item[train-$k$ or $k_{train}$] The GP sideband fit excludes bins with
 $|m-m_0|<k\,\sigma_m$ around the tested mass. The selected production value is
 train-$2.25$, matched to the $2.25\,\sigma_m$ blind/extraction window.
 \item[refmatched] The injected amplitude is defined with the same
@@ -67,11 +62,7 @@ real signal is recovered after the same sideband-refit prescription has been app
 \subsection{Training exclusion and blind-window width}
 \label{subsec:guard-band-construction}
 
-The first decision is the training exclusion: how far from the test mass the sideband
-bins used by the GP should begin. Figure~\ref{fig:blind225-cartoon} illustrates the
-adopted wide-blind geometry. For a large injected signal, Gaussian tails remain visible
-outside the central peak. The training-exclusion studies below show why training directly
-next to a narrow $1.64\,\sigma_m$ extraction window is unattractive: those tails can be
+The first decision is the training exclusion: how far from the test mass the sideband bins used by the GP should begin. Figure~\ref{fig:blind225-cartoon} illustrates the adopted wide-blind geometry. For a large injected signal, Gaussian tails remain visible outside the central peak. The training-exclusion studies below show why training directly next to a narrow $1.64\,\sigma_m$ extraction window is unattractive: those tails can be
 offered to the GP as ordinary smooth-background information and then be partly absorbed
 by the refitted background.
 
@@ -85,20 +76,10 @@ same blinded region is then used by the local signal-extraction likelihood.}
 \label{fig:blind225-cartoon}
 \end{figure}
 
-The training-exclusion scan starts from the older $1.64\,\sigma_m$ blind window and
-varies the outer boundary of the bins excluded from GP training. In this notation,
-train-$k$ means that bins with $|m-m_0|<k\,\sigma_m$ are withheld from the GP sideband
-fit. The train-$2.25$ option is not selected because it has the absolute lowest raw
-background-only expected reach. In the CSV summaries, train-$1.96$ gives the lowest
-median Gaussian-equivalent $\eps^2_{95}$ proxy, but it also leaves a much larger
-fraction of the injected template in the GP training region and strongly under-recovers
-injected signals. The train-$2.25$ exclusion is the balanced candidate: it sharply
-reduces train-region leakage and fixes the large under-recovery seen at $1.96$, while
-retaining better expected reach than the wider $2.58$ and $3.0$ exclusions. The compact
-evidence is summarized in
-Table~\ref{tab:guard-band-choice-summary}; for the train-$2.25$ choice, the mean
-recovery is about $0.961$ at $Z_{\mathrm{inj}}=3$ and $0.943$ at
-$Z_{\mathrm{inj}}=5$, with a maximum injected training fraction of about $0.0258$.
+The training-exclusion scan starts from the older $1.64\,\sigma_m$ blind window and varies the outer boundary of the bins excluded from GP training. In this notation, train-$k$ means that bins with $|m-m_0|<k\,\sigma_m$ are withheld from the GP sideband fit. The train-$2.25$ option is not selected because it has the absolute lowest raw background-only expected reach. 
+
+
+In the comparison of different blind windows shown in ~\ref{fig:guard-band-reach-uncertainty}, train-$1.96$ gives the lowest median Gaussian-equivalent $\eps^2_{95}$ proxy, but it also leaves a much larger fraction of the injected signal template in the GP training region leading to higher leakage rate and lower signal sensitivity. The train-$2.25$ exclusion is the balanced candidate: it sharply reduces train-region leakag, is more sensitive to injected signal than $1.96$, and retains better expected reach than the wider $2.58$ and $3.0$ exclusions. The compact evidence is summarized in Table~\ref{tab:guard-band-choice-summary}; for the train-$2.25$ choice, the mean signal recovery is about $0.961$ at $Z_{\mathrm{inj}}=3$ and $0.943$ at $Z_{\mathrm{inj}}=5$, with a maximum injected training fraction of about $0.0258$.
 
 \begin{table}[H]
 \centering
@@ -115,24 +96,10 @@ max $f_{\mathrm{train}}$ \\
 3.00 & \num{1.19e-4} & 1.049 & 1.037 & 0.00288 \\
 \bottomrule
 \end{tabular}
-\caption{Training-exclusion comparison summary from the refmatched 2015 closure toys
-using the older $1.64\,\sigma_m$ blind window. The expected reach column is the
-background-only Gaussian-equivalent proxy
-$1.64\,\sigma_{A,\mathrm{ref}}/A_{\eps^2=1}$ defined in the terms list, not the final
-$CL_s$ limit. The train-$2.25$ point trades a modest reach cost relative to $1.96$ for
-much smaller training leakage and substantially improved injected-signal recovery.}
-\label{tab:guard-band-choice-summary}
+\caption{Training-exclusion comparison summary from the refmatched 2015 closure toys using the older $1.64\,\sigma_m$ blind window. The expected reach column is the background-only Gaussian-equivalent proxy $1.64\,\sigma_{A,\mathrm{ref}}/A_{\eps^2=1}$ defined in the terms list, not the final $CL_s$ limit. The train-$2.25$ point trades a modest reach cost relative to $1.96$ for much smaller training leakage and substantially improved injected-signal recovery.} \label{tab:guard-band-choice-summary}
 \end{table}
 
-The figures in this subsection are meant to be read sequentially. The construction
-cartoon in Figure~\ref{fig:blind225-cartoon} defines the selected widened blind region.
-Table~\ref{tab:guard-band-choice-summary} then gives the compact numerical trade-off.
-Figures~\ref{fig:guard-band-reach-uncertainty}--\ref{fig:guard-band-recovery-boxes}
-show why train-$2.25$ is a stable training-exclusion choice: narrower exclusions improve
-the expected-reach proxy but leave too much signal in the training sidebands, while much
-wider exclusions throw away sideband information. Finally,
-Figures~\ref{fig:refmatched-blind-geometry-reach}--\ref{fig:refmatched-blind-geometry-deltaz}
-compare the two blind-window geometries once train-$2.25$ is fixed.
+The figures in this subsection are meant to be read sequentially. The construction cartoon in Figure~\ref{fig:blind225-cartoon} defines the selected widened blind region. Table~\ref{tab:guard-band-choice-summary} then gives the compact numerical trade-off. Figures~\ref{fig:guard-band-reach-uncertainty}--\ref{fig:guard-band-recovery-boxes} show why train-$2.25$ is a stable training-exclusion choice: narrower exclusions improve the expected-reach but leave too much signal in the training sidebands, while much wider exclusions throw away sideband information. Finally, Figures~\ref{fig:refmatched-blind-geometry-reach}- \ref{fig:refmatched-blind-geometry-deltaz} compare the two blind-window geometries once train-$2.25$ is fixed.
 
 \begin{figure}[H]
 \centering
@@ -172,11 +139,7 @@ reach.}
   \graphicorplaceholder{\linewidth}{guard_band_figs/reference_components_z0.png}
   \caption{Matched-reference and extraction-uncertainty components.}
 \end{subfigure}
-\caption{Leakage and reference-scale diagnostics used in the guard-band choice. The
-training-fraction panel shows the direct contamination pressure that disfavors too
-narrow a guard, while the reference-component panel checks that the matched
-background-only reference scale is consistent with the refit prescription used for the
-closure toys.}
+\caption{Leakage and reference-scale diagnostics used in the guard-band choice. The training-fraction panel shows the direct contamination pressure that disfavors too narrow a guard, while the reference-component panel checks that the matched background-only reference scale is consistent with the refit prescription used for the closure toys.}
 \label{fig:guard-band-leakage-reference}
 \end{figure}
 
@@ -207,15 +170,7 @@ closure toys.}
   \graphicorplaceholder{\linewidth}{guard_band_figs/pull_width_vs_mass.png}
   \caption{Pull widths.}
 \end{subfigure}
-\caption{Closure diagnostics entering the train-$2.25$ guard choice. Recovery and
-$Z$-calibration test the response to injected signals, while the pull panels diagnose
-amplitude bias and uncertainty calibration across the same mass and injected-strength
-grid. Curves show the toy-ensemble central values exported by the comparison suite; the
-uncertainty bands, where shown, are the toy-to-toy central spread for the same
-mass-strength slice rather than the uncertainty from one individual extraction. The
-train-$2.25$ configuration is well motivated because it suppresses training-region
-signal leakage while keeping the pull means near zero and the pull widths close to
-unity across the tested injections.}
+\caption{Closure diagnostics entering the train-$2.25$ guard choice. Recovery and $Z$-calibration test the response to injected signals, while the pull panels diagnose amplitude bias and uncertainty calibration across the same mass and injected-strength grid. Curves show the toy-ensemble central values exported by the comparison suite; the uncertainty bands, where shown, are the toy-to-toy central spread for the same mass-strength slice rather than the uncertainty from one individual extraction. The train-$2.25$ configuration is well motivated because it suppresses training-region signal leakage while keeping the pull means near zero and the pull widths close to unity across the tested injections.}
 \label{fig:guard-band-closure-diagnostics}
 \end{figure}
 
@@ -242,28 +197,12 @@ closer to unity before the wider-guard sensitivity cost becomes dominant.}
 \end{figure}
 
 Once the training exclusion is fixed at $2.25\,\sigma_m$, there are two clean
-blind-window geometries to compare. The older construction keeps the extraction
-likelihood at $1.64\,\sigma_m$ and treats the $1.64$--$2.25\,\sigma_m$ interval as a
-guard band. The newer construction uses a $2.25\,\sigma_m$ blind/extraction window, so
-the same bins are still excluded from training but are retained in the signal
-likelihood. The refmatched comparison holds the background-only reference convention
-fixed in both cases, so the remaining difference is the blind-window geometry itself.
-Figure~\ref{fig:refmatched-blind-geometry-reach} is the central reach comparison: it
-shows that the separate guard band is possible but unnecessary for the selected
-refmatched 2015 ensemble, because the widened blind window gives similar closure while
-recovering the signal tails that the guard-band construction discards. The older
-guard-band construction is kept as an appendix reference in
-Appendix~\ref{app:guard-band-construction}.
+blind-window geometries to compare. The older construction keeps the extraction likelihood at $1.64\,\sigma_m$ and treats the $1.64$--$2.25\,\sigma_m$ interval as a guard band. The newer construction uses a $2.25\,\sigma_m$ blind/extraction window, so the same bins are still excluded from training but are retained in the signal likelihood. The refmatched comparison holds the background-only reference convention fixed in both cases, so the remaining difference is the blind-window geometry itself. Figure~\ref{fig:refmatched-blind-geometry-reach} is the central reach comparison: it *shows that the separate guard band is possible but unnecessary for the selected refmatched 2015 ensemble, because the widened blind window gives similar closure while recovering the signal tails that the guard-band construction discards. The older guard-band construction is kept as an appendix reference in Appendix~\ref{app:guard-band-construction}.
 
 \begin{figure}[h!]
 \centering
 \graphicorplaceholder{0.82\linewidth}{guard_band_figs/refmatched_blind_geometries_eps2_95_reach.png}
-\caption{Refmatched 2015 blind-geometry reach comparison. Both geometries exclude GP
-training data out to $2.25\,\sigma_m$ and define the injected strength with the matched
-background-only refit convention. The $2.25\,\sigma_m$ blind window has similar closure
-behavior but a lower expected $\eps^2_{95}$ proxy because the $1.64$--$2.25\,\sigma_m$
-signal tails are included in the extraction likelihood instead of being discarded as a
-guard band.}
+\caption{Refmatched 2015 blind-geometry reach comparison. Both geometries exclude GP training data out to $2.25\,\sigma_m$ and define the injected strength with the matched background-only refit convention. The $2.25\,\sigma_m$ blind window has similar closure behavior but a lower expected $\eps^2_{95}$ proxy because the $1.64$--$2.25\,\sigma_m$ signal tails are included in the extraction likelihood instead of being discarded as a guard band.}
 \label{fig:refmatched-blind-geometry-reach}
 \end{figure}
 
@@ -271,8 +210,7 @@ guard band.}
 \centering
 \graphicorplaceholder{0.66\linewidth}{guard_band_figs/refmatched_blind_geometries_background_only_closure.png}
 \caption{Background-only spurious-signal closure for the two refmatched blind
-geometries. Both the guard-band construction and the $2.25\,\sigma_m$ blind/extraction
-window remain centered near zero pull in the tested 2015 functional-form ensemble.}
+geometries. Both the guard-band construction and the $2.25\,\sigma_m$ blind/extraction window remain centered near zero pull in the tested 2015 functional-form ensemble.}
 \label{fig:refmatched-blind-geometry-background}
 \end{figure}
 
@@ -280,29 +218,21 @@ window remain centered near zero pull in the tested 2015 functional-form ensembl
 \centering
 \graphicorplaceholder{0.82\linewidth}{guard_band_figs/refmatched_blind_geometry_pull_summary_z0135.png}
 \caption{Compact pull-summary comparison for $Z_{\mathrm{inj}}=0,1,3,5$. The
-$2.25\,\sigma_m$ blind window preserves the same signal-recovery behavior as the
-guard-band construction within the tested 2015 functional-form ensemble.}
+$2.25\,\sigma_m$ blind window preserves the same signal-recovery behavior as the guard-band construction within the tested 2015 functional-form ensemble.}
 \label{fig:refmatched-blind-geometry-pulls}
 \end{figure}
 
 \begin{figure}[h!]
 \centering
 \graphicorplaceholder{0.66\linewidth}{guard_band_figs/refmatched_blind_geometries_injected_amplitude_recovery.png}
-\caption{Injected-amplitude recovery for the two refmatched blind geometries. The
-recovered amplitudes follow the injected reference scale similarly for the guard-band
-and widened-blind constructions.}
+\caption{Injected-amplitude recovery for the two refmatched blind geometries. The recovered amplitudes follow the injected reference scale similarly for the guard-band and widened-blind constructions.}
 \label{fig:refmatched-blind-geometry-recovery}
 \end{figure}
 
 \begin{figure}[h!]
 \centering
 \graphicorplaceholder{0.66\linewidth}{guard_band_figs/refmatched_blind_geometries_z_calibration_residual.png}
-\caption{$Z$-calibration residual comparison for the two refmatched blind geometries.
-In this 2015 ensemble the $2.25\,\sigma_m$ blind window and the $1.64\,\sigma_m$ blind
-plus $2.25\,\sigma_m$ guard construction have very similar closure behavior. The
-widened blind window is therefore selected because it keeps the same training
-protection while recovering the signal tails in the extraction likelihood and improving
-the expected reach.}
+\caption{$Z$-calibration residual comparison for the two refmatched blind geometries. In this 2015 ensemble the $2.25\,\sigma_m$ blind window and the $1.64\,\sigma_m$ blind plus $2.25\,\sigma_m$ guard construction have very similar closure behavior. The widened blind window is therefore selected because it keeps the same training protection while recovering the signal tails in the extraction likelihood and improving the expected reach.}
 \label{fig:refmatched-blind-geometry-deltaz}
 \end{figure}
 
@@ -315,91 +245,35 @@ The validation program uses three complementary pseudoexperiment constructions.
 \subsubsection{Analytic functional-form pseudoexperiments}
 
 The first class of toys starts from an analytic fit to the smooth $e^+e^-$
-invariant-mass spectrum and fluctuates pseudo-data around that closed-form background
-model. These studies isolate the question of gross spectral smoothness from the later
-question of GP conditioning. They are therefore useful as the first closure test before
-the full inference chain is exercised.
+invariant-mass spectrum and fluctuates pseudo-data around that closed-form background model. These studies isolate the question of gross spectral smoothness from the later question of GP conditioning. They are therefore useful as the first closure test before the full inference chain is exercised.
 
-The fit-selection workflow scans a small menu of smooth positive candidate families,
-fits each family over the dataset-specific fit interval, evaluates bin-integrated
-goodness-of-fit over the scan-support region, and keeps only fits with stable
-parameters and visually acceptable residuals. The selected primary seeds are then frozen
-before the toy ensembles are generated. In the current campaign, the selected 2015
-\texttt{fShiftSigPowTail} seed has Pearson $\chi^2/\mathrm{ndof}\simeq1.90$, the 2016
-10\% \texttt{fShiftSigPowTail} seed has $\chi^2/\mathrm{ndof}\simeq0.99$, and the 2021
-1\% seed uses a different \texttt{fSigPowExpQ} family with Pearson
-$\chi^2/\mathrm{ndof}\simeq1.70$.
+The fit-selection workflow scans a small menu of smooth positive candidate families, fits each family over the dataset-specific fit interval, evaluates bin-integrated goodness-of-fit over the scan-support region, and keeps only fits with stable parameters and visually acceptable residuals. The selected primary seeds are then frozen before the toy ensembles are generated. In the current campaign, the selected 2015 \texttt{fShiftSigPowTail} seed has Pearson $\chi^2/\mathrm{ndof}\simeq1.90$, the 2016 10\% \texttt{fShiftSigPowTail} seed has $\chi^2/\mathrm{ndof}\simeq0.99$, and the 2021 1\% seed uses a different \texttt{fSigPowExpQ} family with Pearson $\chi^2/\mathrm{ndof}\simeq1.70$.
 
 \begin{figure}[H]
 \centering
 \graphicorplaceholder{0.96\linewidth}{toy_generation_figs/funcform_parameterization_summary.png}
-\caption{Functional-form parameter panel for the selected toy seeds. Each row lists the
-primary analytic family, fit and scan intervals, bin-integrated goodness-of-fit metrics,
-and fitted parameter values used to generate the corresponding functional-form ensemble.
-The 2021 row uses a different primary family from the 2015 and 2016 rows. The ROOT
-$\chi^2/\mathrm{ndof}=-1.00$ entry in that row is an unavailable ROOT-side diagnostic
-placeholder; the Pearson and Neyman values are the ranking diagnostics used here.}
+\caption{Functional-form parameter panel for the selected toy seeds. Each row lists the primary analytic family, fit and scan intervals, bin-integrated goodness-of-fit metrics, and fitted parameter values used to generate the corresponding functional-form ensemble. The 2021 row uses a different primary family from the 2015 and 2016 rows. The ROOT $\chi^2/\mathrm{ndof}=-1.00$ entry in that row is an unavailable ROOT-side diagnostic placeholder; the Pearson and Neyman values are the ranking diagnostics used here.}
 \label{fig:funcform-parameterization-summary}
 \end{figure}
 
-Figure~\ref{fig:analytic-fit-publication-overview} packages the publication-facing
-overview year by year: the candidate-family overlay appears on the left of each row, and
-the selected primary fit together with the generated toy-ensemble mean appears on the
-right. The corrected toy workflow keeps three mass intervals explicit in every export:
-the full histogram support used for toy normalization, the fit interval used to
-determine the analytic parameters, and the scan interval passed to the search code.
-Pseudo-data are generated bin-by-bin from Poisson means equal to the bin integrals of
-the selected analytic fit after rescaling that fit to the observed event count on the
-full support range. This avoids both the center-value approximation and the earlier
-fixed-total construction in which every toy inherited exactly the same event count.
-It also leaves the blind-window slice un-renormalized: the search interval inherits
-the normalization implied by the full histogram rather than by an isolated scan-window
-fit. The 2015 study keeps the scan hypotheses at \SIrange{20}{130}{MeV}; the 2016
-toy-validation pass is now displayed with the updated \SIrange{42}{210}{MeV} scan
-window to suppress the low-mass mismodeling that biased the earlier 35--42~MeV region;
-and the 2021 1\% study uses its own fit family and scan support. The right-hand panels
-in Figure~\ref{fig:analytic-fit-publication-overview} show the most direct visualization
-of the corrected generation rule: the toy mean follows the selected fit while the toy
-totals fluctuate around, rather than being pinned to, the observed support-range event
-count.
+Figure~\ref{fig:analytic-fit-publication-overview} displays fits of candidate functional forms (left) and the mean generated value of each pseudoexperiment ensemble (right). The toy workflow keeps three mass intervals explicit in every export: the full histogram support used for toy normalization, the fit interval used to determine the analytic parameters, and the scan interval passed to the search code. Pseudo-data are generated bin-by-bin from Poisson means equal to the bin integrals of the selected analytic fit after rescaling that fit to the observed event count on the full support range. It also leaves the blind-window slice un-renormalized: the search interval inherits the normalization implied by the full histogram rather than by an isolated scan-window fit. The 2015 study keeps the scan hypotheses at \SIrange{20}{130}{MeV}; the 2016 toy-validation pass is now displayed with the updated \SIrange{42}{210}{MeV} scan window to suppress the low-mass mismodeling that biased the earlier 35--42~MeV region; and the 2021 1\% study uses its own fit family and scan support. The right-hand panels in Figure~\ref{fig:analytic-fit-publication-overview} show the most direct visualization of the corrected generation rule: the toy mean follows the selected fit while the toy totals fluctuate around, rather than being pinned to, the observed support-range event count.
 
 \begin{figure}[h!]
 \centering
 \graphicorplaceholder{0.99\linewidth}{toy_generation_figs/funcform_publication_overview.png}
 \caption{Overview of the functional-form toy seeds. Each row
-pairs the dataset-specific candidate-family overlay on the left with the selected
-primary seed and toy-ensemble mean on the right. The right-panel titles report the
-dataset, chosen primary family, analysis scan window, and full-support normalization
-target. The 2016 toy displays are shown with the updated 42--210~MeV scan range,
-while the shaded sidebands denote support-only regions that still contribute to the
-toy normalization even though they lie outside the analysis scan. In every row, the
-toy-ensemble mean is computed from pseudoexperiments generated with bin-integrated
-Poisson expectations normalized to the full support-range event count of the real
-dataset.}
+pairs the dataset-specific candidate-family overlay on the left with the selected primary seed and toy-ensemble mean on the right. The right-panel titles report the dataset, chosen primary family, analysis scan window, and full-support normalization target. The 2016 toy displays are shown with the updated 42--210~MeV scan range, while the shaded sidebands denote support-only regions that still contribute to the toy normalization even though they lie outside the analysis scan. In every row, the toy-ensemble mean is computed from pseudoexperiments generated with bin-integrated Poisson expectations normalized to the full support-range event count of the real dataset.}
 \label{fig:analytic-fit-publication-overview}
 \end{figure}
 
-Figures~\ref{fig:closure-validation-2015-funcform}--\ref{fig:closure-validation-2021-funcform}
-put the three dataset-specific functional-form closure suites on the same footing. Each
-figure uses the full-refit toy rows for the selected $2.25\,\sigma_m$ blind/train
-geometry, groups the toys by mass and injected significance, and displays the pull
-mean, pull width, recovered amplitude, and residual significance for
-$Z_{\mathrm{inj}}=0,1,3,5$. The 2015 suite uses the \texttt{wide\_refmatched} subset
-of the blind-\(2.25\,\sigma_m\) refmatch comparison suite, the 2016 suite uses the
-\texttt{2016\_gpr/closure\_final} full-refit toys, and the 2021 suite uses the finalized
-\texttt{closure\_1pct/injection\_flat} \texttt{fSigPowExpQ} toys.
+Figures~\ref{fig:closure-validation-2015-funcform}--\ref{fig:closure-validation-2021-funcform} put the three dataset-specific functional-form closure suites on the same footing:  Each figure uses the full-refit toy rows for the selected $2.25\,\sigma_m$ blind/train geometry, groups the toys by mass and injected significance, and displays the pull mean, pull width, recovered amplitude, and residual significance for $Z_{\mathrm{inj}}=0,1,3,5$. The 2015 suite uses the \texttt{wide\_refmatched} subset of the blind-\(2.25\,\sigma_m\) refmatch comparison suite, the 2016 suite uses the \texttt{2016\_gpr/closure\_final} full-refit toys, and the 2021 suite uses the finalized \texttt{closure\_1pct/injection\_flat} \texttt{fSigPowExpQ} toys.
 
 \begin{figure}[h!]
 \centering
 \graphicorplaceholder{0.96\linewidth}{toy_generation_figs/closure_validation_suite_2015_fShiftSigPowTail.png}
 \caption{2015 \texttt{fShiftSigPowTail} functional-form full-refit closure validation
 suite for the selected $2.25\,\sigma_m$ blind/refmatched geometry. The rows are taken
-from the \texttt{wide\_refmatched} subset of the blind-geometry comparison suite, so the
-signal-strength reference is determined with the same refit convention used in the final
-window choice. The panels show, as a function of mass, the ensemble pull mean, pull
-width, recovered signal amplitude $\hat A/A_{\mathrm{inj}}$, and residual significance
-$\hat Z-Z_{\mathrm{inj}}$; error bars are the standard errors of the corresponding
-toy-ensemble means or widths.}
+from the \texttt{wide\_refmatched} subset of the blind-geometry comparison suite, so the signal-strength reference is determined with the same refit convention used in the final window choice. The panels show, as a function of mass, the ensemble pull mean, pull width, recovered signal amplitude $\hat A/A_{\mathrm{inj}}$, and residual significance $\hat Z-Z_{\mathrm{inj}}$; error bars are the standard errors of the corresponding toy-ensemble means or widths.}
 \label{fig:closure-validation-2015-funcform}
 \end{figure}
 
