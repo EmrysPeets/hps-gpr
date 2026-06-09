@@ -11,10 +11,15 @@ analysis-note workflow, changing only the CLs threshold from 95% CL to 90% CL:
 - radiative penalty enabled with `radiative_penalty_frac_*: 0.07`
 - prompt-density window: `eps2_density_nsigma: 1.64`
 - 10k expected-band toys
+- for the three-way combined search, `combined_mode: count_scale`
 
 The older 90% CL YAMLs in `study_configs/` are legacy injection-study configs
 with different nominal settings. Use the YAMLs in this folder for the current
 observed-UL rerun on SDF.
+
+The three-way combined YAML uses the corrected count-scale coordinate for the
+shared-coupling CLs calculation and writes to a `_corrected` output directory, so
+it does not mix with earlier uncorrected 90% CL outputs.
 
 ## YAMLs
 
@@ -29,33 +34,17 @@ Outputs go under:
 /sdf/data/hps/users/epeets/hps_gpr/observed_ul_90CL/
 ```
 
-## Push And Merge From Local
-
-From the local checkout where these files were created:
-
-```bash
-git checkout -b codex/90pct-observed-ul-configs
-git add study_configs/90pct_configs
-git commit -m "Add 90 percent observed UL configs"
-git push -u origin codex/90pct-observed-ul-configs
-gh pr create --base main --head codex/90pct-observed-ul-configs --fill
-gh pr merge --squash --delete-branch
-```
-
-If the target branch is not `main`, replace `main` in the `gh pr create`
-command.
-
 ## Update The SDF Checkout
 
-After the PR is merged, update the SDF checkout while preserving local SDF files:
+Update the SDF checkout while preserving local SDF files:
 
 ```bash
 cd /path/to/hps-gpr
 git status --short
 git stash push -u -m "before 90pct observed UL rerun"
 git fetch origin
-git checkout main
-git pull --ff-only origin main
+git checkout codex/observed-ul-blind2p25-lslb1p0-rpen7
+git pull --ff-only origin codex/observed-ul-blind2p25-lslb1p0-rpen7
 git stash pop
 ```
 
@@ -127,7 +116,7 @@ Run each combine after that scan's jobs finish:
 hps-gpr slurm-combine --output-dir /sdf/data/hps/users/epeets/hps_gpr/observed_ul_90CL/obsUL90_2015_blind2p25_lslb1p0_rpen7_dens1p64_10k
 hps-gpr slurm-combine --output-dir /sdf/data/hps/users/epeets/hps_gpr/observed_ul_90CL/obsUL90_2016_10pct_blind2p25_lslb1p0_rpen7_dens1p64_10k
 hps-gpr slurm-combine --output-dir /sdf/data/hps/users/epeets/hps_gpr/observed_ul_90CL/obsUL90_2021_1pct_blind2p25_lslb1p0_rpen7_dens1p64_10k
-hps-gpr slurm-combine --output-dir /sdf/data/hps/users/epeets/hps_gpr/observed_ul_90CL/obsUL90_2015_2016_10pct_2021_1pct_blind2p25_lslb1p0_rpen7_dens1p64_10k
+hps-gpr slurm-combine --output-dir /sdf/data/hps/users/epeets/hps_gpr/observed_ul_90CL/obsUL90_2015_2016_10pct_2021_1pct_blind2p25_lslb1p0_rpen7_dens1p64_10k_corrected
 ```
 
 For the combined scan, inspect `summary_combined_all/` for the combined and
