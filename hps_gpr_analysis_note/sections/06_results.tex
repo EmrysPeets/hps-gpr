@@ -326,6 +326,13 @@ single-dataset CSVs. This keeps the simultaneous result tied to the corrected
 count-scale combined scan while preserving the individual inputs needed for the same
 diagnostic comparisons shown above at 95\% CL.
 
+For the minimal visible-dark-photon interpretation, the observed upper-limit display
+also includes the dimuon-threshold branching correction described in
+Section~\ref{sec:methodology-dimuon-threshold}. In the current \path{v2_dimuon}
+files this correction is unity below $2m_\mu$ and therefore does not change the
+below-threshold simultaneous observed scan. It affects only the 2021-only rows from
+\SIrange{212}{250}{MeV} in the combined-band plotting table.
+
 \begin{figure}[H]
 \centering
 \begin{subfigure}[t]{0.32\linewidth}
@@ -354,10 +361,13 @@ from the corrected shared-coupling combined scan.}
 
 \begin{figure}[H]
 \centering
-\graphicorplaceholder{0.90\linewidth}{final_limit_projection_figs/90cls/combined/combined_90cls_bands_corrected_eps2.png}
-\caption{Corrected combined 90\% CLs observed and expected upper limit on $\eps^2$.
-The observed curve is taken from the corrected simultaneous scan, and the expected
-bands are repaired only at the isolated coherent expected-band spikes identified in
+\graphicorplaceholder{0.90\linewidth}{final_limit_projection_figs/90cls/dimuon/combined_90cls_dimuon_corrected_eps2.png}
+\caption{Corrected combined 90\% CLs observed and expected upper limit on $\eps^2$,
+with the minimal-model dimuon-threshold branching factor folded into the
+electron-channel coupling interpretation. The correction is unity below
+$2m_\mu=\SI{211.3167}{MeV}$; in the present \texttt{v2\_dimuon} files it modifies only
+the 2021-only high-mass rows from \SIrange{212}{250}{MeV}. The expected bands are
+repaired only at the isolated coherent expected-band spikes identified in
 Figure~\ref{fig:results-90cls-repair-diagnostics}.}
 \label{fig:results-90cls-combined-band}
 \end{figure}
