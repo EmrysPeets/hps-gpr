@@ -17,13 +17,31 @@
 \usepackage{placeins}
 \usepackage{microtype}
 \usepackage{textcomp}
-
+% Package used to add line numbers
+\usepackage[left]{lineno}
+\linenumbers
 \hypersetup{
   colorlinks=true,
   linkcolor=blue!60!black,
   citecolor=blue!60!black,
   urlcolor=blue!60!black
 }
+
+
+\usepackage{fancyhdr}
+
+\pagestyle{fancy}
+\fancyhf{}
+
+\fancyhead[R]{HPS-ANALYSIS-NOTE BH-GPR v1}
+\fancyfoot[C]{\thepage}
+
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \fancyhead[R]{HPS-ANALYSIS-NOTE BH-GPR v1}
+  \fancyfoot[C]{\thepage}
+}
+
 
 \setlist[itemize]{leftmargin=*}
 \setlist[enumerate]{leftmargin=*}
@@ -70,11 +88,12 @@
 \date{May 22, 2026}
 
 \begin{document}
+
+
 \maketitle
 
 \begin{abstract}
-This note documents the current Heavy Photon Search (HPS) Gaussian-process-regression
-(GPR) analysis workflow for the dark-sector-motivated search for a narrow prompt
+This note documents the current Heavy Photon Search (HPS) Gaussian-process-regression (GPR) analysis workflow for the dark-sector-motivated search for a narrow prompt
 $A^\prime \rightarrow e^+e^-$ resonance in the HPS invariant-mass spectrum. The
 analysis performs global background interpolation, local signal extraction with
 Gaussian-profiled background nuisances, modified-frequentist
