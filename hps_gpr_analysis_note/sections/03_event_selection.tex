@@ -294,10 +294,17 @@ The present package uses the constant choice
 f_{\mathrm{rad},2021}(m) = 0.05,
 \end{equation}
 with the explicit understanding that the final upgraded-detector normalization note may
-replace both the baseline value and its associated systematic treatment. The figure
-below therefore documents the input presently used by the code rather than claiming a
-final 2021 radiative-fraction determination. Figure~\ref{fig:2021-radfrac} should be
-read in exactly that implementation-facing sense.
+replace both the baseline value and its associated systematic treatment. This constant
+choice is nevertheless supported by the available 2021 full-analysis note over the
+majority of the 2021 search range: that note constructs the radiative fraction from
+selected radiative-trident, tritrig, and WAB samples after preselection and the
+$p_{\mathrm{vtx}}>2.8~\mathrm{GeV}$ requirement, fits the resulting ratio over
+$0.05<m<0.25~\mathrm{GeV}$, and quotes a constant average
+$f_{\mathrm{rad}}^{\mathrm{const}}=0.0496$ \cite[Sec.~6.1, Figs.~92--93,
+Eqs.~25--26]{HPS2021FullAnalysisNote}. The existing $0.05$ input is therefore a
+reasonable compact surrogate for the central and high-mass portion of the present
+2021 scan, while the lowest-mass edge and any final unblinded result should retain the
+mass-dependent 2021 parameterization as the reference cross-check.
 
 \begin{figure}[H]
 \centering
@@ -308,6 +315,25 @@ inputs for the present 1\% study. Their current role is to define how the 2021 s
 enters the shared-$\eps^2$ combination until the dedicated 2021 normalization study is
 finalized.}
 \label{fig:2021-radfrac}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.82\linewidth}{normalization_figs/hps2021_radiative_fraction_note_fig92.png}
+\caption{2021 selected-mass distributions used to form the radiative fraction in the
+full-analysis note \cite{HPS2021FullAnalysisNote}. The upper panel shows the selected
+radiative, tritrig, and WAB components, while the lower panel gives
+$f_{\mathrm{rad}}(m)=N_{\mathrm{rad}}/N_{\mathrm{bkg}}$.}
+\label{fig:2021-radfrac-note-components}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.72\linewidth}{normalization_figs/hps2021_radiative_fraction_note_fig93.png}
+\caption{Fifth-order 2021 full-analysis-note fit to the binned radiative fraction
+\cite{HPS2021FullAnalysisNote}. The fitted curve is close to the constant value
+$0.05$ across most of the range used by the present 2021 GPR workflow.}
+\label{fig:2021-radfrac-note-fit}
 \end{figure}
 
 \subsection{Systematic penalties from the radiative fraction}
@@ -352,3 +378,69 @@ current three-dataset combination is therefore a conservative first-order choice
 large enough to cover the established engineering-run normalization uncertainty, and it
 is a reasonable temporary treatment for 2021 while the dedicated upgraded-detector
 normalization study is still being finalized.
+
+The 2021 full-analysis note now provides a more direct estimate for the 2021
+radiative-fraction normalization uncertainty. Its MC cross-section study uses the
+generated RAD and WAB cross-section distributions shown in
+Fig.~\ref{fig:2021-radfrac-xsec-note}; propagating the quoted RAD and WAB
+cross-section widths with the relative normalization $R=0.244$ gives a bounded
+fractional uncertainty of 3.5\% \cite[Sec.~9.1, Fig.~161]{HPS2021FullAnalysisNote}.
+The same note assigns an additional 3\% preselection/radiative-fraction modeling
+uncertainty, motivated by WAB-selective mismodeling in the selected background
+\cite[Sec.~9.2]{HPS2021FullAnalysisNote}. Treating these two direct
+radiative-fraction normalization terms as independent gives
+\begin{equation}
+\delta_{f,2021}^{\mathrm{note}}
+= \sqrt{(0.035)^2 + (0.030)^2}
+= 0.046,
+\qquad
+f_{\mathrm{rad},2021}^{\mathrm{eff}}
+= 0.954\,f_{\mathrm{rad},2021}.
+\label{eq:frad-2021-note-penalty}
+\end{equation}
+Thus the note-supported 2021 analog of the 2016-style one-sided radiative-fraction
+penalty is 4.6\%, corresponding to a multiplicative factor of 0.954. The current
+results in this note continue to use the deliberately conservative common 7\%
+scenario for consistency with the already-produced combined rerun; later results will
+replace the 2021 component with the 4.6\% penalty of
+Eq.~\eqref{eq:frad-2021-note-penalty}, while keeping the 2015 and 2016 treatments tied
+to their respective internal-note provenance.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.88\linewidth}{normalization_figs/hps2021_radiative_xsec_note_fig16.png}
+\caption{Generated cross-section distributions for the 2021 tritrig, radiative, and
+WAB background MC samples \cite{HPS2021FullAnalysisNote}. These distributions set the
+cross-section normalization inputs for the 2021 radiative-fraction calculation.}
+\label{fig:2021-radfrac-xsec-note}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.76\linewidth}{normalization_figs/hps2021_radiative_xsec_uncertainty_note_fig161.png}
+\caption{RAD and WAB cross-section distributions used in the 2021 note's
+radiative-fraction cross-section uncertainty propagation \cite{HPS2021FullAnalysisNote}.
+Together with the relative normalization $R=0.244$, these inputs lead to the 3.5\%
+MC cross-section contribution.}
+\label{fig:2021-radfrac-xsec-syst-note}
+\end{figure}
+
+This 4.6\% number should not be confused with the broader 2021 displaced-search
+signal-yield uncertainty model summarized in Fig.~\ref{fig:2021-syst-table-note}. The
+broader table includes invariant-mass resolution, target-position, and tight-selection
+terms, and the 2021 note explicitly frames those values as the systematic model for
+the displaced-vertex search and as quantities to revisit before the full-data
+application \cite[Sec.~9, Table~58]{HPS2021FullAnalysisNote}. Those entries are
+important signal-yield or acceptance systematics, but they are not part of the
+radiative-fraction-only penalty implemented by Eq.~\eqref{eq:frad-penalty}.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.62\linewidth}{normalization_figs/hps2021_systematics_note_table58.png}
+\caption{Broader 2021 full-analysis-note systematic summary
+\cite{HPS2021FullAnalysisNote}. Only the MC cross-section and preselection entries
+are folded into the radiative-fraction-only penalty in
+Eq.~\eqref{eq:frad-2021-note-penalty}; the other entries remain separate signal-yield
+or acceptance effects.}
+\label{fig:2021-syst-table-note}
+\end{figure}
