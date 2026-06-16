@@ -313,6 +313,136 @@ stronger over much of the high-mass range.}
 \label{fig:results-babar-projection}
 \end{figure}
 
+\subsection{90\% CLs comparison suite}
+\label{sec:results-90cls-suite}
+
+The 90\% CLs rerun provides a useful cross-check of the final-limit machinery and a
+like-for-like comparison to external 90\% contours. The corrected combined result in
+this subsection uses the \path{v2} combined-only CSV exports from
+\path{obsUL90_combined_only_2015_2016_10pct_2021_1pct_blind2p25_lslb1p0_rpen7_dens1p64_10k_corrected}.
+Where the \path{v2} folder does not contain the corresponding individual observed
+band CSVs, the individual 90\% curves and bands are taken from the \path{v1}
+single-dataset CSVs. This keeps the simultaneous result tied to the corrected
+count-scale combined scan while preserving the individual inputs needed for the same
+diagnostic comparisons shown above at 95\% CL.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[t]{0.32\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/90cls/individual_datasets/2015_90cls_eps2_coupling_bands_observed_expected.png}
+  \caption{2015.}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.32\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/90cls/individual_datasets/2016_90cls_eps2_coupling_bands_observed_expected.png}
+  \caption{2016 10\%.}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.32\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/90cls/individual_datasets/2021_90cls_eps2_coupling_bands_observed_expected.png}
+  \caption{2021 1\%.}
+\end{subfigure}
+\caption{Individual 90\% CLs upper limits on $\eps^2$ from the \texttt{v1}
+single-dataset CSVs. These panels are used as diagnostic inputs to the 90\%
+combined-versus-individual comparison; the simultaneous 90\% limit is still obtained
+from the corrected shared-coupling combined scan.}
+\label{fig:results-90cls-individuals}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.90\linewidth}{final_limit_projection_figs/90cls/combined/combined_90cls_bands_corrected_eps2.png}
+\caption{Corrected combined 90\% CLs observed and expected upper limit on $\eps^2$.
+The observed curve is taken from the corrected simultaneous scan, and the expected
+bands are repaired only at the isolated coherent expected-band spikes identified in
+Figure~\ref{fig:results-90cls-repair-diagnostics}.}
+\label{fig:results-90cls-combined-band}
+\end{figure}
+
+The 90\% combined overlay and ratio diagnostics in
+Figure~\ref{fig:results-90cls-overlay-ratio} follow the same convention as the 95\%
+diagnostics. The combined curve is compared only with active individual datasets at
+each mass hypothesis, and the ratio is formed in $\eps$ so that it directly compares
+coupling reach rather than $\eps^2$ reach.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[t]{0.48\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/90cls/combined/observed_90cls_eps2_overlay_individual_and_combined.png}
+  \caption{Observed individual and combined 90\% CLs limits.}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/90cls/diagnostics/combined_vs_best_individual_observed_epsilon_ratio_90cls.png}
+  \caption{Combined over best active individual observed limit in $\eps$.}
+\end{subfigure}
+\caption{Observed 90\% CLs combination diagnostics. The overlay shows the individual
+observed limits and the corrected simultaneous observed limit on $\eps^2$. The ratio
+panel shows where the simultaneous fit improves on the best active individual observed
+limit and where an individual observed fluctuation gives a stronger pointwise limit.}
+\label{fig:results-90cls-overlay-ratio}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.90\linewidth}{final_limit_projection_figs/90cls/diagnostics/combined_90_vs_95cls_observed_expected_eps2.png}
+\caption{Combined 90\% and 95\% observed and expected-median upper limits on
+$\eps^2$. The lower panel shows the 95\%/90\% ratio and the one-sided Gaussian
+confidence-level scaling for orientation. Deviations from a flat Gaussian ratio track
+the mass-dependent CLs construction, interpolation, and observed-curve corrections.}
+\label{fig:results-90cls-vs-95cls}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[t]{0.48\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/90cls/projections/projected_full_unblinded_reach_90cls_eps2.png}
+  \caption{Projected full-unblinded 90\% reach.}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/90cls/babar_90_comparison/babar90_vs_projected_full_data_100pct.png}
+  \caption{Projected HPS reach compared with BaBar at 90\%.}
+\end{subfigure}
+\caption{Projected 90\% CLs reach comparisons. The full-unblinded projection scales
+the current 2016 10\% and 2021 1\% density inputs to 100\% while holding the 2015
+sample fixed. The BaBar comparison is projection-only on the HPS side: the current
+observed 90\% combined curve is intentionally omitted, and the lower panel shows
+projected HPS divided by the BaBar 90\% contour.}
+\label{fig:results-90cls-projection-babar}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[t]{0.48\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/90cls/diagnostics/combined_expected_band_spike_diagnostics_90cls.png}
+  \caption{Expected-band spike repairs.}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/90cls/diagnostics/combined_toy_limit_tail_areas_90cls.png}
+  \caption{Toy-tail diagnostics.}
+\end{subfigure}
+\caption{90\% CLs diagnostic plots used to audit the two corrected expected-band
+points and the behavior of the observed limit relative to the background-only toy
+limit ensemble. The toy-tail panel is plotted as p-value versus mass on a logarithmic
+y-axis and includes the local and Sidak scan-level global significance-reference
+thresholds used in the corresponding 95\% CLs diagnostic. The expected-band repair is
+limited to coherent one-point excursions at 103 and 198 MeV, where each expected-band
+quantile is replaced by the log-linear
+interpolation between neighboring mass hypotheses in the same active dataset set.}
+\label{fig:results-90cls-repair-diagnostics}
+\end{figure}
+
 \subsection{Forward placeholders}
 \label{sec:results-forward-placeholders}
 
