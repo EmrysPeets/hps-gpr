@@ -12,7 +12,7 @@ track--cluster matching; and the beamline/target geometry, which defines the for
 acceptance and the occupancy environment \cite{HPSExperiment2022,HPS2016PromptLong}.
 
 The 2015 and 2016 engineering runs used the baseline six-station SVT. In that
-configuration, six double-layer stereo measurement stations were distributed between
+configuration, six axial/stereo tracking stations were distributed between
 $z=\SIrange{10}{90}{cm}$ downstream of the target, with the first active silicon only
 about \SI{1.5}{mm} from the beam plane \cite{HPS2016BumpInternal,HPSExperiment2022}.
 The ECal geometry used in the engineering runs was already close to the final HPS
@@ -77,6 +77,9 @@ the present scope. This note keeps the statement explicit: 2019 data exist, but 
 will be analyzed in a similar capacity in later work rather than merged into the
 review-ready workflow described here.
 
+Table~\ref{tab:dataset-summary} summarizes the run periods, approximate exposures, and
+current GPR scan ranges used in this review note.
+
 \begin{table}[H]
 \centering
 \small
@@ -118,6 +121,11 @@ window searches; the corresponding prompt-search publications scanned
 \label{tab:dataset-summary}
 \end{table}
 
+The EOT values are not inputs to the GP background interpolation itself; they enter the
+dataset-specific signal normalization that converts an extracted prompt yield into an
+equivalent $\epsilon^2$ limit, together with the target, acceptance, efficiency, and
+radiative-fraction inputs for that run period.
+
 The staged-analysis logic matters for the way the results are interpreted. The 2015
 sample remains the cleanest environment for methodology validation because it is fully
 unblinded. The 2016 and 2021 analyses are instead organized in review-friendly stages:
@@ -127,3 +135,30 @@ unblinded 2021 analysis remain the end points of the program. The 2021 1\% sampl
 therefore best viewed as a validation subset of the upgraded detector configuration:
 it already shows how the upgraded geometry and normalization inputs enter the
 shared-$\eps^2$ reach, but it is not yet the final physics statement for the 2021 run.
+The 2016 10\% and 2021 1\% samples are constructed as development streams spread across
+their respective running periods rather than as contiguous end-of-run blocks, so they
+sample run-period conditions while keeping most of the blinded exposure reserved for the
+later unblinding stages.
+
+Figure~\ref{fig:dataset-mass-shape-overlay} compares the unit-normalized invariant-mass
+shapes for the three samples. Figure~\ref{fig:dataset-mass-distributions-log} then shows
+the same spectra in absolute events per MeV, with the relevant published or expected
+search regions highlighted.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.86\linewidth}{dataset_summary_figs/invariant_mass_distributions_2015_2016_2021_normalized.png}
+\caption{Unit-normalized invariant-mass shapes for the 2015, 2016 10\%, and 2021 1\%
+samples used in the current workflow. Each histogram is divided by its own total event
+count and bin width, so the overlay compares shape rather than exposure.}
+\label{fig:dataset-mass-shape-overlay}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.98\linewidth}{dataset_summary_figs/invariant_mass_distributions_2015_2016_2021_log.png}
+\caption{Absolute invariant-mass distributions for the three datasets. The shaded
+regions show the published 2015 and 2016 prompt-search windows and the expected 2021
+GPR search region, updated here to \SIrange{35}{250}{MeV}.}
+\label{fig:dataset-mass-distributions-log}
+\end{figure}

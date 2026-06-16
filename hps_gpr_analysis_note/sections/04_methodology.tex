@@ -11,7 +11,7 @@ fragile. Window-by-window fits produced visibly less smooth limit curves, amplif
 dependence of the result on local fit boundaries, and complicated any attempt to write
 a statistically coherent multi-dataset combination. The present workflow therefore uses
 a full-range per-hypothesis GP fit over the histogram range of each dataset and
-excludes only a narrow mass-dependent training region around the test mass. That choice
+excludes only a narrow mass-dependent training-exclusion region around the test mass. That choice
 yields a background description that is smoother, easier to validate, and naturally
 compatible with a combined likelihood in a shared parameter of interest.
 
@@ -32,36 +32,52 @@ resolution,
 \left[m_0 - n_{\mathrm{blind}}\sigma_d(m_0),\,
       m_0 + n_{\mathrm{blind}}\sigma_d(m_0)\right].
 \end{equation}
-For the completed studies summarized in this note, the blind half-width is
-$n_{\mathrm{blind}}=1.64$. For an ideal Gaussian line shape this interval contains
+The package exposes the extraction half-width and GP training exclusion as independent
+configuration values. Earlier injection and GP-toy validation studies used
+$n_{\mathrm{blind}}=1.64$ with the same $1.64\,\sigma_d$ training exclusion. The current
+observed-limit and refmatched closure baseline documented later in this note uses a
+wider $2.25\,\sigma_d$ blind/extraction window with the GP training exclusion also set
+to $2.25\,\sigma_d$. For an ideal Gaussian line shape, the $1.64\,\sigma_d$ interval
+contains
 \begin{equation}
-f_{\mathrm{blind}}^{\mathrm{ideal}}
+f_{\mathrm{blind}}^{\mathrm{ideal}}(1.64)
 = \mathrm{erf}\!\left(\frac{1.64}{\sqrt{2}}\right)
 \simeq 0.899,
 \end{equation}
-so roughly 10\% of the signal lies outside the blinded region. This point matters
-conceptually and numerically: the current code does \emph{not} renormalize the signal
-template inside the blind window. Instead, it keeps the full Gaussian normalization and
-lets only the blinded subset enter the local likelihood. The same $1.64\,\sigma_d$
-scale is used for the nominal GP training exclusion in the current validation studies,
-although the package exposes the training exclusion and the extraction blind window as
-independent controls.
+while the $2.25\,\sigma_d$ interval contains
+\begin{equation}
+f_{\mathrm{blind}}^{\mathrm{ideal}}(2.25)
+= \mathrm{erf}\!\left(\frac{2.25}{\sqrt{2}}\right)
+\simeq 0.976.
+\end{equation}
+This point matters conceptually and numerically: the current code does
+\emph{not} renormalize the signal template inside either blind window. Instead, it
+keeps the full Gaussian normalization and lets only the blinded subset enter the local
+likelihood.
 
 The notation $\mathcal{B}_d(m_0)$ denotes the set of histogram bins that lie inside the
 blinded interval for dataset $d$ at test mass $m_0$. In the current production
 configuration there is no additional gap between the extraction window and the GP
-training sample: the nominal training exclusion starts immediately outside
-$\mathcal{B}_d(m_0)$. A wider exclusion, for example $1.96\,\sigma_d$ instead of
-$1.64\,\sigma_d$, would reduce signal leakage into the training region from about 10\%
-to about 5\%, but it would also increase the interpolation distance and therefore the
-GP predictive uncertainty. In the simple background-dominated proxy
+training sample: when the extraction and training-exclusion half-widths are equal, the
+training exclusion starts immediately outside $\mathcal{B}_d(m_0)$. A wider exclusion,
+for example $1.96\,\sigma_d$ instead of $1.64\,\sigma_d$, reduces signal leakage into
+the training region but also increases the interpolation distance and therefore the GP
+predictive uncertainty. In the simple background-dominated proxy
 $S/\sqrt{B}\propto F(k)/\sqrt{k}$ with $F(k)=\mathrm{erf}(k/\sqrt{2})$, the optimum lies
-near $k\simeq1.4$, so the adopted $1.64\,\sigma_d$ choice remains close to the
-sensitivity optimum while still containing about 90\% of a Gaussian signal. The
-$1.96\,\sigma_d$ choice is therefore treated as a robustness option that prioritizes
-less training-region contamination over slightly better expected reach, not as a
-clearly superior default. Full-refit pseudoexperiments in Section~\ref{sec:toys} are
-the main guard against any residual signal-absorption bias from this choice.
+near $k\simeq1.4$, so the historical $1.64\,\sigma_d$ extraction was close to the
+pure-sensitivity optimum. Section~\ref{sec:toys} then motivates the current
+$2.25\,\sigma_d$ blind/extraction choice as a signal-recovery improvement after
+full-refit pseudoexperiments showed appreciable training-region absorption at narrower
+exclusions.
+
+The bin assignment is implemented with the histogram bin centers: a bin is part of
+$\mathcal{B}_d(m_0)$ when its center lies inside the blind interval, and it is part of
+the GP sideband training sample when its center lies outside the training-exclusion
+interval. This center-based assignment is stable because the mass bins are narrower than
+the detector resolution in the scanned range. The signal template itself is still
+integrated over the full bin edges in Eq.~\eqref{eq:window-template}; only the choice of
+which pre-existing histogram bins enter the blind window or sidebands uses the center
+mask.
 
 \subsection{Log-space preprocessing and the choice \texorpdfstring{$\alpha=1/y$}{alpha=1/y}}
 
@@ -84,6 +100,11 @@ fractional changes in mass, which is the relevant scale once the detector resolu
 written in the transformed coordinate as $\sigma_x(m)\simeq \sigma_d(m)/m$. Barr and
 Liu emphasize that applying logarithms to both axes improves convergence and
 performance for wide, steeply falling spectra \cite{BarrLiu2025}.
+The GP regression step is implemented with the
+\texttt{GaussianProcessRegressor} estimator from \texttt{scikit-learn}
+\cite{ScikitLearn}; the surrounding HPS analysis code supplies the histogram
+handling, mass-dependent sideband masks, signal templates, profile likelihood,
+and \CLs{} limit construction.
 
 The GP is therefore used to model an unobserved smooth mean function
 $z_{\mathrm{true},d}(x)$ for the log-count spectrum. In that language, ``latent'' means
@@ -165,7 +186,10 @@ and uses this local physical scale to set the RBF bounds. In the default
 \qquad
 \ell_{\max}(m) = k_{\max}\sigma_x(m),
 \end{equation}
-with the baseline lower factor $k_{\min}=0.5$.
+with the baseline lower factor $k_{\min}=0.5$ for all three datasets. The practical
+bookkeeping point is worth stating explicitly because an older diagnostic overlay
+showed a stale 2016 value of 0.05; that lower-bound curve was incorrect and is not the
+baseline used in the current production configs.
 
 The physics-facing ceiling adopted in this note is
 \begin{equation}
@@ -184,13 +208,13 @@ problem: the optimizer rides the boundary and the background model becomes visib
 rigid. The adopted 8$\sigma_d$ and 9$\sigma_d$ ceilings are therefore presented as
 stability choices anchored to detector resolution, not as arbitrary tune points.
 
-Two additional guards appear in the current configurations and remain part of the
-method definition. First, a dataset-statistics floor on $\ell_{\max}$ prevents the
-ceiling from becoming artificially small where the local resolution is exceptionally
-tight. Second, an optional cap at a fixed fraction of the training xrange prevents the
-GP from drifting toward an effectively global polynomial interpolant. Together these
-controls keep the kernel flexible enough to describe the smooth spectrum while
-preventing it from becoming either too stiff or too unconstrained.
+The current production configs retain one additional guard: a dataset-statistics floor
+on $\ell_{\max}$ prevents the ceiling from becoming artificially small where the local
+resolution is exceptionally tight. The older fixed-xrange cap remains available only as
+an opt-in diagnostic knob in the code and is not enabled in the baseline results shown
+here. A mass-independent lower floor is likewise a reasonable follow-up robustness
+study, but it would constitute a deliberate method variation rather than the bound
+prescription used for the results documented in this note.
 
 Figure~\ref{fig:lengthscale-bounds} makes the bound prescription explicit. Panel (a)
 shows the detector-resolution scale in the GP coordinate, and panel (b) shows the
@@ -213,11 +237,38 @@ single mass-independent smoothing length.
 \end{subfigure}
 \caption{Length-scale parameterization used in the GPR fit. Panel (a) shows the local
 signal-template width in the GP coordinate, while panel (b) shows the allowed
-length-scale band obtained by multiplying that physical width by the chosen lower and
-upper factors. The purpose of the bound is to permit smooth background variation
-without allowing the optimizer to drift into an unphysically unconstrained smoothing
-regime.}
+length-scale band obtained in the current implementation by applying the common
+$k_{\min}=0.5$ lower factor together with the dataset-specific upper factors. The
+purpose of the bound is to permit smooth background variation without allowing the
+optimizer to drift into an unphysically unconstrained smoothing regime.}
 \label{fig:lengthscale-bounds}
+\end{figure}
+
+Figure~\ref{fig:gpr-window-construction} summarizes the same construction in the
+language used by the implemented likelihood. The sideband bins set the log-count
+training sample and its heteroscedastic bin-noise assignment, the kernel hyperparameters
+are optimized only on those sidebands, and the trained GP is then conditioned to predict
+the mean and covariance in the blinded mass window. That predicted count-space mean and
+covariance are the background inputs passed to the local profiled signal extraction.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[t]{0.52\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{methodology_figs/gpr_training_three_step_rail.png}
+  \caption{Log-count transform, noise-aware covariance training, and window prediction.}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.45\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{methodology_figs/blinded_mass_window_reworked.png}
+  \caption{Sideband-only training and blinded-window prediction.}
+\end{subfigure}
+\caption{Kernel and blinded-window construction used by the GPR workflow. The GP is
+trained on sideband bins with fixed bin-noise variances, not on the blinded bins. The
+posterior prediction in the blind window supplies the background mean and covariance
+that enter the local likelihood.}
+\label{fig:gpr-window-construction}
 \end{figure}
 
 \subsection{Blind-window prediction in count space}
@@ -294,7 +345,8 @@ Its blinded-bin sum is therefore
 \begin{equation}
 f_{\mathrm{blind},d}(m_0) = \sum_{i \in \mathcal{B}_d(m_0)} w_{d,i}(m_0) < 1,
 \end{equation}
-with a value near 0.90 for the nominal $1.64\,\sigma_d$ half-width. The signal
+with a value near 0.90 for a $1.64\,\sigma_d$ half-width and near 0.98 for the current
+$2.25\,\sigma_d$ observed-limit half-width. The signal
 amplitude $A_d$ is defined as the \emph{total} local Gaussian signal yield associated
 with the mass hypothesis, not merely the yield inside the blind window. The expected
 signal contribution entering bin $i$ of the local likelihood is therefore
@@ -322,9 +374,12 @@ fixed-target relation between $A^\prime$ production and radiative trident produc
 where $\alpha_{\mathrm{EM}}$ is the fine-structure constant, the factor $3\pi/2$ is the
 standard narrow-width coefficient relating on-shell $A^\prime$ production to radiative
 trident production, and $N_{\mathrm{eff}}$ counts the number of kinematically open
-visible decay channels contributing to the total $A^\prime$ width. Throughout the mass
-range of interest here only the $e^+e^-$ channel is open, so $N_{\mathrm{eff}}=1$.
-Writing the
+visible decay channels contributing to the total $A^\prime$ width. Below the dimuon
+threshold, only the $e^+e^-$ channel is open and the minimal-model conversion has
+$N_{\mathrm{eff}}=1$. The present GPR implementation keeps this $e^+e^-$ normalization
+as the analysis convention for the prompt electron-channel yield; minimal dark-photon
+interpretations above $2m_\mu$ require updating the visible branching factor to include
+the newly open $\mu^+\mu^-$ channel. Writing the
 radiative differential rate as
 \begin{equation}
 \frac{dN_{\gamma^\ast}}{dm}
@@ -345,12 +400,12 @@ density in the same mass interval used for the nominal blind window,
 \frac{N_d\!\left[m-n_{\mathrm{blind}}\sigma_d(m),\,m+n_{\mathrm{blind}}\sigma_d(m)\right]}
 {2\,n_{\mathrm{blind}}\sigma_d(m)},
 \end{equation}
-with $n_{\mathrm{blind}}=1.64$ in the current 95\% CL studies. This keeps the local
-yield-to-$\eps^2$ normalization aligned with the actual search window rather than with
-a separate fixed $\pm2\,\sigma_d$ convention. The code still exposes
-\texttt{eps2\_density\_nsigma} as an audit knob, so the legacy $m\pm2\sigma_d(m)$
-normalization can be reproduced when needed, but it is no longer the default analysis
-definition. It is convenient to define the
+with $n_{\mathrm{blind}}=1.64$ retained as the current prompt-density normalization
+window even when the extraction blind window is widened to $2.25\,\sigma_d$. This keeps
+the yield-to-$\eps^2$ conversion tied to the historically used local density scale while
+the likelihood itself can recover the wider signal tails. The code exposes
+\texttt{eps2\_density\_nsigma} as an audit knob, so alternative density-window
+conventions can be reproduced when needed. It is convenient to define the
 dataset-specific conversion factor
 \begin{equation}
 K_d(m) \equiv A_d(\eps^2 = 1)
