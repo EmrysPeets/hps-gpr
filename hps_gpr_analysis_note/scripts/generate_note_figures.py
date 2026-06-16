@@ -793,14 +793,6 @@ def main(argv: list[str] | None = None) -> None:
     make_2021_parameterization_fig(NOTE_DIR / "resolution_figs" / "hps2021_resolution_and_frad.png")
     make_2021_resolution_only_fig(NOTE_DIR / "resolution_figs" / "hps2021_mass_resolution_parameterization.png")
     make_2021_radiative_inputs_fig(NOTE_DIR / "normalization_figs" / "hps2021_radiative_fraction_inputs.png")
-    stack_images(
-        [
-            NOTE_DIR / "significance_figs" / "2015" / "p0_analytic_local_global.png",
-            NOTE_DIR / "significance_figs" / "2016_10pct" / "p0_analytic_local_global.png",
-            NOTE_DIR / "summary_combined_all_rad_penalty" / "2021_p0_local_global.png",
-        ],
-        NOTE_DIR / "methodology_figs" / "local_significances_across_datasets.png",
-    )
     make_projection_placeholder(
         NOTE_DIR / "combined_search_figs" / "projected_unblinded_reach_eps2_placeholder.png"
     )
