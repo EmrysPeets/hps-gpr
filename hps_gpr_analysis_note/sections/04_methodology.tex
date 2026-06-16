@@ -805,3 +805,74 @@ alternative Poisson-style treatments as targeted robustness studies. Those alter
 are not presented as equally mature production choices, but they remain important if
 future pseudoexperiments show that the current nuisance model still absorbs an
 unacceptable fraction of injected signal.
+
+\subsection{Dimuon-threshold interpretation}
+\label{sec:methodology-dimuon-threshold}
+
+The yield-to-coupling conversion in Eq.~\eqref{eq:eps2-conversion} is an
+electron-channel normalization: the fitted resonance amplitude is the
+$A^\prime\to e^+e^-$ yield visible in the prompt invariant-mass spectrum. For the
+minimal kinetically mixed dark photon, this is also the full visible branching
+interpretation below the dimuon threshold, $m_{A^\prime}<2m_\mu=\SI{211.3167}{MeV}$,
+where the $\mu^+\mu^-$ final state is kinematically closed. This is the same
+fixed-target convention used in the published HPS prompt searches
+\cite{EssigEtAl2011,HPS2015DarkPhoton,HPS2016PromptLong}. Above threshold, the same
+electron-channel yield corresponds to a weaker minimal-model limit on $\eps^2$ because
+the total width includes the newly open $A^\prime\to\mu^+\mu^-$ mode
+\cite{Holdom1986,Fabbrichesi2020DarkPhoton}.
+
+Neglecting the electron mass and remaining below the two-pion hadronic threshold, the
+charged-lepton width ratio is
+\begin{equation}
+R_{\mu/e}(m_{A^\prime})
+\equiv
+\frac{\Gamma(A^\prime\to\mu^+\mu^-)}
+{\Gamma(A^\prime\to e^+e^-)}
+=
+\sqrt{1-\frac{4m_\mu^2}{m_{A^\prime}^2}}\,
+\left(1+\frac{2m_\mu^2}{m_{A^\prime}^2}\right),
+\qquad m_{A^\prime}>2m_\mu,
+\label{eq:dimuon-width-ratio}
+\end{equation}
+with $R_{\mu/e}=0$ below threshold. The inverse electron branching fraction used for
+the minimal-model reinterpretation is therefore
+\begin{equation}
+N_{\mathrm{eff}}^{\mathrm{BR}}(m_{A^\prime})
+\equiv
+\frac{1}{\mathcal{B}(A^\prime\to e^+e^-)}
+=
+1+R_{\mu/e}(m_{A^\prime}),
+\label{eq:dimuon-neff}
+\end{equation}
+and an electron-channel coupling limit is mapped to the minimal visible-dark-photon
+convention by
+\begin{equation}
+\eps^2_{\mathrm{min}}(m_{A^\prime})
+=
+N_{\mathrm{eff}}^{\mathrm{BR}}(m_{A^\prime})\,\eps^2_{ee}(m_{A^\prime}).
+\label{eq:dimuon-eps2-map}
+\end{equation}
+This operation does not change the local fit, the signal-yield upper limit, the
+\CLs{} value, or the local $p_0$ scan; it changes only the coupling interpretation of
+an electron-channel result. Figure~\ref{fig:methodology-dimuon-factor} shows the
+factor applied in the 90\% CLs cross-check files. The factor is unity below
+$2m_\mu$, rises continuously above threshold, and reaches
+$N_{\mathrm{eff}}^{\mathrm{BR}}=1.725$ at \SI{250}{MeV}
+($\mathcal{B}_{ee}=0.580$).
+
+The scan range used for a look-elsewhere statement must match the range of the quoted
+physics claim \cite{GrossVitells2010}. If the minimal-dark-photon exclusion is quoted
+only below \SI{210}{MeV}, the final scan-level toy or effective-trials calibration
+should use that same below-threshold range. If the high-mass electron-channel scan is
+promoted to a \SIrange{170}{250}{MeV} minimal-model result, the corresponding
+look-elsewhere calibration should include the full extended range as well.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.78\linewidth}{final_limit_projection_figs/90cls/dimuon/dimuon_factor_vs_mass.png}
+\caption{Minimal-model branching factor used to reinterpret electron-channel
+$\eps^2$ limits above the dimuon threshold. The red curve shows
+$N_{\mathrm{eff}}^{\mathrm{BR}}=1/\mathcal{B}(A^\prime\to e^+e^-)$ and the blue dashed
+curve shows $\mathcal{B}(A^\prime\to e^+e^-)$.}
+\label{fig:methodology-dimuon-factor}
+\end{figure}
