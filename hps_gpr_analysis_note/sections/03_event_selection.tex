@@ -15,12 +15,12 @@ oppositely charged tracks matched to ECal clusters, tight cluster-time coinciden
 track-quality and vertex requirements, and momentum cuts that retain prompt radiative
 tridents while suppressing accidentals and converted wide-angle Bremsstrahlung. The
 2015 and 2016 selections are already mature because they are inherited from the
-published prompt searches. The 2021 situation is different: the current GPR workflow
-already consumes a concrete upgraded-era production histogram, but the line-by-line
-bookkeeping has not yet been rewritten in the same ``preselection plus prompt-tight
-additions'' style. Table~\ref{tab:event-selection} therefore records only the working
-2021 values already implemented in the present 1\% sample, without implying that a
-fully frozen 2021 prompt note has already been merged into this document.
+published prompt searches. For 2021, the baseline upgraded-detector preselection is
+taken from the full 2021 analysis note, while the extra prompt-oriented tightening in
+the current GPR workflow is recorded separately. Table~\ref{tab:event-selection}
+therefore distinguishes the full-analysis-note preselection from the additional
+$p_{\mathrm{sum}}<\SI{2.8}{GeV}$ requirement applied by the present 1\% validation
+histogram.
 
 \input{tables/event_selection_table}
 
@@ -43,15 +43,13 @@ practice, the tighter $p_{\mathrm{sum}}$ requirement removes the part of phase s
 where high-momentum prompt backgrounds become more important and where the yield-to-
 $\eps^2$ mapping would be diluted by a less signal-like composition.
 
-For reviewer purposes, the path to finalizing the 2021 column is now concrete rather
-than open ended. The production histogram already used in the analysis is the upgraded
-selection exported as \path{preselection\_invM\_psumlt2p8\_hists.root} with mass
-spectrum \path{preselection/h\_invM\_8000}. Freezing the publication-facing table means
-transcribing that production recipe into note language, then separating which cuts are
-baseline upgraded-detector preselection requirements and which are genuinely
-prompt-tight additions for the final resonance workflow. That bookkeeping step was
-already completed for 2015 and 2016 in the prompt-search notes; it is precisely the
-missing documentation layer for 2021, not a missing event sample.
+The 2021 entries in the table follow the preselection summary in the full 2021 note
+\cite[Sec.~4.8, Table~38 and App.~A]{HPS2021FullAnalysisNote}. The production histogram
+already used in the analysis is the upgraded selection exported as
+\path{preselection\_invM\_psumlt2p8\_hists.root} with mass spectrum
+\path{preselection/h\_invM\_8000}. The table therefore separates which requirements are
+baseline upgraded-detector preselection requirements and which requirement is a
+genuinely prompt-tight addition for the final resonance workflow.
 
 This distinction also explains why the older analyses read differently. In the 2015 and
 2016 prompt notes, ``preselection'' denoted the broad reconstruction-level sample that
@@ -59,9 +57,9 @@ entered the prompt-search optimization, while ``prompt selection'' denoted the n
 subset used for the published resonance result after timing, momentum-sum, and
 background-rejection tightening. The current 2021 GPR workflow is already closer to the
 latter category in physics content, because the exported histogram is a prompt-oriented
-study sample with the extra $p_{\mathrm{sum}}<\SI{2.8}{GeV}$ tightening. What is still
-missing is the final note-quality decomposition of that sample into the same
-review-friendly preselection/prompt columns used for the engineering-run papers.
+study sample with the extra $p_{\mathrm{sum}}<\SI{2.8}{GeV}$ tightening. The table now
+records that decomposition explicitly enough to compare it with the engineering-run
+selections.
 
 \subsection{2015 mass resolution}
 \label{sec:massres-2015}

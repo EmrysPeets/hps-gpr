@@ -89,44 +89,130 @@ original publications \cite{HPS2015DarkPhoton,HPS2016PromptLong}.}
 \subsection{Complementary prompt-visible constraints}
 
 For internal review, the relevant comparison is not merely which experiments reach the
-same mass window, but how their exclusions and favored regions populate the
+same mass window, but how their exclusions and allowed benchmark contours populate the
 $(m_{A^\prime},\eps^2)$ plane over roughly \SIrange{10}{300}{MeV}. In that space HPS
 occupies a distinct fixed-target niche between very-low-mass meson-decay constraints
 and the higher-mass collider reach. Fixed-target electron-beam searches from APEX and
 A1/MAMI provide especially relevant low-mass visible benchmarks
 \cite{APEX2011,A1MAMI2014}; KLOE/KLOE-2 and BaBar probe complementary visible
-production in $e^+e^-$ collisions \cite{KLOE2013,KLOE22015,BaBarDarkPhoton2014}; and
-NA48/2 and NA64 constrain, respectively, low-mass meson-decay and visible missing-beam
-interpretations that border the same general parameter space
-\cite{NA48DarkPhoton2015,NA64X17Visible2021}. Those published contours are the correct
-objects for the final review figure because they show exclusion depth, not only mass
-coverage.
-
-For the present draft, Figure~\ref{fig:prompt-visible-constraints} is a placeholder
-panel that already puts the discussion in the correct coordinates. It overlays the
-electron- and muon-anomaly motivated bands taken from
-Ref.~\cite{PeetsX17g2Comparison2026}, marks the published HPS and current GPR scan
-windows, and highlights the \SI{16.7}{MeV} $X17$ mass location. The
-$X17$/protophobic interpretation should be understood here as adjacent motivation
-rather than as part of the minimal kinetically mixed dark-photon benchmark itself
-\cite{Krasznahorkay2016,FengProtophobic2016}. In the final version of this note, the
-placeholder should be replaced by the cited experimental exclusion contours on the same
-$(m_{A^\prime},\eps^2)$ axes.
+production in $e^+e^-$ collisions \cite{KLOE2013,KLOE22015,BaBarDarkPhoton2014};
+LHCb enters at the upper edge of this panel through prompt $A^\prime\rightarrow\mu^+\mu^-$
+searches above the dimuon threshold \cite{LHCbDarkPhoton2020}; and NA48/2 and NA64
+constrain, respectively, low-mass meson-decay and visible fixed-target interpretations
+that border the same general parameter space \cite{NA48DarkPhoton2015,NA64DarkPhoton2018}.
+Figure~\ref{fig:prompt-visible-constraints} puts those constraints on the same
+$(m_{A^\prime},\eps^2)$ axes as the HPS prompt program. The external prompt-visible
+contours are digitized from the published collaboration limits using the DarkCast limit
+library where available \cite{DarkCast2018}. The panel also overlays the Peets
+electron- and muon-anomaly allowed contours \cite{Peets2026X17}, marks the
+published HPS and current GPR scan windows, and highlights the \SI{16.7}{MeV} $X17$
+mass location. The $X17$/protophobic interpretation should be understood here as
+adjacent motivation rather than as part of the minimal kinetically mixed dark-photon
+benchmark itself \cite{Krasznahorkay2016,FengProtophobic2016}.
 
 \begin{figure}[H]
 \centering
-\graphicorplaceholder{0.88\linewidth}{context_figs/prompt_visible_eps2_placeholder.png}
-\caption{Placeholder prompt-visible parameter-space panel for the review note. The
-electron- and muon-anomaly bands are adapted from
-Ref.~\cite{PeetsX17g2Comparison2026} and are shown only as motivation benchmarks; the
-shaded HPS intervals indicate the published 2015 and 2016 prompt windows together with
-the current GPR scan scope. The final review figure should replace the placeholder
-annotations with explicit exclusion contours from APEX, A1/MAMI, KLOE/KLOE-2, BaBar,
-NA48/2, and NA64 on the same $(m_{A^\prime},\eps^2)$ axes.}
+\graphicorplaceholder{0.98\linewidth}{context_figs/prompt_visible_constraints_panel.png}
+\caption{Prompt-visible dark-photon parameter space around the HPS mass range. The
+foreground contours show published exclusion bounds from APEX, A1/MAMI, KLOE/KLOE-2,
+BaBar, LHCb, NA48/2, NA64, and the published HPS prompt searches
+\cite{APEX2011,A1MAMI2014,KLOE2013,KLOE22015,BaBarDarkPhoton2014,
+LHCbDarkPhoton2020,NA48DarkPhoton2015,NA64DarkPhoton2018,HPS2015DarkPhoton,HPS2016PromptLong}.
+DarkCast digitizations are plotted as $\eps^2$ for the external contours where
+available \cite{DarkCast2018}; confidence levels are kept as quoted by the individual
+publications. The NA64 visible/displaced band is an acceptance-dependent X17/dark-photon
+bound, not a prompt HPS-like resonance search. The labeled Peets electron- and
+muon-anomaly curves are central values, with the lighter unlabeled envelopes indicating
+the corresponding allowed benchmark contours rather than favored bands; the shaded HPS
+intervals indicate the published 2015 and 2016 prompt windows together with the current
+GPR scan scope.}
 \label{fig:prompt-visible-constraints}
 \end{figure}
 
 \subsection{Motivation for the present GPR analysis}
+
+Gaussian-process regression is best viewed here as a modern form of
+covariance-based interpolation. The historical starting point is kriging, developed in
+mine-valuation and geostatistical applications by Krige and formalized by Matheron:
+given observations of a smooth field at some locations, the task is to predict the
+field elsewhere while carrying the uncertainty induced by finite sampling and spatial
+correlation \cite{Krige1951,Matheron1963}. In a resonance search the coordinate is not
+geographic position but invariant mass. The same statistical idea is useful because
+the prompt trident continuum is smooth on the scale of the HPS mass resolution, while a
+prompt $A^\prime$ would appear as a narrow localized excess. GPR replaces an explicit
+closed-form background curve with a probability distribution over smooth functions,
+specified by a mean and covariance kernel and conditioned on the observed training
+bins outside the mass-dependent excluded window \cite{RasmussenWilliams2006}. For each
+test mass, the practical output is therefore not only a background prediction in the
+blinded window, but a correlated uncertainty on that prediction.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.94\linewidth}{methodology_figs/gpr_intro_cartoon.png}
+\caption{Cartoon of the per-test-mass GPR workflow. For each test mass, the GP is
+trained on bins across the full mass range except for a narrow excluded window centered
+on that mass. The trained GP predicts the posterior mean and covariance inside the
+excluded window, where a narrow $A^\prime$-like signal hypothesis is overlaid only for
+illustration.}
+\label{fig:gpr-intro-cartoon}
+\end{figure}
+
+This viewpoint is attractive for HPS for the same reason emphasized in the 2017
+high-energy-physics study of Frate \textit{et al.}: fixed empirical functions restrict
+the background to a low-dimensional family, and discrepancies that are hidden by
+statistical fluctuations can become limiting as luminosity grows or as the scan region
+is widened \cite{FrateGP2017}. Figure~\ref{fig:frate-gp-vs-adhoc} reproduces three of
+their comparison plots. In toy spectra built from ATLAS dijet data, the GP background
+model maintains a near-unit goodness-of-fit scale and remains stable as the effective
+luminosity increases, while the ad-hoc functional form degrades. The lesson for HPS is
+not that a GP is assumption-free: the kernel, training exclusion, transform, and
+length-scale bounds are all analysis choices. The benefit is that the smoothness
+assumption is made explicit and propagated as a covariance, rather than being hidden in
+a hand-selected analytic form.
+
+\begin{figure}[p]
+\centering
+\begin{subfigure}[t]{0.88\linewidth}
+  \centering
+  \includegraphics[width=0.58\linewidth,angle=-90]{external_figs/frate2017/FFGPonToys.pdf}
+  \caption{Toy-spectrum mean and $\pm1\sigma$ background bands.}
+\end{subfigure}
+
+\vspace{0.8em}
+
+\begin{subfigure}[t]{0.46\linewidth}
+\centering
+\includegraphics[width=0.76\linewidth,angle=-90]{external_figs/frate2017/chi2.pdf}
+\caption{Toy goodness-of-fit distributions.}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.46\linewidth}
+\centering
+\includegraphics[width=0.76\linewidth,angle=-90]{external_figs/frate2017/lumivschi2.pdf}
+\caption{Goodness of fit versus effective luminosity.}
+\end{subfigure}
+\caption{Methodological comparison between Gaussian-process and ad-hoc functional-form
+background modeling reproduced from Ref.~\cite{FrateGP2017}. The panels show that, in
+the 2017 dijet toy study, the GP retained an accurate smooth-background description
+while the fixed functional form became increasingly strained as the effective
+statistical precision improved.}
+\label{fig:frate-gp-vs-adhoc}
+\end{figure}
+
+The later CMS-oriented GPR signal-extraction study by Gandrakota \textit{et al.}
+provides the closest methodological bridge to the present implementation: choose a
+kernel class, condition the GP on binned count data, compare candidate kernels against
+the smooth background structure, and then separate a localized signal component from
+the inferred background in a reproducible statistical workflow \cite{Gandrakota2023}.
+The HPS analysis adopts that framework in a form matched to a fixed-target
+prompt-resonance search. It trains the GP in log-mass/log-count space, removes the
+test-mass window from training, ties the allowed length scale to the detector
+resolution, converts the posterior prediction back into count space, and carries the
+resulting mean vector and covariance matrix into the local profile likelihood. The
+detailed construction is given in Section~\ref{sec:methodology}; the introduction
+only needs the central motivation: GPR turns the smooth-background interpolation
+problem into an explicit probabilistic object that can be validated, profiled, and
+combined across datasets.
 
 The motivation for the present note is not simply to replace a local polynomial fit
 with a different smooth background parameterization. The earlier HPS prompt searches

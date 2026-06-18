@@ -481,6 +481,76 @@ def make_constraints_panel(out_path: Path) -> None:
     plt.close(fig)
 
 
+def _darkcast_limit_dir() -> Path:
+    return NOTE_DIR / "tmp" / "darkcast_releases" / "darkcast" / "limits"
+
+
+def _load_darkcast_limit_eps2(
+    name: str,
+    *,
+    mass_range_mev: tuple[float, float] = (10.0, 300.0),
+    eps_max: float = 3.0e-2,
+) -> tuple[np.ndarray, np.ndarray]:
+    path = _darkcast_limit_dir() / f"{name}.lmt"
+    rows = []
+    with open(path, "r", encoding="utf-8") as fh:
+        for raw in fh:
+            raw = raw.strip()
+            if not raw or raw.startswith("#"):
+                continue
+            parts = raw.split()
+            if len(parts) < 2:
+                continue
+            rows.append((float(parts[0]) * 1.0e3, float(parts[1]) ** 2))
+    arr = np.asarray(rows, dtype=float)
+    mask = (
+        (arr[:, 0] >= mass_range_mev[0])
+        & (arr[:, 0] <= mass_range_mev[1])
+        & np.isfinite(arr[:, 1])
+        & (arr[:, 1] > 0.0)
+        & (arr[:, 1] < eps_max**2)
+    )
+    return arr[mask, 0], arr[mask, 1]
+
+
+def _load_darkcast_band_eps2(
+    name: str,
+    *,
+    mass_range_mev: tuple[float, float] = (10.0, 300.0),
+    eps_max: float = 3.0e-2,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    path = _darkcast_limit_dir() / f"{name}.lmt"
+    rows = []
+    with open(path, "r", encoding="utf-8") as fh:
+        for raw in fh:
+            raw = raw.strip()
+            if not raw or raw.startswith("#"):
+                continue
+            parts = raw.split()
+            if len(parts) < 3:
+                continue
+            rows.append((float(parts[0]) * 1.0e3, float(parts[1]) ** 2, float(parts[2]) ** 2))
+    arr = np.asarray(rows, dtype=float)
+    mask = (
+        (arr[:, 0] >= mass_range_mev[0])
+        & (arr[:, 0] <= mass_range_mev[1])
+        & np.all(np.isfinite(arr[:, 1:]), axis=1)
+        & (arr[:, 1] > 0.0)
+        & (arr[:, 2] > arr[:, 1])
+        & (arr[:, 1] < eps_max**2)
+        & (arr[:, 2] < eps_max**2)
+    )
+    return arr[mask, 0], arr[mask, 1], arr[mask, 2]
+
+
+def _load_hps2016_prompt_eps2() -> tuple[np.ndarray, np.ndarray] | None:
+    path = NOTE_DIR / "context_figs" / "hps2016_published_prompt_eps2.csv"
+    if not path.exists():
+        return None
+    data = np.genfromtxt(path, delimiter=",", names=True)
+    return np.asarray(data["mass_MeV"], dtype=float), np.asarray(data["published_2016_eps2"], dtype=float)
+
+
 def _dark_photon_loop_kernel(masses_mev: np.ndarray, m_lepton_mev: float) -> np.ndarray:
     z = np.linspace(0.0, 1.0, 4000)
     r2 = (np.asarray(masses_mev, dtype=float) / float(m_lepton_mev)) ** 2
@@ -504,6 +574,109 @@ def _scaled_eps2_band(
     eps_hi = eps_at_17_mev + nsigma * eps_unc_at_17_mev
     eps_c = eps_at_17_mev
     return (eps_lo**2) * scale, (eps_c**2) * scale, (eps_hi**2) * scale
+
+
+def make_prompt_visible_constraints_panel(out_path: Path) -> None:
+    masses = np.geomspace(10.0, 300.0, 700)
+
+    mu_lo, mu_c, mu_hi = _scaled_eps2_band(
+        masses,
+        m_lepton_mev=105.6583755,
+        eps_at_17_mev=7.03e-4,
+        eps_unc_at_17_mev=0.58e-4,
+        nsigma=2.0,
+    )
+    rb2_lo, rb2_c, rb2_hi = _scaled_eps2_band(
+        masses,
+        m_lepton_mev=0.51099895,
+        eps_at_17_mev=0.69e-3,
+        eps_unc_at_17_mev=0.15e-3,
+        nsigma=2.0,
+    )
+    y_min, y_max = 8.0e-9, 4.0e-4
+    fig, ax = plt.subplots(figsize=(11.0, 5.45))
+
+    ax.axvspan(19.0, 81.0, color="#4C72B0", alpha=0.055, lw=0, zorder=0)
+    ax.axvspan(39.0, 179.0, color="#DD8452", alpha=0.045, lw=0, zorder=0)
+    ax.axvspan(20.0, 250.0, color="#55A868", alpha=0.026, lw=0, zorder=0)
+    ax.axvspan(16.2, 17.2, color="#C44E52", alpha=0.18, lw=0, zorder=0)
+
+    ax.plot(masses, mu_lo, color="#6A3D9A", lw=1.1, ls=(0, (4, 2)), alpha=0.55)
+    ax.plot(masses, mu_hi, color="#6A3D9A", lw=1.1, ls=(0, (4, 2)), alpha=0.55)
+    ax.plot(masses, mu_c, color="#6A3D9A", lw=1.55, alpha=0.85, label=r"Peets $(g-2)_\mu$ central")
+    ax.plot(masses, rb2_lo, color="#1F77B4", lw=1.0, ls=(0, (2, 2)), alpha=0.5)
+    ax.plot(masses, rb2_hi, color="#1F77B4", lw=1.0, ls=(0, (2, 2)), alpha=0.5)
+    ax.plot(masses, rb2_c, color="#1F77B4", lw=1.4, alpha=0.82, label=r"Peets $(g-2)_e$ central")
+
+    curve_specs = [
+        ("BaBar_Lees2014xha", "BaBar", "#7B3294", 2.55, "-", 8),
+        ("NA48_Batley2015lha", "NA48/2", "#B8860B", 2.15, "-", 7),
+        ("KLOE_Babusci2012cr", "KLOE/KLOE-2", "#008B8B", 1.85, "-", 5),
+        ("KLOE_Anastasi2015qla", None, "#008B8B", 1.85, "--", 5),
+        ("A1_Merkel2014avp", "A1/MAMI", "#2E8B57", 2.15, "-", 6),
+        ("APEX_Abrahamyan2011gv", "APEX", "#3CB371", 2.05, "-", 6),
+        ("LHCb_Aaij2019bvg_prompt", "LHCb prompt", "#4D4D4D", 1.95, "-", 6),
+        ("HPS_Adrian2018scb", "HPS 2015", "#1F4E79", 2.05, "-", 6),
+    ]
+    for name, label, color, lw, ls, zorder in curve_specs:
+        x, y = _load_darkcast_limit_eps2(name)
+        if x.size == 0:
+            continue
+        ax.plot(x, y, color=color, lw=lw, ls=ls, label=label, zorder=zorder)
+
+    hps2016 = _load_hps2016_prompt_eps2()
+    if hps2016 is not None:
+        x_hps16, y_hps16 = hps2016
+        ax.plot(x_hps16, y_hps16, color="#D55E00", lw=2.1, label="HPS 2016", zorder=6)
+
+    x_na64, y_na64_lo, y_na64_hi = _load_darkcast_band_eps2("NA64_Banerjee2018vgk")
+    if x_na64.size:
+        ax.fill_between(
+            x_na64,
+            y_na64_lo,
+            y_na64_hi,
+            color="#C44E52",
+            alpha=0.32,
+            lw=0,
+            label="NA64 visible/displaced",
+            zorder=5,
+        )
+        ax.plot(x_na64, y_na64_lo, color="#8B1E3F", lw=1.35, zorder=6)
+        ax.plot(x_na64, y_na64_hi, color="#8B1E3F", lw=1.35, zorder=6)
+
+    ax.text(16.9, 2.2e-6, "X17", color="#8B1E3F", rotation=90, va="bottom", ha="center", fontsize=8.2)
+    ax.text(24.0, 1.9e-4, "HPS 2015", color="#1F4E79", fontsize=8.0, ha="center")
+    ax.text(63.0, 1.45e-4, "HPS 2016", color="#D55E00", fontsize=8.0, ha="center")
+    ax.text(118.0, 2.0e-4, "Current GPR scope", color="#2F6E3F", fontsize=8.0, ha="center")
+
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    ax.set_xlim(10.0, 300.0)
+    ax.set_ylim(y_min, y_max)
+    ax.set_xlabel(r"$m_{A'}$ [MeV]")
+    ax.set_ylabel(r"Kinetic mixing $\epsilon^2$")
+    ax.set_title("Low-mass prompt-visible dark-photon parameter space", fontsize=12.0)
+    ax.set_xticks([10, 20, 30, 50, 100, 200, 300])
+    ax.set_xticklabels(["10", "20", "30", "50", "100", "200", "300"])
+    ax.grid(alpha=0.25, which="both")
+    ax.legend(
+        loc="center left",
+        bbox_to_anchor=(1.02, 0.5),
+        fontsize=7.4,
+        ncol=1,
+        framealpha=0.96,
+        borderpad=0.62,
+        handlelength=2.45,
+        labelspacing=0.42,
+        title="Contours",
+        title_fontsize=8.0,
+    )
+
+    ensure_dir(out_path.parent)
+    fig.tight_layout(rect=[0.0, 0.0, 0.78, 1.0])
+    fig.savefig(out_path, dpi=240, bbox_inches="tight")
+    fig.savefig(out_path.with_suffix(".pdf"), bbox_inches="tight")
+    plt.close(fig)
 
 
 def make_prompt_visible_eps2_placeholder(out_path: Path) -> None:
@@ -788,7 +961,7 @@ def main(argv: list[str] | None = None) -> None:
     )
     make_pvalue_schematic(NOTE_DIR / "methodology_figs" / "pvalue_tail_schematic.png")
     make_pvalue_tail_examples(NOTE_DIR / "methodology_figs" / "pvalue_tail_examples.png")
-    make_prompt_visible_eps2_placeholder(NOTE_DIR / "context_figs" / "prompt_visible_constraints_panel.png")
+    make_prompt_visible_constraints_panel(NOTE_DIR / "context_figs" / "prompt_visible_constraints_panel.png")
     make_prompt_visible_eps2_placeholder(NOTE_DIR / "context_figs" / "prompt_visible_eps2_placeholder.png")
     make_2021_parameterization_fig(NOTE_DIR / "resolution_figs" / "hps2021_resolution_and_frad.png")
     make_2021_resolution_only_fig(NOTE_DIR / "resolution_figs" / "hps2021_mass_resolution_parameterization.png")

@@ -1,0 +1,198 @@
+\section{Comparison of the Corrected 2015 Polynomial Re-analysis and the GPR Method}
+\label{app:2015-method-comparison}
+
+This appendix compares the present GPR-based 2015 upper limit with the corrected
+2015 re-analysis documented in Appendix~J of the 2016 bump-hunt internal note
+\cite{HPS2016BumpInternal}.  The comparison is useful because both analyses use the
+same fully unblinded 2015 engineering-run mass spectrum, the same basic prompt
+$A^\prime\to e^+e^-$ signal hypothesis, and closely related detector inputs for the
+mass resolution and radiative normalization.  At the same time, the comparison should
+not be interpreted as a proof that the two statistical procedures are equivalent.  The
+corrected 2015 re-analysis is a local windowed polynomial fit, while the present
+analysis uses a sideband-trained Gaussian process to predict the blinded mass window
+and propagates the resulting correlated background uncertainty through the profiled
+likelihood.
+
+\subsection{Historical 2015 and 2016 polynomial analyses}
+
+The published 2015 prompt resonance search used the full 2015 engineering-run data set
+passing the analysis selection and scanned the invariant-mass spectrum from roughly
+\SIrange{19}{81}{MeV} \cite{HPS2015DarkPhoton,HPS2015InternalNote}.  For each mass
+hypothesis, the local model consisted of a Gaussian signal component plus a smooth
+background described by a Chebyshev polynomial of the first kind.  The published
+optimization selected a fifth-order polynomial below about \SI{39}{MeV} and a
+third-order polynomial above that mass, with broad mass windows tied to the detector
+resolution.  Upper limits were obtained with a profile-likelihood construction and a
+power-constrained prescription: when the unconstrained observed limit became stronger
+than the median background-only sensitivity, the quoted signal-yield limit was set to
+the median expected limit \cite{HPS2015InternalNote}.  The corresponding coupling
+limit used the standard fixed-target relation between the signal yield and the
+radiative trident rate, with the 2015 radiative fraction convention
+$f_{\rm rad}=0.085$.
+
+The 2016 bump-hunt analysis generalized the polynomial approach.  It used a Gaussian
+signal component plus a Legendre-polynomial background in a mass window scaled to
+$[-1,1]$, so that the polynomial basis was orthogonal over the fitted interval.  The
+polynomial order and window size were selected separately by mass, using 10\% data and
+toy studies to check the background-only fit quality, the fitted signal pull, and the
+expected limit behavior.  The 2016 note then used a bounded profile-likelihood
+\CLs{} construction for the upper limit, with systematic variations propagated by
+repeated fits or conservative conversion factors \cite{HPS2016BumpInternal}.  The
+``Legendre Polynomial Approach'' curve used in Fig.~\ref{fig:hps2015-legendre-gpr-observed}
+is the corrected 2015 re-analysis from that 2016 code path and Appendix~J, not the
+original published 2015 contour.
+
+\subsection{Implementation issues in the original 2015 result}
+
+Appendix~J of the 2016 internal note identifies two separate implementation errors in
+the original 2015 bump-hunt code \cite{HPS2016BumpInternal}.  First, the local fit
+window was scaled to $[-0.25,0.25]$ rather than to the intended $[-1,1]$.  This was not
+a harmless convention change: the polynomial background basis was chosen on the
+assumption that it would be orthogonal over the fitted coordinate range, so the
+incorrect scaling broke the orthogonality argument and invalidated the original
+model-selection basis.  Second, the mass resolution was parameterized in the unscaled
+mass coordinate but was not consistently transformed into the scaled fit coordinate.
+The signal template width entering the fit was therefore inconsistent with the
+coordinate system used by the likelihood.
+
+After these corrections, the model selection preferred narrower and more stable
+windows for the 2015 re-analysis:
+\begin{equation}
+M(N,n_\sigma)=
+\begin{cases}
+O(5),~n_\sigma=10, & m_{A^\prime}<\SI{40}{MeV},\\
+O(3),~n_\sigma=8, & m_{A^\prime}\ge \SI{40}{MeV}.
+\end{cases}
+\end{equation}
+The corrected re-analysis found no significant excess and produced the revised
+$\eps^2$ limit shown in Fig.~71 of the 2016 internal note.  Figure~72 of that note
+compares the original and corrected 2015 contours directly.
+
+This issue should be distinguished from the RooFit binned extended-maximum-likelihood
+problem discussed in the 2015 internal note \cite{HPS2015InternalNote}.  That RooFit
+problem produced biases in high-occupancy binned fits with several floating
+parameters, but the 2015 internal note states that the final results used the
+independent vanilla ROOT fitter.  The Appendix~J corrections are therefore a separate
+coordinate-scaling and signal-width consistency problem in the 2015 resonance-search
+implementation.
+
+\subsection{Present GPR method}
+
+The current GPR method is not a polynomial re-fit with a smoother background curve.
+For each test mass, the method excludes the blinded region from the training data,
+fits the smooth invariant-mass spectrum in log-count space, and predicts the
+count-space mean vector and covariance matrix in the blinded mass window.  The local
+signal extraction then uses a multi-bin Poisson likelihood in which the GP-predicted
+background covariance is represented by correlated Gaussian-constrained nuisance
+parameters.  A full-range Gaussian signal template is normalized over the histogram
+support and then sliced into the blinded window without re-normalization, so the fitted
+signal amplitude remains the total local Gaussian yield associated with the mass
+hypothesis.  The 95\% upper limit is obtained with the bounded profile-likelihood
+\CLs{} construction described in Section~\ref{sec:methodology}.
+
+For the observed-limit comparison shown here, the GPR curve corresponds to the current
+2015 production configuration with a widened $2.25\,\sigma_m$ blind and training
+exclusion region, a \SI{1}{MeV} scan step, the 7\% radiative-normalization penalty, and
+the $\eps^2$ density evaluated with the \SI{1.64}{\sigma_m} convention.  The
+validation studies in Section~\ref{sec:toys} motivate the widened blind/extraction
+window through leakage, pull, amplitude-recovery, and significance-calibration
+diagnostics.  The methodology text and final configuration should use a consistent
+statement of this choice when this appendix is finalized.
+
+\begin{table}[p]
+\centering
+\small
+\begin{tabularx}{\linewidth}{P{0.25\linewidth}YY}
+\toprule
+Feature & Corrected 2015 polynomial re-analysis & Present GPR analysis \\
+\midrule
+Data set & Fully unblinded 2015 engineering-run spectrum over the published low-mass
+range. & Same 2015 spectrum for the comparison; current scan extends beyond the
+published range in production studies. \\
+Background model & Local mass-window fit with a Legendre-polynomial background in the
+corrected 2016-code re-analysis; original 2015 publication used Chebyshev
+polynomials. & Full-range log-count GP trained outside the blinded region, with a
+count-space blind-window mean and covariance. \\
+Signal model & Gaussian resonance template with mass resolution from the 2015 detector
+model. & Full-range Gaussian template sliced into the blinded window without
+renormalization. \\
+Uncertainty treatment & Polynomial coefficients profiled locally; mass-resolution and
+radiative-fraction effects propagated by refits, quantiles, or conversion scaling. &
+Correlated GP background uncertainty enters directly as Gaussian-constrained nuisance
+parameters in the local likelihood; radiative fraction currently enters as a
+conversion penalty. \\
+Limit construction & Original 2015 publication used a power-constrained 95\% C.L.
+limit; the 2016-code re-analysis uses the later bounded \CLs{} machinery. & Bounded
+profile-likelihood \CLs{} limit in signal-yield space, converted to $\eps^2$ with the
+dataset-specific radiative normalization and local event density. \\
+Validation role & Tests whether the corrected historical polynomial implementation
+gives a stable 2015 result. & Requires independent toy closure, coverage, and
+signal-absorption studies in addition to observed-limit agreement. \\
+\bottomrule
+\end{tabularx}
+\caption{Methodological comparison between the corrected 2015 polynomial
+re-analysis and the present GPR analysis.}
+\label{tab:2015-polynomial-gpr-methods}
+\end{table}
+
+\subsection{Observed-limit comparison}
+
+Figure~\ref{fig:hps2015-legendre-gpr-observed} overlays the observed 95\% upper limit
+from the corrected 2015 polynomial re-analysis with the observed 2015 GPR limit.  The
+historical curve was digitized from the solid black contour in Fig.~71 of the 2016
+internal note, with the digitized points and overlay QA archived together with the
+comparison plot.  Over the common \SIrange{20}{81}{MeV} interval, the ratio
+\[
+R(m) = \frac{\eps^2_{95,\mathrm{GPR}}(m)}
+{\eps^2_{95,\mathrm{Legendre}}(m)}
+\]
+has a median value of 0.99 and a mean value of 1.06 on the integer-MeV comparison
+grid.  The central 68\% interval of the ratio is approximately
+$0.73<R<1.42$, and all but two grid points lie within a factor of two.  Thus the two
+observed limits are similar at the level expected for analyses using the same data
+sample, mass resolution scale, radiative normalization, and local event-density
+conversion.
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.92\linewidth}{final_limit_projection_figs/individual_datasets/hps2015_95cl_observed_vs_internal_note.png}
+\caption{Observed 95\% $\eps^2$ upper-limit comparison for the 2015 data set.  The
+black curve labeled ``Legendre Polynomial Approach'' is the corrected 2015
+re-analysis digitized from Fig.~71 of the 2016 bump-hunt internal note.  The blue curve
+labeled ``GPR approach'' is the present GPR result for the 2015 data set.  The lower
+panel shows the ratio GPR/Legendre.}
+\label{fig:hps2015-legendre-gpr-observed}
+\end{figure}
+
+\subsection{Interpretation}
+
+The close observed-limit agreement is reassuring, but its meaning is limited.  An
+observed $\eps^2$ limit is driven by the local event density, the radiative-fraction
+normalization, the mass-resolution model, and the realized upward or downward
+fluctuations in the same data.  Those inputs are largely shared between the two 2015
+curves, so agreement in the gross sensitivity scale is expected if neither background
+model introduces a large bias.  The agreement therefore supports the statement that the
+GPR procedure is operating on the correct physical normalization scale and is not
+obviously over- or under-excluding the 2015 data relative to the corrected historical
+analysis.
+
+The agreement is not, by itself, a validation of coverage, background-model bias, or
+absence of signal absorption.  Those questions are answered by the toy program:
+functional-form pseudoexperiments test closure against smooth analytic spectra,
+GP-propagated pseudoexperiments test behavior under the GP background model, and
+refit-on-toy studies test whether the sideband training can absorb signal-like
+structure.  The comparison in Fig.~\ref{fig:hps2015-legendre-gpr-observed} should
+therefore be presented as a cross-check of the observed sensitivity scale, while the
+closure and coverage figures remain the central statistical validation of the GPR
+method.
+
+The corrected 2015 re-analysis also changes how the published 2015 result should be
+used in this note.  The original published contour should not be used as the primary
+target for validating the GPR background model, because Appendix~J shows that the
+original coordinate scaling and signal-width treatment were inconsistent with the fit
+model assumptions.  The corrected re-analysis is the more appropriate historical
+baseline.  At the same time, the corrected analysis did not reveal a significant
+2015 excess, so the physics conclusion that the 2015 engineering run did not contain a
+discovery-level prompt resonance remains unchanged.  The practical implication is that
+comparisons to 2015 should emphasize the corrected polynomial result for methodology
+checks, while the published 2015 exclusion remains part of the historical HPS record.

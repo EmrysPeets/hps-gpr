@@ -110,7 +110,9 @@ The GP is therefore used to model an unobserved smooth mean function
 $z_{\mathrm{true},d}(x)$ for the log-count spectrum. In that language, ``latent'' means
 only that the smooth log-rate is not observed directly; it is inferred from the
 histogram counts through the transformed coordinates and the heteroscedastic variance
-term. For Poisson counts $Y_i \sim \mathrm{Pois}(\lambda_i)$, the delta method gives
+term. The GP mean vector is the vector of latent log-count means evaluated at the
+selected training-bin coordinate. For Poisson counts $Y_i \sim
+\mathrm{Pois}(\lambda_i)$, the delta method gives
 $\mathrm{Var}[\log Y_i]\approx \mathrm{Var}[Y_i]/E[Y_i]^2 \approx 1/\lambda_i$, which
 motivates the plug-in choice $\alpha_i\approx 1/y_i$ for occupied bins. A
 heteroscedastic diagonal term $\alpha_i$ is then added to the training covariance,
@@ -186,7 +188,7 @@ and uses this local physical scale to set the RBF bounds. In the default
 \qquad
 \ell_{\max}(m) = k_{\max}\sigma_x(m),
 \end{equation}
-with the baseline lower factor $k_{\min}=0.5$ for all three datasets. The practical
+with the baseline lower factor $k_{\min}=1.0$ for all three datasets. The practical
 bookkeeping point is worth stating explicitly because an older diagnostic overlay
 showed a stale 2016 value of 0.05; that lower-bound curve was incorrect and is not the
 baseline used in the current production configs.
@@ -238,10 +240,48 @@ single mass-independent smoothing length.
 \caption{Length-scale parameterization used in the GPR fit. Panel (a) shows the local
 signal-template width in the GP coordinate, while panel (b) shows the allowed
 length-scale band obtained in the current implementation by applying the common
-$k_{\min}=0.5$ lower factor together with the dataset-specific upper factors. The
+$k_{\min}=1.0$ lower factor together with the dataset-specific upper factors. The
 purpose of the bound is to permit smooth background variation without allowing the
 optimizer to drift into an unphysically unconstrained smoothing regime.}
 \label{fig:lengthscale-bounds}
+\end{figure}
+
+The lower-bound scan summarized in
+Figure~\ref{fig:lengthscale-lower-bound-stability} documents the stability study that
+motivated selecting the $1\sigma_x$ lower bound, i.e. the common $k_{\min}=1.0$
+configuration used in the production fits. Panel (a) shows why the looser
+$0.5\sigma_x$ option is unattractive: the optimized length scale can sit close to the
+floor or vary irregularly with mass, which makes the fitted background too sensitive to
+local statistical structure. The most compelling evidence is panel (b). The
+$1.5\sigma_x$ option visibly over-constrains the background response, giving pull
+widths far above the unit reference line, while the selected $1\sigma_x$ floor stays
+near unit pull width across injected strengths without the instability of the looser
+choice. This is why the $1\sigma_x$ lower bound is used as the nominal compromise
+between flexibility and calibration.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[t]{0.88\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{kernel_lengthscale_figs/length_scale_diagnostics_by_lslb.png}
+  \caption{Optimized length-scale diagnostics for candidate lower bounds.}
+\end{subfigure}
+
+\vspace{0.8em}
+
+\begin{subfigure}[t]{0.88\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{kernel_lengthscale_figs/overall_pull_width_vs_injsigma_by_lslb.png}
+  \caption{Overall pull-width response versus injected significance.}
+\end{subfigure}
+\caption{Length-scale lower-bound stability comparison from the 2015 validation scan.
+The selected $1\sigma_x$ lower bound improves fit stability relative to the looser
+$0.5\sigma_x$ option while avoiding the extra rigidity of the $1.5\sigma_x$
+alternative. Panel (b), the average pull width versus injected significance, is the
+primary selection diagnostic: the chosen curve remains close to the horizontal unit
+reference line, while the more aggressive lower bound produces substantially
+over-wide pulls.}
+\label{fig:lengthscale-lower-bound-stability}
 \end{figure}
 
 Figure~\ref{fig:gpr-window-construction} summarizes the same construction in the
@@ -256,18 +296,24 @@ covariance are the background inputs passed to the local profiled signal extract
 \begin{subfigure}[t]{0.52\linewidth}
   \centering
   \graphicorplaceholder{\linewidth}{methodology_figs/gpr_training_three_step_rail.png}
-  \caption{Log-count transform, noise-aware covariance training, and window prediction.}
+  \caption{Log-count transform, noise-aware covariance training, and window prediction.
+  The filled covariance boxes indicate the sideband-sideband, sideband-blind, and
+  blind-blind kernel blocks used when conditioning the GP.}
 \end{subfigure}
 \hfill
 \begin{subfigure}[t]{0.45\linewidth}
   \centering
   \graphicorplaceholder{\linewidth}{methodology_figs/blinded_mass_window_reworked.png}
-  \caption{Sideband-only training and blinded-window prediction.}
+  \caption{Sideband-only training and blinded-window prediction. Filled markers show
+  binned count data, vertical error bars show the fixed per-bin statistical noise, and
+  the horizontal reference lines are count-axis guides used to compare sideband and
+  blinded-window scales.}
 \end{subfigure}
 \caption{Kernel and blinded-window construction used by the GPR workflow. The GP is
 trained on sideband bins with fixed bin-noise variances, not on the blinded bins. The
 posterior prediction in the blind window supplies the background mean and covariance
-that enter the local likelihood.}
+that enter the local likelihood; the shaded band in the schematic denotes the GP
+posterior interval and the dashed vertical lines mark the blinded-window boundaries.}
 \label{fig:gpr-window-construction}
 \end{figure}
 
@@ -693,16 +739,21 @@ The baseline combined likelihood is the product over datasets,
 = \prod_{d \in \mathcal{D}(m)} \mathcal{L}_d(\eps^2,\bm{\theta}_d).
 \label{eq:combinedlike-product}
 \end{equation}
-Equivalently, one may concatenate all blinded-bin vectors into a single object,
+Equivalently, one may concatenate all blinded-bin vectors into a single object. In the
+following equations, $\mathbin{\Vert}$ denotes vector concatenation, e.g.
+$\bm{n}_1\mathbin{\Vert}\bm{n}_2$:
 \begin{align}
 \bm{n} &=
-\left(\bm{n}_1,\bm{n}_2,\ldots\right), \\
+\bm{n}_1\mathbin{\Vert}\bm{n}_2\mathbin{\Vert}\cdots, \\
 \bm{b} &=
-\left(\bm{b}_1,\bm{b}_2,\ldots\right), \\
+\bm{b}_1\mathbin{\Vert}\bm{b}_2\mathbin{\Vert}\cdots, \\
 \bm{s}_{\mathrm{unit}} &=
-\left(K_1^{\mathrm{eff}}\bm{w}_1, K_2^{\mathrm{eff}}\bm{w}_2,\ldots\right), \\
+\left(K_1^{\mathrm{eff}}\bm{w}_1\right)
+\mathbin{\Vert}
+\left(K_2^{\mathrm{eff}}\bm{w}_2\right)
+\mathbin{\Vert}\cdots, \\
 \bm{\theta} &=
-\left(\bm{\theta}_1,\bm{\theta}_2,\ldots\right), \\
+\bm{\theta}_1\mathbin{\Vert}\bm{\theta}_2\mathbin{\Vert}\cdots, \\
 \bm{C}_{\mathrm{comb}} &=
 \mathrm{blockdiag}(\bm{C}_1,\bm{C}_2,\ldots),
 \qquad
