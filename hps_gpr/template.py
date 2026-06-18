@@ -45,8 +45,112 @@ def normalize_template(w: np.ndarray) -> np.ndarray:
     return w / s
 
 
+def normalize_signal_model(signal_model: str) -> str:
+    """Normalize the configured signal model name."""
+    mode = str(signal_model or "default").lower().strip()
+    if mode in ("default", "gaussian", "template"):
+        return "default"
+    if mode in ("kernel", "signal_kernel", "gp_signal_kernel"):
+        return "kernel"
+    raise ValueError(f"Unknown signal_model={signal_model!r}; expected 'default' or 'kernel'.")
+
+
+def signal_model_from_config(config: Optional["Config"]) -> str:
+    """Return the normalized signal model configured for this analysis."""
+    return normalize_signal_model(getattr(config, "signal_model", "default") if config is not None else "default")
+
+
+def _signal_kernel_hyperparams(
+    sigma_val: float,
+    *,
+    width_factor: float = 1.0,
+    length_scale_factor: float = 1.0,
+) -> Tuple[float, float]:
+    """Return (t, ell) for the localized signal kernel."""
+    sig = max(float(sigma_val), 1e-12)
+    t = max(float(width_factor) * sig, 1e-12)
+    ell = max(float(length_scale_factor) * sig, 1e-12)
+    return t, ell
+
+
+def signal_kernel_covariance(
+    x: np.ndarray,
+    mass: float,
+    sigma_val: float,
+    *,
+    width_factor: float = 1.0,
+    length_scale_factor: float = 1.0,
+    amplitude: float = 1.0,
+) -> np.ndarray:
+    r"""Localized signal covariance from Frate et al. Eq. 14.
+
+    The kernel is
+    ``A exp[-0.5 (x-x')^2/ell^2] exp[-0.5 ((x-m)^2 + (x'-m)^2)/t^2]``.
+    The HPS implementation fixes the localization width ``t`` and correlation
+    length ``ell`` from the mass resolution through configurable scale factors.
+    """
+    xv = np.asarray(x, float).reshape(-1)
+    t, ell = _signal_kernel_hyperparams(
+        sigma_val,
+        width_factor=width_factor,
+        length_scale_factor=length_scale_factor,
+    )
+    dx = xv[:, None] - xv[None, :]
+    env = (xv - float(mass)) ** 2
+    return (
+        float(amplitude)
+        * np.exp(-0.5 * (dx ** 2) / (ell ** 2))
+        * np.exp(-0.5 * (env[:, None] + env[None, :]) / (t ** 2))
+    )
+
+
+def signal_kernel_bin_weights(
+    edges: np.ndarray,
+    mass: float,
+    sigma_val: float,
+    *,
+    width_factor: float = 1.0,
+    length_scale_factor: float = 1.0,
+) -> np.ndarray:
+    """Build a positive signal template from the leading signal-kernel mode."""
+    e = np.asarray(edges, float).reshape(-1)
+    if e.size < 2:
+        return np.asarray([], float)
+    centers = 0.5 * (e[:-1] + e[1:])
+    widths = np.clip(np.diff(e), 0.0, None)
+    K = signal_kernel_covariance(
+        centers,
+        mass,
+        sigma_val,
+        width_factor=width_factor,
+        length_scale_factor=length_scale_factor,
+    )
+    try:
+        vals, vecs = np.linalg.eigh(0.5 * (K + K.T))
+        v = np.asarray(vecs[:, int(np.argmax(vals))], float)
+        if np.sum(v) < 0:
+            v = -v
+        w = np.clip(v, 0.0, None) * widths
+    except Exception:
+        t, _ = _signal_kernel_hyperparams(
+            sigma_val,
+            width_factor=width_factor,
+            length_scale_factor=length_scale_factor,
+        )
+        w = np.exp(-0.5 * ((centers - float(mass)) / t) ** 2) * widths
+    if not np.any(np.isfinite(w)) or float(np.nansum(w)) <= 0:
+        return gaussian_bin_integrals(e, mass, sigma_val)
+    return np.asarray(w, float)
+
+
 def build_template(
-    edges: np.ndarray, mass: float, sigma_val: float
+    edges: np.ndarray,
+    mass: float,
+    sigma_val: float,
+    *,
+    signal_model: str = "default",
+    signal_kernel_width_factor: float = 1.0,
+    signal_kernel_length_scale_factor: float = 1.0,
 ) -> np.ndarray:
     """Build a normalized signal template.
 
@@ -54,18 +158,43 @@ def build_template(
         edges: Bin edges
         mass: Signal mass hypothesis
         sigma_val: Mass resolution
+        signal_model: "default" Gaussian-bin template or "kernel" signal-kernel template
 
     Returns:
         Normalized template array
     """
+    model = normalize_signal_model(signal_model)
+    if model == "kernel":
+        return normalize_template(
+            signal_kernel_bin_weights(
+                edges,
+                mass,
+                sigma_val,
+                width_factor=float(signal_kernel_width_factor),
+                length_scale_factor=float(signal_kernel_length_scale_factor),
+            )
+        )
     return normalize_template(gaussian_bin_integrals(edges, mass, sigma_val))
 
 
 def build_full_template(
-    edges_full: np.ndarray, mass: float, sigma_val: float
+    edges_full: np.ndarray,
+    mass: float,
+    sigma_val: float,
+    *,
+    config: Optional["Config"] = None,
+    signal_model: Optional[str] = None,
 ) -> np.ndarray:
-    """Build a Gaussian signal template normalized on the full histogram range."""
-    return build_template(edges_full, mass, sigma_val)
+    """Build a signal template normalized on the full histogram range."""
+    model = signal_model_from_config(config) if signal_model is None else normalize_signal_model(signal_model)
+    return build_template(
+        edges_full,
+        mass,
+        sigma_val,
+        signal_model=model,
+        signal_kernel_width_factor=float(getattr(config, "signal_kernel_width_factor", 1.0)),
+        signal_kernel_length_scale_factor=float(getattr(config, "signal_kernel_length_scale_factor", 1.0)),
+    )
 
 
 def slice_template_to_window(
@@ -88,13 +217,22 @@ def build_window_template_from_full(
     window_mask: np.ndarray,
     mass: float,
     sigma_val: float,
+    *,
+    config: Optional["Config"] = None,
+    signal_model: Optional[str] = None,
 ) -> Tuple[np.ndarray, np.ndarray]:
-    """Build a full-range template and return its blinded-bin slice.
+    """Build a full-range signal template and return its blinded-bin slice.
 
     The returned window template is not renormalized inside the blinded region.
     Its sum therefore equals the signal fraction contained inside the blind window.
     """
-    w_full = build_full_template(edges_full, mass, sigma_val)
+    w_full = build_full_template(
+        edges_full,
+        mass,
+        sigma_val,
+        config=config,
+        signal_model=signal_model,
+    )
     w_window = slice_template_to_window(w_full, window_mask)
     return w_window, w_full
 
@@ -263,9 +401,17 @@ def cls_limit_for_amplitude(
             np.asarray(window_mask, bool),
             mass,
             sigma_val,
+            config=config,
         )
     else:
-        template = build_template(edges, mass, sigma_val)
+        template = build_template(
+            edges,
+            mass,
+            sigma_val,
+            signal_model=signal_model_from_config(config),
+            signal_kernel_width_factor=float(getattr(config, "signal_kernel_width_factor", 1.0)),
+            signal_kernel_length_scale_factor=float(getattr(config, "signal_kernel_length_scale_factor", 1.0)),
+        )
     rng = np.random.default_rng(seed)
     alpha = config.cls_alpha
     mode = config.cls_mode

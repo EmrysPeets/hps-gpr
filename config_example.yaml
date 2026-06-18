@@ -45,7 +45,7 @@ sigma_tail_m0_2016: 0.18
 sigma_tail_slope_floor_2016: 0.0
 sigma_tail_slope_override_2016: 0.0239
 # 2021: quadratic
-sigma_coeffs_2021: [0.00286957, -0.00851449, 0.25362319]
+sigma_coeffs_2021: [0.0014786, -0.0011, 0.0687]
 
 # =====================
 # Radiative fraction f_rad(m) polynomial coefficients
@@ -115,6 +115,13 @@ inj_masses_gev: [0.030, 0.060, 0.090]
 inj_strengths: [0, 100, 200, 500, 1000, 2000, 5000]
 inj_mode: "multinomial"  # "multinomial" or "poisson"
 extract_allow_negative: true
+
+# Signal extraction model
+# "default": nominal fixed Gaussian template with width from mass resolution.
+# "kernel": opt-in localized signal-kernel template for robustness studies.
+signal_model: "default"
+signal_kernel_width_factor: 1.0
+signal_kernel_length_scale_factor: 1.0
 
 # =====================
 # Limit band settings

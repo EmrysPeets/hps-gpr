@@ -34,6 +34,23 @@ def test_generate_extraction_display_slurm_scripts_writes_expected_commands(tmp_
     assert "EXTRACT_MASS=0.08" in submit_text
 
 
+def test_generate_extraction_display_slurm_scripts_can_pin_funcform_toy_index(tmp_path):
+    job = tmp_path / "submit_extract_display_funcform.slurm"
+
+    job_script, _, _ = generate_extraction_display_slurm_scripts(
+        config_path="study_configs/config_2015_extraction_display_v15p8.yaml",
+        output_path=str(job),
+        dataset="2015",
+        masses=[0.060],
+        strengths=[1.0],
+        output_root="outputs/extraction_display_batch",
+        toy_index=7,
+    )
+
+    job_text = Path(job_script).read_text()
+    assert '--toy-index "7"' in job_text
+
+
 def test_generate_scan_slurm_script_writes_cpus_per_task(tmp_path):
     job = tmp_path / "submit_scan.slurm"
     job_script, _ = generate_slurm_script(

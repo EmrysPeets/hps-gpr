@@ -1,0 +1,49 @@
+path_2015: /sdf/home/e/epeets/move/2015_IMD.root
+hist_2015: invariant_mass
+range_2015: [0.02, 0.13]
+sigma_coeffs_2015: [-9.22283032152e-05, 0.0532190838657]
+frad_coeffs_2015: [0.085]
+
+enable_2015: true
+enable_2016: false
+enable_2021: false
+
+blind_nsigma: 1.64
+gp_train_exclude_nsigma: 1.64
+neighborhood_rebin: 5
+n_restarts: 12
+
+cls_mode: asymptotic
+cls_alpha: 0.05
+extract_allow_negative: true
+
+funcform_closure_enable: true
+funcform_closure_root_by_dataset:
+  "2015": outputs/funcform_toys/funcform_2015_dataset_mod_toys.root
+  "2016": outputs/funcform_toys/funcform_2016_dataset_mod_toys.root
+  "2021": outputs/funcform_toys/funcform_2021_dataset_mod_toys.root
+funcform_closure_container_by_dataset:
+  "2015": fShiftSigPowTail
+  "2016": fShiftSigPowTail
+  "2021": fSigPowExpQ
+funcform_closure_toy_pattern_by_dataset:
+  "2015": fShiftSigPowTail_toy_*
+  "2016": fShiftSigPowTail_toy_*
+  "2021": fSigPowExpQ_toy_*
+extraction_display_funcform_toy_index: 0
+
+output_dir: outputs/extraction_display_2015_v15p8_funcform100
+
+extraction_display_dataset_key: "2015"
+extraction_display_masses_gev: [0.030, 0.045, 0.060, 0.075, 0.090, 0.105, 0.120]
+extraction_display_sigma_multipliers: [1.0, 2.0, 3.0, 5.0]
+extraction_display_seed: 271828
+extraction_display_inj_mode: multinomial
+extraction_display_sigma_source: asimov
+extraction_display_refit_gp_on_toy: true
+extraction_display_gp_restarts: 2
+extraction_display_gp_optimize: true
+extraction_display_train_exclude_nsigma: 1.64
+extraction_display_zoom_half_sigma: 0.5
+extraction_display_blind_shade_alpha: 0.18
+extraction_display_blind_shade_color: "0.88"

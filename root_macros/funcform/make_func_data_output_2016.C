@@ -25,7 +25,9 @@ TF1* ff_make_shift_sigpowexp_tail_2016(TH1* h, double fit_min, double fit_max, d
 
 void make_func_data_output_2016(
     const char* outfile = "outputs/funcform_toys/funcform_2016_dataset_mod_toys.root",
-    int n_toys = 100) {
+    int n_toys = 100,
+    double toy_lumi_scale = 1.0,
+    bool primary_plus_alt_only = false) {
   FuncFormJobConfig job;
   job.dataset_key = "2016";
   job.dataset_label = "HPS 2016 Functional-Form Fits";
@@ -38,6 +40,7 @@ void make_func_data_output_2016(
   job.scan_min = 0.035;
   job.scan_max = 0.210;
   job.n_toys = n_toys;
+  job.toy_lumi_scale = toy_lumi_scale;
   job.primary_target_chi2ndf = 2.0;
   job.validation_max_rel_diff_full = 0.05;
   job.validation_max_rel_diff_scan = 0.05;
@@ -49,10 +52,16 @@ void make_func_data_output_2016(
   std::vector<FuncFormCandidateDef> defs;
   defs.push_back({"fShiftSigPowTail", "shifted sigmoid*power*exp + tail", true, true, ff_make_shift_sigpowexp_tail_2016});
   defs.push_back({"fGenGammaThresh", "thresholded gen-gamma", true, true, ff_make_gengamma_thresh});
-  defs.push_back({"fShiftSigPow", "shifted sigmoid*power*exp", false, true, ff_make_shift_sigpowexp});
+  defs.push_back({"fShiftSigPow", "shifted sigmoid*power*exp", false, !primary_plus_alt_only, ff_make_shift_sigpowexp});
   defs.push_back({"fSigPowExpQ", "sigmoid*power*exp + raw expquad", false, false, ff_make_sigpowexp_expquad});
   defs.push_back({"fLogPolyThresh", "thresholded log-polynomial", false, false, ff_make_logpoly_thresh});
   defs.push_back({"fBern5", "positive Bernstein fallback", false, false, ff_make_bern5});
 
   ff_run_job(job, defs);
+}
+
+void make_func_data_output_2016_true_lumi_x10(
+    const char* outfile = "outputs/funcform_toys/funcform_2016_true_lumi_x10_toys.root",
+    int n_toys = 100) {
+  make_func_data_output_2016(outfile, n_toys, 10.0, true);
 }
