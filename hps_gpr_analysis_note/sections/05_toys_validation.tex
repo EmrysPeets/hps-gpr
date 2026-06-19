@@ -192,9 +192,14 @@ reach.}
   \caption{$Z_{\mathrm{inj}}=5$.}
 \end{subfigure}
 \caption{Toy-level $\eps^2$ recovery distributions for all selected injected masses
-(\SIlist{30;45;60;75;90;105;120}{MeV}). The boxes show how the narrow guard
-under-recovers injected signals, while train-$2.25$ restores the median recovery much
-closer to unity before the wider-guard sensitivity cost becomes dominant.}
+(\SIlist{30;45;60;75;90;105;120}{MeV}). For each mass and training guard, the colored
+box shows the central 50\% (interquartile) range of toy recoveries, the whisker bars
+show the wider non-outlier toy range, and the black horizontal line inside the box
+marks the toy median. The gray dashed horizontal reference lines mark 0.9, 1.0, and
+1.1 recovery. The boxes show how the
+narrow guard under-recovers injected signals, while train-$2.25$ restores the median
+recovery much closer to unity before the wider-guard sensitivity cost becomes
+dominant.}
 \label{fig:guard-band-recovery-boxes}
 \end{figure}
 
@@ -278,7 +283,7 @@ N_{21}\,S(m;m_{t,21},w_{21})\,m^{a_{21}}
 \end{align}
 The 2015 and 2016 functions are independent fits of the same shifted sigmoid-power-exponential family with a normalized quadratic tail factor; they are set to zero below the fitted turn-on offset $m_{0,d}$ and are useful when the low-mass turn-on is better described by a shifted variable. The 2021 seed uses the unshifted sigmoid-power-exponential form with an exponential quadratic modifier, which was preferred for the 2021 1\% spectrum because the wider support and smoother low-mass turn-on did not require the shifted threshold parameter.
 
-The fit selection algorithm is implemented in a deliberately conservative ROOT macro. For each dataset the macro builds a small list of positive candidate families, scans the configured lower edge of the fit interval, and for each candidate tries several seeded minimizations covering early turn-on, broad-tail, and late-turn-on shapes. Each trial is fit to the input histogram over the dataset-specific fit range with bin-integrated expectations, then evaluated with Pearson and Neyman goodness-of-fit on the selected support and with normalization checks on the full support range, scan range, and low/high sideband fractions. The primary seed is the first preferred candidate that has finite parameters, passes the support and sideband-fraction checks, and satisfies the configured Pearson target; if no preferred candidate passes, the best validated candidate is used. The selected function is then frozen, normalized to the observed number of events on the full toy-support range, and used to generate Poisson pseudo-data bin by bin from the normalized bin integrals.
+The fit selection algorithm is implemented in a deliberately conservative ROOT macro. For each dataset the macro builds a small list of positive candidate families, scans the configured lower edge of the fit interval, and for each candidate tries several seeded minimizations covering early turn-on, broad-tail, and late-turn-on shapes. Each trial is fit to the input histogram over the dataset-specific fit range with bin-integrated expectations, then evaluated with Pearson and Neyman goodness-of-fit on the selected support and with normalization checks on the full support range, scan range, and low/high sideband fractions. The primary seed is the first preferred candidate that has finite parameters, passes the support and sideband-fraction checks, and satisfies the configured Pearson target; if no preferred candidate passes, the best validated candidate is used. Here, support check means enough sideband bins after mass-dependent exclusion; sideband-fraction check means the retained sideband fraction; and Pearson target means the toy-validation $\chi^2$-like residual threshold. The selected function is then frozen, normalized to the observed number of events on the full toy-support range, and used to generate Poisson pseudo-data bin by bin from the normalized bin integrals.
 
 The candidate families were chosen to span the few smooth structures that can mimic the observed spectra without introducing narrow features: a sigmoid threshold factor for turn-on behavior, a power-law rise, an exponential falloff for the high-mass tail, optional threshold shifts for datasets whose support begins near a sharp turn-on, and low-order exponential curvature for residual broad-shape freedom. The generalized-gamma and simpler sigmoid-power variants in the candidate overlay provide cross-checks that the chosen seed is not an artifact of one algebraic form. They are not used to inject additional model uncertainty in these closure plots; once the primary seed is selected, the closure question is whether the GP extraction recovers known signals from that fixed smooth truth.
 
@@ -298,7 +303,7 @@ For the 2015 suite in Figure~\ref{fig:closure-validation-2015-funcform}, the bac
 
 For the 2016 10\% suite in Figure~\ref{fig:closure-validation-2016-funcform}, the pull and $\Delta Z$ panels again indicate a broadly unbiased model, with the largest visible anomaly appearing in the recovered-amplitude panel for the $Z_{\mathrm{inj}}=1$ row. That row corresponds to a low event-count signal injection, so the ratio $\hat A/A_{\mathrm{inj}}$ is especially sensitive to where the finite toy distribution peaks. At larger injected strengths the recovered amplitude moves closer to the injected value, which argues against a large intrinsic recovery bias and instead points to a small-signal finite-count fluctuation in the $1\sigma$ visualization.
 
-For the 2021 1\% suite in Figure~\ref{fig:closure-validation-2021-funcform}, the same four diagnostics show the selected \texttt{fSigPowExpQ} truth model closing at the level needed for the validation sample. Pull means remain close to zero, pull widths are near unity within the toy precision, and the recovered-amplitude and $\Delta Z$ panels show only mild leakage at high injected significance. Across all three figures, the common pattern is therefore a relatively unbiased extraction with slight signal absorption visible most clearly for injected $5\sigma$ signals, not a mass-coherent failure of the GP-plus-template model.
+For the 2021 1\% suite in Figure~\ref{fig:closure-validation-2021-funcform}, the same four diagnostics show the selected \texttt{fSigPowExpQ} truth model closing at the level needed for the validation sample. Pull means remain close to zero. The pull widths are below unity in this toy ensemble, indicating a mildly conservative predictive uncertainty in the tested configuration; the coverage and \CLs{} checks are used to assess whether this conservatism biases the final limit. The recovered-amplitude and $\Delta Z$ panels show only mild leakage at high injected significance. Across all three figures, the common pattern is therefore a relatively unbiased extraction with slight signal absorption visible most clearly for injected $5\sigma$ signals, not a mass-coherent failure of the GP-plus-template model.
 
 \begin{figure}[h!]
 \centering
@@ -334,6 +339,8 @@ amplitude and $\hat Z-Z_{\mathrm{inj}}$ assess injected-signal linearity and sig
 calibration for $Z_{\mathrm{inj}}=1,3,5$.}
 \label{fig:closure-validation-2021-funcform}
 \end{figure}
+
+Figure~\ref{fig:toy-upper-limit-proxy-funcform} puts the background-only rows of the same functional-form ensembles on the expected-limit scale used to compare scan sensitivity. The top panels keep the diagnostic in fitted signal-yield units, while the bottom panels divide by the per-mass $A(\eps^2=1)$ normalization so that the datasets can be read on a common coupling-squared scale. The shaded bands are toy-to-toy spreads of this simple proxy, not a systematic-uncertainty envelope. Within this subsection, the figure is therefore used as a compact smoothness and sensitivity cross-check: it would reveal mass-local instabilities in the functional-form closure samples, while the actual observed limits are still obtained from the profile-\CLs{} construction.
 
 \begin{figure}[h!]
 \centering
