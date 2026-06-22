@@ -321,12 +321,113 @@ stronger over much of the high-mass range.}
 \subsection{2021 smeared versus unsmeared observed-limit comparison}
 \label{sec:results-2021-smearing-comparison}
 
-\analysisplaceholder{\textbf{2021 mass-resolution smearing comparison.} Reserve this
-subsection for the 2021 observed-limit overlay after the target-constrained smearing
-scale in Section~\ref{sec:massres-2021} is propagated through the production chain.
-The comparison should show smeared and unsmeared 2021 observed $\eps^2$ limits with
-identical radiative-fraction, selection, and GPR settings, plus a ratio panel or short
-summary of the effect on the observed limit.}
+The 2021 target-constrained smearing scale discussed in
+Section~\ref{sec:massres-2021} has also been propagated through the 90\% CLs
+production chain as a dedicated resolution-systematics comparison. In this study the
+2015 and 2016 inputs are unchanged, while the 2021 mass-resolution model is scaled by
+the target-constrained data/MC factor. The comparison is therefore a controlled check
+of how the combined upper limit, local discovery p-values, toy-limit tail p-values,
+and Gaussian-equivalent significances respond when the 2021 signal template is
+broadened.
+
+Figure~\ref{fig:results-scaled-21-limit-comparison} compares the dimuon-corrected
+scaled-resolution result with the unscaled \texttt{v2\_dimuon} reference. The upper
+panel overlays the observed and expected-median limits, while the lower panel shows
+the scaled/unscaled ratio. Because the same dimuon branching factor is applied to both
+curves at a common mass, the ratio isolates the effect of the 2021 resolution change
+and the associated refit, not the branching correction itself. The observed
+scaled/unscaled ratio has a median value of about 1.08 over the common scan points,
+with the most visible structure driven by observed fluctuations rather than a smooth
+normalization shift. The expected-median ratio is smoother and remains close to
+unity, with the largest band-fixed excursions moving away from the repaired 60, 168,
+and 187 MeV points.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.92\linewidth}{final_limit_projection_figs/90cls/scaled_21/scaled_21_bandfixed_dimuon_vs_unscaled_overlay_ratio.png}
+\caption{Combined 90\% CLs upper-limit comparison after applying the 2021
+target-constrained mass-resolution scale. The blue curves show the unscaled
+\texttt{v2\_dimuon} reference and the red curves show the scaled-resolution result
+using the same dimuon-threshold branching convention. The lower panel gives the
+scaled/unscaled ratio for the observed limit and expected median. At common masses
+the dimuon factor cancels in the ratio, so the deviations from unity diagnose the
+impact of the broadened 2021 resolution model and the resulting changes in the shared
+coupling fit.}
+\label{fig:results-scaled-21-limit-comparison}
+\end{figure}
+
+The discovery-oriented comparison in
+Figure~\ref{fig:results-scaled-21-significance} shows that the effect of the
+resolution smearing is not monotonic. Several regions of the distribution become more
+signal-like after the 2021 resolution is broadened: for example, the local $p_0$ is
+smaller in the scaled study near 79, 96, 118, and 138 MeV. At the same time, many of
+the more visually prominent upward fluctuations become less significant. The
+unscaled feature near 141 MeV moves from a local $p_0\simeq2.1\times10^{-3}$
+($Z\simeq2.87$) to $p_0\simeq6.2\times10^{-3}$ ($Z\simeq2.50$) after scaling, and
+the excess-like structure around 169--170 MeV is similarly reduced. The minimum
+scaled local $p_0$ in this comparison is about $4.9\times10^{-3}$ at 140 MeV
+($Z\simeq2.58$). Thus the scaled-resolution treatment redistributes local
+signal-like behavior across the scan rather than uniformly increasing or decreasing
+the apparent significance.
+
+\begin{figure}[p]
+\centering
+\begin{subfigure}[t]{0.90\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/90cls/scaled_21/scaled_vs_unscaled_p0_local_global_visible_sigma_refs.png}
+  \caption{One-sided local $p_0$ and effective-trials global reference curves.}
+\end{subfigure}
+
+\vspace{0.8em}
+\begin{subfigure}[t]{0.90\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/90cls/scaled_21/scaled_vs_unscaled_Z_local_global.png}
+  \caption{Gaussian-equivalent local and approximate global significances.}
+\end{subfigure}
+\caption{Discovery-oriented scaled/unscaled comparison for the 2021
+mass-resolution-smearing study. The local curves compare the fixed-mass one-sided
+discovery tests. The dashed curves are the same effective-trials global
+approximation used elsewhere in the note and are included only as a review guide.
+The scaled-resolution result lowers the local $p_0$ in some regions but raises it in
+others, so the interpretation should be made from the full curve rather than from a
+single ratio or headline value.}
+\label{fig:results-scaled-21-significance}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.92\linewidth}{final_limit_projection_figs/90cls/scaled_21/scaled_vs_unscaled_ul_tail_pvalues_visible_3sigma_refs.png}
+\caption{Toy-limit tail p-values for the scaled and unscaled 2021 resolution
+studies. The three panels show the strong-limit tail, weak-limit tail, and two-sided
+tail p-values of the observed upper limit relative to the background-only toy limit
+ensemble. These quantities diagnose unusually strong or weak limits and are distinct
+from the discovery $p_0$ curves in
+Figure~\ref{fig:results-scaled-21-significance}. The scaled and unscaled curves track
+each other closely in many regions but differ where the broader 2021 signal template
+changes the fitted upper-limit response to local spectral structure.}
+\label{fig:results-scaled-21-toy-pvalues}
+\end{figure}
+
+For the scaled-resolution interpretation itself,
+Figure~\ref{fig:results-scaled-21-dimuon-band} shows the corresponding combined
+90\% CLs upper limit with the dimuon-threshold branching correction applied. The
+expected bands use the same narrow expected-band repair policy documented for the
+standalone scaled study: only the expected-band quantile columns at 60, 168, and
+187 MeV are replaced by log-linear interpolation between neighboring mass points.
+Observed limits, local $p_0$, $Z$, and toy-tail p-values are not altered by that
+expected-band repair.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.90\linewidth}{final_limit_projection_figs/90cls/scaled_21/scaled_21_bandfixed_dimuon_90cls_bands_eps2.png}
+\caption{Combined 90\% CLs upper limit on $\eps^2$ with the minimal-model
+dimuon-threshold branching correction and the 2021 scaled mass-resolution model. The
+green and yellow bands are the repaired expected 68\% and 95\% background-only
+intervals, and the black curve is the scaled-resolution observed limit. The expected
+median curve is omitted here to keep the band-focused comparison visually clean; it
+is shown explicitly in Figure~\ref{fig:results-scaled-21-limit-comparison}.}
+\label{fig:results-scaled-21-dimuon-band}
+\end{figure}
 
 \FloatBarrier
 
@@ -342,6 +443,12 @@ band CSVs, the individual 90\% curves and bands are taken from the \path{v1}
 single-dataset CSVs. This keeps the simultaneous result tied to the corrected
 count-scale combined scan while preserving the individual inputs needed for the same
 diagnostic comparisons shown above at 95\% CL.
+
+The separate 2021 scaled-resolution study in
+Section~\ref{sec:results-2021-smearing-comparison} should be read as a resolution
+systematics comparison to this baseline 90\% suite. It uses the same dimuon
+branching convention but changes the 2021 signal-template width according to the
+target-constrained data/MC smearing scale.
 
 For the minimal visible-dark-photon interpretation, the observed upper-limit display
 also includes the dimuon-threshold branching correction described in
