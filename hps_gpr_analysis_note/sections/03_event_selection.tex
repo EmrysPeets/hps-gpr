@@ -170,48 +170,69 @@ The 2021 prompt workflow uses the upgraded 2019/2021 detector configuration and
 therefore requires a separate resolution parameterization. For the current prompt
 analysis we adopt the inclusive target-constrained V0 fit without hit requirements
 shown in Figure~\ref{fig:2021-resolution}; in that panel, the red fitted curve is the
-mass-resolution model propagated through the signal template and blind-window
-definitions. The current GPR implementation therefore uses
+source mass-resolution model propagated through the signal template and blind-window
+definitions before the final target-constrained data/MC broadening. The source
+parameterization is
 \begin{equation}
-\sigma_{2021}(m)
+\sigma_{2021}^{\mathrm{TC,raw}}(m)
 = 1.4786\times10^{-3} - 1.1\times10^{-3}m + 6.87\times10^{-2}m^2,
 \label{eq:sigma2021}
 \end{equation}
-again with $m$ and $\sigma_{2021}$ in GeV. The search consequence is the same as for
-the earlier data sets: the 2021 curve sets the signal width, the blind-window width,
-and therefore the local prompt-background burden under each mass hypothesis. Because
-the upgraded front tracker changes the low-mass response, it is also a direct
-ingredient in the improved shared-coupling reach. In contrast to 2015 and 2016, the
-present note still does not bundle a dedicated 2021 internal selection note or a
-standalone M{\o}ller cross-check page for this parameterization. Figure~\ref{fig:2021-resolution}
-should therefore be read as the implementation-facing provenance record for the
-current response model, not as a claim that the full 2021 detector-note validation is
-already complete in this manuscript.
+again with $m$ and $\sigma_{2021}$ in GeV. The analysis then applies the
+target-constrained data/MC scale derived from the 2021 smearing study,
+\begin{equation}
+s_{\mathrm{TC}} = \frac{2.186}{1.745} \simeq 1.25,
+\qquad
+\sigma_{2021}^{\mathrm{TC,smear}}(m)
+= s_{\mathrm{TC}}\,\sigma_{2021}^{\mathrm{TC,raw}}(m).
+\label{eq:sigma2021-tc-smear}
+\end{equation}
+This scale is taken from the target-constrained row after hit smearing and curvature
+($\Omega$) smearing are applied to the Monte Carlo to most closely match the observed
+data resolution. The target-constrained row is the relevant comparison for this
+prompt analysis, so the smeared parameterization in
+Eq.~\ref{eq:sigma2021-tc-smear} is the curve propagated to the 2021 signal width,
+blind-window width, and local prompt-background burden under each mass hypothesis.
+Because the upgraded front tracker changes the low-mass response, it is also a direct
+ingredient in the improved shared-coupling reach.
 
 \begin{figure}[H]
 \centering
 \graphicorplaceholder{0.78\linewidth}{resolution_figs/hps2021_mass_resolution_target_constrained_nohitreq.png}
 \caption{2021 mass-resolution summary used for the prompt analysis. The red curve is
-the inclusive target-constrained V0 quadratic fit without hit requirements, and that
-red parameterization is the one implemented in the GPR package for the upgraded
-detector workflow. The blue curve shows the corresponding unconstrained V0 reference
-fit included in the underlying study for comparison.}
+the inclusive target-constrained V0 quadratic fit without hit requirements before the
+TC data/MC broadening in Eq.~\ref{eq:sigma2021-tc-smear}. The blue curve shows the
+corresponding unconstrained V0 reference fit included in the underlying study for
+comparison.}
 \label{fig:2021-resolution}
 \end{figure}
 
-Figure~\ref{fig:mass-resolution-three-panel} collects the three implemented
-parameterizations on the current GPR scan ranges. This summary is separate from the
-provenance crops above: the crops show the source studies, while the three-panel figure
-shows the actual smooth curves propagated through the present signal-template and
-blind-window definitions.
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.78\linewidth}{resolution_figs/hps2021_data_mc_smearing_scale.png}
+\caption{2021 data/MC mass-resolution comparison used to set the smearing scale.
+Here UC denotes the unconstrained vertex sample, BSC denotes the beamspot-constrained
+vertex sample, and TC denotes the target-constrained vertex sample. The TC row is the
+most relevant row for the prompt analysis; comparing the data value
+\SI{2.186}{MeV} to the $\Omega$+hit-smeared Monte Carlo value \SI{1.745}{MeV}
+gives the applied scale factor $2.186/1.745\simeq1.25$.}
+\label{fig:2021-data-mc-smearing-scale}
+\end{figure}
+
+Figure~\ref{fig:mass-resolution-three-panel} collects the implemented
+parameterizations on the current GPR scan ranges after this 2021 TC scaling is
+included. This summary is separate from the provenance crops above: the crops show the
+source studies, while the three-panel figure shows the actual smooth curves propagated
+through the present signal-template and blind-window definitions.
 
 \begin{figure}[H]
 \centering
 \graphicorplaceholder{0.78\linewidth}{resolution_figs/hps_mass_resolution_three_panel.png}
 \caption{Mass-resolution parameterizations used by the GPR workflow over the current
 scan ranges. The 2016 curve includes the configured high-mass tail continuation above
-\SI{180}{MeV}; the 2021 panel shows the quadratic target-constrained V0
-parameterization extended to \SI{250}{MeV}.}
+\SI{180}{MeV}; the 2021 panel shows the target-constrained V0 parameterization after
+multiplication by the TC smearing scale $s_{\mathrm{TC}}=2.186/1.745\simeq1.25$ and
+extended to \SI{250}{MeV}.}
 \label{fig:mass-resolution-three-panel}
 \end{figure}
 
@@ -320,17 +341,6 @@ Eqs.~25--26]{HPS2021FullAnalysisNote}. The existing $0.05$ input is therefore a
 reasonable compact surrogate for the central and high-mass portion of the present
 2021 scan, while the lowest-mass edge and any final unblinded result should retain the
 mass-dependent 2021 parameterization as the reference cross-check.
-
-\begin{figure}[H]
-\centering
-\graphicorplaceholder{0.70\linewidth}{normalization_figs/hps2021_radiative_fraction_inputs.png}
-\caption{Current 2021 radiative-fraction inputs used by the GPR package. The baseline
-constant and its penalty-adjusted counterpart are shown only as provisional workflow
-inputs for the present 1\% study. Their current role is to define how the 2021 subset
-enters the shared-$\eps^2$ combination until the dedicated 2021 normalization study is
-finalized.}
-\label{fig:2021-radfrac}
-\end{figure}
 
 \begin{figure}[H]
 \centering

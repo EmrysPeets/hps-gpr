@@ -23,6 +23,9 @@ COLORS = {
     "2021": "#1B8A5A",
     "tail": "#5B4A68",
 }
+SMEAR_2021_TC_DATA_MEV = 2.186
+SMEAR_2021_TC_MC_MEV = 1.745
+SMEAR_2021_TC_SCALE = SMEAR_2021_TC_DATA_MEV / SMEAR_2021_TC_MC_MEV
 
 
 def sigma_poly(m_gev: np.ndarray, coeffs: list[float]) -> np.ndarray:
@@ -50,6 +53,11 @@ def sigma_2016(m_gev: np.ndarray, cfg: dict) -> tuple[np.ndarray, np.ndarray]:
         slope = max(float(slope), float(cfg.get("sigma_tail_slope_floor_2016", 0.0)))
         sigma[tail_mask] = sigma_m0 + slope * (m_gev[tail_mask] - m0)
     return sigma, tail_mask
+
+
+def sigma_2021_smeared(m_gev: np.ndarray, cfg: dict) -> np.ndarray:
+    coeffs = [float(c) for c in cfg["sigma_coeffs_2021"]]
+    return SMEAR_2021_TC_SCALE * sigma_poly(m_gev, coeffs)
 
 
 def style_axis(ax: plt.Axes, *, title: str, title_color: str, xlim: tuple[float, float], ylim: tuple[float, float]) -> None:
@@ -136,16 +144,16 @@ def main() -> None:
     annotate_curve(ax2015, "Moller anchored", xy=(9, 4.75), color=COLORS["2015"])
 
     m2021 = np.linspace(0.050, 0.190, 300)
-    s2021 = sigma_poly(m2021, [float(c) for c in cfg["sigma_coeffs_2021"]])
+    s2021 = sigma_2021_smeared(m2021, cfg)
     ax2021.plot(1e3 * m2021, 1e3 * s2021, color=COLORS["2021"], lw=2.8)
     style_axis(
         ax2021,
-        title="2021 1%: target-constrained V0",
+        title="2021 1%: TC-smeared V0",
         title_color=COLORS["2021"],
         xlim=(50, 190),
-        ylim=(1.45, 3.9),
+        ylim=(1.8, 4.8),
     )
-    annotate_curve(ax2021, "quadratic fit", xy=(58, 3.45), color=COLORS["2021"])
+    annotate_curve(ax2021, "TC scale 1.25", xy=(58, 4.2), color=COLORS["2021"])
 
     fig.suptitle("HPS Mass resolutions", fontsize=13.4, fontweight="bold", y=0.985)
     fig.subplots_adjust(top=0.89, bottom=0.105, left=0.082, right=0.985)
@@ -189,7 +197,7 @@ def main() -> None:
     titles = {
         "2015": "2015 scaled A-prime MC parameterization",
         "2016": "2016 smeared A-prime MC parameterization",
-        "2021": "2021 target-constrained V0 parameterization",
+        "2021": "2021 TC-smeared V0 parameterization",
     }
     for key, ax, m_vals, coeffs, special, xlim in panels:
         if special == "tail":
@@ -212,7 +220,7 @@ def main() -> None:
             )
             ax.legend(loc="upper left", frameon=True, framealpha=0.94, fontsize=8.4)
         else:
-            sigma_vals = sigma_poly(m_vals, coeffs)
+            sigma_vals = sigma_2021_smeared(m_vals, cfg) if key == "2021" else sigma_poly(m_vals, coeffs)
             ax.plot(1e3 * m_vals, 1e3 * sigma_vals, color=COLORS[key], lw=2.4)
         sigma_mev = 1e3 * sigma_vals
         ymin = 0.0 if key == "2015" else max(0.0, float(np.nanmin(sigma_mev)) * 0.82)
