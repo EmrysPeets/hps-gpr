@@ -931,13 +931,13 @@ def main(argv: list[str] | None = None) -> None:
     crop_pdf(
         NOTE_DIR / "2015_radiative_radiative_fraction.pdf",
         0,
-        (0.04, 0.07, 0.97, 0.92),
+        (0.00, 0.07, 0.97, 0.99),
         NOTE_DIR / "normalization_figs" / "hps2015_radiative_cross_section_review.png",
     )
     crop_pdf(
         NOTE_DIR / "2015_radiative_radiative_fraction.pdf",
         1,
-        (0.08, 0.07, 0.96, 0.92),
+        (0.00, 0.07, 0.96, 0.99),
         NOTE_DIR / "normalization_figs" / "hps2015_radiative_fraction_review_right.png",
     )
     tile_images_horizontal(
