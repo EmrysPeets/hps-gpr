@@ -34,6 +34,10 @@ setting and sets `run_limit_bands_on: ""`, so it still makes the combined
 observed limit and `ul_bands_combined_all.csv` while skipping the individual
 dataset expected-band CSVs.
 
+Additional 2021 systematic-variation configs, including the 1.25 mass-resolution
+scale and the 2021 radiative-penalty 4.6% variant, live in
+`study_configs/90pct_configs/2021_resolution_variants/`.
+
 Outputs go under:
 
 ```bash
