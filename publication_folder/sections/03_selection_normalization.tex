@@ -1,0 +1,66 @@
+\section{Event selection and normalization}
+\label{sec:selection-normalization}
+
+The prompt search starts from selected $e^+e^-$ invariant-mass histograms. The
+selection is designed to retain prompt radiative trident events and possible prompt
+$\Ap\to e^+e^-$ decays while suppressing accidental track combinations and converted
+wide-angle bremsstrahlung (WAB) backgrounds. Across the HPS running periods, the common
+features are oppositely charged tracks, ECal cluster matching, timing consistency,
+vertex-quality requirements, and momentum selections appropriate to the beam energy.
+The GPR layer does not apply additional event-level cuts; it receives the selected
+mass histogram, mass-resolution model, and normalization inputs for each run period.
+
+\input{tables/selection_normalization_summary}
+
+The signal model is a Gaussian line shape whose width is fixed by the run-dependent
+mass resolution. The 2015 and 2016 parameterizations follow the published and internal
+engineering-run resolution studies based on Moller calibration, momentum-smearing
+checks, and simulated $\Ap$ samples \cite{HPS2015DarkPhoton,HPS2016PromptLong,
+HPS2015InternalNote,HPS2016BumpInternal}. The 2021 workflow uses the target-constrained
+upgraded-detector resolution model, broadened by the target-constrained data/Monte
+Carlo smearing scale documented in the analysis note. Figure~\ref{fig:mass-resolution}
+shows the smooth curves propagated through the GPR signal templates.
+
+\begin{figure*}[t]
+\centering
+\ifigure{0.88\textwidth}{mass_resolution_summary.png}
+\caption{Mass-resolution parameterizations used by the current GPR workflow. The 2016
+curve includes the high-mass continuation used to avoid an unphysical improvement of
+the resolution outside the published prompt-search window. The 2021 curve includes the
+target-constrained data/Monte Carlo broadening scale used by the upgraded-detector
+analysis.}
+\label{fig:mass-resolution}
+\end{figure*}
+
+The conversion from a fitted signal yield to $\eps^2$ uses the radiative fraction,
+defined as the fraction of the selected prompt background attributed to radiative
+trident production,
+\begin{equation}
+f_{\mathrm{rad},d}(m)
+=
+\frac{dN_{\gamma^\ast,d}/dm}
+{dN_{\mathrm{tri},d}/dm+dN_{\mathrm{wab},d}/dm},
+\label{eq:frad}
+\end{equation}
+where $d$ labels the data sample, ``tri'' denotes the selected trident background, and
+``wab'' denotes WAB events that reconstruct as $e^+e^-$ candidates. The local prompt
+mass density $\rho_d(m)$ is estimated from the observed selected spectrum in a
+resolution-scaled mass interval. The yield-per-unit-coupling factor is
+\begin{equation}
+K_d(m)\equiv A_d(\eps^2=1)
+=
+\frac{3\pi\,m\,f_{\mathrm{rad},d}(m)\,\rho_d(m)}
+{2\alpha_{\mathrm{EM}}},
+\label{eq:kd}
+\end{equation}
+so a common dark-photon coupling predicts a data-set-dependent total signal yield
+$A_d=K_d(m)\eps^2$. The current production configuration keeps the prompt-density
+normalization window at $1.64\,\sigma_m$ even when the extraction likelihood uses the
+wider $2.25\,\sigma_m$ signal window. This separates the historical prompt-density
+normalization from the wider signal-recovery window used by the likelihood.
+
+Radiative-fraction uncertainties are handled as normalization variations. When a
+radiative penalty $\delta_{f,d}$ is enabled, the effective conversion is weakened by
+$K_d^{\mathrm{eff}}=(1-\delta_{f,d})K_d$, so the same signal-yield limit corresponds
+to a weaker limit on $\eps^2$. This penalty changes the coupling interpretation; it is
+not part of the GPR background fit itself.

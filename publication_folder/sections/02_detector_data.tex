@@ -1,0 +1,63 @@
+\section{The HPS experiment and data samples}
+\label{sec:detector-data}
+
+HPS is a compact forward spectrometer located downstream of a thin tungsten target in
+Hall B at Jefferson Lab. The detector is optimized for boosted $e^+e^-$ pairs produced
+at small angles relative to the beam direction. Its prompt-resonance sensitivity is
+driven by the Silicon Vertex Tracker (SVT), which measures charged-particle momenta and
+vertices, and by the electromagnetic calorimeter (ECal), which provides the fast
+trigger and track--cluster matching \cite{HPSExperiment2022,HPS2016PromptLong}.
+
+The data samples in this analysis span two detector eras. The 2015 and 2016
+engineering runs used the baseline six-station SVT, with the first active silicon
+station near the target and close to the beam plane. Before the 2019 and 2021 physics
+runs, HPS installed an upgraded front tracker with an additional double layer,
+slim-edge sensors, and reduced material in the innermost tracking stations
+\cite{HPSExperiment2022,HPSSlimEdgeSensors2020}. The upgraded configuration improves
+low-mass acceptance and changes the mass-resolution model used by the signal template.
+The ECal layout remained the same basic subsystem, with a positron hodoscope added
+before the physics runs to support upgraded triggering.
+
+\begin{figure*}[t]
+\centering
+\begin{minipage}{0.48\textwidth}
+\centering
+\ifigure{\linewidth}{hps_svt_2015_2016.png}\\
+(a) Baseline engineering-run SVT.
+\end{minipage}
+\hfill
+\begin{minipage}{0.48\textwidth}
+\centering
+\ifigure{\linewidth}{hps_svt_2019_2021.png}\\
+(b) Upgraded 2019/2021 front tracker.
+\end{minipage}
+\caption{Detector-era comparison relevant to the prompt-resonance analysis. The 2015
+and 2016 samples use the baseline six-station SVT, while the 2021 validation sample
+uses the upgraded front tracker. The detector change is a direct input to the
+mass-resolution and acceptance model used by the GPR workflow.}
+\label{fig:svt-eras}
+\end{figure*}
+
+Table~\ref{tab:dataset-summary} summarizes the samples carried through the current
+workflow. The 2015 sample is fully unblinded and is used as the most mature validation
+anchor. The 2016 sample is represented here by the 10\% development subset of the
+full 2016 parent sample. The 2021 sample is represented by the 1\% validation subset
+of the upgraded-detector physics run. These partial samples are useful for validating
+the combined method, but they are not the final full-statistics result.
+
+\input{tables/dataset_summary}
+
+\begin{figure*}[t]
+\centering
+\ifigure{0.86\textwidth}{input_mass_spectra.png}
+\caption{Selected invariant-mass spectra used by the current GPR workflow. The spectra
+are shown in absolute events per MeV for the 2015, 2016 10\%, and 2021 1\% samples.
+The shaded regions mark the published HPS engineering-run search windows and the
+current GPR scan regions.}
+\label{fig:input-spectra}
+\end{figure*}
+
+At a common mass hypothesis, the active data samples are statistically independent.
+They differ in beam energy, exposure, detector resolution, event selection, and
+radiative-trident normalization. The combined analysis therefore treats them as
+separate channels linked only by the same dark-photon coupling parameter $\eps^2$.

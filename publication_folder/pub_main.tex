@@ -1,0 +1,78 @@
+\documentclass[aps,prd,reprint,superscriptaddress,nofootinbib]{revtex4-2}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,bm}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{siunitx}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage[colorlinks=true,linkcolor=blue!55!black,citecolor=blue!55!black,urlcolor=blue!55!black]{hyperref}
+
+\graphicspath{{figures/}}
+
+\newcommand{\Ap}{A^{\prime}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\CLs}{\mathrm{CL}_{s}}
+\newcommand{\GeV}{\mathrm{GeV}}
+\newcommand{\MeV}{\mathrm{MeV}}
+\newcommand{\ifigure}[2]{\includegraphics[width=#1]{#2}}
+\newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+\begin{document}
+
+\title{Gaussian-process resonance search for prompt dark photons with the Heavy Photon Search experiment}
+
+\author{HPS Collaboration}
+\affiliation{Thomas Jefferson National Accelerator Facility, Newport News, Virginia 23606, USA}
+\affiliation{SLAC National Accelerator Laboratory, Stanford, California 94309, USA}
+
+\date{\today}
+
+\begin{abstract}
+We present a Gaussian process regression search for a narrow prompt
+$\Ap \to e^+e^-$ resonance in invariant-mass spectra collected by the Heavy Photon
+Search (HPS) experiment at Jefferson Lab. HPS is a fixed-target forward
+spectrometer designed to search for visible dark-sector decays using a silicon vertex
+tracker and an electromagnetic calorimeter. The analysis models the smooth quantum
+electrodynamics trident background with a sideband-trained Gaussian process and tests,
+at each mass hypothesis, for a detector-resolution-limited Gaussian signal. The
+Gaussian process prediction supplies both the expected background and its correlated
+uncertainty in the excluded signal window, which are propagated through a profiled
+likelihood. Upper limits are set with the modified-frequentist $\CLs$ construction and
+converted to limits on the kinetic-mixing coupling $\eps^2$ using the
+radiative-trident normalization. Independent HPS samples are combined in a common
+$\eps^2$ parameter rather than by combining precomputed limits. The present draft
+documents the staged 2015, 2016, and 2021 GPR workflow, its validation program, and
+the publication-scale figure set; final discovery claims require the frozen
+full-statistics samples and scan-level look-elsewhere calibration.
+\end{abstract}
+
+\maketitle
+
+\input{sections/01_introduction}
+\input{sections/02_detector_data}
+\input{sections/03_selection_normalization}
+\input{sections/04_gpr_statistics}
+\input{sections/05_validation}
+\input{sections/06_results}
+\input{sections/07_conclusions}
+
+\appendix
+\input{sections/appendix_validation_and_figures}
+\clearpage
+
+\begin{acknowledgments}
+The collaboration acknowledges the staff of Jefferson Lab and the Continuous Electron
+Beam Accelerator Facility for the accelerator and experimental support that make the
+HPS program possible. This draft is assembled from the current HPS GPR analysis note
+and should be updated with the final collaboration author list, funding text, and
+frozen unblinding statement before journal submission.
+\end{acknowledgments}
+
+\bibliographystyle{apsrev4-2}
+\bibliography{pub_refs}
+
+\end{document}

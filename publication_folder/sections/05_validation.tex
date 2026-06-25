@@ -1,0 +1,75 @@
+\section{Validation and systematic checks}
+\label{sec:validation}
+
+The validation program asks whether the GPR model can interpolate the smooth prompt
+background without absorbing a narrow signal, whether the fitted signal uncertainty is
+calibrated, and whether the shared-$\eps^2$ combination behaves as expected. The
+complete internal note contains many per-mass and per-sample diagnostic plots. The PRD
+manuscript should keep only the main validation evidence in the body and leave the
+full diagnostic grid to appendices or auxiliary material.
+
+The first validation choice is the training exclusion around each tested mass.
+Training the Gaussian process immediately outside a narrow $1.64\,\sigma_m$ window can
+allow the near tails of an injected Gaussian signal to enter the sideband training set,
+where they can be partly absorbed into the smooth background. Refmatched closure toys
+therefore compare several training exclusions. The selected production geometry uses a
+$2.25\,\sigma_m$ training exclusion matched to a $2.25\,\sigma_m$ blind and extraction
+window. This choice reduces training-region signal leakage while retaining the signal
+tails in the likelihood.
+
+\begin{figure*}[t]
+\centering
+\begin{minipage}{0.47\textwidth}
+\centering
+\ifigure{\linewidth}{blind225_schematic.png}\\
+(a) Selected $2.25\,\sigma_m$ blind/extraction window.
+\end{minipage}
+\hfill
+\begin{minipage}{0.47\textwidth}
+\centering
+\ifigure{\linewidth}{blind_geometry_reach.png}\\
+(b) Refmatched blind-geometry reach comparison.
+\end{minipage}
+\caption{Training-exclusion and blind-window validation. The selected
+$2.25\,\sigma_m$ geometry excludes nearby signal tails from the GPR training set while
+including those tails in the signal extraction likelihood. The reach comparison shows
+that the widened blind window preserves closure behavior while improving the expected
+signal-yield reach relative to discarding the $1.64$--$2.25\,\sigma_m$ tails as a
+guard band.}
+\label{fig:blind-validation}
+\end{figure*}
+
+The second validation layer is closure on pseudoexperiments. Smooth analytic
+functional-form toys provide a background model independent of the Gaussian process
+used in the extraction. Full-refit toys then rerun the sideband-trained GPR procedure
+on pseudo-data with known injected signal strengths. The principal metrics are the
+signal-yield pull mean, pull width, recovered-over-injected yield, and residual
+Gaussian-equivalent significance. Pull means near zero test bias; pull widths near one
+test the fitted uncertainty. Pull widths below one, when the toys are faithful, imply
+conservative uncertainties rather than false exclusions.
+
+\begin{figure*}[t]
+\centering
+\ifigure{0.88\textwidth}{toy_upper_limit_proxy.png}
+\caption{Three-sample toy upper-limit proxy summary for the 2015, 2016 10\%, and 2021
+1\% validation samples. These background-only pseudoexperiment studies check the
+expected signal-yield and $\eps^2$ scales before interpreting the observed
+shared-coupling result.}
+\label{fig:toy-upper-proxy}
+\end{figure*}
+
+The third layer checks sensitivity to systematic modeling choices. These include the
+mass-resolution parameterization, the radiative-fraction normalization, the effective
+length-scale bounds, the 2021 target-constrained smearing scale, and the confidence
+level convention used for external comparisons. The present draft includes the
+corresponding figures in the appendix. For the final journal article, systematic
+variations should be promoted to the body only if they enter the quoted result or
+materially change the external contour.
+
+Finally, discovery calibration is kept distinct from upper-limit diagnostics. The
+limit-tail plots compare observed upper limits with background-only limit ensembles and
+answer whether an observed limit is unusually strong or weak. They are not discovery
+$p$-values. A discovery statement must instead use the one-sided local $p_0$ statistic
+and a scan-level look-elsewhere calibration. The current note uses effective-trials
+overlays as review guides; a final PRD discovery statement should use a frozen toy
+calibration of $q_{0,\max}$ over the final scan range.
