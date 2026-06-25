@@ -707,8 +707,7 @@ def _phase_xy(
     sort: bool = True,
     y_max: float = 8.0e-4,
 ) -> tuple[np.ndarray, np.ndarray]:
-    delimiter = None if name.endswith(".dat") else ","
-    x_raw, y_raw = _read_phase_contour(name, delimiter=delimiter)
+    x_raw, y_raw = _read_phase_contour(name, delimiter=",")
     if columns == (1, 0):
         x_raw, y_raw = y_raw, x_raw
 
@@ -966,8 +965,8 @@ def _style_phase_axis(
     ax.set_xlabel(r"$m_{A'}$ [MeV]")
     ax.set_ylabel(r"Kinetic mixing $\epsilon^2$")
     ax.set_title(title, fontsize=12.2)
-    ax.set_xticks([5, 10, 20, 50, 100, 200, 500, 1000])
-    ax.set_xticklabels(["5", "10", "20", "50", "100", "200", "500", "1000"])
+    ax.set_xticks([1, 2, 5, 10, 20, 50, 100, 200, 500, 1000])
+    ax.set_xticklabels(["1", "2", "5", "10", "20", "50", "100", "200", "500", "1000"])
     ax.grid(alpha=0.24, which="major", color="#bdbdbd")
     ax.grid(alpha=0.14, which="minor", color="#d9d9d9")
 
@@ -1000,7 +999,7 @@ def make_hps_engineering_phase_space_context(out_path: Path) -> None:
     ax.text(68.0, 1.15e-4, "HPS 2016", color="#D55E00", fontsize=8.2, weight="bold")
     _style_phase_axis(
         ax,
-        xlim=(5.0, 1000.0),
+        xlim=(1.0, 1000.0),
         ylim=(y_min, y_top),
         title="Visible dark-photon phase space with HPS engineering-run limits",
     )
@@ -1080,7 +1079,7 @@ def make_projected_gpr_phase_space_context(out_path: Path) -> None:
 
     _style_phase_axis(
         ax,
-        xlim=(5.0, 1000.0),
+        xlim=(1.0, 1000.0),
         ylim=(y_min, y_top),
         title="Projected full-data HPS GPR reach in visible dark-photon phase space",
     )
