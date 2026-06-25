@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import argparse
+import ast
 import json
 from pathlib import Path
 
 import fitz
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 from PIL import Image, ImageOps
 import uproot
 import yaml
@@ -15,6 +17,8 @@ from hps_gpr.statistics import bounded_two_sided_tail_pvalue
 
 
 NOTE_DIR = Path(__file__).resolve().parents[1]
+PHASE_CONTOUR_DIR = NOTE_DIR / "context_figs" / "phase_space_contours"
+CL95_TO_CL90_EPS2 = 1.64 / 1.96
 FUNCFORM_ROOT_SPECS = [
     ("2015", NOTE_DIR.parent / "outputs" / "funcform_toys" / "funcform_2015_dataset_mod_toys.root"),
     ("2016", NOTE_DIR.parent / "outputs" / "funcform_toys" / "funcform_2016_dataset_mod_toys.root"),
@@ -679,6 +683,424 @@ def make_prompt_visible_constraints_panel(out_path: Path) -> None:
     plt.close(fig)
 
 
+def _read_phase_contour(name: str, *, delimiter: str | None = ",") -> tuple[np.ndarray, np.ndarray]:
+    path = PHASE_CONTOUR_DIR / name
+    arr = np.genfromtxt(path, delimiter=delimiter)
+    arr = np.asarray(arr, dtype=float)
+    if arr.ndim == 1:
+        arr = arr.reshape(-1, arr.size)
+    if arr.shape[1] < 2:
+        return np.array([]), np.array([])
+    x = arr[:, 0]
+    y = arr[:, 1]
+    mask = np.isfinite(x) & np.isfinite(y)
+    return x[mask], y[mask]
+
+
+def _phase_xy(
+    name: str,
+    *,
+    mass_unit: str,
+    y_kind: str,
+    columns: tuple[int, int] = (0, 1),
+    cl90_from_95: bool = False,
+    sort: bool = True,
+    y_max: float = 8.0e-4,
+) -> tuple[np.ndarray, np.ndarray]:
+    delimiter = None if name.endswith(".dat") else ","
+    x_raw, y_raw = _read_phase_contour(name, delimiter=delimiter)
+    if columns == (1, 0):
+        x_raw, y_raw = y_raw, x_raw
+
+    if mass_unit == "gev":
+        mass_mev = 1000.0 * x_raw
+    elif mass_unit == "mev":
+        mass_mev = x_raw
+    elif mass_unit == "log10gev":
+        mass_mev = 1000.0 * np.power(10.0, x_raw)
+    else:
+        raise ValueError(f"unknown mass unit: {mass_unit}")
+
+    if y_kind == "eps":
+        eps2 = y_raw**2
+    elif y_kind == "eps2":
+        eps2 = y_raw
+    elif y_kind == "log10eps":
+        eps2 = np.power(10.0, 2.0 * y_raw)
+    else:
+        raise ValueError(f"unknown y kind: {y_kind}")
+
+    if cl90_from_95:
+        eps2 = eps2 * CL95_TO_CL90_EPS2
+
+    mask = (
+        np.isfinite(mass_mev)
+        & np.isfinite(eps2)
+        & (mass_mev > 0.0)
+        & (eps2 > 0.0)
+        & (eps2 < y_max)
+    )
+    mass_mev = mass_mev[mask]
+    eps2 = eps2[mask]
+    if sort:
+        order = np.argsort(mass_mev)
+        mass_mev = mass_mev[order]
+        eps2 = eps2[order]
+    return mass_mev, eps2
+
+
+def _plot_phase_segments(
+    ax: plt.Axes,
+    x: np.ndarray,
+    y: np.ndarray,
+    *,
+    max_ratio: float = 1.45,
+    **kwargs,
+) -> None:
+    x = np.asarray(x, dtype=float)
+    y = np.asarray(y, dtype=float)
+    valid = np.isfinite(x) & np.isfinite(y) & (x > 0.0) & (y > 0.0)
+    x = x[valid]
+    y = y[valid]
+    if x.size == 0:
+        return
+    label = kwargs.pop("label", None)
+    order = np.argsort(x)
+    x = x[order]
+    y = y[order]
+    ratios = x[1:] / x[:-1]
+    breaks = np.flatnonzero(ratios > max_ratio) + 1
+    for iseg, idx in enumerate(np.split(np.arange(x.size), breaks)):
+        if idx.size > 1:
+            ax.plot(x[idx], y[idx], label=label if iseg == 0 else "_nolegend_", **kwargs)
+
+
+def _fill_phase_segments(
+    ax: plt.Axes,
+    x: np.ndarray,
+    y: np.ndarray,
+    y_top: float,
+    *,
+    max_ratio: float = 1.45,
+    **kwargs,
+) -> None:
+    x = np.asarray(x, dtype=float)
+    y = np.asarray(y, dtype=float)
+    valid = np.isfinite(x) & np.isfinite(y) & (x > 0.0) & (y > 0.0) & (y < y_top)
+    x = x[valid]
+    y = y[valid]
+    if x.size == 0:
+        return
+    label = kwargs.pop("label", None)
+    order = np.argsort(x)
+    x = x[order]
+    y = y[order]
+    ratios = x[1:] / x[:-1]
+    breaks = np.flatnonzero(ratios > max_ratio) + 1
+    for iseg, idx in enumerate(np.split(np.arange(x.size), breaks)):
+        if idx.size > 1:
+            ax.fill_between(
+                x[idx],
+                y[idx],
+                y_top,
+                label=label if iseg == 0 else "_nolegend_",
+                **kwargs,
+            )
+
+
+def _draw_phase_polygon(
+    ax: plt.Axes,
+    x: np.ndarray,
+    y: np.ndarray,
+    *,
+    color: str,
+    label: str | None = None,
+    alpha_fill: float = 0.055,
+    alpha_line: float = 0.62,
+    lw: float = 1.0,
+    zorder: int = 2,
+) -> None:
+    x = np.asarray(x, dtype=float)
+    y = np.asarray(y, dtype=float)
+    valid = np.isfinite(x) & np.isfinite(y) & (x > 0.0) & (y > 0.0)
+    x = x[valid]
+    y = y[valid]
+    if x.size < 3:
+        return
+    ax.fill(x, y, color=color, alpha=alpha_fill, lw=0, zorder=zorder - 1)
+    ax.plot(x, y, color=color, alpha=alpha_line, lw=lw, label=label, zorder=zorder)
+
+
+def _draw_thermal_targets(ax: plt.Axes, *, y_min: float, label: str = "Thermal relic targets") -> None:
+    x_lo, y_lo = _phase_xy("thermal_targets_lower.csv", mass_unit="gev", y_kind="eps2", y_max=1.0e-3)
+    x_hi, y_hi = _phase_xy("thermal_targets_upper.csv", mass_unit="gev", y_kind="eps2", y_max=1.0e-3)
+    if x_lo.size < 2 or x_hi.size < 2:
+        return
+    x_min = max(float(np.nanmin(x_lo)), float(np.nanmin(x_hi)))
+    x_max = min(float(np.nanmax(x_lo)), float(np.nanmax(x_hi)))
+    grid = np.geomspace(x_min, x_max, 260)
+    lo = np.exp(np.interp(np.log(grid), np.log(x_lo), np.log(y_lo)))
+    hi = np.exp(np.interp(np.log(grid), np.log(x_hi), np.log(y_hi)))
+    lower = np.minimum(lo, hi)
+    upper = np.maximum(lo, hi)
+    ax.fill_between(grid, lower, upper, color="#C44E52", alpha=0.18, lw=0, label=label, zorder=0)
+    ax.plot(grid, upper, color="#9E2F3F", lw=1.05, alpha=0.85, zorder=1)
+    ax.plot(grid, lower, color="#9E2F3F", lw=1.05, alpha=0.85, zorder=1)
+    ax.text(42.0, max(y_min * 1.45, 1.4e-10), "thermal relic", color="#8B1E3F", fontsize=7.4)
+
+
+def _draw_phase_world_constraints(ax: plt.Axes, *, y_top: float, include_legend_labels: bool = True) -> None:
+    style = {
+        "collider": dict(color="#6F6F6F", lw=1.45, alpha=0.82),
+        "fixed": dict(color="#4A7C59", lw=1.35, alpha=0.82),
+        "meson": dict(color="#8A6F2A", lw=1.35, alpha=0.78),
+        "dump": dict(color="#5B7186", lw=1.15, alpha=0.58),
+        "na64": dict(color="#8B1E3F", lw=1.25, alpha=0.72),
+    }
+
+    specs = [
+        ("babar.csv", "BaBar", "gev", "eps", "collider", True),
+        ("kloe.csv", "KLOE/KLOE-2", "mev", "eps2", "collider", False),
+        ("2014_kloe.csv", None, "mev", "eps2", "collider", False),
+        ("2014_mainz.csv", "A1/MAMI", "gev", "eps2", "fixed", False),
+        ("apex_test_run.csv", "APEX", "mev", "eps2", "fixed", False),
+        ("apex_2019_physics_run.csv", None, "gev", "eps2", "fixed", False),
+        ("2015_na482_rescaled_to_95cl.csv", "NA48/2", "gev", "eps", "meson", True),
+        ("hades.csv", "HADES", "gev", "eps2", "meson", False),
+        ("2014_phenix.csv", "PHENIX", "mev", "eps2", "meson", False),
+        ("lhcb_2019_results_prompt_data.csv", "LHCb prompt", "gev", "eps2", "collider", False),
+    ]
+    for name, label, mass_unit, y_kind, group, scale95 in specs:
+        x, y = _phase_xy(name, mass_unit=mass_unit, y_kind=y_kind, cl90_from_95=scale95, y_max=y_top)
+        if x.size == 0:
+            continue
+        draw_label = label if include_legend_labels and label is not None else None
+        _fill_phase_segments(ax, x, y, y_top, color=style[group]["color"], alpha=0.055, lw=0, zorder=1)
+        _plot_phase_segments(ax, x, y, label=draw_label, zorder=2, **style[group])
+
+    for i, name in enumerate(["na64_2018.csv", "na64_2019.csv"]):
+        x, y = _phase_xy(name, mass_unit="gev", y_kind="eps", sort=False, y_max=y_top)
+        _draw_phase_polygon(
+            ax,
+            x,
+            y,
+            color=style["na64"]["color"],
+            label="NA64" if include_legend_labels and i == 0 else None,
+            alpha_fill=0.06,
+            alpha_line=0.70,
+            lw=1.05,
+            zorder=2,
+        )
+
+    dump_specs = [
+        ("e137_andreas_log.csv", "log10gev", "log10eps", (0, 1)),
+        ("e141_andreas_log.csv", "log10gev", "log10eps", (0, 1)),
+        ("e774_andreas_log.csv", "log10gev", "log10eps", (0, 1)),
+        ("orsay_andreas_95pct.dat", "log10gev", "log10eps", (0, 1)),
+        ("kek.csv", "gev", "eps", (0, 1)),
+        ("u70_serpuhov.csv", "gev", "eps", (1, 0)),
+    ]
+    dump_label = "Beam dumps / U70" if include_legend_labels else None
+    for i, (name, mass_unit, y_kind, cols) in enumerate(dump_specs):
+        x, y = _phase_xy(name, mass_unit=mass_unit, y_kind=y_kind, columns=cols, sort=False, y_max=y_top)
+        if x.size == 0:
+            continue
+        label = dump_label if i == 0 else None
+        _draw_phase_polygon(
+            ax,
+            x,
+            y,
+            color=style["dump"]["color"],
+            label=label,
+            alpha_fill=0.035,
+            alpha_line=0.55,
+            lw=0.95,
+            zorder=2,
+        )
+
+
+def _load_projected_full_gpr_reach() -> pd.DataFrame:
+    path = NOTE_DIR / "final_limit_projection_figs" / "90cls" / "dimuon" / "combined_ul_bands_combined_all_90cls_with_dimuon_columns.csv"
+    df = pd.read_csv(path)
+    factors = {"2015": 1.0, "2016": 10.0, "2021": 100.0}
+    records = []
+    for _, row in df.iterrows():
+        meta = ast.literal_eval(str(row["meta"]))
+        current = 0.0
+        projected = 0.0
+        for item in meta:
+            key = str(item["key"])
+            dens = float(item["dens"])
+            current += dens
+            projected += dens * factors.get(key, 1.0)
+        if projected <= 0.0:
+            continue
+        scale = np.sqrt(current / projected)
+        eps2_obs = float(row.get("eps2_obs_dimuon", row["eps2_obs"]))
+        eps2_med = float(row.get("eps2_med_dimuon", row["eps2_med"]))
+        records.append(
+            {
+                "mass_MeV": float(row["mass_MeV"]),
+                "dataset_set": str(row["dataset_set"]),
+                "current_eps2_obs": eps2_obs,
+                "current_eps2_med": eps2_med,
+                "projected_full_eps2_obs": eps2_obs * scale,
+                "projected_full_eps2_med": eps2_med * scale,
+                "full_projection_scale": scale,
+            }
+        )
+    return pd.DataFrame(records).sort_values("mass_MeV")
+
+
+def _style_phase_axis(
+    ax: plt.Axes,
+    *,
+    xlim: tuple[float, float],
+    ylim: tuple[float, float],
+    title: str,
+) -> None:
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    ax.set_xlim(*xlim)
+    ax.set_ylim(*ylim)
+    ax.set_xlabel(r"$m_{A'}$ [MeV]")
+    ax.set_ylabel(r"Kinetic mixing $\epsilon^2$")
+    ax.set_title(title, fontsize=12.2)
+    ax.set_xticks([5, 10, 20, 50, 100, 200, 500, 1000])
+    ax.set_xticklabels(["5", "10", "20", "50", "100", "200", "500", "1000"])
+    ax.grid(alpha=0.24, which="major", color="#bdbdbd")
+    ax.grid(alpha=0.14, which="minor", color="#d9d9d9")
+
+
+def make_hps_engineering_phase_space_context(out_path: Path) -> None:
+    y_min, y_top = 8.0e-11, 5.0e-4
+    fig, ax = plt.subplots(figsize=(11.6, 5.9))
+    _draw_thermal_targets(ax, y_min=y_min)
+    _draw_phase_world_constraints(ax, y_top=y_top)
+
+    x15, y15 = _phase_xy(
+        "engineering_run2015_fix.csv",
+        mass_unit="mev",
+        y_kind="eps2",
+        cl90_from_95=True,
+        y_max=y_top,
+    )
+    x16, y16 = _phase_xy(
+        "engineering_run2016_reach.csv",
+        mass_unit="mev",
+        y_kind="eps2",
+        cl90_from_95=True,
+        y_max=y_top,
+    )
+    ax.plot(x15, y15, color="#1F4E79", lw=3.0, label=r"HPS 2015 eng. (90% scaled)", zorder=8)
+    ax.plot(x16, y16, color="#D55E00", lw=3.0, label=r"HPS 2016 eng. (90% scaled)", zorder=8)
+    ax.axvspan(19.0, 81.0, color="#1F4E79", alpha=0.035, lw=0, zorder=0)
+    ax.axvspan(39.0, 179.0, color="#D55E00", alpha=0.035, lw=0, zorder=0)
+    ax.text(24.0, 1.55e-4, "HPS 2015", color="#1F4E79", fontsize=8.2, weight="bold")
+    ax.text(68.0, 1.15e-4, "HPS 2016", color="#D55E00", fontsize=8.2, weight="bold")
+    _style_phase_axis(
+        ax,
+        xlim=(5.0, 1000.0),
+        ylim=(y_min, y_top),
+        title="Visible dark-photon phase space with HPS engineering-run limits",
+    )
+    ax.legend(
+        loc="center left",
+        bbox_to_anchor=(1.015, 0.5),
+        framealpha=0.96,
+        fontsize=7.35,
+        title="Contours",
+        title_fontsize=8.0,
+        handlelength=2.4,
+        labelspacing=0.35,
+    )
+    ensure_dir(out_path.parent)
+    fig.tight_layout(rect=[0.0, 0.0, 0.79, 1.0])
+    fig.savefig(out_path, dpi=250, bbox_inches="tight")
+    fig.savefig(out_path.with_suffix(".pdf"), bbox_inches="tight")
+    plt.close(fig)
+
+
+def make_projected_gpr_phase_space_context(out_path: Path) -> None:
+    y_min, y_top = 8.0e-11, 5.0e-4
+    fig, ax = plt.subplots(figsize=(11.6, 5.9))
+    _draw_thermal_targets(ax, y_min=y_min)
+    _draw_phase_world_constraints(ax, y_top=y_top, include_legend_labels=False)
+
+    x15, y15 = _phase_xy(
+        "engineering_run2015_fix.csv",
+        mass_unit="mev",
+        y_kind="eps2",
+        cl90_from_95=True,
+        y_max=y_top,
+    )
+    x16, y16 = _phase_xy(
+        "engineering_run2016_reach.csv",
+        mass_unit="mev",
+        y_kind="eps2",
+        cl90_from_95=True,
+        y_max=y_top,
+    )
+    ax.plot(x15, y15, color="#1F4E79", lw=1.65, alpha=0.78, label=r"HPS 2015 eng. (90% scaled)", zorder=5)
+    ax.plot(x16, y16, color="#D55E00", lw=1.65, alpha=0.78, label=r"HPS 2016 eng. (90% scaled)", zorder=5)
+
+    projection = _load_projected_full_gpr_reach()
+    x = projection["mass_MeV"].to_numpy(float)
+    y_obs = projection["projected_full_eps2_obs"].to_numpy(float)
+    y_med = projection["projected_full_eps2_med"].to_numpy(float)
+    ax.plot(x, y_obs, color="white", lw=6.2, alpha=0.92, zorder=9)
+    ax.plot(
+        x,
+        y_obs,
+        color="#7A3DBB",
+        lw=4.1,
+        label=r"This work: projected full-data GPR reach",
+        zorder=10,
+    )
+    ax.plot(
+        x,
+        y_med,
+        color="#7A3DBB",
+        lw=2.4,
+        ls="--",
+        alpha=0.88,
+        label=r"This work: projected median",
+        zorder=10,
+    )
+    ax.text(
+        44.0,
+        7.5e-7,
+        "Projected HPS GPR result",
+        color="#5E2A92",
+        fontsize=9.0,
+        weight="bold",
+        bbox=dict(boxstyle="round,pad=0.18", fc="white", ec="#7A3DBB", alpha=0.86),
+        zorder=11,
+    )
+
+    _style_phase_axis(
+        ax,
+        xlim=(5.0, 1000.0),
+        ylim=(y_min, y_top),
+        title="Projected full-data HPS GPR reach in visible dark-photon phase space",
+    )
+    ax.legend(
+        loc="center left",
+        bbox_to_anchor=(1.015, 0.5),
+        framealpha=0.96,
+        fontsize=7.45,
+        title="Highlighted curves",
+        title_fontsize=8.0,
+        handlelength=2.55,
+        labelspacing=0.42,
+    )
+    ensure_dir(out_path.parent)
+    fig.tight_layout(rect=[0.0, 0.0, 0.79, 1.0])
+    fig.savefig(out_path, dpi=250, bbox_inches="tight")
+    fig.savefig(out_path.with_suffix(".pdf"), bbox_inches="tight")
+    plt.close(fig)
+
+
 def make_prompt_visible_eps2_placeholder(out_path: Path) -> None:
     masses = np.linspace(10.0, 300.0, 500)
 
@@ -962,6 +1384,16 @@ def main(argv: list[str] | None = None) -> None:
     make_pvalue_schematic(NOTE_DIR / "methodology_figs" / "pvalue_tail_schematic.png")
     make_pvalue_tail_examples(NOTE_DIR / "methodology_figs" / "pvalue_tail_examples.png")
     make_prompt_visible_constraints_panel(NOTE_DIR / "context_figs" / "prompt_visible_constraints_panel.png")
+    make_hps_engineering_phase_space_context(
+        NOTE_DIR / "context_figs" / "hps_engineering_phase_space_context.png"
+    )
+    make_projected_gpr_phase_space_context(
+        NOTE_DIR
+        / "final_limit_projection_figs"
+        / "90cls"
+        / "projections"
+        / "projected_gpr_phase_space_context.png"
+    )
     make_prompt_visible_eps2_placeholder(NOTE_DIR / "context_figs" / "prompt_visible_eps2_placeholder.png")
     make_2021_parameterization_fig(NOTE_DIR / "resolution_figs" / "hps2021_resolution_and_frad.png")
     make_2021_resolution_only_fig(NOTE_DIR / "resolution_figs" / "hps2021_mass_resolution_parameterization.png")
