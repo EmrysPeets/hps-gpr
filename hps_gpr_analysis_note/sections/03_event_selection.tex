@@ -172,13 +172,14 @@ analysis we adopt the inclusive target-constrained V0 fit without hit requiremen
 shown in Figure~\ref{fig:2021-resolution}; in that panel, the red fitted curve is the
 source mass-resolution model propagated through the signal template and blind-window
 definitions before the final target-constrained data/MC broadening. The source
-parameterization is
+parameterization, written here in MeV units, is
 \begin{equation}
-\sigma_{2021}^{\mathrm{TC,raw}}(m)
-= 1.4786\times10^{-3} - 1.1\times10^{-3}m + 6.87\times10^{-2}m^2,
+\sigma_{2021}^{\mathrm{TC,raw}}(m_{\mathrm{MeV}})
+= \left(1.4786 - 1.1\times10^{-3}m_{\mathrm{MeV}}
+  + 6.87\times10^{-5}m_{\mathrm{MeV}}^2\right)\,\mathrm{MeV},
 \label{eq:sigma2021}
 \end{equation}
-again with $m$ and $\sigma_{2021}$ in GeV. The analysis then applies the
+where $m_{\mathrm{MeV}}$ is the numerical mass value in MeV. The analysis then applies the
 target-constrained data/MC scale derived from the 2021 smearing study,
 \begin{equation}
 s_{\mathrm{TC}} = \frac{2.186}{1.745} \simeq 1.25,
@@ -210,7 +211,8 @@ comparison.}
 \begin{figure}[H]
 \centering
 \graphicorplaceholder{0.78\linewidth}{resolution_figs/hps2021_data_mc_smearing_scale.png}
-\caption{2021 data/MC mass-resolution comparison used to set the smearing scale.
+\caption{2021 M{\o}ller run data/MC mass-resolution comparison used to set the
+smearing scale.
 Here UC denotes the unconstrained vertex sample, BSC denotes the beamspot-constrained
 vertex sample, and TC denotes the target-constrained vertex sample. The TC row is the
 most relevant row for the prompt analysis; comparing the data value

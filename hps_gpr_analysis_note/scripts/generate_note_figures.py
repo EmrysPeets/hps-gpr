@@ -965,8 +965,22 @@ def _style_phase_axis(
     ax.set_xlabel(r"$m_{A'}$ [MeV]")
     ax.set_ylabel(r"Kinetic mixing $\epsilon^2$")
     ax.set_title(title, fontsize=12.2)
-    ax.set_xticks([1, 2, 5, 10, 20, 50, 100, 200, 500, 1000])
-    ax.set_xticklabels(["1", "2", "5", "10", "20", "50", "100", "200", "500", "1000"])
+    tick_pairs = [
+        (1, "1"),
+        (2, "2"),
+        (5, "5"),
+        (10, "10"),
+        (20, "20"),
+        (50, "50"),
+        (100, "100"),
+        (200, "200"),
+        (500, "500"),
+        (1000, "1000"),
+    ]
+    ticks = [tick for tick, _ in tick_pairs if xlim[0] <= tick <= xlim[1]]
+    labels = [label for tick, label in tick_pairs if xlim[0] <= tick <= xlim[1]]
+    ax.set_xticks(ticks)
+    ax.set_xticklabels(labels)
     ax.grid(alpha=0.24, which="major", color="#bdbdbd")
     ax.grid(alpha=0.14, which="minor", color="#d9d9d9")
 
@@ -1021,8 +1035,8 @@ def make_hps_engineering_phase_space_context(out_path: Path) -> None:
 
 
 def make_projected_gpr_phase_space_context(out_path: Path) -> None:
-    y_min, y_top = 8.0e-11, 5.0e-4
-    fig, ax = plt.subplots(figsize=(11.6, 5.9))
+    y_min, y_top = 4.0e-7, 1.0e-4
+    fig, ax = plt.subplots(figsize=(9.7, 5.8))
     _draw_thermal_targets(ax, y_min=y_min)
     _draw_phase_world_constraints(ax, y_top=y_top, include_legend_labels=False)
 
@@ -1066,12 +1080,13 @@ def make_projected_gpr_phase_space_context(out_path: Path) -> None:
         label=r"This work: projected median",
         zorder=10,
     )
+    ax.axvspan(20.0, 250.0, color="#7A3DBB", alpha=0.045, lw=0, zorder=1)
     ax.text(
-        44.0,
-        7.5e-7,
-        "Projected HPS GPR result",
+        32.0,
+        7.2e-5,
+        "Zoomed HPS GPR\nprojection window",
         color="#5E2A92",
-        fontsize=9.0,
+        fontsize=9.2,
         weight="bold",
         bbox=dict(boxstyle="round,pad=0.18", fc="white", ec="#7A3DBB", alpha=0.86),
         zorder=11,
@@ -1079,9 +1094,9 @@ def make_projected_gpr_phase_space_context(out_path: Path) -> None:
 
     _style_phase_axis(
         ax,
-        xlim=(1.0, 1000.0),
+        xlim=(15.0, 275.0),
         ylim=(y_min, y_top),
-        title="Projected full-data HPS GPR reach in visible dark-photon phase space",
+        title="Projected full-data HPS GPR reach in the HPS prompt-search mass range",
     )
     ax.legend(
         loc="center left",

@@ -70,14 +70,32 @@ $2.25\,\sigma_d$ blind/extraction choice as a signal-recovery improvement after
 full-refit pseudoexperiments showed appreciable training-region absorption at narrower
 exclusions.
 
-The bin assignment is implemented with the histogram bin centers: a bin is part of
-$\mathcal{B}_d(m_0)$ when its center lies inside the blind interval, and it is part of
-the GP sideband training sample when its center lies outside the training-exclusion
-interval. This center-based assignment is stable because the mass bins are narrower than
-the detector resolution in the scanned range. The signal template itself is still
-integrated over the full bin edges in Eq.~\eqref{eq:window-template}; only the choice of
-which pre-existing histogram bins enter the blind window or sidebands uses the center
-mask.
+The bin assignment is implemented with the fixed histogram bin centers, not by splitting
+partly overlapping bins. Let $c_i=(e_i+e_{i+1})/2$ be the center of bin $i$. The full
+bin is included in the blinded likelihood when
+\begin{equation}
+m_0-n_{\mathrm{blind}}\sigma_d(m_0)
+\le c_i \le
+m_0+n_{\mathrm{blind}}\sigma_d(m_0),
+\end{equation}
+and the full bin is included in the GP sideband training sample only when its center
+lies strictly outside the training-exclusion interval. Thus a bin whose edge overlaps
+the blind boundary is treated by its center: if the center is inside the blind interval,
+the entire bin is blinded and enters the local likelihood; if the center is outside,
+the bin remains available for training unless it is removed by a wider
+training-exclusion interval. No fractional observed count is assigned to both regions.
+This same center mask is used consistently for the observed counts, the GP prediction
+points, the covariance slice, and the blinded-bin signal-template slice.
+
+The finite binning is therefore part of the definition of the numerical result. The
+Gaussian signal template is integrated over the full bin edges in
+Eq.~\eqref{eq:window-template}, but the selected set of bins changes discretely when a
+boundary passes a bin center. Consequently the quoted local significance and
+$\eps^2$ limit are not meaningful to a precision finer than the mass binning and scan
+grid used to define these masks. The production toys and validation plots use the same
+binning convention, so this edge-bin effect is accounted for by applying the identical
+discrete procedure to data, pseudoexperiments, background predictions, signal
+templates, and yield-to-coupling conversions.
 
 \subsection{Log-space preprocessing and the choice \texorpdfstring{$\alpha=1/y$}{alpha=1/y}}
 

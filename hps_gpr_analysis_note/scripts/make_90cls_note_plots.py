@@ -41,6 +41,11 @@ COMBINED_COLOR = "#111111"
 PROJECTION_COLOR = "#7A3DBB"
 BABAR_COLOR = "#D89400"
 SIGMA_REFERENCE_LEVELS = (1.0, 2.0, 3.0)
+SIGMA_REFERENCE_COLORS = {
+    1.0: "#0072B2",
+    2.0: "#D55E00",
+    3.0: "#CC79A7",
+}
 
 
 def ensure_dir(path: Path) -> None:
@@ -869,29 +874,40 @@ def plot_tail_areas(combined: pd.DataFrame, spike_df: pd.DataFrame) -> None:
         )
     for mass in sorted(spike_df["mass_MeV"].unique()) if not spike_df.empty else []:
         ax.axvline(mass, color="#C44E52", linestyle=":", linewidth=1.4, alpha=0.8)
+    ref_handles = []
+    ref_labels = []
     for z in SIGMA_REFERENCE_LEVELS:
         p_local = one_sided_gaussian_p(z)
         p_global_threshold = local_p_from_global_sidak(p_local, neff)
-        ax.axhline(p_local, color="0.35", linestyle=":", linewidth=0.95)
-        ax.text(
-            249.0,
-            p_local,
-            rf"local {int(z)}$\sigma$",
-            va="bottom",
-            ha="right",
-            fontsize=9.0,
-            color="0.15",
-        )
-        ax.axhline(p_global_threshold, color="0.15", linestyle="--", linewidth=0.95)
-        ax.text(
-            20.0,
-            p_global_threshold,
-            rf"global {int(z)}$\sigma$ threshold",
-            va="bottom",
-            ha="left",
-            fontsize=9.0,
-            color="0.15",
-        )
+        color = SIGMA_REFERENCE_COLORS.get(float(z), "0.25")
+        local_visible = p_floor <= p_local <= 1.1
+        global_visible = p_floor <= p_global_threshold <= 1.1
+        if local_visible:
+            local_line = ax.axhline(p_local, color=color, linestyle=":", linewidth=1.35, alpha=0.95)
+            ax.text(
+                249.0,
+                p_local,
+                rf"local {int(z)}$\sigma$",
+                va="bottom",
+                ha="right",
+                fontsize=9.0,
+                color=color,
+            )
+            ref_handles.append(local_line)
+            ref_labels.append(rf"local {int(z)}$\sigma$")
+        if global_visible:
+            global_line = ax.axhline(p_global_threshold, color=color, linestyle="--", linewidth=1.35, alpha=0.95)
+            ax.text(
+                20.0,
+                p_global_threshold,
+                rf"global {int(z)}$\sigma$ threshold",
+                va="bottom",
+                ha="left",
+                fontsize=9.0,
+                color=color,
+            )
+            ref_handles.append(global_line)
+            ref_labels.append(rf"global {int(z)}$\sigma$")
     ax.set_yscale("log")
     ax.set_xlim(18, 252)
     ax.set_ylim(p_floor, 1.1)
@@ -901,7 +917,18 @@ def plot_tail_areas(combined: pd.DataFrame, spike_df: pd.DataFrame) -> None:
     ax.yaxis.set_major_locator(LogLocator(base=10.0, numticks=6))
     ax.yaxis.set_minor_locator(LogLocator(base=10.0, subs=np.arange(2, 10) * 0.1, numticks=60))
     ax.yaxis.set_minor_formatter(NullFormatter())
-    ax.legend(loc="lower right", frameon=True, framealpha=0.94, edgecolor="#c9c9c9")
+    handles, labels = ax.get_legend_handles_labels()
+    ax.legend(
+        handles + ref_handles,
+        labels + ref_labels,
+        loc="lower right",
+        frameon=True,
+        framealpha=0.94,
+        edgecolor="#c9c9c9",
+        ncol=2,
+        columnspacing=1.0,
+        handlelength=2.2,
+    )
     ax.xaxis.set_minor_locator(AutoMinorLocator(5))
     style_axis(ax)
     save_figure(fig, "combined_toy_limit_tail_areas_90cls")

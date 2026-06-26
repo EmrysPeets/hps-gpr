@@ -77,43 +77,39 @@ the present scope. This note keeps the statement explicit: 2019 data exist, but 
 will be analyzed in a similar capacity in later work rather than merged into the
 review-ready workflow described here.
 
-Table~\ref{tab:dataset-summary} summarizes the run periods, approximate exposures, and
+Table~\ref{tab:dataset-summary} summarizes the run periods, exposures, and
 current GPR scan ranges used in this review note.
 
 \begin{table}[H]
 \centering
 \small
 {\setlength{\tabcolsep}{6pt}
-\begin{tabularx}{\linewidth}{@{} P{0.24\linewidth} P{0.12\linewidth} P{0.16\linewidth} P{0.23\linewidth} Y @{}}
+\begin{tabularx}{\linewidth}{@{} P{0.26\linewidth} P{0.15\linewidth} P{0.30\linewidth} Y @{}}
 \toprule
-Run period & Beam energy & Approx. EOT & Exposure used here & Prompt scan range \\
+Run period & Beam energy & Exposure used here & Prompt scan range \\
 \midrule
 2015 engineering run &
 \SI{1.056}{GeV} &
-$\sim 6.2\times10^{16}$ &
 \SI{1170}{nb^{-1}} &
 \SIrange{20}{130}{MeV} \\
 2016 engineering run &
 \SI{2.3}{GeV} &
-$\sim 5.8\times10^{17}$ &
 10\% development subset of a
 \SI{10608}{nb^{-1}} parent sample &
 \SIrange{35}{210}{MeV} \\
 2021 physics run &
 \SI{3.74}{GeV} &
-$\sim 6\times10^{18}$ &
 1\% review-stage subset of a $\sim\SI{160}{pb^{-1}}$ parent run &
 \SIrange{30}{250}{MeV} \\
 \bottomrule
 \end{tabularx}
 }
-\caption{Data-taking campaigns carried through the present prompt-resonance note. The
-quoted EOT values are campaign-scale approximations intended only to indicate the order
-of magnitude of the accumulated statistics. In the present note, the fully unblinded
-2015 engineering run anchors the methodology validation, the 2016 program is carried
-through the current 10\% development sample on the way to the first 100\%
-unblinding-stage analysis, and the 2021 program is represented by the current 1\%
-validation subset on the way to the final 100\% analysis. The scan ranges
+\caption{Data-taking campaigns carried through the present prompt-resonance note. In
+the present note, the fully unblinded 2015 engineering run anchors the methodology
+validation, the 2016 program is carried through the current 10\% development sample on
+the way to the first 100\% unblinding-stage analysis, and the 2021 program is
+represented by the current 1\% validation subset on the way to the final 100\%
+analysis. The scan ranges
 quoted here are the current GPR analysis ranges rather than the smaller published
 window searches; the corresponding prompt-search publications scanned
 \SIrange{19}{81}{MeV} in 2015 and \SIrange{39}{179}{MeV} in 2016
@@ -121,10 +117,10 @@ window searches; the corresponding prompt-search publications scanned
 \label{tab:dataset-summary}
 \end{table}
 
-The EOT values are not inputs to the GP background interpolation itself; they enter the
-dataset-specific signal normalization that converts an extracted prompt yield into an
-equivalent $\epsilon^2$ limit, together with the target, acceptance, efficiency, and
-radiative-fraction inputs for that run period.
+The exposure information is not an input to the GP background interpolation itself; it
+enters the dataset-specific signal normalization that converts an extracted prompt
+yield into an equivalent $\epsilon^2$ limit, together with the target, acceptance,
+efficiency, and radiative-fraction inputs for that run period.
 
 The staged-analysis logic matters for the way the results are interpreted. The 2015
 sample remains the cleanest environment for methodology validation because it is fully
