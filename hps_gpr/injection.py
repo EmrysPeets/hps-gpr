@@ -24,6 +24,8 @@ from .io import estimate_background_for_dataset
 from .template import build_template, build_window_template_from_full
 from .conversion import A_from_epsilon2
 from .statistics import (
+    fit_A_fixed_background_gaussian,
+    fit_A_fixed_background_gaussian_details,
     fit_A_profiled_gaussian,
     fit_A_profiled_gaussian_details,
     qmu_tilde_profiled_gaussian,
@@ -167,6 +169,16 @@ def _prediction_integral_density(pred: Any) -> float:
     return float(np.sum(np.clip(arr, 0.0, None)))
 
 
+def _prediction_y_full_bonly(pred: Any) -> np.ndarray:
+    """Return a full-range B-only count vector with fallbacks for test doubles."""
+    y = getattr(pred, "y_full", None)
+    if y is None:
+        y = getattr(pred, "mu_full", None)
+    if y is None:
+        y = getattr(pred, "mu", None)
+    return np.asarray(y, float).reshape(-1)
+
+
 def _resolve_inj_background_mode(config: "Config", *, refit_gp_on_toy: bool) -> str:
     """Resolve how full-refit injection toys choose their pre-signal background."""
     mode = str(getattr(config, "inj_background_mode", "gp_resample") or "gp_resample").lower().strip()
@@ -203,6 +215,85 @@ def _fixed_hist_background_counts(y_full: np.ndarray, *, dataset_key: str, mass:
             "inj_background_mode='fixed_hist' requires integer-like source histogram counts"
         )
     return rounded.astype(int)
+
+
+def _resolve_extract_background_mode(config: "Config") -> str:
+    """Resolve the extraction treatment of the blind-window background."""
+    mode = str(getattr(config, "extract_background_mode", "profiled") or "profiled").lower().strip()
+    aliases = {
+        "": "profiled",
+        "profile": "profiled",
+        "profiled": "profiled",
+        "gaussian_profiled": "profiled",
+        "fixed": "fixed",
+        "plug_in": "fixed",
+        "plugin": "fixed",
+        "no_profile": "fixed",
+        "no_profiling": "fixed",
+        "fixed_background": "fixed",
+    }
+    if mode not in aliases:
+        raise ValueError(
+            "extract_background_mode must be one of 'profiled' or 'fixed' "
+            f"(got {mode!r})"
+        )
+    return aliases[mode]
+
+
+def _fit_A_for_extraction(
+    config: "Config",
+    n_obs: np.ndarray,
+    b_mean: np.ndarray,
+    b_cov: np.ndarray,
+    template: np.ndarray,
+    *,
+    allow_negative: bool,
+) -> Dict[str, float]:
+    """Fit A using the configured extraction background treatment."""
+    mode = _resolve_extract_background_mode(config)
+    if mode == "fixed":
+        return fit_A_fixed_background_gaussian(
+            n_obs,
+            b_mean,
+            b_cov,
+            template,
+            allow_negative=bool(allow_negative),
+        )
+    return fit_A_profiled_gaussian(
+        n_obs,
+        b_mean,
+        b_cov,
+        template,
+        allow_negative=bool(allow_negative),
+    )
+
+
+def _fit_A_details_for_extraction(
+    config: "Config",
+    n_obs: np.ndarray,
+    b_mean: np.ndarray,
+    b_cov: np.ndarray,
+    template: np.ndarray,
+    *,
+    allow_negative: bool,
+) -> Dict[str, object]:
+    """Detailed A fit using the configured extraction background treatment."""
+    mode = _resolve_extract_background_mode(config)
+    if mode == "fixed":
+        return fit_A_fixed_background_gaussian_details(
+            n_obs,
+            b_mean,
+            b_cov,
+            template,
+            allow_negative=bool(allow_negative),
+        )
+    return fit_A_profiled_gaussian_details(
+        n_obs,
+        b_mean,
+        b_cov,
+        template,
+        allow_negative=bool(allow_negative),
+    )
 
 
 def _dataset_kernel_factor(config: "Config", ds_key: str, base_attr: str, by_attr: str) -> float:
@@ -516,8 +607,209 @@ def _sigmaA_reference(
         n_ref = rng.poisson(b)
     else:
         n_ref = b  # Asimov
-    d = fit_A_profiled_gaussian_details(n_ref, b, pred.cov, tmpl, allow_negative=True)
+    if config is None:
+        d = fit_A_profiled_gaussian_details(n_ref, b, pred.cov, tmpl, allow_negative=True)
+    else:
+        d = _fit_A_details_for_extraction(config, n_ref, b, pred.cov, tmpl, allow_negative=True)
     return float(d.get("sigma_A", np.nan))
+
+
+def _resolve_sigma_a_ref_mode(config: "Config") -> str:
+    """Normalize the sigma_A reference convention used to scale injections."""
+    raw = str(getattr(config, "inj_sigma_a_ref_mode", "prefit_asimov") or "prefit_asimov").lower().strip()
+    aliases = {
+        "": "prefit_asimov",
+        "prefit": "prefit_asimov",
+        "pre_fit": "prefit_asimov",
+        "prefit_asimov": "prefit_asimov",
+        "initial": "prefit_asimov",
+        "initial_fit": "prefit_asimov",
+        "matched": "matched_refit_bonly",
+        "matched_refit": "matched_refit_bonly",
+        "matched_bonly": "matched_refit_bonly",
+        "matched_refit_bonly": "matched_refit_bonly",
+        "refit_bonly": "matched_refit_bonly",
+    }
+    if raw not in aliases:
+        raise ValueError(
+            "inj_sigma_a_ref_mode must be one of 'prefit_asimov' or "
+            f"'matched_refit_bonly' (got {raw!r})"
+        )
+    return aliases[raw]
+
+
+def _sigmaA_from_mu_cov(
+    mu: np.ndarray,
+    cov: np.ndarray,
+    tmpl_win: np.ndarray,
+    *,
+    source: str,
+    rng: Optional[np.random.Generator],
+    config: Optional["Config"] = None,
+) -> float:
+    """Compute sigma_A from an explicit B-only mean/covariance pair."""
+    b = np.asarray(mu, float)
+    if str(source).lower().strip() == "poisson":
+        if rng is None:
+            rng = np.random.default_rng(12345)
+        n_ref = rng.poisson(np.clip(b, 0.0, None))
+    else:
+        n_ref = b
+    if config is None:
+        d = fit_A_profiled_gaussian_details(
+            n_ref,
+            b,
+            np.asarray(cov, float),
+            np.asarray(tmpl_win, float),
+            allow_negative=True,
+        )
+    else:
+        d = _fit_A_details_for_extraction(
+            config,
+            n_ref,
+            b,
+            np.asarray(cov, float),
+            np.asarray(tmpl_win, float),
+            allow_negative=True,
+        )
+    return float(d.get("sigma_A", np.nan))
+
+
+def _matched_refit_bonly_sigmaA_reference(
+    ds: "DatasetConfig",
+    config: "Config",
+    *,
+    mass: float,
+    x_full: np.ndarray,
+    msk_train: np.ndarray,
+    msk_blind: np.ndarray,
+    y_full_bonly: np.ndarray,
+    tmpl_win: np.ndarray,
+    tmpl_full: np.ndarray,
+    source: str,
+    rng: Optional[np.random.Generator],
+    refit_restarts: int,
+    refit_optimize: bool,
+    initial_const_opt: float,
+    initial_ls_opt: float,
+) -> float:
+    """Compute sigma_A after a signal-free refit with the injected-toy settings."""
+    ker = make_kernel_for_dataset(ds, config, mass=float(mass))
+    lock_mode, lock_const_opt, lock_ls_opt = _resolve_refit_kernel_lock_values(
+        config,
+        dataset_key=str(ds.key),
+        mass=float(mass),
+        initial_const_opt=float(initial_const_opt),
+        initial_ls_opt=float(initial_ls_opt),
+    )
+    ker_fit, optimize_allowed = _kernel_for_refit(
+        base_kernel=ker,
+        lock_mode=str(lock_mode),
+        lock_const_opt=float(lock_const_opt),
+        lock_ls_opt=float(lock_ls_opt),
+    )
+    tail_alpha_multiplier, _ = _signal_tail_alpha_multiplier(
+        tmpl_full,
+        msk_train,
+        scale=float(getattr(config, "inj_refit_signal_tail_alpha_scale", 0.0)),
+        threshold=float(getattr(config, "inj_refit_signal_tail_alpha_threshold", 0.0)),
+    )
+    fit_kwargs = dict(
+        restarts=int(refit_restarts),
+        kernel=ker_fit,
+        optimize=bool(refit_optimize) and bool(optimize_allowed),
+    )
+    if tail_alpha_multiplier is not None:
+        fit_kwargs["alpha_multiplier"] = tail_alpha_multiplier
+    gpr = fit_gpr(
+        np.asarray(x_full, float)[np.asarray(msk_train, bool)],
+        np.asarray(y_full_bonly, float)[np.asarray(msk_train, bool)],
+        config,
+        **fit_kwargs,
+    )
+    mu_ref, cov_ref = predict_counts_from_log_gpr(
+        gpr,
+        np.asarray(x_full, float)[np.asarray(msk_blind, bool)],
+        config,
+    )
+    return _sigmaA_from_mu_cov(mu_ref, cov_ref, tmpl_win, source=source, rng=rng, config=config)
+
+
+def _resolve_sigma_a_references(
+    pred: "BlindPrediction",
+    ds: "DatasetConfig",
+    config: "Config",
+    *,
+    mass: float,
+    source: str,
+    rng: Optional[np.random.Generator],
+    refit_gp_on_toy: bool,
+    refit_restarts: int,
+    refit_optimize: bool,
+    x_full: np.ndarray,
+    msk_train: np.ndarray,
+    msk_blind: np.ndarray,
+    y_full_bonly: np.ndarray,
+    tmpl_win: np.ndarray,
+    tmpl_full: np.ndarray,
+    initial_const_opt: float,
+    initial_ls_opt: float,
+) -> Dict[str, Any]:
+    """Return prefit, matched, and selected sigma_A references for one mass."""
+    prefit = _sigmaA_reference(pred, float(mass), source=str(source), rng=rng, config=config)
+    mode = _resolve_sigma_a_ref_mode(config)
+    matched = float("nan")
+    matched_ok = float("nan")
+    error = ""
+    effective_mode = mode
+
+    if mode == "matched_refit_bonly":
+        if not bool(refit_gp_on_toy):
+            matched = float(prefit)
+            matched_ok = 1.0
+        else:
+            try:
+                matched = _matched_refit_bonly_sigmaA_reference(
+                    ds,
+                    config,
+                    mass=float(mass),
+                    x_full=np.asarray(x_full, float),
+                    msk_train=np.asarray(msk_train, bool),
+                    msk_blind=np.asarray(msk_blind, bool),
+                    y_full_bonly=np.asarray(y_full_bonly, float),
+                    tmpl_win=np.asarray(tmpl_win, float),
+                    tmpl_full=np.asarray(tmpl_full, float),
+                    source=str(source),
+                    rng=rng,
+                    refit_restarts=int(refit_restarts),
+                    refit_optimize=bool(refit_optimize),
+                    initial_const_opt=float(initial_const_opt),
+                    initial_ls_opt=float(initial_ls_opt),
+                )
+                matched_ok = 1.0
+            except Exception as exc:
+                matched_ok = 0.0
+                error = _handle_refit_failure(
+                    config,
+                    f"{ds.key} m={float(mass):.6g} matched sigmaA_ref",
+                    exc,
+                )
+
+    if mode == "matched_refit_bonly" and np.isfinite(matched) and matched > 0.0:
+        used = float(matched)
+    else:
+        used = float(prefit)
+        if mode == "matched_refit_bonly" and bool(refit_gp_on_toy):
+            effective_mode = "matched_refit_bonly_fallback_prefit"
+
+    return dict(
+        sigmaA_ref=float(used),
+        sigmaA_ref_prefit=float(prefit),
+        sigmaA_ref_matched=float(matched),
+        sigmaA_ref_mode=str(effective_mode),
+        sigmaA_ref_matched_ok=float(matched_ok),
+        sigmaA_ref_error=str(error),
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -585,6 +877,7 @@ def run_injection_extraction_toys(
     if train_exclude_nsigma is None:
         train_exclude_nsigma = getattr(config, "inj_train_exclude_nsigma", None)
     inj_background_mode = _resolve_inj_background_mode(config, refit_gp_on_toy=bool(refit_gp_on_toy))
+    extract_background_mode = _resolve_extract_background_mode(config)
 
     mvn_method = str(getattr(config, "mvn_trunc_method", "reject_then_clip"))
     mvn_max_tries = int(getattr(config, "mvn_trunc_max_tries", 80))
@@ -627,18 +920,6 @@ def run_injection_extraction_toys(
         initial_ls_opt = float(getattr(pred, "ls_opt", float("nan")))
         initial_const_opt = float(getattr(pred, "const_opt", float("nan")))
 
-        sigmaA_ref = _sigmaA_reference(pred, m, source=sigma_source, rng=rng, config=config)
-
-        if strengths_mode == "sigmaa":
-            A_inj_list = [float(t) * float(sigmaA_ref) for t in strength_tags]
-            inj_nsigma_list = list(strength_tags)
-        else:
-            A_inj_list = list(strength_tags)
-            inj_nsigma_list = [
-                float(A) / float(sigmaA_ref) if np.isfinite(sigmaA_ref) and sigmaA_ref > 0 else np.nan
-                for A in A_inj_list
-            ]
-
         blind = tuple(pred.blind)
         msk_blind = (x_full >= blind[0]) & (x_full <= blind[1])
         if int(np.sum(msk_blind)) == 0:
@@ -657,6 +938,36 @@ def run_injection_extraction_toys(
 
         f_train = float(np.sum(tmpl_full[msk_train])) if tmpl_full.shape[0] == x_full.shape[0] else float("nan")
         f_train_frac = float(f_train / f_full) if np.isfinite(f_train) and f_full > 0 else float("nan")
+        sigma_refs = _resolve_sigma_a_references(
+            pred,
+            ds,
+            config,
+            mass=float(m),
+            source=str(sigma_source),
+            rng=rng,
+            refit_gp_on_toy=bool(refit_gp_on_toy),
+            refit_restarts=int(refit_restarts),
+            refit_optimize=bool(refit_optimize),
+            x_full=x_full,
+            msk_train=msk_train,
+            msk_blind=msk_blind,
+            y_full_bonly=_prediction_y_full_bonly(pred),
+            tmpl_win=tmpl_win,
+            tmpl_full=tmpl_full,
+            initial_const_opt=float(initial_const_opt),
+            initial_ls_opt=float(initial_ls_opt),
+        )
+        sigmaA_ref = float(sigma_refs["sigmaA_ref"])
+
+        if strengths_mode == "sigmaa":
+            A_inj_list = [float(t) * float(sigmaA_ref) for t in strength_tags]
+            inj_nsigma_list = list(strength_tags)
+        else:
+            A_inj_list = list(strength_tags)
+            inj_nsigma_list = [
+                float(A) / float(sigmaA_ref) if np.isfinite(sigmaA_ref) and sigmaA_ref > 0 else np.nan
+                for A in A_inj_list
+            ]
 
         lock_mode, lock_const_opt, lock_ls_opt = ("none", float("nan"), float("nan"))
         tail_alpha_multiplier, tail_alpha_stats = _signal_tail_alpha_multiplier(
@@ -795,8 +1106,8 @@ def run_injection_extraction_toys(
                     else float(initial_const_opt)
                 )
 
-                fit = fit_A_profiled_gaussian(
-                    obs, mu_fit, cov_fit, tmpl_win,
+                fit = _fit_A_for_extraction(
+                    config, obs, mu_fit, cov_fit, tmpl_win,
                     allow_negative=bool(getattr(config, "extract_allow_negative", True)),
                 )
                 A_hat = float(fit["A_hat"])
@@ -808,6 +1119,11 @@ def run_injection_extraction_toys(
                     dataset=ds.key, mass_GeV=m, toy=int(i),
                     strength=float(A_inj), inj_nsigma=float(inj_nsigma),
                     sigmaA_ref=float(sigmaA_ref), sigma_val=float(pred.sigma_val),
+                    sigmaA_ref_prefit=float(sigma_refs["sigmaA_ref_prefit"]),
+                    sigmaA_ref_matched=float(sigma_refs["sigmaA_ref_matched"]),
+                    sigmaA_ref_mode=str(sigma_refs["sigmaA_ref_mode"]),
+                    sigmaA_ref_matched_ok=float(sigma_refs["sigmaA_ref_matched_ok"]),
+                    sigmaA_ref_error=str(sigma_refs["sigmaA_ref_error"]),
                     integral_density=float(integral_density),
                     A_per_eps2_unit=float(A_from_epsilon2(ds, float(m), 1.0, integral_density)),
                     sigma_x=float(getattr(pred, "sigma_x", float("nan"))),
@@ -831,6 +1147,7 @@ def run_injection_extraction_toys(
                     signal_model=str(getattr(config, "signal_model", "default")),
                     inj_shape_mode=inj_shape_mode,
                     inj_background_mode=str(inj_background_mode),
+                    extract_background_mode=str(extract_background_mode),
                     A_hat=float(A_hat), sigma_A=float(sigma_A),
                     Zhat=float(Zhat), pull_param=float(pull),
                     Nsig_win=int(Nsig_win), Nsig_train=int(Nsig_train),
@@ -922,6 +1239,12 @@ class _InjectionMassContext:
     refit_tail_alpha_n_bins: int = 0
     refit_tail_alpha_max: float = 1.0
     refit_tail_alpha_mean: float = 1.0
+    sigmaA_ref_prefit: float = float("nan")
+    sigmaA_ref_matched: float = float("nan")
+    sigmaA_ref_mode: str = "prefit_asimov"
+    sigmaA_ref_matched_ok: float = float("nan")
+    sigmaA_ref_error: str = ""
+    extract_background_mode: str = "profiled"
 
 
 @dataclass
@@ -939,6 +1262,7 @@ class _ToyPointAccumulator:
     kernel_ls_policy: str = ""
     signal_model: str = ""
     inj_background_mode: str = ""
+    extract_background_mode: str = ""
     refit_kernel_lock_mode: str = "none"
     refit_lock_const_opt: float = float("nan")
     refit_lock_ls_opt: float = float("nan")
@@ -1032,6 +1356,7 @@ class _ToyPointAccumulator:
             kernel_ls_policy=str(self.kernel_ls_policy),
             signal_model=str(getattr(self, "signal_model", "")),
             inj_background_mode=str(getattr(self, "inj_background_mode", "")),
+            extract_background_mode=str(getattr(self, "extract_background_mode", "")),
             refit_kernel_lock_mode=str(getattr(self, "refit_kernel_lock_mode", "none")),
             refit_lock_const_opt=float(getattr(self, "refit_lock_const_opt", float("nan"))),
             refit_lock_ls_opt=float(getattr(self, "refit_lock_ls_opt", float("nan"))),
@@ -1283,7 +1608,8 @@ def _simulate_toy_rows_chunk(
                 else float(ctx.initial_const_opt)
             )
 
-            fit = fit_A_profiled_gaussian(
+            fit = _fit_A_for_extraction(
+                config,
                 obs,
                 np.asarray(mu_fit, float),
                 np.asarray(cov_fit, float),
@@ -1302,6 +1628,11 @@ def _simulate_toy_rows_chunk(
                 strength=float(A_inj),
                 inj_nsigma=float(inj_nsigma),
                 sigmaA_ref=float(ctx.sigmaA_ref),
+                sigmaA_ref_prefit=float(ctx.sigmaA_ref_prefit),
+                sigmaA_ref_matched=float(ctx.sigmaA_ref_matched),
+                sigmaA_ref_mode=str(ctx.sigmaA_ref_mode),
+                sigmaA_ref_matched_ok=float(ctx.sigmaA_ref_matched_ok),
+                sigmaA_ref_error=str(ctx.sigmaA_ref_error),
                 integral_density=float(ctx.integral_density),
                 A_per_eps2_unit=float(ctx.A_per_eps2_unit),
                 sigma_val=float(ctx.sigma_val),
@@ -1331,6 +1662,7 @@ def _simulate_toy_rows_chunk(
                 signal_model=str(ctx.signal_model),
                 inj_shape_mode=str(ctx.inj_shape_mode),
                 inj_background_mode=str(ctx.inj_background_mode),
+                extract_background_mode=str(ctx.extract_background_mode),
                 A_hat=float(A_hat),
                 sigma_A=float(sigma_A),
                 Zhat=float(Zhat),
@@ -1460,9 +1792,6 @@ def _build_injection_mass_context(
     initial_ls_opt = float(getattr(pred, "ls_opt", float("nan")))
     initial_const_opt = float(getattr(pred, "const_opt", float("nan")))
 
-    sigma_seed = _stable_point_seed(int(seed), str(ds.key), float(mass), -1.0)
-    sigma_rng = np.random.default_rng(int(sigma_seed))
-    sigmaA_ref = _sigmaA_reference(pred, float(mass), source=str(sigma_source), rng=sigma_rng, config=config)
     integral_density = _prediction_integral_density(pred)
     A_per_eps2_unit = float(A_from_epsilon2(ds, float(mass), 1.0, integral_density))
 
@@ -1484,6 +1813,28 @@ def _build_injection_mass_context(
     n_blind = int(np.count_nonzero(msk_blind))
     f_train = float(np.sum(tmpl_full[msk_train])) if tmpl_full.shape[0] == x_full.shape[0] else float("nan")
     f_train_frac = float(f_train / f_full) if np.isfinite(f_train) and f_full > 0 else float("nan")
+    sigma_seed = _stable_point_seed(int(seed), str(ds.key), float(mass), -1.0)
+    sigma_rng = np.random.default_rng(int(sigma_seed))
+    sigma_refs = _resolve_sigma_a_references(
+        pred,
+        ds,
+        config,
+        mass=float(mass),
+        source=str(sigma_source),
+        rng=sigma_rng,
+        refit_gp_on_toy=bool(refit_gp_on_toy),
+        refit_restarts=int(refit_restarts),
+        refit_optimize=bool(refit_optimize),
+        x_full=x_full,
+        msk_train=msk_train,
+        msk_blind=msk_blind,
+        y_full_bonly=_prediction_y_full_bonly(pred),
+        tmpl_win=tmpl_win,
+        tmpl_full=tmpl_full,
+        initial_const_opt=float(initial_const_opt),
+        initial_ls_opt=float(initial_ls_opt),
+    )
+    sigmaA_ref = float(sigma_refs["sigmaA_ref"])
 
     lock_mode, lock_const_opt, lock_ls_opt = ("none", float("nan"), float("nan"))
     tail_alpha_multiplier, tail_alpha_stats = _signal_tail_alpha_multiplier(
@@ -1507,13 +1858,18 @@ def _build_injection_mass_context(
         mu=np.asarray(pred.mu, float),
         cov=np.asarray(pred.cov, float),
         mu_full=np.asarray(pred.mu_full, float).reshape(-1),
-        y_full=np.asarray(pred.y_full, float).reshape(-1),
+        y_full=_prediction_y_full_bonly(pred),
         x_full=x_full,
         msk_blind=msk_blind,
         msk_train=msk_train,
         tmpl_win=np.asarray(tmpl_win, float),
         tmpl_full=np.asarray(tmpl_full, float),
         sigmaA_ref=float(sigmaA_ref),
+        sigmaA_ref_prefit=float(sigma_refs["sigmaA_ref_prefit"]),
+        sigmaA_ref_matched=float(sigma_refs["sigmaA_ref_matched"]),
+        sigmaA_ref_mode=str(sigma_refs["sigmaA_ref_mode"]),
+        sigmaA_ref_matched_ok=float(sigma_refs["sigmaA_ref_matched_ok"]),
+        sigmaA_ref_error=str(sigma_refs["sigmaA_ref_error"]),
         sigma_val=float(pred.sigma_val),
         sigma_x=float(getattr(pred, "sigma_x", float("nan"))),
         kernel_ls_policy=str(kernel_diag["kernel_ls_policy"]),
@@ -1540,6 +1896,7 @@ def _build_injection_mass_context(
         inj_mode=str(inj_mode),
         inj_shape_mode=str(inj_shape_mode),
         inj_background_mode=str(inj_background_mode),
+        extract_background_mode=str(_resolve_extract_background_mode(config)),
         refit_gp_on_toy=bool(refit_gp_on_toy),
         refit_restarts=int(refit_restarts),
         refit_optimize=bool(refit_optimize),
@@ -1677,6 +2034,7 @@ def run_injection_extraction_streaming(
                 kernel_ls_policy=str(ctx.kernel_ls_policy),
                 signal_model=str(ctx.signal_model),
                 inj_background_mode=str(ctx.inj_background_mode),
+                extract_background_mode=str(ctx.extract_background_mode),
                 refit_kernel_lock_mode=str(ctx.refit_kernel_lock_mode),
                 refit_lock_const_opt=float(ctx.refit_lock_const_opt),
                 refit_lock_ls_opt=float(ctx.refit_lock_ls_opt),
@@ -1754,6 +2112,7 @@ def _combine_toy_rows(rows: List[Dict[str, Any]], *, mass: float, toy_idx: int) 
     zinj = np.array([float(r.get("inj_nsigma", np.nan)) for r in valid], float)
     sref = np.array([float(r.get("sigmaA_ref", np.nan)) for r in valid], float)
     bg_modes = sorted({str(r.get("inj_background_mode", "")) for r in valid if str(r.get("inj_background_mode", ""))})
+    extract_modes = sorted({str(r.get("extract_background_mode", "")) for r in valid if str(r.get("extract_background_mode", ""))})
 
     A_hat = float(np.nansum(w * ah) / sum_w)
     sigma_A = float(1.0 / np.sqrt(sum_w))
@@ -1777,6 +2136,7 @@ def _combine_toy_rows(rows: List[Dict[str, Any]], *, mass: float, toy_idx: int) 
         n_contrib=int(len(valid)),
         contrib_datasets="+".join(sorted({str(r.get("dataset", "")) for r in valid})),
         inj_background_mode="+".join(bg_modes),
+        extract_background_mode="+".join(extract_modes),
         success=bool(all(bool(r.get("success", False)) for r in valid)),
     )
 
@@ -1944,6 +2304,7 @@ def run_injection_extraction_streaming_combined(
                     n_blind=int(ctxs_m[ds_key].n_blind),
                     signal_model=str(ctxs_m[ds_key].signal_model),
                     inj_background_mode=str(ctxs_m[ds_key].inj_background_mode),
+                    extract_background_mode=str(ctxs_m[ds_key].extract_background_mode),
                     refit_kernel_lock_mode=str(ctxs_m[ds_key].refit_kernel_lock_mode),
                     refit_lock_const_opt=float(ctxs_m[ds_key].refit_lock_const_opt),
                     refit_lock_ls_opt=float(ctxs_m[ds_key].refit_lock_ls_opt),
@@ -1980,6 +2341,7 @@ def run_injection_extraction_streaming_combined(
                         f_win=float("nan"),
                         f_train_frac=float("nan"),
                         inj_background_mode=str(inj_background_mode),
+                        extract_background_mode=str(_resolve_extract_background_mode(config)),
                     )
                 else:
                     can_combine = False
@@ -2346,6 +2708,7 @@ def summarize_injection_grid(df_toys: pd.DataFrame) -> pd.DataFrame:
             kernel_ls_policy=_first_col(sub, "kernel_ls_policy"),
             signal_model=_first_col(sub, "signal_model"),
             inj_background_mode=_first_col(sub, "inj_background_mode"),
+            extract_background_mode=_first_col(sub, "extract_background_mode"),
             refit_kernel_lock_mode=_first_col(sub, "refit_kernel_lock_mode"),
             refit_lock_const_opt=_mean_col(sub, "refit_lock_const_opt"),
             refit_lock_ls_opt=_mean_col(sub, "refit_lock_ls_opt"),
@@ -2584,6 +2947,8 @@ def collapse_fragmented_injection_summary(df_sum: pd.DataFrame) -> pd.DataFrame:
             row["signal_model"] = str(_first_col(sub, "signal_model", ""))
         if "inj_background_mode" in sub.columns:
             row["inj_background_mode"] = str(_first_col(sub, "inj_background_mode", ""))
+        if "extract_background_mode" in sub.columns:
+            row["extract_background_mode"] = str(_first_col(sub, "extract_background_mode", ""))
         if "refit_kernel_lock_mode" in sub.columns:
             row["refit_kernel_lock_mode"] = str(_first_col(sub, "refit_kernel_lock_mode", "none"))
         for col in ["n_train", "n_train_low", "n_train_high", "n_blind"]:

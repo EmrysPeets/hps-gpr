@@ -194,10 +194,12 @@ class Config:
     inj_masses_gev: List[float] = field(default_factory=lambda: [0.030, 0.060, 0.090])
     inj_strengths: List[int] = field(default_factory=lambda: [0, 100, 200, 500, 1000, 2000, 5000])
     inj_mode: str = "poisson"
+    extract_background_mode: str = "profiled"  # "profiled" | "fixed"
     extract_allow_negative: bool = True
     # v15 injection extensions
     inj_strength_mode: str = "absolute"   # "absolute" | "sigmaA"
     inj_sigma_a_source: str = "asimov"    # "asimov" | "poisson"
+    inj_sigma_a_ref_mode: str = "prefit_asimov"  # "prefit_asimov" | "matched_refit_bonly"
     inj_shape_mode: str = "full"          # "full" | "window"
     inj_background_mode: str = "gp_resample"  # "gp_resample" | "fixed_hist"
     inj_refit_gp_on_toy: bool = False

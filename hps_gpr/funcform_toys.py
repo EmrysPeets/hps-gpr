@@ -150,6 +150,56 @@ def discover_funcform_toys(
     return specs
 
 
+def _config_mapping_value(config: "Config", attr_name: str, dataset_key: str, default: str = "") -> str:
+    """Resolve a per-dataset functional-form config value."""
+    mapping = getattr(config, attr_name, {}) or {}
+    if isinstance(mapping, dict):
+        return str(mapping.get(str(dataset_key), default) or default)
+    return str(default)
+
+
+def resolve_funcform_closure_mass_ranges(
+    config: "Config",
+    dataset_keys: Sequence[str],
+) -> Dict[str, Tuple[float, float]]:
+    """Resolve functional-form closure mass ranges for SLURM job filtering."""
+    out: Dict[str, Tuple[float, float]] = {}
+    for key in dataset_keys:
+        ds_key = str(key)
+        fallback = getattr(config, f"range_{ds_key}", None)
+        if fallback is not None:
+            try:
+                out[ds_key] = (float(fallback[0]), float(fallback[1]))
+            except Exception:
+                pass
+
+        root_path = _config_mapping_value(config, "funcform_closure_root_by_dataset", ds_key)
+        container = _config_mapping_value(config, "funcform_closure_container_by_dataset", ds_key)
+        toy_pattern = _config_mapping_value(
+            config,
+            "funcform_closure_toy_pattern_by_dataset",
+            ds_key,
+            default="*",
+        )
+        if not root_path or not os.path.exists(root_path):
+            continue
+        try:
+            specs = discover_funcform_toys(root_path, container=container, toy_pattern=toy_pattern)
+            if not specs:
+                continue
+            h = load_funcform_toy_hist(
+                specs[0].source_root,
+                container=specs[0].container,
+                toy_name=specs[0].toy_name,
+            )
+            edges = np.asarray(h.axes[0].edges, float)
+            if edges.size >= 2 and np.all(np.isfinite(edges)):
+                out[ds_key] = (float(edges[0]), float(edges[-1]))
+        except Exception:
+            continue
+    return out
+
+
 def load_funcform_toy_hist(
     root_path: str,
     *,

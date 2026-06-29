@@ -409,6 +409,114 @@ def fit_A_profiled_gaussian(
     )
 
 
+def fit_A_fixed_background_gaussian_details(
+    n_obs: np.ndarray,
+    b_mean: np.ndarray,
+    b_cov: np.ndarray,
+    template: np.ndarray,
+    *,
+    allow_negative: bool = True,
+    lam_floor: float = 1e-12,
+) -> Dict[str, object]:
+    """Fit A with the background fixed to the supplied mean prediction.
+
+    This is a diagnostic plug-in extraction mode: the GP covariance is not
+    profiled or marginalized, so the only fitted parameter is A.
+    """
+    n = np.clip(np.asarray(n_obs, float), 0.0, None)
+    b = np.clip(np.asarray(b_mean, float), 1e-12, None)
+    w = np.asarray(template, float)
+    B = b.size
+    if B == 0:
+        return dict(
+            A_hat=float("nan"),
+            sigma_A=float("nan"),
+            theta_hat=np.array([]),
+            delta_b_hat=np.array([]),
+            b_fit=np.array([]),
+            lambda_hat=np.array([]),
+            success=False,
+            nll=float("nan"),
+        )
+    eps = max(float(lam_floor), 1e-9 * max(1.0, float(np.median(b))))
+
+    var0 = np.clip(b, 1.0, None)
+    denom = float(np.sum((w ** 2) / var0))
+    if np.isfinite(denom) and denom > 0.0:
+        A0 = float(np.sum(w * (n - b) / var0) / denom)
+    else:
+        A0 = float(np.sum(n - b))
+    if not allow_negative:
+        A0 = max(0.0, A0)
+
+    def nll_and_grad(x: np.ndarray):
+        A = float(x[0])
+        lam = b + A * w
+        lam_eff = np.maximum(lam, eps)
+        ll = np.sum(n * np.log(lam_eff) - lam_eff)
+        r = (n / lam_eff) - 1.0
+        gA = -float(np.dot(w, r))
+        bad = lam < eps
+        if np.any(bad):
+            delta = eps - lam[bad]
+            k = 1e6
+            penalty = float(k * np.dot(delta, delta))
+            dpen = -2.0 * k * delta
+            gA += float(np.dot(w[bad], dpen))
+            return -float(ll) + penalty, np.asarray([gA], float)
+        return -float(ll), np.asarray([gA], float)
+
+    bounds = None if allow_negative else [(0.0, None)]
+    res = minimize(
+        fun=lambda x: nll_and_grad(x)[0],
+        x0=np.asarray([A0], float),
+        jac=lambda x: nll_and_grad(x)[1],
+        method="L-BFGS-B",
+        bounds=bounds,
+        options=dict(maxiter=500, ftol=1e-10),
+    )
+
+    Ahat = float(res.x[0])
+    if not allow_negative and Ahat < 0:
+        Ahat = 0.0
+    lamhat = (b + Ahat * w).astype(float)
+    lam_eff = np.maximum(lamhat, eps)
+    info_obs = float(np.sum(n * (w ** 2) / (lam_eff ** 2)))
+    info_exp = float(np.sum((w ** 2) / lam_eff))
+    info = info_obs if np.isfinite(info_obs) and info_obs > 0.0 else info_exp
+    sigA = float(np.sqrt(1.0 / max(info, 1e-18))) if np.isfinite(info) and info > 0.0 else float("nan")
+
+    return dict(
+        A_hat=float(Ahat),
+        sigma_A=float(sigA),
+        theta_hat=np.array([]),
+        delta_b_hat=np.zeros_like(b, dtype=float),
+        b_fit=b.astype(float),
+        lambda_hat=lamhat,
+        success=bool(getattr(res, "success", False)),
+        nll=float(getattr(res, "fun", float("nan"))),
+    )
+
+
+def fit_A_fixed_background_gaussian(
+    n_obs: np.ndarray,
+    b_mean: np.ndarray,
+    b_cov: np.ndarray,
+    template: np.ndarray,
+    allow_negative: bool = True,
+) -> Dict[str, float]:
+    """Fit signal amplitude with the background fixed to the GP mean."""
+    d = fit_A_fixed_background_gaussian_details(
+        n_obs, b_mean, b_cov, template, allow_negative=allow_negative
+    )
+    return dict(
+        A_hat=float(d["A_hat"]),
+        sigma_A=float(d["sigma_A"]),
+        success=bool(d["success"]),
+        nll=float(d.get("nll", np.nan)),
+    )
+
+
 # ---------------------------------------------------------------------------
 # Profiled likelihood ratio test p0
 # ---------------------------------------------------------------------------
