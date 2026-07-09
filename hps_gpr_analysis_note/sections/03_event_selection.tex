@@ -19,29 +19,12 @@ published prompt searches. For 2021, the baseline upgraded-detector preselection
 taken from the full 2021 analysis note, while the extra prompt-oriented tightening in
 the current GPR workflow is recorded separately. Table~\ref{tab:event-selection}
 therefore distinguishes the full-analysis-note preselection from the additional
-$p_{\mathrm{sum}}<\SI{2.8}{GeV}$ requirement applied by the present 1\% validation
+$p_{\mathrm{sum}}>\SI{2.8}{GeV}$ requirement applied by the present 1\% validation
 histogram.
 
 \input{tables/event_selection_table}
 
-The one 2021 choice that already matters directly for the current shared-$\eps^2$
-combination is the summed-momentum requirement used to define the 1\% study sample.
-The histogram input currently used by the GPR workflow applies
-$p_{\mathrm{sum}}<\SI{2.8}{GeV}$. Relative to a looser upgraded-configuration preselection, this
-acts as a deliberately prompt-tight cut: it suppresses the high-momentum tail where
-wide-angle Bremsstrahlung and other prompt-background contaminants become more
-important, while retaining the narrow prompt-resonance topology at a level that is
-roughly aligned with the high-$p_{\mathrm{sum}}$ acceptance fractions already used in
-the 2015 and 2016 studies. The GPR layer does not add any further per-event selection
-on top of these prompt cuts. In the remainder of the note, each dataset is represented
-only by the selected invariant-mass histogram together with the detector response and
-normalization inputs derived from the same event category.
 
-The physics reason for highlighting this cut is that it keeps the selected 2021 sample
-closer to the radiative-trident topology used for the $A^\prime$ normalization. In
-practice, the tighter $p_{\mathrm{sum}}$ requirement removes the part of phase space
-where high-momentum prompt backgrounds become more important and where the yield-to-
-$\eps^2$ mapping would be diluted by a less signal-like composition.
 
 The 2021 entries in the table follow the preselection summary in the full 2021 note
 \cite[Sec.~4.8, Table~38 and App.~A]{HPS2021FullAnalysisNote}. The production histogram
@@ -50,6 +33,10 @@ already used in the analysis is the upgraded selection exported as
 \path{preselection/h\_invM\_8000}. The table therefore separates which requirements are
 baseline upgraded-detector preselection requirements and which requirement is a
 genuinely prompt-tight addition for the final resonance workflow.
+The GPR layer does not add any further per-event selection
+on top of these prompt cuts. In the remainder of the note, each dataset is represented
+only by the selected invariant-mass histogram together with the detector response and
+normalization inputs derived from the same event category.
 
 This distinction also explains why the older analyses read differently. In the 2015 and
 2016 prompt notes, ``preselection'' denoted the broad reconstruction-level sample that
@@ -57,9 +44,180 @@ entered the prompt-search optimization, while ``prompt selection'' denoted the n
 subset used for the published resonance result after timing, momentum-sum, and
 background-rejection tightening. The current 2021 GPR workflow is already closer to the
 latter category in physics content, because the exported histogram is a prompt-oriented
-study sample with the extra $p_{\mathrm{sum}}<\SI{2.8}{GeV}$ tightening. The table now
+study sample with the extra $p_{\mathrm{sum}}>\SI{2.8}{GeV}$ tightening. The table now
 records that decomposition explicitly enough to compare it with the engineering-run
 selections.
+
+% ============================================================
+%  Preselection validation figures (v13 signal overlay)
+% ============================================================
+Several reconstruction level variables are shown in the figures below. 
+An arbitrary signal normalization is applied to show the shapes of the signal vs the 1\% dataset. 
+
+% ------------------------------------------------------------
+%  4. Vertex quantities
+% ------------------------------------------------------------
+% The reconstructed-vertex observables are shown in
+% Figure~\ref{fig:presel_vertex}: the vertex-fit $\chi^2$, the invariant mass,
+% and the longitudinal vertex position $V_z$. The vertex $z$ distribution is the
+% primary discriminant for the displaced-vertex signal, whose long lifetime
+% populates the downstream tail well beyond the prompt data.
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/signal_overlay_loose_loose_vtx_mass.pdf}
+    \caption{Vertex invariant mass.}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/signal_overlay_loose_loose_vtx_chi2.pdf}
+    \caption{Vertex-fit $\chi^2$.}
+  \end{subfigure}
+  \caption{Reconstructed-vertex distributions after the loose preselection,
+    comparing data (points) with the signal MC (filled histogram).}
+  \label{fig:presel_vertex}
+\end{figure}
+
+% ------------------------------------------------------------
+%  1. Electron track kinematics
+% ------------------------------------------------------------
+% The following figures compare the loose-preselected data (points) with the
+% signal Monte Carlo (histogram), normalised to unit area, for the kinematic
+% variables entering the preselection. Figure~\ref{fig:presel_ele_kin} shows the
+% electron-track quantities: the total and longitudinal momentum together with
+% the transverse and longitudinal impact parameters. Good agreement between the
+% shapes of the reconstructed distributions is expected in the bulk of phase
+% space, while the signal is characterised by its harder momentum spectrum and
+% displaced-vertex tails.
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/signal_overlay_loose_loose_ele_p.pdf}
+    \caption{Electron momentum $p$.}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/signal_overlay_loose_loose_ele_pz.pdf}
+    \caption{Electron longitudinal momentum $p_z$.}
+  \end{subfigure}
+
+  \vspace{0.5em}
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/signal_overlay_loose_loose_ele_d0.pdf}
+    \caption{Electron transverse impact parameter $d_0$.}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/signal_overlay_loose_loose_ele_z0.pdf}
+    \caption{Electron longitudinal impact parameter $z_0$.}
+  \end{subfigure}
+  \caption{Electron-track kinematic distributions after the loose preselection,
+    comparing data (points) with the signal MC (filled histogram).}
+  \label{fig:presel_ele_kin}
+\end{figure}
+
+% ------------------------------------------------------------
+%  2. Positron track kinematics
+% ------------------------------------------------------------
+% Figure~\ref{fig:presel_pos_kin} shows the corresponding positron-track
+% quantities. As for the electron, the momentum and impact-parameter
+% distributions are used to validate the modelling of the reconstructed final
+% state prior to any signal-region selection.
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/signal_overlay_loose_loose_pos_p.pdf}
+    \caption{Positron momentum $p$.}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/signal_overlay_loose_loose_pos_pz.pdf}
+    \caption{Positron longitudinal momentum $p_z$.}
+  \end{subfigure}
+
+  \vspace{0.5em}
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/signal_overlay_loose_loose_pos_d0.pdf}
+    \caption{Positron transverse impact parameter $d_0$.}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/signal_overlay_loose_loose_pos_z0.pdf}
+    \caption{Positron longitudinal impact parameter $z_0$.}
+  \end{subfigure}
+  \caption{Positron-track kinematic distributions after the loose preselection,
+    comparing data (points) with the signal MC (filled histogram).}
+  \label{fig:presel_pos_kin}
+\end{figure}
+
+
+
+% ------------------------------------------------------------
+%  5. Two-dimensional mass correlations
+% ------------------------------------------------------------
+% The two-dimensional distributions of the reconstructed invariant mass versus
+% the preselection variables are shown for data (left column) and signal MC
+% (right column) in the following figures. These correlations are used to check
+% that the mass reconstruction is unbiased across the relevant phase space and
+% that no artificial structure is introduced by the selection.
+% Figure~\ref{fig:scatter_mom} shows the mass-versus-momentum correlations.
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/xy_scatter_xy_mass_vs_ele_p_data_loose.pdf}
+    \caption{Mass vs.\ electron $p$ (data).}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/xy_scatter_xy_mass_vs_ele_p_signal_loose.pdf}
+    \caption{Mass vs.\ electron $p$ (signal).}
+  \end{subfigure}
+
+  \vspace{0.5em}
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/xy_scatter_xy_mass_vs_pos_p_data_loose.pdf}
+    \caption{Mass vs.\ positron $p$ (data).}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/xy_scatter_xy_mass_vs_pos_p_signal_loose.pdf}
+    \caption{Mass vs.\ positron $p$ (signal).}
+  \end{subfigure}
+
+  \caption{Reconstructed invariant mass versus momentum observables, for data
+    (left) and signal MC (right), after the loose preselection.}
+  \label{fig:scatter_mom}
+\end{figure}
+
+% Figure~\ref{fig:scatter_chi2} shows the mass-versus-track/vertex-quality
+% correlations.
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/xy_scatter_xy_mass_vs_ele_chi2_data_loose.pdf}
+    \caption{Mass vs.\ electron $\chi^2$ (data).}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/xy_scatter_xy_mass_vs_ele_chi2_signal_loose.pdf}
+    \caption{Mass vs.\ electron $\chi^2$ (signal).}
+  \end{subfigure}
+
+  \vspace{0.5em}
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/xy_scatter_xy_mass_vs_pos_chi2_data_loose.pdf}
+    \caption{Mass vs.\ positron $\chi^2$ (data).}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/xy_scatter_xy_mass_vs_pos_chi2_signal_loose.pdf}
+    \caption{Mass vs.\ positron $\chi^2$ (signal).}
+  \end{subfigure}
+
+  \vspace{0.5em}
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/xy_scatter_xy_mass_vs_vtx_chi2_data_loose.pdf}
+    \caption{Mass vs.\ vertex $\chi^2$ (data).}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/xy_scatter_xy_mass_vs_vtx_chi2_signal_loose.pdf}
+    \caption{Mass vs.\ vertex $\chi^2$ (signal).}
+  \end{subfigure}
+  \caption{Reconstructed invariant mass versus track- and vertex-fit quality,
+    for data (left) and signal MC (right), after the loose preselection.}
+  \label{fig:scatter_chi2}
+\end{figure}
 
 \subsection{2015 mass resolution}
 \label{sec:massres-2015}
