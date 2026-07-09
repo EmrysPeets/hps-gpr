@@ -13,6 +13,7 @@ import uproot
 
 NOTE_DIR = Path(__file__).resolve().parents[1]
 OUT_DIR = NOTE_DIR / "dataset_summary_figs"
+OVERLAY_XLIM_MEV = (0.0, 350.0)
 
 
 @dataclass(frozen=True)
@@ -58,14 +59,15 @@ PANELS = (
         key="2021_1pct",
         title="HPS 2021 1%",
         root_candidates=(
+            Path("/Users/emryspeets/Desktop/gp_mods/data_input_21/final_1pct_invM.root"),
             Path("/Users/emryspeets/root_files/tc_1pct/preselection_invM_psumlt2p8_hists.root"),
             Path("/Users/emryspeets/Desktop/2026_winter/preselection_invM_psumlt2p8_hists.root"),
             Path("/sdf/home/e/epeets/run/2021_bump/preselection_invM_psumlt2p8_hists.root"),
         ),
         hist_name="preselection/h_invM_8000",
-        highlight_mev=(35.0, 250.0),
-        search_label="Expected Search Region\n[35, 250] MeV",
-        xlim_mev=(0.0, 260.0),
+        highlight_mev=(50.0, 250.0),
+        search_label="Expected Search Region\n[50, 250] MeV",
+        xlim_mev=(0.0, 350.0),
         color="#2F8F6B",
     ),
 )
@@ -222,7 +224,7 @@ def make_normalized_overlay() -> list[Path]:
             where=widths_mev > 0,
         )
         x_step, y_step = step_xy(edges_mev, density)
-        step_mask = (x_step >= 0.0) & (x_step <= 260.0)
+        step_mask = (x_step >= OVERLAY_XLIM_MEV[0]) & (x_step <= OVERLAY_XLIM_MEV[1])
         ax.plot(
             x_step[step_mask],
             y_step[step_mask],
@@ -232,7 +234,7 @@ def make_normalized_overlay() -> list[Path]:
             solid_capstyle="round",
         )
 
-    ax.set_xlim(0.0, 260.0)
+    ax.set_xlim(*OVERLAY_XLIM_MEV)
     ax.set_yscale("log")
     ax.set_xlabel(r"$e^+e^-$ invariant mass [MeV]", fontsize=12.5)
     ax.set_ylabel("Unit-normalized events / MeV", fontsize=12.5)

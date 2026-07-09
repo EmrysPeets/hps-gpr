@@ -22,7 +22,7 @@ CL95_TO_CL90_EPS2 = 1.64 / 1.96
 FUNCFORM_ROOT_SPECS = [
     ("2015", NOTE_DIR.parent / "outputs" / "funcform_toys" / "funcform_2015_dataset_mod_toys.root"),
     ("2016", NOTE_DIR.parent / "outputs" / "funcform_toys" / "funcform_2016_dataset_mod_toys.root"),
-    ("2021", NOTE_DIR.parent / "outputs" / "funcform_toys" / "funcform_2021_dataset_mod_toys.root"),
+    ("2021", NOTE_DIR.parent / "outputs" / "funcform_toys" / "funcform_2021_1pct_search50_toys.root"),
 ]
 FUNCFORM_TITLES = {
     "2015": "HPS 2015",
@@ -31,6 +31,9 @@ FUNCFORM_TITLES = {
 }
 FUNCFORM_SCAN_RANGE_OVERRIDES_MEV = {
     "2016": (42.0, 210.0),
+}
+FUNCFORM_DISPLAY_RANGE_OVERRIDES_MEV = {
+    "2021": (0.0, 350.0),
 }
 FUNCFORM_COLORS = {
     "data": "#222222",
@@ -154,7 +157,9 @@ def _load_funcform_payload(dataset: str, root_path: Path) -> dict:
 
     support_lo, support_hi = meta["toy_support_range_GeV"]
     occupied = np.flatnonzero(data_vals > 0.0)
-    display_hi = float(edges[occupied[-1] + 1]) if occupied.size else float(support_hi)
+    display_hi = min(float(edges[occupied[-1] + 1]), float(support_hi)) if occupied.size else float(support_hi)
+    display_xlim_mev = (float(support_lo) * 1.0e3, display_hi * 1.0e3)
+    display_xlim_mev = FUNCFORM_DISPLAY_RANGE_OVERRIDES_MEV.get(dataset, display_xlim_mev)
     return {
         "dataset": dataset,
         "title": FUNCFORM_TITLES.get(dataset, dataset),
@@ -166,7 +171,7 @@ def _load_funcform_payload(dataset: str, root_path: Path) -> dict:
         "fit_curves": fit_curves,
         "toy_vals": np.asarray(toy_vals, dtype=float),
         "support_range_mev": (float(support_lo) * 1.0e3, float(support_hi) * 1.0e3),
-        "display_xlim_mev": (float(support_lo) * 1.0e3, display_hi * 1.0e3),
+        "display_xlim_mev": display_xlim_mev,
         "scan_range_mev": _funcform_scan_range_mev(dataset, meta["scan_range_GeV"]),
     }
 
