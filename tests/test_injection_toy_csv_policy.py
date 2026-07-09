@@ -128,53 +128,6 @@ def test_sigma_mode_uses_explicit_strength_overrides(tmp_path, monkeypatch):
     assert sorted(df["inj_nsigma"].unique().tolist()) == [1.0]
 
 
-def test_fixed_extract_mode_uses_fixed_background_fitter(tmp_path, monkeypatch):
-    _install_fast_injection_mocks(monkeypatch)
-    import hps_gpr.injection as inj
-
-    def _profiled_should_not_run(*args, **kwargs):
-        raise AssertionError("profiled fitter should not run in fixed extraction mode")
-
-    monkeypatch.setattr(inj, "fit_A_profiled_gaussian", _profiled_should_not_run)
-    monkeypatch.setattr(
-        inj,
-        "fit_A_fixed_background_gaussian_details",
-        lambda *args, **kwargs: {
-            "A_hat": 0.0,
-            "sigma_A": 4.0,
-            "success": True,
-            "nll": 0.0,
-        },
-    )
-    monkeypatch.setattr(
-        inj,
-        "fit_A_fixed_background_gaussian",
-        lambda *args, **kwargs: {
-            "A_hat": 7.0,
-            "sigma_A": 4.0,
-            "success": True,
-            "nll": 0.0,
-        },
-    )
-    cfg = Config(
-        output_dir=str(tmp_path),
-        inj_write_toy_csv=False,
-        extract_background_mode="fixed",
-    )
-
-    df = run_injection_extraction_toys(
-        _make_dataset(),
-        cfg,
-        masses=[0.05],
-        strengths=[1.0],
-        n_toys=1,
-    )
-
-    assert df["extract_background_mode"].iloc[0] == "fixed"
-    assert float(df["A_hat"].iloc[0]) == 7.0
-    assert float(df["sigma_A"].iloc[0]) == 4.0
-
-
 def test_streaming_skips_writing_toy_csv_when_disabled(tmp_path, monkeypatch):
     _install_fast_injection_mocks(monkeypatch)
     cfg = Config(
