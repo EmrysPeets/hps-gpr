@@ -183,11 +183,10 @@ Earlier studies preserved in the analysis history explored more complicated kern
 piecewise procedures, but those variants are no longer the production baseline. This
 note therefore documents the Constant$\times$RBF model as the authoritative kernel
 choice and treats more elaborate alternatives as robustness checks rather than
-competing mainline methods. The first non-baseline comparison reserved for later
-documentation is a Constant$\times$Mat\'ern$(\nu=3/2)$ study with the same
-resolution-scaled bounds, because it relaxes the infinitely differentiable RBF
-assumption without changing the overall smooth-background prior class. A placeholder
-appendix for these comparisons is provided in Appendix~\ref{app:kernel-studies}.
+competing mainline methods. The exploratory Constant$\times$Mat\'ern$(\nu=3/2)$ and
+earlier piecewise-kernel studies are summarized in
+Appendix~\ref{app:kernel-studies}. No production-matched alternative-kernel coverage
+result is used to select the v3 baseline.
 
 \subsection{Resolution-scaled length-scale parameterization and bounds}
 \label{sec:length-scale}
@@ -199,108 +198,61 @@ log-mass units. The package defines
 \simeq \frac{\sigma_d(m)}{m}
 \qquad (\sigma_d \ll m),
 \end{equation}
-and uses this local physical scale to set the RBF bounds. In the default
+and uses this local physical scale to set the RBF bounds. In the
 \path{resolution_scaled_local} policy,
 \begin{equation}
-\ell_{\min}(m) = k_{\min}\sigma_x(m),
+\ell_{\min,d}(m) = k_{\min,d}\sigma_x(m),
 \qquad
-\ell_{\max}(m) = k_{\max}\sigma_x(m),
+\ell_{\max,d}(m) = k_{\max,d}\sigma_x(m).
+\label{eq:dataset-lengthscale-bounds}
 \end{equation}
-with the baseline lower factor $k_{\min}=1.0$ for all three datasets. The practical
-bookkeeping point is worth stating explicitly because an older diagnostic overlay
-showed a stale 2016 value of 0.05; that lower-bound curve was incorrect and is not the
-baseline used in the current production configs.
+The July 2026 pre-unblinding configuration freezes the dataset-specific factors in
+Table~\ref{tab:production-lengthscale-bounds}; it does not use the common
+$k_{\min}=1.0$ prescription shown in earlier note drafts.
 
-The physics-facing ceiling adopted in this note is
-\begin{equation}
-k_{\max} =
-\begin{cases}
-8, & \text{2015 and 2016}, \\
-9, & \text{2021}.
-\end{cases}
-\end{equation}
-These values are motivated by the dedicated length-scale scans already performed for
-this analysis and by the practical requirement that the upper bound remain tied to a
-detector-scale quantity. Leaving $\ell$ effectively free allowed the GP to become too
-aggressive in smoothing away signal-like structure, which could make the fit appear
-better while reducing signal fidelity. Setting the ceiling too low creates the opposite
-problem: the optimizer rides the boundary and the background model becomes visibly too
-rigid. The adopted 8$\sigma_d$ and 9$\sigma_d$ ceilings are therefore presented as
-stability choices anchored to detector resolution, not as arbitrary tune points.
-
-The current production configs retain one additional guard: a dataset-statistics floor
-on $\ell_{\max}$ prevents the ceiling from becoming artificially small where the local
-resolution is exceptionally tight. The older fixed-xrange cap remains available only as
-an opt-in diagnostic knob in the code and is not enabled in the baseline results shown
-here. A mass-independent lower floor is likewise a reasonable follow-up robustness
-study, but it would constitute a deliberate method variation rather than the bound
-prescription used for the results documented in this note.
-
-Figure~\ref{fig:lengthscale-bounds} makes the bound prescription explicit. Panel (a)
-shows the detector-resolution scale in the GP coordinate, and panel (b) shows the
-allowed interval for the fitted length scale in each dataset. The key point is that the
-optimization band follows the detector scale across the scan rather than imposing a
-single mass-independent smoothing length.
-
-\begin{figure}[H]
+\begin{table}[H]
 \centering
-\begin{subfigure}[t]{0.48\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{kernel_lengthscale_figs/sigma_x_logm_overlay.png}
-  \caption{Signal-template width $\sigma_x(m)$ in the GP coordinate $x=\ln m$.}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.48\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{kernel_lengthscale_figs/ls_bounds_band_logm_overlay.png}
-  \caption{Allowed RBF length-scale band imposed for each dataset.}
-\end{subfigure}
-\caption{Length-scale parameterization used in the GPR fit. Panel (a) shows the local
-signal-template width in the GP coordinate, while panel (b) shows the allowed
-length-scale band obtained in the current implementation by applying the common
-$k_{\min}=1.0$ lower factor together with the dataset-specific upper factors. The
-purpose of the bound is to permit smooth background variation without allowing the
-optimizer to drift into an unphysically unconstrained smoothing regime.}
-\label{fig:lengthscale-bounds}
-\end{figure}
+\begin{tabular}{lccc}
+\toprule
+Dataset & $k_{\min,d}$ & $k_{\max,d}$ & selection status \\
+\midrule
+2015 & 1.0 & 8 & frozen conservative baseline \\
+2016 10\% & 0.9 & 8 & selected by functional-form closure \\
+2021 1\% & 1.1 & 9 & selected calibration--reach compromise \\
+\bottomrule
+\end{tabular}
+\caption{Resolution-scaled RBF length-scale factors in the July 2026 pre-unblinding
+configuration. The factors multiply $\sigma_x(m)$ in
+Eq.~\eqref{eq:dataset-lengthscale-bounds}. The labels summarize how each lower factor
+is used; they do not imply that one scalar ranking metric uniquely determines all three
+choices.}
+\label{tab:production-lengthscale-bounds}
+\end{table}
 
-The lower-bound scan summarized in
-Figure~\ref{fig:lengthscale-lower-bound-stability} documents the stability study that
-motivated selecting the $1\sigma_x$ lower bound, i.e. the common $k_{\min}=1.0$
-configuration used in the production fits. Panel (a) shows why the looser
-$0.5\sigma_x$ option is unattractive: the optimized length scale can sit close to the
-floor or vary irregularly with mass, which makes the fitted background too sensitive to
-local statistical structure. The most compelling evidence is panel (b). The
-$1.5\sigma_x$ option visibly over-constrains the background response, giving pull
-widths far above the unit reference line, while the selected $1\sigma_x$ floor stays
-near unit pull width across injected strengths without the instability of the looser
-choice. This is why the $1\sigma_x$ lower bound is used as the nominal compromise
-between flexibility and calibration.
+The lower factors are based on full-refit functional-form closure scans, with the
+observed-spectrum result kept out of the selection criterion. For 2015, the 100-toy scan
+slightly prefers $k_{\min}=1.1$ in its aggregate score, but $k_{\min}=1.0$ has similar
+pull-width calibration and a weaker expected-reach proxy. The latter is therefore
+retained as the conservative frozen baseline rather than described as the numerical
+score winner. For 2016, the 25-toy continuation directly supports the change to
+$k_{\min}=0.9$: its nonzero-injection RMS pull mean is 0.321 and its median pull width
+is 0.948, compared with 0.403 and 0.889 for $k_{\min}=1.1$. It gives the smallest
+aggregate calibration score among the scanned 0.9, 1.0, and 1.1 rows and reduces the
+coherent apparent signal-recovery bias that motivated the follow-up. For 2021, the
+corrected matched-reference scan finds small rank separations among the same three
+settings. The $k_{\min}=1.1$ row has the median pull width closest to unity and the best
+extraction-level $\eps^2$ proxy, while the 0.9 and 1.0 rows have slightly smaller
+aggregate scores. The frozen 1.1 choice is therefore a calibration--reach tradeoff, not
+a claim that it wins every diagnostic.
 
-\begin{figure}[H]
-\centering
-\begin{subfigure}[t]{0.88\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{kernel_lengthscale_figs/length_scale_diagnostics_by_lslb.png}
-  \caption{Optimized length-scale diagnostics for candidate lower bounds.}
-\end{subfigure}
-
-\vspace{0.8em}
-
-\begin{subfigure}[t]{0.88\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{kernel_lengthscale_figs/overall_pull_width_vs_injsigma_by_lslb.png}
-  \caption{Overall pull-width response versus injected significance.}
-\end{subfigure}
-\caption{Length-scale lower-bound stability comparison from the 2015 validation scan.
-The selected $1\sigma_x$ lower bound improves fit stability relative to the looser
-$0.5\sigma_x$ option while avoiding the extra rigidity of the $1.5\sigma_x$
-alternative. Panel (b), the average pull width versus injected significance, is the
-primary selection diagnostic: the chosen curve remains close to the horizontal unit
-reference line, while the more aggressive lower bound produces substantially
-over-wide pulls.}
-\label{fig:lengthscale-lower-bound-stability}
-\end{figure}
+The upper factors remain 8 for 2015 and 2016 and 9 for 2021. They keep the optimizer
+tied to a detector-scale interval while preventing effectively unbounded smoothing.
+The current configurations also retain the dataset-statistics floor on
+$\ell_{\max,d}$ so that the ceiling does not become artificially small where the local
+resolution is exceptionally tight. Alternative upper bounds, fixed-background fits,
+and the historical common-lower-bound overlays are robustness studies and are collected
+in the appendices. The error-barred closure figures that directly support the frozen
+choices are presented in Section~\ref{sec:toys}.
 
 Figure~\ref{fig:gpr-window-construction} summarizes the same construction in the
 language used by the implemented likelihood. The sideband bins set the log-count
@@ -388,7 +340,7 @@ w^{\mathrm{full}}_{d,i}(m_0) =
 \exp\!\left[-\frac{(m-m_0)^2}{2\sigma_d(m_0)^2}\right]\,dm,
 \end{equation}
 where $e_i$ and $e_{i+1}$ are the lower and upper edges of histogram bin $i$.
-normalized so that
+The template is normalized so that
 \begin{equation}
 \sum_{i \in \mathrm{full\ range}} w^{\mathrm{full}}_{d,i}(m_0) = 1.
 \end{equation}
@@ -599,13 +551,17 @@ and
 \end{equation}
 Dividing by $\mathrm{CL}_b$ prevents a downward background fluctuation from producing
 an artificially aggressive exclusion in a region with little intrinsic sensitivity
-\cite{Junk1999,Read2002}. The quoted single-dataset 95\% limit is
+\cite{Junk1999,Read2002}. At confidence level $1-\alpha$, the single-dataset upper
+limit is
 \begin{equation}
-A_{95,d}(m)=\min\{A_d:\mathrm{CL}_s(A_d;m)=0.05\}.
-\label{eq:a95-single}
+A_{\mathrm{UL},d}(m;\alpha)
+=\min\{A_d:\mathrm{CL}_s(A_d;m)\le\alpha\}.
+\label{eq:aul-single}
 \end{equation}
-The package reports this limit both in signal-yield space and, after applying the
-dataset-specific conversion factor of Eq.~\eqref{eq:Kd-conversion}, in $\eps^2$ space.
+The v3 candidate uses $\alpha=0.10$, corresponding to a 90\% CL upper limit; retained
+historical 95\% studies use $\alpha=0.05$. The package reports the limit both in
+signal-yield space and, after applying the dataset-specific conversion factor of
+Eq.~\eqref{eq:Kd-conversion}, in $\eps^2$ space.
 
 \subsection{Asymptotic and toy calibration}
 
@@ -648,21 +604,22 @@ Eq.~\eqref{eq:q0-single}, summarized through $q_0(m)$, $p_0(m)$, and
 $Z_{\mathrm{local}}(m)$. The second family is a set of reviewer-facing diagnostics
 derived from the background-only \CLs{} limit ensemble at each mass. For
 $N_{\mathrm{toys}}$ background-only pseudoexperiments and an observed limit
-$\eps^2_{95,\mathrm{obs}}(m)$, those quantities are
+$\eps^2_{\mathrm{UL},\mathrm{obs}}(m)$ at the confidence level under study, those
+quantities are
 \begin{align}
 p_{\mathrm{strong}}(m)
 &=
 \frac{1}{N_{\mathrm{toys}}}
 \sum_{t=1}^{N_{\mathrm{toys}}}
 \mathbf{1}\!\left[
-\eps^2_{95,t}(m)\le \eps^2_{95,\mathrm{obs}}(m)
+\eps^2_{\mathrm{UL},t}(m)\le \eps^2_{\mathrm{UL},\mathrm{obs}}(m)
 \right], \\
 p_{\mathrm{weak}}(m)
 &=
 \frac{1}{N_{\mathrm{toys}}}
 \sum_{t=1}^{N_{\mathrm{toys}}}
 \mathbf{1}\!\left[
-\eps^2_{95,t}(m)\ge \eps^2_{95,\mathrm{obs}}(m)
+\eps^2_{\mathrm{UL},t}(m)\ge \eps^2_{\mathrm{UL},\mathrm{obs}}(m)
 \right], \\
 p_{\mathrm{two}}(m)
 &=
@@ -806,9 +763,11 @@ merging of already-compressed outputs. This is the standard common-POI structure
 in multi-channel HEP combinations \cite{HistFactory,ATLASCMSHiggs2016}. The combined
 upper limit is set directly on the shared coupling,
 \begin{equation}
-\eps^2_{95}(m) = \min\{\eps^2 : \mathrm{CL}_s(\eps^2)=0.05\},
+\eps^2_{\mathrm{UL}}(m;\alpha)
+= \min\{\eps^2 : \mathrm{CL}_s(\eps^2)\le\alpha\},
 \end{equation}
-while the combined local significance is evaluated from the same profiled likelihood
+with $\alpha=0.10$ for the v3 90\% CL candidate. The combined local significance is
+evaluated from the same profiled likelihood
 with the common signal vector $\eps^2 \bm{s}_{\mathrm{unit}}$. By contrast, the
 inverse-variance expressions shown later in the search-power figures are auxiliary
 interpretations of combined sensitivity, not the defining inference.
@@ -852,65 +811,18 @@ Z_{\mathrm{global}}^{\mathrm{Sidak}}
 For small $p_{0,\min}^{\mathrm{obs}}$, Eq.~\eqref{eq:sidak-global} reduces to the
 familiar $p_{\mathrm{global}}\simeq N_{\mathrm{eff}}p_{0,\min}$ form.
 
-The preferred final calibration is therefore toy based: if the background-only
-distribution of $q_{0,\max}$ is available, Eq.~\eqref{eq:pglobal-toy} is the
-physics-facing look-elsewhere result. When that distribution has not yet been frozen,
-the summary products fall back to the \v{S}id\'ak approximation of
-Eq.~\eqref{eq:sidak-global}. The present note uses these quantities asymmetrically.
-The combined 2015$+$2016 10\%$+$2021 1\% radiative-penalty summary is the only place
-where the global conversion is interpreted as part of the final look-elsewhere
-discussion. The single-dataset overlays retained in
-Figure~\ref{fig:local-significances-across-datasets} are used only to show where each
-dataset has its largest \emph{local} upward fluctuation; any global overlays in those
-auxiliary PNGs should be read as approximations rather than as finalized toy-calibrated
-claims.
-
-\begin{figure}[p]
-\centering
-\begin{subfigure}[t]{0.32\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/individual_datasets/2015_local_p0_with_global_p_overlay.png}
-  \caption{2015.}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.32\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/individual_datasets/2016_local_p0_with_global_p_overlay.png}
-  \caption{2016 10\%.}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.32\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/individual_datasets/2021_local_p0_with_global_p_overlay.png}
-  \caption{2021 1\%.}
-\end{subfigure}
-\caption{Local discovery p-value scans for the individual input datasets. The blue
-curves are the one-sided local $p_0(m)$ values entering the fixed-mass discovery
-interpretation. The global overlays are effective-trials diagnostics and are shown only
-to indicate the approximate local threshold required for a scan-level statement.}
-\label{fig:local-significances-across-datasets}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\begin{subfigure}[t]{0.48\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/diagnostics/combined_local_p0_with_global_p_overlay.png}
-  \caption{Combined local $p_0$ curve with the current global approximation overlay.}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.48\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/diagnostics/combined_local_Z_with_global_Z_overlay.png}
-  \caption{Equivalent local-$Z$ representation with the current global approximation.}
-\end{subfigure}
-\caption{Analytic significance curves for the corrected three-dataset combination. When
-a full scan-level toy calibration of $q_{0,\max}$ is unavailable, the global curve
-shown here is the effective-trials approximation described by
-Eq.~\eqref{eq:sidak-global}; a toy-calibrated $q_{0,\max}$ distribution would take
-precedence for a final discovery claim.}
-\label{fig:combined-significance-rpen}
-\end{figure}
+For the present studies, Eq.~\eqref{eq:sidak-global} provides the global, or
+look-elsewhere-corrected, $p$-value quoted with each local scan. The effective number of
+trials is evaluated from the stated scan range and the mass-dependent resolution, so
+the approximation accounts for the strong correlation between adjacent
+\SI{1}{MeV}-spaced hypotheses rather than treating every scan point as independent.
+This is sufficient for interpreting the current pre-unblinding scans and is shown
+alongside the local $p$-values in Section~\ref{sec:results}. A background-only ensemble
+of the frozen search maximum, $q_{0,\max}$, remains the preferred calibration for any
+future discovery-level claim; when that ensemble is available,
+Eq.~\eqref{eq:pglobal-toy} supersedes the analytic approximation. The distinction is
+therefore one of calibration precision, not an absence of a global interpretation in
+v3.
 
 \subsection{Signal absorption and alternative background-profile treatments}
 
@@ -928,9 +840,9 @@ especially the effective length scale, and the flexibility of the Gaussian-profi
 background nuisance itself. For that reason, the current note keeps the
 Gaussian-profile model as the mainline baseline while reserving fixed-background and
 alternative Poisson-style treatments as targeted robustness studies. Those alternatives
-are not presented as equally mature production choices, but they remain important if
-future pseudoexperiments show that the current nuisance model still absorbs an
-unacceptable fraction of injected signal.
+are not presented as equally mature production choices. They become necessary
+follow-up tests if production-faithful pseudoexperiments demonstrate that the current
+nuisance model absorbs an unacceptable fraction of injected signal.
 
 \subsection{Dimuon-threshold interpretation}
 \label{sec:methodology-dimuon-threshold}
@@ -981,7 +893,7 @@ N_{\mathrm{eff}}^{\mathrm{BR}}(m_{A^\prime})\,\eps^2_{ee}(m_{A^\prime}).
 This operation does not change the local fit, the signal-yield upper limit, the
 \CLs{} value, or the local $p_0$ scan; it changes only the coupling interpretation of
 an electron-channel result. Figure~\ref{fig:methodology-dimuon-factor} shows the
-factor applied in the 90\% CLs cross-check files. The factor is unity below
+factor applied in the v3 90\% CL candidate obtained with \CLs{}. The factor is unity below
 $2m_\mu$, rises continuously above threshold, and reaches
 $N_{\mathrm{eff}}^{\mathrm{BR}}=1.725$ at \SI{250}{MeV}
 ($\mathcal{B}_{ee}=0.580$).

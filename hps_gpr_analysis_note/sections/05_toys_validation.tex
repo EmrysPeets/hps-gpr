@@ -5,13 +5,26 @@
 \centering
 \graphicorplaceholder{0.98\linewidth}{guard_band_figs/hps_gpr_bump_hunt_flowchart.png}
 \caption{HPS GPR bump-hunt analysis and closure-validation flow. The shared
-per-mass setup defines the spectrum, signal template, blind/extraction window, sideband-training region, GP refit, and amplitude extraction. The nominal-data limit path converts the profiled yield limit to $\eps^2_{95}$, while the functional-form closure path injects known signals into matched smooth-background toys and tests signal recovery, pull calibration, $Z$ calibration, uncertainty consistency, and signal leakage into the sideband-training region before the blind-window geometry is selected.}
+per-mass setup defines the spectrum, signal template, blind/extraction window,
+sideband-training region, GP refit, and amplitude extraction. The nominal-data path
+converts the profiled yield upper limit to $\eps^2_{\mathrm{UL}}$, while the
+functional-form path injects known signals into smooth-background toys and tests signal
+recovery, pull calibration, $Z$ calibration, uncertainty consistency, and leakage into
+the sideband-training region.}
 \label{fig:hps-gpr-flowchart-section5}
 \end{figure}
 
 \subsection{Validation of the Statistical Framework}
 
-Unless stated otherwise, the toy studies summarized here correspond to the 95\% confidence-level workflow and the current refit-based local extraction. The staged suites cover the fully unblinded 2015 sample, the 2016 10\% development sample, the 2021 1\% validation sample, and the shared-$\eps^2$ combinations built from those inputs. Older GP-generated injection/extraction figures are retained where they answer a stable statistical question, while the newest functional-form closure and observed limit studies use the refmatched, widened blind-window convention discussed below.
+The closure tests in this section validate the local extraction and are not themselves
+confidence-level statements. Some historical reach proxies use the one-sided 95\%
+Gaussian coefficient, while the current physics-facing result in
+Section~\ref{sec:results} is a 90\% CL upper limit obtained with the \CLs{} construction.
+The staged suites cover the fully unblinded 2015 sample, the 2016 10\% development
+sample, and the regenerated 2021 1\% validation sample. The headline functional-form
+figures use full GP refits and, for 2021, the corrected matched-reference widened-window
+convention. Superseded and duplicated closure displays are collected in
+Appendix~\ref{app:prior-validation-results}.
 
 The validation material is organized around four checks of analysis robustness:
 
@@ -20,7 +33,7 @@ The validation material is organized around four checks of analysis robustness:
 
     \item  Second, after that training exclusion is fixed, should the $1.64$--$2.25\,\sigma_m$ signal tails be omitted as a guard band or included in the extraction likelihood through a wider blind window?
 
-    \item Third, do the reference matched full-refit toys close for the 2015, 2016, and 2021 datasets?
+    \item Third, do the reference-matched full-refit toys close for the 2015, 2016, and 2021 datasets?
 
     \item   Finally, do the combined pseudoexperiments accumulate sensitivity as expected when statistically independent datasets share one coupling parameter?
 
@@ -76,7 +89,12 @@ same blinded region is then used by the local signal-extraction likelihood.}
 \label{fig:blind225-cartoon}
 \end{figure}
 
-The training-exclusion scan starts from the older $1.64\,\sigma_m$ blind window and varies the outer boundary of the bins excluded from GP training. In this notation, train-$k$ means that bins with $|m-m_0|<k\,\sigma_m$ are withheld from the GP sideband fit. The train-$2.25$ option is not selected because it has the absolute lowest raw background-only expected reach.
+The training-exclusion scan starts from the older $1.64\,\sigma_m$ blind window and
+varies the outer boundary of the bins excluded from GP training. In this notation,
+train-$k$ means that bins with $|m-m_0|<k\,\sigma_m$ are withheld from the GP sideband
+fit. The train-$2.25$ choice is not the point with the strongest raw background-only
+reach proxy; it is selected from the combined leakage, recovery, and calibration
+evidence below.
 
 
 In the comparison of different blind windows shown in Figure~\ref{fig:guard-band-reach-uncertainty}, train-$1.96$ gives the lowest median Gaussian-equivalent $\eps^2_{95}$ proxy, but it also leaves a much larger fraction of the injected signal template in the GP training region, leading to higher leakage rate and lower signal sensitivity. The train-$2.25$ exclusion is the balanced candidate: it sharply reduces train-region leakage, is more sensitive to injected signal than $1.96$, and retains better expected reach than the wider $2.58$ and $3.0$ exclusions. The compact evidence is summarized in Table~\ref{tab:guard-band-choice-summary}; for the train-$2.25$ choice, the mean signal recovery is about $0.961$ at $Z_{\mathrm{inj}}=3$ and $0.943$ at $Z_{\mathrm{inj}}=5$, with a maximum injected training fraction of about $0.0258$.
@@ -287,75 +305,168 @@ The fit selection algorithm is implemented in a deliberately conservative ROOT m
 
 The candidate families were chosen to span the few smooth structures that can mimic the observed spectra without introducing narrow features: a sigmoid threshold factor for turn-on behavior, a power-law rise, an exponential falloff for the high-mass tail, optional threshold shifts for datasets whose support begins near a sharp turn-on, and low-order exponential curvature for residual broad-shape freedom. The generalized-gamma and simpler sigmoid-power variants in the candidate overlay provide cross-checks that the chosen seed is not an artifact of one algebraic form. They are not used to inject additional model uncertainty in these closure plots; once the primary seed is selected, the closure question is whether the GP extraction recovers known signals from that fixed smooth truth.
 
-Figure~\ref{fig:analytic-fit-publication-overview} displays the outcome of this algorithm rather than the internal parameter table. In each row, the left panel overlays the input histogram with all enabled candidate fits and highlights whether the chosen primary seed is representative of the smooth family envelope; the right panel compares the selected seed with the mean of the generated pseudoexperiment ensemble. The 2015 row shows that the shifted tail family follows the turn-on and the falling spectrum over the \SIrange{20}{130}{MeV} scan support without sculpting a narrow local feature. The 2016 row shows the same primary family on the 10\% sample, with the displayed analysis range tightened to \SIrange{42}{210}{MeV} to avoid the visibly poorer low-mass region that motivated the updated scan boundary. The 2021 row shows that the \texttt{fSigPowExpQ} seed follows the final 1\% spectrum over the \SIrange{50}{250}{MeV} search window with smooth curvature rather than using the shifted-threshold solution, while the wider displayed mass range shows the surrounding 2021 high-mass tail. The right panels are the most important quality check for toy generation: in all three datasets the toy mean follows the selected fit, while the toy totals fluctuate around the full-support normalization target instead of being artificially fixed in the analysis scan window.
+Figure~\ref{fig:functional-form-seed-overview} shows the outcome of this construction
+rather than an internal parameter dump. In each row, the left panel overlays the input
+histogram with all enabled candidate families, while the right panel compares the
+selected seed with the pseudoexperiment-ensemble mean. The 2015 shifted-tail family
+follows both the turn-on and falling spectrum without introducing a narrow feature. The
+2016 row shows the same family on the 10\% sample. The 2021 row selects the unshifted
+\texttt{fSigPowExpQ} family, whose broad curvature follows the 1\% spectrum without
+requiring a shifted threshold. Most importantly, each right-hand panel demonstrates
+that the Poisson toy mean reproduces the selected analytic expectation and that the toy
+normalization is set on the stated support rather than fixed inside the search window.
 
-\begin{figure}[H]
+\begin{figure}[p]
 \centering
 \graphicorplaceholder{0.99\linewidth}{toy_generation_figs/funcform_publication_overview.png}
-\caption{Overview of the functional-form toy seeds. Each row
-pairs the dataset-specific candidate-family overlay on the left with the selected primary seed and toy-ensemble mean on the right. The right-panel titles report the dataset, chosen primary family, analysis scan window, and full-support normalization target. The 2016 toy displays are shown with the updated 42--210~MeV scan range, and the 2021 row uses the final 1\% histogram with the 50--250~MeV search window. Shaded sidebands denote support-only regions that still contribute to the toy normalization even though they lie outside the analysis scan. In every row, the toy-ensemble mean is computed from pseudoexperiments generated with bin-integrated Poisson expectations normalized to the full support-range event count of the real dataset.}
-\label{fig:analytic-fit-publication-overview}
+\caption{Functional-form seeds used to construct the analytic-background
+pseudoexperiments. Each dataset row pairs the candidate-family comparison (left) with
+the selected seed and the mean of the generated toy ensemble (right). The titles give
+the family, the scan interval used for that generation campaign, and the full-support
+normalization target. The 2015 row uses the shifted
+sigmoid--power--exponential form with an additional smooth tail; the 2016 10\% row uses
+an independently fitted member of the same family; and the 2021 1\% row uses the
+unshifted \texttt{fSigPowExpQ} form. Shaded regions contribute to the normalization but
+lie outside the displayed campaign's search interval. The 2016 42--210~MeV label is
+retained to document the seed-generation study; the v3 result itself is restricted to
+39--180~MeV. The corrected 2021 lower-bound study likewise uses 30--250~MeV model
+support and searches 50--250~MeV, as documented below.}
+\label{fig:functional-form-seed-overview}
 \end{figure}
 
-Figures~\ref{fig:closure-validation-2015-funcform}--\ref{fig:closure-validation-2021-funcform} put the three dataset-specific functional-form closure suites on the same footing. Each figure uses full-refit toy rows for the selected $2.25\,\sigma_m$ blind/train geometry, groups the toys by mass and injected significance, and displays four panels: the pull mean tests amplitude bias, the pull width tests whether the fitted $\sigma_A$ is calibrated, the recovered-amplitude panel tests linearity in the injected signal strength, and the $\hat Z-Z_{\mathrm{inj}}$ panel tests significance calibration. Figures~\ref{fig:refmatched-train225-closure-2015}--\ref{fig:refmatched-train225-closure-2021} later show the same information in a two-panel pull/$\Delta Z$ visualization; those figures are useful cross-checks, while the four-panel summaries here make the amplitude-recovery behavior explicit.
+\paragraph{Injected-signal lower-bound scans.}
+The lower-bound choice was made with signal-injection studies, not from the observed
+limit curve. For every mass and $k_{\min}$ setting, the analytic background was
+Poisson fluctuated, a full-range Gaussian signal was injected, the GP was refit to the
+toy sidebands, and the blinded-window extraction was repeated. The 2015 and 2016 grids
+used $Z_{\mathrm{inj}}=0,1,2,3,5$ at masses
+\SIlist{45;60;75;90;105}{MeV} and \SIlist{60;90;105;120;150}{MeV}, respectively.
+The corrected 2021 grid used $Z_{\mathrm{inj}}=0,1,3,5$ at
+\SIlist{50;60;90;120;180;210}{MeV}. There are 100 toys per 2015 mass--strength cell
+and 25 toys per 2016 and 2021 cell. The zero-injection cells test for a fitted false
+signal; the nonzero cells test recovery, fitted uncertainty, and significance
+calibration across the injected-strength range.
 
-For the 2015 suite in Figure~\ref{fig:closure-validation-2015-funcform}, the background-only row is centered near zero pull and near-zero $\Delta Z$, so the smooth functional-form toys do not induce a spurious signal under the widened-blind refit. The nonzero rows show small negative recovery bias at the largest injected strengths, which is the expected direction if the sideband refit absorbs a small amount of the injected Gaussian tail, but the effect is modest: the $Z_{\mathrm{inj}}=5$ recovery remains close to the injected amplitude and the $\Delta Z$ panel does not show a large mass-coherent significance offset.
+Table~\ref{tab:lslb-injection-pull-summary} makes the mean-pull information explicit.
+The signed $Z_{\mathrm{inj}}=0$ entry is the equal-weight mean of the background-only
+cell means over the tested masses. The signed $Z_{\mathrm{inj}}>0$ entry is the
+equal-weight mean over all nonzero mass--strength cells. The RMS column is the root
+mean square of those nonzero cell means and is sensitive to biases that change sign
+across the grid; the last column is the median nonzero-injection pull width. No
+uncertainty is assigned to the aggregate rows because the plots retain the
+cell-by-cell toy-derived uncertainties used to judge whether a pattern is coherent.
 
-For the 2016 10\% suite in Figure~\ref{fig:closure-validation-2016-funcform}, the pull and $\Delta Z$ panels again indicate a broadly unbiased model, with the largest visible anomaly appearing in the recovered-amplitude panel for the $Z_{\mathrm{inj}}=1$ row. That row corresponds to a low event-count signal injection, so the ratio $\hat A/A_{\mathrm{inj}}$ is especially sensitive to where the finite toy distribution peaks. At larger injected strengths the recovered amplitude moves closer to the injected value, which argues against a large intrinsic recovery bias and instead points to a small-signal finite-count fluctuation in the $1\sigma$ visualization.
-
-For the 2021 1\% suite in Figure~\ref{fig:closure-validation-2021-funcform}, the same four diagnostics show the selected \texttt{fSigPowExpQ} truth model closing at the level needed for the validation sample. Pull means remain close to zero. The pull widths are below unity in this toy ensemble, indicating a mildly conservative predictive uncertainty in the tested configuration; the coverage and \CLs{} checks are used to assess whether this conservatism biases the final limit. The recovered-amplitude and $\Delta Z$ panels show only mild leakage at high injected significance. Across all three figures, the common pattern is therefore a relatively unbiased extraction with slight signal absorption visible most clearly for injected $5\sigma$ signals, not a mass-coherent failure of the GP-plus-template model.
-
-\begin{figure}[h!]
+\begin{table}[H]
 \centering
-\graphicorplaceholder{0.96\linewidth}{toy_generation_figs/closure_validation_suite_2015_fShiftSigPowTail.png}
-\caption{2015 \texttt{fShiftSigPowTail} functional-form full-refit closure validation
-suite for the selected $2.25\,\sigma_m$ blind/refmatched geometry. The rows are taken
-from the \texttt{wide\_refmatched} subset of the blind-geometry comparison suite, so the signal-strength reference is determined with the same refit convention used in the final window choice. The panels show, as a function of mass, the ensemble pull mean, pull width, recovered signal amplitude $\hat A/A_{\mathrm{inj}}$, and residual significance $\hat Z-Z_{\mathrm{inj}}$; error bars are the standard errors of the corresponding toy-ensemble means or widths.}
-\label{fig:closure-validation-2015-funcform}
+\scriptsize
+\begin{tabular}{lrrrrrr}
+\toprule
+Dataset & $k_{\min}$ & \makecell{Toys\\per cell} &
+\makecell{Signed mean pull\\$Z_{\mathrm{inj}}=0$} &
+\makecell{Signed mean pull\\$Z_{\mathrm{inj}}>0$} &
+\makecell{RMS cell-mean pull\\$Z_{\mathrm{inj}}>0$} &
+\makecell{Median pull width\\$Z_{\mathrm{inj}}>0$} \\
+\midrule
+2015 & 0.50 & 100 & $+0.235$ & $-1.449$ & 1.897 & 1.110 \\
+     & 0.75 & 100 & $+0.146$ & $-0.508$ & 0.732 & 0.895 \\
+     & 0.90 & 100 & $+0.090$ & $-0.259$ & 0.363 & 0.884 \\
+     & $\mathbf{1.00}^{\ast}$ & 100 & $\mathbf{+0.029}$ & $\mathbf{-0.223}$ & $\mathbf{0.285}$ & $\mathbf{0.887}$ \\
+     & 1.10 & 100 & $+0.037$ & $-0.161$ & 0.217 & 0.890 \\
+\addlinespace
+2016 10\% & $\mathbf{0.90}^{\ast}$ & 25 & $\mathbf{-0.016}$ & $\mathbf{-0.262}$ & $\mathbf{0.321}$ & $\mathbf{0.948}$ \\
+     & 1.00 & 25 & $+0.178$ & $+0.036$ & 0.377 & 0.924 \\
+     & 1.10 & 25 & $+0.222$ & $+0.120$ & 0.403 & 0.889 \\
+\addlinespace
+2021 1\% & 0.90 & 25 & $+0.061$ & $+0.041$ & 0.213 & 0.838 \\
+     & 1.00 & 25 & $+0.016$ & $+0.004$ & 0.230 & 0.860 \\
+     & $\mathbf{1.10}^{\ast}$ & 25 & $\mathbf{-0.005}$ & $\mathbf{-0.034}$ & $\mathbf{0.276}$ & $\mathbf{0.908}$ \\
+\bottomrule
+\end{tabular}
+\caption{Aggregate pull diagnostics from the functional-form signal-injection scans.
+An asterisk marks the lower-bound factor frozen for v3. Signed means and RMS values
+refer to cell-level mean pulls, while $w_{\mathrm{pull}}$ is the fitted width of the
+toy pull distribution in a mass--strength cell. The table should be read together with
+the mass-resolved panels in Figures~\ref{fig:v3-lslb-closure-2015}--%
+\ref{fig:v3-lslb-closure-2021}; a small aggregate mean alone can hide compensating
+mass-dependent biases.}
+\label{tab:lslb-injection-pull-summary}
+\end{table}
+
+Figures~\ref{fig:v3-lslb-closure-2015}--\ref{fig:v3-lslb-closure-2021} are the
+physics-facing closure summaries for v3. Each panel uses analytic functional-form toys,
+per-toy GP refitting, profiled background covariance, and toy-derived error bars. The
+mean pull tests amplitude bias, the pull width tests the fitted uncertainty, the
+$\hat Z-Z_{\mathrm{inj}}$ panel tests significance calibration when the reference scale
+is matched, and the amplitude-bias panel tests signal recovery directly. These are
+extraction-closure tests. Their reach panels and rankings are diagnostic proxies rather
+than direct \CLs{} coverage measurements.
+
+For 2015, the 100-toy study strongly rejects the overly flexible
+$k_{\min}=0.5$ row. The 1.0 and 1.1 rows are close in pull-width calibration; the frozen
+1.0 row has a background-only mean pull of $+0.029$, a signed nonzero-injection mean of
+$-0.223$, and an RMS cell-mean pull of 0.285. It is retained as a conservative
+production compromise even though the aggregate score slightly favors 1.1. For 2016,
+the 25-toy scan selects $k_{\min}=0.9$ among 0.9, 1.0, and 1.1. In particular, the
+background-only mean pull changes from $+0.222$ at 1.1 to $-0.016$ at 0.9, removing
+the positive false-signal offset that motivated the follow-up. Across the injected
+cells, 0.9 also reduces the RMS cell-mean pull from 0.403 to 0.321 and moves the median
+pull width from 0.889 to 0.948. Its signed nonzero-injection mean is $-0.262$, so the
+selection should be understood as the best joint calibration of the scanned rows, not
+as exact zero bias in every injected cell.
+
+The 2021 figure is not the older full-support study. It uses the regenerated
+\path{final_1pct_invM.root} sample, an \texttt{fSigPowExpQ} truth model with
+\SIrange{30}{250}{MeV} toy/data support, the \SIrange{50}{250}{MeV} search range, a
+$2.25\,\sigma_m$ exclusion, $k_{\max}=9$, and a matched background-only refit reference.
+All 1,800 requested toy rows have finite key fit quantities and successful refit and
+$q_\mu$ statuses. The aggregate scores are nearly degenerate; $k_{\min}=1.1$ is frozen
+because it gives the pull-width median closest to unity and the strongest extraction
+proxy. Its background-only and nonzero-injection signed mean pulls are $-0.005$ and
+$-0.034$, respectively; the larger 0.276 RMS reflects mass-to-mass variation that is
+visible in Figure~\ref{fig:v3-lslb-closure-2021}. Pull widths below unity imply
+conservative fitted uncertainties only if the toy ensemble faithfully represents the
+production procedure. Direct coverage with the frozen upper-limit configuration
+remains the final calibration requirement.
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.98\linewidth}{toy_generation_figs/v3_20260709_lslb_closure/fig40_style_2015_lslb_closure_suite_100toy.png}
+\caption{2015 injected-signal closure as the RBF lower bound is varied. At each mass,
+the plotted central value is the median of the nonzero
+$Z_{\mathrm{inj}}=1,2,3,5$ cell summaries; each cell contains 100 full-refit
+functional-form toys, and the error bars are derived from those toy ensembles. The
+$k_{\min}=0.5$ behavior is incompatible with reliable signal recovery. The 1.0 and 1.1
+curves form the stable neighborhood, and 1.0 is retained as the conservative v3
+choice rather than as the minimum of the aggregate ranking score.}
+\label{fig:v3-lslb-closure-2015}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[p]
 \centering
-\graphicorplaceholder{0.96\linewidth}{toy_generation_figs/closure_validation_suite_2016_fShiftSigPowTail.png}
-\caption{2016 10\% \texttt{fShiftSigPowTail} functional-form full-refit closure
-validation suite from \texttt{2016\_gpr/closure\_final}. The same $2.25\,\sigma_m$
-blind/train configuration and matched-refit signal normalization are used at each mass.
-The pull-mean and pull-width panels test the calibration of the fitted signal amplitude,
-the recovered-amplitude panel tests linearity for injected signals, and the
-$\hat Z-Z_{\mathrm{inj}}$ panel shows the residual significance bias after the local
-refit and extraction procedure are repeated on each toy.}
-\label{fig:closure-validation-2016-funcform}
+\graphicorplaceholder{0.98\linewidth}{toy_generation_figs/v3_20260709_lslb_closure/fig40_style_2016_lslb_closure_suite_25toy.png}
+\caption{2016 10\% injected-signal closure for
+$k_{\min}=0.9,1.0,1.1$. Each point summarizes the nonzero
+$Z_{\mathrm{inj}}=1,2,3,5$ cells at that mass, with 25 full-refit functional-form toys
+per cell. The companion background-only cells have mean pulls $-0.016$, $+0.178$, and
+$+0.222$ for 0.9, 1.0, and 1.1, respectively. Together with the smaller RMS
+nonzero-injection mean pull and the pull width closer to unity, removal of the positive
+background-only offset is the reason $k_{\min}=0.9$ is used for 2016 in v3.}
+\label{fig:v3-lslb-closure-2016}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[p]
 \centering
-\graphicorplaceholder{0.96\linewidth}{toy_generation_figs/closure_validation_suite_2021_fSigPowExpQ.png}
-\caption{2021 1\% \texttt{fSigPowExpQ} functional-form full-refit closure validation
-suite from the \texttt{2021\_gpr/closure\_1pct/injection\_flat} toys. This suite uses the
-finalized 2021 functional family and the same $2.25\,\sigma_m$ blind/train geometry as
-the selected analysis configuration. The panels mirror the 2015 and 2016 closure
-summaries: pull mean and pull width assess background-only calibration, while recovered
-amplitude and $\hat Z-Z_{\mathrm{inj}}$ assess injected-signal linearity and significance
-calibration for $Z_{\mathrm{inj}}=1,3,5$.}
-\label{fig:closure-validation-2021-funcform}
-\end{figure}
-
-Figure~\ref{fig:toy-upper-limit-proxy-funcform} puts the background-only rows of the same functional-form ensembles on the expected-limit scale used to compare scan sensitivity. The top panels keep the diagnostic in fitted signal-yield units, while the bottom panels divide by the per-mass $A(\eps^2=1)$ normalization so that the datasets can be read on a common coupling-squared scale. The shaded bands are toy-to-toy spreads of this simple proxy, not a systematic-uncertainty envelope. Within this subsection, the figure is therefore used as a compact smoothness and sensitivity cross-check: it would reveal mass-local instabilities in the functional-form closure samples, while the actual observed limits are still obtained from the profile-\CLs{} construction.
-
-\begin{figure}[h!]
-\centering
-\graphicorplaceholder{0.99\linewidth}{toy_generation_figs/toy_upper_limit_proxy_2015_2016_2021.png}
-\caption{Toy upper-limit proxy for the three functional-form closure ensembles: 2015
-on the left, 2016 10\% in the center, and 2021 1\% on the right. The upper row shows a
-signal-yield proxy and the lower row shows the corresponding coupling-squared proxy.
-For each background-only toy row, the proxy is
-$A^{\mathrm{proxy}}_{95,i}=\max(0,\hat A_i)+1.64485\,\sigma_{A,i}$ and
-$\eps^2_{95,i}=A^{\mathrm{proxy}}_{95,i}/A_i(\eps^2=1)$. The solid curves are the
-means of those per-toy proxy values at each mass, and the shaded bands show their
-central 68\% and 95\% spreads. This is a compact sensitivity diagnostic from the toy
-summaries, not a replacement for the final profile-\CLs{} scan used for the observed
-result.}
-\label{fig:toy-upper-limit-proxy-funcform}
+\graphicorplaceholder{0.98\linewidth}{toy_generation_figs/v3_20260709_lslb_closure/fig40_style_2021_search50_project30_refmatched_lslb_closure_suite_25toy.png}
+\caption{Corrected 2021 1\% injected-signal closure for the
+\texttt{fSigPowExpQ} toy truth. Each mass point summarizes the nonzero
+$Z_{\mathrm{inj}}=1,3,5$ cells, with 25 toys per cell, \SIrange{30}{250}{MeV} model
+support, and a \SIrange{50}{250}{MeV} search range. Defining the injected amplitude
+with the matched background-only refit uncertainty removes the mixed-denominator
+$\Delta Z$ offset seen in the superseded study. The 1.1 choice has the pull-width
+median closest to unity and the strongest extraction-reach proxy; its signed mean pull
+over the nonzero cells is $-0.034$. It is a calibration--reach choice, not the winner of
+every scalar diagnostic.}
+\label{fig:v3-lslb-closure-2021}
 \end{figure}
 
 \FloatBarrier
@@ -429,10 +540,14 @@ fluctuated,
 n_{\mathrm{ref},i} \sim \mathrm{Pois}\!\left(b_i\right),
 \end{equation}
 and the extracted $\sigma_{A,\mathrm{ref}}$ then inherits an extra layer of
-background-only sampling noise. The completed 95\% CL studies summarized here use the
-Asimov convention because it cleanly separates the definition of the injected signal
-axis from the later ensemble fluctuations of the toy study itself
-\cite{Cowan1998,Cowan2011}.
+background-only sampling noise. In both cases, the v3 headline closure studies use the
+reference spectrum only to seed a background-only \emph{refit}. The reference
+uncertainty is evaluated after imposing the same mass support, exclusion mask, kernel
+bounds, and refit prescription used for the corresponding toy ensemble. This matched
+background-only refit is the calibration reference used in the updated 2021 study and
+in the year-specific lower-bound comparisons. Earlier studies that evaluated
+$\sigma_{A,\mathrm{ref}}$ directly from a prefit Asimov spectrum are retained in
+Appendix~\ref{app:prior-validation-results}; they do not define the v3 calibration.
 
 This distinction matters for the later profile-likelihood interpretation. The Asimov
 construction defines the expected sensitivity scale, while the background-only
@@ -442,14 +557,16 @@ axis, but the pseudoexperiments remain the mechanism that profiles the backgroun
 and measures how realistic background-only fluctuations propagate through the
 extraction chain.
 
-The later toy summaries therefore involve two related but different uncertainty scales.
-The reference quantity $\sigma_{A,\mathrm{ref}}$ fixes the horizontal injection axis and
-the nominal target significance $Z_{\mathrm{inj}}$. By contrast, the toy-level
-$\sigma_A$ is the uncertainty returned by the fit \emph{for that specific toy} after the
-background and signal fluctuations have been realized. Pulls use the toy-level
-$\sigma_A$, while $Z_{\mathrm{inj}}$ is defined from $\sigma_{A,\mathrm{ref}}$. This is
-precisely why pull curves and $\Delta Z$ curves need not overlay one another
-point-by-point even in a well-calibrated study.
+The later toy summaries therefore involve two related uncertainty scales. The reference
+quantity $\sigma_{A,\mathrm{ref}}$ fixes the horizontal injection axis and the nominal
+target significance $Z_{\mathrm{inj}}$. The toy-level $\sigma_A$ is returned by the fit
+\emph{for that specific toy} after the background and signal fluctuations have been
+realized. Pulls use the toy-level $\sigma_A$, whereas $Z_{\mathrm{inj}}$ is defined from
+$\sigma_{A,\mathrm{ref}}$. Once the reference and toy fits are matched, the ensemble
+pull and residual-significance calibrations should consequently be mutually
+consistent, up to finite-sample and fit fluctuations. A large coherent separation is
+a diagnostic of a reference-denominator or refit mismatch; it is not accepted as
+normal behavior of an otherwise calibrated study.
 
 \subsection{Poisson versus multinomial signal injection}
 
@@ -530,52 +647,38 @@ whether the estimator is biased, whether the quoted uncertainty is correctly cal
 and whether the reported intervals achieve the claimed frequentist coverage
 \cite{Cowan1998,Cowan2011}.
 
-The main closure evidence below comes from the functional-form pseudoexperiments, where
+The main closure evidence in this section comes from the functional-form
+pseudoexperiments, where
 the smooth-spectrum truth is an analytic toy seed rather than a GP-generated background
 ensemble. Earlier GP-generated pull, coverage, and $\Delta Z$ displays remain useful
 internal checks of the extraction layer, but they are not shown as headline validation
 figures because the refmatched functional-form pull and calibration plots are the more
 direct closure tests.
 
-\subsubsection{Functional-form closure studies}
+\subsubsection{Representative pull distributions}
 
-The functional-form closure studies answer a related but distinct question: whether the
-blind-window extraction closes when the toy truth is a smooth analytic spectrum rather
-than a GP-derived background realization. They are used for three checks:
-\begin{itemize}
-\item smooth-spectrum closure against analytic toy truth;
-\item spurious-signal behavior at $Z_{\mathrm{inj}}=0$;
-\item injected-signal recovery under the full-refit condition, with no-refit displays
-retained only as internal extraction checks.
-\end{itemize}
+The year-specific v3 figures above summarize closure across mass and injected strength.
+Figure~\ref{fig:refmatched-train225-pulls-2015} complements those summaries by showing
+the toy-level pull distributions at one representative 2015 mass. It uses the
+reference-matched definition given above: the zero-injection panel tests for a spurious
+signal, while the nonzero panels test recovery after the same sideband-refit procedure
+has been applied to the toys.
 
-The physics-relevant figures in the main text are the refmatched full-refit studies. In
-this context, ``refmatched'' means that the injected amplitude is set using the matched
-background-only refit reference for the same mass, geometry, kernel policy, and refit
-prescription before injection:
-\begin{equation}
-A_{\mathrm{inj}}=Z_{\mathrm{inj}}\sigma_{A,\mathrm{ref}}.
-\end{equation}
-That convention avoids defining the injected strength with a prefit uncertainty scale
-while testing recovery with a different refitted uncertainty scale. The $Z_{\mathrm{inj}}=0$
-row is the spurious-signal line; the nonzero rows test signal recovery after the same
-sideband refit has been applied to the injected toys.
-
-\begin{figure}[h!]
+\begin{figure}[p]
 \centering
-\begin{subfigure}[t]{0.32\linewidth}
+\begin{subfigure}[t]{0.60\linewidth}
   \centering
   \graphicorplaceholder{\linewidth}{injection_extraction_figs/refmatched_train2p25_pull_hists_2015/pull_hist_2015_m075MeV_Z0.png}
   \caption{$Z_{\mathrm{inj}}=0$.}
 \end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.32\linewidth}
+\par\vspace{0.25em}
+\begin{subfigure}[t]{0.60\linewidth}
   \centering
   \graphicorplaceholder{\linewidth}{injection_extraction_figs/refmatched_train2p25_pull_hists_2015/pull_hist_2015_m075MeV_Z2.png}
   \caption{$Z_{\mathrm{inj}}=2$.}
 \end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.32\linewidth}
+\par\vspace{0.25em}
+\begin{subfigure}[t]{0.60\linewidth}
   \centering
   \graphicorplaceholder{\linewidth}{injection_extraction_figs/refmatched_train2p25_pull_hists_2015/pull_hist_2015_m075MeV_Z5.png}
   \caption{$Z_{\mathrm{inj}}=5$.}
@@ -587,72 +690,11 @@ response under the same full-refit widened-blind prescription.}
 \label{fig:refmatched-train225-pulls-2015}
 \end{figure}
 
-\begin{figure}[h!]
-\centering
-\begin{subfigure}[t]{0.86\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{injection_extraction_figs/refmatched_train2p25_pull_vs_mass_2015.png}
-  \caption{Pull mean and width versus mass.}
-\end{subfigure}
-
-\vspace{0.8em}
-
-\begin{subfigure}[t]{0.86\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{injection_extraction_figs/refmatched_train2p25_z_calibration_residual_2015.png}
-  \caption{$Z$-calibration residual versus mass.}
-\end{subfigure}
-\caption{2015 train-$2.25$ refmatched functional-form closure diagnostics. These
-panels use the matched background-only reference scale to define
-$A_{\mathrm{inj}}=Z_{\mathrm{inj}}\sigma_{A,\mathrm{ref}}$, then perform the injected
-toy extraction with the same GP refit and widened-blind policy. The zero-injection row checks
-for a spurious signal, and the injected rows test recovery and significance
-calibration after the full refit.}
-\label{fig:refmatched-train225-closure-2015}
-\end{figure}
-
-\begin{figure}[h!]
-\centering
-\begin{subfigure}[t]{0.86\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{injection_extraction_figs/refmatched_train2p25_pull_vs_mass_2016.png}
-  \caption{Pull mean and width versus mass.}
-\end{subfigure}
-
-\vspace{0.8em}
-
-\begin{subfigure}[t]{0.86\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{injection_extraction_figs/refmatched_train2p25_z_calibration_residual_2016.png}
-  \caption{$Z$-calibration residual versus mass.}
-\end{subfigure}
-\caption{2016 10\% refmatched functional-form closure diagnostics. The pull panel tests
-estimator closure and uncertainty calibration, while the $\Delta Z$ panel tests
-significance calibration. As in the 2015 study, these are full-refit closure tests with
-the injected strength defined from the matched background-only reference scale.}
-\label{fig:refmatched-train225-closure-2016}
-\end{figure}
-
-\begin{figure}[h!]
-\centering
-\begin{subfigure}[t]{0.86\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{injection_extraction_figs/refmatched_train2p25_pull_vs_mass_2021.png}
-  \caption{Pull mean and width versus mass.}
-\end{subfigure}
-
-\vspace{0.8em}
-
-\begin{subfigure}[t]{0.86\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{injection_extraction_figs/refmatched_train2p25_z_calibration_residual_2021.png}
-  \caption{$Z$-calibration residual versus mass.}
-\end{subfigure}
-\caption{2021 1\% refmatched functional-form closure diagnostics. The two panels mirror
-the 2015 and 2016 layouts so that the pull calibration and residual significance
-calibration can be compared dataset by dataset.}
-\label{fig:refmatched-train225-closure-2021}
-\end{figure}
+The earlier two-panel dataset summaries are superseded by
+Figures~\ref{fig:v3-lslb-closure-2015}--\ref{fig:v3-lslb-closure-2021}. They are retained
+in Appendix~\ref{app:prior-validation-results} because they document the development of
+the matched-reference procedure, but they do not use the selected three-dataset lower-bound
+choices and should not be read as the v3 headline closure evidence.
 
 \FloatBarrier
 
@@ -662,135 +704,12 @@ prediction is held fixed. They are not the main closure evidence in this note an
 therefore not shown as headline figures here. The full-refit panels above are the
 appropriate studies for assessing signal absorption by the sideband refit.
 
-\subsection{Combined search-power studies}
+\subsection{Auxiliary combined-study displays}
 
-The combined-search-power figures illustrate why a shared-$\eps^2$ combination can
-outperform any one constituent data set alone. The key point is that the combined
-injection is not defined by adding the same number of signal events to each data set.
-Instead, a common injected $\eps^2$ is mapped into dataset-specific total signal yields
-through the conversion factors $K_d(m)$ and then interpreted relative to the
-dataset-specific $\sigma_{A,\mathrm{ref}}$. As a result, a combined ``5$\sigma$'' or
-``7$\sigma$'' injection means a common-coupling significance in the combined statistic,
-not the same per-dataset significance in each constituent channel.
-
-The updated search-power plotter is now configured for both the historical
-two-dataset export and the current three-dataset scenarios documented in the README.
-In particular, the same stacked layout can be rerendered for intuitive
-``1$\sigma$ + 1$\sigma$ + 1$\sigma$'' and ``1$\sigma$ + 2$\sigma$ + 3$\sigma$''
-shared-coupling tests once the corresponding injection-summary CSVs are bundled in the
-note workspace. The panels shown here therefore remain provisional in their numerical
-content, but they already use the publication-facing top-bottom layout and the final
-inverse-variance bookkeeping. Figure~\ref{fig:combined-search-power} then shows both
-the combined search-power scan and the constituent-dataset allocations needed to reach
-a target shared significance.
-
-\begin{figure}[h!]
-\centering
-\begin{subfigure}[t]{0.66\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{combined_search_figs/combined_search_power_scenarios.png}
-  \caption{Current two-dataset search-power scan. The injected common coupling is
-  translated into dataset-specific signal yields before the combined significance is
-  evaluated, so the curves track genuine shared-likelihood sensitivity rather than a
-  same-event-count toy convention.}
-\end{subfigure}
-
-\vspace{0.25em}
-
-\begin{subfigure}[t]{0.66\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{combined_search_figs/combined_search_power_constituent_pvalues_5sigma.png}
-  \caption{Constituent-dataset requirements for a target combined $5\sigma$ excess. The
-  point of this panel is that the shared fit can reach a fixed combined threshold from
-  many different per-dataset allocations, depending on where each spectrum has the
-  better local signal-to-background leverage.}
-\end{subfigure}
-\caption{Combined-search-power diagnostics. These plots show how sensitivity accumulates
-in the shared-$\eps^2$ framework and should be interpreted together with the
-significance-calibration studies rather than as direct limit-setting observables. Their
-review value is to show why the combined search can outperform any one constituent
-dataset even when the underlying injected coupling is the same in every channel.}
-\label{fig:combined-search-power}
-\end{figure}
-
-\subsection{Projected unblinded reach in \texorpdfstring{$\eps^2$}{epsilon2}}
-
-The same inverse-variance logic can be used for a simple full-luminosity projection.
-For the current study this is implemented directly at the level of the dataset-specific
-$\eps^2$ curves: each constituent curve is scaled by $1/\sqrt{L}$, and the projected
-shared-coupling sensitivity is then recomputed with the same inverse-variance
-combination logic used elsewhere in the note. The resulting projection is shown with
-the three-dataset results in Section~\ref{sec:results-combined-151621-1pct}, where it
-is most naturally interpreted as part of the physics-facing combined reach.
-
-\subsection{Combined extraction displays}
-
-The common-signal extraction displays are the most transparent way to visualize the
-shared-$\eps^2$ construction. The top row shows individual single-dataset
-pseudoexperiments. The lower panel shows the combined Gaussian signal representation
-constructed from the same injected coupling. For this note, the main illustrations are
-now the no-refit pseudoexperiments with a five-standard-deviation
-injected shared signal at \SIlist{40;80;120}{MeV}. Those examples are deliberately
-shown without toy-by-toy GP retraining because they are meant to test extraction
-closure under the sideband-conditioned background model and to show, mass by mass, how
-the shared coupling is partitioned among 2015, 2016, and 2021.
-Figures~\ref{fig:combined-extract-displays} and
-~\ref{fig:combined-extract-displays-additional} are the main examples of that
-shared-coupling bookkeeping.
-
-\begin{figure}[h!]
-\centering
-\graphicorplaceholder{0.96\linewidth}{extract_display_combined_m040MeV_z5p0_polished.png}
-\caption{Illustrative no-refit combined extraction display at \SI{40}{MeV}. The
-annotation box summarizes the injected coupling, the extracted combined coupling, the
-observed combined limit, the local significance, and the corresponding per-dataset fit
-summaries. The upper panels show the single-dataset fits and extracted signal
-components, while the lower panel shows the combined Gaussian signal representation that
-enters the shared-$\eps^2$ interpretation. At \SI{40}{MeV}, the 2015 spectrum carries
-most of the signal normalization, but the three-way fit still illustrates the core
-physics point of the combination: statistically independent datasets with different
-resolutions and backgrounds are constrained in one common coupling parameter.}
-\label{fig:combined-extract-displays}
-\end{figure}
-
-\begin{figure}[h!]
-\centering
-\begin{subfigure}[t]{0.88\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{extract_display_combined_m080MeV_z5p0_polished.png}
-  \caption{No-refit shared-coupling pseudoexperiment at \SI{80}{MeV}.}
-\end{subfigure}
-
-\vspace{0.8em}
-
-\begin{subfigure}[t]{0.88\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{extract_display_combined_m120MeV_z5p0_polished.png}
-  \caption{No-refit shared-coupling pseudoexperiment at \SI{120}{MeV}.}
-\end{subfigure}
-\caption{Additional no-refit combined pseudoexperiments at \SIlist{80;120}{MeV}. The
-local-significance entry in the metadata box and the changing relative sizes of the
-per-dataset extracted signals make the mass dependence of the shared fit concrete:
-different datasets dominate at different masses because their resolutions, accepted
-statistics, and prompt-background levels are not the same.}
-\label{fig:combined-extract-displays-additional}
-\end{figure}
-
-The full-refit comparison is retained as a diagnostic because it answers a different
-question: whether the sideband refit can absorb signal-like structure once the toy
-spectrum is regenerated over the full mass range. The visibly poorer recovery in that
-case is therefore not a contradiction of the no-refit closure test; it is the point of
-the absorption diagnostic. Figure~\ref{fig:combined-extract-displays-refit} documents
-that distinct failure mode explicitly.
-
-\begin{figure}[h!]
-\centering
-\graphicorplaceholder{0.88\linewidth}{extract_display_combined_m040MeV_z3p0_refit.png}
-\caption{Diagnostic full-refit combined extraction display at \SI{40}{MeV}. This panel
-is kept specifically to document how the sideband refit can absorb part of an injected
-signal when the toy is regenerated over the full mass range and the GP background model
-is retrained on the toy sidebands before extraction.}
-\label{fig:combined-extract-displays-refit}
-\end{figure}
-
-\FloatBarrier
+The earlier combined-search-power scans and illustrative no-refit/full-refit extraction
+displays have been moved to Appendix~\ref{app:prior-validation-results}. They remain
+useful demonstrations of how a common $\eps^2$ maps into dataset-dependent signal
+yields, but their provisional injections are not direct coverage or closure evidence
+for the frozen v3 result. The physics-facing simultaneous limit and its matching
+observed-equivalent full-sample projection are presented in
+Section~\ref{sec:results-combined-151621-1pct}.

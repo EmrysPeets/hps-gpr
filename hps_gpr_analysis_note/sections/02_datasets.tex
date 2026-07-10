@@ -71,13 +71,11 @@ detector configuration and were already analyzed in the published prompt-search
 workflow. The 2021 dataset belongs to the upgraded detector configuration and is the
 first large-statistics physics-run sample to be carried through the GPR workflow.
 
-The 2019 physics run is acknowledged here because it shares the upgraded SVT and
-hodoscope configuration with 2021, but its prompt-resonance analysis is not included in
-the present scope. This note keeps the statement explicit: 2019 data exist, but they
-will be analyzed in a similar capacity in later work rather than merged into the
-review-ready workflow described here.
+The 2019 physics run is acknowledged because it shares the upgraded SVT and hodoscope
+configuration with 2021, but no 2019 data enter the prompt-resonance result documented
+here.
 
-Table~\ref{tab:dataset-summary} summarizes the run periods, exposures, and
+Table~\ref{tab:dataset-summary} summarizes the run periods, analyzed samples, and
 current GPR scan ranges used in this review note.
 
 \begin{table}[H]
@@ -86,41 +84,41 @@ current GPR scan ranges used in this review note.
 {\setlength{\tabcolsep}{6pt}
 \begin{tabularx}{\linewidth}{@{} P{0.26\linewidth} P{0.15\linewidth} P{0.30\linewidth} Y @{}}
 \toprule
-Run period & Beam energy & Exposure used here & Prompt scan range \\
+Run period & Beam energy & Sample used here & Prompt scan range \\
 \midrule
 2015 engineering run &
 \SI{1.056}{GeV} &
 \SI{1170}{nb^{-1}} &
-\SIrange{20}{130}{MeV} \\
+\SIrange{19}{90}{MeV} \\
 2016 engineering run &
 \SI{2.3}{GeV} &
 10\% development subset of a
 \SI{10608}{nb^{-1}} parent sample &
-\SIrange{35}{210}{MeV} \\
+\SIrange{39}{180}{MeV} \\
 2021 physics run &
 \SI{3.74}{GeV} &
 1\% review-stage subset of a $\sim\SI{160}{pb^{-1}}$ parent run &
-\SIrange{30}{250}{MeV} \\
+\SIrange{50}{250}{MeV} \\
 \bottomrule
 \end{tabularx}
 }
-\caption{Data-taking campaigns carried through the present prompt-resonance note. In
-the present note, the fully unblinded 2015 engineering run anchors the methodology
-validation, the 2016 program is carried through the current 10\% development sample on
-the way to the first 100\% unblinding-stage analysis, and the 2021 program is
-represented by the current 1\% validation subset on the way to the final 100\%
-analysis. The scan ranges
-quoted here are the current GPR analysis ranges rather than the smaller published
-window searches; the corresponding prompt-search publications scanned
-\SIrange{19}{81}{MeV} in 2015 and \SIrange{39}{179}{MeV} in 2016
+\caption{Data-taking campaigns carried through the present prompt-resonance note. The
+fully unblinded 2015 engineering run anchors the methodology validation; the 2016
+input is the current 10\% development sample; and the 2021 input is the regenerated
+1\% validation sample. The quoted ranges are those frozen for the July 2026
+pre-unblinding 90\% CL upper-limit candidate: \SIrange{19}{90}{MeV} for 2015,
+\SIrange{39}{180}{MeV} for 2016, and \SIrange{50}{250}{MeV} for 2021. The corresponding
+published prompt searches scanned \SIrange{19}{81}{MeV} in 2015 and
+\SIrange{39}{179}{MeV} in 2016
 \cite{HPS2015DarkPhoton,HPS2016PromptLong}.}
 \label{tab:dataset-summary}
 \end{table}
 
-The exposure information is not an input to the GP background interpolation itself; it
-enters the dataset-specific signal normalization that converts an extracted prompt
-yield into an equivalent $\epsilon^2$ limit, together with the target, acceptance,
-efficiency, and radiative-fraction inputs for that run period.
+The integrated luminosity and analyzed fraction are not inputs to the GP background
+interpolation itself. They enter the dataset-specific signal normalization that
+converts an extracted prompt yield into an equivalent $\epsilon^2$ limit, together
+with the target, acceptance, efficiency, and radiative-fraction inputs for that run
+period.
 
 The staged-analysis logic matters for the way the results are interpreted. The 2015
 sample remains the cleanest environment for methodology validation because it is fully
@@ -131,22 +129,24 @@ unblinded 2021 analysis remain the end points of the program. The 2021 1\% sampl
 therefore best viewed as a validation subset of the upgraded detector configuration:
 it already shows how the upgraded geometry and normalization inputs enter the
 shared-$\eps^2$ reach, but it is not yet the final physics statement for the 2021 run.
-The 2016 10\% and 2021 1\% samples are constructed as development streams spread across
+The regenerated 2021 input is \path{final_1pct_invM.root}; it supersedes the earlier
+low-$p_{\mathrm{sum}}$ development histogram used in preceding note drafts. The 2016
+10\% and 2021 1\% samples are constructed as development streams spread across
 their respective running periods rather than as contiguous end-of-run blocks, so they
-sample run-period conditions while keeping most of the blinded exposure reserved for the
-later unblinding stages.
+sample run-period conditions while keeping most of each campaign dataset blinded for
+the later unblinding stages.
 
 Figure~\ref{fig:dataset-mass-shape-overlay} compares the unit-normalized invariant-mass
 shapes for the three samples. Figure~\ref{fig:dataset-mass-distributions-log} then shows
-the same spectra in absolute events per MeV, with the relevant published or expected
-search regions highlighted.
+the same spectra in absolute events per MeV, with the published engineering-run windows
+and the frozen 2021 candidate range highlighted.
 
 \begin{figure}[H]
 \centering
 \graphicorplaceholder{0.86\linewidth}{dataset_summary_figs/invariant_mass_distributions_2015_2016_2021_normalized.png}
 \caption{Unit-normalized invariant-mass shapes for the 2015, 2016 10\%, and 2021 1\%
 samples used in the current workflow. Each histogram is divided by its own total event
-count and bin width, so the overlay compares shape rather than exposure.}
+count and bin width, so the overlay compares spectral shape rather than sample size.}
 \label{fig:dataset-mass-shape-overlay}
 \end{figure}
 
@@ -154,8 +154,8 @@ count and bin width, so the overlay compares shape rather than exposure.}
 \centering
 \graphicorplaceholder{0.98\linewidth}{dataset_summary_figs/invariant_mass_distributions_2015_2016_2021_log.png}
 \caption{Absolute invariant-mass distributions for the three datasets. The shaded
-regions show the published 2015 and 2016 prompt-search windows and the expected 2021
-GPR search region, updated here to \SIrange{50}{250}{MeV}; the 2021 panel is plotted
+regions show the published 2015 and 2016 prompt-search windows and the v3 2021
+candidate range, \SIrange{50}{250}{MeV}; the 2021 panel is plotted
 to higher mass to show the visible high-mass tail beyond the search window.}
 \label{fig:dataset-mass-distributions-log}
 \end{figure}

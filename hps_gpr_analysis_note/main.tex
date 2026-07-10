@@ -15,6 +15,7 @@
 \usepackage{enumitem}
 \usepackage{float}
 \usepackage{placeins}
+\usepackage{pdflscape}
 \usepackage{microtype}
 \usepackage{textcomp}
 % Package used to add line numbers
@@ -32,13 +33,14 @@
 
 \pagestyle{fancy}
 \fancyhf{}
+\setlength{\headheight}{14pt}
 
-\fancyhead[R]{HPS-ANALYSIS-NOTE BH-GPR v2}
+\fancyhead[R]{HPS-ANALYSIS-NOTE BH-GPR v3}
 \fancyfoot[C]{\thepage}
 
 \fancypagestyle{plain}{
   \fancyhf{}
-  \fancyhead[R]{HPS-ANALYSIS-NOTE BH-GPR v2}
+  \fancyhead[R]{HPS-ANALYSIS-NOTE BH-GPR v3}
   \fancyfoot[C]{\thepage}
 }
 
@@ -72,18 +74,9 @@
   }%
 }
 
-\newcommand{\analysisplaceholder}[1]{%
-  \begin{center}
-  \fbox{%
-    \begin{minipage}{0.94\linewidth}
-      \small #1
-    \end{minipage}
-  }
-  \end{center}
-}
-
 \title{\vspace{-1.0em}HPS Gaussian-Process Resonance Search Analysis Note\\
-\large Global background modeling, limit setting, toy validation, and shared-$\eps^2$ combination}
+\large Version 3: global background modeling, limit setting, toy validation, and
+shared-$\eps^2$ combination}
 \author{
 Emrys Peets\\Stanford University and SLAC National Accelerator Laboratory
 \and
@@ -91,7 +84,7 @@ Matthew Gignac\\SLAC National Accelerator Laboratory
 \and
 Eden Hsu\\Stanford University and SLAC National Accelerator Laboratory
 }
-\date{June 22, 2026}
+\date{July 10, 2026}
 
 \begin{document}
 
@@ -99,21 +92,30 @@ Eden Hsu\\Stanford University and SLAC National Accelerator Laboratory
 \maketitle
 
 \begin{abstract}
-This note documents the current Heavy Photon Search (HPS) Gaussian-process-regression (GPR) analysis workflow for the dark-sector-motivated search for a narrow prompt
+This note documents the Heavy Photon Search (HPS) Gaussian-process-regression (GPR)
+workflow for a narrow prompt
 $A^\prime \rightarrow e^+e^-$ resonance in the HPS invariant-mass spectrum. The
 analysis performs global background interpolation, local signal extraction with
-Gaussian-profiled background nuisances, modified-frequentist
+Gaussian-constrained nuisance parameters for the correlated background uncertainty,
+modified-frequentist
 \CLs\ ($\mathrm{CL}_{s+b}/\mathrm{CL}_b$) upper limits in signal-yield and
-$\eps^2$ space, and statistically independent multi-dataset combinations in a shared
+$\eps^2$ space, and a statistically independent multi-dataset combination in a shared
 $\eps^2$ parameter of interest. The signal model is implemented as a full-range
 Gaussian template whose blinded-bin slice enters the local likelihood without
 renormalization, so the fitted amplitude retains the interpretation of a total local
 signal yield. The note also summarizes the radiative-fraction normalization,
-length-scale parameterization, toy-validation program, and the current staged path from
-the published 2015 and 2016 HPS prompt searches to the final combined analysis.
+length-scale parameterization, toy-validation program, and staged path from the
+published 2015 and 2016 HPS prompt searches toward a fully unblinded combination.
+Version 3 uses the regenerated high-$p_{\mathrm{sum}}$ 2021 input, dataset-dependent
+length-scale bounds, and a pre-unblinding 90\% CL upper-limit candidate obtained with
+\CLs{}. Plotting-export discrepancies are documented explicitly and must be resolved
+before a final observed result is claimed.
 \end{abstract}
 
 \tableofcontents
+\clearpage
+
+\input{sections/00_change_log}
 \clearpage
 
 \input{sections/01_introduction}
@@ -124,6 +126,7 @@ the published 2015 and 2016 HPS prompt searches to the final combined analysis.
 \input{sections/06_results}
 \input{sections/07_conclusions}
 \appendix
+\input{sections/appendix_prior_validation_results}
 \input{sections/appendix_kernel_studies}
 \input{sections/appendix_2015_method_comparison}
 
