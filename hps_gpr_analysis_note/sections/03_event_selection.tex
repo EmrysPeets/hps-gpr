@@ -12,27 +12,30 @@ radiative-fraction treatment are documented together in this section.
 
 Across all HPS campaigns, the prompt selection follows the same experimental logic:
 oppositely charged tracks matched to ECal clusters, tight cluster-time coincidence,
-track-quality and vertex requirements, and momentum cuts that retain prompt radiative
-tridents while suppressing accidentals and converted wide-angle Bremsstrahlung. The
+track-quality and vertex-reconstruction requirements, and momentum cuts that retain
+prompt radiative tridents while suppressing accidentals and converted wide-angle
+Bremsstrahlung. The
 2015 and 2016 selections are already mature because they are inherited from the
 published prompt searches. For 2021, the baseline upgraded-detector preselection is
-taken from the full 2021 analysis note, while the extra prompt-oriented tightening in
-the current GPR workflow is recorded separately. Table~\ref{tab:event-selection}
-therefore distinguishes the full-analysis-note preselection from the additional
-$p_{\mathrm{sum}}>\SI{2.8}{GeV}$ requirement applied by the present 1\% validation
-histogram.
+taken from the full 2021 analysis note, while the event-level changes used to construct
+the regenerated GPR input are recorded separately. In particular, events with
+$p_{\mathrm{sum}}<\SI{2.8}{GeV}$ are rejected, so the retained sample is the
+high-$p_{\mathrm{sum}}$ side. The regenerated sample also lowers the electron-track hit
+requirement to at least eight two-dimensional hits and applies no requirement on the
+vertex-fit $\chi^2$. Table~\ref{tab:event-selection} distinguishes these production
+choices from the broader full-analysis-note preselection.
 
 \input{tables/event_selection_table}
 
 
 
 The 2021 entries in the table follow the preselection summary in the full 2021 note
-\cite[Sec.~4.8, Table~38 and App.~A]{HPS2021FullAnalysisNote}. The production histogram
-already used in the analysis is the upgraded selection exported as
-\path{preselection\_invM\_psumlt2p8\_hists.root} with mass spectrum
-\path{preselection/h\_invM\_8000}. The table therefore separates which requirements are
-baseline upgraded-detector preselection requirements and which requirement is a
-genuinely prompt-tight addition for the final resonance workflow.
+\cite[Sec.~4.8, Table~38 and App.~A]{HPS2021FullAnalysisNote}. The regenerated production
+histogram is read from \path{final_1pct_invM.root}, with mass spectrum
+\path{preselection/h_invM_8000}. This file supersedes the legacy \texttt{psumlt2p8}
+input used by earlier drafts and studies. The table therefore separates baseline
+upgraded-detector preselection requirements from the changes made when constructing the
+high-$p_{\mathrm{sum}}$ prompt-resonance input.
 The GPR layer does not add any further per-event selection
 on top of these prompt cuts. In the remainder of the note, each dataset is represented
 only by the selected invariant-mass histogram together with the detector response and
@@ -44,15 +47,18 @@ entered the prompt-search optimization, while ``prompt selection'' denoted the n
 subset used for the published resonance result after timing, momentum-sum, and
 background-rejection tightening. The current 2021 GPR workflow is already closer to the
 latter category in physics content, because the exported histogram is a prompt-oriented
-study sample with the extra $p_{\mathrm{sum}}>\SI{2.8}{GeV}$ tightening. The table now
-records that decomposition explicitly enough to compare it with the engineering-run
+high-$p_{\mathrm{sum}}$ sample. Stating the selection as rejection of
+$p_{\mathrm{sum}}<\SI{2.8}{GeV}$ avoids conflating the rejected low-momentum side with
+the events retained for the analysis. The table also records the updated electron-hit
+and vertex-quality treatment needed to compare this sample with the engineering-run
 selections.
 
 % ============================================================
 %  Preselection validation figures (v13 signal overlay)
 % ============================================================
-Several reconstruction level variables are shown in the figures below. 
-An arbitrary signal normalization is applied to show the shapes of the signal vs the 1\% dataset. 
+The figures below show selected reconstruction-level variables from the 2021
+preselection study. The signal simulation is assigned an arbitrary normalization, so
+these are shape comparisons rather than yield or efficiency measurements.
 
 % ------------------------------------------------------------
 %  4. Vertex quantities
@@ -73,7 +79,9 @@ An arbitrary signal normalization is applied to show the shapes of the signal vs
     \caption{Vertex-fit $\chi^2$.}
   \end{subfigure}
   \caption{Reconstructed-vertex distributions after the loose preselection,
-    comparing data (points) with the signal MC (filled histogram).}
+    comparing data (points) with the signal MC (filled histogram). The vertex-fit
+    $\chi^2$ is shown as a diagnostic; no vertex-fit $\chi^2$ requirement is applied to
+    the regenerated 2021 GPR input.}
   \label{fig:presel_vertex}
 \end{figure}
 
@@ -285,19 +293,23 @@ quote a continuous resolution curve rather than a set of isolated calibration po
 the figure compresses a data anchor, a detector-smearing correction, and a mass
 interpolation study into one review-facing summary.
 
-The current GPR workflow uses the same published-resolution logic, with one practical
-extension: the historical polynomial is not allowed to turn over and improve
-artificially above about \SI{180}{MeV}. The operative 2016 parameterization is
+The current GPR workflow uses the same published-resolution logic. The polynomial used
+for the 2016 signal model is
 \begin{align}
 \sigma_{2016}(m) &= 3.8\times10^{-4} + 4.1\times10^{-2}m - 2.7\times10^{-1}m^2 \nonumber\\
 &\quad + 3.49\,m^3 - 11.11\,m^4,
 \qquad m \le \SI{0.18}{GeV},
 \label{eq:sigma2016}
 \end{align}
-followed by a linear continuation above $m_0=\SI{0.18}{GeV}$ with slope override
-\num{0.0239}. That tail prescription is purely technical, but it is necessary for the
-wider GPR scan window because an unphysical decrease of $\sigma_m$ at high mass would
-overstate the prompt sensitivity.
+Earlier GPR studies continued this function linearly above
+$m_0=\SI{0.18}{GeV}$, using slope \num{0.0239}, to prevent the polynomial from turning
+over when those studies scanned beyond the published search range. That override is
+not used by the v3 result. The v3 scan ends at \SI{180}{MeV} for 2016, compared with
+the published \SIrange{39}{179}{MeV} interval, and therefore does not evaluate a mass
+hypothesis above the polynomial boundary. The same range-freezing policy brings the
+2015 scan back near its published \SIrange{19}{81}{MeV} interval; its only deliberate
+extension is the upper endpoint at \SI{90}{MeV}. Thus the high-mass slope override
+documents analyses prior to v3 and is not an ingredient of the present candidate.
 
 The 2016 review emphasis is therefore twofold. First, the mass resolution must be
 described as a data-validated quantity rather than a free fit parameter. Second, the
@@ -421,8 +433,8 @@ A_d = K_d(m)\,\eps^2,
 \label{eq:kd-radfrac}
 \end{equation}
 where $\rho_d(m)$ is the selected prompt-spectrum density in dataset $d$. The
-dataset-specific radiative-fraction story then differs in important ways between the
-engineering-run searches and the provisional 2021 workflow.
+radiative-fraction inputs differ in important ways between the engineering-run searches
+and the provisional 2021 normalization used for this pre-unblinding candidate.
 
 \subsubsection{2015 Radiative Fraction}
 
@@ -484,23 +496,24 @@ surrogate for numerical stability.}
 
 \subsubsection{2021 Radiative Fraction}
 
-For the current 2021 1\% workflow, the radiative-fraction input remains provisional.
-The present package uses the constant choice
+For the 2021 1\% candidate, the radiative-fraction input remains provisional. The
+present package uses the constant choice
 \begin{equation}
 f_{\mathrm{rad},2021}(m) = 0.05,
 \end{equation}
-with the explicit understanding that the final upgraded-detector normalization note may
-replace both the baseline value and its associated systematic treatment. This constant
-choice is nevertheless supported by the available 2021 full-analysis note over the
+This value is not frozen for the final unblinded interpretation. It is nevertheless
+supported by the available 2021 full-analysis note over the
 majority of the 2021 search range: that note constructs the radiative fraction from
-selected radiative-trident, tritrig, and WAB samples after preselection and the
-$p_{\mathrm{vtx}}>2.8~\mathrm{GeV}$ requirement, fits the resulting ratio over
+selected radiative-trident, tritrig, and WAB samples after preselection and a
+high-momentum requirement quoted there as $p_{\mathrm{vtx}}>2.8~\mathrm{GeV}$, fits the resulting ratio over
 $0.05<m<0.25~\mathrm{GeV}$, and quotes a constant average
 $f_{\mathrm{rad}}^{\mathrm{const}}=0.0496$ \cite[Sec.~6.1, Figs.~92--93,
-Eqs.~25--26]{HPS2021FullAnalysisNote}. The existing $0.05$ input is therefore a
-reasonable compact surrogate for the central and high-mass portion of the present
-2021 scan, while the lowest-mass edge and any final unblinded result should retain the
-mass-dependent 2021 parameterization as the reference cross-check.
+Eqs.~25--26]{HPS2021FullAnalysisNote}. The $0.05$ input is therefore a reasonable
+compact surrogate for the central and high-mass portion of the present 2021 scan.
+Before the final unblinded interpretation, the normalization category must be checked
+explicitly against the regenerated production histogram's
+$p_{\mathrm{sum}}$ selection and the exact threshold-inclusivity convention, and the
+mass-dependent 2021 parameterization should remain the reference cross-check.
 
 \begin{figure}[H]
 \centering
@@ -535,34 +548,34 @@ than inside the local likelihood. It therefore acts as a normalization systemati
 the inferred coupling, not as a change in the shape of the blind-window extraction
 model.
 
-For the current combined rerun summarized later in the note,
-$\delta_{f,d}=0.07$ for 2015, 2016, and 2021. At the single-dataset level, this means
-that a fixed signal-yield limit maps to a weaker coupling limit by approximately
-$1/(1-\delta_f)\simeq 1.075$. In the combined analysis, the same logic applies to
-every constituent dataset at once: each conversion factor $K_d(m)$ is reduced, so the
-shared $\eps^2$ value required to produce the same per-dataset yields becomes larger.
-This is why the radiative-fraction penalty should be described as a coherent
-normalization systematic scenario on the coupling interpretation, not as a profiled
-shared nuisance parameter in the current likelihood.
+For the July 2026 pre-unblinding configuration summarized later in the note, the frozen
+penalties are
+\begin{equation}
+(\delta_{f,2015},\delta_{f,2016},\delta_{f,2021})=(0.070,0.070,0.046).
+\label{eq:frad-penalty-vector}
+\end{equation}
+At the single-dataset level, a fixed signal-yield limit therefore maps to a weaker
+coupling-squared limit by factors $1/0.93$ for 2015 and 2016 and $1/0.954$ for 2021.
+In the combined analysis each conversion factor $K_d(m)$ is reduced by its own frozen
+amount, so the shared $\eps^2$ required to produce the same per-dataset yields becomes
+larger. These factors are fixed normalization shifts in the present result, not nuisance
+parameters profiled by the simultaneous likelihood.
 
-The practical reason to keep this discussion separate from the baseline
-radiative-fraction subsection is that the two questions are not the same. The baseline
-$f_{\mathrm{rad},d}(m)$ determines how prompt backgrounds are translated into a signal
-normalization for each dataset. The penalty $\delta_{f,d}$ instead quantifies how
-conservative one chooses to be when carrying that normalization into the final
-$\eps^2$ statement. In reviewer terms: the former is the nominal calibration, the
-latter is the systematic safety margin carried by the current combination.
+The baseline $f_{\mathrm{rad},d}(m)$ determines how the selected prompt spectrum is
+translated into a signal normalization for each dataset. The factor $\delta_{f,d}$ is a
+separate one-sided normalization variation carried into the candidate $\eps^2$ limit;
+it is not part of the GP interpolation or a nuisance parameter profiled in the
+likelihood.
 
-The reason to choose a 7\% penalty in the present note is historical as well as
-practical. In the 2015 prompt-search documentation, the radiative-fraction/e$^+$e$^-$
+The 7\% engineering-run penalties are historical as well as practical. In the 2015
+prompt-search documentation, the radiative-fraction/e$^+$e$^-$
 composition uncertainty enters the systematic summary at the several-percent level, and
 the 2016 prompt search likewise propagated a non-negligible normalization uncertainty
 from the selected radiative, trident, and converted-WAB inputs
-\cite{HPS2015InternalNote,HPS2016PromptLong}. Carrying a common 7\% penalty into the
-current three-dataset combination is therefore a conservative first-order choice: it is
-large enough to cover the established engineering-run normalization uncertainty, and it
-is a reasonable temporary treatment for 2021 while the dedicated upgraded-detector
-normalization study is still being finalized.
+\cite{HPS2015InternalNote,HPS2016PromptLong}. Retaining 7\% for 2015 and 2016 is
+therefore a conservative first-order treatment of the established engineering-run
+normalization uncertainty. The 2021 component is instead set by the dedicated
+upgraded-detector estimate below.
 
 The 2021 full-analysis note now provides a more direct estimate for the 2021
 radiative-fraction normalization uncertainty. Its MC cross-section study uses the
@@ -584,12 +597,9 @@ f_{\mathrm{rad},2021}^{\mathrm{eff}}
 \label{eq:frad-2021-note-penalty}
 \end{equation}
 Thus the note-supported 2021 analog of the 2016-style one-sided radiative-fraction
-penalty is 4.6\%, corresponding to a multiplicative factor of 0.954. The current
-results in this note continue to use the deliberately conservative common 7\%
-scenario for consistency with the already-produced combined rerun; later results will
-replace the 2021 component with the 4.6\% penalty of
-Eq.~\eqref{eq:frad-2021-note-penalty}, while keeping the 2015 and 2016 treatments tied
-to their respective internal-note provenance.
+penalty is 4.6\%, corresponding to a multiplicative factor of 0.954. This 4.6\% value
+is the 2021 component used by the July 2026 pre-unblinding result; the 2015 and 2016
+components remain at 7\% and retain their engineering-run provenance.
 
 \begin{figure}[H]
 \centering

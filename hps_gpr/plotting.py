@@ -2969,13 +2969,6 @@ def plot_combined_search_power(
 
     for ax in (axz, axp):
         ax.legend(loc="best", frameon=True)
-    fig.text(
-        0.01,
-        0.01,
-        "Constituent expectations use inverse-variance weighting from toy-derived sigmaA_ref(m); "
-        "the higher-information dataset carries a larger share of the required local significance.",
-        fontsize=8,
-    )
     out = os.path.join(outdir, "combined_search_power_constituent_pvalues_5sigma.png")
     _save_plot_outputs(fig, out)
     saved.append(out)

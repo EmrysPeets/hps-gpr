@@ -1,7 +1,7 @@
 \section{Comparison of the Corrected 2015 Polynomial Re-analysis and the GPR Method}
 \label{app:2015-method-comparison}
 
-This appendix compares the present GPR-based 2015 upper limit with the corrected
+This appendix compares a historical 95\% CL GPR-based 2015 upper limit with the corrected
 2015 re-analysis documented in Appendix~J of the 2016 bump-hunt internal note
 \cite{HPS2016BumpInternal}.  The comparison is useful because both analyses use the
 same fully unblinded 2015 engineering-run mass spectrum, the same basic prompt
@@ -78,7 +78,7 @@ implementation.
 
 \subsection{Present GPR method}
 
-The current GPR method is not a polynomial re-fit with a smoother background curve.
+The GPR method is not a polynomial re-fit with a smoother background curve.
 For each test mass, the method excludes the blinded region from the training data,
 fits the smooth invariant-mass spectrum in log-count space, and predicts the
 count-space mean vector and covariance matrix in the blinded mass window.  The local
@@ -87,28 +87,30 @@ background covariance is represented by correlated Gaussian-constrained nuisance
 parameters.  A full-range Gaussian signal template is normalized over the histogram
 support and then sliced into the blinded window without re-normalization, so the fitted
 signal amplitude remains the total local Gaussian yield associated with the mass
-hypothesis.  The 95\% upper limit is obtained with the bounded profile-likelihood
-\CLs{} construction described in Section~\ref{sec:methodology}.
+hypothesis. The comparison curve uses a 95\% CL upper limit obtained with the bounded
+profile-likelihood \CLs{} construction described in Section~\ref{sec:methodology}; it
+is retained as a historical cross-check and is not the v3 90\% CL candidate.
 
-For the observed-limit comparison shown here, the GPR curve corresponds to the current
-2015 production configuration with a widened $2.25\,\sigma_m$ blind and training
+For the observed-limit comparison shown here, the GPR curve corresponds to an earlier
+2015 configuration with a widened $2.25\,\sigma_m$ blind and training
 exclusion region, a \SI{1}{MeV} scan step, the 7\% radiative-normalization penalty, and
 the $\eps^2$ density evaluated with the \SI{1.64}{\sigma_m} convention.  The
 validation studies in Section~\ref{sec:toys} motivate the widened blind/extraction
 window through leakage, pull, amplitude-recovery, and significance-calibration
-diagnostics.  The methodology text and final configuration should use a consistent
-statement of this choice when this appendix is finalized.
+diagnostics. This figure is not used to define the v3 confidence-level convention or
+the simultaneous candidate.
 
 \begin{table}[p]
 \centering
 \small
 \begin{tabularx}{\linewidth}{P{0.25\linewidth}YY}
 \toprule
-Feature & Corrected 2015 polynomial re-analysis & Present GPR analysis \\
+Feature & Corrected 2015 polynomial re-analysis & Historical GPR comparison \\
 \midrule
 Data set & Fully unblinded 2015 engineering-run spectrum over the published low-mass
-range. & Same 2015 spectrum for the comparison; current scan extends beyond the
-published range in production studies. \\
+range. & Same 2015 spectrum for the comparison; the v3 scan begins at the published
+lower boundary of \SI{19}{MeV} and extends the upper boundary from \SI{81}{MeV} to
+\SI{90}{MeV}. \\
 Background model & Local mass-window fit with a Legendre-polynomial background in the
 corrected 2016-code re-analysis; original 2015 publication used Chebyshev
 polynomials. & Full-range log-count GP trained outside the blinded region, with a
@@ -155,12 +157,15 @@ conversion.
 
 \begin{figure}[p]
 \centering
-\graphicorplaceholder{0.92\linewidth}{final_limit_projection_figs/individual_datasets/hps2015_95cl_observed_vs_internal_note.png}
+\graphicorplaceholder{0.97\linewidth}{final_limit_projection_figs/individual_datasets/hps2015_95cl_observed_vs_internal_note.png}
 \caption{Observed 95\% $\eps^2$ upper-limit comparison for the 2015 data set.  The
 black curve labeled ``Legendre Polynomial Approach'' is the corrected 2015
 re-analysis digitized from Fig.~71 of the 2016 bump-hunt internal note.  The blue curve
-labeled ``GPR approach'' is the present GPR result for the 2015 data set.  The lower
-panel shows the ratio GPR/Legendre.}
+labeled ``GPR approach'' is the historical 95\% CL GPR result for the same data set.
+The lower panel shows the pointwise GPR/Legendre ratio; over the common
+\SIrange{20}{81}{MeV} grid its median is 0.99 and its mean is 1.06. Agreement at this
+level checks the overall yield-to-$\eps^2$ normalization and observed sensitivity
+scale, but does not by itself test background-model coverage or signal absorption.}
 \label{fig:hps2015-legendre-gpr-observed}
 \end{figure}
 
@@ -177,14 +182,14 @@ obviously over- or under-excluding the 2015 data relative to the corrected histo
 analysis.
 
 The agreement is not, by itself, a validation of coverage, background-model bias, or
-absence of signal absorption.  Those questions are answered by the toy program:
+absence of signal absorption. Those questions are addressed by the toy program:
 functional-form pseudoexperiments test closure against smooth analytic spectra,
 GP-propagated pseudoexperiments test behavior under the GP background model, and
 refit-on-toy studies test whether the sideband training can absorb signal-like
 structure.  The comparison in Fig.~\ref{fig:hps2015-legendre-gpr-observed} should
-therefore be presented as a cross-check of the observed sensitivity scale, while the
-closure and coverage figures remain the central statistical validation of the GPR
-method.
+therefore be presented as a cross-check of the observed sensitivity scale. The
+functional-form closure studies and the outstanding production-matched coverage test
+provide the relevant calibration evidence and gate, respectively.
 
 The corrected 2015 re-analysis also changes how the published 2015 result should be
 used in this note.  The original published contour should not be used as the primary

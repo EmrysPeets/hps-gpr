@@ -1,70 +1,63 @@
 \section{Conclusions and Outlook}
 \label{sec:conclusions}
 
-This note documents a coherent GPR-based framework for the HPS narrow prompt
-$A^\prime \rightarrow e^+e^-$ search. The workflow now ties the detector-era inputs,
-mass-resolution parameterizations, radiative-fraction normalization, log-count GP
-background model, local profiled signal extraction, \CLs\ limit setting, and
-shared-$\eps^2$ combination into one reviewable chain.
+Version 3 records the current HPS GPR prompt-resonance analysis in a form aligned with
+the July 2026 pre-unblinding studies. The 2021 analysis now uses the regenerated
+\path{final_1pct_invM.root} input, rejects events satisfying
+$p_{\mathrm{sum}}<\SI{2.8}{GeV}$, requires at least eight
+two-dimensional hits on the electron track, and applies no vertex-fit $\chi^2$
+selection. The result therefore no longer inherits the oppositely selected
+low-$p_{\mathrm{sum}}$ development histogram or the earlier vertex and hit
+requirements.
 
-The validation suite supports the current blind-window and extraction choices with
-several complementary studies. The training-exclusion scan shows why the GP sidebands
-should begin outside approximately $2.25\,\sigma_m$ rather than immediately outside a
-narrow $1.64\,\sigma_m$ blind region. The refmatched 2015 blind-geometry comparison
-then shows that a $2.25\,\sigma_m$ blind/extraction window gives similar closure to the
-$1.64\,\sigma_m$ blind plus $2.25\,\sigma_m$ guard construction while retaining better
-expected reach. The length-scale lower-bound scan motivates the selected $1\sigma$
-stability bound, and the functional-form seed panels document the analytic backgrounds
-used for the smooth-spectrum toy ensembles. The dataset-level refmatched full-refit
-closure panels for 2015, 2016 10\%, and 2021 1\% document the corresponding pull
-calibration and residual significance calibration.
+The GP length-scale bounds are also dataset dependent. The frozen lower factors are
+1.0 for 2015, 0.9 for 2016, and 1.1 for 2021, with upper factors 8, 8, and 9,
+respectively. Their interpretation is deliberately narrower than \emph{best value in
+every metric}. The 2016 choice reduces the coherent pull bias seen for the earlier
+bound; the 2015 choice is a conservative frozen baseline despite a marginally better
+aggregate score at 1.1; and the 2021 choice is a calibration--reach compromise among
+nearly degenerate candidates. The corresponding error-barred, matched-reference
+functional-form studies are the principal closure figures in the note. Pull widths
+below unity are described as conservative only conditional on a toy ensemble that
+faithfully reproduces the production refit and fluctuation model.
 
-The current staged internal-review result is the corrected
-2015$+$2016 10\%$+$2021 1\% simultaneous shared-$\eps^2$ analysis. The individual
-dataset limits and local $p_0$ scans are shown as diagnostic inputs, but the combined
-limit is obtained from the joint profiled likelihood rather than from an envelope of
-single-dataset curves. The observed extraction display at \SI{119}{MeV} provides a
-concrete check of how the dataset-level fits enter the shared-coupling result.
-The 90\% CLs interpretation now also includes the dimuon-threshold branching
-correction and a dedicated 2021 target-constrained resolution-smearing comparison.
-That comparison shows that broadening the 2021 signal template redistributes the
-local discovery structure: some mass regions become more signal-like, while several
-prominent unscaled excess-like features become less significant.
+The staged review candidate is a simultaneous 2015 full, 2016 10\%, and regenerated
+2021 1\% 90\% CL upper limit on $\eps^2$ obtained with \CLs{}. The conversion uses
+fixed radiative-fraction penalties of 7\%, 7\%, and 4.6\%, respectively, and includes
+the minimal-model dimuon-threshold branching correction. The regenerated 2021
+signal-yield and $\eps^2$ panels are shown together so that extraction and conversion
+effects remain distinguishable. The combined result is obtained from the profiled
+shared-coupling likelihood; it is not an envelope of individual observed limits.
 
-The full-statistics curves remain projections. They are useful for comparing the
-expected reach of the GPR strategy with the published HPS prompt result and the BaBar
-visible-dark-photon contour, but they are not observed full-statistics exclusions. The
-local/global significance overlays shown in the note are likewise review diagnostics;
-any final discovery statement should use a frozen scan-level toy calibration of the
-maximum discovery statistic.
+The current band and observed curves remain pre-unblinding candidates. Their plotting
+bundle records a reproducible display-level repair for isolated failed mass points:
+in the displayed observed-limit curves only, log-linear interpolation at 24~MeV in
+2015; 44, 98, 133, and 171~MeV in the 2016
+10\% sample; and 136~MeV in the simultaneous observed limit. The repaired 136~MeV
+value is used consistently in the headline limit, the individual-versus-combined
+comparison, and the complete-campaign projection. Known failed fits are omitted,
+rather than interpolated, in the individual local-$p_0$ scans. These choices
+produce legible review figures without treating a failed export as a physical
+measurement, and the repaired points and neighboring inputs are retained in the
+figure audit tables. The affected hypotheses must nevertheless be regenerated or
+reconciled from the frozen likelihood outputs before a final observed exclusion is
+quoted. The connected local-$p_0$ curves and their analytic
+effective-trials conversion provide the review-level global $p$-values used in v3.
+A background-only maximum-$q_0$ ensemble would remain a valuable publication-stage
+cross-check of that conversion, but it is not required to interpret the present
+scan-level comparison.
 
-\begin{figure}[H]
-\centering
-\graphicorplaceholder{0.98\linewidth}{final_limit_projection_figs/90cls/projections/projected_gpr_phase_space_context.png}
-\caption{Projected full-data HPS GPR reach in the same visible-dark-photon phase space
-as Fig.~\ref{fig:hps-engineering-phase-space}, zoomed to the HPS prompt-search region
-$15<m_{A^\prime}<275~\mathrm{MeV}$ and
-$4\times10^{-7}<\eps^2<10^{-4}$. The shaded purple band marks the main GPR projection
-window. The subdued world-data contours include BaBar, KLOE/KLOE-2, A1/MAMI, APEX,
-NA48/2, HADES, PHENIX, NA64, LHCb, and the older beam-dump or low-mass constraints
-from E137, E141, E774, Orsay, KEK, and U70
-\cite{BaBarDarkPhoton2014,KLOE2013,KLOE22015,A1MAMI2014,APEX2011,
-NA48DarkPhoton2015,HADESDarkPhoton2014,PHENIXDarkPhoton2015,NA64DarkPhoton2018,
-NA64X17Visible2021,LHCbDarkPhoton2020,E137BeamDump1988,E141BeamDump1987,
-E774BeamDump1991,OrsayBeamDump1989,KEKBeamDump1986,U70DarkPhoton2014}; the thermal
-relic band is shown as a benchmark target \cite{EssigEtAl2011}. The thick purple curve
-is this work's projected full-unblinded 90\% CL GPR observed-equivalent reach, obtained
-from the current combined 90\% CL result by applying the full-density scaling described
-in the projection workflow; the dashed purple curve shows the corresponding projected
-median. The highlighted HPS 2015 and 2016 engineering-run contours are the same
-approximate 90\% CL rescalings shown in Fig.~\ref{fig:hps-engineering-phase-space}
-\cite{HPS2015DarkPhoton,HPS2016PromptLong}.}
-\label{fig:gpr-projected-phase-space}
-\end{figure}
-
-The remaining work is well bounded. The final production pass should freeze the full
-2016 and 2021 inputs, finalize the radiative-fraction and systematic-penalty model,
-regenerate the complete toy-tail and scan-level look-elsewhere calibration tables, and
-rerender the note figures from the same production outputs used for the final
-unblinding. With those pieces in place, the framework documented here is ready to
-support the first fully combined HPS GPR prompt-resonance result.
+The full-dataset comparison is an observed-equivalent density projection from the
+same candidate. It holds the fully analyzed 2015 sample fixed and scales the 2016 10\%
+and 2021 1\% samples to their corresponding complete campaign datasets by factors of
+10 and 100. It is not a fit to the complete 2016 or 2021 datasets and is not an
+expected production sensitivity. The
+remaining publication gates are therefore concrete: regenerate the discrepant scan
+points and expected bands from frozen outputs; validate direct \CLs{} coverage with
+production-faithful toys; freeze and document the effective-trials conversion used for
+the global $p$-values; and rerender every result figure from the same immutable
+configuration and tables used for the final unblinding. The older 95\% results,
+earlier closure suites, repair
+diagnostics, and superseded projections remain available in
+Appendix~\ref{app:prior-validation-results} as analysis history rather than headline
+evidence.

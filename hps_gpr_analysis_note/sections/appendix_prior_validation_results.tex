@@ -1,0 +1,457 @@
+\section{Superseded and Auxiliary Validation and Limit Studies}
+\label{app:prior-validation-results}
+
+This appendix preserves the development history of the analysis without assigning the
+older plots the status of v3 result figures. In particular, the closure panels below
+predate the selected year-dependent lower-length-scale factors, while the limit figures
+predate the July 8, 2026 configuration or use plotting repairs that have not yet been
+replaced by rerun likelihood outputs. They remain useful for method auditing, but they
+must not be combined numerically with the main-text candidate. Each subsection records
+the question asked by the study, the relevant configuration, and the conclusion that
+was carried forward. Captions deliberately retain the historical confidence level and
+toy convention, even where these differ from the v3 90\% CL analysis.
+
+\subsection{Earlier functional-form closure summaries}
+
+Figures~\ref{fig:closure-validation-2015-funcform}--%
+\ref{fig:closure-validation-2021-funcform} are the former main-text four-panel
+functional-form summaries. They motivated the expanded lower-bound study, but they do
+not implement the selected three-dataset choices summarized in
+Table~\ref{tab:results-v3-configuration}. The error-barred, matched-reference
+lower-bound scans in
+Figures~\ref{fig:v3-lslb-closure-2015}--\ref{fig:v3-lslb-closure-2021} supersede
+them as the headline closure evidence. The functional-form seed and toy-mean overview
+is now shown where those pseudoexperiments are introduced in
+Section~\ref{sec:toys}; the plots below retain the earlier extraction
+diagnostics for comparison with that history.
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.99\linewidth}{toy_generation_figs/closure_validation_suite_2015_fShiftSigPowTail.png}
+\caption{Historical 2015 \texttt{fShiftSigPowTail} functional-form, full-refit closure
+suite for the $2.25\,\sigma_m$ blind and matched-reference geometry. The rows were
+selected from the \texttt{wide\_refmatched} subset of the blind-geometry comparison,
+so the injected amplitude was defined using the same refit convention used to assess
+the widened window. From left to right, the panels show the ensemble pull mean, pull
+width, recovered amplitude $\hat A/A_{\mathrm{inj}}$, and residual significance
+$\hat Z-Z_{\mathrm{inj}}$ versus mass; the error bars are standard errors of the
+ensemble mean or width. The near-zero background-only pull and $\Delta Z$ supported
+the absence of a mass-coherent spurious signal, while the small negative shift at the
+largest injection illustrated limited signal absorption. This study is retained for
+provenance; the 100-toy lower-bound comparison in
+Figure~\ref{fig:v3-lslb-closure-2015} is the v3 selection evidence.}
+\label{fig:closure-validation-2015-funcform}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.99\linewidth}{toy_generation_figs/closure_validation_suite_2016_fShiftSigPowTail.png}
+\caption{Historical 2016 10\% \texttt{fShiftSigPowTail} functional-form, full-refit
+closure suite from \texttt{2016\_gpr/closure\_final}. A $2.25\,\sigma_m$ blind and
+training exclusion and matched-refit signal normalization were used at each mass.
+The pull mean and width test bias and uncertainty calibration, the recovered-amplitude
+panel tests linearity, and $\hat Z-Z_{\mathrm{inj}}$ tests significance calibration
+after repeating the local GP refit and extraction on every toy. The isolated behavior
+of the $Z_{\mathrm{inj}}=1$ amplitude ratio was interpreted as a small-signal,
+finite-ensemble effect rather than a large bias because the higher injections closed
+more closely. This plot predates, and by itself does not establish, the v3 choice
+$k_{\min}=0.9$; that choice is supported by
+Figure~\ref{fig:v3-lslb-closure-2016}.}
+\label{fig:closure-validation-2016-funcform}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.99\linewidth}{toy_generation_figs/closure_validation_suite_2021_fSigPowExpQ.png}
+\caption{Historical 2021 1\% \texttt{fSigPowExpQ} functional-form, full-refit closure
+suite from the \texttt{2021\_gpr/closure\_1pct/injection\_flat} toys. The study used
+the then-current 2021 functional family and $2.25\,\sigma_m$ blind and training
+exclusion. Pull mean and width assess background-only calibration; recovered amplitude
+and $\hat Z-Z_{\mathrm{inj}}$ assess linearity and significance calibration for
+$Z_{\mathrm{inj}}=1,3,5$. Pull means were near zero and widths below unity indicated
+that the fitted uncertainty was larger than the ensemble scatter in this particular
+toy model. The displayed support and reference convention differ from the corrected
+v3 study, which uses \SIrange{30}{250}{MeV} model support and reports the
+\SIrange{50}{250}{MeV} search range in
+Figure~\ref{fig:v3-lslb-closure-2021}.}
+\label{fig:closure-validation-2021-funcform}
+\end{figure}
+
+\FloatBarrier
+
+\subsection{Earlier two-panel matched-reference displays}
+
+The following pairs are the former dataset-level pull and residual-significance
+summaries. They document the introduction of the matched-reference full-refit
+procedure, but they were not generated as a common lower-bound comparison and are
+therefore auxiliary to the v3 choice. In these studies ``matched reference'' means
+that, at every mass, the injection was defined by
+$A_{\mathrm{inj}}=Z_{\mathrm{inj}}\sigma_{A,\mathrm{ref}}$ using a background-only
+refit with the same geometry, kernel policy, and extraction prescription as the
+subsequent injected-toy fit. This removes a change of uncertainty convention between
+signal definition and recovery.
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.84\linewidth}{injection_extraction_figs/refmatched_train2p25_pull_vs_mass_2015.png}
+
+\vspace{0.35em}
+
+\graphicorplaceholder{0.84\linewidth}{injection_extraction_figs/refmatched_train2p25_z_calibration_residual_2015.png}
+\caption{Historical 2015 train-$2.25$ matched-reference functional-form closure
+diagnostics. The injected amplitude was defined with the matched background-only
+reference scale, after which every toy was processed with the same GP refit and
+widened-blind prescription. In the upper panel, the zero-injection row tests for a
+spurious fitted signal, the pull means test estimator bias, and the pull widths compare
+the fitted $\sigma_A$ with the toy-to-toy scatter. The lower panel tests significance
+calibration for the injected rows. This study established the matched-reference
+workflow, while the explicit lower-bound scan in
+Figure~\ref{fig:v3-lslb-closure-2015} determines the v3 2015 choice.}
+\label{fig:refmatched-train225-closure-2015}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.84\linewidth}{injection_extraction_figs/refmatched_train2p25_pull_vs_mass_2016.png}
+
+\vspace{0.35em}
+
+\graphicorplaceholder{0.84\linewidth}{injection_extraction_figs/refmatched_train2p25_z_calibration_residual_2016.png}
+\caption{Historical 2016 10\% train-$2.25$ matched-reference functional-form closure
+diagnostics. The upper panel tests estimator closure and uncertainty calibration and
+the lower panel tests significance calibration. The injections use the matched
+background-only reference scale and each pseudoexperiment is subjected to the full GP
+refit, so the plots probe both the local extraction and possible absorption by the
+sideband-trained background. This single-bound study does not replace the dedicated
+$k_{\min}=0.9$ comparison in Figure~\ref{fig:v3-lslb-closure-2016}.}
+\label{fig:refmatched-train225-closure-2016}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.84\linewidth}{injection_extraction_figs/refmatched_train2p25_pull_vs_mass_2021.png}
+
+\vspace{0.35em}
+
+\graphicorplaceholder{0.84\linewidth}{injection_extraction_figs/refmatched_train2p25_z_calibration_residual_2021.png}
+\caption{Historical 2021 1\% train-$2.25$ matched-reference functional-form closure
+diagnostics. The layout and matched-reference convention mirror the 2015 and 2016
+studies, allowing the fitted pull calibration and $\hat Z-Z_{\mathrm{inj}}$ response
+to be compared across campaigns. This plot used the earlier 2021 input and support.
+The corrected lower-bound study in Figure~\ref{fig:v3-lslb-closure-2021} instead uses
+\SIrange{30}{250}{MeV} model support and reports the
+\SIrange{50}{250}{MeV} search range.}
+\label{fig:refmatched-train225-closure-2021}
+\end{figure}
+
+\FloatBarrier
+
+\subsection{Legacy limit and projection figures}
+
+The figures in this subsection are retained to make changes between review iterations
+traceable. They do not use the complete July 8 v3 configuration and should not be
+quoted as the present exclusion or sensitivity. The first five plots use the former
+95\% CL convention; they are separated from the later 90\% CL projections so that the
+two confidence levels cannot be mistaken for one common result series.
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.90\linewidth}{final_limit_projection_figs/individual_datasets/2015_eps2_coupling_bands_observed_expected.png}
+\caption{Historical individual 2015 95\% CL upper limit on $\eps^2$ obtained with
+\CLs{}. The observed curve is shown with the background-only expected median and its
+68\% and 95\% intervals. This plot checked the 2015 yield-to-coupling conversion and
+served as an input diagnostic for the earlier shared-coupling analysis; it is not a
+component of the v3 90\% CL result.}
+\label{fig:app-legacy-95-individuals}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.90\linewidth}{final_limit_projection_figs/individual_datasets/2016_eps2_coupling_bands_observed_expected.png}
+\caption{Historical individual 2016 10\% 95\% CL upper limit on $\eps^2$ obtained
+with \CLs{}. The observed curve and background-only expected bands were used to audit
+the intermediate-mass input to an earlier combination. The analyzed sample is the
+10\% development subset, not the complete 2016 campaign dataset, and this plot does
+not use the v3 90\% CL configuration.}
+\label{fig:app-legacy-95-individual-2016}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.90\linewidth}{final_limit_projection_figs/individual_datasets/2021_eps2_coupling_bands_observed_expected.png}
+\caption{Historical individual 2021 1\% 95\% CL upper limit on $\eps^2$ obtained
+with \CLs{}. The plot records the earlier 2021 input and conversion used during
+development of the combined likelihood. It predates the regenerated
+\texttt{final\_1pct\_invM.root} sample and is therefore retained only as analysis history,
+not as a cross-check of the corrected v3 2021 limit.}
+\label{fig:app-legacy-95-individual-2021}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.90\linewidth}{final_limit_projection_figs/combined/combined_corrected2_bands_with_correct_observed_eps2.png}
+\caption{Historical simultaneous 2015$+$2016 10\%$+$2021 1\% 95\% CL upper limit
+on $\eps^2$ obtained with \CLs{}. The green and yellow regions are the 68\% and 95\%
+background-only expected intervals and the black curve is the then-current observed
+shared-coupling limit. This plot documented the earlier combined likelihood; it has
+been replaced by the selected v3 90\% CL configuration.}
+\label{fig:app-legacy-95-combined}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.90\linewidth}{final_limit_projection_figs/combined/observed_eps2_overlay_individual_and_correct_combined.png}
+\caption{Historical observed 95\% CL upper limits on $\eps^2$ for the individual
+datasets and their simultaneous shared-coupling combination. The plot was used to
+check that the joint likelihood behaved recognizably relative to its inputs; the
+combined curve is a direct profile of one common $\eps^2$, not the pointwise envelope
+of the individual curves. It is superseded by the clean v3 90\% CL comparison in the
+main text.}
+\label{fig:app-legacy-95-observed-overlay}
+\end{figure}
+
+The following two figures are 90\% CL projection products, but they predate the frozen
+$k_{\min}=(1.0,0.9,1.1)$ configuration. They were produced by rescaling the current
+2016 10\% and 2021 1\% density inputs to the complete campaign datasets while keeping
+2015 fixed. They are observed-equivalent scaling studies, not likelihood fits to the
+blinded data and not median expected sensitivities.
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.90\linewidth}{final_limit_projection_figs/90cls/projections/projected_full_unblinded_reach_90cls_eps2.png}
+\caption{Historical 90\% CL projection to the complete 2016 and 2021 campaign
+datasets. The 2016 10\% and 2021 1\% density inputs were scaled to their corresponding
+complete samples while the fully analyzed 2015 input was held fixed. Because no
+complete-dataset spectrum was fitted, the curve is an observed-equivalent projection
+and should not be read as an expected sensitivity or observed exclusion. The v3
+counterpart is Figure~\ref{fig:results-v3-projection}.}
+\label{fig:app-legacy-projections}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.90\linewidth}{final_limit_projection_figs/90cls/babar_90_comparison/babar90_vs_projected_full_data_100pct.png}
+\caption{Historical comparison of the projected HPS 90\% CL reach with the BaBar
+90\% CL contour. Only the projection is shown on the HPS side; the observed HPS curve
+was intentionally omitted. The lower panel gives the projected HPS limit divided by
+the BaBar contour. The figure was used to locate the mass range in which a complete
+HPS campaign could add sensitivity, not to quote a current exclusion.}
+\label{fig:app-legacy-projection-babar}
+\end{figure}
+
+\FloatBarrier
+
+\subsection{Plot-repair and signal-model diagnostics}
+
+Plot-level repairs were useful for locating export inconsistencies but are not a
+substitute for production reruns. Figures~\ref{fig:app-v2-repair-diagnostics} and
+\ref{fig:app-v2-tail-diagnostic} record the repair procedure and limit-tail diagnostic
+used for an earlier v2 export; their repaired mass points do not describe the July 8
+candidate. The corresponding machine-readable audit tables for the v3 figures are
+bundled with their provenance files and are summarized in
+Section~\ref{sec:results-frozen-candidate}.
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.94\linewidth}{final_limit_projection_figs/90cls/diagnostics/combined_expected_band_spike_diagnostics_90cls.png}
+\caption{Historical v2 expected-band repair diagnostic for the simultaneous 90\% CL
+upper limit. The original expected quantiles are compared with the plotting values
+after the isolated coherent excursions at 103 and 198~MeV were replaced by log-linear
+interpolation between the adjacent mass hypotheses with the same active dataset set.
+Only expected-band quantiles were changed; no observed limit or local-significance
+value was modified. The plot documents how the display was repaired, rather than
+providing statistical evidence for the interpolation.}
+\label{fig:app-v2-repair-diagnostics}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.94\linewidth}{final_limit_projection_figs/90cls/diagnostics/combined_toy_limit_tail_areas_90cls.png}
+\caption{Historical v2 limit-tail diagnostic for the simultaneous 90\% CL upper
+limit. The connected curves give, at each mass, the fractions of background-only toy
+limits at least as strong as, at least as weak as, and at least as extreme on either
+side of the median as the observed limit. These are limit-ensemble tail probabilities,
+not discovery $p_0$ values. The horizontal references show the corresponding local
+and \v{S}id\'ak effective-trials thresholds used for review-level scan interpretation.}
+\label{fig:app-v2-tail-diagnostic}
+\end{figure}
+
+The next three figures are historical individual discovery scans. In each case the
+solid curve is the one-sided local $p_0(m)$ for a positive signal at a fixed mass; the
+global curve applies the analytic effective-trials conversion used in that review
+iteration. The separate panels are kept large enough to inspect the mass dependence
+and are not interchangeable with the toy-limit tail probabilities above.
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.90\linewidth}{final_limit_projection_figs/individual_datasets/2015_local_p0_with_global_p_overlay.png}
+\caption{Historical 2015 one-sided local discovery $p_0$ scan with the corresponding
+effective-trials global approximation. The local minimum identifies the largest
+upward fluctuation in the fully analyzed 2015 sample; the global curve accounts for
+the mass scan under the approximation documented in Section~\ref{sec:methodology}.}
+\label{fig:local-significances-across-datasets}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.90\linewidth}{final_limit_projection_figs/individual_datasets/2016_local_p0_with_global_p_overlay.png}
+\caption{Historical 2016 10\% one-sided local discovery $p_0$ scan with the
+corresponding effective-trials global approximation. The curve was used to locate
+upward fluctuations in the development subset and to identify where the individual
+spectrum could weaken the simultaneous observed limit.}
+\label{fig:app-historical-local-p0-2016}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.90\linewidth}{final_limit_projection_figs/individual_datasets/2021_local_p0_with_global_p_overlay.png}
+\caption{Historical 2021 1\% one-sided local discovery $p_0$ scan with the
+corresponding effective-trials global approximation. This figure uses the earlier
+2021 input and is retained to document development of the combined significance
+workflow; the corrected individual scan in the main results section supersedes it.}
+\label{fig:app-historical-local-p0-2021}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.90\linewidth}{final_limit_projection_figs/diagnostics/combined_local_p0_with_global_p_overlay.png}
+\caption{Historical one-sided local $p_0$ scan for an earlier three-dataset
+combination, together with the analytic effective-trials global approximation. The
+local curve is the fixed-mass profile-likelihood discovery test; the global curve
+converts its scan minimum to a review-level look-elsewhere estimate. The updated v3
+combined curve is shown in Figure~\ref{fig:results-v3-local-p0}.}
+\label{fig:combined-significance-rpen}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.90\linewidth}{final_limit_projection_figs/diagnostics/combined_local_Z_with_global_Z_overlay.png}
+\caption{Gaussian-equivalent representation of the historical combined local and
+effective-trials global significance curves. It contains the same hypothesis tests as
+Figure~\ref{fig:combined-significance-rpen}, expressed as one-sided normal
+significances rather than $p$-values. The pair was used to check the numerical
+$p$-to-$Z$ conversion and to communicate the size of scan-level fluctuations.}
+\label{fig:app-combined-significance-z}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.96\linewidth}{final_limit_projection_figs/90cls/scaled_21/scaled_21_bandfixed_dimuon_vs_unscaled_overlay_ratio.png}
+\caption{Historical combined 90\% CL upper-limit comparison used to study the 2021
+mass-resolution correction. Blue curves use the unscaled \texttt{v2\_dimuon}
+reference and red curves use the target-constrained 2021 resolution scale under the
+same dimuon-threshold branching convention. The lower panel gives scaled/unscaled
+ratios for the observed limit and expected median; at common masses the branching
+factor cancels, isolating changes caused by the broadened 2021 signal template and
+shared-coupling fit. The effect was not monotonic in mass, so this plot supports a
+signal-model cross-check rather than a uniform correction factor. It is not the
+corrected 2021 result shown in Figure~\ref{fig:results-v3-2021-pair}.}
+\label{fig:app-2021-resolution-comparison}
+\end{figure}
+
+\FloatBarrier
+
+\subsection{Auxiliary shared-coupling demonstrations}
+
+The following plots illustrate shared-coupling bookkeeping but were generated with
+provisional injection scenarios. They are not direct \CLs{} coverage tests and are not
+used to select the v3 kernel bounds. Their purpose is narrower: they show how one
+injected $\eps^2$ maps through the dataset-specific conversion factors into different
+signal yields and significances, and how statistically independent likelihoods add
+information about that common parameter.
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.90\linewidth}{combined_search_figs/combined_search_power_scenarios.png}
+\caption{Historical two-dataset shared-coupling search-power scan. At each point the
+injected common $\eps^2$ is translated into dataset-specific signal yields before the
+combined statistic is evaluated. The curves therefore illustrate genuine accumulation
+of likelihood information for one coupling, rather than a toy in which the same event
+count is added to every dataset. The injection scenarios were provisional, so the
+plot documents the combination logic but does not quantify the v3 candidate
+sensitivity.}
+\label{fig:app-combined-search-power}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.90\linewidth}{combined_search_figs/combined_search_power_constituent_pvalues_5sigma.png}
+\caption{Historical constituent-dataset allocations capable of reaching a target
+combined $5\sigma$ excess in the provisional shared-coupling study. The panel shows
+that a fixed combined threshold can arise from different per-dataset contributions,
+depending on the local resolution, background, and signal-normalization leverage.
+It should be read with Figure~\ref{fig:app-combined-search-power} as an illustration
+of the likelihood bookkeeping, not as a prediction of discovery reach.}
+\label{fig:app-combined-search-power-constituents}
+\end{figure}
+
+The extraction displays below use no-refit pseudoexperiments with a nominal
+five-standard-deviation shared signal. The GP background is first conditioned on the
+sidebands and then held fixed while the local pseudoexperiment is extracted. This
+isolates the signal and nuisance-parameter bookkeeping of the local likelihood; it
+does not test whether a toy-by-toy sideband refit can absorb signal.
+
+The final display in this sequence answers that complementary question. Its toy was
+generated over the full mass range and the GP was retrained on the toy sidebands before
+the blind-window extraction. Any loss of recovery can therefore reveal signal
+absorption by the background refit, which the three no-refit displays are not designed
+to measure.
+
+\clearpage
+\begin{landscape}
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.92\linewidth}{extract_display_combined_m040MeV_z5p0_polished.png}
+\caption{Historical no-refit shared-coupling extraction at \SI{40}{MeV}. The upper
+panels show the dataset-level pseudoexperiments, conditioned GP backgrounds, and
+extracted signal components. The lower panel places those components on the common
+$(m-m_0)/\sigma_m$ coordinate used for the simultaneous interpretation. The annotation
+records the injected and fitted coupling, combined upper limit, local significance,
+and per-dataset fit summaries. In this low-mass example the 2015 sample carries most
+of the signal normalization, while the fit still constrains one common $\eps^2$.}
+\label{fig:app-combined-extract-no-refit}
+\end{figure}
+\end{landscape}
+
+\begin{landscape}
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.92\linewidth}{extract_display_combined_m080MeV_z5p0_polished.png}
+\caption{Historical no-refit shared-coupling extraction at \SI{80}{MeV}. The same
+five-standard-deviation injection and held-fixed sideband-conditioned background
+prescription are used as in Figure~\ref{fig:app-combined-extract-no-refit}. The
+relative dataset contributions differ from the \SI{40}{MeV} example because the
+accepted statistics, mass resolution, and prompt-background level vary with campaign
+and mass.}
+\label{fig:app-combined-extract-no-refit-80}
+\end{figure}
+\end{landscape}
+
+\begin{landscape}
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.92\linewidth}{extract_display_combined_m120MeV_z5p0_polished.png}
+\caption{Historical no-refit shared-coupling extraction at \SI{120}{MeV}. The display
+uses the same provisional five-standard-deviation shared signal as the lower-mass
+examples. At this mass the changing active samples and conversion factors redistribute
+the fitted signal among the datasets, illustrating why the simultaneous likelihood
+must map a common coupling to campaign-dependent yields instead of adding separate
+limits after fitting.}
+\label{fig:app-combined-extract-no-refit-120}
+\end{figure}
+\end{landscape}
+
+\begin{landscape}
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.92\linewidth}{extract_display_combined_m040MeV_z3p0_refit.png}
+\caption{Historical full-refit shared-coupling extraction at \SI{40}{MeV} for a
+provisional three-standard-deviation injection. The full pseudoexperiment was
+regenerated and the GP background was retrained on its sidebands before extraction.
+The visibly poorer recovery documented signal absorption in that provisional
+configuration. It is retained as a failure-mode diagnostic and is not evidence of
+calibrated v3 signal recovery.}
+\label{fig:app-combined-extract-refit}
+\end{figure}
+\end{landscape}
+\clearpage
