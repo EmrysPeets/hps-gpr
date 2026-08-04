@@ -1,0 +1,125 @@
+{
+  "attempt_01_vs_attempt_02": {
+    "comparison_table": "study_results/v4p1_2021_ls_exposure_ensembles_20260804/derived/2016_10pct_attempt_01_vs_02.csv",
+    "comparison_table_sha256": "7eda58d5859ec43e5f57b4ae815c89e6f6c22ed5ad94bbb989b9d535c2e84ac3",
+    "material_branch_count": 2,
+    "material_branch_masses_MeV": [
+      117,
+      128
+    ],
+    "maximum_abs_delta_lml_all_rows": 251.56049101728104,
+    "maximum_abs_delta_lml_excluding_material_branches": 4.928197085973807e-07,
+    "maximum_abs_delta_ls_opt_over_sigma_x_excluding_material_branches": 0.0003238339199302942
+  },
+  "card": {
+    "attempt_02_runtime_change": "CLI output-dir override only; the same config and input were used unchanged",
+    "config": "study_results/v4p1_2021_ls_exposure_ensembles_20260804/configs/config_2016_10pct_wide_support_lsupper12.yaml",
+    "config_sha256": "2d993d9f7c79f738d3b9157b33d473354e81ae138f7c963789263d063dd87762",
+    "input": "study_results/v4p1_2021_ls_exposure_ensembles_20260804/inputs/EventSelection_Data_10Percent_recovered.root",
+    "input_sha256": "689cee658d8fb0b48491151e9e7ee3f0e4bab2adba2ad9060e57c4757c7c2562",
+    "limit_bands": false,
+    "rows": 142,
+    "scan_mass_max_MeV": 180,
+    "scan_mass_min_MeV": 39,
+    "toys": 0,
+    "upper_factor_2016": 12.0
+  },
+  "complete_attempts": [
+    {
+      "label": "attempt_01",
+      "results": "study_results/v4p1_2021_ls_exposure_ensembles_20260804/observed_2016_10pct_k12_wide_support/attempt_01/results_single.csv",
+      "results_sha256": "a3f290bbd862045e39c700f807abbe382c5906a54b3be33a1b003d4c1e987a9f",
+      "validation_report": "study_results/v4p1_2021_ls_exposure_ensembles_20260804/observed_2016_10pct_k12_wide_support/attempt_01/validation_report.json",
+      "validation_report_sha256": "dd5a3fe7e7417ccfd8e4e6711d7c7361071d15ee01eb2d8da6831f7763d41c9a"
+    },
+    {
+      "label": "attempt_02",
+      "results": "study_results/v4p1_2021_ls_exposure_ensembles_20260804/observed_2016_10pct_k12_wide_support/attempt_02/results_single.csv",
+      "results_sha256": "533efee361126f7783ddb4110318811ef7b432af5fdc3fbdb0046a6719e8a5fe",
+      "validation_report": "study_results/v4p1_2021_ls_exposure_ensembles_20260804/observed_2016_10pct_k12_wide_support/attempt_02/validation_report.json",
+      "validation_report_sha256": "dd5a3fe7e7417ccfd8e4e6711d7c7361071d15ee01eb2d8da6831f7763d41c9a"
+    }
+  ],
+  "created_utc": "2026-08-04T22:10:03.522259+00:00",
+  "policy": {
+    "interpolation_allowed": false,
+    "lml_reproduction_atol": 2e-05,
+    "reproduction_requirement": "at least two candidate rows within absolute delta LML <= 2e-05 of the selected maximum",
+    "selection": "exact maximum LML among observed candidate rows"
+  },
+  "purpose": "Review two complete unchanged-card 2016 10% k=12 scans and reproduce materially different maximum-LML branches with targeted unchanged-card repeats.",
+  "recovery_manifest": {
+    "histogram_sha256": "db85ff94c74855549c45b173116b36a70a4183ac86db8f374d5b3202c1410656",
+    "independent_archives_checked": 5,
+    "path": "study_results/v4p1_2021_ls_exposure_ensembles_20260804/derived/2016_10pct_recovery_manifest.json",
+    "sha256": "ae6f7d7fc14b123641a2f5e252c7b7e84e1a8c77efafa5fb39e6cb3a63469f0b"
+  },
+  "review": {
+    "all_maximum_lml_branches_reproduced": true,
+    "interpolated_rows": 0,
+    "ls_opt_over_sigma_x_max": 11.514308256772264,
+    "ls_opt_over_sigma_x_median": 10.782323507204092,
+    "ls_opt_over_sigma_x_min": 9.92634316564176,
+    "material_optimizer_repair_count": 2,
+    "material_optimizer_repairs_MeV": [
+      117,
+      128
+    ],
+    "repeat_ledger": "study_results/v4p1_2021_ls_exposure_ensembles_20260804/derived/2016_10pct_optimizer_repeat_ledger.csv",
+    "repeat_ledger_sha256": "b686088936df1b5c1f12a8c23e52a754bece526af2f9fe32b8f3e9c8a2750ab2",
+    "reviewed_table": "study_results/v4p1_2021_ls_exposure_ensembles_20260804/derived/2016_10pct_observed_k12_reviewed.csv",
+    "reviewed_table_sha256": "d3fa2848a868299d303c34d1eb241a119ed93328601496a3eac3534711c60057",
+    "selected_attempt_counts": {
+      "attempt_01": 66,
+      "attempt_02": 75,
+      "m117_targeted_03": 1
+    },
+    "unresolved_masses_MeV": [],
+    "upper_boundary_rows": 0
+  },
+  "status": "pass",
+  "targeted_repeats": [
+    {
+      "label": "m117_targeted_01",
+      "results": "study_results/v4p1_2021_ls_exposure_ensembles_20260804/observed_2016_10pct_k12_wide_support/repairs/m117_attempt_01/results_single.csv",
+      "results_sha256": "927666f77c6418744a8efaf2ea1ba000d45abe4c9f99f834e02a3a6565e68177",
+      "validation_report": "study_results/v4p1_2021_ls_exposure_ensembles_20260804/observed_2016_10pct_k12_wide_support/repairs/m117_attempt_01/validation_report.json",
+      "validation_report_sha256": "dd5a3fe7e7417ccfd8e4e6711d7c7361071d15ee01eb2d8da6831f7763d41c9a"
+    },
+    {
+      "label": "m117_targeted_02",
+      "results": "study_results/v4p1_2021_ls_exposure_ensembles_20260804/observed_2016_10pct_k12_wide_support/repairs/m117_attempt_02/results_single.csv",
+      "results_sha256": "91bc163d8a99708dd5eed9571c49d0542e256b44225994c8f8aa98554356f391",
+      "validation_report": "study_results/v4p1_2021_ls_exposure_ensembles_20260804/observed_2016_10pct_k12_wide_support/repairs/m117_attempt_02/validation_report.json",
+      "validation_report_sha256": "dd5a3fe7e7417ccfd8e4e6711d7c7361071d15ee01eb2d8da6831f7763d41c9a"
+    },
+    {
+      "label": "m117_targeted_03",
+      "results": "study_results/v4p1_2021_ls_exposure_ensembles_20260804/observed_2016_10pct_k12_wide_support/repairs/m117_attempt_03/results_single.csv",
+      "results_sha256": "bd0ac90bd5496bf896916906b26f7196f9aae71d94cb85a0b61adf9037725850",
+      "validation_report": "study_results/v4p1_2021_ls_exposure_ensembles_20260804/observed_2016_10pct_k12_wide_support/repairs/m117_attempt_03/validation_report.json",
+      "validation_report_sha256": "dd5a3fe7e7417ccfd8e4e6711d7c7361071d15ee01eb2d8da6831f7763d41c9a"
+    },
+    {
+      "label": "m128_targeted_01",
+      "results": "study_results/v4p1_2021_ls_exposure_ensembles_20260804/observed_2016_10pct_k12_wide_support/repairs/m128_attempt_01/results_single.csv",
+      "results_sha256": "ff721a3f70e422f0203d2ab3e2547280d7fabaf039a09d1bddd20a50d885cc6a",
+      "validation_report": "study_results/v4p1_2021_ls_exposure_ensembles_20260804/observed_2016_10pct_k12_wide_support/repairs/m128_attempt_01/validation_report.json",
+      "validation_report_sha256": "dd5a3fe7e7417ccfd8e4e6711d7c7361071d15ee01eb2d8da6831f7763d41c9a"
+    },
+    {
+      "label": "m128_targeted_02",
+      "results": "study_results/v4p1_2021_ls_exposure_ensembles_20260804/observed_2016_10pct_k12_wide_support/repairs/m128_attempt_02/results_single.csv",
+      "results_sha256": "80072da65abaaa736dca02aa89be708fa018f7b1f041a79bc1cb4c3d4886a3d9",
+      "validation_report": "study_results/v4p1_2021_ls_exposure_ensembles_20260804/observed_2016_10pct_k12_wide_support/repairs/m128_attempt_02/validation_report.json",
+      "validation_report_sha256": "dd5a3fe7e7417ccfd8e4e6711d7c7361071d15ee01eb2d8da6831f7763d41c9a"
+    },
+    {
+      "label": "m128_targeted_03",
+      "results": "study_results/v4p1_2021_ls_exposure_ensembles_20260804/observed_2016_10pct_k12_wide_support/repairs/m128_attempt_03/results_single.csv",
+      "results_sha256": "d553892cb57e64f3c7905e5a1607159b6e1c196c5fe190e82a9ec3263ca8a7b0",
+      "validation_report": "study_results/v4p1_2021_ls_exposure_ensembles_20260804/observed_2016_10pct_k12_wide_support/repairs/m128_attempt_03/validation_report.json",
+      "validation_report_sha256": "dd5a3fe7e7417ccfd8e4e6711d7c7361071d15ee01eb2d8da6831f7763d41c9a"
+    }
+  ]
+}

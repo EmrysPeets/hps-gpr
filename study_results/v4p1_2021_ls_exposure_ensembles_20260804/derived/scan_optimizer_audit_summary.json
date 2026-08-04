@@ -1,0 +1,86 @@
+{
+  "actual_fit_selection_ledger_rows": 7263,
+  "audit_gate": "optimizer_audit_pass",
+  "bound_thresholds": {
+    "at_bound_fraction_of_upper": 0.999,
+    "near_bound_fraction_of_upper": 0.98
+  },
+  "candidate_bound_gate": {
+    "common_card_caveat": "If one bound is to be frozen for every exposure, require the same gate across all five scenarios.",
+    "diagnostic_not_projection_veto": [
+      "2021_1pct",
+      "2021_1pct_x10",
+      "2021_10pct"
+    ],
+    "projected_2021_100pct_scenarios": [
+      "2021_1pct_x100",
+      "2021_10pct_x10"
+    ],
+    "required_truth_models": [
+      "gengamma",
+      "sigpowexpq"
+    ]
+  },
+  "completion": {
+    "completed_valid_scan_tasks": 600,
+    "expected_scan_tasks": 600,
+    "missing_scan_tasks": 0,
+    "missing_task_ids": [],
+    "partial_scan_tasks": 0,
+    "partial_task_ids": [],
+    "unexpected_scan_tasks": 0,
+    "unexpected_task_ids": []
+  },
+  "exact_initialization_locks": 0,
+  "expected_limit_bands_constructed": false,
+  "fit_rows_are_actual": true,
+  "independently_reproduced_initialization_states": 1,
+  "interpolation_used": false,
+  "lml_tolerance": {
+    "absolute": 0.0001,
+    "formula": "max(abs_tol, rel_tol*max(abs(low_lml),abs(high_lml),1))",
+    "relative": 1e-06
+  },
+  "nested_pair_status_counts": {
+    "allowed_domain_gain": 13285,
+    "consistent_lml_plateau": 3215
+  },
+  "occupancy_interpretation": "Row fractions are descriptive because mass points share each toy. Toy is the independent ensemble unit; ten toys are only a pilot.",
+  "outputs": {
+    "bound_occupancy": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v4p1_2021_ls_exposure_ensembles_20260804/derived/scan_optimizer_bound_occupancy.csv",
+    "nested_pairs": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v4p1_2021_ls_exposure_ensembles_20260804/derived/scan_optimizer_nested_lml_audit.csv",
+    "rejected_attempts": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v4p1_2021_ls_exposure_ensembles_20260804/derived/scan_optimizer_rejected_attempts.csv",
+    "repair_manifest": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v4p1_2021_ls_exposure_ensembles_20260804/derived/scan_optimizer_repair_manifest.csv",
+    "reviewed_complete_collection": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v4p1_2021_ls_exposure_ensembles_20260804/derived/scan_reviewed_collection_complete.json",
+    "reviewed_complete_rows": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v4p1_2021_ls_exposure_ensembles_20260804/derived/scan_reviewed_rows_complete.csv",
+    "reviewed_rows": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v4p1_2021_ls_exposure_ensembles_20260804/derived/scan_optimizer_reviewed_actual_rows.csv",
+    "selection_ledger": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v4p1_2021_ls_exposure_ensembles_20260804/derived/scan_optimizer_actual_fit_selection_ledger.csv",
+    "summary": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v4p1_2021_ls_exposure_ensembles_20260804/derived/scan_optimizer_audit_summary.json"
+  },
+  "rejected_success_markers": 0,
+  "repair_policy": [
+    "Freeze the completed nominal production outputs before any repair fits.",
+    "For every repair row, run a new exact-mass fit at the same target bound. Use the recorded feasible optimum as both the length-scale and kernel-constant warm start when available.",
+    "Initialization locks require independently salted optimizer seeds even when a warm start is available; retain the nominal 12-restart setting.",
+    "Independent reproduction of the exact initialization state is recorded but remains unresolved unless a better actual branch supersedes it; it is never silently promoted to a pass.",
+    "Select the maximum finite LML only among recorded actual fits for the same exact target row; keep an attempt ledger.",
+    "Repeat this audit. Any surviving nested dominance failure or initialization lock fails the bound-choice gate; never fill a row by interpolation."
+  ],
+  "reviewed_exact_rows": 6600,
+  "schema_version": 1,
+  "scientific_scope": "optimizer and hyperparameter-support pilot only; no coverage, expected-band, exclusion, or discovery calibration claim",
+  "selected_rows_by_fit_origin": {
+    "nominal_scan": 6433,
+    "targeted_repair": 167
+  },
+  "selected_rows_by_repair_round": {
+    "1": 155,
+    "2": 12
+  },
+  "selected_rows_in_ledger": 6600,
+  "study_id": "v4p1_2021_ls_exposure_ensembles_20260804",
+  "unique_target_rows_requiring_repair": 0,
+  "unresolved_initialization_states": 0,
+  "valid_attempt_rows_read": 7263,
+  "valid_successful_attempts": 1263
+}

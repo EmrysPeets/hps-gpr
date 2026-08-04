@@ -1,0 +1,76 @@
+{
+  "decision": {
+    "dataset": "2016 full statistics",
+    "selected_upper_factor": 12,
+    "status": "v4p1_observed_asymptotic_candidate",
+    "selection_rule": "first tested factor with zero ls_opt_over_ls_hi occupancy at threshold 0.999, followed by stable nested-LML, observed-yield-limit, and local-Z behavior at the next tested settings",
+    "selection_used_observed_limit_direction": false,
+    "selection_used_local_pvalue_ranking": false
+  },
+  "boundary_occupancy": {
+    "criterion": "ls_opt / ls_hi >= 0.999",
+    "rows_per_factor": 142,
+    "upper_factor_8": 142,
+    "upper_factor_10": 56,
+    "upper_factor_12": 0,
+    "upper_factor_15": 0,
+    "upper_factor_20": 0
+  },
+  "plateau_checks": {
+    "factor_12_to_15": {
+      "nested_lml_violations_at_1e-4": 0,
+      "delta_lml_min": -4.4349189920467325e-06,
+      "delta_lml_max": 7.933645974844694e-06,
+      "max_abs_observed_A_up_fractional_change": 0.0008227318755855,
+      "max_abs_delta_Z": 0.0025424112879641747
+    },
+    "factor_15_to_20": {
+      "nested_lml_violations_at_1e-4": 0,
+      "delta_lml_min": -8.443377737421542e-06,
+      "delta_lml_max": 5.375071850721724e-06,
+      "max_abs_observed_A_up_fractional_change": 0.0008932112753322,
+      "max_abs_delta_Z": 0.0019397273399158754
+    }
+  },
+  "optimizer_review": {
+    "selected_repair_rows": 14,
+    "selected_repairs_independently_reproduced": 14,
+    "pending_reproductions": 0,
+    "interpolation_used": false,
+    "row_selection": "highest_lml_actual_fit"
+  },
+  "interpretation_boundary": {
+    "prompted_by_observed_v4_boundary_diagnostic": true,
+    "pre_unblinding_freeze": false,
+    "coverage_qualified": false,
+    "discovery_claim_authorized": false,
+    "expected_limit_bands_produced": false,
+    "new_pseudoexperiments_drawn": 0
+  },
+  "sources": {
+    "factor_summary_csv": {
+      "path": "study_results/v4p1_2016_ls_upper_optimization_20260804/derived/factor_summary.csv",
+      "sha256": "d31938e8518d5e31cce5058541a35a9c3df55af7530458b58a92a23d59317dfa"
+    },
+    "adjacent_factor_summary_csv": {
+      "path": "study_results/v4p1_2016_ls_upper_optimization_20260804/derived/adjacent_factor_summary.csv",
+      "sha256": "d0019e474364371c58be4c57da5f5c5c8571ce21554d5be6a4e891e5999abc49"
+    },
+    "diagnostic_run_summary_json": {
+      "path": "study_results/v4p1_2016_ls_upper_optimization_20260804/derived/run_summary.json",
+      "sha256": "84b352dee123ce32b23a48b15d9ad1b9a8cd6bf765be8d387d731fd4d99729a1"
+    },
+    "repair_candidate_ledger_csv": {
+      "path": "study_results/v4p1_2016_ls_upper_optimization_20260804/derived/repair_candidate_ledger.csv",
+      "sha256": "e927d130a5047d53c8c65b5000e35f86b7f8d71b30f8d0fa7ccfb9b064499ff6"
+    },
+    "selected_gp_states_csv": {
+      "path": "study_results/v4p1_2016_ls_upper_optimization_20260804/derived/observed_gp_states_k12_reviewed.csv",
+      "sha256": "a962c01aa030429c04e2cc102253b6b8750eacc3c9e294a7a99f851a9870aea9"
+    },
+    "combined_observed_csv": {
+      "path": "study_results/v4p1_2016_ls_upper_optimization_20260804/final_k12_combined_observed/combined_observed_fixed_reviewed.csv",
+      "sha256": "fa95a50a8b8ddc1d69a319137038a177c6d6da3afbbf9163d8955cf197182de2"
+    }
+  }
+}
