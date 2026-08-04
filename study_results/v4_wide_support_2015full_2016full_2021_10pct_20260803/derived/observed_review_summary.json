@@ -1,0 +1,179 @@
+{
+  "all_review_requirements_passed": true,
+  "attempt_count": 3,
+  "attempts": [
+    {
+      "dataset_rows": {
+        "2015": 72,
+        "2016": 142,
+        "2021": 201
+      },
+      "label": "attempt_01",
+      "minimum_n_train_high": 51,
+      "minimum_n_train_low": 9,
+      "rows": 415,
+      "sha256": "f9f25a337aa644e5c7e03555e6341f63a6ff30e907db7d718d5fc5055fceb719",
+      "source": "study_results/v4_wide_support_2015full_2016full_2021_10pct_20260803/observed_attempt_01/results_single.csv"
+    },
+    {
+      "dataset_rows": {
+        "2015": 72,
+        "2016": 142,
+        "2021": 201
+      },
+      "label": "attempt_02",
+      "minimum_n_train_high": 51,
+      "minimum_n_train_low": 9,
+      "rows": 415,
+      "sha256": "a56e71628b94169ba0cb858d13f8e09a16131ff7ee7c63d0dd39a221afff32ff",
+      "source": "study_results/v4_wide_support_2015full_2016full_2021_10pct_20260803/observed_attempt_02/results_single.csv"
+    },
+    {
+      "dataset_rows": {
+        "2015": 72,
+        "2016": 142,
+        "2021": 201
+      },
+      "label": "attempt_03",
+      "minimum_n_train_high": 51,
+      "minimum_n_train_low": 9,
+      "rows": 415,
+      "sha256": "fb065cd988534049027c8e3c255b341b97f9ed630b9a27e698ba7452a7f67dcc",
+      "source": "study_results/v4_wide_support_2015full_2016full_2021_10pct_20260803/observed_attempt_03/results_single.csv"
+    }
+  ],
+  "branch_multiplicity_counts": {
+    "2": 10,
+    "3": 405
+  },
+  "campaign": "v4_wide_support_2015full_2016full_2021_10pct_20260803",
+  "expected_grid_MeV": {
+    "2015": {
+      "high": 90,
+      "low": 19,
+      "rows": 72,
+      "step": 1
+    },
+    "2016": {
+      "high": 180,
+      "low": 39,
+      "rows": 142,
+      "step": 1
+    },
+    "2021": {
+      "high": 250,
+      "low": 50,
+      "rows": 201,
+      "step": 1
+    }
+  },
+  "expected_states_per_attempt": 415,
+  "generated_utc": "2026-08-04T15:26:44.479160+00:00",
+  "interpolation_used": false,
+  "ledger_rows": 1245,
+  "lml_reproduction_atol": 2e-05,
+  "max_abs_reproducing_delta_const_opt": 0.030993899087221166,
+  "max_abs_reproducing_delta_lml": 3.1054014471010305e-06,
+  "max_abs_reproducing_delta_ls_opt": 1.8544114012419843e-05,
+  "outputs": {
+    "attempt_ledger": {
+      "path": "study_results/v4_wide_support_2015full_2016full_2021_10pct_20260803/derived/observed_attempt_ledger.csv",
+      "rows": 1245,
+      "sha256": "e1e5a6a1453be5112967b0863fd85e716510e3298b0e84551b30c58e8e545c90"
+    },
+    "reviewed_gp_states": {
+      "complete_415_state_authority": true,
+      "path": "study_results/v4_wide_support_2015full_2016full_2021_10pct_20260803/derived/observed_gp_states_reviewed.csv",
+      "rows": 415,
+      "sha256": "0bf70d1516ffab383dc50278b9adf6b568beafac9c4362ad5b6840b776a65dd0"
+    },
+    "unresolved_states": {
+      "path": "study_results/v4_wide_support_2015full_2016full_2021_10pct_20260803/derived/unresolved_observed_states.csv",
+      "rows": 0,
+      "sha256": "502265e9c7f4ab5604c613779c5bbfd1d4999a0677f23c4487ee9505703ba99a"
+    }
+  },
+  "physics_config": "study_configs/v4_wide_support_2015full_2016full_2021_10pct_20260803/config_obsUL90_combined_wide_support_v4_observed_only.yaml",
+  "physics_config_sha256": "16f686602514c5e156a8da83ed4f5facc1027788e184ef32ff72313f3fadd2a3",
+  "reviewed_state_rows": 415,
+  "schema_version": 1,
+  "selected_source_counts": {
+    "attempt_01": 135,
+    "attempt_02": 150,
+    "attempt_03": 130
+  },
+  "selection_rule": "retain the exact maximum-LML input row per dataset/mass; require at least one other complete unchanged-card attempt within abs(delta LML) <= 2e-5",
+  "static_numeric_atol": 1e-12,
+  "status": "passed",
+  "stitched_observed_campaign": {
+    "exact_authority": "study_results/v4_wide_support_2015full_2016full_2021_10pct_20260803/run_combined_bands_cached_fixed_reviewed.py",
+    "expected_rows": 232,
+    "reason": "Not written: A_hat, sigma_A, and integral_density do not encode the per-bin observed counts, GP mean vector, full posterior covariance blocks, and signal templates required by the shared count-scale likelihood. Use run_combined_bands_cached_fixed_reviewed.py to rebuild fixed GP predictions and compute the exact 232-row observed campaign.",
+    "written": false
+  },
+  "unchanged_card_columns_checked": [
+    "sigma_val",
+    "blind_lo",
+    "blind_hi",
+    "integral_density",
+    "density_nsigma",
+    "density_window_lo",
+    "density_window_hi",
+    "density_window_width",
+    "density_source_lo",
+    "density_source_hi",
+    "density_source_n_bins",
+    "density_source_bin_width_median",
+    "density_window_fully_covered",
+    "cls_statistic",
+    "cls_calibration",
+    "signal_model",
+    "global_method",
+    "visibility",
+    "ls_lo",
+    "ls_hi",
+    "ls_init",
+    "sigma_x",
+    "n_train",
+    "n_train_low",
+    "n_train_high",
+    "n_full",
+    "n_blind",
+    "train_domain_lo",
+    "train_domain_hi",
+    "bin_width_median",
+    "const_init",
+    "const_lo",
+    "const_hi",
+    "optimizer_restarts",
+    "ls_lo_over_sigma_x",
+    "ls_hi_over_sigma_x",
+    "ls_lo_over_sigma",
+    "ls_hi_over_sigma"
+  ],
+  "unresolved_state_rows": 0,
+  "validation_report_audit": {
+    "present_count": 3,
+    "present_reports_identical": true,
+    "reports": [
+      {
+        "attempt": "attempt_01",
+        "path": "study_results/v4_wide_support_2015full_2016full_2021_10pct_20260803/observed_attempt_01/validation_report.json",
+        "present": true,
+        "sha256": "44d0929644c76231d33086a277ff7e4b7cbb667f6b1635e0d4f0830f1f529f57"
+      },
+      {
+        "attempt": "attempt_02",
+        "path": "study_results/v4_wide_support_2015full_2016full_2021_10pct_20260803/observed_attempt_02/validation_report.json",
+        "present": true,
+        "sha256": "44d0929644c76231d33086a277ff7e4b7cbb667f6b1635e0d4f0830f1f529f57"
+      },
+      {
+        "attempt": "attempt_03",
+        "path": "study_results/v4_wide_support_2015full_2016full_2021_10pct_20260803/observed_attempt_03/validation_report.json",
+        "present": true,
+        "sha256": "44d0929644c76231d33086a277ff7e4b7cbb667f6b1635e0d4f0830f1f529f57"
+      }
+    ]
+  }
+}

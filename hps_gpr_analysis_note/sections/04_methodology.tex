@@ -10,10 +10,35 @@ the smooth trident spectrum, but they also made clear where the older strategy b
 fragile. Window-by-window fits produced visibly less smooth limit curves, amplified the
 dependence of the result on local fit boundaries, and complicated any attempt to write
 a statistically coherent multi-dataset combination. The present workflow therefore uses
-a full-range per-hypothesis GP fit over the histogram range of each dataset and
-excludes only a narrow mass-dependent training-exclusion region around the test mass. That choice
-yields a background description that is smoother, easier to validate, and naturally
-compatible with a combined likelihood in a shared parameter of interest.
+a per-hypothesis GP fit over one fixed, dataset-specific support and excludes only a
+narrow mass-dependent training region around the test mass. The fit support is wider
+than the interval searched for a signal, but it need not extend through empty turn-on
+bins or the entire ROOT-histogram axis. That choice yields a background description
+that is smoother, easier to validate, and naturally compatible with a combined
+likelihood in a shared parameter of interest.
+
+\subsection{Search interval and GP fit support}
+\label{sec:fit-support-policy}
+
+The search interval answers where a resonance hypothesis is tested. The GP fit support
+answers which surrounding bins constrain the smooth background at that hypothesis.
+Using the same endpoints for both definitions leaves the first and last test masses
+with a one-sided training sample, even though the input histogram contains usable
+data beyond the search. Version 4 therefore keeps the established 19--90, 39--180,
+and 50--250~MeV search intervals, while using 14--135, 30--210, and 40--300~MeV fit
+supports for 2015, 2016, and 2021, respectively.
+
+These endpoints were declared before the v4 observed scan. The 2015 domain and the
+upper 2016 edge follow the earlier functional-form validation fits. The 2016 lower
+edge is placed at 30~MeV rather than the historical 35~MeV fit edge because the exact
+rebin-five geometry matters: at a 39~MeV hypothesis the blind interval begins at
+35.063~MeV, while the first bin center from a 35~MeV support is 35.125~MeV. A nominal
+35--210~MeV support would therefore still contain no low-side training-bin center at
+the lower search endpoint. The adopted domains retain at least 12 and 20 low-side
+training bins at the 2015 and 2016 lower endpoints, and at least 138 and 51 high-side
+training bins at their upper endpoints. The corresponding 2021 counts are 9 and 55.
+The bin-count audit is applied to every active dataset and mass hypothesis, rather
+than inferred only from continuous support boundaries.
 
 \subsection{Observable, scan grid, and blinding}
 
@@ -186,7 +211,7 @@ choice and treats more elaborate alternatives as robustness checks rather than
 competing mainline methods. The exploratory Constant$\times$Mat\'ern$(\nu=3/2)$ and
 earlier piecewise-kernel studies are summarized in
 Appendix~\ref{app:kernel-studies}. No production-matched alternative-kernel coverage
-result is used to select the v3 baseline.
+result is used to select the v4 baseline.
 
 \subsection{Resolution-scaled length-scale parameterization and bounds}
 \label{sec:length-scale}
@@ -206,9 +231,10 @@ and uses this local physical scale to set the RBF bounds. In the
 \ell_{\max,d}(m) = k_{\max,d}\sigma_x(m).
 \label{eq:dataset-lengthscale-bounds}
 \end{equation}
-The July 2026 pre-unblinding configuration freezes the dataset-specific factors in
-Table~\ref{tab:production-lengthscale-bounds}; it does not use the common
-$k_{\min}=1.0$ prescription shown in earlier note drafts.
+The v4 configuration freezes the dataset-specific factors in
+Table~\ref{tab:production-lengthscale-bounds}. It retains the reviewed lower bounds
+from v3, while the 2021 upper factor is 15 in the present support study rather than
+the factor 9 used in the earlier candidate.
 
 \begin{table}[H]
 \centering
@@ -216,16 +242,16 @@ $k_{\min}=1.0$ prescription shown in earlier note drafts.
 \toprule
 Dataset & $k_{\min,d}$ & $k_{\max,d}$ & selection status \\
 \midrule
-2015 & 1.0 & 8 & frozen conservative baseline \\
-2016 10\% & 0.9 & 8 & selected by functional-form closure \\
-2021 1\% & 1.1 & 9 & selected calibration--reach compromise \\
+2015 full & 1.0 & 8 & frozen conservative baseline \\
+2016 full & 0.9 & 8 & lower factor selected by prior closure \\
+2021 10\% & 1.1 & 15 & endpoint-support stability setting \\
 \bottomrule
 \end{tabular}
-\caption{Resolution-scaled RBF length-scale factors in the July 2026 pre-unblinding
-configuration. The factors multiply $\sigma_x(m)$ in
+\caption{Resolution-scaled RBF length-scale factors in the v4 configuration. The
+factors multiply $\sigma_x(m)$ in
 Eq.~\eqref{eq:dataset-lengthscale-bounds}. The labels summarize how each lower factor
-is used; they do not imply that one scalar ranking metric uniquely determines all three
-choices.}
+or upper factor is used; they do not imply that one scalar ranking metric uniquely
+determines all three choices.}
 \label{tab:production-lengthscale-bounds}
 \end{table}
 
@@ -245,7 +271,8 @@ extraction-level $\eps^2$ proxy, while the 0.9 and 1.0 rows have slightly smalle
 aggregate scores. The frozen 1.1 choice is therefore a calibration--reach tradeoff, not
 a claim that it wins every diagnostic.
 
-The upper factors remain 8 for 2015 and 2016 and 9 for 2021. They keep the optimizer
+The upper factors remain 8 for 2015 and 2016. The 2021 factor is 15 in v4, following
+the endpoint-support study that preceded this scan. These bounds keep the optimizer
 tied to a detector-scale interval while preventing effectively unbounded smoothing.
 The current configurations also retain the dataset-statistics floor on
 $\ell_{\max,d}$ so that the ceiling does not become artificially small where the local
@@ -558,7 +585,7 @@ A_{\mathrm{UL},d}(m;\alpha)
 =\min\{A_d:\mathrm{CL}_s(A_d;m)\le\alpha\}.
 \label{eq:aul-single}
 \end{equation}
-The v3 candidate uses $\alpha=0.10$, corresponding to a 90\% CL upper limit; retained
+The v4 result uses $\alpha=0.10$, corresponding to a 90\% CL upper limit; retained
 historical 95\% studies use $\alpha=0.05$. The package reports the limit both in
 signal-yield space and, after applying the dataset-specific conversion factor of
 Eq.~\eqref{eq:Kd-conversion}, in $\eps^2$ space.
@@ -766,7 +793,7 @@ upper limit is set directly on the shared coupling,
 \eps^2_{\mathrm{UL}}(m;\alpha)
 = \min\{\eps^2 : \mathrm{CL}_s(\eps^2)\le\alpha\},
 \end{equation}
-with $\alpha=0.10$ for the v3 90\% CL candidate. The combined local significance is
+with $\alpha=0.10$ for the v4 90\% CL result. The combined local significance is
 evaluated from the same profiled likelihood
 with the common signal vector $\eps^2 \bm{s}_{\mathrm{unit}}$. By contrast, the
 inverse-variance expressions shown later in the search-power figures are auxiliary
@@ -811,18 +838,16 @@ Z_{\mathrm{global}}^{\mathrm{Sidak}}
 For small $p_{0,\min}^{\mathrm{obs}}$, Eq.~\eqref{eq:sidak-global} reduces to the
 familiar $p_{\mathrm{global}}\simeq N_{\mathrm{eff}}p_{0,\min}$ form.
 
-For the present studies, Eq.~\eqref{eq:sidak-global} provides the global, or
-look-elsewhere-corrected, $p$-value quoted with each local scan. The effective number of
-trials is evaluated from the stated scan range and the mass-dependent resolution, so
-the approximation accounts for the strong correlation between adjacent
+For the present result, Eq.~\eqref{eq:sidak-global} supplies a separate analytic
+look-elsewhere reference for the local scan. The effective number of trials is
+evaluated from the stated scan range and the mass-dependent resolution, so the
+approximation accounts for the strong correlation between adjacent
 \SI{1}{MeV}-spaced hypotheses rather than treating every scan point as independent.
-This is sufficient for interpreting the current pre-unblinding scans and is shown
-alongside the local $p$-values in Section~\ref{sec:results}. A background-only ensemble
-of the frozen search maximum, $q_{0,\max}$, remains the preferred calibration for any
+It is shown alongside the local $p$-values in Section~\ref{sec:results}, but it is not
+called a toy-calibrated global discovery probability. A background-only ensemble of
+the frozen search maximum, $q_{0,\max}$, remains the required calibration for any
 future discovery-level claim; when that ensemble is available,
-Eq.~\eqref{eq:pglobal-toy} supersedes the analytic approximation. The distinction is
-therefore one of calibration precision, not an absence of a global interpretation in
-v3.
+Eq.~\eqref{eq:pglobal-toy} supersedes the analytic approximation.
 
 \subsection{Signal absorption and alternative background-profile treatments}
 
@@ -893,7 +918,7 @@ N_{\mathrm{eff}}^{\mathrm{BR}}(m_{A^\prime})\,\eps^2_{ee}(m_{A^\prime}).
 This operation does not change the local fit, the signal-yield upper limit, the
 \CLs{} value, or the local $p_0$ scan; it changes only the coupling interpretation of
 an electron-channel result. Figure~\ref{fig:methodology-dimuon-factor} shows the
-factor applied in the v3 90\% CL candidate obtained with \CLs{}. The factor is unity below
+factor applied in the v4 90\% CL result obtained with \CLs{}. The factor is unity below
 $2m_\mu$, rises continuously above threshold, and reaches
 $N_{\mathrm{eff}}^{\mathrm{BR}}=1.725$ at \SI{250}{MeV}
 ($\mathcal{B}_{ee}=0.580$).

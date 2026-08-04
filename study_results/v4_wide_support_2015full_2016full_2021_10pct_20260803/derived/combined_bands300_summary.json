@@ -1,0 +1,339 @@
+{
+  "artifacts": {
+    "gp_state_closure": "study_results/v4_wide_support_2015full_2016full_2021_10pct_20260803/derived/combined_bands300_gp_state_closure.csv",
+    "plot_manifest": "study_results/v4_wide_support_2015full_2016full_2021_10pct_20260803/derived/combined_bands300_plot_manifest.json",
+    "reviewed_bands": "study_results/v4_wide_support_2015full_2016full_2021_10pct_20260803/derived/combined_bands300_reviewed.csv",
+    "sidak_reference": "study_results/v4_wide_support_2015full_2016full_2021_10pct_20260803/derived/combined_bands300_sidak_reference.csv",
+    "summary_csv": "study_results/v4_wide_support_2015full_2016full_2021_10pct_20260803/derived/combined_bands300_summary.csv",
+    "summary_json": "study_results/v4_wide_support_2015full_2016full_2021_10pct_20260803/derived/combined_bands300_summary.json",
+    "wide_narrow_comparison": "study_results/v4_wide_support_2015full_2016full_2021_10pct_20260803/derived/wide_vs_narrow_observed_limit.csv"
+  },
+  "campaign": "v4_wide_support_2015full_2016full_2021_10pct_20260803",
+  "created_utc": "2026-08-04T15:27:19.247037+00:00",
+  "empirical_limit_tail_diagnostics": {
+    "strong": {
+      "discovery_pvalue": false,
+      "fixed_mass_diagnostic": true,
+      "minimum_interpretation": "0/300; no pseudoexperiment in this empirical tail; quote below one-count resolution 1/300, not exact zero",
+      "minimum_masses_MeV": [
+        59,
+        71,
+        72
+      ],
+      "minimum_probability": 0.0,
+      "n_toys_per_mass": 300,
+      "n_zero_count_masses": 3,
+      "one_count_resolution": 0.0033333333333333335,
+      "raw_count_column": "tail_count_strong_le_observed",
+      "raw_count_semantics": "toy limits less than or equal to the observed limit",
+      "raw_counts_at_minimum": [
+        0
+      ],
+      "zero_count_masses_MeV": [
+        59,
+        71,
+        72
+      ]
+    },
+    "two_sided": {
+      "discovery_pvalue": false,
+      "fixed_mass_diagnostic": true,
+      "minimum_interpretation": "2*0/300; no pseudoexperiment in the smaller empirical tail; not an exact zero probability",
+      "minimum_masses_MeV": [
+        21,
+        59,
+        65,
+        66,
+        71,
+        72
+      ],
+      "minimum_probability": 0.0,
+      "n_toys_per_mass": 300,
+      "n_zero_count_masses": 6,
+      "one_count_resolution": 0.0033333333333333335,
+      "raw_count_column": "tail_count_two_sided_min",
+      "raw_count_semantics": "twice the smaller strong/weak raw tail, bounded at one",
+      "raw_counts_at_minimum": [
+        0
+      ],
+      "zero_count_masses_MeV": [
+        21,
+        59,
+        65,
+        66,
+        71,
+        72
+      ]
+    },
+    "weak": {
+      "discovery_pvalue": false,
+      "fixed_mass_diagnostic": true,
+      "minimum_interpretation": "0/300; no pseudoexperiment in this empirical tail; quote below one-count resolution 1/300, not exact zero",
+      "minimum_masses_MeV": [
+        21,
+        65,
+        66
+      ],
+      "minimum_probability": 0.0,
+      "n_toys_per_mass": 300,
+      "n_zero_count_masses": 3,
+      "one_count_resolution": 0.0033333333333333335,
+      "raw_count_column": "tail_count_weak_ge_observed",
+      "raw_count_semantics": "toy limits greater than or equal to the observed limit",
+      "raw_counts_at_minimum": [
+        0
+      ],
+      "zero_count_masses_MeV": [
+        21,
+        65,
+        66
+      ]
+    }
+  },
+  "ensemble": {
+    "bands_are_coverage_calibrated": false,
+    "bands_interpretation": "descriptive central quantiles of conditional fixed-GP background-only limit pseudoexperiments",
+    "child_seed_index": "mass_MeV - 19",
+    "cls_calibration": "asymptotic",
+    "cls_statistic": "tilde_q_mu",
+    "combined_mode": "count_scale",
+    "gp_refit_per_toy": false,
+    "gp_reoptimized_for_bands": false,
+    "n_toys_finite_per_mass": 300,
+    "n_toys_requested_per_mass": 300,
+    "observed_state_mode": "fixed_reviewed_max_lml",
+    "seed": 24680
+  },
+  "figures": [
+    {
+      "description": "Observed minimal-visible limit, central 68/95% fixed-GP toy-limit quantiles, activity strip, and observed/median panel.",
+      "pdf": "study_results/v4_wide_support_2015full_2016full_2021_10pct_20260803/note_figures/combined_observed_bands300_minimal_visible.pdf",
+      "pdf_bytes": 47952,
+      "pdf_sha256": "45f205af20dfa6fa2999de4d74e6619484659631b6a36e762a7a418d55c26211",
+      "png": "study_results/v4_wide_support_2015full_2016full_2021_10pct_20260803/note_figures/combined_observed_bands300_minimal_visible.png",
+      "png_bytes": 596964,
+      "png_sha256": "3fa50321736e23dc4b0f47bb0aabf385821faa3c6e4062ce245c240e077aee5d",
+      "stem": "combined_observed_bands300_minimal_visible"
+    },
+    {
+      "description": "Strong, weak, and bounded two-sided empirical fixed-mass limit-tail diagnostics with raw-zero markers and one-count resolution.",
+      "pdf": "study_results/v4_wide_support_2015full_2016full_2021_10pct_20260803/note_figures/combined_limit_tail_pvalues300.pdf",
+      "pdf_bytes": 36228,
+      "pdf_sha256": "293a65b770965e151a567165a8f5b0d3a1ebdd763e1cb514eb50190b447ae45c",
+      "png": "study_results/v4_wide_support_2015full_2016full_2021_10pct_20260803/note_figures/combined_limit_tail_pvalues300.png",
+      "png_bytes": 583110,
+      "png_sha256": "07cee9cde7a1bfb12912fdfbc33cb0ddc21f274b0a4879b697fda3e53b607806",
+      "stem": "combined_limit_tail_pvalues300"
+    },
+    {
+      "description": "Local asymptotic p0 and separate 2.25-sigma resolution-spacing analytic Sidak look-elsewhere reference.",
+      "pdf": "study_results/v4_wide_support_2015full_2016full_2021_10pct_20260803/note_figures/combined_local_p0_sidak_reference.pdf",
+      "pdf_bytes": 35228,
+      "pdf_sha256": "3949256be4cbd424edcffc2b10692441f4d05e614c3269c9420c10559ffdfab8",
+      "png": "study_results/v4_wide_support_2015full_2016full_2021_10pct_20260803/note_figures/combined_local_p0_sidak_reference.png",
+      "png_bytes": 298943,
+      "png_sha256": "fa93651d7824975ef86a15f5b72591b79efe5f1da9c7d654ee10511a0f549572",
+      "stem": "combined_local_p0_sidak_reference"
+    },
+    {
+      "description": "Wide fit supports versus search regions and reviewed GP length-scale occupancy relative to the configured upper bound.",
+      "pdf": "study_results/v4_wide_support_2015full_2016full_2021_10pct_20260803/note_figures/wide_support_search_kernel_audit.pdf",
+      "pdf_bytes": 34219,
+      "pdf_sha256": "01cbb652a6c1e3f6fd5b64987a783cf0a12ed7b5f57d19b3fa8bad5d1b67ac22",
+      "png": "study_results/v4_wide_support_2015full_2016full_2021_10pct_20260803/note_figures/wide_support_search_kernel_audit.png",
+      "png_bytes": 308855,
+      "png_sha256": "c2244d8ba07157044daf8c410cb9bd12850a43234c94fce19f8fee2a39ab53f2",
+      "stem": "wide_support_search_kernel_audit"
+    },
+    {
+      "description": "Matched-mass observed-limit ratio for wide versus narrow fit supports, with the active-dataset strip.",
+      "pdf": "study_results/v4_wide_support_2015full_2016full_2021_10pct_20260803/note_figures/wide_vs_narrow_observed_limit_ratio.pdf",
+      "pdf_bytes": 33020,
+      "pdf_sha256": "4868267248587c378ef84ddf8a16ac9da544440416f97a07b5b36ec02e5499c3",
+      "png": "study_results/v4_wide_support_2015full_2016full_2021_10pct_20260803/note_figures/wide_vs_narrow_observed_limit_ratio.png",
+      "png_bytes": 241206,
+      "png_sha256": "bd13b7f69a434f1e5188492ffd897103175b4127ee05f71edfbd80e1463d7b67",
+      "stem": "wide_vs_narrow_observed_limit_ratio"
+    }
+  ],
+  "grid": {
+    "active_set_counts": {
+      "2015": 20,
+      "2015+2016": 11,
+      "2015+2016+2021": 41,
+      "2016+2021": 90,
+      "2021": 70
+    },
+    "fixed_state_closure_rows": 415,
+    "mass_high_MeV": 250,
+    "mass_low_MeV": 19,
+    "n_mass_points": 232,
+    "reviewed_state_rows": 415,
+    "step_MeV": 1
+  },
+  "inputs": {
+    "fixed_gp_300toy_bands": {
+      "path": "study_results/v4_wide_support_2015full_2016full_2021_10pct_20260803/combined_bands_300toy_cached/ul_bands_combined_all.csv",
+      "rows": 232,
+      "sha256": "33f576e09d0e603978b2e0b71eb608663b95806606ab056d1ba8f32c8f5b2cdb"
+    },
+    "matched_config_validation": {
+      "declared_difference_keys": [
+        "combined_bands_n_toys",
+        "data_range_2015",
+        "data_range_2016",
+        "do_combined_bands",
+        "make_ul_bands",
+        "output_dir",
+        "scan_n_workers",
+        "scan_require_two_sidebands",
+        "ul_bands_n_workers",
+        "ul_bands_parallel_backend"
+      ],
+      "matched_except_support_and_runtime_controls": true,
+      "narrow_config": "study_configs/finalist_k15_2021_10pct_combined100toy_20260803/config_obsUL90_combined_2015full_2016full_2021_10pct_k15_bands100.yaml",
+      "narrow_config_sha256": "1843339199078484ebcfb68d65dfcd0ce080ed05610a8140a966888530a26c2c",
+      "wide_config": "study_configs/v4_wide_support_2015full_2016full_2021_10pct_20260803/config_obsUL90_combined_wide_support_v4_observed_only.yaml",
+      "wide_config_sha256": "16f686602514c5e156a8da83ed4f5facc1027788e184ef32ff72313f3fadd2a3"
+    },
+    "narrow_support_finalist": {
+      "path": "study_results/finalist_k15_2021_10pct_combined100toy_20260803/derived/combined_bands100_reviewed.csv",
+      "rows": 232,
+      "sha256": "1ac0adc3b2ccacc28798a50ac82909d5a894f00ad0bbac05aaf08dd778246619"
+    },
+    "reviewed_observed_states": {
+      "path": "study_results/v4_wide_support_2015full_2016full_2021_10pct_20260803/derived/observed_gp_states_reviewed.csv",
+      "rows": 415,
+      "sha256": "0bf70d1516ffab383dc50278b9adf6b568beafac9c4362ad5b6840b776a65dd0"
+    }
+  },
+  "local_asymptotic_search": {
+    "N_eff_resolution_spacing": 35.381377775674636,
+    "independence_width_sigma": 2.25,
+    "interpretation": "local asymptotic p0 plus a separate analytic resolution-spacing Sidak reference",
+    "minimum_masses_MeV": [
+      66
+    ],
+    "minimum_p0": 0.0001763637359786,
+    "sidak_is_scan_toy_calibrated": false,
+    "sidak_p_at_local_minimum": 0.006221110545967756,
+    "sidak_uses_limit_tail_ensemble": false
+  },
+  "minimal_visible_reinterpretation": {
+    "N_eff_BR_at_250_MeV": 1.7252323083862526,
+    "common_factor_cancels_in_ratios": true,
+    "dimuon_threshold_GeV": 0.211316749,
+    "first_corrected_grid_mass_MeV": 212,
+    "muon_mass_GeV": 0.1056583745,
+    "pvalues_changed": false,
+    "toy_ensemble_changed": false,
+    "toy_quantiles_recomputed": false
+  },
+  "ratio_diagnostics": {
+    "observed_over_median": {
+      "interpretation": "observed divided by fixed-GP toy-limit median",
+      "maximum": 3.020963281527186,
+      "maximum_masses_MeV": [
+        65
+      ],
+      "minimum": 0.5587343277717434,
+      "minimum_masses_MeV": [
+        19
+      ]
+    },
+    "wide_over_narrow_observed": {
+      "interpretation": "wide-support observed limit divided by narrow-support finalist",
+      "maximum": 2.256692851319198,
+      "maximum_masses_MeV": [
+        43
+      ],
+      "minimum": 0.2348670443713394,
+      "minimum_masses_MeV": [
+        19
+      ],
+      "tightening_percent_at_minimum_ratio": 76.51329556286606,
+      "weakening_percent_at_maximum_ratio": 125.66928513191979
+    }
+  },
+  "reviewed_kernel_bound_diagnostics": {
+    "2015": {
+      "fraction_ls_at_upper_bound": 0.0,
+      "interpretation": "diagnostic occupancy of the frozen reviewed state; not a post-unblinding retuning rule",
+      "max_ls_opt_over_ls_hi": 0.9596921904399434,
+      "median_ls_opt_over_ls_hi": 0.8723307524433352,
+      "min_ls_opt_over_ls_hi": 0.850658843670322,
+      "n_ls_at_upper_bound": 0,
+      "n_states": 72
+    },
+    "2016": {
+      "fraction_ls_at_upper_bound": 1.0,
+      "interpretation": "diagnostic occupancy of the frozen reviewed state; not a post-unblinding retuning rule",
+      "max_ls_opt_over_ls_hi": 1.0000000000000007,
+      "median_ls_opt_over_ls_hi": 1.0,
+      "min_ls_opt_over_ls_hi": 0.9999999999999993,
+      "n_ls_at_upper_bound": 142,
+      "n_states": 142
+    },
+    "2021": {
+      "fraction_ls_at_upper_bound": 0.0,
+      "interpretation": "diagnostic occupancy of the frozen reviewed state; not a post-unblinding retuning rule",
+      "max_ls_opt_over_ls_hi": 0.8539071448133041,
+      "median_ls_opt_over_ls_hi": 0.8040003043671391,
+      "min_ls_opt_over_ls_hi": 0.5369189060894284,
+      "n_ls_at_upper_bound": 0,
+      "n_states": 201
+    }
+  },
+  "schema_version": 1,
+  "semantic_boundaries": {
+    "bands": "conditional fixed-GP limit quantiles, not a coverage result",
+    "empirical_zero": "zero raw count at finite 1/300 resolution; never an exact probability-zero statement",
+    "sidak": "analytic resolution-spacing reference, not pseudoexperiment-calibrated",
+    "tail_pvalues": "fixed-mass observed-limit ensemble diagnostics, not discovery p-values"
+  },
+  "status": "reviewed postprocessing complete",
+  "supports_GeV": {
+    "fit_support_wide": {
+      "2015": [
+        0.014,
+        0.135
+      ],
+      "2016": [
+        0.03,
+        0.21
+      ],
+      "2021": [
+        0.04,
+        0.3
+      ]
+    },
+    "narrow_finalist_support": {
+      "2015": [
+        0.019,
+        0.09
+      ],
+      "2016": [
+        0.039,
+        0.18
+      ],
+      "2021": [
+        0.04,
+        0.3
+      ]
+    },
+    "reported_search_region": {
+      "2015": [
+        0.019,
+        0.09
+      ],
+      "2016": [
+        0.039,
+        0.18
+      ],
+      "2021": [
+        0.05,
+        0.25
+      ]
+    }
+  }
+}

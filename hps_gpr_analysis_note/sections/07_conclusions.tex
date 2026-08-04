@@ -1,63 +1,58 @@
 \section{Conclusions and Outlook}
 \label{sec:conclusions}
 
-Version 3 records the current HPS GPR prompt-resonance analysis in a form aligned with
-the July 2026 pre-unblinding studies. The 2021 analysis now uses the regenerated
-\path{final_1pct_invM.root} input, rejects events satisfying
-$p_{\mathrm{sum}}<\SI{2.8}{GeV}$, requires at least eight
-two-dimensional hits on the electron track, and applies no vertex-fit $\chi^2$
-selection. The result therefore no longer inherits the oppositely selected
-low-$p_{\mathrm{sum}}$ development histogram or the earlier vertex and hit
-requirements.
+Version 4 makes the endpoint treatment explicit. The signal search remains
+\SIrange{19}{90}{MeV} in 2015, \SIrange{39}{180}{MeV} in 2016, and
+\SIrange{50}{250}{MeV} in 2021, while the corresponding GPs are trained on
+\SIrange{14}{135}{MeV}, \SIrange{30}{210}{MeV}, and
+\SIrange{40}{300}{MeV}. These supports were declared before examining the v4
+observed scan. They use populated sidebands beyond both search endpoints without
+turning those sidebands into additional signal hypotheses.
 
-The GP length-scale bounds are also dataset dependent. The frozen lower factors are
-1.0 for 2015, 0.9 for 2016, and 1.1 for 2021, with upper factors 8, 8, and 9,
-respectively. Their interpretation is deliberately narrower than \emph{best value in
-every metric}. The 2016 choice reduces the coherent pull bias seen for the earlier
-bound; the 2015 choice is a conservative frozen baseline despite a marginally better
-aggregate score at 1.1; and the 2021 choice is a calibration--reach compromise among
-nearly degenerate candidates. The corresponding error-barred, matched-reference
-functional-form studies are the principal closure figures in the note. Pull widths
-below unity are described as conservative only conditional on a toy ensemble that
-faithfully reproduces the production refit and fluctuation model.
+The v4 combination uses the full 2015 and 2016 samples and the reviewed 2021 10\%
+sample. At each mass, one shared $\eps^2$ predicts a campaign-specific signal yield,
+so the observed 90\% confidence-level asymptotic \CLs{} curve is a simultaneous
+likelihood result rather than an envelope or a luminosity rescaling of earlier
+limits. Suspicious optimizer branches are handled by repeated fits with the card held
+unchanged and by a recorded branch review. No observed point, expected quantile, or
+$p$-value is supplied by interpolation.
 
-The staged review candidate is a simultaneous 2015 full, 2016 10\%, and regenerated
-2021 1\% 90\% CL upper limit on $\eps^2$ obtained with \CLs{}. The conversion uses
-fixed radiative-fraction penalties of 7\%, 7\%, and 4.6\%, respectively, and includes
-the minimal-model dimuon-threshold branching correction. The regenerated 2021
-signal-yield and $\eps^2$ panels are shown together so that extraction and conversion
-effects remain distinguishable. The combined result is obtained from the profiled
-shared-coupling likelihood; it is not an envelope of individual observed limits.
+The wider-support audit also exposes a feature that should remain visible in review:
+the 2016 length scale sits on its frozen upper bound at all 142 search hypotheses.
+That behavior reproduces across unchanged-card attempts, so it is not treated as a
+missing optimizer branch. It is instead a clear reason to require support-matched
+functional-form closure and direct coverage before promoting the conditional result
+to a fully calibrated statement. The observed wide-to-narrow comparison is retained
+as a support-dependence diagnostic, not used to choose whichever domain happens to
+give the tighter curve.
 
-The current band and observed curves remain pre-unblinding candidates. Their plotting
-bundle records a reproducible display-level repair for isolated failed mass points:
-in the displayed observed-limit curves only, log-linear interpolation at 24~MeV in
-2015; 44, 98, 133, and 171~MeV in the 2016
-10\% sample; and 136~MeV in the simultaneous observed limit. The repaired 136~MeV
-value is used consistently in the headline limit, the individual-versus-combined
-comparison, and the complete-campaign projection. Known failed fits are omitted,
-rather than interpolated, in the individual local-$p_0$ scans. These choices
-produce legible review figures without treating a failed export as a physical
-measurement, and the repaired points and neighboring inputs are retained in the
-figure audit tables. The affected hypotheses must nevertheless be regenerated or
-reconciled from the frozen likelihood outputs before a final observed exclusion is
-quoted. The connected local-$p_0$ curves and their analytic
-effective-trials conversion provide the review-level global $p$-values used in v3.
-A background-only maximum-$q_0$ ensemble would remain a valuable publication-stage
-cross-check of that conversion, but it is not required to interpret the present
-scan-level comparison.
+The expected median and central 68\% and 95\% bands use 300 background-only joint
+pseudoexperiments at each mass. The observed-data GP state is fixed throughout this
+ensemble: pseudo-spectra fluctuate the conditional background prediction and event
+counts, but the GP is not retrained on each toy. The bands are therefore a conditional
+description of expected upper limits, not a measurement of full-procedure coverage.
+Their empirical tail resolution is one toy, $1/300\simeq0.0033$, and a zero-count
+tail is retained as 0 of 300 rather than promoted to a probability of zero.
 
-The full-dataset comparison is an observed-equivalent density projection from the
-same candidate. It holds the fully analyzed 2015 sample fixed and scales the 2016 10\%
-and 2021 1\% samples to their corresponding complete campaign datasets by factors of
-10 and 100. It is not a fit to the complete 2016 or 2021 datasets and is not an
-expected production sensitivity. The
-remaining publication gates are therefore concrete: regenerate the discrepant scan
-points and expected bands from frozen outputs; validate direct \CLs{} coverage with
-production-faithful toys; freeze and document the effective-trials conversion used for
-the global $p$-values; and rerender every result figure from the same immutable
-configuration and tables used for the final unblinding. The older 95\% results,
-earlier closure suites, repair
-diagnostics, and superseded projections remain available in
-Appendix~\ref{app:prior-validation-results} as analysis history rather than headline
-evidence.
+The same ensemble supplies $p_{\mathrm{strong}}$, $p_{\mathrm{weak}}$, and the
+bounded $p_{\mathrm{two}}$. These values answer whether the observed upper limit is
+unusually strong or weak relative to the conditional background-only limit
+distribution. They do not answer whether the data contain a resonance. That question
+is summarized separately by the fixed-mass asymptotic $p_0$ scan. Its
+\v{S}id\'ak-equivalent curve is an analytic effective-trials approximation and is not
+a global significance calibrated by the 300 expected-limit toys.
+
+The v3 result remains useful as analysis history: it established the statistical
+definitions and shared-coupling construction, and it records why display-level
+repairs were once used while reruns were pending. Its numerical bands, p-values,
+sample fractions, and repaired points do not enter v4. The present result is rebuilt
+from the wider-support scans and the reviewed full-2015, full-2016, and 2021-10\%
+inputs.
+
+Two validation steps remain distinct from the result reported here. Production-faithful
+toys that retrain the GP are needed to test full-procedure \CLs{} coverage under the
+frozen v4 card. A scan-wise background-only maximum-$q_0$ ensemble would be needed to
+replace the analytic \v{S}id\'ak approximation with a toy-calibrated global discovery
+$p$-value. Neither is inferred from the conditional 300-toy expected-band ensemble.
+The eventual full-2021 unblinding is likewise a new analysis input, not a scale factor
+to be applied to the present 10\% result.

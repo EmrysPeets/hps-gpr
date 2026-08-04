@@ -17,6 +17,10 @@ standalone project.
   `\graphicorplaceholder` macro.
 - `generated placeholder`: note-local stand-in created to reserve the final upload
   location for a figure that still needs to be regenerated.
+- `conditional v4`: generated from the reviewed fixed-GP 300-toy ensemble; suitable
+  for the v4 internal-review result but not evidence of full-procedure coverage.
+- `v4 diagnostic`: documents optimizer, support, kernel-bound, or matched-analysis
+  dependence without defining a calibrated sensitivity or discovery claim.
 
 ## Published reference figures
 
@@ -235,11 +239,17 @@ section now uses the following copied limit, significance, and projection assets
 | `kernel_lengthscale_figs/overall_pull_width_vs_injsigma_by_lslb.png` | `/Users/emryspeets/Desktop/gp_mods/2015_gpr/lstests/overall_pull_width_vs_injsigma_by_lslb.png` | stable | 2015 lower-bound scan diagnostic comparing pull-width calibration versus injected significance for candidate lower bounds. |
 | `kernel_lengthscale_figs/ls_hi_vs_k_2021.png` | `ls_bound_plots/ls_hi_vs_k_2021.png` | stable | Additional 2021 length-scale study retained for later use. |
 
-## Reserved folders currently without exported figures
+## Version 4 dataset and result figures
 
 | Bundle path | Original source | Status | Notes |
 | --- | --- | --- | --- |
-| `dataset_summary_figs/` | not yet populated | placeholder | Reserved for dataset overview plots or scan-range schematics if needed later. |
+| `dataset_summary_figs/invariant_mass_distributions_2015_2016_2021_normalized.{png,pdf}` | `scripts/make_dataset_mass_distribution_overview.py` using the reviewed full-2015, full-2016, and 2021-10% inputs | stable | Unit-normalized comparison of the three v4 input spectra. |
+| `dataset_summary_figs/invariant_mass_distributions_2015_2016_2021_log.{png,pdf}` | Same script and inputs | stable | Absolute spectra with distinct GP-support and signal-search shading. |
+| `final_limit_projection_figs/v4_20260803_wide_support/combined_observed_bands300_minimal_visible.{png,pdf}` | `study_results/v4_wide_support_2015full_2016full_2021_10pct_20260803/note_figures/` | conditional v4 | Observed shared-$\eps^2$ limit and conditional 300-toy expected bands. |
+| `final_limit_projection_figs/v4_20260803_wide_support/combined_limit_tail_pvalues300.{png,pdf}` | Same study and postprocessor | conditional v4 | Strong, weak, and bounded two-sided upper-limit ensemble diagnostics. |
+| `final_limit_projection_figs/v4_20260803_wide_support/combined_local_p0_sidak_reference.{png,pdf}` | Same study and postprocessor | v4 diagnostic | Fixed-mass asymptotic $p_0$ and analytic Šidák reference; not toy-calibrated globally. |
+| `final_limit_projection_figs/v4_20260803_wide_support/wide_support_search_kernel_audit.{png,pdf}` | Same study and reviewed GP-state ledger | v4 diagnostic | Search/support geometry and kernel-bound occupancy, including 2016 saturation. |
+| `final_limit_projection_figs/v4_20260803_wide_support/wide_vs_narrow_observed_limit_ratio.{png,pdf}` | Same study and matched narrow-support finalist | v4 diagnostic | Observed support-dependence comparison; not an optimization or sensitivity claim. |
 
 ## Notes
 
