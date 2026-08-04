@@ -10,8 +10,10 @@ version corresponds to a distinct, internally consistent analysis state.
 
 \begin{table}[H]
 \centering
-\small
-\begin{tabularx}{\textwidth}{P{0.12\textwidth}P{0.16\textwidth}Y}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.04}
+\begin{tabularx}{\textwidth}{P{0.11\textwidth}P{0.15\textwidth}Y}
 \toprule
 Version & Circulation date & Principal changes \\
 \midrule
@@ -50,10 +52,27 @@ pseudoexperiments place the observed limit within the ensemble through the stron
 weak-, and bounded two-sided consistency tests used in v3. Those quantities remain
 upper-limit diagnostics rather than discovery significances or a substitute for
 full-procedure coverage. \\
+\addlinespace
+v4.1 & August 4, 2026 &
+Responds to the full-2016 length-scale saturation with a controlled observed-only
+scan of $k_{\max,2016}=8,10,12,15,$ and 20. Factor 12 is the first nonbinding value
+and is followed by a stable plateau. The exact combined observed limit and local
+asymptotic $p_0$ scan are recomputed with all other analysis settings fixed. A
+ten-toy 2021 source-and-exposure screen---native 1\%, $1\%\times10$,
+$1\%\times100$, native 10\%, and $10\%\times10$---is included only as a fit-space
+hyperparameter pilot. Its reviewed background-only scan supports factor 20 for the two
+projected-100\% lanes and factor 25 if one bound must cover every pilot exposure;
+the fixed-amplitude screen shows no factor-20 sensitivity loss, while a common 2--3\%
+under-response remains an unresolved ten-toy closure diagnostic. No new expected
+bands, limit-tail ensemble result, toy-calibrated discovery claim, or coverage claim
+is included; the observed result remains a candidate pending production-matched
+closure and direct coverage. \\
 \bottomrule
 \end{tabularx}
-\caption{Analysis-note version history. The v4 row defines the scope of the present
-document; earlier versions are summarized only to make changes in inputs, validation,
-and statistical interpretation traceable to reviewers.}
+\caption{Analysis-note version history. The v4.1 row defines the scope of the
+present document. It is explicitly a post-v4 observed/asymptotic candidate update,
+not a pre-unblinding kernel-card selection; earlier versions are summarized only to
+make changes in inputs, validation, and statistical interpretation traceable to
+reviewers.}
 \label{tab:note-change-log}
 \end{table}

@@ -1,58 +1,75 @@
 \section{Conclusions and Outlook}
 \label{sec:conclusions}
 
-Version 4 makes the endpoint treatment explicit. The signal search remains
-\SIrange{19}{90}{MeV} in 2015, \SIrange{39}{180}{MeV} in 2016, and
-\SIrange{50}{250}{MeV} in 2021, while the corresponding GPs are trained on
-\SIrange{14}{135}{MeV}, \SIrange{30}{210}{MeV}, and
-\SIrange{40}{300}{MeV}. These supports were declared before examining the v4
-observed scan. They use populated sidebands beyond both search endpoints without
-turning those sidebands into additional signal hypotheses.
+Version 4.1 documents a controlled response to a numerical-range diagnostic in the
+v4 observed scan. The search intervals and wider GP supports remain 19--90 and
+14--135~MeV for 2015, 39--180 and 30--210~MeV for 2016, and 50--250 and
+40--300~MeV for 2021. The full 2015 and 2016 samples and the 2021 10\% sample are
+combined in a shared-$\eps^2$ likelihood. Only the 2016 resolution-scaled
+length-scale upper factor changes, from 8 to 12.
 
-The v4 combination uses the full 2015 and 2016 samples and the reviewed 2021 10\%
-sample. At each mass, one shared $\eps^2$ predicts a campaign-specific signal yield,
-so the observed 90\% confidence-level asymptotic \CLs{} curve is a simultaneous
-likelihood result rather than an envelope or a luminosity rescaling of earlier
-limits. Suspicious optimizer branches are handled by repeated fits with the card held
-unchanged and by a recorded branch review. No observed point, expected quantile, or
-$p$-value is supplied by interpolation.
+That change follows a controlled factor-8, 10, 12, 15, and 20 observed-only scan.
+The v4 ceiling is occupied at all 142 full-2016 hypotheses; factor 10 remains
+occupied at 56, while factors 12, 15, and 20 have no occupied hypotheses. Factor 12
+is selected as the first nonbinding value and is followed by a stable plateau in log
+marginal likelihood, observed yield limits, and local $Z$. Repeated actual fits
+resolve the reviewed branches, and no GP state, limit, or $p$-value is interpolated.
+The rule does not select whichever observed limit is tighter or whichever local
+$p_0$ is smaller.
 
-The wider-support audit also exposes a feature that should remain visible in review:
-the 2016 length scale sits on its frozen upper bound at all 142 search hypotheses.
-That behavior reproduces across unchanged-card attempts, so it is not treated as a
-missing optimizer branch. It is instead a clear reason to require support-matched
-functional-form closure and direct coverage before promoting the conditional result
-to a fully calibrated statement. The observed wide-to-narrow comparison is retained
-as a support-dependence diagnostic, not used to choose whichever domain happens to
-give the tighter curve.
+The exact 415-state reconstruction gives finite observed 90\% asymptotic \CLs{}
+limits and fixed-mass asymptotic $p_0$ values on all 232 combined hypotheses.
+Relative to v4, the observed-limit ratio over the 2016-active interval ranges from
+0.6941 at 103~MeV to 1.2789 at 90~MeV. The smallest local asymptotic value is
+$3.2592\times10^{-5}$ at 65~MeV ($Z=3.993$). The corresponding fixed-card analytic
+\v{S}id\'ak reference is not a calibrated global $p$-value because it does not
+account for the post-v4 upper-bound scan.
 
-The expected median and central 68\% and 95\% bands use 300 background-only joint
-pseudoexperiments at each mass. The observed-data GP state is fixed throughout this
-ensemble: pseudo-spectra fluctuate the conditional background prediction and event
-counts, but the GP is not retrained on each toy. The bands are therefore a conditional
-description of expected upper limits, not a measurement of full-procedure coverage.
-Their empirical tail resolution is one toy, $1/300\simeq0.0033$, and a zero-count
-tail is retained as 0 of 300 rather than promoted to a probability of zero.
+No v4.1 expected-limit bands or upper-limit-tail pseudoexperiment diagnostics have
+been made. The v4 conditional bands are not transferred to the new observed curve.
+Likewise, no scan-wise toy-calibrated discovery probability or direct \CLs{}
+coverage claim is inferred. Version 4.1 is therefore an observed/asymptotic
+candidate update, not yet a replacement for a coverage-qualified frozen card.
 
-The same ensemble supplies $p_{\mathrm{strong}}$, $p_{\mathrm{weak}}$, and the
-bounded $p_{\mathrm{two}}$. These values answer whether the observed upper limit is
-unusually strong or weak relative to the conditional background-only limit
-distribution. They do not answer whether the data contain a resonance. That question
-is summarized separately by the fixed-mass asymptotic $p_0$ scan. Its
-\v{S}id\'ak-equivalent curve is an analytic effective-trials approximation and is not
-a global significance calibrated by the 300 expected-limit toys.
+A ten-toy 2021 source-and-exposure pilot now exercises the paired Poisson generator,
+production-geometry GP refit, and hyperparameter export for five declared scenarios:
+native 1\%, $1\%\times10$, $1\%\times100$, native 10\%, and $10\%\times10$.
+The native-10\% support total is 11.296 times the native-1\% total, so the
+$1\%\times10$ versus native-10\% comparison probes source/selection shape and native
+normalization rather than a pure exposure scaling. The observed comparisons also move
+downward with data fraction: the median $\ell_{\mathrm{opt}}/\sigma_x$ changes from
+10.782 to 9.716 between 2016 10\% and full data on the factor-12 card, and from
+13.061 to 12.060 between 2021 1\% and 10\% on the factor-15 card. Higher statistics
+therefore do not imply a longer optimized scale.
 
-The v3 result remains useful as analysis history: it established the statistical
-definitions and shared-coupling construction, and it records why display-level
-repairs were once used while reruns were pending. Its numerical bands, p-values,
-sample fractions, and repaired points do not enter v4. The present result is rebuilt
-from the wider-support scans and the reviewed full-2015, full-2016, and 2021-10\%
-inputs.
+After actual-fit optimizer review, factor 15 truncates the two projected-100\% lanes,
+whereas factors 20 and 25 are nonbinding and form the likelihood plateau. Factor 20
+is the provisional upper ceiling for the 2021 100\%-statistics projection. If one
+ceiling must instead cover all five pilot exposures, the native-1\% boundary contact
+at factor 20 makes factor 25 the first universally nonbinding tested value. Both
+statements are background-only pilot conclusions, not production-card freezes.
 
-Two validation steps remain distinct from the result reported here. Production-faithful
-toys that retrain the GP are needed to test full-procedure \CLs{} coverage under the
-frozen v4 card. A scan-wise background-only maximum-$q_0$ ensemble would be needed to
-replace the analytic \v{S}id\'ak approximation with a toy-calibrated global discovery
-$p$-value. Neither is inferred from the conditional 300-toy expected-band ensemble.
-The eventual full-2021 unblinding is likewise a new analysis input, not a scale factor
-to be applied to the present 10\% result.
+The factor-15-anchored fixed-amplitude screen shows no factor-20 sensitivity loss in
+the projected lanes: three fitted-$\sigma_A$ ratios are unity to the quoted precision,
+and the alternate native-10\%$\times10$ lane improves by 1.43\%. The four factor-20
+paired-response medians lie between 0.971921 and 0.979603 and are essentially unchanged
+at factors 15 and 25. The common 2--3\% under-response is therefore not caused by
+lifting the upper bound. With ten toys it remains an unresolved closure diagnostic,
+not a calibrated bias claim. No expected-limit band or coverage result is constructed,
+and the unused $q_\mu$ and immutable-path $\eps^2$ outputs are non-promotable.
+
+The production follow-up should use a predeclared larger ensemble, retain paired toy
+identifiers within each truth-source scaling family and across upper-bound settings,
+and include independent smooth truth families and injected-signal closure. Its
+principal outputs should remain $\ell_{\mathrm{opt}}/\sigma_x$,
+$\ell_{\mathrm{opt}}/\ell_{\max}$, boundary occupancy, log marginal likelihood,
+repeat stability, background bias, pull, and signal recovery versus exposure. Only
+that larger closure study can support a frozen numerical range; direct limit coverage
+remains a separate post-freeze requirement.
+
+After a candidate upper range is selected without using observed limit direction or
+local significance, production-faithful functional-form closure and direct limit
+coverage should be rerun under that frozen card. A separate scan-wise
+background-only maximum-$q_0$ ensemble would be required for a toy-calibrated global
+discovery statement. The eventual full-2021 observed spectrum remains a new analysis
+input, not a deterministic scale factor applied to the present 10\% observation.

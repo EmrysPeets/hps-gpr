@@ -1,0 +1,375 @@
+diff -ruN a/hps_gpr_analysis_note/FIGURE_MANIFEST.md b/hps_gpr_analysis_note/FIGURE_MANIFEST.md
+--- a/hps_gpr_analysis_note/FIGURE_MANIFEST.md	2026-08-04 15:17:28
++++ b/hps_gpr_analysis_note/FIGURE_MANIFEST.md	2026-08-04 15:18:57
+@@ -19,6 +19,11 @@
+   location for a figure that still needs to be regenerated.
+ - `observed-only candidate`: exact observed/asymptotic product from the v4.1 card;
+   it has no associated expected-limit band and is not yet coverage-qualified.
++- `fit-space diagnostic`: exact hyperparameter or optimizer comparison that is not a
++  limit, expected band, coverage result, or physics-card freeze.
++- `pilot diagnostic`: small implementation-screen ensemble shown only to expose
++  generator, refit, or optimizer behavior; it is not an expected band, coverage
++  result, or physics-card freeze.
+ 
+ ## Published reference figures
+ 
+@@ -112,9 +117,18 @@
+ | `final_limit_projection_figs/v4p1_20260804_2016_lsupper/combined_observed_limit_k12_vs_v4_no_bands.pdf` | v4.1 final observed comparison export from the exact 232-row factor-12 reconstruction and the reviewed v4 factor-8 table | observed-only candidate | Matched-mass shared-`\eps^2` observed 90% asymptotic `\CLs` comparison and ratio. No expected bands are shown or implied. |
+ | `final_limit_projection_figs/v4p1_20260804_2016_lsupper/combined_asymptotic_p0_k12_vs_v4.pdf` | v4.1 final p-value comparison export from the exact 232-row factor-12 reconstruction and the reviewed v4 factor-8 table | observed-only candidate | Fixed-mass asymptotic `p_0` comparison. Any Sidak curve is an analytic fixed-card reference, not a toy-calibrated global probability and not corrected for the upper-bound scan. |
+ 
+-No v4.1 expected-limit-band or upper-limit-tail-ensemble asset exists. The v4
+-300-toy conditional products remain historical reference products and must not be
+-paired with the v4.1 factor-12 observed curve.
++## v4.1 2021 source-and-exposure length-scale pilot figures
++
++| Bundle path | Original source | Status | Notes |
++| --- | --- | --- | --- |
++| `toy_generation_figs/v4p1_ls_exposure_pilot/fig_v4p1_ls_observed_dataset_comparison.pdf` | `study_results/v4p1_2021_ls_exposure_ensembles_20260804/plots/fig_v4p1_ls_observed_dataset_comparison.pdf` | fit-space diagnostic | Exact observed 2016 10%-versus-full and 2021 1%-versus-10% optimized-length-scale comparison. No toy-derived quantity or expected band is shown. |
++| `toy_generation_figs/v4p1_ls_exposure_pilot/fig_v4p1_ls_toy_ensemble_curves.pdf` | `study_results/v4p1_2021_ls_exposure_ensembles_20260804/plots/fig_v4p1_ls_toy_ensemble_curves.pdf` | pilot diagnostic | Ten individual refitted hyperparameter curves for each of the five declared native/scaled scenarios. The native-10% versus `1%-truth x10` comparison is a source/selection-shape diagnostic because their support totals differ. |
++| `toy_generation_figs/v4p1_ls_exposure_pilot/fig_v4p1_ls_bound_sensitivity.pdf` | `study_results/v4p1_2021_ls_exposure_ensembles_20260804/plots/fig_v4p1_ls_bound_sensitivity.pdf` | pilot diagnostic | Ten-toy upper-bound, nested-LML, and optimizer-stability screen across factors 6, 9, 12, 15, 20, and 25. It is not a physics-card freeze. |
++
++No v4.1 expected-limit-band or upper-limit-tail-ensemble asset exists. The ten-toy
++source-and-exposure assets above are fit-space pilot diagnostics and must not be
++presented as bands. The v4 300-toy conditional products remain historical reference
++products and must not be paired with the v4.1 factor-12 observed curve.
+ 
+ | Bundle path | Original source | Status | Notes |
+ | --- | --- | --- | --- |
+diff -ruN a/hps_gpr_analysis_note/hps_gpr_analysis_note.bib b/hps_gpr_analysis_note/hps_gpr_analysis_note.bib
+--- a/hps_gpr_analysis_note/hps_gpr_analysis_note.bib	2026-08-04 15:17:28
++++ b/hps_gpr_analysis_note/hps_gpr_analysis_note.bib	2026-08-04 15:18:57
+@@ -65,10 +65,25 @@
+   author = {Rasmussen, Carl Edward and Williams, Christopher K. I.},
+   title = {Gaussian Processes for Machine Learning},
+   publisher = {MIT Press},
++  address = {Cambridge, Massachusetts},
++  series = {Adaptive Computation and Machine Learning},
+   year = {2006},
++  isbn = {978-0-262-18253-9},
+   url = {https://gaussianprocess.org/gpml/}
+ }
+ 
++@book{Kingman1993PoissonProcesses,
++  author = {Kingman, J. F. C.},
++  title = {Poisson Processes},
++  publisher = {Oxford University Press},
++  address = {Oxford},
++  series = {Oxford Studies in Probability},
++  volume = {3},
++  year = {1993},
++  isbn = {978-0-19-853693-2},
++  doi = {10.1093/oso/9780198536932.001.0001}
++}
++
+ @article{Krige1951,
+   author = {Krige, D. G.},
+   title = {A Statistical Approach to Some Basic Mine Valuation Problems on the {Witwatersrand}},
+@@ -550,6 +565,14 @@
+   pages = {2825--2830},
+   year = {2011},
+   url = {https://jmlr.org/papers/v12/pedregosa11a.html}
++}
++
++@misc{ScikitLearnGPRDocs16,
++  author = {{scikit-learn developers}},
++  title = {Gaussian Processes: scikit-learn 1.6.1 Documentation},
++  year = {2025},
++  note = {Version 1.6.1; accessed August 4, 2026},
++  url = {https://scikit-learn.org/1.6/modules/gaussian_process.html}
+ }
+ 
+ @article{HPSSlimEdgeSensors2020,
+diff -ruN a/hps_gpr_analysis_note/main.tex b/hps_gpr_analysis_note/main.tex
+--- a/hps_gpr_analysis_note/main.tex	2026-08-04 15:17:28
++++ b/hps_gpr_analysis_note/main.tex	2026-08-04 15:18:55
+@@ -116,8 +116,11 @@
+ \CLs{} limit and fixed-mass asymptotic $p_0$ scan are reported as a post-v4 candidate
+ update. No new expected-limit bands, limit-tail ensemble diagnostics,
+ toy-calibrated global $p$-value, or direct coverage claim is made.
+-Production-matched hyperparameter closure and direct limit coverage remain required
+-before this candidate can replace a frozen analysis card.
++A ten-toy, five-scenario 2021 source-and-exposure screen is included only as a
++fit-space pilot of the hyperparameter-closure machinery. It is not used to select a
++physics card or qualify the observed result. Production-matched hyperparameter closure
++and direct limit coverage remain required before this candidate can replace a frozen
++analysis card.
+ \end{abstract}
+ 
+ \tableofcontents
+diff -ruN a/hps_gpr_analysis_note/sections/00_change_log.tex b/hps_gpr_analysis_note/sections/00_change_log.tex
+--- a/hps_gpr_analysis_note/sections/00_change_log.tex	2026-08-04 15:17:28
++++ b/hps_gpr_analysis_note/sections/00_change_log.tex	2026-08-04 15:18:55
+@@ -57,9 +57,12 @@
+ Responds to the full-2016 length-scale saturation with a controlled observed-only
+ scan of $k_{\max,2016}=8,10,12,15,$ and 20. Factor 12 is the first nonbinding value
+ and is followed by a stable plateau. The exact combined observed limit and local
+-asymptotic $p_0$ scan are recomputed with all other analysis settings fixed. No new
+-expected bands or toy-calibrated discovery claim is included; the result remains a
+-candidate pending production-matched closure and direct coverage. \\
++asymptotic $p_0$ scan are recomputed with all other analysis settings fixed. A
++ten-toy 2021 source-and-exposure screen---native 1\%, $1\%\times10$,
++$1\%\times100$, native 10\%, and $10\%\times10$---is included only as a fit-space
++hyperparameter pilot. No new expected bands, limit-tail ensemble result,
++toy-calibrated discovery claim, or coverage claim is included; the observed result
++remains a candidate pending production-matched closure and direct coverage. \\
+ \bottomrule
+ \end{tabularx}
+ \caption{Analysis-note version history. The v4.1 row defines the scope of the
+diff -ruN a/hps_gpr_analysis_note/sections/04_methodology.tex b/hps_gpr_analysis_note/sections/04_methodology.tex
+--- a/hps_gpr_analysis_note/sections/04_methodology.tex	2026-08-04 15:17:28
++++ b/hps_gpr_analysis_note/sections/04_methodology.tex	2026-08-04 15:19:25
+@@ -231,6 +231,17 @@
+ \ell_{\max,d}(m) = k_{\max,d}\sigma_x(m).
+ \label{eq:dataset-lengthscale-bounds}
+ \end{equation}
++For the RBF covariance, $\ell$ is the characteristic separation in the GP input
++coordinate over which the prior covariance decays. It controls the scale of
++variations admitted by the background model
++\cite{RasmussenWilliams2006}; without an additional mapping, it is not a measured
++detector or background-physics correlation length. Likewise, the lower and upper
++values in Eq.~\eqref{eq:dataset-lengthscale-bounds} define the numerical optimizer
++domain. An optimum at $\ell_{\max}$ establishes that the constraint is active for
++that fit, not that the physical background correlation scale has been measured at
++the boundary. The implementation optimizes log-transformed kernel
++hyperparameters within these configured bounds \cite{ScikitLearnGPRDocs16}.
++
+ The v4.1 observed/asymptotic candidate uses the dataset-specific factors in
+ Table~\ref{tab:production-lengthscale-bounds}. The lower factors retain their earlier
+ full-refit closure provenance; changing the 2016 upper factor does not requalify those
+@@ -281,43 +292,65 @@
+ Production-matched functional-form closure, optimizer-repeat stability, and direct
+ coverage remain separate requirements.
+ 
+-\subsection{Planned 2021 exposure-scaled hyperparameter closure}
++\subsection{2021 source-and-exposure hyperparameter pilot design}
+ \label{sec:planned-2021-exposure-ls-toys}
+ 
+-The corresponding 2021 study should vary exposure through the expected count
+-intensity, not by multiplying the observed bin contents or rescaling an existing
+-limit. Let $\lambda_i^{10\%}$ be a validated smooth expectation for the present 2021
+-10\% spectrum in bin $i$. For exposure factors $s\in\{1,2,5,10\}$, define
+-\[
+-\lambda_i(s)=s\,\lambda_i^{10\%},
+-\qquad
+-Y_i^{(t,s)}\sim\operatorname{Pois}\!\left[\lambda_i(s)\right],
+-\]
+-so that $s=10$ represents 100\%-equivalent statistics. Paired toy identifiers should
+-be used across exposures and candidate upper-bound settings. A nested implementation
+-may generate independent Poisson increments between successive exposure points and
+-accumulate them, giving the correct Poisson marginal at each exposure while reducing
+-the Monte Carlo noise in exposure-to-exposure comparisons.
++The 2021 pilot changes the expected count intensity, never a realized histogram or an
++existing limit. Let $\lambda_i^{(1)}$ and $\lambda_i^{(10)}$ denote independently
++constructed smooth expected intensities derived from the native 2021 1\% and 10\%
++sources on the common 40--300~MeV support. The five declared scenarios are
++\begin{align}
++\Lambda_i^{\mathrm{native}\,1\%} &= \lambda_i^{(1)}, &
++\Lambda_i^{1\%\times10} &= 10\lambda_i^{(1)}, &
++\Lambda_i^{1\%\times100} &= 100\lambda_i^{(1)}, \nonumber\\
++\Lambda_i^{\mathrm{native}\,10\%} &= \lambda_i^{(10)}, &
++\Lambda_i^{10\%\times10} &= 10\lambda_i^{(10)}.
++\label{eq:v4p1-ls-pilot-scenarios}
++\end{align}
++Within each source family, paired toys are generated with independent Poisson
++increments,
++\begin{align}
++N_i^{1\%} &\sim \operatorname{Pois}\!\left(\lambda_i^{(1)}\right), &
++N_i^{1\%\times10} &= N_i^{1\%}
++ + \operatorname{Pois}\!\left(9\lambda_i^{(1)}\right), \nonumber\\
++N_i^{1\%\times100} &= N_i^{1\%\times10}
++ + \operatorname{Pois}\!\left(90\lambda_i^{(1)}\right), \nonumber\\
++N_i^{10\%} &\sim \operatorname{Pois}\!\left(\lambda_i^{(10)}\right), &
++N_i^{10\%\times10} &= N_i^{10\%}
++ + \operatorname{Pois}\!\left(9\lambda_i^{(10)}\right).
++\label{eq:v4p1-ls-pilot-increments}
++\end{align}
++Every marginal is therefore a Poisson draw from its declared mean, while the paired
++comparisons share their lower-exposure realization
++\cite{Kingman1993PoissonProcesses,HistFactory}.
+ 
+-Each pseudo-spectrum must retrain the GP with the production 40--300~MeV support,
+-50--250~MeV search interval, rebin-five histogram geometry, and
+-$2.25\,\sigma_m$ training exclusion. The study should include GP self-closure and
+-independent smooth functional-form truth families, use a deliberately loose
+-$k_{\max}$ grid, and repeat questionable optimizer branches without changing the
+-toy. Per mass and exposure it should retain
++The native 10\% source has 11.296 times the native 1\% support total, not exactly ten
++times. The $1\%\times10$ versus native-10\% comparison is consequently a
++source/selection-shape diagnostic, including the different native normalization, rather
++than a pure tenfold-exposure closure test. The primary lane uses the same
++\texttt{fGenGammaThresh} analytic family for both native sources; the independently
++declared \texttt{fSigPowExpQ} lane is an alternate smooth-truth stress test. Neither
++family is asserted to be the physical trident generator.
++
++Every pseudo-spectrum is passed through a fresh GP sideband fit with the production
++40--300~MeV support, 50--250~MeV search interval, rebin-five geometry, and
++$2.25\,\sigma_m$ training exclusion. The ten-toy pilot scans
++$k_{\max}=6,9,12,15,20,$ and 25 on the predeclared
++\SIlist{50;70;90;110;130;150;170;190;210;230;250}{MeV} grid. Per fit it records
+ $\ell_{\mathrm{opt}}/\sigma_x$, $\ell_{\mathrm{opt}}/\ell_{\max}$, boundary
+-occupancy, log marginal likelihood, and repeat stability, together with background
+-bias, pull, and injected-signal recovery diagnostics. Medians and central 68\% and
+-95\% intervals of these hyperparameter quantities versus exposure can then determine
+-whether the preferred range grows between 10\% and 100\% statistics.
++occupancy, log marginal likelihood, optimizer status, count-space amplitude
++diagnostics, and repeat stability. Questionable optimizer branches must be rerun with
++the toy and card unchanged; they must not be repaired by interpolation.
+ 
+-This is a hyperparameter-closure study. It does not produce expected limit bands and
+-does not by itself establish \CLs{} coverage or a scan-wise global discovery
+-$p$-value. Those require distinct, production-faithful ensembles after a candidate
+-card is frozen. The current convenience toy path must also be made production
+-matched---in particular, it must preserve rebin five and expose the luminosity scale
+-rather than silently using its present fixed geometry---before its output can support
+-that decision.
++This is a screening pilot in fit space. The immutable fit path used for the scan
++predates the v4 uncropped fractional-bin density conversion, so its exported
++$\eps^2$ values are explicitly non-promotable. The pilot produces no expected-limit
++bands and does not establish \CLs{} coverage or a scan-wise global discovery
++$p$-value. A larger production-matched closure ensemble, including signal-injection
++bias and direct post-freeze coverage studies, remains necessary before a candidate
++upper range can become a physics card. The pilot implementation and its deliberately
++limited interpretation are documented in
++Section~\ref{sec:v4p1-ls-exposure-pilot}.
+ 
+ Figure~\ref{fig:gpr-window-construction} summarizes the same construction in the
+ language used by the implemented likelihood. The sideband bins set the log-count
+diff -ruN a/hps_gpr_analysis_note/sections/05_toys_validation.tex b/hps_gpr_analysis_note/sections/05_toys_validation.tex
+--- a/hps_gpr_analysis_note/sections/05_toys_validation.tex	2026-08-04 15:17:28
++++ b/hps_gpr_analysis_note/sections/05_toys_validation.tex	2026-08-04 15:18:56
+@@ -502,6 +502,81 @@
+ therefore emphasizes the clean year-matched functional-form scan suites above and the
+ refmatched full-refit closure studies below.
+ 
++\providecommand{\VFourPOneLSPilotNumericalSummary}{%
++  \emph{[Production ensemble numerical summary pending.]}}
++
++\subsection{Ten-toy 2021 source-and-exposure length-scale pilot}
++\label{sec:v4p1-ls-exposure-pilot}
++
++The pilot implements Eqs.~\eqref{eq:v4p1-ls-pilot-scenarios} and
++\eqref{eq:v4p1-ls-pilot-increments} for the native 1\%, $1\%\times10$,
++$1\%\times100$, native 10\%, and $10\%\times10$ scenarios. Ten background
++pseudoexperiments are generated for each analytic truth and scenario. Within a source
++family, the same toy index identifies a nested Poisson realization, and the optimizer
++seed is held common across upper-bound factors at fixed truth, scenario, toy, and mass.
++This pairing reduces comparison noise; it does not make the independently derived
++native-1\% and native-10\% source functions identical.
++
++The common-family primary lane uses \texttt{fGenGammaThresh} for both native sources so
++that the $1\%\times10$ versus native-10\% comparison probes the source spectrum and
++selection rather than a change of analytic family. The \texttt{fSigPowExpQ} lane is
++kept separate as an alternate-truth stress test. Both are smooth stress truths with
++their source-fit diagnostics retained in the provenance ledger; neither is promoted as
++a physical background generator.
++
++\begin{figure}[H]
++\centering
++\graphicorplaceholder{0.92\linewidth}{toy_generation_figs/v4p1_ls_exposure_pilot/fig_v4p1_ls_observed_dataset_comparison.pdf}
++\caption{Observed optimized-length-scale comparison used to motivate the 2021 pilot.
++The ordinate is $\ell_{\mathrm{opt}}/\sigma_x$ at each mass. The 2016 panel compares
++the reviewed 10\% and full samples on the common factor-12 wide-support card, while the
++2021 panel compares the reviewed native 1\% and 10\% samples on the common factor-15
++wide-support card. These are exact observed fit-space diagnostics with no interpolated
++rows; they are not ensemble expectations, limit bands, or evidence for a universal
++monotonic luminosity dependence.}
++\label{fig:v4p1-ls-observed-dataset-comparison}
++\end{figure}
++
++\begin{figure}[H]
++\centering
++\graphicorplaceholder{0.94\linewidth}{toy_generation_figs/v4p1_ls_exposure_pilot/fig_v4p1_ls_toy_ensemble_curves.pdf}
++\caption{Individual optimized-length-scale curves in the ten-toy 2021
++source-and-exposure pilot. Curves are shown separately for native 1\%,
++$1\%\times10$, $1\%\times100$, native 10\%, and $10\%\times10$. They are
++projections of a fit-space hyperparameter diagnostic under the declared smooth truth,
++not projected limits, expected-limit bands, or a prediction of the eventual full-2021
++observed spectrum. Because the native-10\% support total is 11.296 times the
++native-1\% total, the $1\%\times10$ versus native-10\% comparison also probes
++source/selection shape and native normalization.}
++\label{fig:v4p1-ls-toy-ensemble-curves}
++\end{figure}
++
++\begin{figure}[H]
++\centering
++\graphicorplaceholder{0.92\linewidth}{toy_generation_figs/v4p1_ls_exposure_pilot/fig_v4p1_ls_bound_sensitivity.pdf}
++\caption{Upper-bound sensitivity in the same ten-toy pilot for
++$k_{\max}=6,9,12,15,20,$ and 25. The panels summarize boundary occupancy,
++log-marginal-likelihood ordering, and optimizer-repeat stability on the predeclared
++mass grid. A bound is not selected because it gives a favorable limit or local
++$p_0$. With only ten toys per scenario, even zero observed boundary hits is a screening
++diagnostic rather than a production qualification.}
++\label{fig:v4p1-ls-bound-sensitivity}
++\end{figure}
++
++\paragraph{Numerical pilot summary.}
++\VFourPOneLSPilotNumericalSummary
++
++The production replacement for the preceding placeholder should report, for each truth,
++scenario, and upper factor, the completed-fit fraction, upper-bound occupancy, median
++and range of $\ell_{\mathrm{opt}}/\sigma_x$, adjacent-factor
++log-marginal-likelihood ordering, and unchanged-card repeat stability. These ten-toy
++summaries must remain labeled as pilot diagnostics. They do not retroactively validate
++the 2016 factor-12 observed candidate, select a final 2021 upper range, qualify the
++non-promotable $\eps^2$ export, or supply coverage, expected bands, or a global
++discovery probability.
++
++\FloatBarrier
++
+ \subsection{Asimov calibration and background-only pseudoexperiments}
+ 
+ When toy strengths are specified in units of $\sigma_A$, the package first constructs a
+diff -ruN a/hps_gpr_analysis_note/sections/06_results.tex b/hps_gpr_analysis_note/sections/06_results.tex
+--- a/hps_gpr_analysis_note/sections/06_results.tex	2026-08-04 15:17:28
++++ b/hps_gpr_analysis_note/sections/06_results.tex	2026-08-04 15:18:56
+@@ -87,6 +87,13 @@
+ Neither the direction of the observed-limit change nor the local $p_0$ values enter
+ that rule.
+ 
++The ten-toy 2021 source-and-exposure screen in
++Section~\ref{sec:v4p1-ls-exposure-pilot} is not part of this selection rule. It is a
++later fit-space pilot and supplies neither an expected band nor a coverage
++qualification or trials correction for the observed factor scan. None of the observed
++limits or asymptotic $p_0$ values below is conditioned on a conclusion drawn from those
++ten toys.
++
+ \subsection{Exact combined observed reconstruction}
+ \label{sec:results-v4p1-reconstruction}
+ 
+diff -ruN a/hps_gpr_analysis_note/sections/07_conclusions.tex b/hps_gpr_analysis_note/sections/07_conclusions.tex
+--- a/hps_gpr_analysis_note/sections/07_conclusions.tex	2026-08-04 15:17:28
++++ b/hps_gpr_analysis_note/sections/07_conclusions.tex	2026-08-04 15:18:56
+@@ -31,15 +31,24 @@
+ coverage claim is inferred. Version 4.1 is therefore an observed/asymptotic
+ candidate update, not yet a replacement for a coverage-qualified frozen card.
+ 
+-The next hyperparameter study should use 2021 pseudo-spectra whose expected
+-intensities are scaled from the validated 10\% expectation through 20\%, 50\%, and
+-100\%-equivalent statistics, with paired toy identifiers across exposures and
+-upper-bound settings. Each pseudo-spectrum should retrain the GP with production
+-support, rebinning, and blind geometry. The principal outputs are the distributions
+-of $\ell_{\mathrm{opt}}/\sigma_x$, $\ell_{\mathrm{opt}}/\ell_{\max}$, boundary
+-occupancy, log marginal likelihood, repeat stability, and closure diagnostics versus
+-exposure. Those toys determine whether the admissible length-scale range should grow
+-with statistics; they are not expected-limit-band toys.
++A ten-toy 2021 source-and-exposure pilot now exercises the paired Poisson generator,
++production-geometry GP refit, and hyperparameter export for five declared scenarios:
++native 1\%, $1\%\times10$, $1\%\times100$, native 10\%, and $10\%\times10$.
++The native-10\% support total is 11.296 times the native-1\% total, so the
++$1\%\times10$ versus native-10\% comparison probes source/selection shape and native
++normalization rather than a pure exposure scaling. The individual curves and
++upper-bound summaries are pilot fit-space diagnostics. Ten toys are too few to
++establish stable tail probabilities or coverage, and no expected-limit band is
++constructed from this screen.
++
++The production follow-up should use a predeclared larger ensemble, retain paired toy
++identifiers within each truth-source scaling family and across upper-bound settings,
++and include independent smooth truth families and injected-signal closure. Its
++principal outputs should remain $\ell_{\mathrm{opt}}/\sigma_x$,
++$\ell_{\mathrm{opt}}/\ell_{\max}$, boundary occupancy, log marginal likelihood,
++repeat stability, background bias, pull, and signal recovery versus exposure. Only
++that larger closure study can support a frozen numerical range; direct limit coverage
++remains a separate post-freeze requirement.
+ 
+ After a candidate upper range is selected without using observed limit direction or
+ local significance, production-faithful functional-form closure and direct limit

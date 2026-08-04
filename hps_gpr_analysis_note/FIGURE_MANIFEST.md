@@ -21,6 +21,13 @@ standalone project.
   for the v4 internal-review result but not evidence of full-procedure coverage.
 - `v4 diagnostic`: documents optimizer, support, kernel-bound, or matched-analysis
   dependence without defining a calibrated sensitivity or discovery claim.
+- `observed-only candidate`: exact observed/asymptotic product from the v4.1 card;
+  it has no associated expected-limit band and is not yet coverage-qualified.
+- `fit-space diagnostic`: exact hyperparameter or optimizer comparison that is not a
+  limit, expected band, coverage result, or physics-card freeze.
+- `pilot diagnostic`: small implementation-screen ensemble shown only to expose
+  generator, refit, or optimizer behavior; it is not an expected band, coverage
+  result, or physics-card freeze.
 
 ## Published reference figures
 
@@ -105,6 +112,32 @@ standalone project.
 The previous note-local limit and p-value folders were moved to
 `old_lim_and_plots_folder/2026_05_18_replaced_limit_pvalue_plots/`. The active Results
 section now uses the following copied limit, significance, and projection assets.
+
+## v4.1 2016 length-scale upper-range and observed-only figures
+
+| Bundle path | Original source | Status | Notes |
+| --- | --- | --- | --- |
+| `final_limit_projection_figs/v4p1_20260804_2016_lsupper/lml_and_length_scale_boundary_occupancy.pdf` | `study_results/v4p1_2016_ls_upper_optimization_20260804/plots/lml_and_length_scale_boundary_occupancy.pdf` | diagnostic | Controlled 2016 factor-8, 10, 12, 15, and 20 boundary-occupancy and log-marginal-likelihood scan. Factor 12 is the first nonbinding setting followed by the factor-15 and factor-20 plateau. |
+| `final_limit_projection_figs/v4p1_20260804_2016_lsupper/combined_observed_limit_k12_vs_v4_no_bands.pdf` | v4.1 final observed comparison export from the exact 232-row factor-12 reconstruction and the reviewed v4 factor-8 table | observed-only candidate | Matched-mass shared-`\eps^2` observed 90% asymptotic `\CLs` comparison and ratio. No expected bands are shown or implied. |
+| `final_limit_projection_figs/v4p1_20260804_2016_lsupper/combined_asymptotic_p0_k12_vs_v4.pdf` | v4.1 final p-value comparison export from the exact 232-row factor-12 reconstruction and the reviewed v4 factor-8 table | observed-only candidate | Fixed-mass asymptotic `p_0` comparison. Any Sidak curve is an analytic fixed-card reference, not a toy-calibrated global probability and not corrected for the upper-bound scan. |
+
+## v4.1 2021 source-and-exposure length-scale pilot figures
+
+| Bundle path | Original source | Status | Notes |
+| --- | --- | --- | --- |
+| `toy_generation_figs/v4p1_ls_exposure_pilot/fig_v4p1_ls_observed_dataset_comparison.pdf` | `study_results/v4p1_2021_ls_exposure_ensembles_20260804/plots/fig_v4p1_ls_observed_dataset_comparison.pdf` | fit-space diagnostic | Exact observed 2016 10%-versus-full and 2021 1%-versus-10% optimized-length-scale comparison. The 2016 10% source is recovered from five bitwise-identical archived histogram copies as recorded in `derived/2016_10pct_recovery_manifest.json`. No toy-derived quantity or expected band is shown. |
+| `toy_generation_figs/v4p1_ls_exposure_pilot/fig_v4p1_ensemble_ls_all_toys_gengamma_f20.pdf` | `study_results/v4p1_2021_ls_exposure_ensembles_20260804/plots/fig_v4p1_ensemble_ls_all_toys_gengamma_f20.pdf` | pilot diagnostic | One-page factor-20 primary-lane export of all ten refitted length-scale trajectories for each declared native/scaled scenario. |
+| `toy_generation_figs/v4p1_ls_exposure_pilot/fig_v4p1_ensemble_ls_all_toys_sigpowexpq_f20.pdf` | `study_results/v4p1_2021_ls_exposure_ensembles_20260804/plots/fig_v4p1_ensemble_ls_all_toys_sigpowexpq_f20.pdf` | pilot diagnostic | One-page factor-20 alternate-truth export of all ten refitted length-scale trajectories for each declared native/scaled scenario. |
+| `toy_generation_figs/v4p1_ls_exposure_pilot/fig_v4p1_factor20_native10_vs_1pct_x10_toy_medians.pdf` | `study_results/v4p1_2021_ls_exposure_ensembles_20260804/plots/fig_v4p1_factor20_native10_vs_1pct_x10_toy_medians.pdf` | pilot diagnostic | Focused factor-20 comparison of toy-median optimized length scales for native 10% and the 1%-source times-ten sample in both truth lanes. The source families are independent and have an effective normalization ratio of 1.129647, so this is explicitly unpaired and is not a pure exposure-scaling test. |
+| `toy_generation_figs/v4p1_ls_exposure_pilot/fig_v4p1_ensemble_bound_lml_diagnostics_gengamma.pdf` | `study_results/v4p1_2021_ls_exposure_ensembles_20260804/plots/fig_v4p1_ensemble_bound_lml_diagnostics_gengamma.pdf` | pilot diagnostic | Primary-lane ten-toy upper-bound occupancy and nested-LML screen across factors 6, 9, 12, 15, 20, and 25 after unchanged-card optimizer review. It is not a physics-card freeze. |
+| `toy_generation_figs/v4p1_ls_exposure_pilot/fig_v4p1_ensemble_bound_lml_diagnostics_sigpowexpq.pdf` | `study_results/v4p1_2021_ls_exposure_ensembles_20260804/plots/fig_v4p1_ensemble_bound_lml_diagnostics_sigpowexpq.pdf` | pilot diagnostic | Alternate-truth ten-toy upper-bound occupancy and nested-LML screen across factors 6, 9, 12, 15, 20, and 25 after unchanged-card optimizer review. It is not a physics-card freeze. |
+| `toy_generation_figs/v4p1_ls_exposure_pilot/fig_v4p1_ensemble_fixed_amplitude_response_gengamma.pdf` | `study_results/v4p1_2021_ls_exposure_ensembles_20260804/plots/fig_v4p1_ensemble_fixed_amplitude_response_gengamma.pdf` | pilot diagnostic | Primary-lane fixed-amplitude response screen. Absolute injected amplitudes are calibrated once on the factor-15 reference and reused at every upper factor. No expected-limit band, coverage result, or promotable `q_mu` quantity is used. |
+| `toy_generation_figs/v4p1_ls_exposure_pilot/fig_v4p1_ensemble_fixed_amplitude_response_sigpowexpq.pdf` | `study_results/v4p1_2021_ls_exposure_ensembles_20260804/plots/fig_v4p1_ensemble_fixed_amplitude_response_sigpowexpq.pdf` | pilot diagnostic | Alternate-truth fixed-amplitude response screen under the same factor-15-anchored protocol. No expected-limit band, coverage result, or promotable `q_mu` quantity is used. |
+
+No v4.1 expected-limit-band or upper-limit-tail-ensemble asset exists. The ten-toy
+source-and-exposure assets above are fit-space pilot diagnostics and must not be
+presented as bands. The v4 300-toy conditional products remain historical reference
+products and must not be paired with the v4.1 factor-12 observed curve.
 
 | Bundle path | Original source | Status | Notes |
 | --- | --- | --- | --- |

@@ -35,12 +35,12 @@
 \fancyhf{}
 \setlength{\headheight}{14pt}
 
-\fancyhead[R]{HPS-ANALYSIS-NOTE BH-GPR v4}
+\fancyhead[R]{HPS-ANALYSIS-NOTE BH-GPR v4.1}
 \fancyfoot[C]{\thepage}
 
 \fancypagestyle{plain}{
   \fancyhf{}
-  \fancyhead[R]{HPS-ANALYSIS-NOTE BH-GPR v4}
+  \fancyhead[R]{HPS-ANALYSIS-NOTE BH-GPR v4.1}
   \fancyfoot[C]{\thepage}
 }
 
@@ -75,8 +75,8 @@
 }
 
 \title{\vspace{-1.0em}HPS Gaussian-Process Resonance Search Analysis Note\\
-\large Version 4: wider GP supports, shared-$\eps^2$ limits, and
-conditional ensembles}
+\large Version 4.1: 2016 full-statistics length-scale range and
+observed-only update}
 \author{
 Emrys Peets\\Stanford University and SLAC National Accelerator Laboratory
 \and
@@ -84,7 +84,7 @@ Matthew Gignac\\SLAC National Accelerator Laboratory
 \and
 Eden Hsu\\Stanford University and SLAC National Accelerator Laboratory
 }
-\date{August 3, 2026}
+\date{August 4, 2026}
 
 \begin{document}
 
@@ -107,12 +107,25 @@ signal yield. The note also summarizes the radiative-fraction normalization,
 length-scale parameterization, toy-validation program, and staged path from the
 published 2015 and 2016 HPS prompt searches toward a fully unblinded combination.
 Version 4 separates the mass interval searched for a signal from the wider spectrum
-used to train each GP. It combines the full 2015 and 2016 samples with the 2021 10\%
-sample using the reviewed dataset-dependent kernel card, and reports conditional
-background-only expected bands together with empirical strong-limit, weak-limit, and
-bounded two-sided upper-limit consistency tests. These ensemble diagnostics are kept
-separate from the local discovery statistic and from the still-required direct
-coverage studies.
+used to train each GP. Version 4.1 keeps those supports and combines the full 2015
+and 2016 samples with the 2021 10\% sample, but revisits one numerical range after
+the v4 observed scan showed that all 142 full-2016 fits saturated the
+resolution-scaled length-scale ceiling. A controlled observed-only scan of
+$k_{\max,2016}=8,10,12,15,$ and 20 identifies 12 as the first nonbinding value
+followed by a stable plateau. The resulting shared-$\eps^2$ observed 90\% asymptotic
+\CLs{} limit and fixed-mass asymptotic $p_0$ scan are reported as a post-v4 candidate
+update. No new expected-limit bands, limit-tail ensemble diagnostics,
+toy-calibrated global $p$-value, or direct coverage claim is made.
+A ten-toy, five-scenario 2021 source-and-exposure screen is included only as a
+fit-space pilot of the hyperparameter-closure machinery. The completed
+background-only audit makes factor 20 the provisional projected-100\% ceiling, while
+factor 25 is required if one common ceiling is imposed on every pilot exposure.
+The fixed-amplitude screen shows no loss of local extraction sensitivity at factor 20.
+Its common 2--3\% under-response is already present at factors 15 and 25 and is retained
+as an unresolved ten-toy closure diagnostic, not a bias claim. The pilot constructs no
+limit bands or coverage result and does not qualify the observed result;
+production-matched hyperparameter closure and direct limit coverage remain required
+before this candidate can replace a frozen analysis card.
 \end{abstract}
 
 \tableofcontents

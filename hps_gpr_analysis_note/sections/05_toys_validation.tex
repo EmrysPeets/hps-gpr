@@ -504,6 +504,171 @@ scan machinery, but it is not the main closure evidence in this note. The main t
 therefore emphasizes the clean year-matched functional-form scan suites above and the
 refmatched full-refit closure studies below.
 
+\subsection{Ten-toy 2021 source-and-exposure length-scale pilot}
+\label{sec:v4p1-ls-exposure-pilot}
+
+The pilot implements Eqs.~\eqref{eq:v4p1-ls-pilot-scenarios} and
+\eqref{eq:v4p1-ls-pilot-increments} for the native 1\%, $1\%\times10$,
+$1\%\times100$, native 10\%, and $10\%\times10$ scenarios. Ten background
+pseudoexperiments are generated for each analytic truth and scenario. Within a source
+family, the same toy index identifies a nested Poisson realization, and the optimizer
+seed is held common across upper-bound factors at fixed truth, scenario, toy, and mass.
+This pairing reduces comparison noise; it does not make the independently derived
+native-1\% and native-10\% source functions identical.
+
+The common-family primary lane uses \texttt{fGenGammaThresh} for both native sources so
+that the $1\%\times10$ versus native-10\% comparison probes the source spectrum and
+selection rather than a change of analytic family. The \texttt{fSigPowExpQ} lane is
+kept separate as an alternate-truth stress test. Both are smooth stress truths with
+their source-fit diagnostics retained in the provenance ledger; neither is promoted as
+a physical background generator.
+
+\paragraph{Recovered 2016 10\% observed-input provenance.}
+The original remote 2016 10\% ROOT input is not present in the local checkout. The
+observed histogram used here was recovered from five retained functional-form products.
+All five archived copies have bitwise-identical bin values and edges, with the joint
+values-and-edges SHA-256
+\path{db85ff94c74855549c45b173116b36a70a4183ac86db8f374d5b3202c1410656}.
+The source paths, per-file hashes, underflow/overflow accounting, recovered-file hash,
+and the statement of this limitation are recorded in
+\path{study_results/v4p1_2021_ls_exposure_ensembles_20260804/derived/2016_10pct_recovery_manifest.json}.
+The recovery changes no bin content and is used only to place the 10\% and full samples
+on the same factor-12 wide-support card.
+
+On the matched observed grids, increasing the data fraction did not move the optimized
+length scale upward. For 2016, the median
+$\ell_{\mathrm{opt}}/\sigma_x$ changes from 10.782 in the recovered 10\% sample to
+9.716 in the full sample on the common factor-12 card; the median pointwise change is
+$-1.080$. For 2021, it changes from 13.061 at 1\% to 12.060 at 10\% on the common
+factor-15 card, with a median pointwise change of $-0.850$ and a negative change at
+every matched mass. These observed comparisons show that higher statistics do not by
+themselves require a longer correlation scale. They are diagnostics of these spectra,
+not an exposure-scaling law.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.92\linewidth}{toy_generation_figs/v4p1_ls_exposure_pilot/fig_v4p1_ls_observed_dataset_comparison.pdf}
+\caption{Observed optimized-length-scale comparison used to motivate the 2021 pilot.
+The ordinate is $\ell_{\mathrm{opt}}/\sigma_x$ at each mass. The 2016 panel compares
+the reviewed 10\% and full samples on the common factor-12 wide-support card, while the
+2021 panel compares the reviewed native 1\% and 10\% samples on the common factor-15
+wide-support card. The respective medians are 10.782 and 9.716 for 2016, and
+13.061 and 12.060 for 2021. These are exact observed fit-space diagnostics with no
+interpolated rows; they are not ensemble expectations, limit bands, or evidence for
+a universal monotonic luminosity dependence.}
+\label{fig:v4p1-ls-observed-dataset-comparison}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.94\linewidth}{toy_generation_figs/v4p1_ls_exposure_pilot/fig_v4p1_ensemble_ls_all_toys_gengamma_f20.pdf}
+\caption{Individual optimized-length-scale curves at the provisional factor-20
+ceiling in the ten-toy 2021 source-and-exposure pilot primary lane. The one-page
+raw-trajectory display shows native 1\%,
+$1\%\times10$, $1\%\times100$, native 10\%, and $10\%\times10$. They are
+projections of a fit-space hyperparameter diagnostic under the declared smooth truth,
+not projected limits, expected-limit bands, or a prediction of the eventual full-2021
+observed spectrum. Because the native-10\% support total is 11.296 times the
+native-1\% total, the $1\%\times10$ versus native-10\% comparison also probes
+source/selection shape and native normalization.}
+\label{fig:v4p1-ls-toy-ensemble-curves}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.92\linewidth}{toy_generation_figs/v4p1_ls_exposure_pilot/fig_v4p1_factor20_native10_vs_1pct_x10_toy_medians.pdf}
+\caption{Focused, unpaired factor-20 comparison of the toy-level median
+$\ell_{\mathrm{opt}}/\sigma_x$ for the native-10\% and
+$1\%\times10$ source scenarios in the primary and alternate truth lanes. Each point
+is one toy median over the 11 predeclared masses. The two source families are generated
+independently and are not paired by toy index; moreover, the native-10\% effective
+target is 1.129647 times the $1\%\times10$ source target. The separation is therefore
+a source/selection-shape and normalization diagnostic, not a pure exposure-scaling
+effect or a paired significance test. No expected-limit quantity is shown.}
+\label{fig:v4p1-ls-factor20-native10-vs-1pct-x10}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.92\linewidth}{toy_generation_figs/v4p1_ls_exposure_pilot/fig_v4p1_ensemble_bound_lml_diagnostics_gengamma.pdf}
+\caption{Upper-bound occupancy and likelihood diagnostic in the same ten-toy pilot for
+$k_{\max}=6,9,12,15,20,$ and 25. The panels summarize row- and toy-level boundary
+occupancy and the median and worst adjacent-factor log-marginal-likelihood changes
+on the predeclared mass grid after unchanged-card optimizer review. A bound is not
+selected because it gives a favorable limit or local $p_0$. With only ten toys per
+scenario, even zero observed boundary hits is a screening diagnostic rather than a
+production qualification. Factor 15 truncates at least one mass-toy row in each
+projected-100\% lane and truth family; factors 20 and 25 are nonbinding and form the
+reviewed likelihood plateau for those projection lanes.}
+\label{fig:v4p1-ls-bound-sensitivity}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.94\linewidth}{toy_generation_figs/v4p1_ls_exposure_pilot/fig_v4p1_ensemble_fixed_amplitude_response_gengamma.pdf}
+\caption{Fixed-amplitude signal-response screen for the primary truth lane. At each
+truth, scenario, toy, and injection mass, the absolute injected amplitudes are
+calibrated once from the factor-15 background-only Asimov reference according to
+Eq.~\eqref{eq:v4p1-fixed-amplitude-anchor} and then reused unchanged at every upper
+factor. The panels compare extraction uncertainty, signed residual, paired recovery,
+pull width, and injection-refit boundary occupancy. An increased $\sigma_A$ is the
+defined indicator of reduced local extraction sensitivity; a nonzero residual or
+response away from unity is the corresponding bias or absorption diagnostic. With
+ten toys, the figure is an implementation screen and neither a sensitivity
+qualification, a coverage result, nor an expected-limit band. The $q_\mu$ fields
+retained in the raw fit output are not used in this display.}
+\label{fig:v4p1-ls-fixed-amplitude-response}
+\end{figure}
+
+\paragraph{Reviewed background-only pilot result.}
+All 600 predeclared scan tasks and 6600 mass rows pass the final optimizer audit.
+The reviewed table uses actual fits only: 167 rows select a higher-likelihood targeted
+repair, no row is interpolated, no initialization lock remains, and every adjacent
+factor comparison is either an allowed-domain likelihood gain or a consistent
+plateau.
+
+Factor 15 still has boundary contact in both projected-100\% scenarios and both truth
+lanes under the predeclared 0.999 occupancy criterion. At factors 20 and 25, both
+projected scenarios have zero boundary and near-boundary rows in both truth lanes, and
+their optimized-length-scale medians and log marginal likelihoods form the reviewed
+plateau. Factor 20 is therefore the first tested nonbinding value and the provisional
+ceiling for a 2021 100\%-statistics projection. It is not a production-card freeze.
+
+The lower-statistics native-1\% scenario still binds at factor 20 in both truth lanes.
+If one numerical ceiling must cover all five pilot exposures rather than only the
+projected-100\% use case, factor 25 is the first tested value with zero boundary and
+near-boundary rows for every scenario and truth. This universal-card option is a
+conservative pilot choice, not evidence that the physical correlation length grows
+with luminosity.
+
+\paragraph{Fixed-amplitude sensitivity and bias.}
+For the projected native-1\%$\times100$ and native-10\%$\times10$ lanes, respectively,
+the median fitted-uncertainty ratios
+$\sigma_A(k_{\max}=20)/\sigma_A(k_{\max}=15)$ are 0.999993 and 1.00001 in the
+primary truth lane, and 1.00000 and 0.985677 in the alternate lane. Thus no local
+extraction-sensitivity loss is seen when lifting the ceiling from factor 15 to factor
+20. The alternate native-10\%$\times10$ lane instead has a 1.43\% smaller fitted
+uncertainty. Together with the nonbinding factor-20/factor-25 likelihood plateau, this
+supports factor 20 as the provisional projected-100\% ceiling.
+
+At factor 20, the paired response medians
+$(\hat A_z-\hat A_0)/A_{\mathrm{inj}}$ span 0.971921--0.979603 across the four
+projected truth/scenario groups and are essentially unchanged at factors 15 and 25.
+The common 2--3\% under-response is therefore not introduced by lifting the
+length-scale ceiling. At factor 20, the absolute anchor-normalized median residual is
+at most 0.214502 and the median pull widths span 1.01892--1.21408. With only ten
+independent background toys per scenario, these offsets and widths are an unresolved
+closure diagnostic rather than evidence for a calibrated bias.
+
+The response study uses the fixed absolute amplitudes of
+Eq.~\eqref{eq:v4p1-fixed-amplitude-anchor}; it constructs no expected-limit band and
+does not establish coverage. The raw $q_\mu$ fields are neither relabeled nor used by
+the postprocessor and are explicitly non-promotable, as are the immutable-path
+$\eps^2$ values. None of these pilot quantities supplies an exclusion, global
+discovery probability, or production-card qualification.
+
+\FloatBarrier
+
 \subsection{Asimov calibration and background-only pseudoexperiments}
 
 When toy strengths are specified in units of $\sigma_A$, the package first constructs a
@@ -712,7 +877,7 @@ The earlier combined-search-power scans and illustrative no-refit/full-refit ext
 displays have been moved to Appendix~\ref{app:prior-validation-results}. They remain
 useful demonstrations of how a common $\eps^2$ maps into dataset-dependent signal
 yields, but their provisional injections are not direct coverage or closure evidence
-for the frozen v3 result. The current physics-facing simultaneous limit is presented
+for the v4.1 candidate. The current physics-facing simultaneous limit is presented
 in Section~\ref{sec:results-v4-combined-limit}. The older observed-equivalent
 full-sample projection remains in
-Figure~\ref{fig:app-legacy-projections} as a planning study rather than a v4 result.
+Figure~\ref{fig:app-legacy-projections} as a planning study rather than a v4.1 result.

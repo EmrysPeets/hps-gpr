@@ -1,0 +1,145 @@
+{
+  "created_utc": "2026-08-04T22:13:43.672666+00:00",
+  "normalization": {
+    "boundary_criterion": "ls_opt_over_sigma_x >= 0.999 * ls_hi_over_sigma_x",
+    "definition": "ls_opt / sigma_x at each mass hypothesis",
+    "gp_coordinate": "x = ln(mass)",
+    "plotted_quantity": "ls_opt_over_sigma_x"
+  },
+  "outputs": {
+    "pdf": "study_results/v4p1_2021_ls_exposure_ensembles_20260804/plots/fig_v4p1_ls_observed_dataset_comparison.pdf",
+    "pdf_sha256": "64d298b05013149e36a51cfa6eeb2ec03a493b709fe0b1381c35f918768c1b32",
+    "png": "study_results/v4p1_2021_ls_exposure_ensembles_20260804/plots/fig_v4p1_ls_observed_dataset_comparison.png",
+    "png_sha256": "d4a3e8747e86cdcd97bba79cc50400b26fa346612ccc6f9bdab03ea737c7cba7",
+    "script": "study_results/v4p1_2021_ls_exposure_ensembles_20260804/make_observed_ls_dataset_comparison.py",
+    "script_sha256": "d4fec2e8447f11daba9c36a856cf2f1e46ab822e1f010a0ba7fba1fe6202d655",
+    "summary_csv": "study_results/v4p1_2021_ls_exposure_ensembles_20260804/derived/fig_v4p1_ls_observed_dataset_comparison_summary.csv",
+    "summary_csv_sha256": "bccfffe00b9ed8f2118f652f3c2fa4af7c5a192c8681c461f394dd7c0bed660e"
+  },
+  "paired_comparisons": [
+    {
+      "delta_definition": "higher exposure minus lower exposure",
+      "delta_ls_opt_over_sigma_x_max": 0.5003625057476082,
+      "delta_ls_opt_over_sigma_x_median": -1.080235956328507,
+      "delta_ls_opt_over_sigma_x_min": -1.726164206767594,
+      "label": "2016 100% minus 10%, same k=12 wide-support card",
+      "mass_max_MeV": 180,
+      "mass_min_MeV": 39,
+      "matched_mass_grid": true,
+      "rows": 142
+    },
+    {
+      "delta_definition": "higher exposure minus lower exposure",
+      "delta_ls_opt_over_sigma_x_max": -0.037030938321143125,
+      "delta_ls_opt_over_sigma_x_median": -0.8499394294702345,
+      "delta_ls_opt_over_sigma_x_min": -6.946211029264218,
+      "label": "2021 10% minus 1%, same k=15 wide-support card",
+      "mass_max_MeV": 250,
+      "mass_min_MeV": 50,
+      "matched_mass_grid": true,
+      "rows": 201
+    }
+  ],
+  "purpose": "Review-ready observed optimized-length-scale exposure comparison; no expected bands or toy-derived quantities.",
+  "series": [
+    {
+      "at_ceiling_count": 0,
+      "at_ceiling_fraction": 0.0,
+      "at_ceiling_masses_MeV": "",
+      "boundary_fraction_criterion": 0.999,
+      "configured_ceiling": 12.0,
+      "exposure": "10%",
+      "interpolated_rows": 0,
+      "ls_opt_over_sigma_x_max": 11.514308256772264,
+      "ls_opt_over_sigma_x_median": 10.782323507204092,
+      "ls_opt_over_sigma_x_min": 9.92634316564176,
+      "mass_max_MeV": 180,
+      "mass_min_MeV": 39,
+      "rows": 142,
+      "source": "study_results/v4p1_2021_ls_exposure_ensembles_20260804/derived/2016_10pct_observed_k12_reviewed.csv",
+      "source_filter": "all reviewed rows",
+      "source_sha256": "d3fa2848a868299d303c34d1eb241a119ed93328601496a3eac3534711c60057",
+      "support_sensitive_masses_MeV": "",
+      "year": 2016
+    },
+    {
+      "at_ceiling_count": 0,
+      "at_ceiling_fraction": 0.0,
+      "at_ceiling_masses_MeV": "",
+      "boundary_fraction_criterion": 0.999,
+      "configured_ceiling": 12.0,
+      "exposure": "100%",
+      "interpolated_rows": 0,
+      "ls_opt_over_sigma_x_max": 11.67109629613771,
+      "ls_opt_over_sigma_x_median": 9.715735494496712,
+      "ls_opt_over_sigma_x_min": 8.87946948349124,
+      "mass_max_MeV": 180,
+      "mass_min_MeV": 39,
+      "rows": 142,
+      "source": "study_results/v4p1_2016_ls_upper_optimization_20260804/derived/pointwise_factor_grid.csv",
+      "source_filter": "upper_factor == 12",
+      "source_sha256": "6b5be702f1b65688f6ce7f86922716f012f72cb8c9f33320b5783c08a0123657",
+      "support_sensitive_masses_MeV": "",
+      "year": 2016
+    },
+    {
+      "at_ceiling_count": 7,
+      "at_ceiling_fraction": 0.03482587064676617,
+      "at_ceiling_masses_MeV": "50|51|52|57|58|59|60",
+      "boundary_fraction_criterion": 0.999,
+      "configured_ceiling": 15.0,
+      "exposure": "1%",
+      "interpolated_rows": 0,
+      "ls_opt_over_sigma_x_max": 15.0,
+      "ls_opt_over_sigma_x_median": 13.061447547976709,
+      "ls_opt_over_sigma_x_min": 8.900634007554874,
+      "mass_max_MeV": 250,
+      "mass_min_MeV": 50,
+      "rows": 201,
+      "source": "study_results/observed_2021_1pct_vs_10pct_k15_20260803/derived/observed_2021_1pct_reviewed.csv",
+      "source_filter": "all reviewed rows",
+      "source_sha256": "a3b3c4feac9a0ce8be07329514b3696bd7e8505a1cd874bf660f6afeebe7475f",
+      "support_sensitive_masses_MeV": "50|51|52",
+      "year": 2021
+    },
+    {
+      "at_ceiling_count": 0,
+      "at_ceiling_fraction": 0.0,
+      "at_ceiling_masses_MeV": "",
+      "boundary_fraction_criterion": 0.999,
+      "configured_ceiling": 15.0,
+      "exposure": "10%",
+      "interpolated_rows": 0,
+      "ls_opt_over_sigma_x_max": 12.808603568615032,
+      "ls_opt_over_sigma_x_median": 12.060029577462617,
+      "ls_opt_over_sigma_x_min": 8.053788970735782,
+      "mass_max_MeV": 250,
+      "mass_min_MeV": 50,
+      "rows": 201,
+      "source": "study_results/finalist_k15_2021_10pct_combined100toy_20260803/derived/observed_2021_reviewed.csv",
+      "source_filter": "all reviewed rows",
+      "source_sha256": "4b5d8df6e4e5f3d0cdf4bb21b19fcd5dc9f92c3fdff28d5968662ba6fcabad93",
+      "support_sensitive_masses_MeV": "",
+      "year": 2021
+    }
+  ],
+  "status": "pass",
+  "support_sensitive_points": {
+    "masses_MeV": [
+      50,
+      51,
+      52
+    ],
+    "reason": "lower-edge fits have only 9-12 low-side training bins and sit at the configured length-scale ceiling",
+    "series": "2021 1%"
+  },
+  "validation": {
+    "exact_mass_grids": true,
+    "finite_optimizer_states": true,
+    "interpolated_rows": 0,
+    "limit_bands_created": false,
+    "matched_grids_within_year": true,
+    "realized_configured_ceilings": true,
+    "toy_results_used": false
+  }
+}

@@ -1,36 +1,29 @@
-% These summaries are generated from the reviewed 232-row v4 campaign table.
-\providecommand{\VFourLocalPZeroMinimum}{$1.7636\times10^{-4}$}
-\providecommand{\VFourLocalPZeroMass}{\SI{66}{MeV}}
-\providecommand{\VFourEffectiveTrials}{$35.381$}
-\providecommand{\VFourSidakValue}{$0.006221$}
-\providecommand{\VFourStrongTailMinimum}{$0/300$ at 59, 71, and
-72~MeV}
-\providecommand{\VFourWeakTailMinimum}{$0/300$ at 21, 65, and
-66~MeV}
-\providecommand{\VFourTwoSidedTailMinimum}{$2\times0/300$ at
-21, 59, 65, 66, 71, and 72~MeV}
+% These summaries are generated from the reviewed 232-row v4.1 candidate table.
+\providecommand{\VFourPOneLocalPZeroMinimum}{\ensuremath{3.2592\times10^{-5}}}
+\providecommand{\VFourPOneLocalPZeroMass}{\SI{65}{MeV}}
+\providecommand{\VFourPOneLocalZ}{\ensuremath{3.993}}
+\providecommand{\VFourPOneEffectiveTrials}{\ensuremath{35.381}}
+\providecommand{\VFourPOneSidakValue}{\ensuremath{0.0011525}}
+\providecommand{\VFourPOneSidakZ}{\ensuremath{3.048}}
 
 \section{Results}
 \label{sec:results}
 
-Version 4 reports one internally consistent combined scan: the full 2015 and 2016
-samples together with the reviewed 2021 10\% sample. The mass intervals tested for a
-signal are unchanged from the recent combined analysis, while every GP is trained on
-the wider support declared in Section~\ref{sec:fit-support-policy}. The headline
-quantity is the observed 90\% confidence-level upper limit on the shared coupling
-$\eps^2$, evaluated with the asymptotic \CLs{} construction. Conditional
-background-only pseudoexperiments provide the expected bands and place the observed
-limit within the corresponding upper-limit ensemble. Local discovery diagnostics are
-reported separately.
+Version 4.1 reports a controlled post-v4 observed/asymptotic candidate update. The
+full 2015 and 2016 samples and the reviewed 2021 10\% sample are combined in one
+shared-$\eps^2$ likelihood. Relative to v4, only the 2016 resolution-scaled
+length-scale upper factor changes, from 8 to 12; the output directory changes to
+keep the products isolated. The data, mass grids, fit supports, blind and
+training-exclusion geometry, lower factors, likelihood, and 90\% asymptotic \CLs{}
+construction are unchanged.
 
-\subsection{Declared v4 analysis state}
-\label{sec:results-v4-analysis-state}
+The reported products are the observed 90\% \CLs{} upper limit and fixed-mass
+asymptotic $p_0$ scan. No v4.1 expected-limit bands or upper-limit-tail ensemble
+diagnostics have been generated. In particular, the conditional v4 bands are not
+recentered on or otherwise assigned to the new observed curve.
 
-Table~\ref{tab:results-v4-configuration} records the dataset domains that were fixed
-before the observed v4 scan. The search interval controls which resonance hypotheses
-enter the result. The fit support controls which spectrum bins may train the GP after
-the mass-dependent exclusion is removed. In particular, widening the support does not
-add lower- or higher-mass signal hypotheses.
+\subsection{Declared v4.1 candidate state}
+\label{sec:results-v4p1-analysis-state}
 
 \begin{table}[H]
 \centering
@@ -42,246 +35,133 @@ Campaign & Sample & Search [MeV] & GP support [MeV] &
 $k_{\min}$ & $k_{\max}$ \\
 \midrule
 2015 & full & 19--90  & 14--135 & 1.0 & 8 \\
-2016 & full & 39--180 & 30--210 & 0.9 & 8 \\
+2016 & full & 39--180 & 30--210 & 0.9 & 12 \\
 2021 & 10\% & 50--250 & 40--300 & 1.1 & 15 \\
 \bottomrule
 \end{tabular}
 }
-\caption{Predeclared v4 data samples, signal-search intervals, and GP fit supports.
-The search intervals are identical to those in the preceding combined study. The
-wider fit supports restore sideband information on both sides of the endpoint
-hypotheses without extending the signal scan. The last two columns give the frozen
-lower and upper length-scale factors multiplying the local resolution scale.}
-\label{tab:results-v4-configuration}
+\caption{Data samples, search intervals, GP fit supports, and
+resolution-scaled length-scale factors for the v4.1 observed/asymptotic candidate.
+Only $k_{\max,2016}$ differs from v4. Because that change follows the observed v4
+boundary diagnostic, this table must not be described as a pre-unblinding freeze.}
+\label{tab:results-v4p1-configuration}
 \end{table}
 
 At a mass covered by more than one campaign, the simultaneous likelihood profiles
-one common $\eps^2$. The corresponding signal yields remain dataset dependent through
-the luminosity, radiative fraction, mass resolution, efficiency, and branching
-inputs described in Section~\ref{sec:event-selection}. The combined curve is therefore
-a direct shared-coupling result, not the pointwise envelope of the individual limits.
-The minimal visible-dark-photon branching correction above the dimuon threshold is
-applied through the same conversion used for the constituent scans.
+one common $\eps^2$. Campaign-specific luminosity, radiative fraction, resolution,
+efficiency, and branching inputs map that parameter to separate expected signal
+yields. The curve is therefore a direct shared-coupling result rather than a
+pointwise envelope or luminosity-scaled earlier limit. The minimal-visible branching
+correction above the dimuon threshold is applied consistently to v4 and v4.1.
 
-\subsection{Optimizer-branch review}
-\label{sec:results-v4-branch-review}
-
-Every active dataset and mass hypothesis is first evaluated with the frozen v4 card.
-A nonfinite result, a visibly discontinuous likelihood branch, or an optimizer state
-requiring review is rerun without changing the data, search interval, fit support,
-blind geometry, kernel bounds, likelihood, or limit construction. Only the numerical
-initialization and optimizer trajectory are allowed to differ. When several repeated
-fits are finite, the retained branch is the reviewed solution with the largest
-log-marginal likelihood, subject to the same fit-quality checks as the nominal scan.
-The repeat seeds, candidate branches, selected branch, and selection reason are kept
-in the mass-by-mass optimizer ledger.
-
-No observed limit, expected quantile, or $p$-value is repaired by interpolation. If
-unchanged-card repeats do not produce an acceptable branch, the hypothesis remains
-explicitly unresolved and is omitted with its status recorded in the ledger. This
-replaces the display-level interpolation used for a few v3 review points; none of
-those repaired values is carried into the v4 result.
-
-\subsection{Support and kernel-bound audit}
+\subsection{Controlled 2016 upper-range study}
+\label{sec:results-v4p1-lsupper-study}
 \label{sec:results-v4-support-audit}
 
-The separation between the fit support and the signal-search interval is shown
-directly in Figure~\ref{fig:results-v4-support-audit}. At the limiting search
-hypotheses, the widened domains leave at least 12 low-side and 138 high-side
-training bins for 2015, 20 and 51 for 2016, and 9 and 55 for 2021, after the
-mass-dependent exclusion is applied. These are counts of the actual rebinned
-training centers rather than continuous-width estimates. This distinction is why
-the 2016 lower support is \SI{30}{MeV}: a trial lower edge of \SI{35}{MeV} left no
-low-side training center at the \SI{39}{MeV} endpoint with the frozen
-\SI{5}{MeV} rebinning.
+The study evaluates $k_{\max,2016}=8,10,12,15,$ and 20 on the same 142 hypotheses
+from 39 to 180~MeV. A state is classified as upper-bound occupied when
+$\ell_{\mathrm{opt}}/\ell_{\max}\geq0.999$. The occupancy falls from 142 of 142 at
+factor 8 to 56 of 142 at factor 10 and zero at factors 12, 15, and 20.
 
 \begin{figure}[H]
 \centering
-\graphicorplaceholder{0.92\linewidth}{final_limit_projection_figs/v4_20260803_wide_support/wide_support_search_kernel_audit.pdf}
-\caption{Audit of the declared search intervals, wider GP fit supports, and
-length-scale-bound occupancy in the reviewed observed scan. The fit support
-extends beyond the signal-search interval for all three campaigns. The 2016
-length scale reaches its frozen upper bound at all 142 evaluated hypotheses,
-whereas the corresponding counts are 0 of 72 for 2015 and 0 of 201 for 2021.
-This occupancy is retained as a diagnostic; it is not a reason for a
-post-observation retune. Support-matched closure and direct coverage remain
-required before treating the conditional ensemble as calibrated.}
-\label{fig:results-v4-support-audit}
+\graphicorplaceholder{0.92\linewidth}{final_limit_projection_figs/v4p1_20260804_2016_lsupper/lml_and_length_scale_boundary_occupancy.pdf}
+\caption{Controlled full-2016 upper-length-scale study. The panels show the
+optimized length scale relative to the local resolution and ceiling, together with
+the log-marginal-likelihood response for factors 8, 10, 12, 15, and 20. Factor 12
+is the first scanned value with zero upper-bound occupancy and is followed by a
+stable factor-15 and factor-20 plateau. The scan uses observed data, so it diagnoses
+a numerical-range restriction; it is not a coverage or expected-sensitivity
+optimization.}
+\label{fig:results-v4p1-lsupper-study}
 \end{figure}
 
-All 415 campaign--mass GP states were resolved by unchanged-card fits. Of these,
-405 reproduced across all three observed attempts and 10 across two attempts; the
-selected ledger contains 135 states from attempt 1, 150 from attempt 2, and 130
-from attempt 3. The 2016 boundary occupancy is therefore not an isolated failed
-fit or a missing branch. It is a persistent property of the frozen v4 card and is
-carried forward visibly rather than removed by changing the kernel bounds after
-looking at the observed spectrum.
+Questionable branches were rerun with the data and card held fixed. Across the four
+new factor scans, 14 selected repair rows use the largest log marginal likelihood
+among actual repeated fits, and each selected row is independently reproduced. No
+limit, significance, or GP coordinate is interpolated. From factor 12 to 15, the
+largest pointwise change in the 2016 observed yield upper limit is 0.083\%, the
+largest $|\Delta Z|$ is 0.00255, and the log-marginal-likelihood differences lie in
+$[-4.5,8.0]\times10^{-6}$. The factor-15 to factor-20 comparison is similarly
+stable. These results define factor 12 as the first nonbinding plateau setting.
+Neither the direction of the observed-limit change nor the local $p_0$ values enter
+that rule.
 
-\subsection{Combined observed limit and conditional expected bands}
+The ten-toy 2021 source-and-exposure screen in
+Section~\ref{sec:v4p1-ls-exposure-pilot} is not part of this selection rule. It is a
+later fit-space pilot and supplies neither an expected band nor a coverage
+qualification or trials correction for the observed factor scan. None of the observed
+limits or asymptotic $p_0$ values below is conditioned on a conclusion drawn from those
+ten toys.
+
+\subsection{Exact combined observed reconstruction}
+\label{sec:results-v4p1-reconstruction}
+
+The reviewed state ledger contains exactly 415 campaign--mass GP states: 72 for
+2015, 142 for 2016, and 201 for 2021. The final runner reconstructs the GP mean and
+covariance at those exact optimized coordinates and evaluates the shared
+\texttt{count\_scale} likelihood on the union of 232 mass hypotheses. All 232
+observed limits and all 232 local asymptotic $p_0$ values are finite. Cached and
+reference implementations give bitwise-identical observed limits at 20, 40, and
+60~MeV, which exercise one-, two-, and three-campaign likelihoods. The runner draws
+zero toys and has no expected-band output path.
+
+\subsection{Combined observed limit without expected bands}
+\label{sec:results-v4p1-combined-limit}
 \label{sec:results-v4-combined-limit}
 
-Figure~\ref{fig:results-v4-combined-band} is the principal v4 result. The observed
-curve uses the asymptotic 90\% \CLs{} upper limit at each reviewed mass hypothesis.
-The expected median and central 68\% and 95\% intervals come from 300 background-only
-joint pseudoexperiments per mass. A common toy index supplies one pseudo-spectrum for
-every campaign active at that mass before the spectra are combined in the
-shared-$\eps^2$ likelihood.
-
 \begin{figure}[H]
 \centering
-\graphicorplaceholder{0.92\linewidth}{final_limit_projection_figs/v4_20260803_wide_support/combined_observed_bands300_minimal_visible.pdf}
-\caption{Combined 90\% confidence-level upper limit on $\eps^2$ from the full 2015
-and 2016 samples and the 2021 10\% sample. The black curve is the observed asymptotic
-\CLs{} result. The expected median and central 68\% and 95\% intervals are obtained
-from 300 conditional background-only joint pseudoexperiments at each mass. Search
-intervals and fit supports are those in Table~\ref{tab:results-v4-configuration}; no
-point is replaced by interpolation. The conversion is the minimal-visible
-dark-photon interpretation, including the common dimuon branching correction above
-threshold.}
-\label{fig:results-v4-combined-band}
+\graphicorplaceholder{0.92\linewidth}{final_limit_projection_figs/v4p1_20260804_2016_lsupper/combined_observed_limit_k12_vs_v4_no_bands.pdf}
+\caption{Combined observed 90\% asymptotic \CLs{} upper limit on $\eps^2$ for the
+v4.1 factor-12 candidate, compared at matched masses with the v4 factor-8 result.
+The lower panel shows the v4.1-to-v4 ratio. Values below unity are tighter and
+values above unity are weaker. Both curves use the minimal-visible interpretation;
+no expected-limit band is shown or implied.}
+\label{fig:results-v4p1-combined-limit}
 \end{figure}
 
-For this ensemble, the reviewed observed-data GP state is held fixed. Each
-pseudoexperiment fluctuates the conditional background prediction and event counts,
-after which its upper limit is evaluated with the same asymptotic \CLs{} calculation
-as the observed spectrum. The GP hyperparameters and sideband fit are not retrained
-toy by toy. The bands therefore describe the distribution of limits conditional on
-the reviewed GP state. They are not a direct \CLs{} coverage measurement and do not
-include the additional variation that would arise from repeating the full training
-procedure on every pseudo-spectrum.
+Only the 142 hypotheses at which 2016 is active change. Over 39--180~MeV, the
+v4.1-to-v4 observed-limit ratio has a minimum of 0.6941 at 103~MeV, corresponding
+to a 30.59\% tightening, and a maximum of 1.2789 at 90~MeV, corresponding to a
+27.89\% weakening. Its median is 0.9933. The response is therefore neither a
+uniform sensitivity gain nor a luminosity rescaling. It records how removing an
+active numerical ceiling changes the observed background interpolation and
+conditional uncertainty. The comparison was not used to select whichever curve was
+tighter.
 
-With 300 pseudoexperiments, a one-toy change corresponds to an empirical tail-fraction
-step of $1/300\simeq0.0033$. The 95\% band is correspondingly less stable than the
-central 68\% band because each outer quantile is determined by only the most extreme
-few percent of the ensemble. This finite-ensemble precision is shown in the
-machine-readable table and retained when the band edges are interpreted.
-
-\subsection{Observed-limit consistency within the pseudoexperiment ensemble}
-\label{sec:results-v4-limit-tail}
-
-The strong-, weak-, and two-sided quantities defined in
-Section~\ref{sec:methodology} compare the observed upper limit with the same 300
-background-only limits used for Figure~\ref{fig:results-v4-combined-band}.
-$p_{\mathrm{strong}}$ is the fraction of pseudoexperiment limits at or below the
-observed value, while $p_{\mathrm{weak}}$ is the fraction at or above it. The bounded
-summary
-\[
-p_{\mathrm{two}}=
-\min\!\left[1,2\min\!\left(p_{\mathrm{strong}},p_{\mathrm{weak}}\right)\right]
-\]
-flags either an unusually strong or unusually weak observed limit. Figure
-\ref{fig:results-v4-limit-tail} presents all three so that the direction of any
-departure remains visible.
-
-\begin{figure}[H]
-\centering
-\graphicorplaceholder{0.92\linewidth}{final_limit_projection_figs/v4_20260803_wide_support/combined_limit_tail_pvalues300.pdf}
-\caption{Empirical upper-limit consistency diagnostics from the 300 conditional
-background-only joint pseudoexperiments used for the expected bands. The panels show
-$p_{\mathrm{strong}}$, $p_{\mathrm{weak}}$, and the bounded
-$p_{\mathrm{two}}$. The one-sided values are their inclusive toy counts divided by
-300; the two-sided value doubles the smaller one-sided fraction and is capped at
-unity. A zero-count tail is reported as 0 of 300, not interpreted as a probability
-of zero; any positive floor used to display it on a logarithmic axis is a plotting
-convention only. These
-quantities locate the observed upper limit within the fixed-GP ensemble and are not
-discovery significances or direct coverage tests.}
-\label{fig:results-v4-limit-tail}
-\end{figure}
-
-In the reviewed table, the smallest strong-tail result is
-\VFourStrongTailMinimum, the smallest weak-tail result is
-\VFourWeakTailMinimum, and the smallest bounded two-sided result is
-\VFourTwoSidedTailMinimum. In each case, the notation means that no
-pseudoexperiment entered the indicated empirical tail. It establishes only that the
-tail lies below the $1/300$ resolution of this ensemble; it is not a measured
-probability of zero. A more granular statement about an extreme tail would require a
-larger independent ensemble.
-
-\subsection{Local discovery statistic and analytic trials correction}
+\subsection{Local asymptotic p-values}
+\label{sec:results-v4p1-local-p0}
 \label{sec:results-v4-local-p0}
 
-Figure~\ref{fig:results-v4-local-p0} shows the one-sided fixed-mass asymptotic $p_0$
-scan derived from the profiled signal-strength likelihood. The plotted
-\v{S}id\'ak curve is the analytic scan-level approximation
-\[
-p_{\mathrm{Sidak}}(m)
-=
-1-\left[1-p_0(m)\right]^{N_{\mathrm{eff}}},
-\]
-using the predeclared effective-trials value for the reviewed mass grid. It is shown
-to indicate the size of the look-elsewhere correction under that approximation. It is
-not obtained from the 300 expected-limit pseudoexperiments, which contain neither a
-full-scan maximum-$q_0$ construction nor a toy-calibrated discovery statistic.
-
 \begin{figure}[H]
 \centering
-\graphicorplaceholder{0.90\linewidth}{final_limit_projection_figs/v4_20260803_wide_support/combined_local_p0_sidak_reference.pdf}
-\caption{Combined fixed-mass asymptotic $p_0$ values and their analytic
-\v{S}id\'ak-equivalent scan values. The evaluated hypotheses may be joined to make
-the scan legible, but the curve is not smoothed and unresolved hypotheses are not
-interpolated. The \v{S}id\'ak conversion is an effective-trials approximation, not a
-global $p$-value calibrated with full-scan pseudoexperiments.}
-\label{fig:results-v4-local-p0}
+\graphicorplaceholder{0.90\linewidth}{final_limit_projection_figs/v4p1_20260804_2016_lsupper/combined_asymptotic_p0_k12_vs_v4.pdf}
+\caption{Combined fixed-mass asymptotic $p_0$ values for the v4.1 factor-12
+candidate and the v4 factor-8 result. The associated analytic \v{S}id\'ak reference
+uses the same resolution-spacing effective-trials estimate as v4. It corrects only
+the mass scan for a fixed card; it does not account for the post-v4 upper-bound
+study and is not a toy-calibrated global $p$-value.}
+\label{fig:results-v4p1-local-p0}
 \end{figure}
 
-The smallest reviewed local value is \VFourLocalPZeroMinimum{} at
-\VFourLocalPZeroMass, corresponding to $Z_{\mathrm{local}}=3.573$. The
-resolution-spacing effective-trials value is
-\VFourEffectiveTrials, and the corresponding analytic \v{S}id\'ak value is
-\VFourSidakValue{} ($Z_{\mathrm{Sidak}}=2.499$). These values come from the final
-significance table and remain conceptually separate from the upper-limit ensemble
-fractions in Figure~\ref{fig:results-v4-limit-tail}.
+The smallest v4.1 fixed-mass asymptotic value is
+\VFourPOneLocalPZeroMinimum{} at \VFourPOneLocalPZeroMass, corresponding to
+$Z_{\mathrm{local}}=\VFourPOneLocalZ$. For comparison, the v4 minimum was
+$1.7636\times10^{-4}$ at 66~MeV ($Z_{\mathrm{local}}=3.573$). Applying the
+unchanged resolution-spacing estimate
+$N_{\mathrm{eff}}=\VFourPOneEffectiveTrials$ to the new minimum gives the
+conditional analytic reference $p_{\mathrm{Sidak}}=\VFourPOneSidakValue$
+($Z_{\mathrm{Sidak}}=\VFourPOneSidakZ$). This number is not a global discovery
+significance: it neither includes the observed-data upper-bound scan nor replaces a
+scan-wise maximum-$q_0$ ensemble.
 
-\subsection{Matched comparison with the preceding narrow supports}
-\label{sec:results-v4-support-comparison}
+\subsection{Relation to v4 and validation boundary}
+\label{sec:results-v4p1-v4-context}
 
-Figure~\ref{fig:results-v4-wide-narrow-ratio} compares the observed v4 curve with
-the preceding narrow-support finalist at matched dataset fractions and mass
-hypotheses. The ratio is most visibly displaced in the 2015-only and
-2015--2016 overlap regions. Its minimum is 0.2349 at \SI{19}{MeV}, a 76.51\%
-tightening relative to the narrow-support result, while its maximum is 2.2567 at
-\SI{43}{MeV}, a 125.67\% weakening. Once the scan is supported only by 2021, the
-ratio is unity to within approximately $6\times10^{-5}$. The common dimuon
-branching correction cancels in this comparison.
-
-\begin{figure}[H]
-\centering
-\graphicorplaceholder{0.92\linewidth}{final_limit_projection_figs/v4_20260803_wide_support/wide_vs_narrow_observed_limit_ratio.pdf}
-\caption{Mass-matched ratio of the v4 observed 90\% \CLs{} limit to the preceding
-narrow-support finalist, using the same 2015 full, 2016 full, and 2021 10\% data
-fractions. Values below unity are tighter and values above unity are weaker. The
-largest changes occur where the widened 2015 or 2016 support contributes; the
-2021-only region is unchanged. Because the wider supports were declared before the
-observed v4 scan, this is a support-dependence diagnostic rather than an
-observed-data optimization or a standalone sensitivity claim.}
-\label{fig:results-v4-wide-narrow-ratio}
-\end{figure}
-
-The nonmonotonic low-mass response is an important part of the result: extending
-the training domain can either strengthen or weaken an observed limit as the fitted
-background and its conditional uncertainty change. The comparison therefore does
-not justify selecting a support by whichever curve is numerically tighter. Its role
-is to document the effect of restoring both sidebands and to motivate the
-support-matched closure and coverage checks already identified in
-Section~\ref{sec:results-v4-support-audit}.
-
-\subsection{Relation to the v3 review result}
-\label{sec:results-v4-v3-context}
-
-Version 3 established the shared-$\eps^2$ likelihood, the 90\% \CLs{} convention,
-and the strong-, weak-, and bounded two-sided definitions used here. Its headline
-candidate combined the full 2015 sample with only 10\% of 2016 and 1\% of 2021, and
-its 2015 and 2016 GP supports ended at the corresponding search boundaries. It also
-documented a small number of plot-level interpolations while production reruns were
-still outstanding. The v3 tail study used 10,000 pseudoexperiments per mass; v4
-retains its definitions but, with the present 300-toy cap, does not inherit that
-finer empirical-tail granularity.
-
-Those numerical limits, p-value minima, expected bands, and repaired points are
-historical context only. Version 4 refits the full 2016 and 2021 10\% spectra over the
-predeclared wider supports, reviews repeated optimizer branches without changing the
-card, and recomputes the combined observed scan and its conditional ensemble from
-that analysis state. Earlier plots and closure studies remain in
-Appendix~\ref{app:prior-validation-results}; they are not mixed with the v4 tables or
-used to fill missing v4 hypotheses.
+Version 4 remains the frozen reference for this diagnostic. Its factor-8 saturation,
+observed limit, local $p_0$ scan, and conditional 300-toy limit ensemble motivated
+or contextualize the present study, but those conditional bands and their strong-,
+weak-, and bounded two-sided tail fractions are not v4.1 outputs. They are not mixed
+with the factor-12 curve. The factor-12 result is an observed/asymptotic candidate
+until production-matched hyperparameter closure and direct coverage are complete.
