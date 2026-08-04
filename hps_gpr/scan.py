@@ -63,6 +63,85 @@ def _write_json(path: str, payload: dict) -> None:
         json.dump(payload, f, indent=2, sort_keys=True)
 
 
+def _gp_diagnostics_payload(pred) -> dict:
+    """Build the nested, JSON-safe provenance block for one GP fit."""
+    blind_train = getattr(pred, "blind_train", None)
+    return {
+        "kernel": str(getattr(pred, "kernel_str", "")),
+        "length_scale": {
+            "lower": _jfloat(getattr(pred, "ls_lo", float("nan"))),
+            "upper": _jfloat(getattr(pred, "ls_hi", float("nan"))),
+            "initial": _jfloat(getattr(pred, "ls_init", float("nan"))),
+            "optimized": _jfloat(getattr(pred, "ls_opt", float("nan"))),
+            "at_lower": bool(getattr(pred, "ls_at_lower", False)),
+            "at_upper": bool(getattr(pred, "ls_at_upper", False)),
+            "sigma_x": _jfloat(getattr(pred, "sigma_x", float("nan"))),
+        },
+        "constant": {
+            "lower": _jfloat(getattr(pred, "const_lo", float("nan"))),
+            "upper": _jfloat(getattr(pred, "const_hi", float("nan"))),
+            "initial": _jfloat(getattr(pred, "const_init", float("nan"))),
+            "optimized": _jfloat(getattr(pred, "const_opt", float("nan"))),
+            "at_lower": bool(getattr(pred, "const_at_lower", False)),
+            "at_upper": bool(getattr(pred, "const_at_upper", False)),
+        },
+        "training": {
+            "domain_lo_GeV": _jfloat(getattr(pred, "train_domain_lo", float("nan"))),
+            "domain_hi_GeV": _jfloat(getattr(pred, "train_domain_hi", float("nan"))),
+            "exclude_lo_GeV": (
+                _jfloat(blind_train[0]) if blind_train is not None else None
+            ),
+            "exclude_hi_GeV": (
+                _jfloat(blind_train[1]) if blind_train is not None else None
+            ),
+            "n_full": int(getattr(pred, "n_full", 0)),
+            "n_blind": int(getattr(pred, "n_blind", 0)),
+            "n_train": int(getattr(pred, "n_train", 0)),
+            "n_train_low": int(getattr(pred, "n_train_low", 0)),
+            "n_train_high": int(getattr(pred, "n_train_high", 0)),
+            "bin_width_median_GeV": _jfloat(
+                getattr(pred, "bin_width_median", float("nan"))
+            ),
+        },
+        "optimizer": {
+            "restarts": int(getattr(pred, "optimizer_restarts", 0)),
+            "log_marginal_likelihood": _jfloat(getattr(pred, "lml", float("nan"))),
+        },
+    }
+
+
+def _density_diagnostics_payload(pred) -> dict:
+    """Build the JSON-safe physical density-window provenance block."""
+    return {
+        "counts_per_GeV": _jfloat(
+            getattr(pred, "integral_density", float("nan"))
+        ),
+        "nsigma": _jfloat(getattr(pred, "density_nsigma", float("nan"))),
+        "window_lo_GeV": _jfloat(
+            getattr(pred, "density_window_lo", float("nan"))
+        ),
+        "window_hi_GeV": _jfloat(
+            getattr(pred, "density_window_hi", float("nan"))
+        ),
+        "window_width_GeV": _jfloat(
+            getattr(pred, "density_window_width", float("nan"))
+        ),
+        "source_lo_GeV": _jfloat(
+            getattr(pred, "density_source_lo", float("nan"))
+        ),
+        "source_hi_GeV": _jfloat(
+            getattr(pred, "density_source_hi", float("nan"))
+        ),
+        "source_n_bins": int(getattr(pred, "density_source_n_bins", 0)),
+        "source_bin_width_median_GeV": _jfloat(
+            getattr(pred, "density_source_bin_width_median", float("nan"))
+        ),
+        "fully_covered": bool(
+            getattr(pred, "density_window_fully_covered", False)
+        ),
+    }
+
+
 def run_scan(
     datasets: Dict[str, "DatasetConfig"],
     config: "Config",
@@ -184,6 +263,8 @@ def run_scan(
                             "sigma_val": _jfloat(pred.sigma_val),
                             "blind": [_jfloat(pred.blind[0]), _jfloat(pred.blind[1])],
                             "integral_density": _jfloat(pred.integral_density),
+                            "density": _density_diagnostics_payload(pred),
+                            "gp_diagnostics": _gp_diagnostics_payload(pred),
                             "cls_statistic": "tilde_q_mu",
                             "cls_calibration": str(config.cls_mode).lower().strip(),
                             "signal_model": str(getattr(config, "signal_model", "default")),
@@ -198,6 +279,38 @@ def run_scan(
                     "sigma_val": float(pred.sigma_val),
                     "blind_lo": float(pred.blind[0]),
                     "blind_hi": float(pred.blind[1]),
+                    "integral_density": float(pred.integral_density),
+                    "density_nsigma": float(
+                        getattr(pred, "density_nsigma", float("nan"))
+                    ),
+                    "density_window_lo": float(
+                        getattr(pred, "density_window_lo", float("nan"))
+                    ),
+                    "density_window_hi": float(
+                        getattr(pred, "density_window_hi", float("nan"))
+                    ),
+                    "density_window_width": float(
+                        getattr(pred, "density_window_width", float("nan"))
+                    ),
+                    "density_source_lo": float(
+                        getattr(pred, "density_source_lo", float("nan"))
+                    ),
+                    "density_source_hi": float(
+                        getattr(pred, "density_source_hi", float("nan"))
+                    ),
+                    "density_source_n_bins": int(
+                        getattr(pred, "density_source_n_bins", 0)
+                    ),
+                    "density_source_bin_width_median": float(
+                        getattr(
+                            pred,
+                            "density_source_bin_width_median",
+                            float("nan"),
+                        )
+                    ),
+                    "density_window_fully_covered": bool(
+                        getattr(pred, "density_window_fully_covered", False)
+                    ),
                     "A_up": float(res.A_up),
                     "eps2_up": float(res.eps2_up),
                     "p0_analytic": float(res.p0_analytic),
@@ -219,6 +332,29 @@ def run_scan(
                     "const_opt": float(getattr(pred, "const_opt", float("nan"))),
                     "lml": float(getattr(pred, "lml", float("nan"))),
                     "n_train": int(getattr(pred, "n_train", 0)),
+                    "n_train_low": int(getattr(pred, "n_train_low", 0)),
+                    "n_train_high": int(getattr(pred, "n_train_high", 0)),
+                    "n_full": int(getattr(pred, "n_full", 0)),
+                    "n_blind": int(getattr(pred, "n_blind", 0)),
+                    "train_domain_lo": float(
+                        getattr(pred, "train_domain_lo", float("nan"))
+                    ),
+                    "train_domain_hi": float(
+                        getattr(pred, "train_domain_hi", float("nan"))
+                    ),
+                    "bin_width_median": float(
+                        getattr(pred, "bin_width_median", float("nan"))
+                    ),
+                    "const_init": float(getattr(pred, "const_init", float("nan"))),
+                    "const_lo": float(getattr(pred, "const_lo", float("nan"))),
+                    "const_hi": float(getattr(pred, "const_hi", float("nan"))),
+                    "const_at_lower": bool(getattr(pred, "const_at_lower", False)),
+                    "const_at_upper": bool(getattr(pred, "const_at_upper", False)),
+                    "ls_at_lower": bool(getattr(pred, "ls_at_lower", False)),
+                    "ls_at_upper": bool(getattr(pred, "ls_at_upper", False)),
+                    "optimizer_restarts": int(
+                        getattr(pred, "optimizer_restarts", 0)
+                    ),
                 })
 
             except Exception as e:
@@ -279,6 +415,14 @@ def run_scan(
                             "eps2_up": _jfloat(comb.eps2_up),
                             "p0_analytic": _jfloat(comb.p0_analytic),
                             "Z_analytic": _jfloat(comb.Z_analytic),
+                            "gp_diagnostics_by_dataset": {
+                                ds.key: _gp_diagnostics_payload(pred)
+                                for ds, pred in zip(ds_list_here, preds_here)
+                            },
+                            "density_by_dataset": {
+                                ds.key: _density_diagnostics_payload(pred)
+                                for ds, pred in zip(ds_list_here, preds_here)
+                            },
                             "cls_statistic": "tilde_q_mu",
                             "cls_calibration": str(config.cls_mode).lower().strip(),
                             "signal_model": str(getattr(config, "signal_model", "default")),

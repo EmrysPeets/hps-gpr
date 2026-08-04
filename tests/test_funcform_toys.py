@@ -174,7 +174,10 @@ def test_estimate_background_uses_mean_only_full_prediction(monkeypatch):
 
     import hps_gpr.io as io
 
-    fake_model = SimpleNamespace(histogram=toy_hist)
+    fake_model = SimpleNamespace(
+        histogram=toy_hist,
+        density_histogram=toy_hist,
+    )
     fake_gpr = SimpleNamespace(kernel_=None, kernel=None, log_marginal_likelihood_value_=0.5)
     calls = {"blind": [], "full": []}
 

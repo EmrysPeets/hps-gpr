@@ -35,12 +35,12 @@
 \fancyhf{}
 \setlength{\headheight}{14pt}
 
-\fancyhead[R]{HPS-ANALYSIS-NOTE BH-GPR v3}
+\fancyhead[R]{HPS-ANALYSIS-NOTE BH-GPR v4}
 \fancyfoot[C]{\thepage}
 
 \fancypagestyle{plain}{
   \fancyhf{}
-  \fancyhead[R]{HPS-ANALYSIS-NOTE BH-GPR v3}
+  \fancyhead[R]{HPS-ANALYSIS-NOTE BH-GPR v4}
   \fancyfoot[C]{\thepage}
 }
 
@@ -75,8 +75,8 @@
 }
 
 \title{\vspace{-1.0em}HPS Gaussian-Process Resonance Search Analysis Note\\
-\large Version 3: global background modeling, limit setting, toy validation, and
-shared-$\eps^2$ combination}
+\large Version 4: wider GP supports, shared-$\eps^2$ limits, and
+conditional ensembles}
 \author{
 Emrys Peets\\Stanford University and SLAC National Accelerator Laboratory
 \and
@@ -84,7 +84,7 @@ Matthew Gignac\\SLAC National Accelerator Laboratory
 \and
 Eden Hsu\\Stanford University and SLAC National Accelerator Laboratory
 }
-\date{July 10, 2026}
+\date{August 3, 2026}
 
 \begin{document}
 
@@ -106,10 +106,13 @@ renormalization, so the fitted amplitude retains the interpretation of a total l
 signal yield. The note also summarizes the radiative-fraction normalization,
 length-scale parameterization, toy-validation program, and staged path from the
 published 2015 and 2016 HPS prompt searches toward a fully unblinded combination.
-Version 3 uses the regenerated high-$p_{\mathrm{sum}}$ 2021 input, dataset-dependent
-length-scale bounds, and a pre-unblinding 90\% CL upper-limit candidate obtained with
-\CLs{}. Plotting-export discrepancies are documented explicitly and must be resolved
-before a final observed result is claimed.
+Version 4 separates the mass interval searched for a signal from the wider spectrum
+used to train each GP. It combines the full 2015 and 2016 samples with the 2021 10\%
+sample using the reviewed dataset-dependent kernel card, and reports conditional
+background-only expected bands together with empirical strong-limit, weak-limit, and
+bounded two-sided upper-limit consistency tests. These ensemble diagnostics are kept
+separate from the local discovery statistic and from the still-required direct
+coverage studies.
 \end{abstract}
 
 \tableofcontents
