@@ -89,6 +89,51 @@ If `tectonic` is not available on your machine, the lightweight macOS install is
 brew install tectonic
 ```
 
+The two reviewer-facing ConstantKernel × RBF hyperparameter schematics are
+deterministic and contain no HPS observations or fit results. Regenerate their PDF
+and PNG versions before rebuilding the note with:
+
+```bash
+cd hps_gpr_analysis_note
+python3 scripts/make_gpr_hyperparameter_explainer.py
+tectonic main.tex
+```
+
+### Reviewed v4.2 combined result
+
+The August 5 v4.2 campaign accepts the v4.1 factor-12 upper length-scale setting
+for full 2016 and combines full 2015, full 2016, and the reviewed 2021 10% sample:
+
+- configuration:
+  `study_configs/v4p2_combined_2015full_2016full_2021_10pct_300toy_20260805/`
+- reviewed result, validation ledgers, figure sources, and reproduction scripts:
+  `study_results/v4p2_combined_2015full_2016full_2021_10pct_300toy_20260805/`
+- note-local publication assets:
+  `hps_gpr_analysis_note/final_limit_projection_figs/v4p2_20260805_combined300/`
+- rendered review PDF:
+  `hps_gpr_analysis_note/HPS_GPR_Analysis_Note_v4p2_20260805.pdf`
+- presentation-only combined limit without the observed/median subpanel:
+  `hps_gpr_analysis_note/final_limit_projection_figs/v4p2_20260805_combined300/combined_observed_bands300_minimal_visible_presentation.pdf`
+- exact 65 MeV observed extraction and profiled-residual figures:
+  `hps_gpr_analysis_note/final_limit_projection_figs/v4p2_20260805_combined300/observed_extraction_m065_wide.pdf`
+  and
+  `hps_gpr_analysis_note/final_limit_projection_figs/v4p2_20260805_combined300/observed_extraction_m065_profiled_residuals.pdf`
+- standalone and pairwise 100-toy conditional band triptychs:
+  `hps_gpr_analysis_note/final_limit_projection_figs/v4p2_20260805_combined300/standalone_observed_bands100_minimal_visible.pdf`
+  and
+  `hps_gpr_analysis_note/final_limit_projection_figs/v4p2_20260805_combined300/pairwise_observed_bands100_minimal_visible.pdf`
+
+The principal combined expected-limit bands use exactly 300 shared,
+mass-local, background-only pseudoexperiments. Auxiliary standalone and
+pairwise bands use toy indices 0--99 from that accepted parent stream, with
+campaign pseudo-spectra reused across scopes. All are conditional fixed-GP
+quantiles, not direct-coverage intervals or coherent scan-wide ensembles; the
+empirical combined limit-tail diagnostics are separate from the local
+asymptotic discovery \(p_0\) scans.
+The 65 MeV extraction uses the exact simultaneous shared-coupling likelihood;
+its dataset comparison shows that the localized feature is driven mainly by
+the 2021 10% sample rather than by three concordant standalone excesses.
+
 ## Configuration
 
 The analysis is configured via a YAML file. Copy the example configuration and modify it for your analysis:
@@ -115,7 +160,9 @@ For ROOT file paths/histogram names used in the legacy validation notebook workf
 use [`v15_8_HPS_simultaneous_GP_notebook_quality.ipynb`](v15_8_HPS_simultaneous_GP_notebook_quality.ipynb)
 as the reference map (especially for local path conventions and histogram-key checks).
 
-Current 2021 production defaults in this repo use:
+The generic 2021 CLI defaults below predate the reviewed v4.2 campaign and are
+not its result card; use the versioned v4.2 configuration linked above for that
+analysis. These legacy defaults use:
 - ROOT file: `/sdf/home/e/epeets/run/2021_bump/preselection_invM_psumlt2p8_hists.root`
 - histogram: `preselection/h_invM_8000`
 - scan window: `30-250 MeV`

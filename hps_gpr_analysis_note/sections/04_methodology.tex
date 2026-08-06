@@ -185,7 +185,38 @@ after the log transformation. In this high-statistics search such bins are rare,
 floor acts mainly as a conservative legacy-stable safeguard rather than as a dominant
 source of uncertainty.
 
-\subsection{Kernel choice and CMS-motivated background modeling}
+The distinction from Ref.~\cite{BarrLiu2025} is more specific than a difference in
+kernel choice. Barr and Liu also use a Constant$\times$RBF kernel and optimize its
+amplitude and length scale. Their independent methodological study uses a spectrum
+derived from a published CMS search; it is not a CMS Collaboration GPR result. In
+addition to optimizing the kernel, they treat the diagonal array as tunable
+regularization. For occupied bins their nominal prescription is
+\begin{equation}
+\alpha_i^{\mathrm{BL}}
+= \frac{\sqrt{y_i}}{y_i\log y_i}
+= \frac{1}{\sqrt{y_i}\log y_i},
+\end{equation}
+and fixed regional multipliers $f_i$ are then applied to
+$\alpha_i^{\mathrm{BL}}$. Reducing the first eleven multipliers to 0.1 raised the
+fraction of 100 background-only pseudoexperiments passing their BumpHunter criterion
+from 51\% to 87\%, but localized residual structures remained; their high-luminosity
+benchmark subsequently extended the reduced-multiplier region to the first twenty
+bins \cite{BarrLiu2025}. The study therefore demonstrates that diagonal tuning can
+improve a particular benchmark, while also showing that the tuned region is
+sample- and regime-dependent.
+
+The active HPS configuration instead has no regional multiplier
+(\texttt{pre\_alpha\_first\_n=0}) and fixes Eq.~\eqref{eq:alpha-oney} as the
+delta-method variance model. This choice matters because \texttt{scikit-learn}'s
+\texttt{alpha} has both an observation-noise interpretation and a numerical
+Tikhonov-regularization interpretation \cite{ScikitLearnGPRDocs16}. HPS adopts the
+former and places its separately validated smoothness control in the allowed
+length-scale domain. These are complementary controls: changing $\alpha_i$ changes
+the leverage of bin $i$ on the covariance diagonal, whereas changing $\ell$ changes
+the off-diagonal correlation range of the latent function. No matched study presented
+here establishes that one strategy is intrinsically superior to the other.
+
+\subsection{Kernel choice and distinct regularization roles}
 \label{sec:kernel-choice}
 
 The baseline kernel in the current package is a single
@@ -193,16 +224,40 @@ ConstantKernel$\times$RBF model,
 \begin{equation}
 k(x,x') = C \exp\!\left[-\frac{(x-x')^2}{2\ell^2}\right],
 \end{equation}
-with broad amplitude bounds and a resolution-scaled RBF length scale. This is closely
-aligned with the smooth-background prior used in contemporary CMS-oriented GPR
-signal-extraction studies \cite{Gandrakota2023} and with the log-space HEP background
-modeling framework emphasized in Ref.~\cite{BarrLiu2025}. The HPS implementation keeps
-this kernel intentionally simple. The amplitude parameter $C$ sets the overall
-covariance scale, while $\ell$ controls how rapidly the background is allowed to bend
-in log-mass space. For the smooth prompt trident continuum considered here, one overall
-covariance scale $C$ and one smoothness scale $\ell$ are adequate for the baseline
-model: they capture the observed broad curvature without introducing additional poorly
-constrained structure on signal-like mass scales.
+with broad amplitude bounds and a resolution-scaled RBF length-scale domain. This is
+the same simple kernel class used in the methodological studies of
+Refs.~\cite{Gandrakota2023,BarrLiu2025}, but the surrounding noise and validation
+choices need not be the same. The two quantities optimized in every HPS sideband fit
+are $C$ and $\ell$. The ConstantKernel value $C=k(x,x)$ is the pointwise prior
+variance of the latent log-rate, so $\sqrt{C}$ is its prior standard deviation; $C$
+is not a fitted event-count normalization. The length scale $\ell$ controls how
+quickly covariance falls with separation in $x=\log m$, and therefore how rapidly
+the background function may bend. The fixed $\alpha_i$ values are not a third kernel
+parameter and there is no optimized WhiteKernel in the baseline. They enter only
+through the observation-covariance diagonal.
+
+Figure~\ref{fig:gpr-hyperparameter-roles} separates these roles graphically. This
+separation is useful when discussing regularization: changing $C$ rescales the
+covariance amplitude, changing $\ell$ changes the correlation geometry and smoothness
+of the latent function, and changing $\alpha_i$ changes how strongly one observation
+constrains that function.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.99\linewidth}{methodology_figs/gpr_hyperparameter_roles.pdf}
+\caption{Division of labor in the baseline GPR covariance. Panel (a) shows the
+normalized RBF correlation for three illustrative values of
+$\ell/\sigma_x(m_0)$; at a separation equal to $\ell$, every curve has correlation
+$e^{-1/2}\simeq0.61$. The length scale therefore changes the horizontal range over
+which bins communicate. Panel (b) varies $C$ at fixed $\ell$. It changes the
+covariance amplitude, with pointwise prior standard deviation $\sqrt{C}$, without
+changing the normalized correlation range. Panel (c) holds the kernel fixed and
+changes one diagonal variance $\alpha_j$: a smaller value gives the highlighted bin
+more leverage, while a larger value downweights it. HPS optimizes $C$ and $\ell$ on
+the sidebands within configured bounds, but fixes $\alpha_i$ from the count-based
+variance rule. All curves and observations are schematic and are not an HPS fit.}
+\label{fig:gpr-hyperparameter-roles}
+\end{figure}
 
 Earlier studies preserved in the analysis history explored more complicated kernels and
 piecewise procedures, but those variants are no longer the production baseline. This
@@ -211,7 +266,7 @@ choice and treats more elaborate alternatives as robustness checks rather than
 competing mainline methods. The exploratory Constant$\times$Mat\'ern$(\nu=3/2)$ and
 earlier piecewise-kernel studies are summarized in
 Appendix~\ref{app:kernel-studies}. No production-matched alternative-kernel coverage
-result is used to qualify the v4.1 candidate.
+result is used to qualify the v4.2 result.
 
 \subsection{Resolution-scaled length-scale parameterization and bounds}
 \label{sec:length-scale}
@@ -254,6 +309,59 @@ locates the unconstrained optimum. The implementation optimizes log-transformed
 kernel hyperparameters within these configured bounds
 \cite{ScikitLearnGPRDocs16}.
 
+For a fixed dataset $d$ and mass hypothesis $m_0$, let
+$\bm{z}_{\mathrm{sb}}$ contain only the transformed sideband observations and define
+\begin{equation}
+K_y(C,\ell)
+= C\,R_{\ell}(X_{\mathrm{sb}},X_{\mathrm{sb}})
++ \mathrm{diag}(\bm{\alpha}_{\mathrm{sb}}).
+\end{equation}
+The optimized pair maximizes
+\begin{equation}
+\log p(\bm{z}_{\mathrm{sb}}\mid X_{\mathrm{sb}},C,\ell)
+= -\frac{1}{2}\bm{z}_{\mathrm{sb}}^{T}K_y^{-1}\bm{z}_{\mathrm{sb}}
+  -\frac{1}{2}\log|K_y|
+  -\frac{n_{\mathrm{sb}}}{2}\log(2\pi).
+\label{eq:gpr-log-marginal-likelihood}
+\end{equation}
+The quadratic term rewards agreement with the sideband observations, while the
+determinant term accounts for the covariance volume used to obtain that agreement.
+The implementation searches in the logarithms of $C$ and $\ell$ with multiple
+optimizer restarts. This is an empirical-Bayes, or type-II maximum-likelihood,
+selection of the covariance parameters; it is not a profile of $\ell$ as a
+frequentist nuisance parameter in the subsequent local \CLs{} likelihood.
+
+Figure~\ref{fig:gpr-mass-hypothesis-optimization} shows why the optimum is specific
+to a dataset and mass hypothesis. Moving $m_0$ changes which bins are excluded from
+training and changes the resolution-scaled domain through $\sigma_x(m_0)$. The same
+dataset can therefore return a different $(C_{\mathrm{opt}},\ell_{\mathrm{opt}})$ at
+neighboring hypotheses even though the kernel family is unchanged. An interior
+maximum means only that the configured range is nonbinding for that fit. A maximum on
+a boundary means that the range is active, while a long shallow likelihood ridge means
+that the parameters are weakly identified. None of these cases turns
+$\ell_{\mathrm{opt}}$ into a direct measurement of detector resolution or a physical
+background correlation length.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.99\linewidth}{methodology_figs/gpr_mass_hypothesis_optimization.pdf}
+\caption{Meaning of per-mass-hypothesis hyperparameter optimization. Panel (a)
+shows one schematic sideband problem in
+$u=(x-x_0)/\sigma_x(m_0)$. The shaded $2.25\,\sigma_x$ interval is excluded from
+training; the three curves illustrate the different interpolation behavior allowed
+by short, interior, and long candidate length scales. Panel (b) shows the joint
+log-marginal-likelihood surface for the same synthetic sidebands. The star is the
+bounded maximum in $(C,\ell)$, and the elongated contours expose their possible
+tradeoff. Panel (c) shows that moving $m_0$ changes both the sideband mask and the
+local resolution scale that defines the allowed $\ell$ interval. Panel (d) illustrates
+how a scan records an interior optimum differently from repeated upper-bound contact:
+the former is a conditional best fit within a nonbinding range, whereas the latter
+diagnoses an active numerical domain and motivates a predeclared range and closure
+study. The figure is explanatory only; it contains no HPS observations or fit
+results.}
+\label{fig:gpr-mass-hypothesis-optimization}
+\end{figure}
+
 This distinction determines how the hyperparameter study enters a physics result.
 If the allowed range forces $\ell$ too low, the GP retains unnecessary
 signal-scale flexibility and can absorb part of a localized excess; if the fitted
@@ -267,7 +375,7 @@ favorable observed limit or local $p_0$. Only after those procedural checks and
 coverage qualification may the range be treated as part of a physics analysis
 card.
 
-The v4.1 observed/asymptotic candidate uses the dataset-specific factors in
+The v4.2 result uses the dataset-specific factors in
 Table~\ref{tab:production-lengthscale-bounds}. The lower factors retain their earlier
 full-refit closure provenance; changing the 2016 upper factor does not requalify those
 closure studies at full statistics.
@@ -276,17 +384,19 @@ closure studies at full statistics.
 \centering
 \begin{tabular}{lccc}
 \toprule
-Dataset & $k_{\min,d}$ & $k_{\max,d}$ & v4.1 status \\
+Dataset & $k_{\min,d}$ & $k_{\max,d}$ & v4.2 status \\
 \midrule
 2015 full & 1.0 & 8 & unchanged from v4 \\
-2016 full & 0.9 & 12 & observed-only candidate \\
+2016 full & 0.9 & 12 & accepted; conditional \\
 2021 10\% & 1.1 & 15 & unchanged from v4 \\
 \bottomrule
 \end{tabular}
-\caption{Resolution-scaled RBF length-scale factors in the v4.1
-observed/asymptotic candidate. The factors multiply $\sigma_x(m)$ in
+\caption{Resolution-scaled RBF length-scale factors in the v4.2 result. The
+factors multiply $\sigma_x(m)$ in
 Eq.~\eqref{eq:dataset-lengthscale-bounds}. Only the 2016 upper factor differs from
-v4. The factor-12 row is not yet a coverage-qualified production freeze.}
+v4. Factor 12 is accepted as the current full-2016 setting, but the
+observed-data selection remains distinct from a pre-unblinding freeze or direct
+coverage qualification.}
 \label{tab:production-lengthscale-bounds}
 \end{table}
 
@@ -323,12 +433,15 @@ artificial boundary and the next-setting plateau, not on which observed limit is
 tighter or which local $p_0$ is smaller.
 
 Because this diagnostic was prompted by the v4 observed spectrum, factor 12 is
-reported as an observed/asymptotic candidate rather than a new calibrated nominal.
-Production-matched functional-form closure, optimizer-repeat stability, and direct
-coverage remain separate requirements.
-The configurations continue to retain the dataset-statistics floor on
+accepted for the v4.2 result with an explicit post-selection qualification; it is
+not presented as a pre-unblinding choice or a coverage-calibrated nominal.
+Production-matched functional-form closure and direct coverage remain separate
+requirements.
+The configurations continue to retain a dataset-wide median-resolution floor on
 $\ell_{\max,d}$ so that the ceiling does not become artificially small where the
-local resolution is exceptionally tight. Alternative upper bounds,
+local resolution is exceptionally tight. This is a guard based on a representative
+$\sigma_x$ value, not a floor derived from luminosity or event statistics.
+Alternative upper bounds,
 fixed-background fits, and the historical common-lower-bound overlays remain
 robustness studies collected in the appendices.
 
@@ -824,10 +937,12 @@ These quantities are therefore limit diagnostics rather than discovery-significa
 measures in the sense of $p_0$. If the observed limit lies near the median of the
 background-only ensemble, then roughly half of the toys lie above it and half lie
 below it, making both $p_{\mathrm{strong}}$ and $p_{\mathrm{weak}}$ naturally
-$\mathcal{O}(0.5)$. With $N_{\mathrm{toys}}=\num{10000}$, the smallest non-zero
-empirical tail probability is still only of order $10^{-4}$, so these toy-limit
-diagnostics cannot by themselves establish or refute a high-significance local excess
-in the discovery statistic defined by the one-sided local $p_0$ mapping above.
+$\mathcal{O}(0.5)$. Their finite resolution is $1/N_{\mathrm{toys}}$. In the v4.2
+combined ensemble, $N_{\mathrm{toys}}=300$, so a one-count change is
+$1/300\simeq0.0033$ and a zero-count tail is reported as 0 of 300 rather than as an
+exact zero probability. These toy-limit diagnostics cannot by themselves establish
+or refute a high-significance local excess in the discovery statistic defined by the
+one-sided local $p_0$ mapping above.
 
 \subsection{Shared-\texorpdfstring{$\eps^2$}{epsilon2} combination across datasets}
 \label{sec:combination}

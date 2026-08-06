@@ -1,35 +1,57 @@
 \section{Conclusions and Outlook}
 \label{sec:conclusions}
 
-Version 4.1 documents a controlled response to a numerical-range diagnostic in the
-v4 observed scan. The search intervals and wider GP supports remain 19--90 and
-14--135~MeV for 2015, 39--180 and 30--210~MeV for 2016, and 50--250 and
-40--300~MeV for 2021. The full 2015 and 2016 samples and the 2021 10\% sample are
-combined in a shared-$\eps^2$ likelihood. Only the 2016 resolution-scaled
-length-scale upper factor changes, from 8 to 12.
+Version 4.2 adopts the factor-12 upper length-scale setting for the full 2016
+sample and completes the corresponding three-campaign result. The search
+intervals and wider GP supports remain 19--90 and 14--135~MeV for 2015, 39--180
+and 30--210~MeV for 2016, and 50--250 and 40--300~MeV for 2021. The full 2015
+and 2016 samples and the 2021 10\% sample enter a shared-$\eps^2$ likelihood.
 
-That change follows a controlled factor-8, 10, 12, 15, and 20 observed-only scan.
-The v4 ceiling is occupied at all 142 full-2016 hypotheses; factor 10 remains
-occupied at 56, while factors 12, 15, and 20 have no occupied hypotheses. Factor 12
-is selected as the first nonbinding value and is followed by a stable plateau in log
-marginal likelihood, observed yield limits, and local $Z$. Repeated actual fits
-resolve the reviewed branches, and no GP state, limit, or $p$-value is interpolated.
-The rule does not select whichever observed limit is tighter or whichever local
-$p_0$ is smaller.
+The adopted setting follows the controlled factor-8, 10, 12, 15, and 20 range
+study. The v4 ceiling is occupied at all 142 full-2016 hypotheses; factor 10
+remains occupied at 56, while factors 12, 15, and 20 have no occupied
+hypotheses. Factor 12 is the first nonbinding value and is followed by a stable
+plateau in log marginal likelihood, observed yield limits, and local $Z$.
+Repeated actual fits resolve the reviewed branches, and no GP state, limit, or
+$p$-value is interpolated. The rule does not select whichever observed limit is
+tighter or whichever local $p_0$ is smaller.
 
-The exact 415-state reconstruction gives finite observed 90\% asymptotic \CLs{}
-limits and fixed-mass asymptotic $p_0$ values on all 232 combined hypotheses.
-Relative to v4, the observed-limit ratio over the 2016-active interval ranges from
-0.6941 at 103~MeV to 1.2789 at 90~MeV. The smallest local asymptotic value is
-$3.2592\times10^{-5}$ at 65~MeV ($Z=3.993$). The corresponding fixed-card analytic
-\v{S}id\'ak reference is not a calibrated global $p$-value because it does not
-account for the post-v4 upper-bound scan.
+The exact 415-state reconstruction is finite on all 232 combined hypotheses.
+For the combined search, 300 shared mass-local conditional background-only
+pseudoexperiments provide the median and central limit quantiles. They retain the
+reviewed GP states without refitting and use the same asymptotic inner 90\%
+\CLs{} construction as the observed limit. The observed-to-median ratio ranges
+from 0.514396 at 73~MeV to 3.29400 at 65~MeV. The corresponding mass-local tail
+counts reach $0/300$ on the strong side at 71--73~MeV and on the weak side at
+21, 65, and 66~MeV; a zero count is finite ensemble resolution, not an exact
+probability.
 
-No v4.1 expected-limit bands or upper-limit-tail pseudoexperiment diagnostics have
-been made. The v4 conditional bands are not transferred to the new observed curve.
-Likewise, no scan-wise toy-calibrated discovery probability or direct \CLs{}
-coverage claim is inferred. Version 4.1 is therefore an observed/asymptotic
-candidate update, not yet a replacement for a coverage-qualified frozen card.
+The individual full-2015, full-2016, and 2021 10\% observed limits are reported
+alongside the combined result. Auxiliary 100-pseudoexperiment conditional bands
+document each standalone likelihood and each pairwise shared-$\eps^2$
+combination. They select the first 100 entries from the accepted
+300-pseudoexperiment parent stream, reuse campaign draws across scopes, and are
+not used as direct-coverage or scan-wide discovery ensembles. The smallest
+campaign-level asymptotic $p_0$ values are
+$8.46283\times10^{-4}$ at 51~MeV, $3.08781\times10^{-4}$ at 90~MeV, and
+$1.05702\times10^{-5}$ at 65~MeV, respectively. The combined minimum is
+$3.25918\times10^{-5}$ at 65~MeV ($Z=3.99321$). With
+$N_{\mathrm{eff}}=35.3814$, the fixed-card analytic \v{S}id\'ak reference is
+$p=0.00115250$ ($Z=3.04783$).
+
+The exact 65~MeV extraction gives
+$\widehat{\eps^2}=(6.42706\pm1.61009)\times10^{-6}$. Its dataset-block
+decomposition shows that the localized feature is predominantly carried by the
+2021 10\% sample, is modestly supported by 2015, and is opposed by 2016 at the
+common-coupling yield. The displayed background-subtracted spectra and profiled
+residuals document this structure without treating individual bins as independent
+significances.
+
+The conditional limit ensemble does not establish direct \CLs{} coverage, refit
+the GP, or supply a scan-wise discovery calibration. The analytic \v{S}id\'ak
+reference likewise does not account for the observed-data upper-bound study.
+Factor 12 is accepted for the v4.2 result, while the post-selection and coverage
+qualifications remain explicit.
 
 A ten-toy 2021 source-and-exposure pilot now exercises the paired Poisson generator,
 production-geometry GP refit, and hyperparameter export for five declared scenarios:
@@ -55,8 +77,9 @@ and the alternate native-10\%$\times10$ lane improves by 1.43\%. The four factor
 paired-response medians lie between 0.971921 and 0.979603 and are essentially unchanged
 at factors 15 and 25. The common 2--3\% under-response is therefore not caused by
 lifting the upper bound. With ten toys it remains an unresolved closure diagnostic,
-not a calibrated bias claim. No expected-limit band or coverage result is constructed,
-and the unused $q_\mu$ and immutable-path $\eps^2$ outputs are non-promotable.
+not a calibrated bias claim. The pilot itself constructs no expected-limit band or
+coverage result, and its unused $q_\mu$ and immutable-path $\eps^2$ outputs are
+non-promotable.
 
 The production follow-up should use a predeclared larger ensemble, retain paired toy
 identifiers within each truth-source scaling family and across upper-bound settings,
@@ -67,9 +90,9 @@ repeat stability, background bias, pull, and signal recovery versus exposure. On
 that larger closure study can support a frozen numerical range; direct limit coverage
 remains a separate post-freeze requirement.
 
-After a candidate upper range is selected without using observed limit direction or
-local significance, production-faithful functional-form closure and direct limit
-coverage should be rerun under that frozen card. A separate scan-wise
+Production-faithful functional-form closure and direct limit coverage should be
+rerun under a card frozen independently of observed limit direction or local
+significance. A separate scan-wise
 background-only maximum-$q_0$ ensemble would be required for a toy-calibrated global
 discovery statement. The eventual full-2021 observed spectrum remains a new analysis
 input, not a deterministic scale factor applied to the present 10\% observation.
