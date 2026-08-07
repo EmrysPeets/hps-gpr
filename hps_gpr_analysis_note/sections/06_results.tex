@@ -316,7 +316,7 @@ caption rather than an in-figure text box.}
 
 \begin{figure}[H]
 \centering
-\graphicorplaceholder{0.98\linewidth}{final_limit_projection_figs/v4p2_20260805_combined300/observed_extraction_m065_profiled_residuals.pdf}
+\graphicorplaceholder{0.98\linewidth}{final_limit_projection_figs/v4p2_followups_20260806/figure62_profiled_residuals_physical68.pdf}
 \caption{Profiled residual diagnostics for the same 65~MeV extraction. In the
 first three panels, open blue circles use the background-only profiled
 expectation, orange triangles use the standalone signal-plus-background fit,
@@ -324,12 +324,14 @@ and red points use the simultaneous shared-$\eps^2$ signal-plus-background fit.
 Each plotted quantity is the conditional Pearson residual
 $(n_i-\widehat{\lambda}_i)/\sqrt{\widehat{\lambda}_i}$ in the exact extraction
 window. These correlated post-fit diagnostics are not independent standard
-normal variates or per-bin significances. The lower-right panel compares the
-three standalone coupling estimates with the simultaneous value and its
-one-standard-deviation band. At the joint mode, the dataset-block contributions
-to $q_0$ are $+2.72558$, $-3.32200$, and $+16.54218$ for 2015, 2016, and 2021,
-respectively. Negative block contributions are allowed and are not standalone
-$q_0$ values.}
+normal variates or per-bin significances. The lower-right panel shows the
+physical best fits and the nominal asymptotic $\eps^2\geq0$ profile sets
+defined by $\Delta(-2\ln L)\leq1$; these sets are not coverage calibrated.
+The 2016 set starts at the physical boundary, replacing the ambiguous negative
+endpoint of the former symmetric signed-Wald display. At the joint mode, the
+dataset-block contributions to $q_0$ are $+2.72558$, $-3.32200$, and
+$+16.54218$ for 2015, 2016, and 2021, respectively. Negative block
+contributions are allowed and are not standalone $q_0$ values.}
 \label{fig:results-v4p2-m065-residuals}
 \end{figure}
 
@@ -343,6 +345,50 @@ correlated multi-bin profile-likelihood result. These plots document an
 apparent localized excess on the selected fixed card. They do not supply a
 scan-toy global significance, and the 300 mass-local limit pseudoexperiments do
 not calibrate such a claim.
+
+\subsection{Observed-equivalent 2021-statistics response compared with BaBar}
+\label{sec:results-v4p2-babar-response}
+
+Figure~\ref{fig:results-v4p2-babar-response} compares the reviewed v4.2
+combined observed 90\% asymptotic \CLs{} limit with the published BaBar visible
+dark-photon result \cite{BaBarDarkPhoton2014}.  The blue curve is a deliberately
+restricted density-response calculation: the full 2015 and 2016 contributions
+are held fixed, while only the observed count density of the 2021 10\% sample
+in the physical $m\pm1.64\sigma_m$ normalization window is multiplied by ten.
+At each mass the observed minimal-visible limit is scaled by the square root of
+the ratio of the current summed active-dataset density to the density after
+that replacement.  Thus the scaling is density weighted in overlap regions and
+is exactly $1/\sqrt{10}$ where only 2021 is active.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.98\linewidth}{final_limit_projection_figs/v4p2_followups_20260806/v4p2_babar_observed_equivalent_projection_eps2.pdf}
+\caption{Observed 90\% upper limits on the minimal-visible dark-photon kinetic
+mixing parameter $\eps^2$.  The dashed gray curve is the reviewed HPS-GPR v4.2
+combined observed asymptotic \CLs{} result from the full 2015 and 2016 samples
+and the 2021 10\% sample.  The blue curve holds 2015 and 2016 fixed and applies
+the observed-equivalent density response for 2021 at 100\% statistics.  The
+orange curve is the published BaBar visible-dark-photon observed 90\% limit
+\cite{BaBarDarkPhoton2014}.  The HPS proxy preserves fluctuations in the
+current observation; it is not an expected sensitivity, a future observed
+limit, or a refit to full-2021 data.  HPS and BaBar use different statistical
+constructions.  No HPS limit bands or projected $p$-values are shown.}
+\label{fig:results-v4p2-babar-response}
+\end{figure}
+
+The current observed v4.2 curve has a minimum of
+$1.13397\times10^{-6}$ at 72~MeV and remains numerically above the BaBar
+contour on the integer-MeV HPS grid.  The response proxy reaches
+$4.51266\times10^{-7}$ at 73~MeV.  Its smallest pointwise ratio to the
+interpolated BaBar contour is 0.3747 at 98~MeV; the numerical crossings occur
+at 55 grid points in nine disconnected intervals.  Those intervals inherit
+the fluctuations in the present observation and are not probabilities for a
+future result.  The frozen inputs, all crossing intervals, and a ratio
+diagnostic are retained in the accompanying follow-up bundle.  A slide-ready
+companion uses the same upper panel and places
+projected-HPS-proxy/BaBar directly underneath.  Values below unity identify
+the masses where the proxy is numerically stronger; it changes no curve or
+comparison convention.
 
 \subsection{Relation to v4 and validation boundary}
 \label{sec:results-v4p2-v4-context}
