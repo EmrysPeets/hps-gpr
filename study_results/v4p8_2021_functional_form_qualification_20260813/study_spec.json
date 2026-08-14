@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "study_version": "v4.8.0-development",
+  "study_id": "v4p8_2021_functional_form_qualification_20260813",
+  "created_utc": "2026-08-13",
+  "purpose": "Fail-closed source-generator qualification before any scaled 2021 injection-extraction or kernel-bound study.",
+  "declared_result_state": {
+    "version": "v4.2",
+    "result_commit": "4c7698e28f0c2c9eedf531a5b614ca727d7c305b",
+    "integration_commit": "675b1c65be9238d6d97d7eeb0f09fd860404d13a",
+    "archived_config_path": "inputs/frozen_v4p2_analysis_card.yaml",
+    "config_sha256": "5a52abb41896b161bd6dd8f66859737b6d98ea7d40d2eb8d8c677c3161ed6055"
+  },
+  "source_inputs": {
+    "one_pct": {
+      "path": "/Users/emryspeets/Desktop/gp_mods/data_input_21/final_1pct_invM.root",
+      "sha256": "eecb5b8f40820c8f3c5d9673d2cddc155f2e2282474e20eb4f8930fd0a561ada",
+      "histogram": "preselection/h_invM_8000"
+    },
+    "ten_pct": {
+      "path": "/Users/emryspeets/Desktop/gp_mods/10pct_2021/final_10pct_invM.root",
+      "sha256": "3944d4c71a453c6c810061248c34d2fca9eceaad1de85c137afdc291c2195ac4",
+      "histogram": "preselection/h_invM_8000"
+    }
+  },
+  "generator_qualification": {
+    "archived_root_family_audit": "derived/archived_root_family_edge_audit.csv",
+    "archived_root_family_audit_sha256": "d711e2130c715e6107c3f5dcfcdae6c876e3512002b8e1e17607f28f981f6f99",
+    "archived_root_family_audit_driver": "audit_archived_families.py",
+    "archived_root_family_audit_driver_sha256": "0487657eaeb67419c7fe653e2eeb36e7e24f7cbc8c0be0f98abfc113a0814f76",
+    "protocol": "GENERATOR_QUALIFICATION_PROTOCOL.md",
+    "protocol_sha256": "85d3d040bbfd909ec220a230084b36018b997a31c8ea41f5497df104d6941a7c",
+    "reconnaissance_driver": "fit_qualify.py",
+    "reconnaissance_driver_sha256": "d8337e9b6f28fb186d01d6bc2bb6624ef1c4990596a555b7baccd4ad4b65c5c3",
+    "result": "derived/generator_qualification.json",
+    "result_sha256_at_freeze": "9d32cdc407ee11ae8170e8b76fe83c4c3f1ba4e6986051f2d725bcd298e97fec",
+    "requested_name_resolution": {
+      "literal_repository_tag_exists": false,
+      "five_parameter_repository_tag": "fSigPow",
+      "seven_parameter_repository_tag": "fSigPowExpQ"
+    },
+    "in_sample_screen_common_degrees": [18, 20, 24],
+    "fully_qualified_common_degrees": [],
+    "selected_degree": null,
+    "optimizer_reproducibility_gate_passed": false,
+    "status": "blocked_no_qualified_generator"
+  },
+  "planned_only_after_generator_qualification": {
+    "reported_scenarios": [
+      "2021_1pct_x10",
+      "2021_1pct_x100",
+      "2021_10pct",
+      "2021_10pct_x10"
+    ],
+    "stored_parent_scenarios": ["2021_1pct", "2021_10pct"],
+    "closure_masses_gev": [0.065, 0.09, 0.12, 0.18, 0.21],
+    "injected_reference_sigmas": [0.0, 1.0, 3.0, 5.0],
+    "backgrounds_per_source_family": 25,
+    "primary_support_gev": [0.04, 0.3],
+    "support_control_gev": [0.03, 0.3],
+    "primary_length_scale_upper_factor": 15.0,
+    "length_scale_scan_factors": [15.0, 20.0, 25.0],
+    "length_scale_scan_masses_gev": [
+      0.05, 0.07, 0.09, 0.11, 0.13, 0.15,
+      0.17, 0.19, 0.21, 0.23, 0.25
+    ]
+  },
+  "inference_contract": {
+    "test_statistic": "tilde_q_mu",
+    "cls_alpha": 0.1,
+    "confidence_level_percent": 90,
+    "cls_mode": "asymptotic",
+    "eps2_density_nsigma": 1.64,
+    "eps2_density_nsigma_role": "signal-integration normalization window, not confidence level"
+  },
+  "execution_status": {
+    "generator_qualified": false,
+    "toys_generated": false,
+    "four_lane_closure_run": false,
+    "support_control_run": false,
+    "length_scale_scan_run": false,
+    "promotion_gate_passed": false,
+    "production_card_changed": false
+  },
+  "interpretation": "No physical truth, coverage, expected band, limit, or kernel-bound claim is made from this branch."
+}

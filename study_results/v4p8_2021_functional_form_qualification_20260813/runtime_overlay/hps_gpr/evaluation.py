@@ -1,0 +1,387 @@
+"""Evaluation functions for single and combined dataset analyses."""
+
+import hashlib
+import math
+from dataclasses import dataclass
+from typing import Dict, List, Optional, Tuple, TYPE_CHECKING
+
+import numpy as np
+from scipy.stats import norm
+
+from .io import BlindPrediction, estimate_background_for_dataset
+from .template import (
+    build_window_template_from_full,
+    cls_limit_for_amplitude,
+    cls_amplitude_asymptotic,
+    cls_amplitude_toys,
+)
+from .statistics import (
+    p0_from_blind_vectors,
+    p0_lognormal_poisson,
+    fit_A_profiled_gaussian,
+    fit_A_profiled_gaussian_details,
+    p0_profiled_gaussian_LRT,
+)
+from .conversion import epsilon2_from_A, A_from_epsilon2
+
+if TYPE_CHECKING:
+    from .config import Config
+    from .dataset import DatasetConfig
+
+
+@dataclass
+class SingleResult:
+    """Results from single-dataset evaluation."""
+
+    dataset: str
+    mass: float
+    A_up: float
+    eps2_up: float
+    p0_analytic: float
+    Z_analytic: float
+    A_hat: float
+    sigma_A: float
+    extract_success: bool
+
+
+@dataclass
+class CombinedResult:
+    """Results from combined dataset evaluation."""
+
+    mass: float
+    eps2_up: float
+    p0_analytic: float
+    Z_analytic: float
+
+
+# ---------------------------------------------------------------------------
+# Visibility and edge-guard helpers
+# ---------------------------------------------------------------------------
+
+def _stable_seed_from_tag(tag: str, *, base: int = 0) -> int:
+    """Deterministic 32-bit seed from a string tag (stable across sessions/processes)."""
+    h = hashlib.md5(tag.encode("utf-8")).hexdigest()[:8]
+    return int((base + int(h, 16)) % (2 ** 31 - 1))
+
+
+def _dataset_visibility(ds: "DatasetConfig", config: "Config") -> str:
+    """Return the visibility policy ('observed' or 'expected_only') for a dataset."""
+    vis_map = dict(getattr(config, "data_visibility", {}) or {})
+    vis = str(vis_map.get(ds.key, "observed")).lower().strip()
+    return vis if vis in ("observed", "expected_only") else "observed"
+
+
+def _all_observed(ds_list: List["DatasetConfig"], config: "Config") -> bool:
+    """Return True only if every dataset in the list is in 'observed' mode."""
+    return all(_dataset_visibility(ds, config) == "observed" for ds in ds_list)
+
+
+def active_datasets_for_mass(
+    mass: float,
+    datasets: Dict[str, "DatasetConfig"],
+    config: "Config",
+) -> List["DatasetConfig"]:
+    """Return datasets active at this mass point, applying optional edge guards.
+
+    If config.scan_require_two_sidebands=True, require the full training exclusion
+    window (±guard_nsigma·σ(m)) to lie within the dataset's data range.
+    This suppresses unstable fits near dataset boundaries.
+    """
+    out: List["DatasetConfig"] = []
+    m = float(mass)
+    require_two = bool(getattr(config, "scan_require_two_sidebands", False))
+    guard_nsig = float(
+        getattr(config, "scan_edge_guard_nsigma", None)
+        or getattr(config, "gp_train_exclude_nsigma", None)
+        or config.blind_nsigma
+    )
+
+    for ds in datasets.values():
+        if not bool(getattr(ds, "enabled", True)):
+            continue
+        if m < float(ds.m_low) or m > float(ds.m_high):
+            continue
+        if require_two:
+            try:
+                s = float(ds.sigma(m))
+                lo = float(getattr(ds, "data_low", None) or ds.m_low)
+                hi = float(getattr(ds, "data_high", None) or ds.m_high)
+                if (m - guard_nsig * s) <= lo:
+                    continue
+                if (m + guard_nsig * s) >= hi:
+                    continue
+            except Exception:
+                pass  # fail-open on guard errors
+        out.append(ds)
+
+    return out
+
+
+# ---------------------------------------------------------------------------
+# Single dataset evaluation
+# ---------------------------------------------------------------------------
+
+def evaluate_single_dataset(
+    ds: "DatasetConfig",
+    mass: float,
+    config: "Config",
+    do_extraction: bool = True,
+    *,
+    compute_observed: Optional[bool] = None,
+    return_fit_details: bool = False,
+) -> Tuple[SingleResult, BlindPrediction, Optional[Dict]]:
+    """Evaluate a single dataset at one mass hypothesis.
+
+    If data_visibility for this dataset is 'expected_only', observed quantities
+    (UL, p0, extraction) are suppressed and returned as NaN.
+
+    Returns:
+        Tuple of (SingleResult, BlindPrediction, fit_details or None)
+    """
+    pred = estimate_background_for_dataset(ds, mass, config)
+
+    vis = _dataset_visibility(ds, config)
+    if compute_observed is None:
+        compute_observed = (vis == "observed")
+
+    if not compute_observed:
+        return (
+            SingleResult(ds.key, float(mass),
+                         float("nan"), float("nan"), float("nan"), float("nan"),
+                         float("nan"), float("nan"), False),
+            pred,
+            None,
+        )
+
+    # --- CLs upper limit on A ---
+    seed = None
+    if config.cls_mode == "toys":
+        seed = _stable_seed_from_tag(
+            f"CLS:{ds.key}:{float(mass):.6f}", base=config.cls_seed_base
+        )
+
+    A_up, _ = cls_limit_for_amplitude(
+        n_obs=pred.obs,
+        b_mean=pred.mu,
+        b_cov=pred.cov,
+        edges=pred.edges,
+        mass=mass,
+        sigma_val=pred.sigma_val,
+        config=config,
+        seed=seed,
+        full_edges=pred.edges_full,
+        window_mask=pred.blind_mask,
+    )
+    eps2_up = epsilon2_from_A(ds, mass, A_up, pred.integral_density)
+
+    # --- p0/Z via profiled LRT (v15) ---
+    tmpl, _ = build_window_template_from_full(
+        pred.edges_full, pred.blind_mask, mass, pred.sigma_val, config=config
+    )
+    p0, Z, _, _ = p0_profiled_gaussian_LRT(pred.obs, pred.mu, pred.cov, tmpl)
+
+    # --- Signal extraction ---
+    fit_details = None
+    if do_extraction:
+        allow_neg = bool(getattr(config, "extract_allow_negative", True))
+        if return_fit_details:
+            fit_details = fit_A_profiled_gaussian_details(
+                pred.obs, pred.mu, pred.cov, tmpl, allow_negative=allow_neg
+            )
+            A_hat = float(fit_details.get("A_hat", float("nan")))
+            sigma_A = float(fit_details.get("sigma_A", float("nan")))
+            ok = bool(fit_details.get("success", False))
+        else:
+            fit = fit_A_profiled_gaussian(
+                pred.obs, pred.mu, pred.cov, tmpl, allow_negative=allow_neg
+            )
+            A_hat = float(fit["A_hat"])
+            sigma_A = float(fit["sigma_A"])
+            ok = bool(fit["success"])
+    else:
+        A_hat, sigma_A, ok = float("nan"), float("nan"), False
+
+    return (
+        SingleResult(
+            ds.key, float(mass), float(A_up), float(eps2_up),
+            float(p0), float(Z), float(A_hat), float(sigma_A), bool(ok),
+        ),
+        pred,
+        fit_details if return_fit_details else None,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Combined dataset evaluation
+# ---------------------------------------------------------------------------
+
+def _concat_block_diag(covs: List[np.ndarray]) -> np.ndarray:
+    """Concatenate covariance matrices into block diagonal."""
+    sizes = [c.shape[0] for c in covs]
+    out = np.zeros((sum(sizes), sum(sizes)), float)
+    i = 0
+    for C in covs:
+        n = C.shape[0]
+        out[i: i + n, i: i + n] = C
+        i += n
+    return out
+
+
+def _combined_mode(config: "Config") -> str:
+    """Normalize the combined shared-coupling scan mode."""
+    raw = str(getattr(config, "combined_mode", "epsilon2") or "epsilon2").lower().strip()
+    mode = raw.replace("-", "_")
+    if mode in {"epsilon2", "eps2", "direct", "legacy"}:
+        return "epsilon2"
+    if mode in {"count_scale", "countscale", "count_scaled"}:
+        return "count_scale"
+    raise ValueError(
+        f"Unknown combined_mode={raw!r}; expected 'epsilon2' or 'count_scale'."
+    )
+
+
+def build_combined_components(
+    mass: float,
+    ds_list: List["DatasetConfig"],
+    preds: List[BlindPrediction],
+    config: Optional["Config"] = None,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """Build concatenated (obs, b, cov, s_unit) for a shared mass hypothesis.
+
+    s_unit is the expected counts per unit ε² in each concatenated bin.
+    """
+    obs = np.concatenate([p.obs for p in preds]).astype(int)
+    b = np.concatenate([p.mu for p in preds]).astype(float)
+    cov = _concat_block_diag([p.cov for p in preds]).astype(float)
+    templates = [
+        build_window_template_from_full(p.edges_full, p.blind_mask, mass, p.sigma_val, config=config)[0]
+        for p in preds
+    ]
+    Ks = [A_from_epsilon2(ds, mass, 1.0, p.integral_density) for ds, p in zip(ds_list, preds)]
+    s_unit = np.concatenate([K * t for K, t in zip(Ks, templates)]).astype(float)
+    return obs, b, cov, s_unit
+
+
+def combined_cls_limit_epsilon2_from_vectors(
+    obs: np.ndarray,
+    b: np.ndarray,
+    cov: np.ndarray,
+    s_unit: np.ndarray,
+    config: "Config",
+    seed: int = 1,
+    *,
+    mode: Optional[str] = None,
+    num_toys: Optional[int] = None,
+) -> float:
+    """Compute combined CLs limit on epsilon^2 from pre-built concatenated vectors.
+
+    This lower-level function accepts pre-built (obs, b, cov, s_unit) arrays directly,
+    enabling repeated calls in toy loops without rebuilding from datasets each time.
+
+    Args:
+        obs: Concatenated observed counts across datasets
+        b: Concatenated background mean predictions
+        cov: Block-diagonal background covariance
+        s_unit: Expected counts per unit epsilon^2 (concatenated)
+        config: Global configuration
+        seed: Random seed
+
+    Returns:
+        epsilon^2 upper limit
+    """
+    obs = np.asarray(obs, int)
+    b = np.asarray(b, float)
+    cov = np.asarray(cov, float)
+    s_unit = np.asarray(s_unit, float)
+
+    rng = np.random.default_rng(seed)
+    alpha = float(config.cls_alpha)
+    mode = str(config.cls_mode if mode is None else mode).lower().strip()
+    num_toys = int(config.cls_num_toys if num_toys is None else num_toys)
+    combined_mode = _combined_mode(config)
+
+    signal_scale = 1.0
+    signal_template = s_unit
+    if combined_mode == "count_scale":
+        # Coordinate change only:
+        #   eps2 * s_unit == (eps2 * sum(s_unit)) * (s_unit / sum(s_unit)).
+        # Dataset-specific mass resolution, density, and radiative factors are
+        # already encoded bin-by-bin in s_unit.
+        signal_template = np.clip(s_unit, 0.0, None)
+        signal_scale = float(np.sum(signal_template))
+        if not np.isfinite(signal_scale) or signal_scale <= 0.0:
+            return float("nan")
+        signal_template = signal_template / signal_scale
+
+    def cls_at_eps2(eps2: float) -> float:
+        eps2 = float(max(eps2, 0.0))
+        test_strength = eps2 * signal_scale
+        if mode == "asymptotic":
+            return cls_amplitude_asymptotic(test_strength, obs, b, cov, signal_template)[0]
+        return cls_amplitude_toys(
+            test_strength,
+            obs,
+            b,
+            cov,
+            signal_template,
+            rng,
+            max(1, int(num_toys)),
+        )[0]
+
+    s_sum = float(np.sum(np.clip(s_unit, 0.0, None)))
+    b_sum = float(np.sum(np.clip(b, 0.0, None)))
+    eps_lo = 0.0
+    if combined_mode == "count_scale":
+        eps_hi = max(
+            1e-10,
+            max(1.0, 3.0 * math.sqrt(max(b_sum, 1.0))) / max(signal_scale, 1e-12),
+        )
+    else:
+        eps_hi = max(1e-10, 3.0 * math.sqrt(max(b_sum, 1.0)) / max(s_sum, 1e-12))
+    it = 0
+    while cls_at_eps2(eps_hi) > alpha and eps_hi < 1e12 and it < 80:
+        eps_hi *= 2.0
+        it += 1
+    for _ in range(80):
+        mid = 0.5 * (eps_lo + eps_hi)
+        c = cls_at_eps2(mid)
+        if abs(c - alpha) < 1e-8:
+            eps_lo = eps_hi = mid
+            break
+        if c > alpha:
+            eps_lo = mid
+        else:
+            eps_hi = mid
+        if abs(eps_hi - eps_lo) <= max(1e-16, 1e-6 * eps_hi):
+            break
+
+    return float(0.5 * (eps_lo + eps_hi))
+
+
+def combined_cls_limit_epsilon2(
+    mass: float,
+    ds_list: List["DatasetConfig"],
+    preds: List[BlindPrediction],
+    config: "Config",
+    seed: int = 1,
+) -> float:
+    """Compute combined CLs limit on epsilon^2."""
+    obs, b, cov, s_unit = build_combined_components(float(mass), ds_list, preds, config=config)
+    return combined_cls_limit_epsilon2_from_vectors(obs, b, cov, s_unit, config, seed=seed)
+
+
+def evaluate_combined(
+    mass: float,
+    ds_list: List["DatasetConfig"],
+    preds: List[BlindPrediction],
+    config: "Config",
+) -> CombinedResult:
+    """Evaluate combined datasets at one mass hypothesis."""
+    obs, b, cov, s_unit = build_combined_components(float(mass), ds_list, preds, config=config)
+    eps2_up = combined_cls_limit_epsilon2(mass, ds_list, preds, config)
+
+    # Profiled LRT p0 on ε² scale
+    eps2_scale = float(getattr(config, "eps2_lrt_scale", 1e10))
+    p0, Z, _, _ = p0_profiled_gaussian_LRT(obs, b, cov, s_unit / eps2_scale)
+
+    return CombinedResult(float(mass), float(eps2_up), float(p0), float(Z))
