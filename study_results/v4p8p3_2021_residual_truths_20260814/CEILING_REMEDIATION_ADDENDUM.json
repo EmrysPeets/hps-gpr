@@ -1,0 +1,190 @@
+{
+  "schema_version": 1,
+  "study_id": "v4p8p3_2021_residual_truths_20260814",
+  "addendum_id": "v4p8p3_residual_length_ceiling_remediation_v1",
+  "frozen_utc": "2026-08-14T18:35:33Z",
+  "status": "frozen_before_remediation_toy_generation_or_fits",
+  "post_closure_initiation": {
+    "initiated_after_both_original_closure_models_were_collected": true,
+    "original_closure_pulls_were_inspected": true,
+    "original_closure_has_no_unopened_reserve": true,
+    "reason": "The original three-toy pilot had 9/9 knot_spline native-1% factor-25 upper-bound contacts, but the frozen fallback logic did not require factor-25 sufficiency. The completed closure subsequently had 345/400 accepted knot_spline native-1% rows at the factor-25 upper bound.",
+    "consequence": "This remediation is a post-closure, pull-blind, targeted optimizer study. It cannot restore an independent confirmatory interpretation to the already inspected original closure ensemble."
+  },
+  "claim_boundary": "Targeted conditional knot_spline native-1% extraction-ceiling qualification only. Not an all-lane qualification, closure rerun, coverage study, expected limit, exclusion, observed-data bias measurement, production-card change, or independent confirmation of the inspected closure.",
+  "frozen_inputs": {
+    "model_protocol": {
+      "path": "MODEL_PROTOCOL.json",
+      "sha256": "3a68c17913aa16567605399d91c14fb2ffe03aaaa6ccfa98084044514cbbd219"
+    },
+    "source_fit_and_influence": {
+      "path": "derived/source_fit_and_influence.json",
+      "sha256": "f39bb7acdc73709abc2a2483c5d6e99b944c300415653fd692abcae68933ff0e"
+    },
+    "source_model_implementation": {
+      "path": "residual_models.py",
+      "sha256": "6ac6bfe4d872b1cea0c650d2384e78b14d0ad1e758dee9f2e61d50afee736e5d"
+    },
+    "source_fit_driver": {
+      "path": "fit_residual_models.py",
+      "sha256": "ae2b523dd92ab2332c77114e699d5be86f1040af8e9d3d32750396ee5769e4d8"
+    },
+    "original_toy_root": {
+      "path": "inputs/residual_structured_nested_toys.root",
+      "sha256": "62938abcc35184ba03ce15d5533b1e6daff1c69c3742eb49143f95f46ebaaca0"
+    },
+    "original_toy_manifest": {
+      "path": "inputs/residual_structured_nested_toys.manifest.json",
+      "sha256": "ed3631d12a348b6da06c1739e05b05cb0fc9d1b7d60ad3adff1b87a18be2fb94"
+    },
+    "original_toy_builder": {
+      "path": "build_residual_toys.py",
+      "sha256": "452a402f6c653ae09466e3e4d51e797e9af33b1222427836ee88916ab51755bc"
+    },
+    "original_length_pilot_runner": {
+      "path": "run_residual_length_pilot.py",
+      "sha256": "205420bd293404bab08af2cb0230ad66c3dcc87dcfc627fdf3b5a13bd928dbd3"
+    },
+    "original_length_pilot_disposition": {
+      "path": "derived/residual_length_pilot/common_ceiling_disposition.json",
+      "sha256": "a29b1a4de2bcfe35983112c0d4fd1435875e208c8bcd0da0fac98d3edd3bb77a"
+    },
+    "closure_runner": {
+      "path": "run_residual_closure.py",
+      "sha256": "385384b311e954ac31cc5cf587b3d963ae361930fa5a53c4ec2127d4d6bfd614"
+    },
+    "knot_spline_collection_summary": {
+      "path": "derived/residual_closure/knot_spline/collection_summary.json",
+      "sha256": "2b95636c0f6a60789a225b9cceebeb4330a0dc7a272b76733c1ef08e815ccfb1"
+    },
+    "regional_blend_collection_summary": {
+      "path": "derived/residual_closure/regional_blend/collection_summary.json",
+      "sha256": "2a9bf11917c843361703f78b3b5976793ff400a13f62de4854ad66ffeb1fe797"
+    },
+    "v4p8_length_core": {
+      "path": "../v4p8_2021_functional_form_qualification_20260813/rigid_length_scan_core.py",
+      "sha256": "97c0f41a220da7ec6cdf5666c2ab78db8fa429f1f99ddb0ea20e09f261c072f8"
+    },
+    "v4p8_runtime_manifest": {
+      "path": "../v4p8_2021_functional_form_qualification_20260813/runtime_overlay_manifest.json",
+      "sha256": "667390be8c2c5b79578c4ca933ff94fad289146432859f62ebf851a128a6c2e6"
+    },
+    "v4p2_analysis_card": {
+      "path": "../v4p8_2021_functional_form_qualification_20260813/inputs/frozen_v4p2_analysis_card.yaml",
+      "sha256": "5a52abb41896b161bd6dd8f66859737b6d98ea7d40d2eb8d8c677c3161ed6055"
+    }
+  },
+  "target_scope": {
+    "model": "knot_spline",
+    "source_family": "one_pct",
+    "scenario": "2021_1pct",
+    "background_only": true,
+    "masses_gev": [
+      0.065,
+      0.12,
+      0.21
+    ],
+    "upper_factors": [
+      25,
+      35,
+      50,
+      75
+    ],
+    "candidate_sentinel_pairs": [
+      {
+        "candidate": 35,
+        "sentinel": 50
+      },
+      {
+        "candidate": 50,
+        "sentinel": 75
+      }
+    ],
+    "candidate_selection_order": [
+      35,
+      50
+    ],
+    "fallback": null,
+    "common_ceiling_claim": false,
+    "all_lane_confirmation": false,
+    "closure_rerun": false
+  },
+  "fresh_background_contract": {
+    "count": 8,
+    "selection_toy_indices": [
+      0,
+      1,
+      2
+    ],
+    "confirmation_toy_indices": [
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "poisson_mean": "validated frozen knot_spline/one_pct full-support mean",
+    "independent_across_toy_indices": true,
+    "independent_of_original_pilot_and_closure_streams": true,
+    "selection_and_confirmation_streams_distinct": true,
+    "reserve_toys": 0,
+    "base_seed": 20260814,
+    "seed_namespace": "v4p8p3_residual_length_ceiling_remediation_background_v1",
+    "root_path": "inputs/residual_length_ceiling_remediation_toys.root",
+    "manifest_path": "inputs/residual_length_ceiling_remediation_toys.manifest.json"
+  },
+  "optimizer_contract": {
+    "workers": 1,
+    "blas_threads": 1,
+    "optimizer_restarts": 12,
+    "optimizer_seed_namespace": "v4p8p3_residual_length_ceiling_remediation_optimizer_v1",
+    "optimizer_seed_excludes_upper_factor": true,
+    "reference_initial_attempts": 3,
+    "maximum_attempts": 5,
+    "top_branch_minimum_replicates": 2,
+    "reuse": "Hash-pinned v4.8 length core, runtime overlay, frozen v4.2 card, and audited original length-pilot fit implementation."
+  },
+  "stage_gate": {
+    "evaluated_separately_by_mass": true,
+    "optimizer_integrity_scope": "At each mass, the full four-factor state lattice must be complete, with zero exclusions or invalid selected states and at least two repeats for every selected branch. Contact and plateau comparisons apply to the candidate-sentinel pair.",
+    "candidate_and_sentinel_exact_or_near_upper_contacts": 0,
+    "optimizer_exclusions": 0,
+    "invalid_selected_states": 0,
+    "minimum_top_branch_replicates": 2,
+    "maximum_abs_delta_lml_per_training_bin": 0.001,
+    "median_abs_delta_ell_over_sigma_x": 0.01,
+    "p95_abs_delta_ell_over_sigma_x": 0.03,
+    "maximum_abs_delta_ell_over_sigma_x": 0.05,
+    "quantile_method": "numpy linear",
+    "selection_rule": "Evaluate candidate 35 against sentinel 50 first, then candidate 50 against sentinel 75. Select the first pair passing every gate at every mass. There is no fallback.",
+    "confirmation_rule": "Evaluate only the frozen selected candidate and its sentinel on fresh toys 3-7. Final qualified-targeted status requires every confirmation gate at every mass; otherwise fail closed."
+  },
+  "information_firewall": {
+    "selection_and_confirmation_use_only_background_optimizer_quantities": true,
+    "inference_quantities_inspected_by_remediation_runner": false,
+    "forbidden_output_column_substrings": [
+      "ahat",
+      "amplitude",
+      "aup",
+      "cls",
+      "coverage",
+      "eps2",
+      "epsilon",
+      "limit",
+      "p0",
+      "pull",
+      "pvalue",
+      "qmu",
+      "recovery",
+      "sigmaa",
+      "signal_yield",
+      "upper_limit",
+      "zhat"
+    ]
+  },
+  "output_roots": {
+    "runs": "runs/residual_length_ceiling_remediation",
+    "derived": "derived/residual_length_ceiling_remediation",
+    "qa": "qa/residual_length_ceiling_remediation"
+  }
+}

@@ -1,0 +1,6283 @@
+{
+  "base_seed": 20260814,
+  "builder": {
+    "path": "build_residual_toys.py",
+    "sha256": "452a402f6c653ae09466e3e4d51e797e9af33b1222427836ee88916ab51755bc"
+  },
+  "claim_boundary": "Conditional source-conditioned stress diagnostics only; not physical background truth, observed-data bias, coverage, expected bands, limits, exclusions, or a production-card change.",
+  "closure_background_clusters": 80,
+  "edges": {
+    "high_GeV": 1.0,
+    "low_GeV": 0.0,
+    "n_bins": 8000,
+    "sha256_float64": "27c327aa0b477efd4851b64c5643e17e74398de5aa3f54416232111055aa63ef"
+  },
+  "model_streams_distinct": true,
+  "models": [
+    "knot_spline",
+    "regional_blend"
+  ],
+  "nested_poisson_within_source_family": true,
+  "phase_counts_per_model_scenario": {
+    "pilot": 3,
+    "toys": 20
+  },
+  "pilot_and_closure_streams_independent": true,
+  "promotion_scope": "requested conditional stress only",
+  "protocol": {
+    "path": "MODEL_PROTOCOL.json",
+    "sha256": "3a68c17913aa16567605399d91c14fb2ffe03aaaa6ccfa98084044514cbbd219"
+  },
+  "reported_scenarios": [
+    "2021_1pct",
+    "2021_1pct_x10",
+    "2021_1pct_x100",
+    "2021_10pct",
+    "2021_10pct_x10"
+  ],
+  "reserve_backgrounds": 0,
+  "root": {
+    "histograms_expected": 240,
+    "path": "inputs/residual_structured_nested_toys.root",
+    "sha256": "62938abcc35184ba03ce15d5533b1e6daff1c69c3742eb49143f95f46ebaaca0"
+  },
+  "schema_version": 1,
+  "source_families_distinct": true,
+  "source_fit_and_influence": {
+    "path": "derived/source_fit_and_influence.json",
+    "sha256": "f39bb7acdc73709abc2a2483c5d6e99b944c300415653fd692abcae68933ff0e"
+  },
+  "study_id": "v4p8p3_2021_residual_truths_20260814",
+  "toys": [
+    {
+      "counts_sha256_int64": "c002b1140eb475d11ddb299aeae7e2a53ba0121aae9eaa850e7b20443cee838e",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_1pct/toy_0000",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        0,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        205219089,
+        845351773,
+        388473984,
+        4156955239
+      ],
+      "source_family": "one_pct",
+      "total": 12501332,
+      "toy_index": 0
+    },
+    {
+      "counts_sha256_int64": "e495fb295cd3c7ae6d1eb3431b2c99b9b40de77f12fdf3f5c9f641df6d5cb3f9",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "ab4c7ab91647a0abfbe8daad091b4ab84637cd48804d679cf5ab75d6b33af722",
+      "key": "toys/knot_spline/2021_1pct_x10/toy_0000",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        0,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        1604160002,
+        2492742949,
+        2430024309,
+        1647134708
+      ],
+      "source_family": "one_pct",
+      "total": 125032508,
+      "toy_index": 0
+    },
+    {
+      "counts_sha256_int64": "5d644d5e6c6039ba170b6456e575fb081320717ccac79349a961c6e14c1c0dd6",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "18d42b6ee10ec740c80c00ec88c6c35145e4f08dde61413f4c145b4e89d52233",
+      "key": "toys/knot_spline/2021_1pct_x100/toy_0000",
+      "model": "knot_spline",
+      "multiplier": 100,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        0,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        912509647,
+        23617537,
+        2201359220,
+        2423582817
+      ],
+      "source_family": "one_pct",
+      "total": 1250397520,
+      "toy_index": 0
+    },
+    {
+      "counts_sha256_int64": "bb193a54a0baf7843843de7d66973283c6d042f14c035cc7510f41d03cfbb225",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_10pct/toy_0000",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        0,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        2704172455,
+        1991092606,
+        314808327,
+        1553846256
+      ],
+      "source_family": "ten_pct",
+      "total": 141258901,
+      "toy_index": 0
+    },
+    {
+      "counts_sha256_int64": "0b8f114769daa6045ad0ff5b8eb80705b5ae8f2cea242d6fa5a5fdcc6d70dfe8",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "29cafb42a4bfdf0e0bc4a56f016d6d5f732bfcf6ea9d34902a0d534ee0f7e6dd",
+      "key": "toys/knot_spline/2021_10pct_x10/toy_0000",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        0,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        1187187670,
+        1457601170,
+        4071414111,
+        3719856681
+      ],
+      "source_family": "ten_pct",
+      "total": 1412483119,
+      "toy_index": 0
+    },
+    {
+      "counts_sha256_int64": "b30377de1c30bb618257f6f5b88831e31d0c4a40f743a4590f188b378d77025b",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_1pct/toy_0001",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        1,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        3447827629,
+        235065624,
+        3214492559,
+        1743786348
+      ],
+      "source_family": "one_pct",
+      "total": 12503272,
+      "toy_index": 1
+    },
+    {
+      "counts_sha256_int64": "58ed4df27ac70aa99c644f350614a3751355877563717a2e1f814e9f6986bb0d",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "75dd07b43d3c5f47982ea8fe7b8acf50fda3ec0f77bbc1c98e4b77a178e174bb",
+      "key": "toys/knot_spline/2021_1pct_x10/toy_0001",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        1,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        2611655336,
+        2099927971,
+        2569954257,
+        2450631433
+      ],
+      "source_family": "one_pct",
+      "total": 125041271,
+      "toy_index": 1
+    },
+    {
+      "counts_sha256_int64": "728bc77feed8be76542ba83f5ed4f30e97b5e239e316ad437101c90640f988b5",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "3f934e078f24161b242e11f710664da97eb1151fc4f14e5520940f98eb93d0df",
+      "key": "toys/knot_spline/2021_1pct_x100/toy_0001",
+      "model": "knot_spline",
+      "multiplier": 100,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        1,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        2217923586,
+        2140207892,
+        3740321580,
+        3369205561
+      ],
+      "source_family": "one_pct",
+      "total": 1250367331,
+      "toy_index": 1
+    },
+    {
+      "counts_sha256_int64": "9a4b664e2a7af3a932ddd51af63ce9f57795178697b170d5470f816be6d3d293",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_10pct/toy_0001",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        1,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        3109575258,
+        271931670,
+        2682542642,
+        3285561078
+      ],
+      "source_family": "ten_pct",
+      "total": 141263047,
+      "toy_index": 1
+    },
+    {
+      "counts_sha256_int64": "3835990a2dcbc2618457d072f9c41c89adc1eb7833ac041c35bd22bff8afb30b",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "ed46590735e95d6ba2cf4e34b2564a8c7eb377a826209977226ff0ce65201bd8",
+      "key": "toys/knot_spline/2021_10pct_x10/toy_0001",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        1,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        1218386493,
+        159144276,
+        3961349344,
+        2061007380
+      ],
+      "source_family": "ten_pct",
+      "total": 1412531939,
+      "toy_index": 1
+    },
+    {
+      "counts_sha256_int64": "3e88d850b7467362704569b9b2292f8aba70cfc33b00cd704381752b8eb6b86d",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_1pct/toy_0002",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        2,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        2684289853,
+        3183828707,
+        2411228577,
+        421658116
+      ],
+      "source_family": "one_pct",
+      "total": 12497986,
+      "toy_index": 2
+    },
+    {
+      "counts_sha256_int64": "438e697f4842d1c5ad6f74577b86a6fc5681412d10734adb56ddf1dcf4cf3b89",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "9d0aed9289386b2aa6a8685a47d8c11e7d17f83e3e2015f9ed60f9649fbd0b1f",
+      "key": "toys/knot_spline/2021_1pct_x10/toy_0002",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        2,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        545048899,
+        1680789055,
+        3896335686,
+        3874258644
+      ],
+      "source_family": "one_pct",
+      "total": 125018131,
+      "toy_index": 2
+    },
+    {
+      "counts_sha256_int64": "c1d38691a461aa099c5ac4682fdd3d9aaf1c4b4308b8e12fe082c7407249bd68",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "e5f4a8cf065b41325e0ffaeab923a2a7e6491e9fb1da9f5432a6c1da8b1b3207",
+      "key": "toys/knot_spline/2021_1pct_x100/toy_0002",
+      "model": "knot_spline",
+      "multiplier": 100,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        2,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        3748788900,
+        3742099608,
+        2551105420,
+        1553930623
+      ],
+      "source_family": "one_pct",
+      "total": 1250389118,
+      "toy_index": 2
+    },
+    {
+      "counts_sha256_int64": "e4ada01507fb73a0418bb0d596cda288055c47274425122fa1dc1da8b07d4e95",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_10pct/toy_0002",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        2,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        1165186944,
+        2446959660,
+        1888649793,
+        2297111305
+      ],
+      "source_family": "ten_pct",
+      "total": 141248361,
+      "toy_index": 2
+    },
+    {
+      "counts_sha256_int64": "7769187dab6142d05cbc92f47eccca9609310f3ddec81106fe33426e18251bc6",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "2058729649138875d6bf130e760f50d0e708862c8402b6be421dc2df6617da11",
+      "key": "toys/knot_spline/2021_10pct_x10/toy_0002",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        2,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        174860845,
+        2875015286,
+        1448582280,
+        3038045033
+      ],
+      "source_family": "ten_pct",
+      "total": 1412481966,
+      "toy_index": 2
+    },
+    {
+      "counts_sha256_int64": "bbe3410889a3feb7fb36a7e95613be3d226016df84a0c20fc55a599b694e3b0f",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_1pct/toy_0003",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        3,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        1150509430,
+        512003204,
+        869869479,
+        917774934
+      ],
+      "source_family": "one_pct",
+      "total": 12504904,
+      "toy_index": 3
+    },
+    {
+      "counts_sha256_int64": "d830dd80fba445edb464966e91165b250f29a8c1b198f6d6e40c7e0f473efcfd",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "6ce4cae2f04f9685de77f196b9624c9962a0bab0d0f7e6a9f9086598c82fbe52",
+      "key": "toys/knot_spline/2021_1pct_x10/toy_0003",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        3,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        4085986125,
+        2523835800,
+        1759203184,
+        4291835692
+      ],
+      "source_family": "one_pct",
+      "total": 125044773,
+      "toy_index": 3
+    },
+    {
+      "counts_sha256_int64": "cf956c8637b5da6feffe91dddeaf278d40a7bf857681c7ba07c8064b05dd8f43",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "e9d63ea4b80c62e534748393876cc06d16899a7e962312c8c7919a23b25e855d",
+      "key": "toys/knot_spline/2021_1pct_x100/toy_0003",
+      "model": "knot_spline",
+      "multiplier": 100,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        3,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        2385684252,
+        3129775815,
+        904483112,
+        3920485015
+      ],
+      "source_family": "one_pct",
+      "total": 1250405966,
+      "toy_index": 3
+    },
+    {
+      "counts_sha256_int64": "e7fba43598161ab7ea10215c637ac865cb69d21d7a19a0082989dd27d6a1b850",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_10pct/toy_0003",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        3,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        207224678,
+        692247227,
+        2975152861,
+        3894185168
+      ],
+      "source_family": "ten_pct",
+      "total": 141256329,
+      "toy_index": 3
+    },
+    {
+      "counts_sha256_int64": "c6330d1e747ac9b458995f2d8f8775b8e37d918b6e4a159139b80f7a87b4e4c6",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "a45a8de4c93bbf41d9011f39c477ce55d41f98e80550def3f6b5859af59ed5d1",
+      "key": "toys/knot_spline/2021_10pct_x10/toy_0003",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        3,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        2649907112,
+        357738131,
+        1313848665,
+        942552809
+      ],
+      "source_family": "ten_pct",
+      "total": 1412475985,
+      "toy_index": 3
+    },
+    {
+      "counts_sha256_int64": "baf50f9175445d91a0a59e2dfbcd6351f8dfd6bfc9a8344214ee7f539bdd1927",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_1pct/toy_0004",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        4,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        1081466437,
+        1167119575,
+        1263760097,
+        3955847686
+      ],
+      "source_family": "one_pct",
+      "total": 12501793,
+      "toy_index": 4
+    },
+    {
+      "counts_sha256_int64": "621cdc993126d624df88dde8a36a3cb44797c5786460710dc472e00b0d0ef344",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "de203378e308124ef628c0ddee6873423ec3187f2d51468ad9710c00c54fb851",
+      "key": "toys/knot_spline/2021_1pct_x10/toy_0004",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        4,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        3447007015,
+        2226693559,
+        2205124049,
+        1474651546
+      ],
+      "source_family": "one_pct",
+      "total": 125033903,
+      "toy_index": 4
+    },
+    {
+      "counts_sha256_int64": "833169ff284150d9877cba60daf8bf0729c78a887ccf433c3a3d370840534a18",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "c84834c54603021f335b1fe97515cf0c4d075f9bc4fbe68eabc0ef1846edb1c6",
+      "key": "toys/knot_spline/2021_1pct_x100/toy_0004",
+      "model": "knot_spline",
+      "multiplier": 100,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        4,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        1598105520,
+        3268597816,
+        2238680344,
+        3492365437
+      ],
+      "source_family": "one_pct",
+      "total": 1250345876,
+      "toy_index": 4
+    },
+    {
+      "counts_sha256_int64": "6f0b3a26f73d8ed363ba2b87433f28cda57531bc78c1adfd6033b8ed99c7ddca",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_10pct/toy_0004",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        4,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        1454669369,
+        1647611998,
+        1918822250,
+        2357729626
+      ],
+      "source_family": "ten_pct",
+      "total": 141239787,
+      "toy_index": 4
+    },
+    {
+      "counts_sha256_int64": "2c6dd82492a3db56cadc6b611871e64b3fd42f5914bbc56d0e21d3d5c5cb3973",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "28fff94533063574c763a56be314f636f7052a772e653b29598ec3d445273fba",
+      "key": "toys/knot_spline/2021_10pct_x10/toy_0004",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        4,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        3647957957,
+        3049628939,
+        439910288,
+        1866598809
+      ],
+      "source_family": "ten_pct",
+      "total": 1412485266,
+      "toy_index": 4
+    },
+    {
+      "counts_sha256_int64": "4381b9bd39fa107c0735c55c6af8db68d84491aa81bd328f12e4709527667d3a",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_1pct/toy_0005",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        5,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        2638834118,
+        2249681929,
+        2052181051,
+        3668865533
+      ],
+      "source_family": "one_pct",
+      "total": 12503587,
+      "toy_index": 5
+    },
+    {
+      "counts_sha256_int64": "a0681505e30a9dbbf0699358127bd6e60102a7fdf985541ec8b8db43ca2fc53a",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "84ba6714181f9950250bef3195f45fb8a5ce5c9d65eb361cd398ea9f7ba0902e",
+      "key": "toys/knot_spline/2021_1pct_x10/toy_0005",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        5,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        1061250299,
+        3737140264,
+        3416389343,
+        1672187696
+      ],
+      "source_family": "one_pct",
+      "total": 125042742,
+      "toy_index": 5
+    },
+    {
+      "counts_sha256_int64": "025f2b35452571cb89926c90684db97ce0295eb978f2def697cb3fa74adcf961",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "f5f1f8ff51cb47a7d2ad3bb74d59534b362beb6adacf1118d4023f3629b7ab52",
+      "key": "toys/knot_spline/2021_1pct_x100/toy_0005",
+      "model": "knot_spline",
+      "multiplier": 100,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        5,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        1527175140,
+        283282839,
+        2817101948,
+        1895307437
+      ],
+      "source_family": "one_pct",
+      "total": 1250410453,
+      "toy_index": 5
+    },
+    {
+      "counts_sha256_int64": "d3c12380967e315a75a033fa0ad0412b174a82e95ce7aa89b45599a647aa9481",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_10pct/toy_0005",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        5,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        2079631221,
+        559989245,
+        1227292023,
+        501144620
+      ],
+      "source_family": "ten_pct",
+      "total": 141240021,
+      "toy_index": 5
+    },
+    {
+      "counts_sha256_int64": "c136dd7a9269ab0cee766929321550addf6a1fd9eec93453a468ec35a5058b2e",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "a2c677f25e48dd2dd482a7741d7845412f88add373398ad7646d4b26c87733ba",
+      "key": "toys/knot_spline/2021_10pct_x10/toy_0005",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        5,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        1683827448,
+        3870726498,
+        4049061021,
+        1750465596
+      ],
+      "source_family": "ten_pct",
+      "total": 1412494218,
+      "toy_index": 5
+    },
+    {
+      "counts_sha256_int64": "4a82d13c9d8fd3b01858d220f92bf51650bd5539a1f39b83af4032606d5e62a9",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_1pct/toy_0006",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        6,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        4134230799,
+        1394262160,
+        3327026302,
+        360257622
+      ],
+      "source_family": "one_pct",
+      "total": 12502591,
+      "toy_index": 6
+    },
+    {
+      "counts_sha256_int64": "66646ab5e55c797610025c0cf9f0d575f4c71cfa78aee25ac377c2efbd367098",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "33a16d1375f02f340eed62e3a318b757568ac25d72e391363ae61e350960c472",
+      "key": "toys/knot_spline/2021_1pct_x10/toy_0006",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        6,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        3770984317,
+        1814626433,
+        1088602448,
+        3067039781
+      ],
+      "source_family": "one_pct",
+      "total": 125047023,
+      "toy_index": 6
+    },
+    {
+      "counts_sha256_int64": "776d4e17f8f2d02b7db130c7b25e4acced269b13682c40bd62d4aa044cd9a487",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "406cf264c6a876c2ac60bcde3cd2293b677756b75be427e6a781fae00c755421",
+      "key": "toys/knot_spline/2021_1pct_x100/toy_0006",
+      "model": "knot_spline",
+      "multiplier": 100,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        6,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        3125270119,
+        865172524,
+        284777305,
+        321009375
+      ],
+      "source_family": "one_pct",
+      "total": 1250364965,
+      "toy_index": 6
+    },
+    {
+      "counts_sha256_int64": "1f68204379649f9e0fbc0014fef4ee6862f6a533b9c337300ab2a7fdf7c33cf4",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_10pct/toy_0006",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        6,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        191163953,
+        3347835240,
+        3945697053,
+        953576820
+      ],
+      "source_family": "ten_pct",
+      "total": 141238656,
+      "toy_index": 6
+    },
+    {
+      "counts_sha256_int64": "87a606f50d4294dbc0883f177a27cdc3e64080e6f4c7abb747116421db4957e9",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "76bd01d06c4db8eeaaec1b78903e7f214325a17402cfff4e49c7002689f2ba93",
+      "key": "toys/knot_spline/2021_10pct_x10/toy_0006",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        6,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        3221523873,
+        2536941001,
+        1879667578,
+        491127614
+      ],
+      "source_family": "ten_pct",
+      "total": 1412494551,
+      "toy_index": 6
+    },
+    {
+      "counts_sha256_int64": "95292961f4198917fcd86174052828947d8af8535e9016ca6c9d8761c9ae1bcd",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_1pct/toy_0007",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        7,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        2816135150,
+        4194450399,
+        2993174947,
+        2253845550
+      ],
+      "source_family": "one_pct",
+      "total": 12503881,
+      "toy_index": 7
+    },
+    {
+      "counts_sha256_int64": "cb0ba9ae67dde33c73bcac0c5fa57e34224d39a383eac17bdfe5de1fddff97cd",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "e3de481e729e6e8db996bb767f734b32bec0363ee128bab06802b62e0c4fc807",
+      "key": "toys/knot_spline/2021_1pct_x10/toy_0007",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        7,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        1172808352,
+        4222345233,
+        3858342830,
+        1568549004
+      ],
+      "source_family": "one_pct",
+      "total": 125055152,
+      "toy_index": 7
+    },
+    {
+      "counts_sha256_int64": "fed60e94a91d2efd92d032673237049bb3cc7ff124939c583acb7d5c8ab4e16a",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "8caf6593539cff2ff201a8442ffdf17d7e98251755cdb58af02628cc8c5eeb9e",
+      "key": "toys/knot_spline/2021_1pct_x100/toy_0007",
+      "model": "knot_spline",
+      "multiplier": 100,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        7,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        2798302913,
+        1452101189,
+        3902150240,
+        2549093672
+      ],
+      "source_family": "one_pct",
+      "total": 1250426465,
+      "toy_index": 7
+    },
+    {
+      "counts_sha256_int64": "e0599546111474b3e65ad94c29d03dc057a97c8e2ea31c8e3ac950053846a326",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_10pct/toy_0007",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        7,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        3014573550,
+        2491047454,
+        98648972,
+        2560969172
+      ],
+      "source_family": "ten_pct",
+      "total": 141216449,
+      "toy_index": 7
+    },
+    {
+      "counts_sha256_int64": "64a9a0bf7d49affa2f035be7c5bb25b5aab8071f2faa892c9e1db996b7e3ce85",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "62c0dfec8b72165598c28b3879d6ed4876c9db7f4a9f83ae48b8b7b0694d600a",
+      "key": "toys/knot_spline/2021_10pct_x10/toy_0007",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        7,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        3899763748,
+        3798011500,
+        3513660443,
+        452106893
+      ],
+      "source_family": "ten_pct",
+      "total": 1412542035,
+      "toy_index": 7
+    },
+    {
+      "counts_sha256_int64": "8964d9306c0f9dd02134f028fcf4a8e090c55d5a502b840cc7712b8bc085f0ae",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_1pct/toy_0008",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        8,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        1622332202,
+        4283537698,
+        2027934276,
+        3298031648
+      ],
+      "source_family": "one_pct",
+      "total": 12499177,
+      "toy_index": 8
+    },
+    {
+      "counts_sha256_int64": "c17c358e676f5bdf3df3e76e3ede0f92f3ed2c27235cbe71a93c996ce4b8a4ec",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "7207a876cd939d50928b7179d20732e5599c4242a97f522fb57086ebf26d8f52",
+      "key": "toys/knot_spline/2021_1pct_x10/toy_0008",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        8,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        13252746,
+        3256498690,
+        2258713486,
+        1421729731
+      ],
+      "source_family": "one_pct",
+      "total": 125031734,
+      "toy_index": 8
+    },
+    {
+      "counts_sha256_int64": "7675442e51b22285e71ae9db514acff6af0cb8f5767f275663c716d138d00421",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "93164a1d617abf6ccbad8d26b93c0ec3c87d6835e8ab90ca5110551ce1bc2dd2",
+      "key": "toys/knot_spline/2021_1pct_x100/toy_0008",
+      "model": "knot_spline",
+      "multiplier": 100,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        8,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        2649432723,
+        2627973671,
+        3436465893,
+        1144604011
+      ],
+      "source_family": "one_pct",
+      "total": 1250393922,
+      "toy_index": 8
+    },
+    {
+      "counts_sha256_int64": "8077230342dda813fd0aed0f625a4c8ba3244edcd8e910634277b400a933ede7",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_10pct/toy_0008",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        8,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        3653473099,
+        1733127642,
+        1269422453,
+        2788709932
+      ],
+      "source_family": "ten_pct",
+      "total": 141243175,
+      "toy_index": 8
+    },
+    {
+      "counts_sha256_int64": "b4a41983abe2066ccc636624cb76b64b32acf528919a38143a98e34c0aaaf5f4",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "8ebbd9cfde49c3d3b340f2756b1039471f6f4181f8e494b3fcfeee691212f625",
+      "key": "toys/knot_spline/2021_10pct_x10/toy_0008",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        8,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        3412677028,
+        3528855099,
+        2819127703,
+        436286427
+      ],
+      "source_family": "ten_pct",
+      "total": 1412483104,
+      "toy_index": 8
+    },
+    {
+      "counts_sha256_int64": "ceb865d8a00c9bc3dabbece4a42d06ab57ba307013ac654c6ee0d8d98a0814d4",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_1pct/toy_0009",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        9,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        2886712935,
+        3857851228,
+        2613511050,
+        1472832981
+      ],
+      "source_family": "one_pct",
+      "total": 12507013,
+      "toy_index": 9
+    },
+    {
+      "counts_sha256_int64": "d6690c9d379fbbbcf64b7338c4dcdf8ee41d28b45427f24ffb64d8055152df85",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "d9fd534249dae11558894f50302b0f2b17dca5644dab129b3f5bfe628a8e4728",
+      "key": "toys/knot_spline/2021_1pct_x10/toy_0009",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        9,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        3315007765,
+        420128146,
+        3807431293,
+        3555198876
+      ],
+      "source_family": "one_pct",
+      "total": 125051196,
+      "toy_index": 9
+    },
+    {
+      "counts_sha256_int64": "4b7003629641152b98c977de524c8e43237afbbf5d014e3f066ce6b57c513199",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "99748b5c2aa41cb59019773440ec91008a23513c5bfe888033dd6912c698fb6c",
+      "key": "toys/knot_spline/2021_1pct_x100/toy_0009",
+      "model": "knot_spline",
+      "multiplier": 100,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        9,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        722993525,
+        3574321605,
+        958722523,
+        311614043
+      ],
+      "source_family": "one_pct",
+      "total": 1250404284,
+      "toy_index": 9
+    },
+    {
+      "counts_sha256_int64": "90433af01a6f66e8e90520e5cce5e6a09aa3ef03785c0827dfaa12939091ecac",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_10pct/toy_0009",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        9,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        2014921615,
+        3169459539,
+        3612854135,
+        1092458720
+      ],
+      "source_family": "ten_pct",
+      "total": 141254507,
+      "toy_index": 9
+    },
+    {
+      "counts_sha256_int64": "f073cd011f6c2356d76ed7c91e6c00d3e943b2804355de876e4e2e742bf4d745",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "b8e0b30b6ecc6f074501e6aab9eabb423c781dc5ed79c653a5112048aff04ce8",
+      "key": "toys/knot_spline/2021_10pct_x10/toy_0009",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        9,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        1915331265,
+        2407568594,
+        1001266073,
+        3193895997
+      ],
+      "source_family": "ten_pct",
+      "total": 1412533812,
+      "toy_index": 9
+    },
+    {
+      "counts_sha256_int64": "d0a014f921521c6c7aab4d93a4314150c2853bbb85f27b57ab6a1baffd8bfa7a",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_1pct/toy_0010",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        10,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        1475629111,
+        812929430,
+        4021747582,
+        2436527918
+      ],
+      "source_family": "one_pct",
+      "total": 12503340,
+      "toy_index": 10
+    },
+    {
+      "counts_sha256_int64": "19d0ff0fc9a7e4226814d4e3ca08bd58033bff36ac7da856c2f0a53e4899d067",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "2384b2abe0fc8bed7b277001fc377d41ee852cb5efc1910c3b461a336781ab47",
+      "key": "toys/knot_spline/2021_1pct_x10/toy_0010",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        10,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        2146320390,
+        275335209,
+        3060255893,
+        2011061567
+      ],
+      "source_family": "one_pct",
+      "total": 125055251,
+      "toy_index": 10
+    },
+    {
+      "counts_sha256_int64": "4265e4e274f7548756f2bae7ec06a556a9e9c5cc44025535618e5c09e584ffe0",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "aac4ec067ac552c88a2067e4fa5055016f43966e058ae00d9b02439ddd008522",
+      "key": "toys/knot_spline/2021_1pct_x100/toy_0010",
+      "model": "knot_spline",
+      "multiplier": 100,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        10,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        1979193833,
+        1208771976,
+        4079372171,
+        2920284444
+      ],
+      "source_family": "one_pct",
+      "total": 1250364041,
+      "toy_index": 10
+    },
+    {
+      "counts_sha256_int64": "383766757e309887c1a412d4cc12f00e1863b6a90d63b923dd3ef789255ade53",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_10pct/toy_0010",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        10,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        761538949,
+        1929605370,
+        2454284347,
+        2955641030
+      ],
+      "source_family": "ten_pct",
+      "total": 141247834,
+      "toy_index": 10
+    },
+    {
+      "counts_sha256_int64": "a44a8a282afaa89c9f8d11432f4abe0c773fdf24182a9000318968c3fca3b342",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "5f8dc00821fc9a0f2324a3486779b68ace9c9b044e0eaff4cee5c1d2a734052e",
+      "key": "toys/knot_spline/2021_10pct_x10/toy_0010",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        10,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        2122478014,
+        682550349,
+        2782674418,
+        1306664495
+      ],
+      "source_family": "ten_pct",
+      "total": 1412511515,
+      "toy_index": 10
+    },
+    {
+      "counts_sha256_int64": "3e6b7a1a6808151fba2a4852cd3f8cef8edf5d42aa161913602eab32b08dce5b",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_1pct/toy_0011",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        11,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        1026348191,
+        3596753196,
+        2574161285,
+        1852652416
+      ],
+      "source_family": "one_pct",
+      "total": 12505527,
+      "toy_index": 11
+    },
+    {
+      "counts_sha256_int64": "711f50c05cf32f23e7bc940daf55b0e420298a946236cd1aa107e7ab5d60d1fe",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "3a047ea2571ee7afb4426010367733f4e950701fc041aaf7128919256a6c2695",
+      "key": "toys/knot_spline/2021_1pct_x10/toy_0011",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        11,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        582631367,
+        3967015854,
+        3097095701,
+        1689472786
+      ],
+      "source_family": "one_pct",
+      "total": 125063938,
+      "toy_index": 11
+    },
+    {
+      "counts_sha256_int64": "135c870b238edb36b510192ed308d542889508a16d92b291b2db7097df4eff61",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "c7758dae7ab0aec0d29674008420dff51e01f44bce56fd8b401c800f66bb2e87",
+      "key": "toys/knot_spline/2021_1pct_x100/toy_0011",
+      "model": "knot_spline",
+      "multiplier": 100,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        11,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        4023915697,
+        2060290370,
+        2252604415,
+        1406109826
+      ],
+      "source_family": "one_pct",
+      "total": 1250430472,
+      "toy_index": 11
+    },
+    {
+      "counts_sha256_int64": "aca75e118156b13a34c1a6aa17ef6b5200e9efc6e691944907f9cf3818321cb7",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_10pct/toy_0011",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        11,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        157472090,
+        1522472697,
+        3979963036,
+        3032328453
+      ],
+      "source_family": "ten_pct",
+      "total": 141240572,
+      "toy_index": 11
+    },
+    {
+      "counts_sha256_int64": "eefdc5ff95cd974cc9b72cf9e1069b74af73a35d5ae163fda3ae343584ddbe9a",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "662a558b107139a1d1870781135f563672c83e2eb2141a809957f7f124eb5ff7",
+      "key": "toys/knot_spline/2021_10pct_x10/toy_0011",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        11,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        2392250478,
+        2322931299,
+        1349603606,
+        2094703237
+      ],
+      "source_family": "ten_pct",
+      "total": 1412529834,
+      "toy_index": 11
+    },
+    {
+      "counts_sha256_int64": "6f9bfe68e03a0ee93507b1fbbb6779b49e3dddd3ac521905070ed73b3dbba22e",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_1pct/toy_0012",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        12,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        3427823132,
+        3233327391,
+        2823751728,
+        2225575222
+      ],
+      "source_family": "one_pct",
+      "total": 12503042,
+      "toy_index": 12
+    },
+    {
+      "counts_sha256_int64": "cd1af0292b4700f01948344c254da9ba0e7af5ec04149ff230bd36e5ad4052a5",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "dba155e2e621a237be7253bd94a14f03fb632fc6c0d601768a00c4e4e3749945",
+      "key": "toys/knot_spline/2021_1pct_x10/toy_0012",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        12,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        2403216057,
+        3310004889,
+        3299676453,
+        2253413344
+      ],
+      "source_family": "one_pct",
+      "total": 125024050,
+      "toy_index": 12
+    },
+    {
+      "counts_sha256_int64": "3113c78bb55ce9c4d6e50c759883ebd55dc2fd6fa2f79f9612413f8bc7115186",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "b9982fee121813c91c43b550f928ce12c4ba3efd80a2701b65f7b7c32a66cd76",
+      "key": "toys/knot_spline/2021_1pct_x100/toy_0012",
+      "model": "knot_spline",
+      "multiplier": 100,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        12,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        462561231,
+        3675536191,
+        2758301699,
+        2251112972
+      ],
+      "source_family": "one_pct",
+      "total": 1250330622,
+      "toy_index": 12
+    },
+    {
+      "counts_sha256_int64": "871340ee87e3a5af5922768fe4d9bf92cd27e4e74c62a7ef5e559a89c2ec4a83",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_10pct/toy_0012",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        12,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        783393357,
+        1037100090,
+        837968665,
+        126030873
+      ],
+      "source_family": "ten_pct",
+      "total": 141242994,
+      "toy_index": 12
+    },
+    {
+      "counts_sha256_int64": "a43045cb785be42377fafc7624e3fb7158fd03052a0220be62c64846f113a2d3",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "c6138ffe622155372a0471597db7010a41284bef188d887f72f6f19057ec943c",
+      "key": "toys/knot_spline/2021_10pct_x10/toy_0012",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        12,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        2497638609,
+        1500009826,
+        310122121,
+        3859312148
+      ],
+      "source_family": "ten_pct",
+      "total": 1412485672,
+      "toy_index": 12
+    },
+    {
+      "counts_sha256_int64": "267a228647613b0eb3014abae5865cc7e72bca51bcf57b54a3576e37b974ee1d",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_1pct/toy_0013",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        13,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        2189349455,
+        4044192709,
+        2009310702,
+        246134628
+      ],
+      "source_family": "one_pct",
+      "total": 12498631,
+      "toy_index": 13
+    },
+    {
+      "counts_sha256_int64": "09e12425eaf64e026ca2472a985745a48aa09ba5a6c6a3669b067a1f813242bd",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "88bbd5bca4b6e5ef67692828b6fc277d1de3b509441be1df528cfbfb30772bf1",
+      "key": "toys/knot_spline/2021_1pct_x10/toy_0013",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        13,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        1650947853,
+        2169266247,
+        3571010679,
+        1634915291
+      ],
+      "source_family": "one_pct",
+      "total": 125050603,
+      "toy_index": 13
+    },
+    {
+      "counts_sha256_int64": "7f612d6362ab1d26765b365b17bba0a75773e66a07c59de3f00b47113a0a950f",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "33a15d80a102590a382a5bc120103d94da947197e29d188e09d38bd4393e3e4b",
+      "key": "toys/knot_spline/2021_1pct_x100/toy_0013",
+      "model": "knot_spline",
+      "multiplier": 100,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        13,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        1236979805,
+        2291660356,
+        1058580741,
+        260087914
+      ],
+      "source_family": "one_pct",
+      "total": 1250403482,
+      "toy_index": 13
+    },
+    {
+      "counts_sha256_int64": "4785463242a2f101f9ae08d5930be631b8a4986fe18a7a09146e68498024826d",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_10pct/toy_0013",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        13,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        103294680,
+        689242961,
+        2438727522,
+        3750329387
+      ],
+      "source_family": "ten_pct",
+      "total": 141259887,
+      "toy_index": 13
+    },
+    {
+      "counts_sha256_int64": "f0c553825cb0d9e7b559d6689145b19050adca7d26f836813ddfbfe9f65198d8",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "9046e7d802e740c357784a2ca48a1b8a3192a8190670ea692d7b6fb477530f13",
+      "key": "toys/knot_spline/2021_10pct_x10/toy_0013",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        13,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        779861132,
+        3916528644,
+        2966268475,
+        1308208934
+      ],
+      "source_family": "ten_pct",
+      "total": 1412477817,
+      "toy_index": 13
+    },
+    {
+      "counts_sha256_int64": "79362c01e917101a1ebe9955cf119d7c87173412cc7ddf9afdcb08d0e27e8fa6",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_1pct/toy_0014",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        14,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        333765166,
+        3775892727,
+        1695480867,
+        1074293285
+      ],
+      "source_family": "one_pct",
+      "total": 12506634,
+      "toy_index": 14
+    },
+    {
+      "counts_sha256_int64": "1059698bb251906c42b0db217c550bb696a2cbb20e14fef4d507a5ef9e8c6b1a",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "7f2b571e846a0e471d1c0b7f243336d86caf5300fd3e58443f681df54f4e9132",
+      "key": "toys/knot_spline/2021_1pct_x10/toy_0014",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        14,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        3682749989,
+        3295045825,
+        418509354,
+        595164336
+      ],
+      "source_family": "one_pct",
+      "total": 125036865,
+      "toy_index": 14
+    },
+    {
+      "counts_sha256_int64": "0ef36b98c9bead058cacb72e87aa1946f85cd432429671a18ff8cf9923259886",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "6e62a28172d4014d1cc5c55ae7fac1dfdf06175db75da152212e9b6e275c9956",
+      "key": "toys/knot_spline/2021_1pct_x100/toy_0014",
+      "model": "knot_spline",
+      "multiplier": 100,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        14,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        4196339243,
+        4143440891,
+        3265028749,
+        196083243
+      ],
+      "source_family": "one_pct",
+      "total": 1250406091,
+      "toy_index": 14
+    },
+    {
+      "counts_sha256_int64": "b15a9e3df8401779290b46f092b389f003dba918cd9d50d6965b0b43f4a9fb4b",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_10pct/toy_0014",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        14,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        3167585954,
+        4271460040,
+        2204673380,
+        3221054591
+      ],
+      "source_family": "ten_pct",
+      "total": 141246107,
+      "toy_index": 14
+    },
+    {
+      "counts_sha256_int64": "fb01883a4a5c6a559e1243ded19a48af8277a55c3979ebffed7edcd6233b5bd3",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "f6aa33d333dd5de1cbfcb73b556c79485c0f2616d4c21668eb6199ab1aac31ba",
+      "key": "toys/knot_spline/2021_10pct_x10/toy_0014",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        14,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        1770435287,
+        3302094064,
+        2813061639,
+        89813763
+      ],
+      "source_family": "ten_pct",
+      "total": 1412512768,
+      "toy_index": 14
+    },
+    {
+      "counts_sha256_int64": "5247bc7db6b4744e068846ee8b2ecdd94fd1cb35373bc1be1dd0e263df81964d",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_1pct/toy_0015",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        15,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        3514589395,
+        2715184783,
+        496570583,
+        3231771729
+      ],
+      "source_family": "one_pct",
+      "total": 12504779,
+      "toy_index": 15
+    },
+    {
+      "counts_sha256_int64": "930b4c5d5dba9e474f69b74ace60b8e5d9d64c65f5eea342c04a41c42a4c1414",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "10cd6b7c2a2d89d6343cfcc5e0fe106aeb4038f6039ffe94c79021ecf62a8c3a",
+      "key": "toys/knot_spline/2021_1pct_x10/toy_0015",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        15,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        3395717608,
+        1253462364,
+        258219683,
+        895500850
+      ],
+      "source_family": "one_pct",
+      "total": 125038390,
+      "toy_index": 15
+    },
+    {
+      "counts_sha256_int64": "29f409fd447bbf50ab9a2e34b360ebc7d471eb8e895d213f37ed1245752a67b2",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "9e281cd40378564563a77f003449a7a966a2afb01d9ef1b2fab8ef4760a45bf5",
+      "key": "toys/knot_spline/2021_1pct_x100/toy_0015",
+      "model": "knot_spline",
+      "multiplier": 100,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        15,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        2425739047,
+        1948074536,
+        1935636011,
+        1773506764
+      ],
+      "source_family": "one_pct",
+      "total": 1250330834,
+      "toy_index": 15
+    },
+    {
+      "counts_sha256_int64": "1faa2687783641b654d8b31c489326b7c79578035d992bbfa3057af8557aa6e6",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_10pct/toy_0015",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        15,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        2601132799,
+        358989837,
+        1962544037,
+        615030656
+      ],
+      "source_family": "ten_pct",
+      "total": 141243727,
+      "toy_index": 15
+    },
+    {
+      "counts_sha256_int64": "097721ad9353f22bc9d61dd4da1d29585360ba9258fc604b1e54e3501530bee1",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "a684b4ac59952c0fbf4f63c245a2857802dac911ac25c7101ff5be83ae92bc44",
+      "key": "toys/knot_spline/2021_10pct_x10/toy_0015",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        15,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        3929888537,
+        3330195198,
+        4102311252,
+        4016993115
+      ],
+      "source_family": "ten_pct",
+      "total": 1412516831,
+      "toy_index": 15
+    },
+    {
+      "counts_sha256_int64": "1c8c0ba0f6c6b4c4511b69b8d03043472ef37e8ff31ce9b5d41edc4c384152c6",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_1pct/toy_0016",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        16,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        1811086466,
+        3406451398,
+        2835416786,
+        3101722925
+      ],
+      "source_family": "one_pct",
+      "total": 12500184,
+      "toy_index": 16
+    },
+    {
+      "counts_sha256_int64": "fa5181af5663a473fb1c9b273f070f3b028bc462070383be79622fb064d68570",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "b263457de5f47c84a1ec69ab6c17d2043ad32a54013c03445f8a4a9b4cacce30",
+      "key": "toys/knot_spline/2021_1pct_x10/toy_0016",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        16,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        1772897881,
+        2481045104,
+        1722537017,
+        2723527002
+      ],
+      "source_family": "one_pct",
+      "total": 125050753,
+      "toy_index": 16
+    },
+    {
+      "counts_sha256_int64": "a65c6d1c50699a66391278ac1e7fc822944ec8f3b4acd8497c28f79bccc36c88",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "d7c33e2d1dafc4a88466a9c1704ab50623cf3231cefc6fd6702fd83a2939a9fd",
+      "key": "toys/knot_spline/2021_1pct_x100/toy_0016",
+      "model": "knot_spline",
+      "multiplier": 100,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        16,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        1640107526,
+        2900763049,
+        2420170132,
+        2543493946
+      ],
+      "source_family": "one_pct",
+      "total": 1250381283,
+      "toy_index": 16
+    },
+    {
+      "counts_sha256_int64": "f30c22e874cea36a0007ecb90930226f4da0e51a6009da8302ae97585bf4d697",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_10pct/toy_0016",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        16,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        119652081,
+        2557513773,
+        1278448227,
+        4096038273
+      ],
+      "source_family": "ten_pct",
+      "total": 141243147,
+      "toy_index": 16
+    },
+    {
+      "counts_sha256_int64": "324f24c37fe74fd9e9b795892d4616cb384bf7506d9b690d02b4fbd9b7fc1776",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "6707cfd73a29549788402e029a89be19a7f0d38713c3b7476bee6859b0b70149",
+      "key": "toys/knot_spline/2021_10pct_x10/toy_0016",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        16,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        2293178548,
+        558348895,
+        943992814,
+        717509517
+      ],
+      "source_family": "ten_pct",
+      "total": 1412472412,
+      "toy_index": 16
+    },
+    {
+      "counts_sha256_int64": "6da459c6e15e6f3de1b2bf800fde3216e272d3326df989d3fc1de783dea2c131",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_1pct/toy_0017",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        17,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        888979763,
+        3660872222,
+        647156807,
+        2888042707
+      ],
+      "source_family": "one_pct",
+      "total": 12504834,
+      "toy_index": 17
+    },
+    {
+      "counts_sha256_int64": "1d1d681e3b1a0c796a1ba55197367d80920a25916bfc31996c45463e2f1a03e9",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "b398deddf34a91727db76296234bea1ccbdca59447b2b932c0745d3ea1642ae5",
+      "key": "toys/knot_spline/2021_1pct_x10/toy_0017",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        17,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        895587645,
+        2302534861,
+        2239296729,
+        460631354
+      ],
+      "source_family": "one_pct",
+      "total": 125047063,
+      "toy_index": 17
+    },
+    {
+      "counts_sha256_int64": "284f6241d2570d21a0026aa8e91ceac2d0a6416434c4619d03381163efa9c96e",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "c1734a1afebbeb70de9568c8f3856d5504df30ba460fa2f3ecaafad60dafedcd",
+      "key": "toys/knot_spline/2021_1pct_x100/toy_0017",
+      "model": "knot_spline",
+      "multiplier": 100,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        17,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        2605863931,
+        300775595,
+        1320942153,
+        708882594
+      ],
+      "source_family": "one_pct",
+      "total": 1250346685,
+      "toy_index": 17
+    },
+    {
+      "counts_sha256_int64": "31569601ef66f55fb23eba0b32a9d2db25d2f572cd7b3af93a23486d3b2f948c",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_10pct/toy_0017",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        17,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        4169446686,
+        2933045234,
+        2403499863,
+        1700677689
+      ],
+      "source_family": "ten_pct",
+      "total": 141238191,
+      "toy_index": 17
+    },
+    {
+      "counts_sha256_int64": "3adffc53532b504030b4e4d4dcf8f4d35c526f4a705997d4a086e487b6f66b4a",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "da43295d48f5780529b2855577d535d5160b36e9eeef031b9ac19cffb20f91fb",
+      "key": "toys/knot_spline/2021_10pct_x10/toy_0017",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        17,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        1138418705,
+        92921281,
+        3227472107,
+        3804325539
+      ],
+      "source_family": "ten_pct",
+      "total": 1412478002,
+      "toy_index": 17
+    },
+    {
+      "counts_sha256_int64": "8839b8912ad053a3e91a1fd70d1ffce9331732c16b5eca030c2407d1c5a76467",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_1pct/toy_0018",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        18,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        26274151,
+        1183883177,
+        1711864014,
+        1802535196
+      ],
+      "source_family": "one_pct",
+      "total": 12498290,
+      "toy_index": 18
+    },
+    {
+      "counts_sha256_int64": "d686b389212c0be44c6c522153e14155ad2a065592a52fbcf7f6efee570a88eb",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "aa0d34783d606ba3959a4fa60150d44d9d864de4666616dfa20e3227030a913e",
+      "key": "toys/knot_spline/2021_1pct_x10/toy_0018",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        18,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        2580479342,
+        2146484365,
+        1258456977,
+        992243832
+      ],
+      "source_family": "one_pct",
+      "total": 125042923,
+      "toy_index": 18
+    },
+    {
+      "counts_sha256_int64": "a26ede533d24e8f39ddf15706ae6c26607bb49d07134dffb02eb26f5fee96a26",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "f1f0322a777a69f4361cebd1b0d47fae4d546c47941f108d44953fdfb77a0288",
+      "key": "toys/knot_spline/2021_1pct_x100/toy_0018",
+      "model": "knot_spline",
+      "multiplier": 100,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        18,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        3240890589,
+        3552665590,
+        1369268743,
+        2195582548
+      ],
+      "source_family": "one_pct",
+      "total": 1250428825,
+      "toy_index": 18
+    },
+    {
+      "counts_sha256_int64": "c6786451550fb9dfa8cd1d00e943f028d2abd028d567863a1266076468703023",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_10pct/toy_0018",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        18,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        2923830231,
+        1966489221,
+        925538014,
+        3743401063
+      ],
+      "source_family": "ten_pct",
+      "total": 141242886,
+      "toy_index": 18
+    },
+    {
+      "counts_sha256_int64": "2ce5616e97b1bc041f3dd331ce4b4cea3ec6a59bfa46f63301d537bc007cfa7a",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "e3e639835111e1f4a0dee5fc5a2cc188e142692bc5b9c0184c1407f810ba8d09",
+      "key": "toys/knot_spline/2021_10pct_x10/toy_0018",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        18,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        802204798,
+        2154905080,
+        3749305317,
+        1443929110
+      ],
+      "source_family": "ten_pct",
+      "total": 1412547776,
+      "toy_index": 18
+    },
+    {
+      "counts_sha256_int64": "63092af7c8b36eee018bfa3d97aedb4b7a19effa6fa5043299dc0cdd1b4a0cf4",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_1pct/toy_0019",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        19,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        3420601423,
+        1316165008,
+        597528047,
+        2770112642
+      ],
+      "source_family": "one_pct",
+      "total": 12501766,
+      "toy_index": 19
+    },
+    {
+      "counts_sha256_int64": "8485adfabc190fcfc97966bb544a4c15c029e96925ad08b0951bdfd424b5892f",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "d75c8076b1502cf50c9062a891d410c86981b26549b7184474dd8a2a2ebd124b",
+      "key": "toys/knot_spline/2021_1pct_x10/toy_0019",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        19,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        2719306218,
+        652099562,
+        4058720285,
+        3845759527
+      ],
+      "source_family": "one_pct",
+      "total": 125028689,
+      "toy_index": 19
+    },
+    {
+      "counts_sha256_int64": "83296353c2178a8b2b7e32962a7c299626bcb3639b96d96eb13ddb044b20fb15",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "f3f13051318b78de31a8eb39199cfb3a81072ee2f2664e10993b60c207372e03",
+      "key": "toys/knot_spline/2021_1pct_x100/toy_0019",
+      "model": "knot_spline",
+      "multiplier": 100,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "one_pct",
+        19,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        2283929159,
+        3164747081,
+        2656033815,
+        136725842
+      ],
+      "source_family": "one_pct",
+      "total": 1250362690,
+      "toy_index": 19
+    },
+    {
+      "counts_sha256_int64": "2ef04badb0954db62103bcf1ca0031a51e6a2522bc6a1d9ae022eb1684bfe397",
+      "increment_multiplier": 1,
+      "key": "toys/knot_spline/2021_10pct/toy_0019",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        19,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        4197050510,
+        623904932,
+        2846888110,
+        93027067
+      ],
+      "source_family": "ten_pct",
+      "total": 141241306,
+      "toy_index": 19
+    },
+    {
+      "counts_sha256_int64": "3d5167533183f18604f7967be8843ada7b2a13bf06c27085ee3236ac364d9fb2",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "d313e6347b6dedeef603581b28f307fc33cb690e02f93c5752cfc344f4a93e6b",
+      "key": "toys/knot_spline/2021_10pct_x10/toy_0019",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "toys",
+        "ten_pct",
+        19,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        1194875318,
+        2615819440,
+        1138396868,
+        3276450345
+      ],
+      "source_family": "ten_pct",
+      "total": 1412512736,
+      "toy_index": 19
+    },
+    {
+      "counts_sha256_int64": "14c9e4b7cb7d7399af8f05d5cbebcabcd3db4a3fbd47952ee02494f92d4c016b",
+      "increment_multiplier": 1,
+      "key": "pilot/knot_spline/2021_1pct/toy_0000",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "pilot",
+        "one_pct",
+        0,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "pilot",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        4228712260,
+        1773645395,
+        2918186484,
+        2749476529
+      ],
+      "source_family": "one_pct",
+      "total": 12501065,
+      "toy_index": 0
+    },
+    {
+      "counts_sha256_int64": "d10dca51cd0cf0132980fa058aab606f2faea32bcb3d91f0511d0e1bad4d301d",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "889f006e242f8ada9ac65e156321c4b81edcca9a46906e3a7136f3e7112cda99",
+      "key": "pilot/knot_spline/2021_1pct_x10/toy_0000",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "pilot",
+        "one_pct",
+        0,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "pilot",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        620452949,
+        2465742956,
+        408395494,
+        1517932057
+      ],
+      "source_family": "one_pct",
+      "total": 125050455,
+      "toy_index": 0
+    },
+    {
+      "counts_sha256_int64": "ccc3c030280f2dfff752b53241029b00c4fa3007c2eddfd2e923b785644c2462",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "babf3759f09573336331577f3ad72004cd954ffc7be284d609570193d20704cb",
+      "key": "pilot/knot_spline/2021_1pct_x100/toy_0000",
+      "model": "knot_spline",
+      "multiplier": 100,
+      "namespace": [
+        "knot_spline",
+        "pilot",
+        "one_pct",
+        0,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "pilot",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        4205488066,
+        3213495190,
+        2134742830,
+        2949668157
+      ],
+      "source_family": "one_pct",
+      "total": 1250463762,
+      "toy_index": 0
+    },
+    {
+      "counts_sha256_int64": "07d8597573d7748bdc00226d69a151790af067b1de685433168b883deba46ba3",
+      "increment_multiplier": 1,
+      "key": "pilot/knot_spline/2021_10pct/toy_0000",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "pilot",
+        "ten_pct",
+        0,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "pilot",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        1637396353,
+        2799332440,
+        635988833,
+        337407498
+      ],
+      "source_family": "ten_pct",
+      "total": 141257181,
+      "toy_index": 0
+    },
+    {
+      "counts_sha256_int64": "c4bfd145514e440e5339628f5bc36dcd99084c559b294567627bfbee32331887",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "13d0fdf9a6bc08b3331b7340c32ccf267f6922c9664aa0622dda7329c2b351d9",
+      "key": "pilot/knot_spline/2021_10pct_x10/toy_0000",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "pilot",
+        "ten_pct",
+        0,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "pilot",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        323489214,
+        3955647442,
+        3526415676,
+        1742790815
+      ],
+      "source_family": "ten_pct",
+      "total": 1412539244,
+      "toy_index": 0
+    },
+    {
+      "counts_sha256_int64": "b89d53d728999623efde87841dbef55a641049e9de49fbc550c5fa7f7895383b",
+      "increment_multiplier": 1,
+      "key": "pilot/knot_spline/2021_1pct/toy_0001",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "pilot",
+        "one_pct",
+        1,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "pilot",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        2516153988,
+        2277303273,
+        2024872952,
+        3948028147
+      ],
+      "source_family": "one_pct",
+      "total": 12503940,
+      "toy_index": 1
+    },
+    {
+      "counts_sha256_int64": "a7988b20fcacfc9773172937f044b8c4ef00178104c74d43d5a1597a51c29679",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "cfbe1664d4a64e04bb6da5dd27af37e486cdc5d663c2e1775086378541bad981",
+      "key": "pilot/knot_spline/2021_1pct_x10/toy_0001",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "pilot",
+        "one_pct",
+        1,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "pilot",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        4153354536,
+        844473860,
+        2952965337,
+        1202838519
+      ],
+      "source_family": "one_pct",
+      "total": 125051664,
+      "toy_index": 1
+    },
+    {
+      "counts_sha256_int64": "9424cd1edefc9638b12c2eb4ffdcdaf779a9dc068ca19394cf76aae58895c5b5",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "e7b6fb5ff5525993dde7a02b822e547fb12a863cb0567206178a1539288d0d41",
+      "key": "pilot/knot_spline/2021_1pct_x100/toy_0001",
+      "model": "knot_spline",
+      "multiplier": 100,
+      "namespace": [
+        "knot_spline",
+        "pilot",
+        "one_pct",
+        1,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "pilot",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        2269038441,
+        1148463345,
+        1560343381,
+        2382894386
+      ],
+      "source_family": "one_pct",
+      "total": 1250376819,
+      "toy_index": 1
+    },
+    {
+      "counts_sha256_int64": "973aac19963ea62667888ab4543ed737700213c7ef7307b149808f58e64cd8fe",
+      "increment_multiplier": 1,
+      "key": "pilot/knot_spline/2021_10pct/toy_0001",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "pilot",
+        "ten_pct",
+        1,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "pilot",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        535468428,
+        2413966467,
+        673331894,
+        1152510460
+      ],
+      "source_family": "ten_pct",
+      "total": 141243533,
+      "toy_index": 1
+    },
+    {
+      "counts_sha256_int64": "3d67eab12a32b11f01e5d93161551a84982aa3a7eb863a9a03f2f9ebb6bcb128",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "447ac9088de699b5795cf897fbc4c2b705212bed6a7be61c1a32b2183124cec9",
+      "key": "pilot/knot_spline/2021_10pct_x10/toy_0001",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "pilot",
+        "ten_pct",
+        1,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "pilot",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        3182062989,
+        3344838073,
+        3299136204,
+        2376746039
+      ],
+      "source_family": "ten_pct",
+      "total": 1412507405,
+      "toy_index": 1
+    },
+    {
+      "counts_sha256_int64": "ed0fb8e8c811e5fda71fa6356207adacaaf1489ccc47e674a1203bedd5671141",
+      "increment_multiplier": 1,
+      "key": "pilot/knot_spline/2021_1pct/toy_0002",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "pilot",
+        "one_pct",
+        2,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "pilot",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        3222606449,
+        1817324827,
+        3101431788,
+        996247143
+      ],
+      "source_family": "one_pct",
+      "total": 12505790,
+      "toy_index": 2
+    },
+    {
+      "counts_sha256_int64": "b8cbf0d61617435d297e5e8bef4d8a584afee10f071fe14570bc9efea1d0ff31",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "e55bcce8b851070807d2994387be031159b0eeb35b77226035cff04619cbd125",
+      "key": "pilot/knot_spline/2021_1pct_x10/toy_0002",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "pilot",
+        "one_pct",
+        2,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "pilot",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        3269728541,
+        2219380848,
+        1156060686,
+        2232120087
+      ],
+      "source_family": "one_pct",
+      "total": 125052391,
+      "toy_index": 2
+    },
+    {
+      "counts_sha256_int64": "f5d832a0dfc8a015e2ba6a75613df2aef42bf1dd5727d13ea143a106bf4fdfa3",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "79fd579f201757694a5ffbd1bcb2ba3a7eea9793140b9b6e984adac688c2aa9e",
+      "key": "pilot/knot_spline/2021_1pct_x100/toy_0002",
+      "model": "knot_spline",
+      "multiplier": 100,
+      "namespace": [
+        "knot_spline",
+        "pilot",
+        "one_pct",
+        2,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "pilot",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        3445925145,
+        2159580198,
+        1908405596,
+        3421982056
+      ],
+      "source_family": "one_pct",
+      "total": 1250407125,
+      "toy_index": 2
+    },
+    {
+      "counts_sha256_int64": "5b3d67f1a05a40a683850c90701d82b8778792668d55bf68ac92cadeb8dd927b",
+      "increment_multiplier": 1,
+      "key": "pilot/knot_spline/2021_10pct/toy_0002",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "namespace": [
+        "knot_spline",
+        "pilot",
+        "ten_pct",
+        2,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "pilot",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        1794724615,
+        2972095179,
+        2260118032,
+        188762960
+      ],
+      "source_family": "ten_pct",
+      "total": 141243433,
+      "toy_index": 2
+    },
+    {
+      "counts_sha256_int64": "3c65fa23e0787262b9de8261696939ca845a4b727138dcadc069d6eeabb1bb56",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "8920f39954de24d4cd59e3291a97bfcb8adae488977844852be280929e0e1708",
+      "key": "pilot/knot_spline/2021_10pct_x10/toy_0002",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "namespace": [
+        "knot_spline",
+        "pilot",
+        "ten_pct",
+        2,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "pilot",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        3426279871,
+        3777299220,
+        1817618341,
+        1715675357
+      ],
+      "source_family": "ten_pct",
+      "total": 1412481541,
+      "toy_index": 2
+    },
+    {
+      "counts_sha256_int64": "b755df7f51667cf4c420b3b45c4a4b82e91ce6ef9f8ff6ff61a022780712838c",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_1pct/toy_0000",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        0,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        1259453292,
+        1377925868,
+        3039641516,
+        1902285176
+      ],
+      "source_family": "one_pct",
+      "total": 12499675,
+      "toy_index": 0
+    },
+    {
+      "counts_sha256_int64": "154f9c145884e7ba58ccf1ee63965bb68366fc9fb01eb461a0b3fd208124ffb2",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "deda1c294ffbd9ca66356e67b3ba9dc3c57745ceceb303b36e8096c0946877e1",
+      "key": "toys/regional_blend/2021_1pct_x10/toy_0000",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        0,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        2937710354,
+        827275518,
+        292601081,
+        3087490031
+      ],
+      "source_family": "one_pct",
+      "total": 125019208,
+      "toy_index": 0
+    },
+    {
+      "counts_sha256_int64": "8fb02bc8ffee64cb182c6773f5ab174fd76e34be439adbde215e46c4410d7115",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "ac04d3c7f1a46b3ebcd2cacb1d780d43bfa9ed69f76c1e7d64b37ccd0fe913c9",
+      "key": "toys/regional_blend/2021_1pct_x100/toy_0000",
+      "model": "regional_blend",
+      "multiplier": 100,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        0,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        666904954,
+        771084508,
+        1961710634,
+        2378494753
+      ],
+      "source_family": "one_pct",
+      "total": 1250378695,
+      "toy_index": 0
+    },
+    {
+      "counts_sha256_int64": "074605cce8438bb63b35c1b76f4fc7810146e037c34fbfc1b6ef1301c0a2bb17",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_10pct/toy_0000",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        0,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        3648290470,
+        54987621,
+        826694859,
+        2146427750
+      ],
+      "source_family": "ten_pct",
+      "total": 141247689,
+      "toy_index": 0
+    },
+    {
+      "counts_sha256_int64": "68149d0fa6baac7be5a4c252bf3152c5150021b7fd3d6c919dad882a97f95b38",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "2838a396e87356121cab4c9ca2b5b9fcc362d8e41c1313f023cba9122589596f",
+      "key": "toys/regional_blend/2021_10pct_x10/toy_0000",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        0,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        444321264,
+        3023855752,
+        3506925794,
+        2519966556
+      ],
+      "source_family": "ten_pct",
+      "total": 1412465080,
+      "toy_index": 0
+    },
+    {
+      "counts_sha256_int64": "d28f8a9472ec0fba907328c988bc21e480e22bcb739b7a489b102b74392298a7",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_1pct/toy_0001",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        1,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        2816313230,
+        1160074377,
+        1349200028,
+        3704616197
+      ],
+      "source_family": "one_pct",
+      "total": 12502915,
+      "toy_index": 1
+    },
+    {
+      "counts_sha256_int64": "89435d2a3b5235a458932977231d878c452188c316a304863221e5878911c3d1",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "bfd3fec293880e556e738f7489fa33aae83ba6471701c23713338d5890a32833",
+      "key": "toys/regional_blend/2021_1pct_x10/toy_0001",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        1,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        3797722555,
+        788734310,
+        948026875,
+        1810349693
+      ],
+      "source_family": "one_pct",
+      "total": 125057244,
+      "toy_index": 1
+    },
+    {
+      "counts_sha256_int64": "cdcde981b1c8a7d12a63deb5d2591e9c981103b09af8b65c812e8f527949b31c",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "dc66e6208316f4eeb4c7fc58d34f3c7764d045c9b46600a3249072ec55175983",
+      "key": "toys/regional_blend/2021_1pct_x100/toy_0001",
+      "model": "regional_blend",
+      "multiplier": 100,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        1,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        366138219,
+        1663212254,
+        3659956186,
+        209190650
+      ],
+      "source_family": "one_pct",
+      "total": 1250383093,
+      "toy_index": 1
+    },
+    {
+      "counts_sha256_int64": "413002c45649346c1841b64293f6e22b02ae20e77440962cb525dfb405b99e2e",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_10pct/toy_0001",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        1,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        1934921817,
+        2851566187,
+        357863978,
+        714022507
+      ],
+      "source_family": "ten_pct",
+      "total": 141239945,
+      "toy_index": 1
+    },
+    {
+      "counts_sha256_int64": "4ccd1bc5080011edd98bb64559946ed0c6b06aa7501959b6fe2715d355f9d915",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "6a96bc9cdb982b9b3f1ed5de964728a2481d110827e726ab320cfac7eddcaca3",
+      "key": "toys/regional_blend/2021_10pct_x10/toy_0001",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        1,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        2044949831,
+        989937867,
+        1158646511,
+        1411576718
+      ],
+      "source_family": "ten_pct",
+      "total": 1412476841,
+      "toy_index": 1
+    },
+    {
+      "counts_sha256_int64": "d373cf982c57f5be03188a37f755d682644ca4b089dcb89f9d7851e097736814",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_1pct/toy_0002",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        2,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        1317972944,
+        2190013290,
+        3041322477,
+        1493305730
+      ],
+      "source_family": "one_pct",
+      "total": 12502530,
+      "toy_index": 2
+    },
+    {
+      "counts_sha256_int64": "6e8258bcd423d024141e07d06209e1a4efb5d27c6d2f996a2659c14bfa142134",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "cdcf5e895dabff74dd6bb51650eca9772b908272449a72b944a275aa1529f97e",
+      "key": "toys/regional_blend/2021_1pct_x10/toy_0002",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        2,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        595426400,
+        2196501375,
+        2435959167,
+        1653395639
+      ],
+      "source_family": "one_pct",
+      "total": 125019749,
+      "toy_index": 2
+    },
+    {
+      "counts_sha256_int64": "d3bd32957593de4df2fa1fb6fffe92565ea115b9b4e75302dd9d842fea264a7c",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "5f8299007a5b44e47377729182afdc4c81d69993dfa60a5a4d4b40576d338aab",
+      "key": "toys/regional_blend/2021_1pct_x100/toy_0002",
+      "model": "regional_blend",
+      "multiplier": 100,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        2,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        3899814430,
+        647420103,
+        768220803,
+        1150713182
+      ],
+      "source_family": "one_pct",
+      "total": 1250423972,
+      "toy_index": 2
+    },
+    {
+      "counts_sha256_int64": "c47bddd2bbd369429c048d0bd2d14e094efadf8e3da4afc59fb919ecd1b25ff4",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_10pct/toy_0002",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        2,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        3448107381,
+        1514774230,
+        556405093,
+        1208505273
+      ],
+      "source_family": "ten_pct",
+      "total": 141250072,
+      "toy_index": 2
+    },
+    {
+      "counts_sha256_int64": "1749a1b0ccf6c1b473c15eb4fc7634fc012038abd0f9121bdd4a8ecd1fda7549",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "3089a5f849ee10d7e63022db84fa6981dd10126c9cab998906482048be986892",
+      "key": "toys/regional_blend/2021_10pct_x10/toy_0002",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        2,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        3542553513,
+        742765504,
+        702607787,
+        2727442026
+      ],
+      "source_family": "ten_pct",
+      "total": 1412477756,
+      "toy_index": 2
+    },
+    {
+      "counts_sha256_int64": "ca582ff610e6951bb01a03262c51ad406068b03138c7be186ac1347c13fcfc9a",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_1pct/toy_0003",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        3,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        1536369322,
+        681668315,
+        3902421868,
+        1728339407
+      ],
+      "source_family": "one_pct",
+      "total": 12504697,
+      "toy_index": 3
+    },
+    {
+      "counts_sha256_int64": "4f70d81ba808c497c7a14dc89f3ebb3d37a9f6652c07818af58847a60ff711b9",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "9e2ca94c6a3a4956217088ab6bbd219436827dd61d4c887e900cc3e6db235d23",
+      "key": "toys/regional_blend/2021_1pct_x10/toy_0003",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        3,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        3974811905,
+        3706361193,
+        2619632475,
+        1877818158
+      ],
+      "source_family": "one_pct",
+      "total": 125031611,
+      "toy_index": 3
+    },
+    {
+      "counts_sha256_int64": "3501d618961fec45be6892f2f7e4b3438ed1aed5469adaa5c80ccedf71f7a785",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "c21faddd973e1f7e00ec6a06069c8322b70238393be8d38d40b7101fcbb3ece4",
+      "key": "toys/regional_blend/2021_1pct_x100/toy_0003",
+      "model": "regional_blend",
+      "multiplier": 100,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        3,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        2011496473,
+        456459005,
+        3092350611,
+        3799056613
+      ],
+      "source_family": "one_pct",
+      "total": 1250449680,
+      "toy_index": 3
+    },
+    {
+      "counts_sha256_int64": "89ff6ca142e047d234a01844e936d1dc42c8d24274bd24adbdb3c9ac718217b9",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_10pct/toy_0003",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        3,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        1280396827,
+        1567395663,
+        1692208814,
+        2322754769
+      ],
+      "source_family": "ten_pct",
+      "total": 141247625,
+      "toy_index": 3
+    },
+    {
+      "counts_sha256_int64": "aea015bcb569400df7ef11e9e7ca84711cbcb7487b26cb120fac04b1327b6477",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "faf50bcfb6217e4f1c0208036bf754e3ab90c0419cba243e673631fb706fd978",
+      "key": "toys/regional_blend/2021_10pct_x10/toy_0003",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        3,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        956191382,
+        895236296,
+        3499234112,
+        1948107801
+      ],
+      "source_family": "ten_pct",
+      "total": 1412493382,
+      "toy_index": 3
+    },
+    {
+      "counts_sha256_int64": "d5dcbd45168db597cbc3f674bb7864bca9f9f90fd2372f0f6f3af0cae84a078d",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_1pct/toy_0004",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        4,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        2539534708,
+        1788369962,
+        1464203338,
+        3066018882
+      ],
+      "source_family": "one_pct",
+      "total": 12505180,
+      "toy_index": 4
+    },
+    {
+      "counts_sha256_int64": "8b0068f46367d410b1748091a6e13003a7c02a8d4acce52d53f3dd6d68c14fb9",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "248916f71e91c068a9b707a3f4d08d58ccbdc626372191c28e6c83b5e238a537",
+      "key": "toys/regional_blend/2021_1pct_x10/toy_0004",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        4,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        4206371481,
+        872659170,
+        591900633,
+        4133161149
+      ],
+      "source_family": "one_pct",
+      "total": 125036876,
+      "toy_index": 4
+    },
+    {
+      "counts_sha256_int64": "a0b4b4b641f0da03ba39b398b8760065a716475c8ef26ca9c8fc27d8bf858801",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "6c0f671025880b561aa1791e99741ca0d4948e03698abe627ca87cdc3d843c22",
+      "key": "toys/regional_blend/2021_1pct_x100/toy_0004",
+      "model": "regional_blend",
+      "multiplier": 100,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        4,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        2841887813,
+        2505269226,
+        3337563075,
+        4149475017
+      ],
+      "source_family": "one_pct",
+      "total": 1250388968,
+      "toy_index": 4
+    },
+    {
+      "counts_sha256_int64": "11d0be945c8a69b4204d8f4d4e0c20024ba99a857442b745d4ba0abb0a935cae",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_10pct/toy_0004",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        4,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        2093713669,
+        16020059,
+        2024860109,
+        4006654893
+      ],
+      "source_family": "ten_pct",
+      "total": 141246914,
+      "toy_index": 4
+    },
+    {
+      "counts_sha256_int64": "1768ca3ef259d1cda0d97497bd7a3607e29a2a06a04161839e03b95db7337604",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "c3fa3f93cfa1992a415c8c14ce0df0ae40b40ec5ea65cb20714c7a85ae28da37",
+      "key": "toys/regional_blend/2021_10pct_x10/toy_0004",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        4,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        2342943088,
+        3837994676,
+        3883697586,
+        1379766915
+      ],
+      "source_family": "ten_pct",
+      "total": 1412467610,
+      "toy_index": 4
+    },
+    {
+      "counts_sha256_int64": "7e78ee9f4824266fd49d2499b2ef6442159ae4868f420815b0159ba7c3bb00fa",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_1pct/toy_0005",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        5,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        1266984512,
+        2167351653,
+        3781953029,
+        789096623
+      ],
+      "source_family": "one_pct",
+      "total": 12505515,
+      "toy_index": 5
+    },
+    {
+      "counts_sha256_int64": "559c1f93300e59fef1ad1cd05f4f4dc541a980431826976d7ef423ee5baa003d",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "a7c50b3b09ace669d16a7a8d86a9b93dea85ab205a75c1934c476c3d16d9d7dc",
+      "key": "toys/regional_blend/2021_1pct_x10/toy_0005",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        5,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        2172206219,
+        22776300,
+        2664808357,
+        3146563485
+      ],
+      "source_family": "one_pct",
+      "total": 125051479,
+      "toy_index": 5
+    },
+    {
+      "counts_sha256_int64": "15f00c95d91ff84b916b621ca6a0559e27158544b54daddd6301cedd154d3d59",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "0b8c8d842beacb24d55011770d621930eba4c520ff6b8783849d80ecb59cc103",
+      "key": "toys/regional_blend/2021_1pct_x100/toy_0005",
+      "model": "regional_blend",
+      "multiplier": 100,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        5,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        1052446802,
+        1064324143,
+        1010429134,
+        2406362838
+      ],
+      "source_family": "one_pct",
+      "total": 1250401083,
+      "toy_index": 5
+    },
+    {
+      "counts_sha256_int64": "85229ebf540c0469507ac4df132f7caffa77fe9c2475bfd3e92ecc87cd7e0eb7",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_10pct/toy_0005",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        5,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        1965011017,
+        1705966243,
+        1143922207,
+        1291182142
+      ],
+      "source_family": "ten_pct",
+      "total": 141240659,
+      "toy_index": 5
+    },
+    {
+      "counts_sha256_int64": "546f24ee7a426e001284d48e73bdb7dec57eff97d275d56c09aa325f79063f52",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "e777f0db1429c304d20a6cd0979d7aabc85b1815f99a65c0b118fe46659aaa65",
+      "key": "toys/regional_blend/2021_10pct_x10/toy_0005",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        5,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        3248077160,
+        2764741297,
+        2525478523,
+        2658016245
+      ],
+      "source_family": "ten_pct",
+      "total": 1412497666,
+      "toy_index": 5
+    },
+    {
+      "counts_sha256_int64": "bd5762eef8bceaf2a591abc231195d6b2884775589d40c32d8131a50bef295e0",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_1pct/toy_0006",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        6,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        1852601940,
+        100114592,
+        3147877728,
+        49678590
+      ],
+      "source_family": "one_pct",
+      "total": 12498755,
+      "toy_index": 6
+    },
+    {
+      "counts_sha256_int64": "fa78d2a07863bdfa9f6ca4d9f3841aa3cc5d47dd7fb22e9e5eae26841d188134",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "5763ef287cb5416d6aaf0accf67ea24ae980190447599d199b480ab5fe64b221",
+      "key": "toys/regional_blend/2021_1pct_x10/toy_0006",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        6,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        3105933884,
+        3680948120,
+        2322964635,
+        3837955650
+      ],
+      "source_family": "one_pct",
+      "total": 125025479,
+      "toy_index": 6
+    },
+    {
+      "counts_sha256_int64": "b3941d6d9f354cd4914a168102fb2323f4751a015eb489ea9d30b94ab0afe30f",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "543ad9446525a29fc28335ffe2243176cf1b1e8682ae3b0f80e6516c86497770",
+      "key": "toys/regional_blend/2021_1pct_x100/toy_0006",
+      "model": "regional_blend",
+      "multiplier": 100,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        6,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        1622622864,
+        643889359,
+        1983421306,
+        1345368660
+      ],
+      "source_family": "one_pct",
+      "total": 1250446397,
+      "toy_index": 6
+    },
+    {
+      "counts_sha256_int64": "3891ac883614830a74b985fbe8e512814ac20f541ec4b5986528d95a4cd32eeb",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_10pct/toy_0006",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        6,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        733664224,
+        3066222495,
+        2211708138,
+        829779513
+      ],
+      "source_family": "ten_pct",
+      "total": 141235900,
+      "toy_index": 6
+    },
+    {
+      "counts_sha256_int64": "a3e8dac37fd8da0091f69ed941280a7a5ec91a9d02aac8f9edab9fa519433660",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "4a3745d0a417bdc53f33d98f433d97038796089e6c95fbe40352300859997373",
+      "key": "toys/regional_blend/2021_10pct_x10/toy_0006",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        6,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        886350023,
+        2188507218,
+        1698821768,
+        1636954123
+      ],
+      "source_family": "ten_pct",
+      "total": 1412466838,
+      "toy_index": 6
+    },
+    {
+      "counts_sha256_int64": "80d3dc5a986890ff97f07b3bbe234c6428c6289f89e64df50ef049b57cc0afa0",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_1pct/toy_0007",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        7,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        1930732422,
+        128720469,
+        3817635438,
+        516145195
+      ],
+      "source_family": "one_pct",
+      "total": 12498463,
+      "toy_index": 7
+    },
+    {
+      "counts_sha256_int64": "01e077d730b868f3431736d412c75b0b315dfe93349ceeb58f9d090f8ccdf3d5",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "61ef3029f8d0c1ff09e8ce36e8808bf94e1b0b14b940344204922c284e186fb5",
+      "key": "toys/regional_blend/2021_1pct_x10/toy_0007",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        7,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        2946905004,
+        273208085,
+        3520100791,
+        126679490
+      ],
+      "source_family": "one_pct",
+      "total": 125012741,
+      "toy_index": 7
+    },
+    {
+      "counts_sha256_int64": "eb44a2f89532f275d90d0c809bbdf3289b3bdb254cdfed0f0bf83114cf66f0df",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "d9ba77f673f95fe553f0796240337b1705ac2aff5fc8003272432a5128b349a0",
+      "key": "toys/regional_blend/2021_1pct_x100/toy_0007",
+      "model": "regional_blend",
+      "multiplier": 100,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        7,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        3718184927,
+        884660469,
+        2725519471,
+        2019024213
+      ],
+      "source_family": "one_pct",
+      "total": 1250349214,
+      "toy_index": 7
+    },
+    {
+      "counts_sha256_int64": "533d52d582c519aae00690c3ac79332dd4047cb5bd651e87bc9c588c5d7857a0",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_10pct/toy_0007",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        7,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        2894465053,
+        3332696710,
+        2458895135,
+        3993322552
+      ],
+      "source_family": "ten_pct",
+      "total": 141279516,
+      "toy_index": 7
+    },
+    {
+      "counts_sha256_int64": "3ccd4fd3e0557a93c4643f9f2e629aaf9aaa643cbb70e0cb5156c8b006181e73",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "e5efa71db6360bdebf8371ce781d9426bc4c5537d99bbf468eed621fc883e244",
+      "key": "toys/regional_blend/2021_10pct_x10/toy_0007",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        7,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        3920328909,
+        3364081845,
+        2433940033,
+        2905274749
+      ],
+      "source_family": "ten_pct",
+      "total": 1412549021,
+      "toy_index": 7
+    },
+    {
+      "counts_sha256_int64": "6fca4f189bddd799e3be78a8ab843a0906f33f0d19c49b0f517279d37c7d6a32",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_1pct/toy_0008",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        8,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        4168584188,
+        1270072874,
+        108931839,
+        3688469555
+      ],
+      "source_family": "one_pct",
+      "total": 12504644,
+      "toy_index": 8
+    },
+    {
+      "counts_sha256_int64": "4d18b91af5401fdd2351b4cdb8e8eeb7007277a8850b9ed0c9713793056543b7",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "64ec34e85524505f209ad4cd5758e85c59ea575288070622561f574dcba1f5ed",
+      "key": "toys/regional_blend/2021_1pct_x10/toy_0008",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        8,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        3849458390,
+        2849113322,
+        3260022254,
+        1333732437
+      ],
+      "source_family": "one_pct",
+      "total": 125029101,
+      "toy_index": 8
+    },
+    {
+      "counts_sha256_int64": "296780f98c10c93394ed56a5cdde516e05acbdd154cc06b5c244a6cf078301ab",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "dfa05ef1dfc287bf7eba0eedc644349bb82bf27657296d4157de589c96f5bbf9",
+      "key": "toys/regional_blend/2021_1pct_x100/toy_0008",
+      "model": "regional_blend",
+      "multiplier": 100,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        8,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        2574211401,
+        1671903471,
+        4124468614,
+        2287811947
+      ],
+      "source_family": "one_pct",
+      "total": 1250390789,
+      "toy_index": 8
+    },
+    {
+      "counts_sha256_int64": "217d6c615ca084fde31cfb6cd15c0fa2fff3a0101b4ee74fa8be8631aa38d4df",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_10pct/toy_0008",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        8,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        1450161629,
+        3134376238,
+        4148284742,
+        3715919866
+      ],
+      "source_family": "ten_pct",
+      "total": 141259112,
+      "toy_index": 8
+    },
+    {
+      "counts_sha256_int64": "e9a96362fdc3a0bf7add2d46683e4e583ae69dcfd5b4d71c6d496adafb2d4003",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "c8fa3cb24292bfa32c3e4b3932e93721022d7af9467cfa523c74bfbda5879d4f",
+      "key": "toys/regional_blend/2021_10pct_x10/toy_0008",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        8,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        2631836087,
+        3587048677,
+        4196043998,
+        3954435330
+      ],
+      "source_family": "ten_pct",
+      "total": 1412521878,
+      "toy_index": 8
+    },
+    {
+      "counts_sha256_int64": "b1d9460381dcf1d0975ecb3e6273872eac8225e61878b0ae5bfa2a40cebd6a00",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_1pct/toy_0009",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        9,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        1738036251,
+        3789254313,
+        1150225657,
+        2473039663
+      ],
+      "source_family": "one_pct",
+      "total": 12506766,
+      "toy_index": 9
+    },
+    {
+      "counts_sha256_int64": "358d1194ac0bc60f8e1c6da35707d5de3f7bc7c0394a58964e39b41f844cf42e",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "2330a37fda0192ea01e27d096b225476589f57512bb368cd72287f0d9f271cdc",
+      "key": "toys/regional_blend/2021_1pct_x10/toy_0009",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        9,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        3569919943,
+        3633223045,
+        4086627882,
+        2927593313
+      ],
+      "source_family": "one_pct",
+      "total": 125049222,
+      "toy_index": 9
+    },
+    {
+      "counts_sha256_int64": "62820a4c0b7e7c418f2502dd54690a62a344825fd4095f41c2f76d0e340cb0a1",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "6f8ee15b8e587a76c9ba7eee369d149923165a75ae86711301cc0b55bc71b7c1",
+      "key": "toys/regional_blend/2021_1pct_x100/toy_0009",
+      "model": "regional_blend",
+      "multiplier": 100,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        9,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        630346841,
+        3347683483,
+        3880397683,
+        3506199025
+      ],
+      "source_family": "one_pct",
+      "total": 1250349404,
+      "toy_index": 9
+    },
+    {
+      "counts_sha256_int64": "38037bb731a126d95c5b7ce6c2b7d367f599f6b04cb6b4f23383bfc389138dc3",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_10pct/toy_0009",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        9,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        1225489041,
+        328182286,
+        3080057194,
+        2848685723
+      ],
+      "source_family": "ten_pct",
+      "total": 141240595,
+      "toy_index": 9
+    },
+    {
+      "counts_sha256_int64": "494b667ff07b3c1439d94a3de00b28c5c4cdae9ba2db1406dcbb4b9f48159670",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "085a07152f28cb0d0de2cc1eb792c9ad730f1177e59efece3f1753f64063da6e",
+      "key": "toys/regional_blend/2021_10pct_x10/toy_0009",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        9,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        263445946,
+        2137710948,
+        668509131,
+        2283484110
+      ],
+      "source_family": "ten_pct",
+      "total": 1412466141,
+      "toy_index": 9
+    },
+    {
+      "counts_sha256_int64": "b56a33b61cc955d8c1af37ddedbc991d91add405aa55950ce03ad1b4becdb6b0",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_1pct/toy_0010",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        10,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        3219589604,
+        3423469501,
+        1323805630,
+        3334987852
+      ],
+      "source_family": "one_pct",
+      "total": 12503272,
+      "toy_index": 10
+    },
+    {
+      "counts_sha256_int64": "98d8b15835376c8d451e6ec21d67673dda5493f4e0f35cd167fd8b13bad39cb8",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "b3ae5d52bdacf404484f9778a471c4058761f5db95fcaa2f22b77c955058425f",
+      "key": "toys/regional_blend/2021_1pct_x10/toy_0010",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        10,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        734421170,
+        2843153326,
+        326803629,
+        534557208
+      ],
+      "source_family": "one_pct",
+      "total": 125034418,
+      "toy_index": 10
+    },
+    {
+      "counts_sha256_int64": "528244bcea09e3f1596e3b2639280f58ff8de5e8b75a44422a43eb9b9e50a602",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "81149b2de02f8da35241111de7854ce2e7ad6fbda903d5ad675ce2edf76d2678",
+      "key": "toys/regional_blend/2021_1pct_x100/toy_0010",
+      "model": "regional_blend",
+      "multiplier": 100,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        10,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        3213218119,
+        3331794907,
+        855440671,
+        1550497056
+      ],
+      "source_family": "one_pct",
+      "total": 1250408865,
+      "toy_index": 10
+    },
+    {
+      "counts_sha256_int64": "f7c55fcfda535b8326f4e65fba354905b92dcbe954610de5413c5b941f179114",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_10pct/toy_0010",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        10,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        1620068630,
+        2805409829,
+        696380203,
+        1322270976
+      ],
+      "source_family": "ten_pct",
+      "total": 141246014,
+      "toy_index": 10
+    },
+    {
+      "counts_sha256_int64": "3ce02ca0d14c0be44b3bd8aefdfb4a289a9110ac82b7def755a8eaaa0ad00a3d",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "e7b36e809efa661f615420f335a232c2faf12c51bf583e5f65fab7364b22eba4",
+      "key": "toys/regional_blend/2021_10pct_x10/toy_0010",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        10,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        1790802712,
+        381639289,
+        3840573954,
+        2076081757
+      ],
+      "source_family": "ten_pct",
+      "total": 1412523607,
+      "toy_index": 10
+    },
+    {
+      "counts_sha256_int64": "b5c4410475b2de287323d0a9ea9c2c2e75f22910ba4934f588c74603edd43b39",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_1pct/toy_0011",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        11,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        3561518017,
+        3036293561,
+        2212464551,
+        1382921747
+      ],
+      "source_family": "one_pct",
+      "total": 12503466,
+      "toy_index": 11
+    },
+    {
+      "counts_sha256_int64": "be5423473658301b6f0e5df0aebd027a966ac9bf25b7ee354cbf80e4f10d22d3",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "fcab0ff129ca7fd4d8f1da12ca6cdfeeb5e865950d51a9e1455615dbaee7f96b",
+      "key": "toys/regional_blend/2021_1pct_x10/toy_0011",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        11,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        2043306269,
+        3834079950,
+        3407771369,
+        4230238834
+      ],
+      "source_family": "one_pct",
+      "total": 125040809,
+      "toy_index": 11
+    },
+    {
+      "counts_sha256_int64": "fbfc43453c2eb04fc4ffc7937df357818ed46664e177f377981cb6f64ce277a5",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "01927e9f1e3e2afe60547883ea8e7b03d49a2896a3013145ff29fad46c372d88",
+      "key": "toys/regional_blend/2021_1pct_x100/toy_0011",
+      "model": "regional_blend",
+      "multiplier": 100,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        11,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        2058725087,
+        1720300637,
+        3062916414,
+        839243209
+      ],
+      "source_family": "one_pct",
+      "total": 1250360335,
+      "toy_index": 11
+    },
+    {
+      "counts_sha256_int64": "3194d95a2f6a1d0cc600fd93fd81cbcc80a923b2d9dd1ee2041c4a07def87ebc",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_10pct/toy_0011",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        11,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        2906002762,
+        3672333512,
+        4233223029,
+        24381275
+      ],
+      "source_family": "ten_pct",
+      "total": 141253381,
+      "toy_index": 11
+    },
+    {
+      "counts_sha256_int64": "a0b4e665133d9500e229fed1a07a3bb5be17be6b728c13ff2e473207650f4c8b",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "5c6ea2cacc2109b7362f9885ff82987f66bd7ea4fad840f95ff04dd7a533dddf",
+      "key": "toys/regional_blend/2021_10pct_x10/toy_0011",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        11,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        1881984822,
+        1752320709,
+        3046302313,
+        3211543
+      ],
+      "source_family": "ten_pct",
+      "total": 1412541459,
+      "toy_index": 11
+    },
+    {
+      "counts_sha256_int64": "281138597a1bfa2e57fcb1446bf79471da8c6cc8099669e8257a66b383984e6e",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_1pct/toy_0012",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        12,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        475249276,
+        3283937806,
+        1486571715,
+        3842359453
+      ],
+      "source_family": "one_pct",
+      "total": 12505143,
+      "toy_index": 12
+    },
+    {
+      "counts_sha256_int64": "56c4266621d3209a417fd84c558f5e83fce014858f31b71c8681815f57f7d29e",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "2cd61df2992786121d2eda2d32c44f509d9592dfc1072808468715b804a55548",
+      "key": "toys/regional_blend/2021_1pct_x10/toy_0012",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        12,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        670498005,
+        896796524,
+        1067393771,
+        723717597
+      ],
+      "source_family": "one_pct",
+      "total": 125036160,
+      "toy_index": 12
+    },
+    {
+      "counts_sha256_int64": "cb7ccf777176427a6d213feef984d2f8076b6b9edb3c6c6dba5a985f24a66d13",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "8d479671b9404041270cdbaf90762f13c5be283716c0286999d859f7872c70c1",
+      "key": "toys/regional_blend/2021_1pct_x100/toy_0012",
+      "model": "regional_blend",
+      "multiplier": 100,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        12,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        1287533800,
+        687813794,
+        3474675820,
+        2417676067
+      ],
+      "source_family": "one_pct",
+      "total": 1250316116,
+      "toy_index": 12
+    },
+    {
+      "counts_sha256_int64": "a470a9059c58c32bb5230c09b3f430000038d2727add852c54aa478aff92d582",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_10pct/toy_0012",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        12,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        2339859439,
+        1230788507,
+        3487729069,
+        1553509053
+      ],
+      "source_family": "ten_pct",
+      "total": 141266722,
+      "toy_index": 12
+    },
+    {
+      "counts_sha256_int64": "cf2bc8944d0322bfdb8d2c620a3572964307aff3ad6f8618c1ec7ee19ef5e62f",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "3a1ce3ddba6aedcf9aed6aafa2be8bb9abfbc69ee7c156484b3aba65145a0d8d",
+      "key": "toys/regional_blend/2021_10pct_x10/toy_0012",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        12,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        821218204,
+        185620356,
+        15378552,
+        1143106160
+      ],
+      "source_family": "ten_pct",
+      "total": 1412510728,
+      "toy_index": 12
+    },
+    {
+      "counts_sha256_int64": "0ad9c372e30533fb962d63986072dc0b980b0fd8f156d20d499da0177f5e8b43",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_1pct/toy_0013",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        13,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        3975120990,
+        3450366821,
+        165589527,
+        1218705760
+      ],
+      "source_family": "one_pct",
+      "total": 12500207,
+      "toy_index": 13
+    },
+    {
+      "counts_sha256_int64": "6afc35df99dcffd3d8cf3bc30b15a99d0ee244be25ddf093cc8ef06cc24ed581",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "c71aedaf745fe6b0d1a77bda6b70980c5753d90cce11e86442d67b8035c8cc37",
+      "key": "toys/regional_blend/2021_1pct_x10/toy_0013",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        13,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        2688070484,
+        3405146263,
+        3843122308,
+        1913727523
+      ],
+      "source_family": "one_pct",
+      "total": 125038491,
+      "toy_index": 13
+    },
+    {
+      "counts_sha256_int64": "ab8b295668004b267c7f4974db250e641565eecb9459b3c5ff64c564e2a7c205",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "b247ede037617663726e5072168765e52e63e60e708e8267a451198c217ae9e2",
+      "key": "toys/regional_blend/2021_1pct_x100/toy_0013",
+      "model": "regional_blend",
+      "multiplier": 100,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        13,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        3242521124,
+        1238527832,
+        856790164,
+        3526673753
+      ],
+      "source_family": "one_pct",
+      "total": 1250399667,
+      "toy_index": 13
+    },
+    {
+      "counts_sha256_int64": "8f9fcd88427361b38cd63fc15e14a7d3234f31530674a4d4aa4c07d79e5c34bd",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_10pct/toy_0013",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        13,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        1294889950,
+        4207902107,
+        3441849160,
+        1217184812
+      ],
+      "source_family": "ten_pct",
+      "total": 141271593,
+      "toy_index": 13
+    },
+    {
+      "counts_sha256_int64": "727ba15236c7d89c490c5df845ea1992a2f592ea1ab4c6f912cc8074d2d5f270",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "01038e1889c226af9005c95b22c6c55c9f10dd2c216414d3805ea50dd8aab7c6",
+      "key": "toys/regional_blend/2021_10pct_x10/toy_0013",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        13,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        1852479959,
+        1341891588,
+        3372891732,
+        2943942404
+      ],
+      "source_family": "ten_pct",
+      "total": 1412563276,
+      "toy_index": 13
+    },
+    {
+      "counts_sha256_int64": "90ae73da59a384aec1cb8829fc3037324e5d6fbacf06fd8a2153e018dd1dd5bb",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_1pct/toy_0014",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        14,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        334690460,
+        2056886593,
+        639119068,
+        2809868785
+      ],
+      "source_family": "one_pct",
+      "total": 12506558,
+      "toy_index": 14
+    },
+    {
+      "counts_sha256_int64": "d4ae01f23b67706f05d478045c6f875d8794f97c85540949c1f86ae40f55e94f",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "ae50cfbd675105312f7e0b45aca292d50de2ae52691fd40ac92b478a83492889",
+      "key": "toys/regional_blend/2021_1pct_x10/toy_0014",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        14,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        805366187,
+        1125397094,
+        4065246839,
+        4094243188
+      ],
+      "source_family": "one_pct",
+      "total": 125056885,
+      "toy_index": 14
+    },
+    {
+      "counts_sha256_int64": "0ae285959acd56971027a1410096199376b4bf97406b3e65789afcc9c9db3149",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "62f82d807ff6e228d654a80fa67b594d4cd29d2b61c32ad6c374e7bd7439364f",
+      "key": "toys/regional_blend/2021_1pct_x100/toy_0014",
+      "model": "regional_blend",
+      "multiplier": 100,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        14,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        3202760227,
+        2122532313,
+        4000588209,
+        3620658144
+      ],
+      "source_family": "one_pct",
+      "total": 1250440795,
+      "toy_index": 14
+    },
+    {
+      "counts_sha256_int64": "b21a0e26fea6542429ef468d839c8a05f579434c277573ca001a16f6558f6889",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_10pct/toy_0014",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        14,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        2826714038,
+        2684557306,
+        3006059194,
+        518522614
+      ],
+      "source_family": "ten_pct",
+      "total": 141243441,
+      "toy_index": 14
+    },
+    {
+      "counts_sha256_int64": "16283d2d25c53891030535e8ce59d1f808a1e429d8e5310b70929ed9d817932a",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "67bb10cc220474b7b31614c6749b0d1aa83777a20a1e058b67094814b617ada2",
+      "key": "toys/regional_blend/2021_10pct_x10/toy_0014",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        14,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        2731348710,
+        965764591,
+        675607809,
+        913475617
+      ],
+      "source_family": "ten_pct",
+      "total": 1412512255,
+      "toy_index": 14
+    },
+    {
+      "counts_sha256_int64": "b11855e9f9d9ff872d54dff29b18b2d26f4f42b830fcaf04f526a5c2594e6618",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_1pct/toy_0015",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        15,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        886557924,
+        1311606144,
+        1842816637,
+        4161935902
+      ],
+      "source_family": "one_pct",
+      "total": 12504224,
+      "toy_index": 15
+    },
+    {
+      "counts_sha256_int64": "74d3b5a18e84f232c0e8f4c3fea44bfcecda18d327d3a5644fe8e642823629e6",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "16ca117fa20f5187430f8acb889f921e2ebe498a7b45e7c62405c6c14d7a8015",
+      "key": "toys/regional_blend/2021_1pct_x10/toy_0015",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        15,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        2498366441,
+        1489740402,
+        4265006439,
+        3682975401
+      ],
+      "source_family": "one_pct",
+      "total": 125047732,
+      "toy_index": 15
+    },
+    {
+      "counts_sha256_int64": "23111008d6c3579741b1e33a191c583267112ee62cc31cfbb42ca14a460a70c7",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "5ea101d44e41ca8eb6a240c3004405979a65b3306a5ceac3d198747d82a94550",
+      "key": "toys/regional_blend/2021_1pct_x100/toy_0015",
+      "model": "regional_blend",
+      "multiplier": 100,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        15,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        487070265,
+        1130369321,
+        9199767,
+        579182224
+      ],
+      "source_family": "one_pct",
+      "total": 1250359883,
+      "toy_index": 15
+    },
+    {
+      "counts_sha256_int64": "8c864cfdca3d6970966a5b24486bcc747809d15989024d99a899451c39bdcfae",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_10pct/toy_0015",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        15,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        2404320383,
+        1991226705,
+        3511227142,
+        2812833854
+      ],
+      "source_family": "ten_pct",
+      "total": 141235705,
+      "toy_index": 15
+    },
+    {
+      "counts_sha256_int64": "5661987384b25820af6a4fb8c55ff9db23b56cb66b405ce5545a9eb994ef4141",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "9fbfe1331e5d86a5d604aa4361e43ab1e2af27542c188077a2f7e39adaff6bba",
+      "key": "toys/regional_blend/2021_10pct_x10/toy_0015",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        15,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        2344783859,
+        3277167821,
+        3000544161,
+        576555272
+      ],
+      "source_family": "ten_pct",
+      "total": 1412543114,
+      "toy_index": 15
+    },
+    {
+      "counts_sha256_int64": "ffa71775b796a2a4c85dec419df80c27d909d08adeedf09e5fb1121b865b3f82",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_1pct/toy_0016",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        16,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        2491409264,
+        1741213081,
+        877412680,
+        4018223970
+      ],
+      "source_family": "one_pct",
+      "total": 12502004,
+      "toy_index": 16
+    },
+    {
+      "counts_sha256_int64": "474054846ecf2b1a94f5301e1b475a22913aacf37055581bce48869fecb5a86f",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "f7afe4e76684688d157fd7c75f9682624b6b868051d7c25a8d22ea92b6319c5d",
+      "key": "toys/regional_blend/2021_1pct_x10/toy_0016",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        16,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        468109702,
+        3571140595,
+        2411869476,
+        2826365244
+      ],
+      "source_family": "one_pct",
+      "total": 125029299,
+      "toy_index": 16
+    },
+    {
+      "counts_sha256_int64": "36ff5db375fc99bb484a9b121f61a5a4f77621f4d4d8a87d6bb993674638dc2a",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "a74c34a61042a89fa93937595cd271aa520e7aea8229d16c5bb1fee1d2a99f29",
+      "key": "toys/regional_blend/2021_1pct_x100/toy_0016",
+      "model": "regional_blend",
+      "multiplier": 100,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        16,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        3049358156,
+        3992357805,
+        3834131479,
+        2973265255
+      ],
+      "source_family": "one_pct",
+      "total": 1250373412,
+      "toy_index": 16
+    },
+    {
+      "counts_sha256_int64": "f9a686545e17bd1dfd54bb283a18d2da6a2ecb1b798b821dcfcf91d4918f63f6",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_10pct/toy_0016",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        16,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        489223875,
+        3679693184,
+        3199926204,
+        4087709473
+      ],
+      "source_family": "ten_pct",
+      "total": 141269962,
+      "toy_index": 16
+    },
+    {
+      "counts_sha256_int64": "6314714a4583f4e11829fd2cb031e6485e8a197c34d8d2f9adfc64fbbd9d27ca",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "6ce7026d6ebe43707a03015fb1d97503d7732d95263574f25a963192e00dd595",
+      "key": "toys/regional_blend/2021_10pct_x10/toy_0016",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        16,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        2264744178,
+        1998487967,
+        3975563757,
+        2488845248
+      ],
+      "source_family": "ten_pct",
+      "total": 1412556713,
+      "toy_index": 16
+    },
+    {
+      "counts_sha256_int64": "84e15c1a28a3243b8c95c4c74d78eff645df16ab13aa8c647198c5980d49bf24",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_1pct/toy_0017",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        17,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        917772036,
+        1793575331,
+        3221299561,
+        565038995
+      ],
+      "source_family": "one_pct",
+      "total": 12505794,
+      "toy_index": 17
+    },
+    {
+      "counts_sha256_int64": "94f46e16921e3f2b8797b413201a5281dd7ad7d0f925cede707d8408b4e0ec65",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "2a9768cf13e20940094aca5281b703704bd33654d00faedfa59804752ae3fce1",
+      "key": "toys/regional_blend/2021_1pct_x10/toy_0017",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        17,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        82552987,
+        2276683663,
+        1547236154,
+        3073049282
+      ],
+      "source_family": "one_pct",
+      "total": 125046017,
+      "toy_index": 17
+    },
+    {
+      "counts_sha256_int64": "f47d649a1bab5d38d002f9b3f6f79a6e7625327fe7e73f857b09dd7e2a9a5da5",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "dab92971a09544f0ebbe5a922d6b821825ae604d7e24d40cd5a5b6d57eff69bf",
+      "key": "toys/regional_blend/2021_1pct_x100/toy_0017",
+      "model": "regional_blend",
+      "multiplier": 100,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        17,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        824919670,
+        2890399756,
+        1456903975,
+        24554093
+      ],
+      "source_family": "one_pct",
+      "total": 1250437095,
+      "toy_index": 17
+    },
+    {
+      "counts_sha256_int64": "c2752dd30f4ad5106a691eb95840dc26c0a5a17b0fe0fe31d7172a9cfd7365c2",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_10pct/toy_0017",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        17,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        3165352023,
+        661427491,
+        882038804,
+        3026055382
+      ],
+      "source_family": "ten_pct",
+      "total": 141253712,
+      "toy_index": 17
+    },
+    {
+      "counts_sha256_int64": "a83a36578cab97086b923a03542ea5b2cb5db182dd62746330f1c9daa9d924c1",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "bd294037903fa0186711786ccb18be9f52097d2c57dcc3d267c08f722b313a83",
+      "key": "toys/regional_blend/2021_10pct_x10/toy_0017",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        17,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        2799153858,
+        2036810516,
+        3665436831,
+        2101255547
+      ],
+      "source_family": "ten_pct",
+      "total": 1412512748,
+      "toy_index": 17
+    },
+    {
+      "counts_sha256_int64": "292841e2fd74e49ecf599ae9405c8f0c916c9431601408c3d8f153bac157c633",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_1pct/toy_0018",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        18,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        666892176,
+        718630851,
+        319961546,
+        3760087057
+      ],
+      "source_family": "one_pct",
+      "total": 12511803,
+      "toy_index": 18
+    },
+    {
+      "counts_sha256_int64": "49a5b9fef7e7e36113b839b6aadb91be5bac2b2cb131905d1b0f4eae5b7981d8",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "113cd9a0c71aecd4ec0fb408f7bcfb68a21612442b94e8993fd3a666dee56e36",
+      "key": "toys/regional_blend/2021_1pct_x10/toy_0018",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        18,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        1482891317,
+        2485964545,
+        1841853617,
+        219219423
+      ],
+      "source_family": "one_pct",
+      "total": 125043719,
+      "toy_index": 18
+    },
+    {
+      "counts_sha256_int64": "839e78d26907d28488946e1754980c79ec467c35440d8ab699f3110412d15611",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "4e92f5de6d1ec6d8b65302bdcccfc084c02f5865cd49c97f2586dd6e7642d477",
+      "key": "toys/regional_blend/2021_1pct_x100/toy_0018",
+      "model": "regional_blend",
+      "multiplier": 100,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        18,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        1098753342,
+        2010652850,
+        3632619616,
+        229799673
+      ],
+      "source_family": "one_pct",
+      "total": 1250324275,
+      "toy_index": 18
+    },
+    {
+      "counts_sha256_int64": "e63a62534a741ddbffbf071eec03e62f8a2989480815fdb4b82a84ac55ff1072",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_10pct/toy_0018",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        18,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        2095643171,
+        1788106632,
+        3261887510,
+        2613524108
+      ],
+      "source_family": "ten_pct",
+      "total": 141256193,
+      "toy_index": 18
+    },
+    {
+      "counts_sha256_int64": "d6aca7a6c4ec55864d0df45c0d966ee13e5a28b8ee13c74e9e14e0f802d98156",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "678cb040665934ed9b588ce34b0aa1981c2de1431bb78c401a47663c2a2c146a",
+      "key": "toys/regional_blend/2021_10pct_x10/toy_0018",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        18,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        354284497,
+        1395835611,
+        330991104,
+        610473883
+      ],
+      "source_family": "ten_pct",
+      "total": 1412560818,
+      "toy_index": 18
+    },
+    {
+      "counts_sha256_int64": "8340dae19aabe85ada6c18a498feab498c7f3d02a48a47030596cf6e2aeeaf75",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_1pct/toy_0019",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        19,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        784406351,
+        1362033845,
+        1810535765,
+        3635756697
+      ],
+      "source_family": "one_pct",
+      "total": 12503740,
+      "toy_index": 19
+    },
+    {
+      "counts_sha256_int64": "f27ff671326d0856a3fd5b17698f17fdb58ea4b2e4971029813bf9f5bf82ff00",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "0dc344e5933a5fc4de549f8f61fe8832b3b7e61d538b28cd6a41a7c00a874811",
+      "key": "toys/regional_blend/2021_1pct_x10/toy_0019",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        19,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "toys",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        1111614626,
+        1648353542,
+        1010489191,
+        3329489819
+      ],
+      "source_family": "one_pct",
+      "total": 125023557,
+      "toy_index": 19
+    },
+    {
+      "counts_sha256_int64": "20f55cdbc826b6a97a9cc0bcde8a1ae777a7492d8f4ee6b21191ec5a0ed0f4bf",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "9ae47961139fa5cf331073b79686d4e3d5d336d18e751abff94fc64ced703f92",
+      "key": "toys/regional_blend/2021_1pct_x100/toy_0019",
+      "model": "regional_blend",
+      "multiplier": 100,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "one_pct",
+        19,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "toys",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        2192353362,
+        119517592,
+        2546456151,
+        4040700100
+      ],
+      "source_family": "one_pct",
+      "total": 1250471920,
+      "toy_index": 19
+    },
+    {
+      "counts_sha256_int64": "ae8fee86622995e42aa07a0d5fba877cf0a7d34838a6a51fd686513e9acc2c27",
+      "increment_multiplier": 1,
+      "key": "toys/regional_blend/2021_10pct/toy_0019",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        19,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "toys",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        3417533483,
+        717605578,
+        2208191759,
+        1299822066
+      ],
+      "source_family": "ten_pct",
+      "total": 141266885,
+      "toy_index": 19
+    },
+    {
+      "counts_sha256_int64": "a9427edb881e0c15fbc0eedd4311ded52683f9265b06350f11dc57d45fd23d5d",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "e5aef76a6dc061975d057dea0f9b55cc7371f90f13c28bb6ec4367bb6927caa8",
+      "key": "toys/regional_blend/2021_10pct_x10/toy_0019",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "toys",
+        "ten_pct",
+        19,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "toys",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        2655154929,
+        2743454510,
+        2350671514,
+        3725059241
+      ],
+      "source_family": "ten_pct",
+      "total": 1412571061,
+      "toy_index": 19
+    },
+    {
+      "counts_sha256_int64": "df3eaa6ce615b59f9ccca98d9828a2e74369a0fbc5715a26b205db7188501f43",
+      "increment_multiplier": 1,
+      "key": "pilot/regional_blend/2021_1pct/toy_0000",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "pilot",
+        "one_pct",
+        0,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "pilot",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        381271351,
+        3301270743,
+        3027808997,
+        2272297352
+      ],
+      "source_family": "one_pct",
+      "total": 12504452,
+      "toy_index": 0
+    },
+    {
+      "counts_sha256_int64": "80ef83478ec05c0ca57086c98dc226e9361111dc35e83a758169ffc762c2c29e",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "d23aea7198006697848b1870f642d234e2b0579a165d21bdfb7510eb9deac478",
+      "key": "pilot/regional_blend/2021_1pct_x10/toy_0000",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "pilot",
+        "one_pct",
+        0,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "pilot",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        3020698891,
+        1258161847,
+        554363724,
+        277986624
+      ],
+      "source_family": "one_pct",
+      "total": 125028910,
+      "toy_index": 0
+    },
+    {
+      "counts_sha256_int64": "4368fe013ba9b9ee75d631a0a90843e0661295e29070afda11b9e36fa75f0967",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "21fd19195b01ec9f80728a85417691c8dc6c8e430b3d6112cb78f2130ecc52f6",
+      "key": "pilot/regional_blend/2021_1pct_x100/toy_0000",
+      "model": "regional_blend",
+      "multiplier": 100,
+      "namespace": [
+        "regional_blend",
+        "pilot",
+        "one_pct",
+        0,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "pilot",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        852555474,
+        3814163132,
+        3849040944,
+        3933453395
+      ],
+      "source_family": "one_pct",
+      "total": 1250415667,
+      "toy_index": 0
+    },
+    {
+      "counts_sha256_int64": "fa5124737fcef3df6cf8c5ade5ca2be6b0e0d9738bbb22fddb4cafaaf1f664e2",
+      "increment_multiplier": 1,
+      "key": "pilot/regional_blend/2021_10pct/toy_0000",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "pilot",
+        "ten_pct",
+        0,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "pilot",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        1363287565,
+        2282495427,
+        863932418,
+        189782970
+      ],
+      "source_family": "ten_pct",
+      "total": 141240151,
+      "toy_index": 0
+    },
+    {
+      "counts_sha256_int64": "011977e6a096583982b60b75e4ad4ec18caab91340bff33906933b295b60e2e6",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "54c63a9cf362b120bdde58112ebb9d488441152aec9205141ceb38aceaf4a084",
+      "key": "pilot/regional_blend/2021_10pct_x10/toy_0000",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "pilot",
+        "ten_pct",
+        0,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "pilot",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        847599262,
+        3147526680,
+        4218490603,
+        3836944989
+      ],
+      "source_family": "ten_pct",
+      "total": 1412494694,
+      "toy_index": 0
+    },
+    {
+      "counts_sha256_int64": "f8b8a46aad8e49bc7e6eb2572eb0d7d209bad9bf66ae97b22745b2a17bff803b",
+      "increment_multiplier": 1,
+      "key": "pilot/regional_blend/2021_1pct/toy_0001",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "pilot",
+        "one_pct",
+        1,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "pilot",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        1736716286,
+        2761503346,
+        3932588885,
+        3629195724
+      ],
+      "source_family": "one_pct",
+      "total": 12505243,
+      "toy_index": 1
+    },
+    {
+      "counts_sha256_int64": "79b182fbef4e51ae69611bd9d49c9736bde4811ab05ecc1a45dcd08a3c468b2b",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "bddb3ffbb11f2f857e20dc8d8e73bf76474b941adbc881031b1dca24e2c6a803",
+      "key": "pilot/regional_blend/2021_1pct_x10/toy_0001",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "pilot",
+        "one_pct",
+        1,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "pilot",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        3172422662,
+        3241219706,
+        3195518594,
+        970817646
+      ],
+      "source_family": "one_pct",
+      "total": 125039567,
+      "toy_index": 1
+    },
+    {
+      "counts_sha256_int64": "d8614261882ed88ac18f6c4354d76fce01685eeffe3ca348d011cfed49fcfd2c",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "d0dd4af27fe2dcb588e4a5eb92de353a7e9481728fe7b780ac6530fe14fe9728",
+      "key": "pilot/regional_blend/2021_1pct_x100/toy_0001",
+      "model": "regional_blend",
+      "multiplier": 100,
+      "namespace": [
+        "regional_blend",
+        "pilot",
+        "one_pct",
+        1,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "pilot",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        3896180136,
+        2338321475,
+        3742759378,
+        2494872002
+      ],
+      "source_family": "one_pct",
+      "total": 1250397887,
+      "toy_index": 1
+    },
+    {
+      "counts_sha256_int64": "ee94e493597c24ed6e91af8575b57ec7dddcb3c7644b67144cdf9e6e7d5c297a",
+      "increment_multiplier": 1,
+      "key": "pilot/regional_blend/2021_10pct/toy_0001",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "pilot",
+        "ten_pct",
+        1,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "pilot",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        4253573644,
+        1289905905,
+        1832192718,
+        3733889516
+      ],
+      "source_family": "ten_pct",
+      "total": 141261585,
+      "toy_index": 1
+    },
+    {
+      "counts_sha256_int64": "93917a438aeb77785f3fa96720116e30c7840b7d3a4c42ea5a9b1548dd5c4fba",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "1e9eb7ad75d574ebeb91b07fbc0c635d9f8a8416be16fe9484ca8eef545f1b3c",
+      "key": "pilot/regional_blend/2021_10pct_x10/toy_0001",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "pilot",
+        "ten_pct",
+        1,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "pilot",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        407988851,
+        2567459182,
+        3815485433,
+        2872853162
+      ],
+      "source_family": "ten_pct",
+      "total": 1412519094,
+      "toy_index": 1
+    },
+    {
+      "counts_sha256_int64": "ac0d46f8eb1f8a382ce5eb3795998b19f5150c1aad55fbe57f695aeef7d08bfe",
+      "increment_multiplier": 1,
+      "key": "pilot/regional_blend/2021_1pct/toy_0002",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "pilot",
+        "one_pct",
+        2,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "pilot",
+      "scenario": "2021_1pct",
+      "seed_words_uint32": [
+        1053381602,
+        2023365085,
+        2250657721,
+        2652490682
+      ],
+      "source_family": "one_pct",
+      "total": 12504566,
+      "toy_index": 2
+    },
+    {
+      "counts_sha256_int64": "4b12788abfaa9f968624373f07d6eaa4274235d4868729c7f928237557ed67fb",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "3fee32aa4c1cd8489a96261b33b07b0382ae6766be34807451d7b3be20f21b84",
+      "key": "pilot/regional_blend/2021_1pct_x10/toy_0002",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "pilot",
+        "one_pct",
+        2,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_1pct",
+      "phase": "pilot",
+      "scenario": "2021_1pct_x10",
+      "seed_words_uint32": [
+        258776741,
+        3221030318,
+        2503233452,
+        695957546
+      ],
+      "source_family": "one_pct",
+      "total": 125042386,
+      "toy_index": 2
+    },
+    {
+      "counts_sha256_int64": "36f797e90f106979e13de58ff16fda32fcc3463eca1be77d45eaf5f5a1c09371",
+      "increment_multiplier": 90,
+      "increment_sha256_int64": "0b69da278639b532a31c85501875f724acdc46a796fa53430abf91fcbd060f23",
+      "key": "pilot/regional_blend/2021_1pct_x100/toy_0002",
+      "model": "regional_blend",
+      "multiplier": 100,
+      "namespace": [
+        "regional_blend",
+        "pilot",
+        "one_pct",
+        2,
+        "increment_x90"
+      ],
+      "parent_scenario": "2021_1pct_x10",
+      "phase": "pilot",
+      "scenario": "2021_1pct_x100",
+      "seed_words_uint32": [
+        3404903302,
+        3845771939,
+        379840333,
+        2797857614
+      ],
+      "source_family": "one_pct",
+      "total": 1250378312,
+      "toy_index": 2
+    },
+    {
+      "counts_sha256_int64": "d58b1cfeaab6b456f3af1636b206011e7c20f1f58f9fb831f5a38b0b9116df39",
+      "increment_multiplier": 1,
+      "key": "pilot/regional_blend/2021_10pct/toy_0002",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "namespace": [
+        "regional_blend",
+        "pilot",
+        "ten_pct",
+        2,
+        "parent"
+      ],
+      "parent_scenario": null,
+      "phase": "pilot",
+      "scenario": "2021_10pct",
+      "seed_words_uint32": [
+        3580583514,
+        3151679426,
+        2028590609,
+        1103217982
+      ],
+      "source_family": "ten_pct",
+      "total": 141250456,
+      "toy_index": 2
+    },
+    {
+      "counts_sha256_int64": "cea055619c02baace409039f46af8edf7f2193bf8cbd4fd8875dc942c06f1846",
+      "increment_multiplier": 9,
+      "increment_sha256_int64": "47869d188b05723d45bfaa00067e4b55f9f5e8a9856e0bd3b3256f98fee224a1",
+      "key": "pilot/regional_blend/2021_10pct_x10/toy_0002",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "namespace": [
+        "regional_blend",
+        "pilot",
+        "ten_pct",
+        2,
+        "increment_x9"
+      ],
+      "parent_scenario": "2021_10pct",
+      "phase": "pilot",
+      "scenario": "2021_10pct_x10",
+      "seed_words_uint32": [
+        3116204837,
+        3215279347,
+        968679551,
+        1139196479
+      ],
+      "source_family": "ten_pct",
+      "total": 1412495690,
+      "toy_index": 2
+    }
+  ],
+  "truths": [
+    {
+      "increment_multiplier": 1,
+      "key": "truth/knot_spline/2021_1pct_mean",
+      "mean_sha256_float64": "53f9b4da127e48d10dd6f9f1f9e799eebf09afbcd98fc2becbe004e9087e7595",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "parent_scenario": null,
+      "scenario": "2021_1pct",
+      "source_family": "one_pct",
+      "total": 12504043.999999998
+    },
+    {
+      "increment_multiplier": 9,
+      "key": "truth/knot_spline/2021_1pct_x10_mean",
+      "mean_sha256_float64": "7fcaef2ab58c7585db0bc52cda6ca938b10f51c3203a349619a198f311bc31a5",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "parent_scenario": "2021_1pct",
+      "scenario": "2021_1pct_x10",
+      "source_family": "one_pct",
+      "total": 125040439.99999999
+    },
+    {
+      "increment_multiplier": 90,
+      "key": "truth/knot_spline/2021_1pct_x100_mean",
+      "mean_sha256_float64": "99e8a8b693467cb5f08e4043029c1c6186a0d8b1539d1cd212a758ff0c31015a",
+      "model": "knot_spline",
+      "multiplier": 100,
+      "parent_scenario": "2021_1pct_x10",
+      "scenario": "2021_1pct_x100",
+      "source_family": "one_pct",
+      "total": 1250404399.9999998
+    },
+    {
+      "increment_multiplier": 1,
+      "key": "truth/knot_spline/2021_10pct_mean",
+      "mean_sha256_float64": "858a7072616082f0ad1f292015dcb4363c3a5fb961a02ed71923479a8fb8db7c",
+      "model": "knot_spline",
+      "multiplier": 1,
+      "parent_scenario": null,
+      "scenario": "2021_10pct",
+      "source_family": "ten_pct",
+      "total": 141251508.00000003
+    },
+    {
+      "increment_multiplier": 9,
+      "key": "truth/knot_spline/2021_10pct_x10_mean",
+      "mean_sha256_float64": "42039904dd99183272a47f0449d7b45bb9a5a09b61374d21df45390233f31db4",
+      "model": "knot_spline",
+      "multiplier": 10,
+      "parent_scenario": "2021_10pct",
+      "scenario": "2021_10pct_x10",
+      "source_family": "ten_pct",
+      "total": 1412515080.0
+    },
+    {
+      "increment_multiplier": 1,
+      "key": "truth/regional_blend/2021_1pct_mean",
+      "mean_sha256_float64": "ae8669fc232aea96810fdba73afcea85b997d9181376e3a0634762672df5484b",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "parent_scenario": null,
+      "scenario": "2021_1pct",
+      "source_family": "one_pct",
+      "total": 12504044.0
+    },
+    {
+      "increment_multiplier": 9,
+      "key": "truth/regional_blend/2021_1pct_x10_mean",
+      "mean_sha256_float64": "69d8c5d4728f8ca8723e3b605a5d87914cbfc5f4a37c0c7dc4f070d506377c43",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "parent_scenario": "2021_1pct",
+      "scenario": "2021_1pct_x10",
+      "source_family": "one_pct",
+      "total": 125040440.0
+    },
+    {
+      "increment_multiplier": 90,
+      "key": "truth/regional_blend/2021_1pct_x100_mean",
+      "mean_sha256_float64": "9a4b6e8793ee3620e950148b966c7ac9b64356a5c08085697b0c69d6529611fd",
+      "model": "regional_blend",
+      "multiplier": 100,
+      "parent_scenario": "2021_1pct_x10",
+      "scenario": "2021_1pct_x100",
+      "source_family": "one_pct",
+      "total": 1250404400.0000002
+    },
+    {
+      "increment_multiplier": 1,
+      "key": "truth/regional_blend/2021_10pct_mean",
+      "mean_sha256_float64": "d4a531213d3381438db4aa09a339a3865bf4e76b935f338a65b6676f95021fb9",
+      "model": "regional_blend",
+      "multiplier": 1,
+      "parent_scenario": null,
+      "scenario": "2021_10pct",
+      "source_family": "ten_pct",
+      "total": 141251508.0
+    },
+    {
+      "increment_multiplier": 9,
+      "key": "truth/regional_blend/2021_10pct_x10_mean",
+      "mean_sha256_float64": "f02612bb3d2d86ba147422baa69cfbd1e065cc822e07f4496446b9beedbdf8df",
+      "model": "regional_blend",
+      "multiplier": 10,
+      "parent_scenario": "2021_10pct",
+      "scenario": "2021_10pct_x10",
+      "source_family": "ten_pct",
+      "total": 1412515080.0
+    }
+  ]
+}

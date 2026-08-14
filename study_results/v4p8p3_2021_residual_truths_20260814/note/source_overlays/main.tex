@@ -1,0 +1,251 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,mathtools,bm}
+\usepackage{booktabs,tabularx,array,makecell,longtable}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{siunitx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{xurl}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{placeins}
+\usepackage{pdflscape}
+\usepackage{microtype}
+\usepackage{textcomp}
+% Package used to add line numbers
+\usepackage[left]{lineno}
+\linenumbers
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!60!black,
+  citecolor=blue!60!black,
+  urlcolor=blue!60!black
+}
+
+
+\usepackage{fancyhdr}
+
+\pagestyle{fancy}
+\fancyhf{}
+\setlength{\headheight}{14pt}
+
+\fancyhead[R]{HPS-ANALYSIS-NOTE BH-GPR v4.8}
+\fancyfoot[C]{\thepage}
+
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \fancyhead[R]{HPS-ANALYSIS-NOTE BH-GPR v4.8}
+  \fancyfoot[C]{\thepage}
+}
+
+
+\setlist[itemize]{leftmargin=*}
+\setlist[enumerate]{leftmargin=*}
+\setlength{\tabcolsep}{5pt}
+\setlength{\emergencystretch}{2em}
+\renewcommand{\arraystretch}{1.12}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\CLs}{CL$_\mathrm{s}$}
+\newcommand{\Pre}{\textbf{Pre:}\ }
+\newcommand{\Pro}{\textbf{Prompt:}\ }
+\newcommand{\xspace}{}
+
+\newcommand{\graphicorplaceholder}[2]{%
+  \IfFileExists{#2}{%
+    \includegraphics[width=#1]{#2}%
+  }{%
+    \makebox[#1][c]{%
+      \fbox{%
+        \begin{minipage}[c][0.21\textheight][c]{\dimexpr#1-2\fboxsep-2\fboxrule\relax}
+          \centering
+          \footnotesize Figure placeholder\\[0.6ex]
+          \parbox{0.92\linewidth}{\raggedright\scriptsize\path{#2}}
+        \end{minipage}%
+      }%
+    }%
+  }%
+}
+
+\title{\vspace{-1.0em}HPS Gaussian-Process Resonance Search Analysis Note\\
+\large Version 4.8: Residual-structured 2021 functional-form stress tests
+following the frozen v4.2 search result}
+\author{
+Emrys Peets\\Stanford University and SLAC National Accelerator Laboratory
+\and
+Matthew Gignac\\SLAC National Accelerator Laboratory
+\and
+Eden Hsu\\Stanford University and SLAC National Accelerator Laboratory
+}
+\date{August 14, 2026}
+
+\begin{document}
+
+
+\maketitle
+
+\begin{abstract}
+This note documents the Heavy Photon Search (HPS) Gaussian-process-regression (GPR)
+workflow for a narrow prompt
+$A^\prime \rightarrow e^+e^-$ resonance in the HPS invariant-mass spectrum. The
+analysis performs global background interpolation, local signal extraction with
+Gaussian-constrained nuisance parameters for the correlated background uncertainty,
+modified-frequentist
+\CLs\ ($\mathrm{CL}_{s+b}/\mathrm{CL}_b$) upper limits in signal-yield and
+$\eps^2$ space, and a statistically independent multi-dataset combination in a shared
+$\eps^2$ parameter of interest. The signal model is implemented as a full-range
+Gaussian template whose blinded-bin slice enters the local likelihood without
+renormalization, so the fitted amplitude retains the interpretation of a total local
+signal yield. The note also summarizes the radiative-fraction normalization,
+length-scale parameterization, toy-validation program, and staged path from the
+published 2015 and 2016 HPS prompt searches toward a fully unblinded combination.
+Version 4 separates the mass interval searched for a signal from the wider spectrum
+used to train each GP. Version 4.1 kept those supports and revisited one numerical
+range after the v4 observed scan showed that all 142 full-2016 fits saturated the
+resolution-scaled length-scale ceiling. A controlled scan of
+$k_{\max,2016}=8,10,12,15,$ and 20 identified 12 as the first nonbinding value
+followed by a stable plateau. Version 4.2 accepts that factor-12 setting and completes
+the 90\% confidence-level combined search using the full 2015 and 2016 samples and
+the reviewed 2021 10\% sample. The principal result is the shared-$\eps^2$ observed
+asymptotic \CLs{} limit with central expected intervals from exactly 300
+background-only joint pseudoexperiments per mass. A common pseudoexperiment index is
+shared by every dataset active at that mass. The three constituent distributions
+and the three pairwise combinations are additionally documented with auxiliary
+100-pseudoexperiment conditional limit bands that reuse the first 100 entries of
+the accepted parent stream. Local asymptotic $p_0$ values are shown separately.
+The observed 65~MeV local minimum is
+documented with an exact fixed-state extraction, sideband context, profiled
+residuals, and a comparison of the standalone and shared-coupling estimates.
+An August 6 addendum adds an observed-equivalent BaBar comparison, exact
+fixed-mass common-binning and physical-profile checks, and two fixed-seed
+conditional central-window replacements. These diagnostics do not alter the
+accepted v4.2 card or principal result and introduce no projected bands,
+coverage statement, or scan-calibrated global claim.
+An August 7 appendix defines an operational eight-feature catalogue from the
+seven distinct v4.2 limit curves and applies dataset-specific
+$\pm2.5\sigma_m$ native-histogram inpainting.  Three joint GP-posterior plus
+Poisson conditional replicates, together with a separate deterministic mean
+lane, show reciprocal model-mediated cross-response between interventions in
+the 65 and 80~MeV regions, which propagates into pairwise and all-three limits.
+This response is a property of the shared nonlocal GP/background-profile
+refit and is compatible with mediation by the adjacent deficit/background
+structure; no physical-dependence or shared-event interpretation is assigned.
+A
+common-axis 65~MeV positional comparison and a conditional v11
+SIMP/TM kinematic atlas are included.  The exact v16 event-level sample used
+for the observed-limit histogram is unavailable locally, so the atlas is a
+descriptive selection/mechanism comparison.  These
+data-selected interventions do not replace the observed limit and the three
+replicates are not expected-limit or coverage toys.
+An August 10 v4.3 addendum uses a new diagnostic ROOT product whose canonical
+2000-, 4000-, and 8000-bin invariant-mass histograms are bitwise identical to
+the frozen v4.2 2021 input.  Exhaustive topology and stored-trigger partitions
+close bin-by-bin, and four mass-versus-control surfaces permit a deterministic
+selected-row morphology study in the exact v16 production.  A jointly masked,
+sideband-trained conditional-composition GPR is checked with target-blind fake
+gaps, four mass binnings, four continuous-control groupings, and single-target
+mask variants.  It uses zero pseudoexperiments and computes no category limit,
+candidate yield, or significance.  The saved variables show sub-percent
+conditional-composition differences whose direction and stability depend on
+the variable and deterministic analysis choice.  Joint masking of the 65 and
+80~MeV regions protects the interpolation from shared GP/background-profile
+cross-response.  The cross-response describes the common fitting procedure,
+not a physical relation between the two local mass features.
+This diagnostic does not alter the accepted v4.2 card, observed limit, bands,
+or candidate catalogue.
+An August 11 extension compares normalized central-window and adjacent-
+sideband shapes for momentum sum, vertex-projection significance, minimum
+track $|y_0|$, electron 3D-hit count, topology, and stored-trigger category at
+51, 65, 80, 90, 117, and 162~MeV.  Region totals use fractional overlap of
+the 0.125-MeV mass-bin edges with the fixed resolution-scaled windows at each
+anchor.  These histogram-level comparisons add neither a signal yield nor a
+significance or limit result.  The largest central-to-sideband-chord shape
+distances occur at the 51~MeV lower-boundary region and, among the interior
+anchors, at 65~MeV; the corresponding 80~MeV differences are smaller.
+The v4.1 and v4.5 ten-toy source/exposure studies are retained in an appendix.
+Version 4.6 uniformly reruns all 100 background pseudoexperiments for the
+$1\%\times10$, native 10\%, $1\%\times100$, and $10\%\times10$ ensembles at
+65, 90, 120, 180, and 210~MeV with 0-, 1-, 3-, and 5-$\sigma_A$ injections.
+It uses the frozen v4.2 2021 card, including $k_{\max}=15$ and the
+$2.25\sigma_m$ blind/training geometry, and a predeclared adaptive repeat gate
+whose branch choice uses only GP log marginal likelihood and reproducibility.
+The gate excludes six irreproducible state keys from 8000 while retaining every
+statistical extreme that passes the pull-blind technical gate; all 80 closure cells contain
+99 or 100 accepted toys.  The pilot-selected $1\%\times10$, 65~MeV
+zero-signal offset is confirmed in the independent 90-toy reserve:
+$\bar p=0.768$ with 95\% interval $[0.570,0.965]$.  The full-100 value is
+$0.789$, and the analytic stress-truth mean gives 0.837, identifying a local
+functional-form/GP closure offset rather than a few bad toys.  Stable
+factor-15 contacts remain in 4.25\% of accepted $1\%\times100$ fits and 6.72\%
+of accepted $10\%\times10$ fits.  These are conditional stress-test results,
+not direct \CLs{} coverage, expected-limit bands, a scan-wise significance
+calibration, or a change to the accepted v4.2 observed result.
+Version 4.7 responds to the near-threshold closure pattern with independent
+source fits over 35--80~MeV.  A logistic turn-on times an exponentiated
+degree-five Chebyshev series is the lowest common candidate that passes the
+fixed native-bin and five-bin goodness-of-fit gates for the 2021 1\% and 10\%
+sources.  Twenty Poisson background spectra per source-derived scenario are
+then tested at 55, 60, 65, and 70~MeV with 0-, 1-, 3-, and
+5-$\sigma_A$ injections under the unchanged v4.2/v4.5 analysis semantics.
+The dedicated truth reduces the $1\%\times10$ 65~MeV mean pull from the
+archived, unpaired v4.6 value 0.789 to 0.300, but native 10\% remains at
+0.641 and the two scenarios show additional near-threshold offsets at 55 and
+70~MeV.  Thus the study is partial mitigation rather than uniform closure.
+All 640 extraction states are retained after a pull-blind optimizer gate,
+amended following an initial numerical-ledger audit and applied in a uniform
+rerun.  The 20-toy cells are correlated conditional diagnostics, not coverage,
+expected bands, observed limits, or evidence that the observed 65~MeV feature
+has a particular origin.  No accepted card or v4.2 observed result changes.
+Version 4.8 tests two residual-structured 2021 generating means: a source-only
+selected fixed-knot log spline and a fixed, smoothly overlapping three-region
+blend.  Both fail the frozen support-wide source-qualification and
+signal-influence gates, so neither is promoted or described as unable to learn
+a narrow signal.  Exactly 20 backgrounds are nevertheless completed as a
+requested conditional extraction stress for native 1\%, $1\%\times10$,
+$1\%\times100$, native 10\%, and $10\%\times10$ at 65, 90, 120, 180, and
+210~MeV with 0-, 1-, 3-, and 5-$\sigma_A$ injections: 2000 accepted states per
+model and no exclusions.  The K2 form is less pathological than the regional
+blend, with three versus sixteen of 25 exploratory material zero-signal flags,
+but its native-1\% factor-25 closure is upper-bound-censored in 345 of 400
+states.  A post-closure, pull-blind study with eight fresh backgrounds
+qualifies factor 50 against a factor-75 sentinel for that lane only; it does
+not rerun or uncensor the closure, qualify a common all-lane ceiling, or alter
+the production v4.2 factor-15 card.  These results remain conditional stress
+diagnostics rather than coverage, expected bands, observed-data bias, limits,
+or exclusions.
+\end{abstract}
+
+\tableofcontents
+\clearpage
+
+\input{sections/00_change_log}
+\clearpage
+
+\input{sections/01_introduction}
+\input{sections/02_datasets}
+\input{sections/03_event_selection}
+\input{sections/04_methodology}
+\input{sections/05_toys_validation}
+\input{sections/06_results}
+\input{sections/07_conclusions}
+\appendix
+\input{sections/appendix_prior_validation_results}
+\input{sections/appendix_kernel_studies}
+\input{sections/appendix_2015_method_comparison}
+\clearpage
+\input{sections/appendix_v4p2_followups}
+\input{sections/appendix_signal_candidate_catalogue}
+\input{sections/appendix_v4p5_ten_toy_source_exposure}
+
+\clearpage
+\bibliographystyle{unsrt}
+\bibliography{hps_gpr_analysis_note}
+
+\end{document}

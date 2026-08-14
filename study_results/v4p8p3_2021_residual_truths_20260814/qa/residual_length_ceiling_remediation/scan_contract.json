@@ -1,0 +1,105 @@
+{
+  "addendum_id": "v4p8p3_residual_length_ceiling_remediation_v1",
+  "addendum_sha256": "40d81bca0ded24821d2f1213e3df9a6ab1c904242b0e89ea2ad5773533e5fb1d",
+  "all_lane_confirmation": false,
+  "background_only": true,
+  "blas_threads": 1,
+  "candidate_sentinel_pairs": [
+    {
+      "candidate": 35,
+      "sentinel": 50
+    },
+    {
+      "candidate": 50,
+      "sentinel": 75
+    }
+  ],
+  "closure_rerun": false,
+  "confirmation_toy_indices": [
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "driver_path": "run_residual_length_ceiling_remediation.py",
+  "driver_sha256": "3e51b31ec9e358cc6357d7f079d5ad1e348f6c8c0765118e7bbb44e521d44fd3",
+  "fallback": null,
+  "inference_products_produced": false,
+  "legacy_runner_sha256": "205420bd293404bab08af2cb0230ad66c3dcc87dcfc627fdf3b5a13bd928dbd3",
+  "masses_gev": [
+    0.065,
+    0.12,
+    0.21
+  ],
+  "model": "knot_spline",
+  "optimizer_gate": {
+    "abs_log_constant_ratio_max": 0.05,
+    "abs_log_length_ratio_max": 0.01,
+    "bound_ratio_window": 0.02,
+    "covariance_min_eigenvalue_relative": -0.01,
+    "delta_lml_per_train_max": 0.001,
+    "maximum_attempts": 5,
+    "reference_initial_attempts": 3,
+    "top_branch_min_replicates": 2,
+    "version": "v4p7p1_reference_relative_v1"
+  },
+  "optimizer_restarts": 12,
+  "optimizer_seed_excludes_upper_factor": true,
+  "optimizer_seed_namespace": "v4p8p3_residual_length_ceiling_remediation_optimizer_v1",
+  "prohibited_output_column_substrings": [
+    "ahat",
+    "amplitude",
+    "aup",
+    "cls",
+    "coverage",
+    "eps2",
+    "epsilon",
+    "limit",
+    "p0",
+    "pull",
+    "pvalue",
+    "qmu",
+    "recovery",
+    "sigmaa",
+    "signal_yield",
+    "upper_limit",
+    "zhat"
+  ],
+  "pull_blind": true,
+  "scenario": "2021_1pct",
+  "schema_version": 1,
+  "selection_toy_indices": [
+    0,
+    1,
+    2
+  ],
+  "source_family": "one_pct",
+  "stage_gate": {
+    "candidate_and_sentinel_exact_or_near_upper_contacts": 0,
+    "confirmation_rule": "Evaluate only the frozen selected candidate and its sentinel on fresh toys 3-7. Final qualified-targeted status requires every confirmation gate at every mass; otherwise fail closed.",
+    "evaluated_separately_by_mass": true,
+    "invalid_selected_states": 0,
+    "maximum_abs_delta_ell_over_sigma_x": 0.05,
+    "maximum_abs_delta_lml_per_training_bin": 0.001,
+    "median_abs_delta_ell_over_sigma_x": 0.01,
+    "minimum_top_branch_replicates": 2,
+    "optimizer_exclusions": 0,
+    "optimizer_integrity_scope": "At each mass, the full four-factor state lattice must be complete, with zero exclusions or invalid selected states and at least two repeats for every selected branch. Contact and plateau comparisons apply to the candidate-sentinel pair.",
+    "p95_abs_delta_ell_over_sigma_x": 0.03,
+    "quantile_method": "numpy linear",
+    "selection_rule": "Evaluate candidate 35 against sentinel 50 first, then candidate 50 against sentinel 75. Select the first pair passing every gate at every mass. There is no fallback."
+  },
+  "study_id": "v4p8p3_2021_residual_truths_20260814",
+  "toy_manifest": "/private/tmp/hps-gpr-v4p8-residual-20260814.Cz9Lx0/repo/study_results/v4p8p3_2021_residual_truths_20260814/inputs/residual_length_ceiling_remediation_toys.manifest.json",
+  "toy_manifest_sha256": "2d1203593bd7665f4f763e2513647efd757b7d0e4a505ef637e563b0a0c2d053",
+  "toy_root": "/private/tmp/hps-gpr-v4p8-residual-20260814.Cz9Lx0/repo/study_results/v4p8p3_2021_residual_truths_20260814/inputs/residual_length_ceiling_remediation_toys.root",
+  "toy_root_sha256": "3a732b40aabc50b2665753b06377bed3daafa069127343df7ecbd6660cdc5857",
+  "upper_factors": [
+    25,
+    35,
+    50,
+    75
+  ],
+  "workers": 1
+}

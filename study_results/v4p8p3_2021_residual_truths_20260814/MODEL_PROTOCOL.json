@@ -1,0 +1,189 @@
+{
+  "schema_version": 1,
+  "study_id": "v4p8p3_2021_residual_truths_20260814",
+  "frozen_utc": "2026-08-14",
+  "base_commit": "e2c930f3f879742b2846e3fca1ee1b7e8d99ecc6",
+  "purpose": "Source-only development and conditional injection-extraction comparison of two residual-structured 2021 generating means.",
+  "claim_boundary": "Conditional source-conditioned stress diagnostics only; not physical background truth, observed-data bias, coverage, expected bands, limits, exclusions, or a production-card change.",
+  "model_selection_uses_gpr_results": false,
+  "model_selection_frozen_before_signal_audit": true,
+  "source_inputs": {
+    "one_pct": {
+      "path": "/Users/emryspeets/Desktop/gp_mods/data_input_21/final_1pct_invM.root",
+      "sha256": "eecb5b8f40820c8f3c5d9673d2cddc155f2e2282474e20eb4f8930fd0a561ada",
+      "histogram": "preselection/h_invM_8000"
+    },
+    "ten_pct": {
+      "path": "/Users/emryspeets/Desktop/gp_mods/10pct_2021/final_10pct_invM.root",
+      "sha256": "3944d4c71a453c6c810061248c34d2fca9eceaad1de85c137afdc291c2195ac4",
+      "histogram": "preselection/h_invM_8000"
+    }
+  },
+  "frozen_analysis_contract": {
+    "result_version": "v4.2",
+    "result_commit": "4c7698e28f0c2c9eedf531a5b614ca727d7c305b",
+    "integration_commit": "675b1c65be9238d6d97d7eeb0f09fd860404d13a",
+    "card_sha256": "5a52abb41896b161bd6dd8f66859737b6d98ea7d40d2eb8d8c677c3161ed6055",
+    "search_range_gev": [0.05, 0.25],
+    "gp_support_range_gev": [0.04, 0.3],
+    "pre_log": true,
+    "alpha_model": "1/y",
+    "neighborhood_rebin": 5,
+    "blind_nsigma": 2.25,
+    "gp_train_exclude_nsigma": 2.25,
+    "kernel_ls_res_lower_factor_2021": 1.1,
+    "production_kernel_ls_res_upper_factor_2021": 15.0,
+    "n_restarts": 12,
+    "injection_reference": "matched_refit_bonly",
+    "signed_extraction": true,
+    "test_statistic": "tilde_q_mu",
+    "cls_alpha": 0.1
+  },
+  "source_fit": {
+    "support_gev": [0.04, 0.3],
+    "primary_region_gev": [0.05, 0.25],
+    "quadrature": "five-point Gauss-Legendre bin integration",
+    "optimizer_starts": 24,
+    "best_basin_minimum_repeats": 3,
+    "blocked_folds_gev": [[0.04, 0.092], [0.092, 0.144], [0.144, 0.196], [0.196, 0.248], [0.248, 0.3]],
+    "strict_qualification": {
+      "gof_scope": "full 40--300 MeV support; 50--250 MeV metrics are reported separately but are not used for qualification",
+      "native_and_rebin5_pearson_deviance_range": [0.75, 1.25],
+      "heldout_deviance_per_bin_max": 1.25,
+      "heldout_optimizer_success_and_constraint_feasibility_required": true,
+      "heldout_best_basin_minimum_repeats": 3,
+      "minimum_normalized_bound_distance": 0.02,
+      "positive_bin_integrated_mean": true
+    }
+  },
+  "models": {
+    "knot_spline": {
+      "label": "fixed-knot natural log-spline",
+      "baseline": "v4.8 rigid thresholded-generalized-gamma plus T2/T6 mean, recomputed with bin integration",
+      "formula": "log(mu)=log(mu_rigid)+B_K(m)c at native 1pct; native 10pct adds a zero-mean B_K(m)d contrast and a free global normalization",
+      "candidate_interior_knots_gev": {
+        "K2": [0.105, 0.18],
+        "K3": [0.09, 0.16, 0.22]
+      },
+      "boundary_values": {"0.04": 0.0, "0.30": 0.0},
+      "selection": "five-fold blocked Poisson deviance with the one-standard-error rule favoring K2",
+      "free_knot_locations": false,
+      "one_pct_coefficient_bounds": [-0.05, 0.05],
+      "ten_pct_transfer": {
+        "ridge_sigma_log_y": 0.002,
+        "coefficient_shift_bounds": [-0.004, 0.004],
+        "pointwise_abs_envelope_max": 0.005,
+        "pointwise_envelope_grid": "801 equally spaced points on 50--250 MeV",
+        "adjacent_shift_abs_difference_max": 0.003,
+        "adjacency_includes_fixed_zero_boundary_coefficients": true,
+        "orthogonalize_to_count_weighted_constant": true,
+        "orthogonalization_reference": "frozen native-1pct development-source counts"
+      }
+    },
+    "regional_blend": {
+      "label": "three-region C2 geometric blend",
+      "low": {
+        "domain_gev": [0.04, 0.125],
+        "family": "thresholded generalized gamma",
+        "frozen_from_v4p8": ["x0", "xt", "w"],
+        "one_pct_free": ["a", "lambda", "power"]
+      },
+      "middle": {
+        "domain_gev": [0.085, 0.215],
+        "family": "positive degree-two log-Chebyshev",
+        "one_pct_free": ["b1", "b2"]
+      },
+      "high": {
+        "domain_gev": [0.165, 0.3],
+        "family": "monotone power-exponential",
+        "one_pct_free": ["a", "lambda", "power"],
+        "monotone_decreasing": true
+      },
+      "one_pct_parameter_bounds": {
+        "a_low": [0.5, 10.0],
+        "lambda_low_gev": [0.0001, 0.02],
+        "power_low": [0.2, 2.0],
+        "b1": [-10.0, 10.0],
+        "b2": [-10.0, 10.0],
+        "a_high": [-20.0, 20.0],
+        "lambda_high_gev": [0.05, 2.0],
+        "power_high": [0.2, 5.0],
+        "optimizer_coordinates": "natural log for both lambda and both power parameters; direct coordinates otherwise"
+      },
+      "blend": {
+        "space": "log yield",
+        "low_middle_overlap_gev": [0.085, 0.125],
+        "middle_high_overlap_gev": [0.165, 0.215],
+        "taper": "quintic smoothstep",
+        "anchors_gev": [0.105, 0.19],
+        "free_boundaries": false
+      },
+      "ten_pct_transfer": {
+        "contrasts": ["dL*(wL-<wL>)", "dH*(wH-<wH>)"],
+        "ridge_sigma_log_y": 0.002,
+        "coefficient_bounds": [-0.004, 0.004],
+        "pointwise_abs_envelope_max": 0.005,
+        "pointwise_envelope_grid": "801 equally spaced points on 50--250 MeV",
+        "orthogonalization_reference": "frozen native-1pct development-source counts",
+        "refit_component_shapes": false
+      }
+    }
+  },
+  "signal_influence_audit": {
+    "mass_grid_gev": {"start": 0.05, "stop": 0.25, "step": 0.005},
+    "injected_diagonal_poisson_sigmas": [1.0, 3.0, 5.0],
+    "gap_half_width_sigma": 2.25,
+    "gap_projection_abs_sigma_max": 0.2,
+    "refit_z_times_absorption_fraction_max": 0.2,
+    "tangent_absorption_fraction_max": 0.04,
+    "audit_refit_integrity": {
+      "optimizer_success_required": true,
+      "minimum_best_basin_repeats_of_four_starts": 2,
+      "constraints_must_be_feasible": true
+    },
+    "optimizer_failure_handling": "Record the failed cell with null absorption/projection, set its repeat count to zero, fail the integrity and affected metric gate, and do not loosen constraints or omit the cell.",
+    "fitted_feature_scale_descriptor": "adjacent peak--trough separation divided by the local full 4.5-sigma training-mask width; descriptive only because it can miss an isolated feature",
+    "tangent_solver": {
+      "method": "symmetric eigendecomposition of the penalized Fisher matrix",
+      "relative_eigenvalue_cutoffs": [1e-12, 1e-10, 1e-8],
+      "regional_one_pct_finite_difference_step_multipliers": [0.5, 1.0, 2.0],
+      "gate_uses_maximum_absolute_projection_across_cutoffs": true,
+      "condition_number_and_effective_rank_recorded": true
+    },
+    "failure_policy": "Run the user-requested conditional stress toys but prohibit signal-rigid, qualified-generator, coverage, or card-promotion claims."
+  },
+  "toy_contract": {
+    "closure_backgrounds_per_model_source": 20,
+    "pilot_backgrounds_per_model_source": 3,
+    "pilot_and_closure_streams_independent": true,
+    "reported_scenarios": ["2021_1pct", "2021_1pct_x10", "2021_1pct_x100", "2021_10pct", "2021_10pct_x10"],
+    "nested_poisson_within_source_family": true,
+    "source_families_distinct": true,
+    "model_streams_distinct": true,
+    "reserve_claim": "none"
+  },
+  "length_ceiling_pilot": {
+    "background_only": true,
+    "toy_indices": [0, 1, 2],
+    "masses_gev": [0.065, 0.12, 0.21],
+    "upper_factors": [15, 20, 25],
+    "workers": 1,
+    "common_ceiling_for_models_and_lanes": true,
+    "factor20_gate": {
+      "exact_or_near_contacts": 0,
+      "top_branch_minimum_repeats": 2,
+      "maximum_abs_delta_lml_per_training_bin_20_to_25": 0.001,
+      "median_abs_delta_ell_over_sigma_x_20_to_25": 0.01,
+      "p95_abs_delta_ell_over_sigma_x_20_to_25": 0.03
+    },
+    "fallback_factor": 25,
+    "production_card_impact": "none; factor 15 remains the v4.2 production ceiling"
+  },
+  "closure_grid": {
+    "masses_gev": [0.065, 0.09, 0.12, 0.18, 0.21],
+    "injected_reference_sigmas": [0.0, 1.0, 3.0, 5.0],
+    "raw_rows_expected": 4000,
+    "workers_max": 2,
+    "blas_threads": 1
+  }
+}

@@ -1,0 +1,642 @@
+\section{Event Selection, Mass Resolutions, and Radiative Fraction}
+\label{sec:event-selection}
+
+The prompt-resonance workflow begins from histogrammed invariant-mass spectra that
+already incorporate run-specific event selection. Those selections determine not only
+the cleanliness of the prompt $e^+e^-$ sample but also the sample composition entering
+the radiative-fraction normalization and the detector response entering the signal
+model. For that reason the prompt selection, the mass resolution, and the
+radiative-fraction treatment are documented together in this section.
+
+\subsection{Prompt event selection}
+
+Across all HPS campaigns, the prompt selection follows the same experimental logic:
+oppositely charged tracks matched to ECal clusters, tight cluster-time coincidence,
+track-quality and vertex-reconstruction requirements, and momentum cuts that retain
+prompt radiative tridents while suppressing accidentals and converted wide-angle
+Bremsstrahlung. The
+2015 and 2016 selections are already mature because they are inherited from the
+published prompt searches. For 2021, the baseline upgraded-detector preselection is
+taken from the full 2021 analysis note, while the event-level changes used to construct
+the regenerated GPR input are recorded separately. In particular, events with
+$p_{\mathrm{sum}}<\SI{2.8}{GeV}$ are rejected, so the retained sample is the
+high-$p_{\mathrm{sum}}$ side. The regenerated sample also lowers the electron-track hit
+requirement to at least eight two-dimensional hits and applies no requirement on the
+vertex-fit $\chi^2$. Table~\ref{tab:event-selection} distinguishes these production
+choices from the broader full-analysis-note preselection.
+
+\input{tables/event_selection_table}
+
+
+
+The 2021 entries in the table follow the preselection summary in the full 2021 note
+\cite[Sec.~4.8, Table~38 and App.~A]{HPS2021FullAnalysisNote}. The regenerated production
+histogram is read from \path{final_1pct_invM.root}, with mass spectrum
+\path{preselection/h_invM_8000}. This file supersedes the legacy \texttt{psumlt2p8}
+input used by earlier drafts and studies. The table therefore separates baseline
+upgraded-detector preselection requirements from the changes made when constructing the
+high-$p_{\mathrm{sum}}$ prompt-resonance input.
+The GPR layer does not add any further per-event selection
+on top of these prompt cuts. In the remainder of the note, each dataset is represented
+only by the selected invariant-mass histogram together with the detector response and
+normalization inputs derived from the same event category.
+
+This distinction also explains why the older analyses read differently. In the 2015 and
+2016 prompt notes, ``preselection'' denoted the broad reconstruction-level sample that
+entered the prompt-search optimization, while ``prompt selection'' denoted the narrower
+subset used for the published resonance result after timing, momentum-sum, and
+background-rejection tightening. The current 2021 GPR workflow is already closer to the
+latter category in physics content, because the exported histogram is a prompt-oriented
+high-$p_{\mathrm{sum}}$ sample. Stating the selection as rejection of
+$p_{\mathrm{sum}}<\SI{2.8}{GeV}$ avoids conflating the rejected low-momentum side with
+the events retained for the analysis. The table also records the updated electron-hit
+and vertex-quality treatment needed to compare this sample with the engineering-run
+selections.
+
+% ============================================================
+%  Preselection validation figures (v13 signal overlay)
+% ============================================================
+The figures below show selected reconstruction-level variables from the 2021
+preselection study. The signal simulation is assigned an arbitrary normalization, so
+these are shape comparisons rather than yield or efficiency measurements.
+
+% ------------------------------------------------------------
+%  4. Vertex quantities
+% ------------------------------------------------------------
+% The reconstructed-vertex observables are shown in
+% Figure~\ref{fig:presel_vertex}: the vertex-fit $\chi^2$, the invariant mass,
+% and the longitudinal vertex position $V_z$. The vertex $z$ distribution is the
+% primary discriminant for the displaced-vertex signal, whose long lifetime
+% populates the downstream tail well beyond the prompt data.
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/signal_overlay_loose_loose_vtx_mass.pdf}
+    \caption{Vertex invariant mass.}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/signal_overlay_loose_loose_vtx_chi2.pdf}
+    \caption{Vertex-fit $\chi^2$.}
+  \end{subfigure}
+  \caption{Reconstructed-vertex distributions after the loose preselection,
+    comparing data (points) with the signal MC (filled histogram). The vertex-fit
+    $\chi^2$ is shown as a diagnostic; no vertex-fit $\chi^2$ requirement is applied to
+    the regenerated 2021 GPR input.}
+  \label{fig:presel_vertex}
+\end{figure}
+
+% ------------------------------------------------------------
+%  1. Electron track kinematics
+% ------------------------------------------------------------
+% The following figures compare the loose-preselected data (points) with the
+% signal Monte Carlo (histogram), normalised to unit area, for the kinematic
+% variables entering the preselection. Figure~\ref{fig:presel_ele_kin} shows the
+% electron-track quantities: the total and longitudinal momentum together with
+% the transverse and longitudinal impact parameters. Good agreement between the
+% shapes of the reconstructed distributions is expected in the bulk of phase
+% space, while the signal is characterised by its harder momentum spectrum and
+% displaced-vertex tails.
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/signal_overlay_loose_loose_ele_p.pdf}
+    \caption{Electron momentum $p$.}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/signal_overlay_loose_loose_ele_pz.pdf}
+    \caption{Electron longitudinal momentum $p_z$.}
+  \end{subfigure}
+
+  \vspace{0.5em}
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/signal_overlay_loose_loose_ele_d0.pdf}
+    \caption{Electron transverse impact parameter $d_0$.}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/signal_overlay_loose_loose_ele_z0.pdf}
+    \caption{Electron longitudinal impact parameter $z_0$.}
+  \end{subfigure}
+  \caption{Electron-track kinematic distributions after the loose preselection,
+    comparing data (points) with the signal MC (filled histogram).}
+  \label{fig:presel_ele_kin}
+\end{figure}
+
+% ------------------------------------------------------------
+%  2. Positron track kinematics
+% ------------------------------------------------------------
+% Figure~\ref{fig:presel_pos_kin} shows the corresponding positron-track
+% quantities. As for the electron, the momentum and impact-parameter
+% distributions are used to validate the modelling of the reconstructed final
+% state prior to any signal-region selection.
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/signal_overlay_loose_loose_pos_p.pdf}
+    \caption{Positron momentum $p$.}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/signal_overlay_loose_loose_pos_pz.pdf}
+    \caption{Positron longitudinal momentum $p_z$.}
+  \end{subfigure}
+
+  \vspace{0.5em}
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/signal_overlay_loose_loose_pos_d0.pdf}
+    \caption{Positron transverse impact parameter $d_0$.}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/signal_overlay_loose_loose_pos_z0.pdf}
+    \caption{Positron longitudinal impact parameter $z_0$.}
+  \end{subfigure}
+  \caption{Positron-track kinematic distributions after the loose preselection,
+    comparing data (points) with the signal MC (filled histogram).}
+  \label{fig:presel_pos_kin}
+\end{figure}
+
+
+
+% ------------------------------------------------------------
+%  5. Two-dimensional mass correlations
+% ------------------------------------------------------------
+% The two-dimensional distributions of the reconstructed invariant mass versus
+% the preselection variables are shown for data (left column) and signal MC
+% (right column) in the following figures. These correlations are used to check
+% that the mass reconstruction is unbiased across the relevant phase space and
+% that no artificial structure is introduced by the selection.
+% Figure~\ref{fig:scatter_mom} shows the mass-versus-momentum correlations.
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/xy_scatter_xy_mass_vs_ele_p_data_loose.pdf}
+    \caption{Mass vs.\ electron $p$ (data).}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/xy_scatter_xy_mass_vs_ele_p_signal_loose.pdf}
+    \caption{Mass vs.\ electron $p$ (signal).}
+  \end{subfigure}
+
+  \vspace{0.5em}
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/xy_scatter_xy_mass_vs_pos_p_data_loose.pdf}
+    \caption{Mass vs.\ positron $p$ (data).}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/xy_scatter_xy_mass_vs_pos_p_signal_loose.pdf}
+    \caption{Mass vs.\ positron $p$ (signal).}
+  \end{subfigure}
+
+  \caption{Reconstructed invariant mass versus momentum observables, for data
+    (left) and signal MC (right), after the loose preselection.}
+  \label{fig:scatter_mom}
+\end{figure}
+
+% Figure~\ref{fig:scatter_chi2} shows the mass-versus-track/vertex-quality
+% correlations.
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/xy_scatter_xy_mass_vs_ele_chi2_data_loose.pdf}
+    \caption{Mass vs.\ electron $\chi^2$ (data).}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/xy_scatter_xy_mass_vs_ele_chi2_signal_loose.pdf}
+    \caption{Mass vs.\ electron $\chi^2$ (signal).}
+  \end{subfigure}
+
+  \vspace{0.5em}
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/xy_scatter_xy_mass_vs_pos_chi2_data_loose.pdf}
+    \caption{Mass vs.\ positron $\chi^2$ (data).}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/xy_scatter_xy_mass_vs_pos_chi2_signal_loose.pdf}
+    \caption{Mass vs.\ positron $\chi^2$ (signal).}
+  \end{subfigure}
+
+  \vspace{0.5em}
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/xy_scatter_xy_mass_vs_vtx_chi2_data_loose.pdf}
+    \caption{Mass vs.\ vertex $\chi^2$ (data).}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/xy_scatter_xy_mass_vs_vtx_chi2_signal_loose.pdf}
+    \caption{Mass vs.\ vertex $\chi^2$ (signal).}
+  \end{subfigure}
+  \caption{Reconstructed invariant mass versus track- and vertex-fit quality,
+    for data (left) and signal MC (right), after the loose preselection.}
+  \label{fig:scatter_chi2}
+\end{figure}
+
+\subsection{2015 mass resolution}
+\label{sec:massres-2015}
+
+For the 2015 engineering run, the prompt search sensitivity is driven by the mass
+resolution of the target-constrained $e^+e^-$ pair. The 2015 internal note determined
+that response by combining three ingredients \cite{HPS2015InternalNote}. First, M{\o}ller
+events were used to anchor the detector resolution directly in data at the known
+M{\o}ller mass. Second, the momentum-resolution discrepancy between data and MC was
+translated into a smearing correction. Third, a set of $A^\prime$ MC samples spanning
+the prompt-search region was fitted and then rescaled to match the data-driven M{\o}ller
+point. The resulting 2015 parameterization is the linear form
+\begin{equation}
+\sigma_{2015}(m) = -9.22\times10^{-5} + 5.322\times10^{-2}\,m,
+\label{eq:sigma2015}
+\end{equation}
+with $m$ and $\sigma_{2015}$ expressed in GeV.
+
+The important review point is that the 2015 resolution is not taken from MC in
+isolation. The M{\o}ller calibration fixes the absolute detector response, and the
+scaled $A^\prime$ MC points then provide the mass dependence needed to interpolate away
+from the single M{\o}ller mass. That is the same physics logic used in the published
+2015 search, and it is why the 2015 mass-resolution uncertainty is ultimately tied to
+the M{\o}ller calibration, the target-position uncertainty, and the limited residual
+mismodelling of the momentum response \cite{HPS2015DarkPhoton,HPS2015InternalNote}.
+For the prompt search itself, this curve sets the Gaussian signal width used at every
+test mass, and therefore also sets the blind-window width and the amount of smooth
+background admitted under a narrow-resonance hypothesis. Figure~\ref{fig:2015-resolution}
+compresses that calibration chain into the single curve actually used downstream in the
+signal model.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.82\linewidth}{resolution_figs/hps2015_mass_resolution_internal_fig24.png}
+\caption{2015 mass-resolution parameterization from scaled $A^\prime$ MC and M{\o}ller
+data \cite{HPS2015InternalNote}. The M{\o}ller point anchors the absolute detector
+response in data, while the scaled $A^\prime$ simulation supplies the mass dependence
+across the search window. Because the prompt dark-photon width is negligible, this
+curve directly sets the resonance width assumed in the search and therefore the local
+background entering the limit.}
+\label{fig:2015-resolution}
+\end{figure}
+
+\subsection{2016 mass resolution}
+\label{sec:massres-2016}
+
+The 2016 prompt-search program followed the same overall structure as 2015, but with a
+broader mass range and a more explicit study of momentum smearing and systematic
+uncertainties \cite{HPS2016BumpInternal,HPS2016PromptLong}. The M{\o}ller point at
+\SI{48.5}{MeV} fixed the absolute detector response, a dedicated study of the
+full-energy-electron (FEE)
+momentum peaks quantified the data--MC momentum mismatch, and smeared $A^\prime$ MC
+samples were then used to derive the mass dependence of the prompt resolution. In the
+2016 bump-hunt note this procedure is summarized by the smeared $A^\prime$ points shown
+in Figure~\ref{fig:2016-resolution}, which were fitted with a fourth-order polynomial.
+
+That chain of studies is worth making explicit because it explains why the 2016
+parameterization is trustworthy over a wide mass interval. The M{\o}ller sample alone
+provides only one data anchor, so it cannot determine the full mass dependence of
+$\sigma_m(m)$. The FEE momentum study is therefore used to infer how much extra
+smearing must be applied to simulation in order to match the observed tracking
+performance, and the smeared $A^\prime$ MC grid then transports that calibration
+through the rest of the prompt-search window. This is the practical reason the note can
+quote a continuous resolution curve rather than a set of isolated calibration points:
+the figure compresses a data anchor, a detector-smearing correction, and a mass
+interpolation study into one review-facing summary.
+
+The current GPR workflow uses the same published-resolution logic. The polynomial used
+for the 2016 signal model is
+\begin{align}
+\sigma_{2016}(m) &= 3.8\times10^{-4} + 4.1\times10^{-2}m - 2.7\times10^{-1}m^2 \nonumber\\
+&\quad + 3.49\,m^3 - 11.11\,m^4,
+\qquad m \le \SI{0.18}{GeV},
+\label{eq:sigma2016}
+\end{align}
+Earlier GPR studies continued this function linearly above
+$m_0=\SI{0.18}{GeV}$, using slope \num{0.0239}, to prevent the polynomial from turning
+over when those studies scanned beyond the published search range. That override is
+not used by the v4 result. The v4 scan ends at \SI{180}{MeV} for 2016, compared with
+the published \SIrange{39}{179}{MeV} interval, and therefore does not evaluate a mass
+hypothesis above the polynomial boundary. The same range-freezing policy brings the
+2015 scan back near its published \SIrange{19}{81}{MeV} interval; its only deliberate
+extension is the upper endpoint at \SI{90}{MeV}. Thus the high-mass slope override
+documents earlier extended-range studies and is not an ingredient of the present
+candidate.
+
+The 2016 review emphasis is therefore twofold. First, the mass resolution must be
+described as a data-validated quantity rather than a free fit parameter. Second, the
+momentum-smearing correction is central to that validation because it is the step that
+reconciles the M{\o}ller and $A^\prime$ MC widths with the observed detector response
+\cite{HPS2016BumpInternal,HPS2016PromptLong}. The updated crop emphasizes the smeared
+$A^\prime$ trend itself rather than the surrounding page context. As in 2015, the
+search consequence is immediate: the worsening resolution with mass broadens the
+blind-window width and increases the amount of prompt background carried under a narrow
+signal hypothesis, which is one of the main detector effects limiting prompt
+sensitivity at higher mass.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.82\linewidth}{resolution_figs/hps2016_mass_resolution_internal_fig29.png}
+\caption{2016 smeared-$A^\prime$ and M{\o}ller-based mass-resolution summary
+\cite{HPS2016BumpInternal}. The smeared $A^\prime$ points show how the data-driven
+momentum-smearing correction is propagated away from the single M{\o}ller calibration
+point. The worsening resolution with mass broadens the signal window and is one of the
+main detector effects limiting prompt sensitivity at higher mass.}
+\label{fig:2016-resolution}
+\end{figure}
+
+\subsection{2021 mass resolution}
+\label{sec:massres-2021}
+
+The 2021 prompt workflow uses the upgraded 2019/2021 detector configuration and
+therefore requires a separate resolution parameterization. For the current prompt
+analysis we adopt the inclusive target-constrained V0 fit without hit requirements
+shown in Figure~\ref{fig:2021-resolution}; in that panel, the red fitted curve is the
+source mass-resolution model propagated through the signal template and blind-window
+definitions before the final target-constrained data/MC broadening. The source
+parameterization, written here in MeV units, is
+\begin{equation}
+\sigma_{2021}^{\mathrm{TC,raw}}(m_{\mathrm{MeV}})
+= \left(1.4786 - 1.1\times10^{-3}m_{\mathrm{MeV}}
+  + 6.87\times10^{-5}m_{\mathrm{MeV}}^2\right)\,\mathrm{MeV},
+\label{eq:sigma2021}
+\end{equation}
+where $m_{\mathrm{MeV}}$ is the numerical mass value in MeV. The analysis then applies the
+target-constrained data/MC scale derived from the 2021 smearing study,
+\begin{equation}
+s_{\mathrm{TC}} = \frac{2.186}{1.745} \simeq 1.25,
+\qquad
+\sigma_{2021}^{\mathrm{TC,smear}}(m)
+= s_{\mathrm{TC}}\,\sigma_{2021}^{\mathrm{TC,raw}}(m).
+\label{eq:sigma2021-tc-smear}
+\end{equation}
+This scale is taken from the target-constrained row after hit smearing and curvature
+($\Omega$) smearing are applied to the Monte Carlo to most closely match the observed
+data resolution. The target-constrained row is the relevant comparison for this
+prompt analysis, so the smeared parameterization in
+Eq.~\ref{eq:sigma2021-tc-smear} is the curve propagated to the 2021 signal width,
+blind-window width, and local prompt-background burden under each mass hypothesis.
+Because the upgraded front tracker changes the low-mass response, it is also a direct
+ingredient in the improved shared-coupling reach.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.78\linewidth}{resolution_figs/hps2021_mass_resolution_target_constrained_nohitreq.png}
+\caption{2021 mass-resolution summary used for the prompt analysis. The red curve is
+the inclusive target-constrained V0 quadratic fit without hit requirements before the
+TC data/MC broadening in Eq.~\ref{eq:sigma2021-tc-smear}. The blue curve shows the
+corresponding unconstrained V0 reference fit included in the underlying study for
+comparison.}
+\label{fig:2021-resolution}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.78\linewidth}{resolution_figs/hps2021_data_mc_smearing_scale.png}
+\caption{2021 M{\o}ller run data/MC mass-resolution comparison used to set the
+smearing scale.
+Here UC denotes the unconstrained vertex sample, BSC denotes the beamspot-constrained
+vertex sample, and TC denotes the target-constrained vertex sample. The TC row is the
+most relevant row for the prompt analysis; comparing the data value
+\SI{2.186}{MeV} to the $\Omega$+hit-smeared Monte Carlo value \SI{1.745}{MeV}
+gives the applied scale factor $2.186/1.745\simeq1.25$.}
+\label{fig:2021-data-mc-smearing-scale}
+\end{figure}
+
+Figure~\ref{fig:mass-resolution-three-panel} collects the implemented
+parameterizations on the current GPR scan ranges after this 2021 TC scaling is
+included. This summary is separate from the provenance crops above: the crops show the
+source studies, while the three-panel figure shows the actual smooth curves propagated
+through the present signal-template and blind-window definitions.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.78\linewidth}{resolution_figs/hps_mass_resolution_three_panel.png}
+\caption{Mass-resolution parameterizations used by the GPR workflow over the current
+scan ranges. The 2016 curve includes the configured high-mass tail continuation above
+\SI{180}{MeV}; the 2021 panel shows the target-constrained V0 parameterization after
+multiplication by the TC smearing scale $s_{\mathrm{TC}}=2.186/1.745\simeq1.25$ and
+extended to \SI{250}{MeV}.}
+\label{fig:mass-resolution-three-panel}
+\end{figure}
+
+\subsection{Radiative fraction and the \texorpdfstring{$\eps^2$}{epsilon2} normalization}
+\label{sec:radfrac}
+
+The radiative fraction encodes the fraction of the selected prompt background arising
+from the purely radiative trident process,
+\begin{equation}
+f_{\mathrm{rad},d}(m)
+=
+\frac{dN_{\gamma^\ast,d}/dm}{dN_{\mathrm{tri},d}/dm + dN_{\mathrm{wab},d}/dm},
+\label{eq:frad-def}
+\end{equation}
+where the numerator is the selected radiative-trident component and the denominator is
+the full selected prompt background for dataset $d$
+\cite{HPS2015DarkPhoton,HPS2016PromptLong}. Because heavy-photon production is
+normalized to the radiative trident rate, $f_{\mathrm{rad}}$ is the physics quantity
+that converts a fitted prompt signal yield into a limit on the coupling. In the
+present notation,
+\begin{equation}
+K_d(m) \equiv A_d(\eps^2 = 1)
+= \frac{3\pi\,m\,f_{\mathrm{rad},d}(m)\,\rho_d(m)}{2\alpha_{\mathrm{EM}}},
+\qquad
+A_d = K_d(m)\,\eps^2,
+\label{eq:kd-radfrac}
+\end{equation}
+where $\rho_d(m)$ is the selected prompt-spectrum density in dataset $d$. The
+radiative-fraction inputs differ in important ways between the engineering-run searches
+and the provisional 2021 normalization retained for the present 10\% sample.
+
+\subsubsection{2015 Radiative Fraction}
+
+The 2015 prompt search used a constant approximation,
+\begin{equation}
+f_{\mathrm{rad},2015}(m) = 0.085,
+\end{equation}
+which is the baseline retained in the current GPR workflow. The dedicated 2015
+radiative-fraction study is especially useful because it makes the logic of that
+constant fit explicit: the selected radiative trident component is first compared to
+the total prompt composition, and the red horizontal line at 8.5\% is then adopted as
+a conservative description across the scanned mass interval. That constant is therefore
+not a fit artifact of the GPR package; it is inherited from the internal HPS prompt
+normalization study and used here for continuity with the published 2015 analysis.
+Figure~\ref{fig:2015-radfrac} is included precisely to make that provenance visible.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.96\linewidth}{normalization_figs/hps2015_radiative_fraction_review.png}
+\caption{Dedicated 2015 radiative-fraction inputs. The left panel shows the selected
+cross-section composition, while the right panel shows the radiative fraction used for
+normalization. The red horizontal line denotes the 8.5\% constant adopted as the
+conservative fit across the 2015 prompt-search dataset. This quantity converts the
+measured prompt spectrum into the expected $A^\prime$ normalization, so it affects the
+final $\eps^2$ interpretation rather than the local spectral fit itself.}
+\label{fig:2015-radfrac}
+\end{figure}
+
+\subsubsection{2016 Radiative Fraction}
+
+The 2016 prompt search used a fifth-order polynomial derived from radiative, trident,
+and converted-WAB MC after the full prompt selection. That full shape matters for the
+methodology discussion because it is part of the published HPS normalization chain:
+the selected radiative yield, the competing prompt backgrounds, and the converted-WAB
+contamination were all studied together in order to map fitted signal yield into
+$\eps^2$ consistently over the broader 2016 mass range. In the present GPR package,
+however, the working 2016 normalization is simplified to a constant approximation,
+\begin{equation}
+f_{\mathrm{rad},2016}(m) = 0.05,
+\end{equation}
+because that choice is numerically stable over the wider scan range used in the global
+fit. The review point is therefore two-stage: the note should preserve the richer 2016
+determination for provenance, while also stating plainly that the current production
+GPR rerun uses a conservative constant surrogate. Figure~\ref{fig:2016-radfrac} keeps
+the original mass-dependent study in view so the simplification made by the present GPR
+rerun is explicit rather than hidden.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.82\linewidth}{normalization_figs/hps2016_radiative_fraction_internal_fig30.png}
+\caption{2016 radiative-fraction study from radiative, trident, and converted-WAB MC
+\cite{HPS2016BumpInternal}. This is the provenance figure for the 2016 normalization
+discussion even though the present wide-range GPR rerun uses a constant approximation
+for stability. The full MC decomposition shows why the normalization is intrinsically
+mass dependent even though the current wide-range GPR workflow uses a constant
+surrogate for numerical stability.}
+\label{fig:2016-radfrac}
+\end{figure}
+
+\subsubsection{2021 Radiative Fraction}
+
+For the 2021 10\% sample, the radiative-fraction input remains provisional. The
+present package uses the constant choice
+\begin{equation}
+f_{\mathrm{rad},2021}(m) = 0.05,
+\end{equation}
+This value is not frozen for the final unblinded interpretation. It is nevertheless
+supported by the available 2021 full-analysis note over the
+majority of the 2021 search range: that note constructs the radiative fraction from
+selected radiative-trident, tritrig, and WAB samples after preselection and a
+high-momentum requirement quoted there as $p_{\mathrm{vtx}}>2.8~\mathrm{GeV}$, fits the resulting ratio over
+$0.05<m<0.25~\mathrm{GeV}$, and quotes a constant average
+$f_{\mathrm{rad}}^{\mathrm{const}}=0.0496$ \cite[Sec.~6.1, Figs.~92--93,
+Eqs.~25--26]{HPS2021FullAnalysisNote}. The $0.05$ input is therefore a reasonable
+compact surrogate for the central and high-mass portion of the present 2021 scan.
+Before the final unblinded interpretation, the normalization category must be checked
+explicitly against the regenerated production histogram's
+$p_{\mathrm{sum}}$ selection and the exact threshold-inclusivity convention, and the
+mass-dependent 2021 parameterization should remain the reference cross-check.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.82\linewidth}{normalization_figs/hps2021_radiative_fraction_note_fig92.png}
+\caption{2021 selected-mass distributions used to form the radiative fraction in the
+full-analysis note \cite{HPS2021FullAnalysisNote}. The upper panel shows the selected
+radiative, tritrig, and WAB components, while the lower panel gives
+$f_{\mathrm{rad}}(m)=N_{\mathrm{rad}}/N_{\mathrm{bkg}}$.}
+\label{fig:2021-radfrac-note-components}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.72\linewidth}{normalization_figs/hps2021_radiative_fraction_note_fig93.png}
+\caption{Fifth-order 2021 full-analysis-note fit to the binned radiative fraction
+\cite{HPS2021FullAnalysisNote}. The fitted curve is close to the constant value
+$0.05$ across most of the range used by the present 2021 GPR workflow.}
+\label{fig:2021-radfrac-note-fit}
+\end{figure}
+
+\subsection{Systematic penalties from the radiative fraction}
+\label{sec:radfrac-penalty}
+
+The package also supports a dataset-dependent radiative-fraction penalty,
+\begin{equation}
+f_{\mathrm{rad},d}^{\mathrm{eff}}(m)
+= \left(1-\delta_{f,d}\right) f_{\mathrm{rad},d}(m).
+\label{eq:frad-penalty}
+\end{equation}
+This penalty is deliberately applied at the yield-to-$\eps^2$ conversion stage rather
+than inside the local likelihood. It therefore acts as a normalization systematic on
+the inferred coupling, not as a change in the shape of the blind-window extraction
+model.
+
+The v4 analysis retains the frozen normalization penalties established in the
+preceding review:
+\begin{equation}
+(\delta_{f,2015},\delta_{f,2016},\delta_{f,2021})=(0.070,0.070,0.046).
+\label{eq:frad-penalty-vector}
+\end{equation}
+At the single-dataset level, a fixed signal-yield limit therefore maps to a weaker
+coupling-squared limit by factors $1/0.93$ for 2015 and 2016 and $1/0.954$ for 2021.
+In the combined analysis each conversion factor $K_d(m)$ is reduced by its own frozen
+amount, so the shared $\eps^2$ required to produce the same per-dataset yields becomes
+larger. These factors are fixed normalization shifts in the present result, not nuisance
+parameters profiled by the simultaneous likelihood.
+
+The baseline $f_{\mathrm{rad},d}(m)$ determines how the selected prompt spectrum is
+translated into a signal normalization for each dataset. The factor $\delta_{f,d}$ is a
+separate one-sided normalization variation carried into the candidate $\eps^2$ limit;
+it is not part of the GP interpolation or a nuisance parameter profiled in the
+likelihood.
+
+The 7\% engineering-run penalties are historical as well as practical. In the 2015
+prompt-search documentation, the radiative-fraction/e$^+$e$^-$
+composition uncertainty enters the systematic summary at the several-percent level, and
+the 2016 prompt search likewise propagated a non-negligible normalization uncertainty
+from the selected radiative, trident, and converted-WAB inputs
+\cite{HPS2015InternalNote,HPS2016PromptLong}. Retaining 7\% for 2015 and 2016 is
+therefore a conservative first-order treatment of the established engineering-run
+normalization uncertainty. The 2021 component is instead set by the dedicated
+upgraded-detector estimate below.
+
+The 2021 full-analysis note now provides a more direct estimate for the 2021
+radiative-fraction normalization uncertainty. Its MC cross-section study uses the
+generated RAD and WAB cross-section distributions shown in
+Fig.~\ref{fig:2021-radfrac-xsec-note}; propagating the quoted RAD and WAB
+cross-section widths with the relative normalization $R=0.244$ gives a bounded
+fractional uncertainty of 3.5\% \cite[Sec.~9.1, Fig.~161]{HPS2021FullAnalysisNote}.
+The same note assigns an additional 3\% preselection/radiative-fraction modeling
+uncertainty, motivated by WAB-selective mismodeling in the selected background
+\cite[Sec.~9.2]{HPS2021FullAnalysisNote}. Treating these two direct
+radiative-fraction normalization terms as independent gives
+\begin{equation}
+\delta_{f,2021}^{\mathrm{note}}
+= \sqrt{(0.035)^2 + (0.030)^2}
+= 0.046,
+\qquad
+f_{\mathrm{rad},2021}^{\mathrm{eff}}
+= 0.954\,f_{\mathrm{rad},2021}.
+\label{eq:frad-2021-note-penalty}
+\end{equation}
+Thus the note-supported 2021 analog of the 2016-style one-sided radiative-fraction
+penalty is 4.6\%, corresponding to a multiplicative factor of 0.954. This is the 2021
+component retained in v4; the 2015 and 2016 components remain at 7\% and retain their
+engineering-run provenance.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.88\linewidth}{normalization_figs/hps2021_radiative_xsec_note_fig16.png}
+\caption{Generated cross-section distributions for the 2021 tritrig, radiative, and
+WAB background MC samples \cite{HPS2021FullAnalysisNote}. These distributions set the
+cross-section normalization inputs for the 2021 radiative-fraction calculation.}
+\label{fig:2021-radfrac-xsec-note}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.76\linewidth}{normalization_figs/hps2021_radiative_xsec_uncertainty_note_fig161.png}
+\caption{RAD and WAB cross-section distributions used in the 2021 note's
+radiative-fraction cross-section uncertainty propagation \cite{HPS2021FullAnalysisNote}.
+Together with the relative normalization $R=0.244$, these inputs lead to the 3.5\%
+MC cross-section contribution.}
+\label{fig:2021-radfrac-xsec-syst-note}
+\end{figure}
+
+This 4.6\% number should not be confused with the broader 2021 displaced-search
+signal-yield uncertainty model summarized in Fig.~\ref{fig:2021-syst-table-note}. The
+broader table includes invariant-mass resolution, target-position, and tight-selection
+terms, and the 2021 note explicitly frames those values as the systematic model for
+the displaced-vertex search and as quantities to revisit before the full-data
+application \cite[Sec.~9, Table~58]{HPS2021FullAnalysisNote}. Those entries are
+important signal-yield or acceptance systematics, but they are not part of the
+radiative-fraction-only penalty implemented by Eq.~\eqref{eq:frad-penalty}.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.62\linewidth}{normalization_figs/hps2021_systematics_note_table58.png}
+\caption{Broader 2021 full-analysis-note systematic summary
+\cite{HPS2021FullAnalysisNote}. Only the MC cross-section and preselection entries
+are folded into the radiative-fraction-only penalty in
+Eq.~\eqref{eq:frad-2021-note-penalty}; the other entries remain separate signal-yield
+or acceptance effects.}
+\label{fig:2021-syst-table-note}
+\end{figure}
