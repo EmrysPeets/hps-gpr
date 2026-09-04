@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import shutil
 import subprocess
 from pathlib import Path
@@ -37,16 +38,38 @@ def fmt(value: float) -> str:
     return rf"\num{{{value:.3e}}}"
 
 
+def fmt_p(value: float) -> str:
+    return rf"\num{{{value:.3g}}}"
+
+
 def main(argv: Sequence[str] | None = None) -> None:
     args = parse_args(argv)
     target_toys = int(args.target_toys)
     summary_path = HERE / "derived" / f"expected_band_summary_{target_toys}toys.csv"
     manifest_path = HERE / "derived" / f"run_manifest_{target_toys}toys.json"
-    if not summary_path.is_file() or not manifest_path.is_file():
-        raise SystemExit("completed band summary and run manifest are required")
+    pvalue_path = HERE / "derived" / f"pvalue_diagnostics_{target_toys}toys.csv"
+    total_path = (
+        HERE / "derived" / f"final_total_search_window_summary_{target_toys}toys.csv"
+    )
+    if not all(
+        path.is_file()
+        for path in (summary_path, manifest_path, pvalue_path, total_path)
+    ):
+        raise SystemExit(
+            "completed band, p-value, total-window, and run-manifest artifacts are required"
+        )
     summary = pd.read_csv(summary_path)
+    pvalues = pd.read_csv(pvalue_path)
+    total = pd.read_csv(total_path)
+    run_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     if set(summary.n_toys.astype(int)) != {target_toys}:
         raise RuntimeError("note stage does not match the summary toy count")
+    if set(pvalues.n_toys.astype(int)) != {target_toys}:
+        raise RuntimeError("note stage does not match the p-value toy count")
+    if int(run_manifest.get("stage_toys_per_mass", -1)) != target_toys:
+        raise RuntimeError("note stage does not match the run manifest")
+    if not total.mass_MeV.astype(int).tolist() == list(range(19, 251)):
+        raise RuntimeError("total-search-window table is not the exact 19--250 MeV grid")
 
     lines = [
         r"\begin{table}[htbp]",
@@ -87,13 +110,108 @@ def main(argv: Sequence[str] | None = None) -> None:
         "\n".join(lines) + "\n", encoding="utf-8"
     )
 
+    pvalue_lines = [
+        r"\begin{table}[htbp]",
+        r"\centering",
+        r"\scriptsize",
+        r"\setlength{\tabcolsep}{5.1pt}",
+        r"\begin{tabular}{lrrrrrr}",
+        r"\toprule",
+        (
+            r"Scope & $m$ [MeV] & $p_{\rm strong}$ & $p_{\rm weak}$ & "
+            r"$p_{\rm two}$ & analytic $p_0$ & $Z_{\rm local}$ \\"
+        ),
+        r"\midrule",
+    ]
+    for scope in ORDER:
+        frame = pvalues[pvalues.scope_key == scope]
+        row = frame.loc[frame.p0_local_asymptotic.idxmin()]
+        pvalue_lines.append(
+            "{} & {} & {} & {} & {} & {} & {:.3f} \\\\".format(
+                LABELS[scope],
+                int(row.mass_MeV),
+                fmt_p(float(row.p_strong)),
+                fmt_p(float(row.p_weak)),
+                fmt_p(float(row.p_two)),
+                fmt_p(float(row.p0_local_asymptotic)),
+                float(row.Z_local_asymptotic),
+            )
+        )
+    pvalue_lines.extend(
+        [
+            r"\bottomrule",
+            r"\end{tabular}",
+            (
+                r"\caption{Fixed-mass diagnostics at each scope's smallest analytic "
+                r"local $p_0$. The one-sided empirical fractions have granularity "
+                rf"$1/{target_toys}={1.0 / target_toys:.3f}$ and $p_{{\rm two}}$ is "
+                r"constructed from them; the selected minimum "
+                r"analytic $p_0$ is a compact reporting choice, not a trials-corrected "
+                r"global test.}"
+            ),
+            r"\label{tab:pvalue-summary}",
+            r"\end{table}",
+        ]
+    )
+    (NOTE / "generated_pvalue_summary.tex").write_text(
+        "\n".join(pvalue_lines) + "\n", encoding="utf-8"
+    )
+
     toy_rows = target_toys * len(summary)
+    counter_totals = dict(run_manifest.get("solver_counter_totals", {}))
+    bounded_free_retries = int(
+        counter_totals.get("bounded_free_centered_retries", 0)
+    )
+    unbounded_free_retries = int(
+        counter_totals.get("unbounded_free_centered_retries", 0)
+    )
+    null_retries = int(counter_totals.get("null_centered_retries", 0))
+    free_retries = bounded_free_retries + unbounded_free_retries
+    centered_profile_retries = free_retries + null_retries
+    if target_toys == 50:
+        stage_title = "Initial 50-toy stage"
+        stage_text = (
+            "The outer expected band is provisional and will be sharpened by the "
+            "planned 100- and 300-toy stages."
+        )
+        continuation_text = (
+            "Re-running the driver with \\texttt{--target-toys 100} appends IDs "
+            "50--99; using \\texttt{--target-toys 300} then appends IDs 100--299."
+        )
+    elif target_toys == 100:
+        stage_title = "Cumulative 100-toy stage"
+        stage_text = (
+            "Toy IDs 0--49 are the bitwise-preserved initial ensemble and IDs "
+            "50--99 are the continuation. The planned 300-toy stage will sharpen "
+            "the finite-ensemble tails further."
+        )
+        continuation_text = (
+            "Re-running the driver with \\texttt{--target-toys 300} appends only "
+            "IDs 100--299 while retaining IDs 0--99 exactly."
+        )
+    else:
+        stage_title = "Cumulative 300-toy stage"
+        stage_text = (
+            "This is the planned full cumulative ensemble; all earlier toy IDs are "
+            "retained exactly."
+        )
+        continuation_text = (
+            "The contracted cumulative schedule is complete at 300 toys per mass."
+        )
     values = [
         rf"\newcommand{{\StageToys}}{{{target_toys}}}",
         r"\newcommand{\StageToyMin}{0}",
         rf"\newcommand{{\StageToyMax}}{{{target_toys - 1}}}",
         rf"\newcommand{{\ScopeMassRows}}{{{len(summary)}}}",
         rf"\newcommand{{\ToyLimitRows}}{{{toy_rows:,}}}",
+        rf"\newcommand{{\TotalWindowRows}}{{{len(total)}}}",
+        rf"\newcommand{{\EmpiricalPResolution}}{{{1.0 / target_toys:.3f}}}",
+        rf"\newcommand{{\CenteredProfileRetries}}{{{centered_profile_retries}}}",
+        rf"\newcommand{{\FreeProfileRetries}}{{{free_retries}}}",
+        rf"\newcommand{{\NullProfileRetries}}{{{null_retries}}}",
+        rf"\newcommand{{\StageStatusTitle}}{{{stage_title}}}",
+        rf"\newcommand{{\StageStatusText}}{{{stage_text}}}",
+        rf"\newcommand{{\ContinuationText}}{{{continuation_text}}}",
         r"\newcommand{\StageDate}{September 4, 2026}",
     ]
     (NOTE / "generated_values.tex").write_text(

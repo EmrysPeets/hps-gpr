@@ -2,6 +2,7 @@
 \usepackage[margin=0.78in]{geometry}
 \usepackage{graphicx}
 \usepackage{booktabs}
+\usepackage{amsmath}
 \usepackage{siunitx}
 \usepackage{xcolor}
 \usepackage[hidelinks]{hyperref}
@@ -11,7 +12,7 @@
 \newcommand{\CLs}{\ensuremath{CL_s}}
 \input{generated_values.tex}
 \title{HPS Gaussian-Process Resonance Search\\
-Analysis Note v4.9.12: Pointwise Expected-Limit Bands}
+Analysis Note v4.9.12: Expected-Limit Bands and Observed Diagnostics}
 \author{Emrys Peets}
 \date{\StageDate}
 
@@ -21,10 +22,10 @@ Analysis Note v4.9.12: Pointwise Expected-Limit Bands}
 \begin{center}
 \fcolorbox{blue!35!black}{statusblue}{%
 \parbox{0.91\linewidth}{\small
-\textbf{Initial band stage.} This results-only note uses \StageToys{} background-only
-toys per mass (toy IDs \StageToyMin--\StageToyMax). The outer expected band is
-therefore provisional and will be sharpened by the planned 100- and 300-toy
-stages. All bands are pointwise and conditional on frozen GP states.}}
+\textbf{\StageStatusTitle.} This results-only note uses \StageToys{} background-only
+toys per mass (toy IDs \StageToyMin--\StageToyMax). \StageStatusText{} All bands
+and empirical limit-tail diagnostics are pointwise and conditional on frozen GP
+states.}}
 \end{center}
 
 \section{Inputs and construction}
@@ -44,7 +45,14 @@ refit inside toys. Each pseudoexperiment is evaluated with the same bounded,
 piecewise-asymptotic 90\% \CLs{} construction as the observed v4.9.12 curve.
 For numerical stability, fixed-strength nuisance fits minimize a
 data-constant-centered Poisson deviance; the fitted likelihood, statistic, and
-root acceptance gates are unchanged from the parent solver.
+root acceptance gates are unchanged from the parent solver. During the 100-toy
+continuation, an inherited free-strength optimizer status failed at one
+deterministic coordinate despite a finite candidate. The contracted solver now
+uses the same likelihood-equivalent centering as a retry only when a raw free fit
+is unsuccessful. The released ensemble records \CenteredProfileRetries{} centered-profile
+retry activations (\FreeProfileRetries{} free-profile and \NullProfileRetries{} null-profile);
+every retry still passes the original likelihood-nesting and root gates, and no toy is dropped
+or reseeded.
 
 The bands are empirical 2.5\%, 16\%, 50\%, 84\%, and 97.5\% quantiles. Because
 different mass points are generated independently, these are pointwise
@@ -54,6 +62,24 @@ global significance. Full-2016 and 2016-inclusive curves also retain the
 previously disclosed cross-process GP-state replay exception.
 
 \section{Results}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.99\linewidth]{../figures/final_total_search_window_expected_bands_\StageToys toys.pdf}
+  \caption{The ``final'' mass-by-mass maximal-available-dataset observed limit and
+  expected bands over the total search window, 19--250 MeV. The scope strip
+  states which final datasets enter each interval: 2015 at 19--38 MeV,
+  2015+2016 at 39--49 MeV, all three at 50--90 MeV, 2016+2021 at
+  91--180 MeV, and 2021 at 181--250 MeV. Scope boundaries are explicit because
+  this stitched display is not one invariant likelihood across the whole range.}
+  \label{fig:total-window-bands}
+\end{figure}
+
+Figure~\ref{fig:total-window-bands} supplies the requested standalone total-window
+view. It always selects the combination containing every final dataset available
+at that mass; it does not select among scopes according to the observed or expected
+limit. Thus the stitching rule is fixed by dataset support rather than by a favorable
+fluctuation. The displayed 2021 pieces use the optimized-support 10\% configuration.
 
 \begin{figure}[htbp]
   \centering
@@ -67,8 +93,8 @@ previously disclosed cross-process GP-state replay exception.
 
 Figure~\ref{fig:all-three-bands} is the direct Brazil-band analogue of the
 earlier v4.2/v4.5 combination display, now evaluated on the current final
-inputs. At this initial stage, local motion in the outer envelope should be
-read as finite-ensemble granularity rather than a stable tail feature.
+inputs. Local motion in the outer envelope should still be read with the
+finite-ensemble granularity of the current \StageToys-toy stage in mind.
 
 \begin{figure}[p]
   \centering
@@ -88,7 +114,52 @@ read as finite-ensemble granularity rather than a stable tail feature.
 \end{figure}
 
 \clearpage
-\subsection{Compact numerical summary}
+\subsection{Observed-limit and analytic p-values}
+
+Two different diagnostic families are reported and must not be conflated. For an
+observed upper limit $U_{\rm obs}(m)$ and toy limits $U_t(m)$ at a fixed mass,
+\begin{align}
+p_{\rm strong}(m)&=\frac{1}{N}\sum_t
+  \mathbf{1}\!\left[U_t(m)\leq U_{\rm obs}(m)\right],\\
+p_{\rm weak}(m)&=\frac{1}{N}\sum_t
+  \mathbf{1}\!\left[U_t(m)\geq U_{\rm obs}(m)\right],\\
+p_{\rm two}(m)&=\min\!\left[1,2\min(p_{\rm strong},p_{\rm weak})\right].
+\end{align}
+A small $p_{\rm strong}$ marks an unusually tight observed limit, while a small
+$p_{\rm weak}$ marks an unusually loose observed limit. The two-sided number is a
+symmetric reviewer diagnostic. These are upper-limit ensemble positions, not
+discovery p-values and not coverage measurements. The one-sided fractions have
+granularity $1/N=\EmpiricalPResolution$, while $p_{\rm two}$ is constructed from
+them; zero counts are retained as zero in the CSV and shown at half a count only
+for logarithmic plotting.
+
+The analytic $p_0$ is separate: it is the frozen observed curve's one-sided,
+fixed-mass, asymptotic profile-likelihood background-only p-value. It is not derived
+from these \StageToys{} band toys. No look-elsewhere correction is applied, so neither
+the analytic minima nor the empirical tail fractions support a global-significance
+claim.
+
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=0.99\linewidth]{../figures/combination_pvalue_panels_\StageToys toys.pdf}
+  \caption{For each shared-$\eps^2$ combination, the three empirical observed-limit
+  tail diagnostics and the analytic local discovery $p_0$. A downward triangle at
+  half the empirical resolution denotes exactly zero toys in that tail; it is not a
+  nonzero p-value estimate. The horizontal dotted line is 0.05 and is included only
+  as a visual reference.}
+  \label{fig:combination-pvalues}
+\end{figure}
+
+\clearpage
+\input{generated_pvalue_summary.tex}
+
+Table~\ref{tab:pvalue-summary} gives explicit values at the smallest analytic local
+$p_0$ in each scope. Selecting that row makes the compact table scan-aware but does
+not calibrate the minimum; interpretation remains fixed-mass/local. Complete values
+for all \ScopeMassRows{} scope--mass coordinates are in the machine-readable p-value
+ledger.
+
+\subsection{Compact limit summary}
 
 Table~\ref{tab:band-minima} reports, for each scope, the mass at which the
 \StageToys-toy expected median is smallest. These minima summarize the plotted
@@ -103,10 +174,8 @@ limits and pseudo-observation hashes are retained in machine-readable ledgers.
 
 \section{Continuation}
 
-The ensemble is cumulative. Re-running the driver with
-\texttt{--target-toys 100} appends IDs 50--99; using
-\texttt{--target-toys 300} then appends IDs 100--299. Atomic per-mass
-checkpoints make either stage resumable, and the contract hash prevents a
+The ensemble is cumulative. \ContinuationText{} Atomic per-mass checkpoints make
+the continuation resumable, and the contract hash prevents a
 changed card, GP-state ledger, observed curve, solver, or protocol from being
 silently mixed into the existing toys.
 

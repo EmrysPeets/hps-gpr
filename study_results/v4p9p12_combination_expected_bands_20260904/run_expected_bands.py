@@ -116,6 +116,9 @@ def contract(
         "runner": Path(__file__).resolve(),
         "statistical_protocol": HERE / "STATISTICAL_PROTOCOL.md",
         "numerical_amendment": HERE / "NUMERICAL_AMENDMENT_PRE_PRODUCTION.md",
+        "continuation_numerical_amendment": (
+            HERE / "NUMERICAL_AMENDMENT_100TOY_CONTINUATION.md"
+        ),
         "band_solver": HERE / "band_solver.py",
         "analysis_card": card,
         "reviewed_gp_states": states,
@@ -702,6 +705,12 @@ def main(argv: Sequence[str] | None = None) -> None:
     final.atomic_csv(paths["predictions"], predictions)
     final.atomic_csv(paths["summary"], summary)
     final.atomic_csv(paths["summary_current"], summary)
+    solver_counter_totals: Dict[str, int] = {}
+    for encoded in limits.solver_counter_delta.astype(str):
+        for key, value in json.loads(encoded).items():
+            solver_counter_totals[key] = (
+                int(solver_counter_totals.get(key, 0)) + int(value)
+            )
     manifest: Dict[str, object] = {
         "status": "pointwise_conditional_expected_bands_complete",
         "stage_toys_per_mass": target_toys,
@@ -721,6 +730,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         "toy_observation_rows": len(draws),
         "prediction_rows": len(predictions),
         "latent_clip_fallbacks": int(draws.latent_clip_fallback.sum()),
+        "solver_counter_totals": dict(sorted(solver_counter_totals.items())),
         "elapsed_seconds_this_invocation": float(time.time() - start),
         "conditional_on_frozen_gp": True,
         "gp_refit_per_toy": False,

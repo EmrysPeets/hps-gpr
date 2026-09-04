@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import sys
 from pathlib import Path
 from typing import Dict, Sequence
@@ -58,16 +59,73 @@ def validate_prefix(
     current_limit_prefix = limits[limits.toy_id < previous].reset_index(drop=True)
     current_draw_prefix = draws[draws.toy_id < previous].reset_index(drop=True)
     pd.testing.assert_frame_equal(
-        previous_limits.reset_index(drop=True),
-        current_limit_prefix,
-        check_exact=True,
-    )
-    pd.testing.assert_frame_equal(
         previous_draws.reset_index(drop=True),
         current_draw_prefix,
         check_exact=True,
     )
-    checks["earlier_stage_prefix_preserved"] = True
+    if previous == 50:
+        metadata_columns = {"limit_solver", "solver_counter_delta"}
+        comparison_columns = [
+            column
+            for column in previous_limits.columns
+            if column not in metadata_columns
+        ]
+        previous_numeric_prefix = previous_limits[comparison_columns].reset_index(
+            drop=True
+        )
+        current_numeric_prefix = current_limit_prefix[comparison_columns].reset_index(
+            drop=True
+        )
+        # ``dataset_set`` contains both digit-only standalone labels and ``+``
+        # combination labels. Chunked CSV inference can therefore represent the
+        # former as integers in one frame and strings in the other. Canonicalize
+        # only this categorical field; every numerical column remains exact.
+        previous_numeric_prefix["dataset_set"] = previous_numeric_prefix[
+            "dataset_set"
+        ].astype(str)
+        current_numeric_prefix["dataset_set"] = current_numeric_prefix[
+            "dataset_set"
+        ].astype(str)
+        pd.testing.assert_frame_equal(
+            previous_numeric_prefix,
+            current_numeric_prefix,
+            check_exact=True,
+        )
+        old_solver = (
+            "v4p9p12_cached_piecewise_bounded_tildeq_v3_"
+            "centered_fixed_profile_v2"
+        )
+        if set(previous_limits.limit_solver.astype(str)) != {old_solver}:
+            raise RuntimeError("preserved 50-toy ledger has an unexpected solver")
+        retry_keys = {
+            "bounded_free_centered_retries",
+            "unbounded_free_centered_retries",
+            "null_centered_retries",
+        }
+        for old_text, new_text in zip(
+            previous_limits.solver_counter_delta,
+            current_limit_prefix.solver_counter_delta,
+        ):
+            old_counters = json.loads(str(old_text))
+            new_counters = json.loads(str(new_text))
+            if any(int(new_counters.pop(key, 0)) != 0 for key in retry_keys):
+                raise RuntimeError(
+                    "centered-profile retry activated inside the accepted "
+                    "50-toy numeric prefix"
+                )
+            if old_counters != new_counters:
+                raise RuntimeError(
+                    "non-amendment solver counters changed inside the 50-toy prefix"
+                )
+        checks["accepted_50toy_numeric_prefix_preserved"] = True
+        checks["accepted_50toy_draw_prefix_preserved"] = True
+    else:
+        pd.testing.assert_frame_equal(
+            previous_limits.reset_index(drop=True),
+            current_limit_prefix,
+            check_exact=True,
+        )
+        checks["earlier_stage_prefix_preserved"] = True
 
 
 def main(argv: Sequence[str] | None = None) -> None:
@@ -77,8 +135,14 @@ def main(argv: Sequence[str] | None = None) -> None:
         raise SystemExit(f"release target must be one of {band.ALLOWED_RELEASE_STAGES}")
     derived = HERE / "derived"
     paths = band.stage_paths(derived, target_toys)
+    pvalue_path = derived / f"pvalue_diagnostics_{target_toys}toys.csv"
+    total_window_path = (
+        derived / f"final_total_search_window_summary_{target_toys}toys.csv"
+    )
     required = list(paths.values()) + [
         derived / "contract.json",
+        pvalue_path,
+        total_window_path,
         HERE / "figures" / f"figure_manifest_{target_toys}toys.json",
         HERE / "note" / f"HPS_GPR_Analysis_Note_v4p9p12_expected_bands_{target_toys}toys.pdf",
         REPO
@@ -190,6 +254,29 @@ def main(argv: Sequence[str] | None = None) -> None:
         checks,
         "band_solver_version_exact",
     )
+    solver_counter_totals: Dict[str, int] = {}
+    for encoded in limits.solver_counter_delta.astype(str):
+        for key, value in json.loads(encoded).items():
+            solver_counter_totals[key] = (
+                int(solver_counter_totals.get(key, 0)) + int(value)
+            )
+    retry_keys = {
+        "bounded_free_centered_retries",
+        "unbounded_free_centered_retries",
+        "null_centered_retries",
+    }
+    require(
+        manifest.get("solver_counter_totals")
+        == dict(sorted(solver_counter_totals.items()))
+        and retry_keys.issubset(solver_counter_totals)
+        and (
+            target_toys < 100
+            or int(solver_counter_totals["unbounded_free_centered_retries"]) >= 1
+        ),
+        "solver counter totals or centered free-profile retry evidence do not close",
+        checks,
+        "solver_counter_totals_and_free_retry_evidence",
+    )
     require(
         not draws.latent_clip_fallback.astype(bool).any(),
         "a released latent draw used clipping",
@@ -223,6 +310,172 @@ def main(argv: Sequence[str] | None = None) -> None:
         "quantiles_finite_positive_ordered",
     )
 
+    diagnostics = pd.read_csv(pvalue_path)
+    require(
+        len(diagnostics) == len(summary)
+        and set(diagnostics.n_toys.astype(int)) == {target_toys}
+        and set(diagnostics.toy_id_min.astype(int)) == {0}
+        and set(diagnostics.toy_id_max.astype(int)) == {target_toys - 1},
+        "p-value diagnostic grid or toy range is not exact",
+        checks,
+        "pvalue_grid_and_toy_range",
+    )
+    obs_for_tail = observed[["scope_key", "mass_MeV", "eps2_90"]]
+    tail_rows = limits.merge(
+        obs_for_tail,
+        on=["scope_key", "mass_MeV"],
+        how="left",
+        validate="many_to_one",
+        suffixes=("_toy", "_observed"),
+    )
+    tail_rows["strong"] = tail_rows.eps2_90_toy <= tail_rows.eps2_90_observed
+    tail_rows["weak"] = tail_rows.eps2_90_toy >= tail_rows.eps2_90_observed
+    tail_counts = (
+        tail_rows.groupby(["scope_key", "mass_MeV"], as_index=False, sort=True)
+        .agg(
+            n_toys=("toy_id", "count"),
+            n_strong=("strong", "sum"),
+            n_weak=("weak", "sum"),
+        )
+        .sort_values(["scope_key", "mass_MeV"])
+        .reset_index(drop=True)
+    )
+    diagnostic_sorted = diagnostics.sort_values(
+        ["scope_key", "mass_MeV"]
+    ).reset_index(drop=True)
+    require(
+        diagnostic_sorted[["scope_key", "mass_MeV"]].astype(str).to_numpy().tolist()
+        == tail_counts[["scope_key", "mass_MeV"]].astype(str).to_numpy().tolist()
+        and np.array_equal(
+            diagnostic_sorted[["n_toys", "n_strong", "n_weak"]].to_numpy(int),
+            tail_counts[["n_toys", "n_strong", "n_weak"]].to_numpy(int),
+        ),
+        "empirical tail counts do not recompute from the toy ledger",
+        checks,
+        "empirical_tail_counts_recompute",
+    )
+    expected_strong = tail_counts.n_strong.to_numpy(float) / target_toys
+    expected_weak = tail_counts.n_weak.to_numpy(float) / target_toys
+    expected_two = np.clip(
+        2.0 * np.minimum(expected_strong, expected_weak), 0.0, 1.0
+    )
+    require(
+        np.allclose(
+            diagnostic_sorted.p_strong,
+            expected_strong,
+            rtol=0.0,
+            atol=1.0e-15,
+        )
+        and np.allclose(
+            diagnostic_sorted.p_weak,
+            expected_weak,
+            rtol=0.0,
+            atol=1.0e-15,
+        )
+        and np.allclose(
+            diagnostic_sorted.p_two,
+            expected_two,
+            rtol=0.0,
+            atol=1.0e-15,
+        )
+        and np.allclose(
+            diagnostic_sorted.empirical_p_resolution,
+            1.0 / target_toys,
+            rtol=0.0,
+            atol=1.0e-15,
+        ),
+        "empirical p-value fractions or resolution do not recompute",
+        checks,
+        "empirical_pvalue_fractions_recompute",
+    )
+    observed_diagnostics = observed[
+        [
+            "scope_key",
+            "mass_MeV",
+            "eps2_90",
+            "p0_local_asymptotic",
+            "Z_local_asymptotic",
+            "pvalue_method",
+        ]
+    ].sort_values(["scope_key", "mass_MeV"]).reset_index(drop=True)
+    require(
+        diagnostic_sorted[["scope_key", "mass_MeV"]].astype(str).to_numpy().tolist()
+        == observed_diagnostics[["scope_key", "mass_MeV"]]
+        .astype(str)
+        .to_numpy()
+        .tolist()
+        and np.allclose(
+            diagnostic_sorted.eps2_observed,
+            observed_diagnostics.eps2_90,
+            rtol=0.0,
+            atol=1.0e-15,
+        )
+        and np.allclose(
+            diagnostic_sorted.p0_local_asymptotic,
+            observed_diagnostics.p0_local_asymptotic,
+            rtol=0.0,
+            atol=1.0e-15,
+        )
+        and np.allclose(
+            diagnostic_sorted.Z_local_asymptotic,
+            observed_diagnostics.Z_local_asymptotic,
+            rtol=0.0,
+            atol=1.0e-15,
+        )
+        and diagnostic_sorted.pvalue_method.astype(str).tolist()
+        == observed_diagnostics.pvalue_method.astype(str).tolist()
+        and set(diagnostic_sorted.pvalue_method.astype(str))
+        == {"fixed-mass local asymptotic one-sided profile LRT"},
+        "analytic local p0/Z provenance does not match the frozen observed ledger",
+        checks,
+        "analytic_local_pvalue_provenance_exact",
+    )
+
+    total_window = pd.read_csv(total_window_path)
+    total_rule = (
+        (19, 38, "individual_2015_full"),
+        (39, 49, "pair_2015_2016"),
+        (50, 90, "all_2015_2016_2021"),
+        (91, 180, "pair_2016_2021"),
+        (181, 250, "individual_2021_10pct"),
+    )
+    require(
+        len(total_window) == 232
+        and np.array_equal(total_window.mass_MeV.to_numpy(int), np.arange(19, 251))
+        and set(total_window.construction.astype(str))
+        == {"maximal_available_final_dataset_scope_at_each_mass"},
+        "total-search-window ledger does not have the exact 19--250 MeV grid",
+        checks,
+        "total_search_window_grid_exact",
+    )
+    for low, high, scope in total_rule:
+        selected = total_window[
+            total_window.mass_MeV.between(low, high)
+        ].sort_values("mass_MeV")
+        if set(selected.selected_scope_key.astype(str)) != {scope}:
+            raise RuntimeError("total-search-window scope stitching rule drifted")
+        source_rows = summary[
+            (summary.scope_key == scope) & summary.mass_MeV.between(low, high)
+        ].sort_values("mass_MeV")
+        for column in (
+            "eps2_observed",
+            "expected_q025",
+            "expected_q16",
+            "expected_median",
+            "expected_q84",
+            "expected_q975",
+        ):
+            if not np.allclose(
+                selected[column],
+                source_rows[column],
+                rtol=0.0,
+                atol=1.0e-15,
+            ):
+                raise RuntimeError(
+                    f"total-search-window values do not match selected source: {column}"
+                )
+    checks["total_search_window_stitching_and_values_exact"] = True
+
     draw_hash = {
         (str(row.dataset), int(row.mass_MeV), int(row.toy_id)): str(
             row.observation_sha256
@@ -243,9 +496,23 @@ def main(argv: Sequence[str] | None = None) -> None:
 
     figure_manifest_path = HERE / "figures" / f"figure_manifest_{target_toys}toys.json"
     figure_manifest = json.loads(figure_manifest_path.read_text(encoding="utf-8"))
+    expected_figure_stems = {
+        f"all_three_expected_bands_{target_toys}toys",
+        f"individual_expected_band_panels_{target_toys}toys",
+        f"combination_expected_band_panels_{target_toys}toys",
+        f"final_total_search_window_expected_bands_{target_toys}toys",
+        f"combination_pvalue_panels_{target_toys}toys",
+    }
     require(
         int(figure_manifest.get("stage_toys_per_mass", -1)) == target_toys
+        and set(figure_manifest.get("figures", [])) == expected_figure_stems
         and figure_manifest.get("source_summary_sha256") == sha256(paths["summary"])
+        and figure_manifest.get("source_toy_limits_sha256") == sha256(paths["limits"])
+        and figure_manifest.get("source_observed_sha256")
+        == sha256(band.DEFAULT_OBSERVED)
+        and figure_manifest.get("pvalue_diagnostics_sha256") == sha256(pvalue_path)
+        and figure_manifest.get("total_search_window_summary_sha256")
+        == sha256(total_window_path)
         and figure_manifest.get("layout")
         == "one curve family per axis; figure-level legends outside data regions",
         "figure manifest does not bind the stage summary and non-overlap layout",
@@ -284,6 +551,9 @@ def main(argv: Sequence[str] | None = None) -> None:
         .replace("\u2212", "-")
         .split()
     )
+    # pypdf can retain a space after an explicit compound-word hyphen when the
+    # word wraps across a PDF line (for example, ``profile- likelihood``).
+    normalized_text = re.sub(r"(?<=[A-Za-z])- (?=[A-Za-z])", "-", normalized_text)
     semantic_fragments = (
         "Analysis Note v4.9.12",
         f"{target_toys} background-only",
@@ -291,6 +561,12 @@ def main(argv: Sequence[str] | None = None) -> None:
         "36-300 MeV GP support",
         "pointwise expected-limit bands",
         "do not establish unconditional coverage",
+        "total search window",
+        "upper-limit ensemble positions",
+        "one-sided, fixed-mass, asymptotic profile-likelihood",
+        "No look-elsewhere correction is applied",
+        "likelihood-equivalent centering",
+        "no toy is dropped or reseeded",
         "No latent GP draw used the clipping fallback",
     )
     missing_fragments = [
@@ -303,7 +579,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         "pdf_semantic_text",
     )
     require(
-        4 <= len(reader.pages) <= 8,
+        5 <= len(reader.pages) <= 10,
         f"unexpected results-only note page count: {len(reader.pages)}",
         checks,
         "compact_note_page_count",
@@ -319,9 +595,12 @@ def main(argv: Sequence[str] | None = None) -> None:
             "toy_limit_rows": len(limits),
             "toy_observation_rows": len(draws),
             "prediction_rows": len(predictions),
+            "pvalue_rows": len(diagnostics),
+            "total_search_window_rows": len(total_window),
             "note_pages": len(reader.pages),
         },
         "contract_sha256": recomputed_digest,
+        "solver_counter_totals": dict(sorted(solver_counter_totals.items())),
         "note_pdf_sha256": sha256(note_pdf),
         "claim_boundary": manifest["claim_boundary"],
     }
@@ -334,6 +613,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         HERE / "README.md",
         HERE / "STATISTICAL_PROTOCOL.md",
         HERE / "NUMERICAL_AMENDMENT_PRE_PRODUCTION.md",
+        HERE / "NUMERICAL_AMENDMENT_100TOY_CONTINUATION.md",
         HERE / "band_solver.py",
         HERE / "run_expected_bands.py",
         HERE / "make_figures.py",
@@ -341,11 +621,14 @@ def main(argv: Sequence[str] | None = None) -> None:
         HERE / "validate_release.py",
         contract_path,
         *paths.values(),
+        pvalue_path,
+        total_window_path,
         derived / "prediction_state_ledger.csv",
         figure_manifest_path,
         HERE / "note" / "results_section.tex",
         HERE / "note" / "generated_values.tex",
         HERE / "note" / "generated_summary.tex",
+        HERE / "note" / "generated_pvalue_summary.tex",
         note_pdf,
         output_pdf,
         qa_path,
