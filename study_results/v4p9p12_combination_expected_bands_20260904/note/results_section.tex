@@ -1,0 +1,113 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.78in]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{microtype}
+\definecolor{statusblue}{HTML}{EAF2F8}
+\newcommand{\eps}{\ensuremath{\epsilon}}
+\newcommand{\CLs}{\ensuremath{CL_s}}
+\input{generated_values.tex}
+\title{HPS Gaussian-Process Resonance Search\\
+Analysis Note v4.9.12: Pointwise Expected-Limit Bands}
+\author{Emrys Peets}
+\date{\StageDate}
+
+\begin{document}
+\maketitle
+
+\begin{center}
+\fcolorbox{blue!35!black}{statusblue}{%
+\parbox{0.91\linewidth}{\small
+\textbf{Initial band stage.} This results-only note uses \StageToys{} background-only
+toys per mass (toy IDs \StageToyMin--\StageToyMax). The outer expected band is
+therefore provisional and will be sharpened by the planned 100- and 300-toy
+stages. All bands are pointwise and conditional on frozen GP states.}}
+\end{center}
+
+\section{Inputs and construction}
+
+The seven scopes are the exact final-sample curves used in the most recent
+Harvard results section: full 2015, full 2016, the optimized-support 2021 10\%
+sample, their three pairs, and the all-three shared-$\eps^2$ combination. The
+2021 configuration uses the frozen 36--300 MeV GP support and factor-15
+resolution-scaled length ceiling. No 2021 1\% or 2016 10\% comparison enters
+these results.
+
+At each mass, a latent background vector is drawn from the conditioned
+mass-local GP prediction and then Poisson sampled. The same dataset draw is
+reused by every scope containing that dataset at a fixed mass and toy ID, so
+the standalone and combined comparisons are paired. GP hyperparameters are not
+refit inside toys. Each pseudoexperiment is evaluated with the same bounded,
+piecewise-asymptotic 90\% \CLs{} construction as the observed v4.9.12 curve.
+For numerical stability, fixed-strength nuisance fits minimize a
+data-constant-centered Poisson deviance; the fitted likelihood, statistic, and
+root acceptance gates are unchanged from the parent solver.
+
+The bands are empirical 2.5\%, 16\%, 50\%, 84\%, and 97.5\% quantiles. Because
+different mass points are generated independently, these are pointwise
+expected-limit bands rather than a scan-wide ensemble. They do not establish
+unconditional coverage, toy-calibrated \CLs{}, a look-elsewhere correction, or
+global significance. Full-2016 and 2016-inclusive curves also retain the
+previously disclosed cross-process GP-state replay exception.
+
+\section{Results}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.98\linewidth]{../figures/all_three_expected_bands_\StageToys toys.pdf}
+  \caption{Observed and expected 90\% \CLs{} upper limit for the all-three
+  shared-coupling combination. Yellow and green show the central 95\% and 68\%
+  pointwise background-only ranges; the dashed curve is the expected median.
+  The legend is outside the data region so it does not obscure any curve.}
+  \label{fig:all-three-bands}
+\end{figure}
+
+Figure~\ref{fig:all-three-bands} is the direct Brazil-band analogue of the
+earlier v4.2/v4.5 combination display, now evaluated on the current final
+inputs. At this initial stage, local motion in the outer envelope should be
+read as finite-ensemble granularity rather than a stable tail feature.
+
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=0.99\linewidth]{../figures/combination_expected_band_panels_\StageToys toys.pdf}
+  \caption{Pairwise and all-three shared-$\eps^2$ limits. Each combination has
+  its own axis, preventing bands or observed curves from covering another
+  result. All four panels use paired constituent pseudo-observations.}
+  \label{fig:combination-panels}
+\end{figure}
+
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=0.99\linewidth]{../figures/individual_expected_band_panels_\StageToys toys.pdf}
+  \caption{Standalone final-sample limits. The 2021 panel is the optimized
+  native-10\% configuration with 36--300 MeV GP support.}
+  \label{fig:individual-panels}
+\end{figure}
+
+\clearpage
+\subsection{Compact numerical summary}
+
+Table~\ref{tab:band-minima} reports, for each scope, the mass at which the
+\StageToys-toy expected median is smallest. These minima summarize the plotted
+curves; they are not optimization inputs and do not select the analysis card.
+
+\input{generated_summary.tex}
+
+Across all \ScopeMassRows{} scope--mass coordinates, all \ToyLimitRows{} toy
+limits were finite and closed at \CLs{}=0.10 within the frozen numerical
+tolerance. No latent GP draw used the clipping fallback. The exact per-toy
+limits and pseudo-observation hashes are retained in machine-readable ledgers.
+
+\section{Continuation}
+
+The ensemble is cumulative. Re-running the driver with
+\texttt{--target-toys 100} appends IDs 50--99; using
+\texttt{--target-toys 300} then appends IDs 100--299. Atomic per-mass
+checkpoints make either stage resumable, and the contract hash prevents a
+changed card, GP-state ledger, observed curve, solver, or protocol from being
+silently mixed into the existing toys.
+
+\end{document}
