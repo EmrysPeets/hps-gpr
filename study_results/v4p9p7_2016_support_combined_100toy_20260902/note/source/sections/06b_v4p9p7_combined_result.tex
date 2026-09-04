@@ -1,0 +1,43 @@
+\subsection{Downstream recombination gate}
+\label{sec:v4p9p7-combined-gate}
+
+The requested v4.9.7 recombination was conditional on a successful full-2016 support
+freeze.  Section~\ref{sec:v4p9p7-2016-support} records that no eligible edge passed
+the frozen Phase-1 rule.  The resulting authorization record therefore denies the
+Phase-2 continuation, the support-specific full-2016 observed scan, the 65~MeV
+holdout, and the combined 2015-full + 2016-full + 2021-10\% likelihood.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{v4.9.7 downstream gate.  ``Absent'' means deliberately not generated under
+the frozen stop rule, not a numerical result equal to zero.}
+\label{tab:v4p9p7-downstream-gate}
+\begin{tabular}{lll}
+\toprule
+Product & Authorization & Release state \\
+\midrule
+75-background support continuation & denied & absent \\
+Frozen full-2016 support & denied & absent \\
+Full-2016 observed scan (142 masses) & denied & absent \\
+Reviewed 415-state three-campaign ledger & denied & absent \\
+Observed combined upper limit on $\eps^2$ & denied & absent \\
+100-toy conditional combined limit bands & denied & absent \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The release retains fail-closed observed and combined workflow source as unexecuted
+scaffolding.  It does not contain a combined card, a reviewed 2016 state ledger, a
+cache-closure product, band toys, or an updated combined curve.  Running those stages
+inside this frozen study would violate the declared ``stop without retuning'' action.
+A future combination requires a separately named, prospectively specified validation
+protocol or an explicitly chosen historical-support fallback; either choice defines a
+new analysis state and is not inferred here.
+
+The accepted v4.2 three-campaign result and the v4.9.5 2021-only result consequently
+remain distinct historical states.  The single-mass block swaps in
+Section~\ref{sec:v4p9p7-signal-robustness} are mechanism diagnostics only and do not
+substitute for the unproduced v4.9.7 combined scan.
+
+\FloatBarrier

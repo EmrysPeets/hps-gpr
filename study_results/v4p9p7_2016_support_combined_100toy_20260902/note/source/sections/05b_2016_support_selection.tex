@@ -1,0 +1,132 @@
+\subsection{Full-2016 GP-support qualification}
+\label{sec:v4p9p7-2016-support}
+
+Version 4.9.7 repeats the lower-support study for full-2016 inference before
+constructing any support-specific observed result.  The search interval remains
+39--180~MeV and the upper GP-support edge remains 210~MeV.  Candidate lower edges
+are 28, 29, 30, 31, 32, and 33~MeV; 34~MeV is an ineligible geometry control because
+only four rebinned low-side training-bin centers remain at the 39~MeV search endpoint.
+The native 0.05~MeV bins are rebinned by five, so the integer-MeV edge steps retain a
+common 0.25~MeV coarse-bin phase.
+
+\subsubsection{Conditional generating construction}
+
+The low-mass shape is derived from the pre-existing 2016 10\% development
+sample/subset.  Its statistical disjointness from the full sample is not established,
+so it supplies partial observed-shape information and is not called independent here.
+Before the support decision, the full-2016 value array enters only through one scalar
+count over 26--210~MeV: 73,145,594 events.  No support-specific full-data fitted
+amplitude, local $p_0$, or upper limit enters the selection.
+
+Over 26--80~MeV, logistic-turn-on times exponentiated-Chebyshev candidates of degrees
+four through ten are fitted using only the 10\% development spectrum.  Degree five is
+the lowest candidate passing the frozen source-shape gates: its Poisson deviance per
+degree of freedom is 0.970 at native binning and 1.141 after five-bin aggregation, its
+largest aggregated Pearson pull has magnitude 3.521, and no fitted parameter contacts
+a bound.  A quintic $C^2$ smootherstep blends this component into an archived
+\texttt{fShiftSigPowTail} expectation from 75 to 85~MeV.
+
+That broad-tail record has immutable \texttt{fit\_ok=false}.  An independent static
+audit nevertheless verifies a finite nonnegative curve, Pearson
+$\chi^2/N_{\rm dof}=0.990$, free parameters strictly inside their declared bounds, a
+positive 85--210~MeV tail, and bitwise reproduction of all 100 stored Poisson spectra.
+The nonconverged ROOT status is explicitly waived only for a smooth broad-tail
+component of this conditional source-conditioned stress truth.  Neither the component
+nor the hybrid mean is thereby qualified as a physical background truth or coverage
+generator.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.94\linewidth]{v4p9p7_figs/2016_threshold_truth_and_residuals.pdf}
+  \caption{Hybrid conditional generating mean in the units of the 2016 10\%
+  development spectrum.  The degree-five threshold component is blended over
+  75--85~MeV into the explicitly waived broad-tail continuation.  The lower panel
+  shows aggregated source residuals.  Vertical guides mark the tested support edges
+  and the 39~MeV search threshold.  This is a source-conditioned stress truth, not a
+  physical background generator or a coverage model.}
+  \label{fig:v4p9p7-2016-truth}
+\end{figure}
+
+\subsubsection{Frozen Phase-1 rule and outcome}
+
+The same 25 Poisson spectra are paired across all seven edges.  At 44, 49, 54, and
+59~MeV, each edge is tested with matched-reference injections of 0, 2, and
+5$\sigma_A$.  The 65~MeV holdout is forbidden from support and optimizer-branch
+selection.  Branches are selected using covariance validity, kernel state,
+reproducibility, and maximum GP log marginal likelihood only.
+
+An eligible edge must have complete finite numerical products, no accepted kernel-bound
+contact, at least 9 of 12 cell means below 0.75 in absolute value including at least 3
+of 4 background-only cells, and no cell mean at or above 1.25 in magnitude.  Qualifying
+edges would be ranked by their worst absolute cell mean, with a 0.10 tie band and the
+smaller tied edge retained.  Upper-limit strength cannot rank an edge.  The frozen
+protocol requires the study to stop without retuning when no edge passes Phase~1.
+
+Table~\ref{tab:v4p9p7-2016-phase1} gives the complete decision inputs.  Every edge has
+only 3 of 12 means below 0.75 and only 1 of 4 background-only means below 0.75.  Every
+edge also violates the 1.25 gross-bias guard.  The 30~MeV lane has one unreproduced
+injected-refit branch at 44~MeV and $5\sigma_A$ in toy 18; the 32~MeV lane has one at
+54~MeV and $2\sigma_A$ in toy 3.  Those two predeclared technical exclusions are
+retained rather than rerun or suppressed.
+
+\begin{table}[htbp]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3.7pt}
+\caption{Frozen 25-background Phase-1 result.  ``Cells'' gives the number of the 12
+mass--injection means with $|\overline p|<0.75$; ``$z=0$'' gives the corresponding
+count among four background-only means.  The 34~MeV row is an ineligible geometry
+control.}
+\label{tab:v4p9p7-2016-phase1}
+\begin{tabularx}{\linewidth}{r l l r r r Y}
+\toprule
+Edge [MeV] & Role & Numerical gate & Cells & $z=0$ & Worst $|\overline p|$ & Disposition \\
+\midrule
+28 & eligible & pass & 3/12 & 1/4 & 2.696 & fail gross guard \\
+29 & eligible & pass & 3/12 & 1/4 & 2.361 & fail gross guard \\
+30 & eligible & fail (one exclusion) & 3/12 & 1/4 & 2.459 & fail numerical and gross gates \\
+31 & eligible & pass & 3/12 & 1/4 & 2.587 & fail gross guard \\
+32 & eligible & fail (one exclusion) & 3/12 & 1/4 & 2.328 & fail numerical and gross gates \\
+33 & eligible & pass & 3/12 & 1/4 & 2.281 & fail gross guard \\
+34 & control & pass & 3/12 & 1/4 & 2.533 & ineligible; also fails gross guard \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.90\linewidth]{v4p9p7_figs/2016_phase1_support_failure_score.pdf}
+  \caption{Worst absolute Phase-1 mean pull versus lower support edge.  At every edge,
+  the worst cell is the 59~MeV background-only cell.  Black crosses mark the two lanes
+  with a retained technical exclusion; the shaded 34~MeV point is the ineligible
+  control.  No edge approaches the frozen 1.25 gross-bias guard, so the numerically
+  smallest value at 33~MeV is not selected as a fallback.}
+  \label{fig:v4p9p7-2016-phase1-score}
+\end{figure}
+
+The complete cell pattern alternates with mass: pulls are positive near 49~MeV,
+negative near 54~MeV, and strongly positive near 59~MeV for all supports and all three
+injection strengths.  A uniform post-decision refit of the unfluctuated analytic mean
+at every edge gives 49~MeV pulls from $+1.923$ to $+2.181$, 54~MeV pulls from
+$-2.783$ to $-2.579$, and 59~MeV pulls from $+3.465$ to $+3.627$.  The failure is
+therefore a deterministic mismatch between this hybrid stress truth and the fitted GP
+family, not merely a fluctuation of the first 25 Poisson spectra.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.90\linewidth]{v4p9p7_figs/2016_analytic_mean_support_failure_diagnostic.pdf}
+  \caption{Uniform post-decision diagnostic obtained by fitting the unfluctuated
+  analytic generating mean at all seven edges.  The common alternating pattern shows
+  that changing the lower support edge does not resolve the truth--GP mismatch.  This
+  diagnostic explains the stop; it is not a replacement selection rule.}
+  \label{fig:v4p9p7-2016-analytic-failure}
+\end{figure}
+
+The frozen analyzer and a separate reconstruction from the per-task ledgers agree:
+there is no provisional support edge.  Consequently no 75-background continuation,
+support freeze, 65~MeV holdout, support-specific full-2016 observed scan, or updated
+three-campaign result is authorized.  This is a failed conditional source-recovery
+qualification, not an observed-data result, coverage statement, exclusion, or
+calibrated sensitivity.
+
+\FloatBarrier

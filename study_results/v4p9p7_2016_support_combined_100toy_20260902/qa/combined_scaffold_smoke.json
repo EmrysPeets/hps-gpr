@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "status": "pass",
+  "date": "2026-09-02",
+  "scope": "Scaffold-only tests with a clearly synthetic support-30 fixture; no production combined limit was run.",
+  "production_run": false,
+  "selected_2016_support_available": false,
+  "checks": {
+    "python_compile": {
+      "status": "pass",
+      "python_version": "3.9.6",
+      "scripts": [
+        "assemble_reviewed_state_ledger.py",
+        "benchmark_cached_profile_closure.py",
+        "cached_profile_solver.py",
+        "make_combined_card.py",
+        "run_combined_bands_cached_fixed_reviewed.py",
+        "runtime_guard.py",
+        "validate_combined_release.py"
+      ],
+      "runtime_modules": 20
+    },
+    "cli_help": {
+      "status": "pass",
+      "entrypoints": 5
+    },
+    "runtime_snapshot": {
+      "status": "pass",
+      "source_commit": "e2c930f3f879742b2846e3fca1ee1b7e8d99ecc6",
+      "manifest_sha256": "8d20a7f44db25574e20114171d6f014bc116546d0b97c189454d9fceacec767c",
+      "modules_byte_identical_to_origin_main": 20,
+      "actual_import_origins_checked": [
+        "hps_gpr",
+        "hps_gpr.config",
+        "hps_gpr.conversion",
+        "hps_gpr.dataset",
+        "hps_gpr.evaluation",
+        "hps_gpr.gpr",
+        "hps_gpr.io",
+        "hps_gpr.statistics"
+      ],
+      "preloaded_repository_package_rejected": true
+    },
+    "synthetic_card_and_ledger": {
+      "status": "pass",
+      "assembled_rows": 415,
+      "dataset_rows": {
+        "2015": 72,
+        "2016": 142,
+        "2021": 201
+      },
+      "mismatched_support_rejected": true
+    },
+    "synthetic_direct_vs_cache_closure": {
+      "status": "pass",
+      "masses_MeV": [20, 40, 60, 100, 200],
+      "active_dataset_counts_covered": [1, 2, 3],
+      "pseudoexperiments_per_mass": 1,
+      "all_bitwise_equal": true,
+      "maximum_absolute_difference": 0.0
+    },
+    "synthetic_release_validator": {
+      "status": "pass",
+      "structural_mass_rows": 232,
+      "structural_mass_local_toy_count": 23200,
+      "stored_mass_local_toy_count": 23200,
+      "quantiles_means_hashes_and_tail_counts_recomputed": true,
+      "note": "The band rows and stored toy arrays were synthetic structural fixtures, not calculated limits."
+    }
+  },
+  "remaining_required_checks": [
+    "Freeze a protocol-qualified 2016 lower support edge.",
+    "Produce and review all 142 observed 2016 fixed-GP coordinates.",
+    "Run the default 20-pseudoexperiment direct-vs-cache closure on the final card and ledger.",
+    "Run the 232-mass by 100-toy production ensemble.",
+    "Run validate_combined_release.py on the production artifacts."
+  ]
+}

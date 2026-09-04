@@ -1,0 +1,420 @@
+% Validated Section 5 subsection for the v4p8p3 residual-truth study.
+% The final release packager inserts this fragment into the archived v4.7
+% Section 5 source after the v4.7 near-threshold subsection.
+
+\subsection{Residual-structured 2021 generating-mean stress tests}
+\label{sec:v4p8p3-residual-functional-forms}
+
+\begin{center}
+\fbox{%
+\begin{minipage}{0.94\linewidth}
+\textbf{FAILED QUALIFICATION --- REQUESTED CONDITIONAL STRESS ONLY.}
+Both residual-structured means fail the frozen source-qualification and
+signal-influence gates.  The two 20-background extraction ensembles are
+complete, but completion does not rescue either failure.  The fixed-knot
+native-1\% lane is additionally upper-bound-censored at the pilot's factor-25
+fallback.  Nothing in this subsection is physical background truth,
+observed-data bias, coverage, an expected band, a limit, an exclusion, or
+authority to change the production card.
+\end{minipage}}
+\end{center}
+
+\subsubsection{Post-exploratory construction and frozen claim boundary}
+
+The residual patterns exposed by the preceding v4.8 study motivated two
+alternative generating means.  This is therefore post-exploratory model
+development, not a prospectively blind choice.  The model structures and the
+source-only knot-selection rule were frozen before the signal-influence audit
+and before any GPR extraction result from this study was inspected.  No pull,
+recovery, local significance, confidence limit, or length-scale response enters
+the model choice.
+
+The first candidate is a natural spline in log yield relative to the frozen
+v4.8 rigid threshold mean.  The two-knot candidate has fixed interior nodes at
+105 and 180~MeV, while the three-knot comparator has fixed nodes at 90, 160,
+and 220~MeV.  Five-fold blocked source-only Poisson deviance and a
+one-standard-error rule select between them.  Knot locations are never fitted.
+For native 10\%, the selected native-1\% shape is transferred with a free
+normalization and only the frozen, ridge-penalized, zero-mean contrast allowed
+by the protocol.
+
+The second candidate is a three-region geometric blend in log yield.  A
+thresholded generalized-gamma low component, positive quadratic
+log-Chebyshev middle component, and monotone power-exponential high component
+are joined with fixed quintic tapers over 85--125 and 165--215~MeV.  The
+boundaries and tapers are fixed.  Native 10\% again receives only the declared
+normalization and two bounded regional contrasts; the component shapes are not
+refitted.
+
+\subsubsection{Source-only model selection and qualification}
+
+Five blocked source-only folds select the two-knot candidate: its mean
+held-out deviance per bin is 1.153, compared with 1.358 for the three-knot
+candidate, and all candidate-fold best basins repeat 22--24 times.  This
+discrete choice does not make the selected family a qualified source mean.
+Table~\ref{tab:v4p8p3-source-qualification} gives the final support-wide
+40--300~MeV metrics.  A favorable in-sample value cannot override a failed
+blocked-prediction, optimizer-reproducibility, or parameter-bound gate.
+
+\begin{table}[htbp]
+\centering
+\caption{Source-only qualification of the two frozen residual-structured
+means over the complete 40--300~MeV support.  P/D denotes the
+Pearson/deviance pair.  The normalized bound margin is the minimum distance to
+a fitted-parameter bound; zero denotes contact.}
+\label{tab:v4p8p3-source-qualification}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{llcccccc}
+\hline
+Model & Source & Native P/D & Rebin-5 P/D & Held-out D/bin & Basin repeats & Bound margin & Strict gate \\
+\hline
+Fixed-knot log spline & Native 1\%  & 1.104/1.102 & 1.609/1.603 & 1.153 & 23 & 0.500 & Fail \\
+Fixed-knot log spline & Native 10\% & 2.708/2.694 & 9.396/9.330 & 3.178 & 2 & 0.125 & Fail \\
+Three-region blend    & Native 1\%  & 1.430/1.426 & 3.266/3.258 & 1715.005 & 10 & 0.000 & Fail \\
+Three-region blend    & Native 10\% & 6.349/6.334 & 27.704/27.636 & 8.168 & 1 & 0.000 & Fail \\
+\hline
+\end{tabular}}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\graphicorplaceholder{0.99\linewidth}{toy_generation_figs/v4p8p3_2021_residual_truths_20260814/v4p8p3_source_qualification_and_residuals.pdf}
+\caption{Frozen model means against the native 1\% and native 10\% sources,
+with native-bin and five-bin-aggregated Pearson residuals.  The shaded center
+is the 50--250~MeV primary interval; source qualification uses the complete
+40--300~MeV support.  Dotted blue lines are the frozen K2 nodes and orange
+bands are the fixed regional overlaps.}
+\label{fig:v4p8p3-source-qualification}
+\end{figure}
+
+\subsubsection{Signal-influence and feature-scale audits}
+
+Signal rigidity is tested rather than inferred from the small number of model
+coordinates.  The frozen audit reports the projection of leave-window-out
+source refits onto the bin-integrated signal template, the linearized tangent
+absorption, deterministic source refits after one-, three-, and five-sigma
+injections, and the separation of adjacent extrema in the fitted log-mean
+correction.  Optimizer success, constraint feasibility, and repeated recovery
+of the best basin are part of the audit.  Passing this audit does not rescue a
+failed source-qualification gate.
+
+The predeclared maxima are 0.20$\sigma_A$ for a fake-gap shift, 0.04 for the
+conservative tangent fraction, and 0.20 for
+$z\lvert f_{\mathrm{abs}}\rvert$.  Both models fail all three.  In particular,
+the K2 basis projects as much as 24.5\% of a narrow template in the
+linearized metric, while the regional basis reaches 63.1\%.  A small number of
+fixed coordinates therefore does \emph{not} establish that the form cannot
+learn signal.
+
+\begin{table}[htbp]
+\centering
+\caption{Signal-influence diagnostics.  The quantity
+$z\lvert f_{\mathrm{abs}}\rvert$ is an absorbed shift in units of the declared
+diagonal-Poisson $\sigma_A$, not a percentage.}
+\label{tab:v4p8p3-signal-influence}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{llcccccc}
+\hline
+Model & Source & Min. extrema separation / $4.5\sigma_m$ & Max. gap shift / $\sigma_A$ & Max. tangent fraction & Max. $z\lvert f_{\rm abs}\rvert$ & Min. basin repeats & Gate \\
+\hline
+Fixed-knot log spline & Native 1\%  & n/a (one extremum) & 2.550 & 0.245 & 1.227 & 2 & Fail \\
+Fixed-knot log spline & Native 10\% & n/a (one extremum) & 6.500 & 0.237 & 0.706 & 0 & Fail$^\dagger$ \\
+Three-region blend    & Native 1\%  & 1.425 & 12.713 & 0.631 & 2.716 & 1 & Fail \\
+Three-region blend    & Native 10\% & 1.433 & 13.414 & 0.328 & 1.265 & 1 & Fail \\
+\hline
+\end{tabular}}
+\vspace{0.25em}
+
+{\footnotesize $^\dagger$Two constrained native-10\% K2 injection refits
+failed optimizer/feasibility checks; they remain missing rather than being
+replaced.  The extrema-separation column is descriptive and is not a rigidity
+gate.}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\graphicorplaceholder{0.99\linewidth}{toy_generation_figs/v4p8p3_2021_residual_truths_20260814/v4p8p3_signal_influence_audit.pdf}
+\caption{Source-only fake-gap, injection-refit, and tangent-space diagnostics
+versus mass, shown with the predeclared gates.  Crosses identify failed
+constrained refits.  These quantities test whether the generating-mean fit can
+absorb a narrow template; they are not extraction closure or signal
+efficiency.}
+\label{fig:v4p8p3-signal-influence}
+\end{figure}
+
+\subsubsection{Five-lane nested pseudoexperiment design}
+
+The five reported lanes are explicit in Table~\ref{tab:v4p8p3-five-lane-inventory}.
+Within each source family, higher exposures are formed with independent Poisson
+increments, so the lanes are nested rather than independent.  Masses and
+injection strengths reuse each background realization.  The two source
+families are distinct, and the protocol also makes the two model streams
+distinct.  Consequently, side-by-side model differences are unpaired and do
+not isolate a causal response to functional-form replacement.
+
+\begin{table}[htbp]
+\centering
+\caption{Frozen five-lane closure inventory.  Each lane contains 20 background
+labels per model, five mass hypotheses, and four injection strengths, hence 400
+raw extraction states per lane and model.  Repeated labels in nested lanes are
+not additional independent backgrounds.}
+\label{tab:v4p8p3-five-lane-inventory}
+\begin{tabular}{llllr}
+\hline
+Lane & Source family & Nested construction & Background labels/model & States/lane/model \\
+\hline
+Native 1\%    & 1\%  & parent stream                         & 20 & 400 \\
+1\%$\times10$ & 1\%  & parent plus independent $9\times$ increment  & 20 & 400 \\
+1\%$\times100$& 1\%  & $10\times$ plus independent $90\times$ increment & 20 & 400 \\
+Native 10\%   & 10\% & parent stream                         & 20 & 400 \\
+10\%$\times10$& 10\% & parent plus independent $9\times$ increment & 20 & 400 \\
+\hline
+\multicolumn{4}{r}{Total per model} & 2000 \\
+\multicolumn{4}{r}{Two-model total} & 4000 \\
+\hline
+\end{tabular}
+\end{table}
+
+There are 40 independent background clusters per model---20 for each source
+family---and 80 across the two distinct model streams.  The finite sample is a
+conditional screen, not a coverage ensemble.  Raw, accepted, and excluded rows
+remain separate, and the actual accepted count is used in every diagnostic
+interval.
+
+\begin{figure}[htbp]
+\centering
+\graphicorplaceholder{0.99\linewidth}{toy_generation_figs/v4p8p3_2021_residual_truths_20260814/v4p8p3_five_lane_toy_sampling_20.pdf}
+\caption{Analytic expectation, mean,
+median, central 68\% count interval, and standardized mean residual for exactly
+the 20 reported backgrounds in each model and lane.  The ribbons are
+pointwise Poisson-construction diagnostics, not expected-limit bands.}
+\label{fig:v4p8p3-five-lane-sampling}
+\end{figure}
+
+\subsubsection{Pull-blind length-ceiling pilot}
+
+Three independent pilot backgrounds per model and source family are kept
+disjoint from the 20 closure backgrounds.  The background-only pilot compares
+upper factors 15, 20, and 25 at 65, 120, and 210~MeV on identical inputs.  The
+common closure ceiling is selected for all models and lanes using only bound
+occupancy, same-input nested likelihood, optimizer reproducibility, and the
+20-to-25 coordinate plateau.  Pulls, fitted amplitudes, recovery, local
+significance, and limits are forbidden inputs.  The production v4.2 factor-15
+card remains unchanged regardless of the pilot outcome.
+
+Factor 20 fails: seven states contact its exact/near upper bound, the maximum
+$\lvert\Delta\mathrm{LML}\rvert/n_{\rm train}$ from 20 to 25 is 0.01535
+against 0.001, and the 95th percentile of
+$\lvert\Delta\ell\rvert/\sigma_x$ is 5.0 against 0.03.  The protocol therefore
+uses its factor-25 fallback.  Table~\ref{tab:v4p8p3-length-pilot} exposes a
+defect in that fallback rule: all nine independent pilot states for the K2 native-1\%
+lane also lie exactly at factor 25.  The fallback is not a demonstrated
+plateau.
+
+\begin{table}[htbp]
+\centering
+\caption{Pull-blind length-ceiling pilot.  Each contact column contains nine
+states (three pilot backgrounds at three masses).  ``Closure F25'' is the
+number of upper contacts among the 400 accepted extraction states in that
+lane; it is shown only as a post-collection diagnostic and was not used to
+select the fallback.}
+\label{tab:v4p8p3-length-pilot}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lrrrrcrl}
+\hline
+Model/lane & F15 & F20 & F25 & Min. repeats & F25 sufficient? & Closure F25 & Disposition \\
+\hline
+K2, native 1\%     & 9 & 7 & 9 & 3 & No & 345/400 & Ceiling-limited \\
+K2, 1\%$\times10$ & 6 & 0 & 0 & 2 & Yes & 0/400 & Stress only \\
+K2, 1\%$\times100$& 6 & 0 & 0 & 3 & Yes & 0/400 & Stress only \\
+K2, native 10\%    & 6 & 0 & 0 & 2 & Yes & 0/400 & Stress only \\
+K2, 10\%$\times10$& 7 & 0 & 0 & 2 & Yes & 0/400 & Stress only \\
+Blend, native 1\%     & 1 & 0 & 0 & 3 & Yes & 0/400 & Stress only \\
+Blend, 1\%$\times10$ & 0 & 0 & 0 & 2 & Yes & 0/400 & Stress only \\
+Blend, 1\%$\times100$& 0 & 0 & 0 & 2 & Yes & 0/400 & Stress only \\
+Blend, native 10\%    & 0 & 0 & 0 & 2 & Yes & 0/400 & Stress only \\
+Blend, 10\%$\times10$& 0 & 0 & 0 & 2 & Yes & 0/400 & Stress only \\
+\hline
+\end{tabular}}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\graphicorplaceholder{0.99\linewidth}{toy_generation_figs/v4p8p3_2021_residual_truths_20260814/v4p8p3_length_ceiling_pilot.pdf}
+\caption{Pull-blind length-scale
+trajectories, exact/near-bound occupancy, paired nested-LML differences, and
+optimizer-reproducibility diagnostics for the independent pilot.  Factor 25
+is visibly still binding for the K2 native-1\% lane.}
+\label{fig:v4p8p3-length-pilot}
+\end{figure}
+
+Because this defect was found only after the factor-25 closure had been
+collected and inspected, the remediation is explicitly post-closure and uses
+eight new, disjoint, background-only K2 native-1\% pilot toys under a frozen
+addendum.  No pull, amplitude, recovery, $p_0$, or limit enters the choice.
+Three selection toys per mass compare factors 25, 35, 50, and 75.  Factor 35
+fails against factor 50 at 120~MeV: one candidate/sentinel state contacts the
+upper boundary, the 95th-percentile coordinate change is 0.228, and the
+maximum is 0.254.  Factor 50 against the factor-75 sentinel passes at all three
+masses.  The five fresh confirmation toys per mass then reproduce that result
+with no contacts, exclusions, or invalid states.  The smallest repeated
+maximum-LML branch multiplicity is two.
+
+\begin{table}[htbp]
+\centering
+\caption{Targeted ceiling remediation for K2 native 1\%.  Entries are the
+worst values over 65, 120, and 210~MeV.  The coordinate column gives the
+median, 95th percentile, and maximum of
+$|\Delta\ell|/\sigma_x$.  ``Contacts'' counts candidate and sentinel states
+together.}
+\label{tab:v4p8p3-ceiling-remediation}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lrrrrrrl}
+\hline
+Stage and pair & Toys/mass & Contacts & Excl./invalid & Min. repeats & Max. $|\Delta\mathrm{LML}|/n$ & Max. coordinate metrics & Result \\
+\hline
+Required              & --- & 0 & 0/0 & $\geq2$ & 0.001 & 0.01 / 0.03 / 0.05 & --- \\
+Selection 35$\to$50   & 3 & 1 & 0/0 & 2 & $1.4672\times10^{-5}$ & 0.000697 / 0.228406 / 0.253707 & Fail at 120~MeV \\
+Selection 50$\to$75   & 3 & 0 & 0/0 & 2 & $6.8110\times10^{-10}$ & 0.000592 / 0.000594 / 0.000594 & Pass; select 50 \\
+Confirmation 50$\to$75& 5 & 0 & 0/0 & 2 & $1.2999\times10^{-9}$ & 0.000419 / 0.001323 / 0.001536 & Pass targeted gate \\
+\hline
+\end{tabular}}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\graphicorplaceholder{0.99\linewidth}{toy_generation_figs/v4p8p3_2021_residual_truths_20260814/v4p8p3_length_ceiling_remediation.pdf}
+\caption{Post-closure pull-blind ceiling remediation for the K2 native-1\%
+lane.  The upper panels show the full four-factor integrity lattice on three
+selection and five fresh confirmation backgrounds per mass; red crosses mark
+exact or near upper contacts.  The lower panels contain only same-input LML
+and length-coordinate diagnostics.  Factor 35 fails at 120~MeV, whereas
+factor 50 is stable against the factor-75 sentinel in selection and targeted
+confirmation.  Only 50$\to$75 enters the confirmation gate.  No inference
+quantity enters the decision, and the exercise neither reruns nor uncensors
+the original factor-25 closure.}
+\label{fig:v4p8p3-ceiling-remediation}
+\end{figure}
+
+The remediation therefore qualifies factor 50 only for this targeted
+K2/native-1\% extraction diagnostic.  It cannot be applied retroactively to
+the 345 factor-25 contacts in the closure, and a selectively rerun row cannot
+be mixed with the remaining factor-25 rows as a direct model comparison.  No
+all-lane common-ceiling validation or closure rerun is performed; the
+factor-25 K2/native-1\% closure remains upper-bound-censored.  The production
+v4.2 factor-15 card remains unchanged.
+
+\subsubsection{Conditional zero-signal closure and injected recovery}
+
+Zero injection is reported first.  Every accepted signed pull, the raw-first
+optimizer state, any exclusion, the median, and the declared finite-sample mean
+and width intervals remain visible.  Nonzero results then report signed pull,
+pull width, change in fitted significance, and amplitude recovery for the one-,
+three-, and five-sigma injections.  The four strengths and five masses share
+backgrounds and must not be presented as independent tests.
+
+Both model collections contain exactly 2000 raw and 2000 accepted rows, 100
+twenty-background cells, and zero exclusions.  This establishes ledger
+completeness, not scientific closure.  Pull-blind branch selection changes the
+first raw attempt in 570 K2 and 444 regional states; the accepted endpoints in
+Table~\ref{tab:v4p8p3-closure-summary} are therefore not replaced by raw-first
+values.
+
+\begin{table}[htbp]
+\centering
+\caption{Compact conditional-extraction summary.  Every row has 400 states.
+The paired response is
+$R_{\rm pair}=(\widehat A_z-\widehat A_0)/A_{\rm inj}$ on the same background;
+the column gives the range of its five cell medians at $z=5$.  This post-hoc
+quantity removes additive baseline offsets but is not the source-fit rigidity
+test.  The complete 200-cell ledger is archived separately.}
+\label{tab:v4p8p3-closure-summary}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lccccccc}
+\hline
+Model/lane & R/A/E & Worst $z=0$ $\bar p$ (MeV) & CI excl. 0 & $z=0$ width & $z=5$ paired response & $\ell_{\rm hi}$ frac. & Interpretation \\
+\hline
+K2, native 1\%      & 400/400/0 & $+0.957$ (65)  & 2/5 & 0.902--1.432 & 0.979--0.994 & 0.8625 & Stress; ceiling-limited \\
+K2, 1\%$\times10$  & 400/400/0 & $-1.316$ (65)  & 3/5 & 0.684--1.131 & 0.977--0.985 & 0 & Stress only \\
+K2, 1\%$\times100$ & 400/400/0 & $+0.209$ (180) & 0/5 & 0.696--1.430 & 0.971--0.983 & 0 & Stress only \\
+K2, native 10\%     & 400/400/0 & $-1.659$ (65)  & 2/5 & 0.681--0.938 & 0.975--0.986 & 0 & Stress only \\
+K2, 10\%$\times10$ & 400/400/0 & $-0.347$ (65)  & 0/5 & 0.706--1.301 & 0.973--0.984 & 0 & Stress only \\
+Blend, native 1\%      & 400/400/0 & $-3.143$ (90)  & 4/5 & 0.975--1.138 & 0.974--0.986 & 0 & Stress only \\
+Blend, 1\%$\times10$  & 400/400/0 & $+4.229$ (210) & 4/5 & 0.943--1.507 & 0.958--0.979 & 0 & Stress only \\
+Blend, 1\%$\times100$ & 400/400/0 & $+7.558$ (210) & 4/5 & 0.880--2.555 & 0.957--0.980 & 0 & Stress only \\
+Blend, native 10\%     & 400/400/0 & $+4.472$ (210) & 4/5 & 0.640--1.262 & 0.959--0.975 & 0 & Stress only \\
+Blend, 10\%$\times10$ & 400/400/0 & $+6.167$ (210) & 4/5 & 1.074--2.536 & 0.952--0.984 & 0 & Stress only \\
+\hline
+\end{tabular}}
+\end{table}
+
+The exploratory Holm-plus-$|\bar p|\geq0.2$ screen flags 3 of 25 K2
+zero-signal cells, all at 65~MeV, and 16 of 25 regional cells.  The K2 median
+absolute zero-signal mean is 0.193 and its maximum is 1.659.  The regional
+values are 1.728 and 7.558.  Regional negative offsets concentrate near the
+85--125~MeV low/middle overlap, while large positive offsets appear in the
+165--215~MeV middle/high overlap.  This pattern is a conditional model
+mismatch, not evidence for a physical feature.
+
+The raw ratio $\widehat A/A_{\rm inj}$ is strongly confounded by these
+zero-signal offsets.  Across all 1500 injected rows per model, the paired
+response has median $0.9804$ with central 68\% range 0.9678--0.9949 for K2,
+and median $0.9708$ with range 0.9557--0.9872 for the regional blend.  Cell
+medians are stable from one to five injected reference sigmas, but rare
+accepted branch changes remain: K2 has 8 responses below 0.9, 3 below 0.8,
+and 1 below 0.5; the regional blend has 6, 2, and 2, respectively.  These
+tails, together with the independent source-refit audit, forbid a claim of
+signal safety.
+
+\begin{figure}[htbp]
+\centering
+\graphicorplaceholder{0.99\linewidth}{toy_generation_figs/v4p8p3_2021_residual_truths_20260814/v4p8p3_zero_signal_conditional_closure_20toy.pdf}
+\caption{Zero-injection conditional
+closure for both models and all five lanes.  Cellwise 90\% intervals summarize
+the finite pull sample; crosses mark cells with one or more factor-25 contacts.
+The intervals are not CLs intervals, coverage, or observed-data bias.}
+\label{fig:v4p8p3-zero-signal-closure}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\graphicorplaceholder{0.99\linewidth}{toy_generation_figs/v4p8p3_2021_residual_truths_20260814/v4p8p3_injected_recovery_20toy.pdf}
+\caption{Conditional nonzero signed-pull and paired-response summaries.
+Pull bars are 90\% Student-$t$ intervals and paired-response ribbons are the
+cellwise 16th--84th percentiles.  Model streams are distinct, so the
+comparison is descriptive and unpaired rather than a causal paired test of the
+functional form.  The paired response is a post-hoc extraction diagnostic and
+does not replace the source-fit influence audit.}
+\label{fig:v4p8p3-injected-recovery}
+\end{figure}
+
+\subsubsection{Disposition}
+
+Neither residual-structured form is promoted.  K2 is the less pathological
+conditional stress truth: it has three exploratory material zero-bias flags,
+localized at 65~MeV, compared with sixteen and a strong overlap-aligned pattern
+for the regional blend.  Nevertheless K2 fails source qualification and all
+signal-influence gates, has two missing native-10\% constrained influence
+refits, and leaves its native-1\% factor-25 closure upper-bound-censored.  The
+separate factor-50 ceiling remediation passes only for that targeted lane and
+does not re-evaluate the closure.  The regional blend also fails source
+qualification and all influence gates; its zero-signal
+offsets reach 7.558 mean-pull units even though none of its extraction fits
+contacts factor 25.
+
+The complete optimizer ledgers and zero exclusions establish that the
+conditional computations finished under the pull-blind gate.  They do not
+establish coverage or validate either generating mean.  The signals in the
+closure ensembles are added only after each generator is frozen, so downstream
+paired response cannot answer whether fitting that functional family to a
+source containing signal would absorb it.  The dedicated influence audit
+answers that question adversely.
+
+Accordingly, both branches retain the exact phrase ``requested conditional
+stress only.''  The factor-25 K2 native-1\% branch is additionally
+``upper-bound-censored.''  No result in this subsection changes the accepted
+v4.2 production card, its factor-15 2021 ceiling, the observed result,
+confidence-limit procedure, local $p_0$, or interpretation of an observed
+feature.
+
+\FloatBarrier

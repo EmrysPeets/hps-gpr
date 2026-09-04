@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "status": "frozen_before_any_fit_or_score",
+  "amends_protocol_sha256": "f45dbad8ee99f22d8500e4a8effd74b35854e2f694a8bd44ec4704e6b500d14c",
+  "absolute_predictive_adequacy": {
+    "mean_mahalanobis_per_bin_strict_max": 4.0,
+    "individual_anchor_block_mahalanobis_per_bin_exclusive_max": 9.0,
+    "max_abs_marginal_standardized_residual_exclusive_max": 5.0,
+    "applies_to": [
+      "every_support_low_control_in_each_phase",
+      "candidate_independent_high_control_in_each_phase",
+      "reference_support_30_fallback"
+    ],
+    "interpretation": "pragmatic gross-misfit guard, not a calibrated GOF p-value"
+  },
+  "ledger_requirements": {
+    "record_exact_training_and_holdout_masks": true,
+    "record_region_counts_and_center_extrema": true,
+    "record_forbidden_search_center_counts": true,
+    "required_forbidden_search_center_count": 0,
+    "set_sklearn_random_state": true
+  },
+  "downstream_production_requirements": [
+    "per_mass_no_kernel_bound",
+    "per_mass_optimizer_repeat_reproduction",
+    "finite_predictive_covariance",
+    "maximum_LML_branch_reproduction"
+  ]
+}

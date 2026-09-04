@@ -1,0 +1,52 @@
+\section{Conclusions}
+\label{sec:conclusions}
+
+Version 4.9.7 applies a frozen, pull-blind two-stage support protocol to
+full-2016 inference.  Phase~1 tests lower edges from 28 through 33~MeV, plus a
+34~MeV geometry control, using 25 paired conditional backgrounds.  No edge passes:
+each has only 3 of 12 cell means below 0.75 in magnitude, only 1 of 4
+background-only means below 0.75, and a worst mean pull between 2.281 and 2.696.
+The 30 and 32~MeV lanes additionally contain one retained irreproducible refit each.
+No support-specific full-data fitted amplitude, local $p_0$, or upper limit enters
+this decision.
+
+The failure is conditional on the generating construction.  The pre-existing 2016
+10\% development sample/subset supplies partial observed-shape information, while
+the full-2016 array enters before the decision only through one scalar normalization
+over 26--210~MeV.  The hybrid mean also uses an explicitly waived broad-tail
+continuation whose archived ROOT record has \texttt{fit\_ok=false}.  Its favorable
+Pearson statistic, finite positive shape, in-bound parameters, and bitwise toy
+reproduction do not turn it into a qualified physical truth or coverage generator.
+
+A uniform post-decision fit of the unfluctuated analytic mean shows the same
+mass-dependent mismatch at every edge: roughly $+2\sigma_A$ at 49~MeV,
+$-2.6\sigma_A$ at 54~MeV, and $+3.5\sigma_A$ at 59~MeV.  This confirms that the
+observed Phase-1 pattern is not merely a Poisson fluctuation.
+
+\begin{samepage}
+The predeclared stop action therefore authorizes no downstream production.  No
+provisional support, Phase~2 confirmation, 65~MeV holdout, support-specific full-2016
+observed scan, or reviewed 2016 state ledger is present.
+
+\noindent\parbox{\linewidth}{The v4.9.7 combined upper limit and 100-toy combined
+band are also absent by construction.}  Choosing the
+numerically smallest failing edge would be a retrospective rule change and is not
+done.
+\end{samepage}
+
+The separate 2021 robustness audit resolves the apparent ``disappearance'' of the
+earlier 65~MeV signal-like feature more precisely.  The observed counts are unchanged,
+but the fitted narrow-signal coefficient falls by 39.0\% and its local asymptotic
+$Z$ changes from 4.252 to 2.403 when the GP-support prescription changes.  The support
+change shifts the coarse-rebin phase and migrates the preferred GP kernel state; the
+new continuum is higher through the masked region.  Optimizer repair and signal
+normalization do not explain the change.  The defensible conclusion is that the
+narrow-signal attribution is not robust to the support prescription---not that the
+feature has been proved background or that signal has been excluded.
+
+The v4.2 three-campaign combination and v4.9.5 2021-only scan remain preserved as
+distinct historical states.  The unexecuted v4.9.7 observed and combined workflow
+source is retained only to document the gate that prevented production.  A future
+combined result requires a separately named, prospectively specified validation
+protocol or an explicitly chosen historical-support fallback.  Neither is inferred
+from this failed support scan.
