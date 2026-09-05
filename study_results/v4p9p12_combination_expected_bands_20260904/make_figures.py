@@ -286,18 +286,7 @@ def single_scope(summary: pd.DataFrame, scope: str, target_toys: int) -> None:
         fontsize=9.3,
     )
     ax.set_title(LABELS[scope], loc="left", fontweight="semibold", pad=38)
-    fig.text(
-        0.5,
-        0.018,
-        (
-            f"{target_toys} toys per mass; pointwise, background-only, and conditional "
-            "on frozen GP states."
-        ),
-        ha="center",
-        fontsize=8.4,
-        color="0.35",
-    )
-    fig.subplots_adjust(left=0.12, right=0.98, top=0.80, bottom=0.16)
+    fig.subplots_adjust(left=0.12, right=0.98, top=0.80, bottom=0.11)
     save(fig, f"all_three_expected_bands_{target_toys}toys")
 
 
@@ -310,7 +299,8 @@ def panel_grid(
     title: str,
     shape: tuple[int, int],
 ) -> None:
-    fig, axes = plt.subplots(*shape, figsize=(12.8, 8.6) if shape[0] == 2 else (15.2, 5.4))
+    sizes = {(2, 2): (12.8, 8.6), (3, 1): (9.2, 11.0), (1, 3): (15.2, 5.4)}
+    fig, axes = plt.subplots(*shape, figsize=sizes[shape])
     axes_array = np.atleast_1d(axes).reshape(-1)
     for ax, scope in zip(axes_array, scopes):
         panel(ax, summary[summary.scope_key == scope], scope)
@@ -325,19 +315,10 @@ def panel_grid(
         ncol=4,
         fontsize=9.1,
     )
-    fig.text(
-        0.5,
-        0.012,
-        (
-            f"{target_toys} toys per mass. Outer quantiles are provisional at this stage; "
-            "bands are pointwise and conditional on frozen GP states."
-        ),
-        ha="center",
-        fontsize=8.3,
-        color="0.35",
-    )
-    if shape[0] == 2:
-        fig.subplots_adjust(left=0.08, right=0.985, top=0.83, bottom=0.10, hspace=0.31, wspace=0.20)
+    if shape == (3, 1):
+        fig.subplots_adjust(left=0.12, right=0.985, top=0.90, bottom=0.055, hspace=0.40)
+    elif shape[0] == 2:
+        fig.subplots_adjust(left=0.08, right=0.985, top=0.83, bottom=0.07, hspace=0.31, wspace=0.20)
     else:
         fig.subplots_adjust(left=0.06, right=0.985, top=0.76, bottom=0.17, wspace=0.22)
     save(fig, f"{stem}_{target_toys}toys")
@@ -352,7 +333,7 @@ def total_window_plot(total: pd.DataFrame, target_toys: int) -> None:
         hspace=0.055,
         left=0.105,
         right=0.985,
-        bottom=0.145,
+        bottom=0.095,
         top=0.815,
     )
     strip = fig.add_subplot(grid[0])
@@ -457,17 +438,6 @@ def total_window_plot(total: pd.DataFrame, target_toys: int) -> None:
         ncol=4,
         fontsize=9.3,
     )
-    fig.text(
-        0.5,
-        0.025,
-        (
-            f"{target_toys} toys per mass; pointwise and conditional. The active "
-            "dataset composition changes only at the marked boundaries."
-        ),
-        ha="center",
-        fontsize=8.4,
-        color="0.35",
-    )
     save(fig, f"final_total_search_window_expected_bands_{target_toys}toys")
 
 
@@ -504,25 +474,32 @@ def pvalue_panel(
     ax.set_xlabel(r"Mass hypothesis $m_{A'}$ (MeV)")
 
 
-def pvalue_grid(diagnostics: pd.DataFrame, target_toys: int) -> None:
-    fig, axes = plt.subplots(2, 2, figsize=(12.8, 8.7))
+def pvalue_grid(
+    diagnostics: pd.DataFrame,
+    target_toys: int,
+    scopes: tuple[str, ...] = COMBINATIONS,
+) -> None:
+    individual = scopes == INDIVIDUAL
+    shape = (3, 1) if individual else (2, 2)
+    fig, axes = plt.subplots(*shape, figsize=(9.2, 11.0) if individual else (12.8, 8.7))
     combination_values = diagnostics[
-        diagnostics.scope_key.isin(COMBINATIONS)
+        diagnostics.scope_key.isin(scopes)
     ][list(PVALUE_STYLES)].to_numpy(float)
     positive = combination_values[
         np.isfinite(combination_values) & (combination_values > 0.0)
     ]
     y_min = min(0.5 / float(target_toys), float(np.min(positive))) * 0.72
-    for ax, scope in zip(axes.reshape(-1), COMBINATIONS):
+    for ax, scope in zip(axes.reshape(-1), scopes):
         pvalue_panel(ax, diagnostics, scope, target_toys, y_min)
     fig.supylabel("fixed-mass p-value or limit-tail fraction", x=0.018)
     fig.suptitle(
-        "Combination limit-tail diagnostics and analytic local discovery p-value",
+        ("Individual" if individual else "Combination")
+        + " limit-tail diagnostics and analytic local discovery p-value",
         x=0.5,
         y=0.992,
         ha="center",
         fontweight="semibold",
-        fontsize=14,
+        fontsize=12 if individual else 14,
     )
     pvalue_handles = [
         Line2D([0], [0], color=color, lw=1.8, ls=linestyle, label=label)
@@ -535,27 +512,16 @@ def pvalue_grid(diagnostics: pd.DataFrame, target_toys: int) -> None:
         ncol=4,
         fontsize=9.2,
     )
-    fig.text(
-        0.5,
-        0.012,
-        (
-            f"One-sided empirical fractions use {target_toys} toys per mass (resolution "
-            f"{1.0 / target_toys:.3f}); a zero count is drawn as a downward triangle "
-            f"at {0.5 / target_toys:.3f}. The dotted line marks 0.05."
-        ),
-        ha="center",
-        fontsize=8.2,
-        color="0.35",
-    )
     fig.subplots_adjust(
-        left=0.075,
+        left=0.12 if individual else 0.075,
         right=0.985,
-        top=0.84,
-        bottom=0.105,
-        hspace=0.31,
+        top=0.90 if individual else 0.84,
+        bottom=0.055 if individual else 0.07,
+        hspace=0.40 if individual else 0.31,
         wspace=0.19,
     )
-    save(fig, f"combination_pvalue_panels_{target_toys}toys")
+    prefix = "individual" if individual else "combination"
+    save(fig, f"{prefix}_pvalue_panels_{target_toys}toys")
 
 
 def main(argv: Sequence[str] | None = None) -> None:
@@ -568,7 +534,7 @@ def main(argv: Sequence[str] | None = None) -> None:
     if not limits_source.is_file() or not OBSERVED.is_file():
         raise SystemExit("completed toy ledger and frozen observed ledger are required")
     summary = pd.read_csv(source)
-    limits = pd.read_csv(limits_source)
+    limits = pd.read_csv(limits_source, dtype={"dataset_set": str}, low_memory=False)
     observed = pd.read_csv(OBSERVED)
     expected_scopes = set(INDIVIDUAL + COMBINATIONS)
     if set(summary.scope_key.astype(str)) != expected_scopes:
@@ -600,7 +566,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         target_toys=target_toys,
         stem="individual_expected_band_panels",
         title="Standalone final-sample expected bands",
-        shape=(1, 3),
+        shape=(3, 1),
     )
     panel_grid(
         summary,
@@ -612,6 +578,7 @@ def main(argv: Sequence[str] | None = None) -> None:
     )
     total_window_plot(total, target_toys)
     pvalue_grid(diagnostics, target_toys)
+    pvalue_grid(diagnostics, target_toys, INDIVIDUAL)
     inventory = {
         "stage_toys_per_mass": target_toys,
         "source_summary": str(source.relative_to(REPO)),
@@ -630,12 +597,15 @@ def main(argv: Sequence[str] | None = None) -> None:
             f"combination_expected_band_panels_{target_toys}toys",
             f"final_total_search_window_expected_bands_{target_toys}toys",
             f"combination_pvalue_panels_{target_toys}toys",
+            f"individual_pvalue_panels_{target_toys}toys",
         ],
         "style_reference": (
             "v4.2/v4.5 Brazil-band convention: yellow central 95%, green central "
             "68%, dashed black median, solid observed curve"
         ),
         "layout": "one curve family per axis; figure-level legends outside data regions",
+        "floating_explanatory_text": False,
+        "toy_count_location": "report captions and figure filenames",
         "total_search_window_rule": [
             {
                 "mass_min_MeV": low,

@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+from datetime import date
 import json
 import shutil
 import subprocess
@@ -51,9 +52,14 @@ def main(argv: Sequence[str] | None = None) -> None:
     total_path = (
         HERE / "derived" / f"final_total_search_window_summary_{target_toys}toys.csv"
     )
+    global_path = HERE / "derived" / f"global_pvalue_summary_{target_toys}toys.csv"
+    global_manifest_path = (
+        HERE / "derived" / f"global_pvalue_manifest_{target_toys}toys.json"
+    )
     if not all(
         path.is_file()
-        for path in (summary_path, manifest_path, pvalue_path, total_path)
+        for path in (summary_path, manifest_path, pvalue_path, total_path,
+                     global_path, global_manifest_path)
     ):
         raise SystemExit(
             "completed band, p-value, total-window, and run-manifest artifacts are required"
@@ -61,6 +67,8 @@ def main(argv: Sequence[str] | None = None) -> None:
     summary = pd.read_csv(summary_path)
     pvalues = pd.read_csv(pvalue_path)
     total = pd.read_csv(total_path)
+    global_values = pd.read_csv(global_path)
+    global_manifest = json.loads(global_manifest_path.read_text(encoding="utf-8"))
     run_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     if set(summary.n_toys.astype(int)) != {target_toys}:
         raise RuntimeError("note stage does not match the summary toy count")
@@ -68,6 +76,9 @@ def main(argv: Sequence[str] | None = None) -> None:
         raise RuntimeError("note stage does not match the p-value toy count")
     if int(run_manifest.get("stage_toys_per_mass", -1)) != target_toys:
         raise RuntimeError("note stage does not match the run manifest")
+    if (int(global_manifest.get("report_target_toys", -1)) != target_toys
+            or len(global_values) != 8 or global_values.scope_key.duplicated().any()):
+        raise RuntimeError("global-diagnostic stage or scope count does not match")
     if not total.mass_MeV.astype(int).tolist() == list(range(19, 251)):
         raise RuntimeError("total-search-window table is not the exact 19--250 MeV grid")
 
@@ -144,7 +155,7 @@ def main(argv: Sequence[str] | None = None) -> None:
             (
                 r"\caption{Fixed-mass diagnostics at each scope's smallest analytic "
                 r"local $p_0$. The one-sided empirical fractions have granularity "
-                rf"$1/{target_toys}={1.0 / target_toys:.3f}$ and $p_{{\rm two}}$ is "
+                rf"$1/{target_toys}\simeq{1.0 / target_toys:.5f}$ and $p_{{\rm two}}$ is "
                 r"constructed from them; the selected minimum "
                 r"analytic $p_0$ is a compact reporting choice, not a trials-corrected "
                 r"global test.}"
@@ -156,6 +167,44 @@ def main(argv: Sequence[str] | None = None) -> None:
     (NOTE / "generated_pvalue_summary.tex").write_text(
         "\n".join(pvalue_lines) + "\n", encoding="utf-8"
     )
+
+    global_lines = [
+        r"\begin{table}[htbp]",
+        r"\centering\scriptsize",
+        r"\setlength{\tabcolsep}{4pt}",
+        r"\begin{tabular}{llrrrrrr}",
+        r"\toprule",
+        (r"Scope & Window [MeV] & $M$ & $N_{\rm eff}$ & $m_{\min}$ [MeV] & "
+         r"local $p_0$ & $p_{\rm Sidak}$ & $p_{\rm Bonferroni}$ \\"),
+        r"\midrule",
+    ]
+    for scope in (*ORDER, "final_total_search_window"):
+        row = global_values.loc[global_values.scope_key == scope].iloc[0]
+        global_lines.append(
+            "{} & {}--{} & {} & {:.3f} & {} & {} & {} & {} \\\\".format(
+                LABELS.get(scope, "Total window"),
+                int(row.mass_min_MeV), int(row.mass_max_MeV),
+                int(row.n_mass_points), float(row.N_eff_resolution_spacing),
+                int(row.mass_at_min_p0_MeV),
+                fmt_p(float(row.p0_local_asymptotic_min)),
+                fmt_p(float(row.p_sidak_resolution_spacing_analytic)),
+                fmt_p(float(row.p_bonferroni_grid)),
+            )
+        )
+    global_lines.extend([
+        r"\bottomrule\end{tabular}",
+        (r"\caption{Equivalent global and trials-adjusted references for each stated "
+         r"window. The \v{S}id\'ak column uses a resolution-based effective trials "
+         r"count; Bonferroni uses all $M$ tested grid points. Both use the frozen "
+         r"analytic local $p_0$, independently of the \StageToys{} band toys.}"),
+        r"\label{tab:global-summary}\end{table}",
+    ])
+    (NOTE / "generated_global_summary.tex").write_text(
+        "\n".join(global_lines) + "\n", encoding="utf-8"
+    )
+    global_total = global_values.loc[
+        global_values.scope_key == "final_total_search_window"
+    ].iloc[0]
 
     toy_rows = target_toys * len(summary)
     counter_totals = dict(run_manifest.get("solver_counter_totals", {}))
@@ -205,14 +254,22 @@ def main(argv: Sequence[str] | None = None) -> None:
         rf"\newcommand{{\ScopeMassRows}}{{{len(summary)}}}",
         rf"\newcommand{{\ToyLimitRows}}{{{toy_rows:,}}}",
         rf"\newcommand{{\TotalWindowRows}}{{{len(total)}}}",
-        rf"\newcommand{{\EmpiricalPResolution}}{{{1.0 / target_toys:.3f}}}",
+        rf"\newcommand{{\EmpiricalPResolution}}{{{1.0 / target_toys:.5f}}}",
         rf"\newcommand{{\CenteredProfileRetries}}{{{centered_profile_retries}}}",
         rf"\newcommand{{\FreeProfileRetries}}{{{free_retries}}}",
         rf"\newcommand{{\NullProfileRetries}}{{{null_retries}}}",
         rf"\newcommand{{\StageStatusTitle}}{{{stage_title}}}",
         rf"\newcommand{{\StageStatusText}}{{{stage_text}}}",
         rf"\newcommand{{\ContinuationText}}{{{continuation_text}}}",
-        r"\newcommand{\StageDate}{September 4, 2026}",
+        rf"\newcommand{{\GlobalMinMass}}{{{int(global_total.mass_at_min_p0_MeV)}}}",
+        rf"\newcommand{{\GlobalGridCount}}{{{int(global_total.n_mass_points)}}}",
+        rf"\newcommand{{\GlobalNeff}}{{{float(global_total.N_eff_resolution_spacing):.4f}}}",
+        rf"\newcommand{{\GlobalLocalP}}{{{fmt_p(float(global_total.p0_local_asymptotic_min))}}}",
+        rf"\newcommand{{\GlobalSidakP}}{{{fmt_p(float(global_total.p_sidak_resolution_spacing_analytic))}}}",
+        rf"\newcommand{{\GlobalSidakZ}}{{{float(global_total.Z_sidak_resolution_spacing_analytic):.3f}}}",
+        rf"\newcommand{{\GlobalBonferroniP}}{{{fmt_p(float(global_total.p_bonferroni_grid))}}}",
+        rf"\newcommand{{\AllScopesBonferroniP}}{{{fmt_p(float(global_manifest['all_scope_family']['p_bonferroni_grid']))}}}",
+        rf"\newcommand{{\StageDate}}{{{date.today():%B} {date.today().day}, {date.today().year}}}",
     ]
     (NOTE / "generated_values.tex").write_text(
         "\n".join(values) + "\n", encoding="utf-8"

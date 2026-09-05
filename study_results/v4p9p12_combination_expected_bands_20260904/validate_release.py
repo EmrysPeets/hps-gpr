@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import gzip
 import hashlib
 import json
 import re
@@ -15,12 +16,21 @@ import numpy as np
 import pandas as pd
 from PIL import Image
 from pypdf import PdfReader
+from scipy.stats import norm
 
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
 sys.path.insert(0, str(HERE))
 import run_expected_bands as band  # noqa: E402
+
+TOTAL_RULE = (
+    (19, 38, "individual_2015_full"),
+    (39, 49, "pair_2015_2016"),
+    (50, 90, "all_2015_2016_2021"),
+    (91, 180, "pair_2016_2021"),
+    (181, 250, "individual_2021_10pct"),
+)
 
 
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
@@ -54,7 +64,9 @@ def validate_prefix(
     previous_draws_path = HERE / "derived" / f"toy_observations_{previous}toys.csv"
     if not previous_limits_path.is_file() or not previous_draws_path.is_file():
         raise RuntimeError(f"missing preserved {previous}-toy stage ledgers")
-    previous_limits = pd.read_csv(previous_limits_path)
+    previous_limits = pd.read_csv(
+        previous_limits_path, dtype={"dataset_set": str}, low_memory=False
+    )
     previous_draws = pd.read_csv(previous_draws_path)
     current_limit_prefix = limits[limits.toy_id < previous].reset_index(drop=True)
     current_draw_prefix = draws[draws.toy_id < previous].reset_index(drop=True)
@@ -126,6 +138,90 @@ def validate_prefix(
             check_exact=True,
         )
         checks["earlier_stage_prefix_preserved"] = True
+
+
+def validate_global_diagnostics(target_toys: int, checks: Dict[str, object]) -> None:
+    derived = HERE / "derived"
+    metadata_path = derived / f"global_pvalue_manifest_{target_toys}toys.json"
+    metadata = json.loads(metadata_path.read_text())
+    for entry in (*metadata["sources"].values(), *metadata["outputs"].values()):
+        if sha256(REPO / entry["path"]) != entry["sha256"]:
+            raise RuntimeError(f"global-diagnostic hash mismatch: {entry['path']}")
+    require(
+        metadata["report_target_toys"] == target_toys
+        and metadata["requires_completed_band_stage"] is False
+        and metadata["uses_limit_tail_pvalues"] is False
+        and metadata["scan_calibrated_empirical_pvalue"] is None
+        and metadata["scan_calibrated_empirical_pvalue_status"]
+        == "unavailable_from_mass_independent_band_toys"
+        and metadata["independence_width_sigma"] == 2.25,
+        "global-diagnostic interpretation changed", checks, "global_semantics_and_hashes",
+    )
+    summary = pd.read_csv(derived / f"global_pvalue_summary_{target_toys}toys.csv")
+    ledger = pd.read_csv(derived / f"global_resolution_ledger_{target_toys}toys.csv",
+                         dtype={"dataset_set": str})
+    observed = pd.read_csv(band.DEFAULT_OBSERVED, dtype={"dataset_set": str})
+    pieces = [observed[(observed.scope_key == scope) & observed.mass_MeV.between(low, high)]
+              for low, high, scope in TOTAL_RULE]
+    expected = {scope: observed[observed.scope_key == scope]
+                for scope, *_ in band.final.SCOPES}
+    expected["final_total_search_window"] = pd.concat(pieces).sort_values("mass_MeV")
+    if (len(summary) != 8 or len(ledger) != 912 or set(summary.scope_key) != set(expected)
+            or summary.scope_key.duplicated().any()
+            or ledger.duplicated(["scope_key", "mass_MeV"]).any()):
+        raise RuntimeError("global-diagnostic grids are incomplete or duplicated")
+    datasets = band.make_datasets(band.load_config(band.DEFAULT_CARD))
+    for key, frame in expected.items():
+        frame = frame.sort_values("mass_MeV").reset_index(drop=True)
+        trace = ledger[ledger.scope_key == key].sort_values("mass_MeV").reset_index(drop=True)
+        row = summary.loc[summary.scope_key == key].iloc[0]
+        pd.testing.assert_series_equal(frame.mass_MeV, trace.mass_MeV, check_names=False)
+        pd.testing.assert_series_equal(frame.scope_key, trace.selected_scope_key, check_names=False)
+        pd.testing.assert_series_equal(frame.dataset_set, trace.dataset_set, check_names=False)
+        np.testing.assert_allclose(frame.p0_local_asymptotic, trace.p0_local_asymptotic,
+                                   rtol=1e-13, atol=0)
+        sigma = []
+        for source, recorded in zip(frame.itertuples(), trace.itertuples()):
+            mapping = {dataset: float(datasets[dataset].sigma(source.mass_MeV / 1000.0))
+                       for dataset in str(source.dataset_set).split("+")}
+            saved_mapping = json.loads(recorded.sigma_by_dataset_GeV)
+            if saved_mapping != mapping:
+                raise RuntimeError("global detector resolutions do not match the frozen runtime")
+            sigma.append(min(mapping.values()))
+        sigma = np.asarray(sigma)
+        np.testing.assert_allclose(sigma, trace.sigma_effective_GeV, rtol=1e-12, atol=0)
+        contributions = np.diff(frame.mass_MeV.to_numpy(float) / 1000.0) / (
+            2.25 * (sigma[1:] + sigma[:-1]) / 2.0
+        )
+        np.testing.assert_allclose(np.r_[contributions, 0.0],
+                                   trace.N_eff_next_interval_contribution, rtol=1e-12, atol=1e-15)
+        neff = float(np.clip(np.sum(contributions), 1, len(frame)))
+        minimum = frame.loc[frame.p0_local_asymptotic.idxmin()]
+        pmin = float(minimum.p0_local_asymptotic)
+        sidak = float(-np.expm1(neff * np.log1p(-pmin)))
+        bonferroni = min(1.0, len(frame) * pmin)
+        np.testing.assert_allclose(
+            [row.N_eff_resolution_spacing, row.p0_local_asymptotic_min,
+             row.p_sidak_resolution_spacing_analytic, row.Z_sidak_resolution_spacing_analytic,
+             row.p_bonferroni_grid],
+            [neff, pmin, sidak, norm.isf(sidak), bonferroni], rtol=1e-12, atol=1e-15,
+        )
+        if (int(row.n_mass_points) != len(frame)
+                or int(row.mass_at_min_p0_MeV) != int(minimum.mass_MeV)
+                or bool(row.scan_toy_calibrated) or bool(row.uses_limit_tail_pvalues)):
+            raise RuntimeError("global-diagnostic scope metadata mismatch")
+    family = metadata["all_scope_family"]
+    minimum = observed.loc[observed.p0_local_asymptotic.idxmin()]
+    require(
+        family["n_tests"] == 680
+        and family["scope_key_at_min"] == minimum.scope_key
+        and family["mass_at_min_p0_MeV"] == int(minimum.mass_MeV)
+        and family["p0_min"] == float(minimum.p0_local_asymptotic)
+        and family["p_bonferroni_grid"] == min(1.0, 680 * float(minimum.p0_local_asymptotic))
+        and family["p_sidak_resolution_spacing_analytic"] is None,
+        "all-scope Bonferroni family calculation differs", checks, "all_scope_trials_family_exact",
+    )
+    checks["global_resolution_ledger_and_formulas_recompute"] = True
 
 
 def main(argv: Sequence[str] | None = None) -> None:
@@ -227,7 +323,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         "optimized_2021_configuration_exact",
     )
 
-    limits = pd.read_csv(paths["limits"])
+    limits = pd.read_csv(paths["limits"], dtype={"dataset_set": str}, low_memory=False)
     draws = pd.read_csv(paths["draws"])
     predictions = pd.read_csv(paths["predictions"])
     summary = pd.read_csv(paths["summary"])
@@ -236,6 +332,21 @@ def main(argv: Sequence[str] | None = None) -> None:
     checks["current_summary_matches_stage"] = True
     band.validate_raw_frames(limits, draws, predictions, target_toys)
     checks["raw_grid_and_numerical_gates"] = True
+    if target_toys == 300:
+        archive_record = json.loads((HERE / "qa/ledger_archive_300toys.json").read_text())
+        archive = HERE / archive_record["archive_path"]
+        raw_digest = hashlib.sha256()
+        with gzip.open(archive, "rb") as stream:
+            for block in iter(lambda: stream.read(1024 * 1024), b""):
+                raw_digest.update(block)
+        require(
+            sha256(archive) == archive_record["archive_sha256"]
+            and raw_digest.hexdigest() == archive_record["raw_sha256"]
+            == manifest["artifacts_sha256"]["limits"]
+            and archive_record["round_trip_exact"] is True,
+            "compressed toy ledger fails its exact round-trip check", checks,
+            "compressed_limit_ledger_round_trip_exact",
+        )
     expected_limit_rows = target_toys * 680
     expected_draw_rows = target_toys * 415
     require(
@@ -432,13 +543,6 @@ def main(argv: Sequence[str] | None = None) -> None:
     )
 
     total_window = pd.read_csv(total_window_path)
-    total_rule = (
-        (19, 38, "individual_2015_full"),
-        (39, 49, "pair_2015_2016"),
-        (50, 90, "all_2015_2016_2021"),
-        (91, 180, "pair_2016_2021"),
-        (181, 250, "individual_2021_10pct"),
-    )
     require(
         len(total_window) == 232
         and np.array_equal(total_window.mass_MeV.to_numpy(int), np.arange(19, 251))
@@ -448,7 +552,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         checks,
         "total_search_window_grid_exact",
     )
-    for low, high, scope in total_rule:
+    for low, high, scope in TOTAL_RULE:
         selected = total_window[
             total_window.mass_MeV.between(low, high)
         ].sort_values("mass_MeV")
@@ -493,6 +597,7 @@ def main(argv: Sequence[str] | None = None) -> None:
                 raise RuntimeError("a scope did not reuse its paired dataset draw")
     checks["paired_constituent_draw_hashes"] = True
     validate_prefix(limits, draws, target_toys, checks)
+    validate_global_diagnostics(target_toys, checks)
 
     figure_manifest_path = HERE / "figures" / f"figure_manifest_{target_toys}toys.json"
     figure_manifest = json.loads(figure_manifest_path.read_text(encoding="utf-8"))
@@ -502,6 +607,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         f"combination_expected_band_panels_{target_toys}toys",
         f"final_total_search_window_expected_bands_{target_toys}toys",
         f"combination_pvalue_panels_{target_toys}toys",
+        f"individual_pvalue_panels_{target_toys}toys",
     }
     require(
         int(figure_manifest.get("stage_toys_per_mass", -1)) == target_toys
@@ -527,7 +633,21 @@ def main(argv: Sequence[str] | None = None) -> None:
         with Image.open(png) as image:
             if image.width < 1800 or image.height < 900:
                 raise RuntimeError(f"figure raster is unexpectedly small: {stem}")
+        figure_text = PdfReader(str(pdf)).pages[0].extract_text() or ""
+        if any(fragment in figure_text for fragment in
+               ("toys per mass", "Outer quantiles", "conditional on frozen", "One-sided empirical")):
+            raise RuntimeError(f"explanatory footer remains in figure: {stem}")
     checks["figure_files_and_resolution"] = True
+    checks["plot_explanations_moved_to_captions"] = True
+    figure_blocks = re.findall(
+        r"\\begin\{figure\}.*?\\end\{figure\}",
+        (HERE / "note" / "results_section.tex").read_text(), re.DOTALL,
+    )
+    require(
+        len(figure_blocks) == 6
+        and all("\\StageToys" in block.split("\\caption{", 1)[1] for block in figure_blocks),
+        "every figure caption must identify the toy count", checks, "all_figure_captions_state_toy_count",
+    )
 
     note_pdf = HERE / "note" / f"HPS_GPR_Analysis_Note_v4p9p12_expected_bands_{target_toys}toys.pdf"
     output_pdf = (
@@ -564,7 +684,9 @@ def main(argv: Sequence[str] | None = None) -> None:
         "total search window",
         "upper-limit ensemble positions",
         "one-sided, fixed-mass, asymptotic profile-likelihood",
-        "No look-elsewhere correction is applied",
+        "Bonferroni",
+        "resolution-spacing approximation",
+        "scan-toy trials p-value is unavailable",
         "likelihood-equivalent centering",
         "no toy is dropped or reseeded",
         "No latent GP draw used the clipping fallback",
@@ -579,7 +701,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         "pdf_semantic_text",
     )
     require(
-        5 <= len(reader.pages) <= 10,
+        7 <= len(reader.pages) <= 12,
         f"unexpected results-only note page count: {len(reader.pages)}",
         checks,
         "compact_note_page_count",
@@ -618,17 +740,27 @@ def main(argv: Sequence[str] | None = None) -> None:
         HERE / "run_expected_bands.py",
         HERE / "make_figures.py",
         HERE / "make_note_assets.py",
+        HERE / "continue_balanced.py",
+        HERE / "pack_stage.py",
+        HERE / ".gitignore",
+        HERE / "make_global_diagnostics.py",
+        HERE / "GLOBAL_PVALUE_METHOD.md",
         HERE / "validate_release.py",
         contract_path,
         *paths.values(),
         pvalue_path,
         total_window_path,
+        derived / f"global_pvalue_summary_{target_toys}toys.csv",
+        derived / f"global_resolution_ledger_{target_toys}toys.csv",
+        derived / f"global_pvalue_manifest_{target_toys}toys.json",
+        HERE / "qa" / f"execution_{target_toys}toys.json",
         derived / "prediction_state_ledger.csv",
         figure_manifest_path,
         HERE / "note" / "results_section.tex",
         HERE / "note" / "generated_values.tex",
         HERE / "note" / "generated_summary.tex",
         HERE / "note" / "generated_pvalue_summary.tex",
+        HERE / "note" / "generated_global_summary.tex",
         note_pdf,
         output_pdf,
         qa_path,
@@ -638,6 +770,11 @@ def main(argv: Sequence[str] | None = None) -> None:
         manifest_files.extend(
             [HERE / "figures" / f"{stem}.pdf", HERE / "figures" / f"{stem}.png"]
         )
+    if target_toys == 300:
+        manifest_files.extend([
+            HERE / "derived/toy_limits_300toys.csv.gz",
+            HERE / "qa/ledger_archive_300toys.json",
+        ])
     unique = sorted({path.resolve() for path in manifest_files})
     lines = []
     for path in unique:
