@@ -16,6 +16,17 @@ This package implements a simultaneous bump hunt analysis across multiple HPS da
 
 The package converts the original Jupyter notebook analysis into a modular, batch-ready Python package with a command-line interface.
 
+## Version 4.9.12.5: mass-resolution uncertainty study
+
+The [v4.9.12.5 reference section](study_results/v4p9p12p5_mass_resolution_uncertainty_20260905/README.md)
+archives the 2021 optimized-support signal-width scan at nominal resolution and
+±10% / ±20%, including signed local diagnostics and 1,005 observed 90% CLs
+upper limits in signal yield and coupling squared. It also links the supporting
+20-toy peak–dip pilot and deterministic reverse-injection checks, with plots,
+machine-readable results, frozen dependencies, and a portable SHA-256 validator.
+The width scan is a conditional template-sensitivity study, not a limit with a
+profiled resolution nuisance or a calibrated global-significance claim.
+
 ## Statistical Conventions
 
 The production inference uses a profiled likelihood with correlated Gaussian

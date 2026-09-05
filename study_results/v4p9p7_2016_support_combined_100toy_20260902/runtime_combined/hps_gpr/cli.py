@@ -1,0 +1,3534 @@
+"""Command-line interface for HPS GPR analysis."""
+
+import glob
+import os
+import sys
+
+import click
+import numpy as np
+from click.core import ParameterSource
+
+
+@click.group()
+@click.version_option(version="0.1.0")
+def main():
+    """HPS Gaussian Process Regression analysis CLI."""
+    pass
+
+
+def _parse_strength_tokens(raw: str) -> list:
+    """Parse comma-separated strength tokens (supports `1` and `s1` forms)."""
+    if raw is None:
+        return []
+    out = []
+    for tok in str(raw).split(","):
+        t = tok.strip()
+        if not t:
+            continue
+        if len(t) > 1 and t[0].lower() == "s":
+            t = t[1:]
+        out.append(float(t))
+    return out
+
+
+def _parse_mass_tokens(raw: str) -> list:
+    """Parse comma-separated mass tokens in GeV."""
+    if raw is None:
+        return []
+    out = []
+    for tok in str(raw).split(","):
+        t = tok.strip()
+        if not t:
+            continue
+        out.append(float(t))
+    return out
+
+
+def _build_extra_sbatch(account=None, qos=None):
+    """Build optional extra SBATCH directives from CLI charging flags."""
+    extra = []
+    if account:
+        extra.append(f"--account={account}")
+    if qos:
+        extra.append(f"--qos={qos}")
+    return extra or None
+
+
+def _infer_parallel_cpus_per_task(
+    cfg,
+    *,
+    parallel_attr,
+    workers_attr,
+    threads_attr,
+    override=None,
+):
+    """Infer a CPU request matching a configured parallel-work profile."""
+    if override is not None:
+        return max(1, int(override))
+    if not bool(getattr(cfg, parallel_attr, False)):
+        return 1
+    threads_per_worker = int(getattr(cfg, threads_attr, 1) or 1)
+    n_workers = int(getattr(cfg, workers_attr, 1) or 1)
+    return max(1, int(n_workers) * int(threads_per_worker))
+
+
+def _infer_scan_cpus_per_task(cfg, override=None):
+    """Infer a CPU request matching the main scan parallelism."""
+    return _infer_parallel_cpus_per_task(
+        cfg,
+        parallel_attr="scan_parallel",
+        workers_attr="scan_n_workers",
+        threads_attr="scan_threads_per_worker",
+        override=override,
+    )
+
+
+def _infer_toy_scan_cpus_per_task(cfg, override=None):
+    """Infer a CPU request matching the functional-form toy-scan parallelism."""
+    return _infer_parallel_cpus_per_task(
+        cfg,
+        parallel_attr="toy_scan_parallel",
+        workers_attr="toy_scan_n_workers",
+        threads_attr="toy_scan_threads_per_worker",
+        override=override,
+    )
+
+
+def _infer_injection_cpus_per_task(cfg, override=None):
+    """Infer a CPU request matching injection worker parallelism."""
+    if override is not None:
+        return max(1, int(override))
+    threads_per_worker = int(getattr(cfg, "inj_threads_per_worker", 1) or 1)
+    n_workers = int(getattr(cfg, "inj_n_workers", 1) or 1)
+    return max(1, int(n_workers) * int(threads_per_worker))
+
+
+def _resolve_cli_override(ctx, param_name, explicit_value, default_value):
+    """Return the explicit CLI value when provided, otherwise the supplied default."""
+    if ctx.get_parameter_source(param_name) != ParameterSource.DEFAULT:
+        return explicit_value
+    return default_value
+
+
+def _funcform_config_value(cfg, attr_name, dataset_key, explicit_value=None, default=""):
+    """Resolve a functional-form source option from CLI or per-dataset config."""
+    if explicit_value:
+        return explicit_value
+    mapping = getattr(cfg, attr_name, {}) or {}
+    if isinstance(mapping, dict):
+        return mapping.get(str(dataset_key), default)
+    return default
+
+
+@main.command()
+@click.option(
+    "--config",
+    "-c",
+    required=True,
+    type=click.Path(exists=True),
+    help="Path to configuration YAML file",
+)
+@click.option(
+    "--output-dir",
+    "-o",
+    type=click.Path(),
+    help="Override output directory from config",
+)
+@click.option(
+    "--mass-min",
+    type=float,
+    help="Minimum mass to scan (GeV)",
+)
+@click.option(
+    "--mass-max",
+    type=float,
+    help="Maximum mass to scan (GeV)",
+)
+@click.option(
+    "--array-task",
+    type=int,
+    help="SLURM array task ID (0-indexed)",
+)
+@click.option(
+    "--n-tasks",
+    type=int,
+    help="Total number of SLURM array tasks",
+)
+def scan(config, output_dir, mass_min, mass_max, array_task, n_tasks):
+    """Run the full mass scan."""
+    from .config import load_config
+    from .dataset import make_datasets, print_datasets
+    from .validation import validate_datasets
+    from .scan import run_scan
+    from .plotting import plot_eps2_curves
+    from .slurm import get_mass_range_for_task
+
+    cfg = load_config(config)
+
+    if output_dir:
+        cfg.output_dir = output_dir
+
+    # Handle SLURM array task
+    if array_task is not None and n_tasks is not None:
+        datasets = make_datasets(cfg)
+        task_mass_min, task_mass_max = get_mass_range_for_task(
+            datasets, cfg.mass_step_gev, array_task, n_tasks
+        )
+        if task_mass_min is None:
+            print(f"Task {array_task}: No masses to process")
+            return
+        mass_min = task_mass_min
+        mass_max = task_mass_max
+        # Create task-specific output directory
+        cfg.output_dir = os.path.join(cfg.output_dir, f"task_{array_task:04d}")
+        print(f"Task {array_task}: Processing masses {mass_min:.3f} to {mass_max:.3f} GeV")
+
+    cfg.ensure_output_dir()
+
+    print(f"Loading configuration from {config}")
+    print(f"Output directory: {cfg.output_dir}")
+
+    datasets = make_datasets(cfg)
+    print_datasets(datasets)
+
+    if not datasets:
+        print("No datasets enabled. Check configuration.")
+        sys.exit(1)
+
+    print("\nValidating datasets...")
+    validate_datasets(datasets, cfg)
+
+    print("\nRunning scan...")
+    df_single, df_comb = run_scan(datasets, cfg, mass_min=mass_min, mass_max=mass_max)
+
+    if cfg.save_plots:
+        print("\nGenerating summary plots...")
+        plot_eps2_curves(
+            df_single, df_comb, os.path.join(cfg.output_dir, "summary_plots")
+        )
+
+    if bool(getattr(cfg, "make_ul_bands", False)):
+        from .bands import expected_ul_bands_for_dataset, expected_ul_bands_for_combination
+        from .plotting import plot_ul_bands
+
+        masses_all = np.round(np.arange(min(d.m_low for d in datasets.values()),
+                                        max(d.m_high for d in datasets.values()) + cfg.mass_step_gev / 2,
+                                        cfg.mass_step_gev), 3)
+        if mass_min is not None:
+            masses_all = masses_all[masses_all >= float(mass_min)]
+        if mass_max is not None:
+            masses_all = masses_all[masses_all <= float(mass_max)]
+
+        run_limit_raw = getattr(cfg, "run_limit_bands_on", "2015")
+        if isinstance(run_limit_raw, (list, tuple, set)):
+            run_limit_keys = [str(k).strip() for k in run_limit_raw if str(k).strip()]
+        else:
+            run_limit_text = str(run_limit_raw).strip()
+            if run_limit_text.lower() in {"all", "enabled", "*"}:
+                run_limit_keys = list(datasets.keys())
+            else:
+                run_limit_keys = [tok.strip() for tok in run_limit_text.split(",") if tok.strip()]
+
+        for ds_key in run_limit_keys:
+            if ds_key not in datasets:
+                print(f"Warning: requested UL bands for disabled/unknown dataset '{ds_key}'")
+                continue
+            ds = datasets[ds_key]
+            masses_ds = [float(m) for m in masses_all if float(ds.m_low) <= float(m) <= float(ds.m_high)]
+            if masses_ds:
+                print(f"\nComputing UL bands for {ds_key} ({len(masses_ds)} masses)")
+                df_bands = expected_ul_bands_for_dataset(ds, masses_ds, cfg)
+                out_csv = os.path.join(cfg.output_dir, f"ul_bands_{ds.key}.csv")
+                out_png = os.path.join(cfg.output_dir, f"ul_bands_{ds.key}.png")
+                out_eps2 = os.path.join(cfg.output_dir, f"ul_bands_eps2_{ds.key}.png")
+                df_bands.to_csv(out_csv, index=False)
+                plot_ul_bands(df_bands, use_eps2=False, title=f"Expected UL bands ({ds.key})", outpath=out_png)
+                if bool(getattr(cfg, "make_eps2_bands", True)):
+                    plot_ul_bands(df_bands, use_eps2=True, title=f"Expected $\epsilon^2$ UL bands ({ds.key})", outpath=out_eps2)
+
+        if bool(getattr(cfg, "do_combined_bands", False)):
+            keys = list(datasets.keys())
+            print(f"\nComputing combined UL bands for datasets: {keys}")
+            df_cb = expected_ul_bands_for_combination(keys, datasets, [float(m) for m in masses_all], cfg)
+            out_csv_c = os.path.join(cfg.output_dir, "ul_bands_combined_all.csv")
+            out_png_c = os.path.join(cfg.output_dir, "ul_bands_combined_all.png")
+            df_cb.to_csv(out_csv_c, index=False)
+            plot_ul_bands(df_cb, use_eps2=True, title="Expected combined $\epsilon^2$ UL bands", outpath=out_png_c)
+
+    print("\nScan complete!")
+
+
+@main.command()
+@click.option(
+    "--config",
+    "-c",
+    required=True,
+    type=click.Path(exists=True),
+    help="Path to configuration YAML file",
+)
+@click.option(
+    "--dataset",
+    "-d",
+    required=True,
+    help="Dataset key (2015, 2016, or 2021)",
+)
+@click.option(
+    "--n-toys",
+    type=int,
+    help="Number of toys per mass point (overrides config)",
+)
+@click.option(
+    "--output-dir",
+    "-o",
+    type=click.Path(),
+    help="Override output directory from config",
+)
+def bands(config, dataset, n_toys, output_dir):
+    """Compute expected upper limit bands for a dataset."""
+    from .config import load_config
+    from .dataset import make_datasets
+    from .bands import expected_ul_bands_for_dataset
+    from .plotting import plot_bands
+
+    cfg = load_config(config)
+
+    if output_dir:
+        cfg.output_dir = output_dir
+    if n_toys:
+        cfg.ul_bands_toys = n_toys
+
+    cfg.ensure_output_dir()
+
+    datasets = make_datasets(cfg)
+
+    if dataset not in datasets:
+        available = list(datasets.keys())
+        print(f"Dataset '{dataset}' not found or not enabled. Available: {available}")
+        sys.exit(1)
+
+    ds = datasets[dataset]
+
+    print(f"Computing expected bands for {ds.label}")
+    print(f"Mass range: {ds.m_low:.3f} to {ds.m_high:.3f} GeV")
+    print(f"Number of toys: {cfg.ul_bands_toys}")
+
+    masses = np.round(
+        np.arange(ds.m_low, ds.m_high + cfg.mass_step_gev / 2, cfg.mass_step_gev), 3
+    )
+
+    df_bands = expected_ul_bands_for_dataset(ds, masses, cfg)
+
+    out_csv = os.path.join(cfg.output_dir, f"ul_bands_{ds.key}.csv")
+    df_bands.to_csv(out_csv, index=False)
+    print(f"Wrote {out_csv}")
+
+    # Plot bands
+    out_plot = os.path.join(cfg.output_dir, f"ul_bands_{ds.key}.png")
+    plot_bands(df_bands, out_plot, column_prefix="A", ylabel="A UL", title=f"{ds.label}: Expected A UL bands")
+    print(f"Wrote {out_plot}")
+
+    if cfg.make_eps2_bands:
+        out_plot_eps2 = os.path.join(cfg.output_dir, f"ul_bands_eps2_{ds.key}.png")
+        plot_bands(
+            df_bands,
+            out_plot_eps2,
+            column_prefix="eps2",
+            ylabel=r"$\epsilon^2$ UL",
+            title=f"{ds.label}: Expected $\\epsilon^2$ UL bands",
+        )
+        print(f"Wrote {out_plot_eps2}")
+
+
+@main.command("toy-scan")
+@click.option(
+    "--config",
+    "-c",
+    required=True,
+    type=click.Path(exists=True),
+    help="Path to configuration YAML file",
+)
+@click.option(
+    "--dataset",
+    "-d",
+    required=True,
+    help="Dataset key (2015, 2016, or 2021)",
+)
+@click.option(
+    "--toy-root",
+    required=True,
+    type=click.Path(exists=True),
+    help="ROOT file containing functional-form toy histograms",
+)
+@click.option(
+    "--container",
+    help="Optional ROOT directory containing the toy histograms",
+)
+@click.option(
+    "--toy-pattern",
+    default="*",
+    show_default=True,
+    help="Shell-style pattern selecting toy histograms within the container",
+)
+@click.option(
+    "--toy-name-fmt",
+    help="Optional explicit toy-name format string, for example fSigPow_toy_{i}",
+)
+@click.option(
+    "--toy-index",
+    "toy_indices",
+    multiple=True,
+    type=int,
+    help="Toy indices to use together with --toy-name-fmt (repeatable)",
+)
+@click.option(
+    "--max-toys",
+    type=int,
+    help="Limit the run to the first N discovered toys",
+)
+@click.option(
+    "--output-dir",
+    "-o",
+    type=click.Path(),
+    help="Override output directory from config",
+)
+@click.option(
+    "--mass-min",
+    type=float,
+    help="Minimum mass to scan (GeV)",
+)
+@click.option(
+    "--mass-max",
+    type=float,
+    help="Maximum mass to scan (GeV)",
+)
+@click.option(
+    "--save-plots/--no-save-plots",
+    default=False,
+    show_default=False,
+    help="Override the config value and write or skip per-toy scan plots and summary plots",
+)
+@click.option(
+    "--save-fit-json/--no-save-fit-json",
+    default=False,
+    show_default=False,
+    help="Override the config value and write or skip per-toy fit JSON sidecars",
+)
+@click.option(
+    "--save-per-mass-folders/--no-save-per-mass-folders",
+    default=False,
+    show_default=False,
+    help="Override the config value and write or skip nested mass folders for each toy scan",
+)
+@click.option(
+    "--scan-parallel/--no-scan-parallel",
+    default=None,
+    show_default=False,
+    help="Override toy-scan inner mass parallelism",
+)
+@click.option(
+    "--scan-n-workers",
+    type=int,
+    help="Override toy-scan inner mass workers",
+)
+@click.option(
+    "--scan-backend",
+    type=str,
+    help="Override toy-scan joblib backend",
+)
+@click.option(
+    "--scan-threads-per-worker",
+    type=int,
+    help="Override toy-scan threads per worker",
+)
+@click.pass_context
+def toy_scan(
+    ctx,
+    config,
+    dataset,
+    toy_root,
+    container,
+    toy_pattern,
+    toy_name_fmt,
+    toy_indices,
+    max_toys,
+    output_dir,
+    mass_min,
+    mass_max,
+    save_plots,
+    save_fit_json,
+    save_per_mass_folders,
+    scan_parallel,
+    scan_n_workers,
+    scan_backend,
+    scan_threads_per_worker,
+):
+    """Run the mass scan once per functional-form toy histogram."""
+    from .config import load_config
+    from .dataset import make_datasets
+    from .funcform_toys import discover_funcform_toys, run_funcform_toy_scans
+    from .scan import union_scan_grid
+
+    cfg = load_config(config)
+    if output_dir:
+        cfg.output_dir = output_dir
+    cfg.ensure_output_dir()
+
+    if toy_name_fmt and not toy_indices:
+        raise click.BadParameter(
+            "--toy-name-fmt requires at least one --toy-index value",
+            param_hint="--toy-index",
+        )
+
+    datasets = make_datasets(cfg)
+    if dataset not in datasets:
+        available = list(datasets.keys())
+        print(f"Dataset '{dataset}' not found or not enabled. Available: {available}")
+        sys.exit(1)
+    ds = datasets[dataset]
+
+    specs = discover_funcform_toys(
+        toy_root,
+        container=container,
+        toy_pattern=toy_pattern,
+        toy_name_fmt=toy_name_fmt,
+        toy_indices=list(toy_indices) if toy_indices else None,
+    )
+    if max_toys is not None:
+        specs = specs[: int(max_toys)]
+    if not specs:
+        print("No toy histograms matched the requested selection.")
+        sys.exit(1)
+
+    resolved_save_plots = bool(_resolve_cli_override(
+        ctx, "save_plots", save_plots, getattr(cfg, "toy_scan_save_plots", False)
+    ))
+    resolved_save_fit_json = bool(_resolve_cli_override(
+        ctx, "save_fit_json", save_fit_json, getattr(cfg, "toy_scan_save_fit_json", False)
+    ))
+    resolved_save_per_mass_folders = bool(_resolve_cli_override(
+        ctx,
+        "save_per_mass_folders",
+        save_per_mass_folders,
+        getattr(cfg, "toy_scan_save_per_mass_folders", False),
+    ))
+    resolved_scan_parallel = bool(_resolve_cli_override(
+        ctx, "scan_parallel", scan_parallel, getattr(cfg, "toy_scan_parallel", False)
+    ))
+    resolved_scan_n_workers = max(
+        1,
+        int(_resolve_cli_override(
+            ctx, "scan_n_workers", scan_n_workers, getattr(cfg, "toy_scan_n_workers", 1)
+        )),
+    )
+    resolved_scan_backend = str(_resolve_cli_override(
+        ctx, "scan_backend", scan_backend, getattr(cfg, "toy_scan_parallel_backend", "threading")
+    ))
+    resolved_scan_threads_per_worker = max(
+        1,
+        int(_resolve_cli_override(
+            ctx,
+            "scan_threads_per_worker",
+            scan_threads_per_worker,
+            getattr(cfg, "toy_scan_threads_per_worker", 1),
+        )),
+    )
+
+    masses = union_scan_grid({str(ds.key): ds}, cfg.mass_step_gev)
+    if mass_min is not None:
+        masses = masses[masses >= float(mass_min)]
+    if mass_max is not None:
+        masses = masses[masses <= float(mass_max)]
+
+    print(f"Running functional-form toy scans for {ds.label}")
+    print(f"Toy source: {toy_root}")
+    if container:
+        print(f"Container: {container}")
+    print(f"Matched toys: {len(specs)}")
+    print(f"Mass hypotheses per toy: {len(masses)}")
+    print("Effective toy-scan settings:")
+    print(f"  scan_parallel={resolved_scan_parallel}")
+    print(f"  scan_n_workers={resolved_scan_n_workers}")
+    print(f"  scan_backend={resolved_scan_backend}")
+    print(f"  scan_threads_per_worker={resolved_scan_threads_per_worker}")
+    print(f"  save_plots={resolved_save_plots}")
+    print(f"  save_fit_json={resolved_save_fit_json}")
+    print(f"  save_per_mass_folders={resolved_save_per_mass_folders}")
+
+    written = run_funcform_toy_scans(
+        ds,
+        cfg,
+        specs,
+        base_output_dir=cfg.output_dir,
+        mass_min=mass_min,
+        mass_max=mass_max,
+        save_plots=resolved_save_plots,
+        save_fit_json=resolved_save_fit_json,
+        save_per_mass_folders=resolved_save_per_mass_folders,
+        scan_parallel=resolved_scan_parallel,
+        scan_n_workers=resolved_scan_n_workers,
+        scan_parallel_backend=resolved_scan_backend,
+        scan_threads_per_worker=resolved_scan_threads_per_worker,
+    )
+    print(f"Wrote {len(written)} toy scan directories under {os.path.join(cfg.output_dir, 'toy_scans', ds.key)}")
+
+
+@main.command("gp-toy-scan")
+@click.option(
+    "--config",
+    "-c",
+    required=True,
+    type=click.Path(exists=True),
+    help="Path to configuration YAML file",
+)
+@click.option(
+    "--dataset",
+    "-d",
+    required=True,
+    help="Dataset key (2015, 2016, or 2021)",
+)
+@click.option(
+    "--seed-root",
+    type=click.Path(exists=True),
+    help="Optional ROOT file containing a frozen analytic background seed histogram.",
+)
+@click.option(
+    "--seed-container",
+    help="Optional ROOT directory containing --seed-hist.",
+)
+@click.option(
+    "--seed-hist",
+    help="Histogram name to use as the full-range background expectation for seeded GP toys.",
+)
+@click.option(
+    "--seed-label",
+    help="Optional source label for seeded GP toys; defaults to the seed function tag.",
+)
+@click.option(
+    "--n-toys",
+    type=int,
+    default=1000,
+    show_default=True,
+    help="Number of GP-generated toys to scan when --toy-index is not supplied",
+)
+@click.option(
+    "--toy-index",
+    "toy_indices",
+    multiple=True,
+    type=int,
+    help="Optional explicit toy indices to run (repeatable, primarily for SLURM jobs)",
+)
+@click.option(
+    "--seed",
+    type=int,
+    help="Optional base RNG seed for GP-generated toys",
+)
+@click.option(
+    "--output-dir",
+    "-o",
+    type=click.Path(),
+    help="Override output directory from config",
+)
+@click.option(
+    "--mass-min",
+    type=float,
+    help="Minimum mass to scan (GeV)",
+)
+@click.option(
+    "--mass-max",
+    type=float,
+    help="Maximum mass to scan (GeV)",
+)
+@click.option(
+    "--save-plots/--no-save-plots",
+    default=False,
+    show_default=False,
+    help="Override the config value and write or skip per-toy scan plots and summary plots",
+)
+@click.option(
+    "--save-fit-json/--no-save-fit-json",
+    default=False,
+    show_default=False,
+    help="Override the config value and write or skip per-toy fit JSON sidecars",
+)
+@click.option(
+    "--save-per-mass-folders/--no-save-per-mass-folders",
+    default=False,
+    show_default=False,
+    help="Override the config value and write or skip nested mass folders for each toy scan",
+)
+@click.option(
+    "--scan-parallel/--no-scan-parallel",
+    default=None,
+    show_default=False,
+    help="Override toy-scan inner mass parallelism",
+)
+@click.option(
+    "--scan-n-workers",
+    type=int,
+    help="Override toy-scan inner mass workers",
+)
+@click.option(
+    "--scan-backend",
+    type=str,
+    help="Override toy-scan joblib backend",
+)
+@click.option(
+    "--scan-threads-per-worker",
+    type=int,
+    help="Override toy-scan threads per worker",
+)
+@click.pass_context
+def gp_toy_scan(
+    ctx,
+    config,
+    dataset,
+    seed_root,
+    seed_container,
+    seed_hist,
+    seed_label,
+    n_toys,
+    toy_indices,
+    seed,
+    output_dir,
+    mass_min,
+    mass_max,
+    save_plots,
+    save_fit_json,
+    save_per_mass_folders,
+    scan_parallel,
+    scan_n_workers,
+    scan_backend,
+    scan_threads_per_worker,
+):
+    """Run the mass scan once per GP-generated full-range background toy."""
+    from .config import load_config
+    from .dataset import make_datasets
+    from .gp_toys import run_gp_toy_scans, _source_model_name
+    from .scan import union_scan_grid
+    from .toy_backgrounds import normalize_full_toy_bkg_mode
+    from .funcform_toys import _infer_function_tag, load_funcform_toy_hist
+
+    cfg = load_config(config)
+    if output_dir:
+        cfg.output_dir = output_dir
+    cfg.ensure_output_dir()
+
+    datasets = make_datasets(cfg)
+    if dataset not in datasets:
+        available = list(datasets.keys())
+        print(f"Dataset '{dataset}' not found or not enabled. Available: {available}")
+        sys.exit(1)
+    ds = datasets[dataset]
+
+    seed_hist_obj = None
+    seed_label_resolved = None
+    if seed_root or seed_hist or seed_container or seed_label:
+        if not seed_root:
+            raise click.BadParameter("--seed-root is required when using seeded GP toys", param_hint="--seed-root")
+        if not seed_hist:
+            raise click.BadParameter("--seed-hist is required when using seeded GP toys", param_hint="--seed-hist")
+        seed_hist_obj = load_funcform_toy_hist(
+            seed_root,
+            container=seed_container,
+            toy_name=seed_hist,
+        )
+        seed_function_tag = _infer_function_tag(seed_container, seed_hist)
+        seed_label_resolved = str(seed_label or seed_function_tag)
+
+    resolved_save_plots = bool(_resolve_cli_override(
+        ctx, "save_plots", save_plots, getattr(cfg, "toy_scan_save_plots", False)
+    ))
+    resolved_save_fit_json = bool(_resolve_cli_override(
+        ctx, "save_fit_json", save_fit_json, getattr(cfg, "toy_scan_save_fit_json", False)
+    ))
+    resolved_save_per_mass_folders = bool(_resolve_cli_override(
+        ctx,
+        "save_per_mass_folders",
+        save_per_mass_folders,
+        getattr(cfg, "toy_scan_save_per_mass_folders", False),
+    ))
+    resolved_scan_parallel = bool(_resolve_cli_override(
+        ctx, "scan_parallel", scan_parallel, getattr(cfg, "toy_scan_parallel", False)
+    ))
+    resolved_scan_n_workers = max(
+        1,
+        int(_resolve_cli_override(
+            ctx, "scan_n_workers", scan_n_workers, getattr(cfg, "toy_scan_n_workers", 1)
+        )),
+    )
+    resolved_scan_backend = str(_resolve_cli_override(
+        ctx, "scan_backend", scan_backend, getattr(cfg, "toy_scan_parallel_backend", "threading")
+    ))
+    resolved_scan_threads_per_worker = max(
+        1,
+        int(_resolve_cli_override(
+            ctx,
+            "scan_threads_per_worker",
+            scan_threads_per_worker,
+            getattr(cfg, "toy_scan_threads_per_worker", 1),
+        )),
+    )
+
+    masses = union_scan_grid({str(ds.key): ds}, cfg.mass_step_gev)
+    if mass_min is not None:
+        masses = masses[masses >= float(mass_min)]
+    if mass_max is not None:
+        masses = masses[masses <= float(mass_max)]
+
+    resolved_indices = sorted({int(idx) for idx in toy_indices}) if toy_indices else []
+    toy_count_for_print = len(resolved_indices) if resolved_indices else int(n_toys)
+
+    print(f"Running GP-propagated toy scans for {ds.label}")
+    toy_mode = normalize_full_toy_bkg_mode(getattr(cfg, "full_toy_bkg_mode", "poisson"))
+    if seed_hist_obj is None:
+        print(f"Toy source model: {_source_model_name(toy_mode)}")
+    else:
+        print(f"Toy source model: seeded analytic background ({seed_label_resolved})")
+        print(f"Seed histogram: {seed_root}:{str(seed_container or '').strip()}/{seed_hist}")
+    print(f"Full-range toy generation mode: {toy_mode}")
+    print(f"Toys requested: {toy_count_for_print}")
+    print(f"Mass hypotheses per toy: {len(masses)}")
+    print("Effective toy-scan settings:")
+    print(f"  scan_parallel={resolved_scan_parallel}")
+    print(f"  scan_n_workers={resolved_scan_n_workers}")
+    print(f"  scan_backend={resolved_scan_backend}")
+    print(f"  scan_threads_per_worker={resolved_scan_threads_per_worker}")
+    print(f"  save_plots={resolved_save_plots}")
+    print(f"  save_fit_json={resolved_save_fit_json}")
+    print(f"  save_per_mass_folders={resolved_save_per_mass_folders}")
+
+    written = run_gp_toy_scans(
+        ds,
+        cfg,
+        n_toys=int(n_toys),
+        base_output_dir=cfg.output_dir,
+        seed_hist=seed_hist_obj,
+        seed_source_label=seed_label_resolved,
+        seed_source_root=str(seed_root or ""),
+        seed_container=str(seed_container or ""),
+        seed_hist_name=str(seed_hist or ""),
+        mass_min=mass_min,
+        mass_max=mass_max,
+        seed=seed,
+        toy_indices=resolved_indices if resolved_indices else None,
+        save_plots=resolved_save_plots,
+        save_fit_json=resolved_save_fit_json,
+        save_per_mass_folders=resolved_save_per_mass_folders,
+        scan_parallel=resolved_scan_parallel,
+        scan_n_workers=resolved_scan_n_workers,
+        scan_parallel_backend=resolved_scan_backend,
+        scan_threads_per_worker=resolved_scan_threads_per_worker,
+    )
+    print(f"Wrote {len(written)} toy scan directories under {os.path.join(cfg.output_dir, 'toy_scans', ds.key)}")
+
+
+@main.command("toy-scan-merge")
+@click.option(
+    "--input-dir",
+    "-i",
+    required=True,
+    type=click.Path(exists=True),
+    help="Directory containing toy scan outputs, for example OUTPUT_DIR/jobs or OUTPUT_DIR/toy_scans/<dataset>",
+)
+@click.option(
+    "--output-dir",
+    "-o",
+    type=click.Path(),
+    help="Directory to write merged CSV outputs",
+)
+def toy_scan_merge(input_dir, output_dir):
+    """Merge functional-form toy scan outputs into long and per-toy summaries."""
+    from .funcform_toys import merge_toy_scan_results, write_toy_scan_validation_plots
+
+    try:
+        merged, summary = merge_toy_scan_results(input_dir, output_dir=output_dir)
+    except FileNotFoundError as exc:
+        raise click.ClickException(str(exc)) from exc
+    outdir = output_dir or input_dir
+    plot_stems = write_toy_scan_validation_plots(merged, summary, outdir)
+    print(f"Wrote {os.path.join(outdir, 'toy_scan_merged.csv')}")
+    print(f"Wrote {os.path.join(outdir, 'toy_scan_summary.csv')}")
+    for stem in plot_stems:
+        print(f"Wrote {stem}.png/.pdf")
+    print(f"Merged rows: {len(merged)}")
+    print(f"Toy summaries: {len(summary)}")
+
+
+@main.command("toy-scan-plot")
+@click.option(
+    "--merged-csv",
+    required=True,
+    type=click.Path(exists=True),
+    help="Merged toy-scan CSV table, typically toy_scan_merged.csv",
+)
+@click.option(
+    "--summary-csv",
+    type=click.Path(exists=True),
+    help="Optional compact per-toy summary table, typically toy_scan_summary.csv",
+)
+@click.option(
+    "--output-dir",
+    "-o",
+    required=True,
+    type=click.Path(),
+    help="Directory to write publication-facing validation plots",
+)
+@click.option(
+    "--stem-prefix",
+    default="toy_scan_validation",
+    show_default=True,
+    help="Filename stem prefix for the rendered validation plots",
+)
+def toy_scan_plot(merged_csv, summary_csv, output_dir, stem_prefix):
+    """Render toy-scan validation plots from merged CSV inputs."""
+    import pandas as pd
+
+    from .funcform_toys import summarize_toy_scan_results, write_toy_scan_validation_plots
+    from .plotting import ensure_dir
+
+    merged = pd.read_csv(merged_csv)
+    if summary_csv:
+        summary = pd.read_csv(summary_csv)
+    else:
+        summary = summarize_toy_scan_results(merged)
+        summary_out = os.path.join(output_dir, "toy_scan_summary.csv")
+        ensure_dir(str(output_dir))
+        summary.to_csv(summary_out, index=False)
+        print(f"Wrote {summary_out}")
+
+    plot_stems = write_toy_scan_validation_plots(
+        merged,
+        summary,
+        output_dir,
+        stem_prefix=stem_prefix,
+    )
+    for stem in plot_stems:
+        print(f"Wrote {stem}.png/.pdf")
+    print(f"Merged rows: {len(merged)}")
+    print(f"Toy summaries: {len(summary)}")
+
+
+@main.command()
+@click.option(
+    "--config",
+    "-c",
+    required=True,
+    type=click.Path(exists=True),
+    help="Path to configuration YAML file",
+)
+@click.option(
+    "--dataset",
+    "-d",
+    required=True,
+    help="Dataset key (2015, 2016, 2021, or combined)",
+)
+@click.option(
+    "--masses",
+    "-m",
+    required=True,
+    help="Comma-separated list of masses (GeV)",
+)
+@click.option(
+    "--strengths",
+    "-s",
+    help="Comma-separated list of injection strengths (e.g. 1,2,3,5 or s1,s2,s3,s5; overrides config)",
+)
+@click.option(
+    "--n-toys",
+    type=int,
+    default=1,
+    show_default=True,
+    help="Number of pseudoexperiments per (mass,strength) point",
+)
+@click.option(
+    "--output-dir",
+    "-o",
+    type=click.Path(),
+    help="Override output directory from config",
+)
+@click.option(
+    "--write-toy-csv/--no-write-toy-csv",
+    default=None,
+    help="Write per-toy CSV tables (inj_extract_toys_*.csv). Defaults to config inj_write_toy_csv.",
+)
+@click.option(
+    "--stream-aggregate",
+    "stream_aggregate",
+    flag_value=True,
+    default=None,
+    help="Enable streaming toy aggregation (default: value from config).",
+)
+@click.option(
+    "--legacy-toys",
+    "stream_aggregate",
+    flag_value=False,
+    help="Use legacy full toy-table accumulation workflow.",
+)
+@click.option(
+    "--aggregate-every",
+    type=int,
+    help="Streaming aggregation batch size (toys). Overrides config inj_aggregate_every.",
+)
+@click.option(
+    "--toy-workers",
+    type=int,
+    help="Per-point toy workers for streaming mode. Overrides config inj_n_workers.",
+)
+def inject(config, dataset, masses, strengths, n_toys, output_dir, write_toy_csv, stream_aggregate, aggregate_every, toy_workers):
+    """Run injection/extraction study."""
+    import pandas as pd
+
+    from .config import load_config
+    from .dataset import make_datasets
+    from .funcform_toys import align_funcform_closure_toys
+    from .injection import (
+        run_injection_extraction_toys,
+        run_funcform_injection_extraction_toys,
+        run_injection_extraction_streaming,
+        run_injection_extraction_streaming_combined,
+        summarize_injection_grid,
+        combine_injection_toy_tables,
+        _combined_mass_support_summary,
+        format_combined_mass_support_summary,
+    )
+    from .plotting import (
+        ensure_dir,
+        plot_linearity,
+        plot_bias_vs_injected_strength,
+        plot_pull_width,
+        plot_coverage,
+        plot_injection_heatmap,
+        plot_z_calibration_residual,
+        plot_delta_z_minus_pull_vs_injected_sigma,
+    )
+
+    cfg = load_config(config)
+
+    if output_dir:
+        cfg.output_dir = output_dir
+    if write_toy_csv is not None:
+        cfg.inj_write_toy_csv = bool(write_toy_csv)
+    if aggregate_every is not None:
+        cfg.inj_aggregate_every = int(max(1, aggregate_every))
+    if toy_workers is not None:
+        cfg.inj_n_workers = int(max(1, toy_workers))
+    if stream_aggregate is None:
+        stream_aggregate = bool(getattr(cfg, "inj_stream_aggregate", True))
+    else:
+        stream_aggregate = bool(stream_aggregate)
+
+    cfg.ensure_output_dir()
+    datasets = make_datasets(cfg)
+
+    available = list(datasets.keys())
+    if dataset != "combined" and dataset not in datasets:
+        print(f"Dataset '{dataset}' not found or not enabled. Available: {available + ['combined']}")
+        sys.exit(1)
+
+    mass_list = [float(m.strip()) for m in masses.split(",")]
+    try:
+        strength_list = _parse_strength_tokens(strengths) if strengths else [float(s) for s in cfg.inj_strengths]
+    except ValueError as exc:
+        raise click.BadParameter(
+            "Could not parse --strengths. Use comma-separated values like 1,2,3,5 or s1,s2,s3,s5.",
+            param_hint="--strengths",
+        ) from exc
+
+    outdir = os.path.join(cfg.output_dir, "injection_extraction")
+    ensure_dir(outdir)
+    strengths_mode = str(getattr(cfg, "inj_strength_mode", "absolute")).lower().strip()
+    funcform_mode = bool(getattr(cfg, "funcform_closure_enable", False))
+
+    if dataset == "combined":
+        print("Running combined injection study over all enabled datasets")
+        print(f"Masses: {mass_list}")
+        print(f"Strengths: {strength_list}")
+        summary_frames = []
+        zcal_input = pd.DataFrame()
+        zcal_semantic = "summary q16--q84"
+
+        if funcform_mode:
+            print(
+                "[inj] funcform_closure_enable=true: "
+                "using the aligned functional-form toy ensemble as the background truth"
+            )
+            spec_map = align_funcform_closure_toys(
+                cfg,
+                list(datasets.keys()),
+                n_toys=int(n_toys),
+            )
+            df_map = {}
+            for key, ds in datasets.items():
+                print(f"  -> {ds.label}")
+                df_map[key] = run_funcform_injection_extraction_toys(
+                    ds,
+                    cfg,
+                    specs=spec_map[str(key)],
+                    masses=mass_list,
+                    strengths=[float(x) for x in strength_list],
+                    strengths_mode=strengths_mode,
+                    write_toy_csv=cfg.inj_write_toy_csv,
+                )
+
+            mass_policy = str(getattr(cfg, "inj_combined_mass_policy", "intersection")).strip().lower()
+            min_n_contrib = int(getattr(cfg, "inj_combined_min_n_contrib", 2))
+            support = _combined_mass_support_summary(
+                df_map,
+                mass_policy=mass_policy,
+                min_n_contrib=min_n_contrib,
+            )
+            print(format_combined_mass_support_summary(support))
+
+            df_comb_toys = combine_injection_toy_tables(
+                df_map,
+                mass_policy=mass_policy,
+                min_n_contrib=min_n_contrib,
+            )
+            if not df_comb_toys.empty and bool(cfg.inj_write_toy_csv):
+                comb_toys_path = os.path.join(outdir, "inj_extract_toys_combined.csv")
+                df_comb_toys.to_csv(comb_toys_path, index=False)
+                print(f"Wrote {comb_toys_path}")
+            elif not df_comb_toys.empty:
+                print("Skipped writing inj_extract_toys_combined.csv (--no-write-toy-csv)")
+
+            for key, dfi in df_map.items():
+                dsum = summarize_injection_grid(dfi)
+                dsum["dataset"] = str(key)
+                summary_frames.append(dsum)
+                dsum.to_csv(os.path.join(outdir, f"inj_extract_summary_{key}.csv"), index=False)
+
+            if not df_comb_toys.empty:
+                dsum_c = summarize_injection_grid(df_comb_toys)
+                dsum_c["dataset"] = "combined"
+                summary_frames.append(dsum_c)
+                dsum_c.to_csv(os.path.join(outdir, "inj_extract_summary_combined.csv"), index=False)
+
+            zcal_input = (
+                pd.concat([*df_map.values(), df_comb_toys], ignore_index=True)
+                if not df_comb_toys.empty
+                else pd.concat([*df_map.values()], ignore_index=True)
+            )
+            zcal_semantic = "toy spread"
+        elif stream_aggregate:
+            print(
+                "[inj] streaming aggregation enabled: "
+                f"aggregate_every={int(cfg.inj_aggregate_every)}, "
+                f"toy_workers={int(cfg.inj_n_workers)}, backend={str(cfg.inj_parallel_backend)}"
+            )
+            dsum_map, dsum_c = run_injection_extraction_streaming_combined(
+                datasets,
+                cfg,
+                masses=mass_list,
+                strengths=[float(x) for x in strength_list],
+                n_toys=int(n_toys),
+                strengths_mode=strengths_mode,
+                write_toy_csv=cfg.inj_write_toy_csv,
+                aggregate_every=int(cfg.inj_aggregate_every),
+                n_workers=int(cfg.inj_n_workers),
+                parallel_backend=str(cfg.inj_parallel_backend),
+                threads_per_worker=int(cfg.inj_threads_per_worker),
+            )
+            for key, dsum in dsum_map.items():
+                if dsum.empty:
+                    continue
+                dsum["dataset"] = str(key)
+                dsum.to_csv(os.path.join(outdir, f"inj_extract_summary_{key}.csv"), index=False)
+                summary_frames.append(dsum)
+            if not dsum_c.empty:
+                dsum_c["dataset"] = "combined"
+                dsum_c.to_csv(os.path.join(outdir, "inj_extract_summary_combined.csv"), index=False)
+                summary_frames.append(dsum_c)
+        else:
+            print("[inj] legacy toy-table mode enabled (--legacy-toys)")
+            df_map = {}
+            for key, ds in datasets.items():
+                print(f"  -> {ds.label}")
+                df_map[key] = run_injection_extraction_toys(
+                    ds,
+                    cfg,
+                    masses=mass_list,
+                    strengths=[float(x) for x in strength_list],
+                    n_toys=int(n_toys),
+                    strengths_mode=strengths_mode,
+                    write_toy_csv=cfg.inj_write_toy_csv,
+                )
+
+            mass_policy = str(getattr(cfg, "inj_combined_mass_policy", "intersection")).strip().lower()
+            min_n_contrib = int(getattr(cfg, "inj_combined_min_n_contrib", 2))
+            support = _combined_mass_support_summary(
+                df_map,
+                mass_policy=mass_policy,
+                min_n_contrib=min_n_contrib,
+            )
+            print(format_combined_mass_support_summary(support))
+
+            df_comb_toys = combine_injection_toy_tables(
+                df_map,
+                mass_policy=mass_policy,
+                min_n_contrib=min_n_contrib,
+            )
+            if not df_comb_toys.empty and bool(cfg.inj_write_toy_csv):
+                comb_toys_path = os.path.join(outdir, "inj_extract_toys_combined.csv")
+                df_comb_toys.to_csv(comb_toys_path, index=False)
+                print(f"Wrote {comb_toys_path}")
+            elif not df_comb_toys.empty:
+                print("Skipped writing inj_extract_toys_combined.csv (--no-write-toy-csv)")
+
+            for key, dfi in df_map.items():
+                dsum = summarize_injection_grid(dfi)
+                dsum["dataset"] = str(key)
+                summary_frames.append(dsum)
+                dsum.to_csv(os.path.join(outdir, f"inj_extract_summary_{key}.csv"), index=False)
+
+            if not df_comb_toys.empty:
+                dsum_c = summarize_injection_grid(df_comb_toys)
+                dsum_c["dataset"] = "combined"
+                summary_frames.append(dsum_c)
+                dsum_c.to_csv(os.path.join(outdir, "inj_extract_summary_combined.csv"), index=False)
+
+            zcal_input = (
+                pd.concat([*df_map.values(), df_comb_toys], ignore_index=True)
+                if not df_comb_toys.empty
+                else pd.concat([*df_map.values()], ignore_index=True)
+            )
+            zcal_semantic = "toy spread"
+
+        df_sum = pd.concat(summary_frames, ignore_index=True) if summary_frames else pd.DataFrame()
+        if not df_sum.empty:
+            out_sum_all = os.path.join(outdir, "inj_extract_summary_all.csv")
+            df_sum.to_csv(out_sum_all, index=False)
+            print(f"Wrote {out_sum_all}")
+            xvar = "inj_nsigma" if "inj_nsigma" in df_sum.columns and np.isfinite(df_sum["inj_nsigma"]).any() else "strength"
+            preferred_order = ["2015", "2016", "combined"]
+            present = [str(x) for x in df_sum["dataset"].astype(str).unique()]
+            ds_order = [d for d in preferred_order if d in present] + sorted(d for d in present if d not in preferred_order)
+
+            for ds_key in ds_order:
+                sub = df_sum[df_sum["dataset"].astype(str) == ds_key].copy()
+                plot_linearity(sub, xvar=xvar, title=f"{ds_key}: linearity", outpath=os.path.join(outdir, f"linearity_{ds_key}.png"))
+                plot_bias_vs_injected_strength(sub, xvar=xvar, title=f"{ds_key}: bias", outpath=os.path.join(outdir, f"bias_{ds_key}.png"))
+                plot_pull_width(sub, xvar=xvar, title=f"{ds_key}: pull width", outpath=os.path.join(outdir, f"pull_width_{ds_key}.png"))
+                plot_coverage(sub, xvar=xvar, title=f"{ds_key}: coverage", outpath=os.path.join(outdir, f"coverage_{ds_key}.png"))
+                plot_injection_heatmap(sub, value_col="pull_mean", dataset_filter=ds_key, title=f"{ds_key}: mean pull heatmap", outpath=os.path.join(outdir, f"heatmap_pull_mean_{ds_key}.png"))
+                plot_injection_heatmap(sub, value_col="pull_std", dataset_filter=ds_key, title=f"{ds_key}: pull width heatmap", outpath=os.path.join(outdir, f"heatmap_pull_width_{ds_key}.png"))
+
+            if zcal_input.empty:
+                zcal_input = df_sum
+            plot_z_calibration_residual(
+                zcal_input,
+                outdir=outdir,
+                acceptance_bands=[0.5, 1.0],
+                band_semantic=zcal_semantic,
+            )
+            plot_delta_z_minus_pull_vs_injected_sigma(
+                df_sum,
+                outpath=os.path.join(outdir, "delta_z_minus_pull_vs_inj_sigma_all.png"),
+            )
+
+        print(f"\nSummary rows (all datasets + combined): {len(df_sum)}")
+        if not df_sum.empty:
+            print(df_sum.head(20).to_string())
+
+    else:
+        ds = datasets[dataset]
+        print(f"Running injection study for {ds.label}")
+        print(f"Masses: {mass_list}")
+        print(f"Strengths: {strength_list}")
+        if funcform_mode:
+            print(
+                "[inj] funcform_closure_enable=true: "
+                "using the stored functional-form toy histograms as the background truth"
+            )
+            spec_map = align_funcform_closure_toys(
+                cfg,
+                [str(ds.key)],
+                n_toys=int(n_toys),
+            )
+            df = run_funcform_injection_extraction_toys(
+                ds,
+                cfg,
+                specs=spec_map[str(ds.key)],
+                masses=mass_list,
+                strengths=[float(x) for x in strength_list],
+                strengths_mode=strengths_mode,
+                write_toy_csv=cfg.inj_write_toy_csv,
+            )
+            df_sum = summarize_injection_grid(df)
+            zcal_input = df
+            zcal_semantic = "toy spread"
+        elif stream_aggregate:
+            print(
+                "[inj] streaming aggregation enabled: "
+                f"aggregate_every={int(cfg.inj_aggregate_every)}, "
+                f"toy_workers={int(cfg.inj_n_workers)}, backend={str(cfg.inj_parallel_backend)}"
+            )
+            df_sum = run_injection_extraction_streaming(
+                ds,
+                cfg,
+                masses=mass_list,
+                strengths=[float(x) for x in strength_list],
+                n_toys=int(n_toys),
+                strengths_mode=strengths_mode,
+                write_toy_csv=cfg.inj_write_toy_csv,
+                aggregate_every=int(cfg.inj_aggregate_every),
+                n_workers=int(cfg.inj_n_workers),
+                parallel_backend=str(cfg.inj_parallel_backend),
+                threads_per_worker=int(cfg.inj_threads_per_worker),
+            )
+            zcal_input = df_sum
+            zcal_semantic = "summary q16--q84"
+        else:
+            print("[inj] legacy toy-table mode enabled (--legacy-toys)")
+            df = run_injection_extraction_toys(
+                ds,
+                cfg,
+                masses=mass_list,
+                strengths=[float(x) for x in strength_list],
+                n_toys=int(n_toys),
+                strengths_mode=strengths_mode,
+                write_toy_csv=cfg.inj_write_toy_csv,
+            )
+            df_sum = summarize_injection_grid(df)
+            zcal_input = df
+            zcal_semantic = "toy spread"
+
+        out_sum = os.path.join(outdir, f"inj_extract_summary_{ds.key}.csv")
+        df_sum.to_csv(out_sum, index=False)
+        out_sum_all = os.path.join(outdir, "inj_extract_summary_all.csv")
+        df_sum.to_csv(out_sum_all, index=False)
+
+        xvar = "inj_nsigma" if "inj_nsigma" in df_sum.columns and np.isfinite(df_sum["inj_nsigma"]).any() else "strength"
+        plot_linearity(df_sum, xvar=xvar, title=f"{ds.label}: linearity", outpath=os.path.join(outdir, f"linearity_{ds.key}.png"))
+        plot_bias_vs_injected_strength(df_sum, xvar=xvar, title=f"{ds.label}: bias", outpath=os.path.join(outdir, f"bias_{ds.key}.png"))
+        plot_pull_width(df_sum, xvar=xvar, title=f"{ds.label}: pull width", outpath=os.path.join(outdir, f"pull_width_{ds.key}.png"))
+        plot_coverage(df_sum, xvar=xvar, title=f"{ds.label}: coverage", outpath=os.path.join(outdir, f"coverage_{ds.key}.png"))
+        plot_injection_heatmap(df_sum, value_col="pull_mean", title=f"{ds.label}: mean pull heatmap", outpath=os.path.join(outdir, f"heatmap_pull_mean_{ds.key}.png"))
+        plot_injection_heatmap(df_sum, value_col="pull_std", title=f"{ds.label}: pull width heatmap", outpath=os.path.join(outdir, f"heatmap_pull_width_{ds.key}.png"))
+        plot_z_calibration_residual(
+            zcal_input,
+            outdir=outdir,
+            acceptance_bands=[0.5, 1.0],
+            dataset_order=[str(ds.key)],
+            band_semantic=zcal_semantic,
+        )
+        plot_delta_z_minus_pull_vs_injected_sigma(
+            df_sum,
+            outpath=os.path.join(outdir, f"delta_z_minus_pull_vs_inj_sigma_{ds.key}.png"),
+        )
+
+        print(f"Summary rows: {len(df_sum)}")
+        print(f"Wrote summary table: {out_sum}")
+        print(f"Wrote unified summary table: {out_sum_all}")
+        print(df_sum.head(20).to_string())
+
+
+@main.command("funcform-inject")
+@click.option(
+    "--config",
+    "-c",
+    required=True,
+    type=click.Path(exists=True),
+    help="Path to configuration YAML file",
+)
+@click.option(
+    "--dataset",
+    "-d",
+    required=True,
+    help="Dataset key (2015, 2016, or 2021)",
+)
+@click.option(
+    "--toy-root",
+    type=click.Path(exists=True),
+    help="ROOT file containing functional-form toy histograms; defaults to config funcform_closure_root_by_dataset.",
+)
+@click.option(
+    "--container",
+    help="ROOT directory containing the toy histograms; defaults to config funcform_closure_container_by_dataset.",
+)
+@click.option(
+    "--toy-pattern",
+    default=None,
+    help="Shell-style pattern selecting toy histograms; defaults to config funcform_closure_toy_pattern_by_dataset.",
+)
+@click.option(
+    "--toy-name-fmt",
+    help="Format string for explicit toy names, e.g. fShiftSigPowTail_toy_{i}.",
+)
+@click.option(
+    "--toy-index",
+    multiple=True,
+    type=int,
+    help="Toy index to run with --toy-name-fmt; repeatable.",
+)
+@click.option(
+    "--max-toys",
+    type=int,
+    help="Maximum number of matched functional-form toys to process.",
+)
+@click.option(
+    "--masses",
+    "-m",
+    help="Comma-separated masses in GeV; defaults to config inj_masses_gev.",
+)
+@click.option(
+    "--strengths",
+    "-s",
+    help="Comma-separated strengths, e.g. s0,s1,s2,s3,s5; defaults to config injection strengths.",
+)
+@click.option(
+    "--n-injection-toys",
+    type=int,
+    default=1,
+    show_default=True,
+    help="Signal/background replicas per functional-form pseudo-data histogram.",
+)
+@click.option(
+    "--output-dir",
+    "-o",
+    type=click.Path(),
+    help="Override output directory from config.",
+)
+@click.option(
+    "--write-toy-csv/--no-write-toy-csv",
+    default=True,
+    show_default=True,
+    help="Write merged and per-toy injection toy CSV tables.",
+)
+@click.option(
+    "--write-qmu/--no-write-qmu",
+    default=None,
+    help="Write exact tilde-q_mu diagnostics in toy rows; defaults to config inj_write_qmu.",
+)
+def funcform_inject(
+    config,
+    dataset,
+    toy_root,
+    container,
+    toy_pattern,
+    toy_name_fmt,
+    toy_index,
+    max_toys,
+    masses,
+    strengths,
+    n_injection_toys,
+    output_dir,
+    write_toy_csv,
+    write_qmu,
+):
+    """Run injection/refit closure on functional-form ROOT toy histograms."""
+    from .config import load_config
+    from .dataset import make_datasets
+    from .funcform_toys import discover_funcform_toys, run_funcform_injection_extraction
+
+    cfg = load_config(config)
+    if output_dir:
+        cfg.output_dir = output_dir
+    if write_qmu is not None:
+        cfg.inj_write_qmu = bool(write_qmu)
+    cfg.ensure_output_dir()
+
+    datasets = make_datasets(cfg)
+    if dataset not in datasets:
+        print(f"Dataset '{dataset}' not found or not enabled. Available: {list(datasets.keys())}")
+        sys.exit(1)
+    ds = datasets[dataset]
+
+    toy_root = _funcform_config_value(cfg, "funcform_closure_root_by_dataset", dataset, toy_root)
+    container = _funcform_config_value(cfg, "funcform_closure_container_by_dataset", dataset, container)
+    toy_pattern = _funcform_config_value(
+        cfg,
+        "funcform_closure_toy_pattern_by_dataset",
+        dataset,
+        toy_pattern,
+        default="*",
+    )
+    if not toy_root:
+        raise click.BadParameter(
+            "--toy-root is required unless funcform_closure_root_by_dataset contains the dataset",
+            param_hint="--toy-root",
+        )
+
+    specs = discover_funcform_toys(
+        toy_root,
+        container=container,
+        toy_pattern=toy_pattern or "*",
+        toy_name_fmt=toy_name_fmt,
+        toy_indices=list(toy_index) if toy_index else None,
+    )
+    if max_toys is not None:
+        specs = specs[: int(max_toys)]
+    if not specs:
+        print("No functional-form toy histograms matched the requested selection.")
+        sys.exit(1)
+
+    mass_list = _parse_mass_tokens(masses) if masses else [float(x) for x in getattr(cfg, "inj_masses_gev", [])]
+    if not mass_list:
+        raise click.BadParameter("No masses were supplied and config inj_masses_gev is empty", param_hint="--masses")
+    if strengths:
+        strength_list = _parse_strength_tokens(strengths)
+    elif str(getattr(cfg, "inj_strength_mode", "absolute")).lower().strip() == "sigmaa":
+        strength_list = [float(x) for x in getattr(cfg, "inj_sigma_multipliers", [])]
+    else:
+        strength_list = [float(x) for x in getattr(cfg, "inj_strengths", [])]
+
+    print(f"Running functional-form injection/refit study for {ds.label}")
+    print(f"Toy source: {toy_root}")
+    if container:
+        print(f"Container: {container}")
+    print(f"Toy pattern: {toy_pattern}")
+    print(f"Matched toys: {len(specs)}")
+    print(f"Masses: {mass_list}")
+    print(f"Strengths: {strength_list}")
+    print(f"n_injection_toys per functional-form histogram: {int(n_injection_toys)}")
+    print(f"write_qmu={bool(getattr(cfg, 'inj_write_qmu', False))}")
+
+    _, df_summary = run_funcform_injection_extraction(
+        ds,
+        cfg,
+        specs,
+        base_output_dir=cfg.output_dir,
+        masses=mass_list,
+        strengths=strength_list,
+        n_injection_toys=int(n_injection_toys),
+        write_toy_csv=bool(write_toy_csv),
+    )
+    print(f"Summary rows: {len(df_summary)}")
+    if not df_summary.empty:
+        print(df_summary.head(20).to_string())
+
+
+
+@main.command()
+@click.option(
+    "--config",
+    "-c",
+    required=True,
+    type=click.Path(exists=True),
+    help="Path to configuration YAML file",
+)
+@click.option(
+    "--output-dir",
+    "-o",
+    type=click.Path(),
+    help="Override output directory from config",
+)
+def test(config, output_dir):
+    """Run smoke test on a single mass point."""
+    from .config import load_config
+    from .dataset import make_datasets, print_datasets
+    from .validation import validate_datasets
+    from .evaluation import evaluate_single_dataset
+    from .plotting import ensure_dir, plot_full_range
+
+    cfg = load_config(config)
+
+    if output_dir:
+        cfg.output_dir = output_dir
+
+    cfg.ensure_output_dir()
+
+    print(f"Loading configuration from {config}")
+    datasets = make_datasets(cfg)
+    print_datasets(datasets)
+
+    if not datasets:
+        print("No datasets enabled. Check configuration.")
+        sys.exit(1)
+
+    print("\nValidating datasets...")
+    validate_datasets(datasets, cfg)
+
+    # Pick test mass
+    lows = [d.m_low for d in datasets.values()]
+    highs = [d.m_high for d in datasets.values()]
+    lo = max(lows)
+    hi = min(highs)
+
+    if lo < hi:
+        test_mass = float(np.round(0.5 * (lo + hi), 3))
+    else:
+        d0 = list(datasets.values())[0]
+        test_mass = float(np.round(0.5 * (d0.m_low + d0.m_high), 3))
+
+    print(f"\nTest mass: {test_mass:.3f} GeV")
+
+    for key, ds in datasets.items():
+        if ds.m_low <= test_mass <= ds.m_high:
+            print(f"\n--- Testing {key} ({ds.label}) ---")
+            try:
+                res, pred, _ = evaluate_single_dataset(ds, test_mass, cfg, do_extraction=True)
+                print(f"A_up = {res.A_up:.2f}  eps2_up = {res.eps2_up:.3e}")
+                print(f"p0 = {res.p0_analytic:.3e}  Z = {res.Z_analytic:.2f}")
+                print(f"A_hat = {res.A_hat:.2f} +/- {res.sigma_A:.2f}  success = {res.extract_success}")
+
+                # Make one plot
+                tmp_dir = os.path.join(cfg.output_dir, "smoke_test")
+                ensure_dir(tmp_dir)
+                plot_path = os.path.join(tmp_dir, f"{key}_fit_full.png")
+                plot_full_range(ds, test_mass, pred, plot_path)
+                print(f"Wrote {plot_path}")
+
+            except Exception as e:
+                print(f"FAILED: {e}")
+                import traceback
+                traceback.print_exc()
+
+    print("\nSmoke test complete!")
+
+
+@main.command("slurm-gen-toy-scan")
+@click.option(
+    "--config",
+    "-c",
+    required=True,
+    type=click.Path(exists=True),
+    help="Path to configuration YAML file",
+)
+@click.option(
+    "--dataset",
+    required=True,
+    help="Dataset key (2015, 2016, or 2021)",
+)
+@click.option(
+    "--toy-root",
+    required=True,
+    type=click.Path(exists=True),
+    help="ROOT file containing functional-form toy histograms",
+)
+@click.option(
+    "--container",
+    help="Optional ROOT directory containing the toy histograms",
+)
+@click.option(
+    "--toy-pattern",
+    default="*",
+    show_default=True,
+    help="Shell-style pattern selecting toy histograms within the container",
+)
+@click.option(
+    "--output",
+    "-o",
+    default="submit_toy_scan.slurm",
+    help="Output SLURM script path",
+)
+@click.option(
+    "--job-name",
+    default="hps-gpr-toys",
+    help="SLURM job name",
+)
+@click.option(
+    "--partition",
+    default="batch",
+    help="SLURM partition",
+)
+@click.option(
+    "--time",
+    default="4:00:00",
+    help="Time limit per task",
+)
+@click.option(
+    "--memory",
+    default="4G",
+    help="Memory per task",
+)
+@click.option(
+    "--cpus-per-task",
+    type=int,
+    help="SLURM CPUs per task; defaults to toy_scan_n_workers * toy_scan_threads_per_worker from the config",
+)
+@click.option(
+    "--conda-env",
+    help="Conda environment to activate",
+)
+@click.option(
+    "--account",
+    help="SLURM account/project to charge",
+)
+@click.option(
+    "--qos",
+    help="Optional SLURM QOS to request",
+)
+def slurm_gen_toy_scan(config, dataset, toy_root, container, toy_pattern, output, job_name, partition, time, memory, cpus_per_task, conda_env, account, qos):
+    """Generate SLURM scripts for one functional-form toy scan per job."""
+    from .config import load_config
+    from .funcform_toys import discover_funcform_toys
+    from .slurm import generate_toy_scan_slurm_scripts
+
+    cfg = load_config(config)
+    specs = discover_funcform_toys(
+        toy_root,
+        container=container,
+        toy_pattern=toy_pattern,
+    )
+    if not specs:
+        raise click.BadParameter(
+            "No toy histograms matched the requested selection",
+            param_hint="--toy-pattern",
+        )
+
+    extra = _build_extra_sbatch(account=account, qos=qos)
+    resolved_cpus_per_task = _infer_toy_scan_cpus_per_task(cfg, override=cpus_per_task)
+    job_script, submit_script, n_jobs = generate_toy_scan_slurm_scripts(
+        config_path=config,
+        output_path=output,
+        dataset=dataset,
+        toy_root=toy_root,
+        toy_names=[spec.toy_name for spec in specs],
+        toy_indices=[spec.toy_index for spec in specs],
+        output_root=cfg.output_dir,
+        container=container,
+        job_name=job_name,
+        partition=partition,
+        time_limit=time,
+        memory=memory,
+        cpus_per_task=resolved_cpus_per_task,
+        conda_env=conda_env,
+        extra_sbatch=extra,
+    )
+    print(f"\nPrepared {n_jobs} toy-scan jobs.")
+    print(f"CPUs per task: {resolved_cpus_per_task}")
+    print("To submit all jobs, run:")
+    print(f"  bash {submit_script}")
+    print("If your site needs different submission-time charging flags, append them to the submit helper.")
+
+
+@main.command("slurm-gen-gp-toy-scan")
+@click.option(
+    "--config",
+    "-c",
+    required=True,
+    type=click.Path(exists=True),
+    help="Path to configuration YAML file",
+)
+@click.option(
+    "--dataset",
+    required=True,
+    help="Dataset key (2015, 2016, or 2021)",
+)
+@click.option(
+    "--n-toys",
+    type=int,
+    default=1000,
+    show_default=True,
+    help="Number of GP-generated toys to submit",
+)
+@click.option(
+    "--output",
+    "-o",
+    default="submit_gp_toy_scan.slurm",
+    help="Output SLURM script path",
+)
+@click.option(
+    "--job-name",
+    default="hps-gpr-gp-toys",
+    help="SLURM job name",
+)
+@click.option(
+    "--partition",
+    default="batch",
+    help="SLURM partition",
+)
+@click.option(
+    "--time",
+    default="4:00:00",
+    help="Time limit per task",
+)
+@click.option(
+    "--memory",
+    default="4G",
+    help="Memory per task",
+)
+@click.option(
+    "--cpus-per-task",
+    type=int,
+    help="SLURM CPUs per task; defaults to toy_scan_n_workers * toy_scan_threads_per_worker from the config",
+)
+@click.option(
+    "--conda-env",
+    help="Conda environment to activate",
+)
+@click.option(
+    "--account",
+    help="SLURM account/project to charge",
+)
+@click.option(
+    "--qos",
+    help="Optional SLURM QOS to request",
+)
+def slurm_gen_gp_toy_scan(config, dataset, n_toys, output, job_name, partition, time, memory, cpus_per_task, conda_env, account, qos):
+    """Generate SLURM scripts for one GP-generated toy scan per job."""
+    from .config import load_config
+    from .slurm import generate_gp_toy_scan_slurm_scripts
+
+    cfg = load_config(config)
+    extra = _build_extra_sbatch(account=account, qos=qos)
+    resolved_cpus_per_task = _infer_toy_scan_cpus_per_task(cfg, override=cpus_per_task)
+    job_script, submit_script, n_jobs = generate_gp_toy_scan_slurm_scripts(
+        config_path=config,
+        output_path=output,
+        dataset=dataset,
+        n_toys=int(n_toys),
+        output_root=cfg.output_dir,
+        job_name=job_name,
+        partition=partition,
+        time_limit=time,
+        memory=memory,
+        cpus_per_task=resolved_cpus_per_task,
+        conda_env=conda_env,
+        extra_sbatch=extra,
+    )
+    print(f"\nPrepared {n_jobs} GP toy-scan jobs.")
+    print(f"CPUs per task: {resolved_cpus_per_task}")
+    print("To submit all jobs, run:")
+    print(f"  bash {submit_script}")
+    print("If your site needs different submission-time charging flags, append them to the submit helper.")
+
+
+@main.command("slurm-gen")
+@click.option(
+    "--config",
+    "-c",
+    required=True,
+    type=click.Path(exists=True),
+    help="Path to configuration YAML file",
+)
+@click.option(
+    "--n-jobs",
+    "-n",
+    required=True,
+    type=int,
+    help="Number of array tasks",
+)
+@click.option(
+    "--output",
+    "-o",
+    default="submit.slurm",
+    help="Output SLURM script path",
+)
+@click.option(
+    "--job-name",
+    default="hps-gpr",
+    help="SLURM job name",
+)
+@click.option(
+    "--partition",
+    default="batch",
+    help="SLURM partition",
+)
+@click.option(
+    "--time",
+    default="4:00:00",
+    help="Time limit per task",
+)
+@click.option(
+    "--memory",
+    default="4G",
+    help="Memory per task",
+)
+@click.option(
+    "--cpus-per-task",
+    type=int,
+    help="SLURM CPUs per task; defaults to scan_n_workers * scan_threads_per_worker when scan_parallel is enabled",
+)
+@click.option(
+    "--conda-env",
+    help="Conda environment to activate",
+)
+@click.option(
+    "--account",
+    help="SLURM account/project to charge",
+)
+@click.option(
+    "--qos",
+    help="Optional SLURM QOS to request",
+)
+def slurm_gen(config, n_jobs, output, job_name, partition, time, memory, cpus_per_task, conda_env, account, qos):
+    """Generate SLURM array job script."""
+    from .config import load_config
+    from .slurm import generate_slurm_script
+
+    cfg = load_config(config)
+    extra = _build_extra_sbatch(account=account, qos=qos)
+    resolved_cpus_per_task = _infer_scan_cpus_per_task(cfg, override=cpus_per_task)
+
+    job_script, submit_script = generate_slurm_script(
+        config_path=config,
+        n_jobs=n_jobs,
+        output_path=output,
+        job_name=job_name,
+        partition=partition,
+        time_limit=time,
+        memory=memory,
+        cpus_per_task=resolved_cpus_per_task,
+        conda_env=conda_env,
+        extra_sbatch=extra,
+    )
+    print(f"\nTo submit all {n_jobs} jobs, run:")
+    print(f"  bash {submit_script}")
+    print(f"CPUs per task: {resolved_cpus_per_task}")
+
+
+
+
+@main.command("slurm-gen-funcform-inject")
+@click.option(
+    "--config",
+    "-c",
+    required=True,
+    type=click.Path(exists=True),
+    help="Path to configuration YAML file",
+)
+@click.option(
+    "--dataset",
+    required=True,
+    help="Dataset key (2015, 2016, or 2021)",
+)
+@click.option(
+    "--toy-root",
+    type=click.Path(exists=True),
+    help="ROOT file containing functional-form toy histograms; defaults to config funcform_closure_root_by_dataset.",
+)
+@click.option(
+    "--container",
+    help="ROOT directory containing the toy histograms; defaults to config funcform_closure_container_by_dataset.",
+)
+@click.option(
+    "--toy-pattern",
+    default=None,
+    help="Shell-style pattern selecting toy histograms; defaults to config funcform_closure_toy_pattern_by_dataset.",
+)
+@click.option(
+    "--masses",
+    required=True,
+    help="Comma-separated masses (GeV)",
+)
+@click.option(
+    "--strengths",
+    required=True,
+    help="Comma-separated injection strengths (e.g. s0,s1,s2,s3,s5)",
+)
+@click.option(
+    "--n-injection-toys",
+    type=int,
+    default=1,
+    show_default=True,
+    help="Signal/background replicas per functional-form pseudo-data histogram.",
+)
+@click.option(
+    "--write-qmu/--no-write-qmu",
+    default=None,
+    help="Write exact tilde-q_mu diagnostics in generated jobs; defaults to config inj_write_qmu.",
+)
+@click.option(
+    "--output",
+    "-o",
+    default="submit_funcform_injection.slurm",
+    help="Output SLURM script path",
+)
+@click.option(
+    "--job-name",
+    default="hps-gpr-ffinj",
+    help="SLURM job name",
+)
+@click.option(
+    "--partition",
+    default="batch",
+    help="SLURM partition",
+)
+@click.option(
+    "--time",
+    default="4:00:00",
+    help="Time limit per task",
+)
+@click.option(
+    "--memory",
+    default="4G",
+    help="Memory per task",
+)
+@click.option(
+    "--cpus-per-task",
+    type=int,
+    help="SLURM CPUs per task; defaults to inj_n_workers * inj_threads_per_worker",
+)
+@click.option(
+    "--conda-env",
+    help="Conda environment to activate",
+)
+@click.option(
+    "--account",
+    help="SLURM account/project to charge",
+)
+@click.option(
+    "--qos",
+    help="Optional SLURM QOS to request",
+)
+def slurm_gen_funcform_inject(
+    config,
+    dataset,
+    toy_root,
+    container,
+    toy_pattern,
+    masses,
+    strengths,
+    n_injection_toys,
+    write_qmu,
+    output,
+    job_name,
+    partition,
+    time,
+    memory,
+    cpus_per_task,
+    conda_env,
+    account,
+    qos,
+):
+    """Generate SLURM jobs for functional-form toy injection/refit closure."""
+    from .config import load_config
+    from .funcform_toys import discover_funcform_toys
+    from .slurm import generate_funcform_injection_slurm_scripts
+
+    cfg = load_config(config)
+    toy_root = _funcform_config_value(cfg, "funcform_closure_root_by_dataset", dataset, toy_root)
+    container = _funcform_config_value(cfg, "funcform_closure_container_by_dataset", dataset, container)
+    toy_pattern = _funcform_config_value(
+        cfg,
+        "funcform_closure_toy_pattern_by_dataset",
+        dataset,
+        toy_pattern,
+        default="*",
+    )
+    if not toy_root:
+        raise click.BadParameter(
+            "--toy-root is required unless funcform_closure_root_by_dataset contains the dataset",
+            param_hint="--toy-root",
+        )
+
+    specs = discover_funcform_toys(
+        toy_root,
+        container=container,
+        toy_pattern=toy_pattern or "*",
+    )
+    if not specs:
+        raise click.BadParameter("No toy histograms matched the requested selection", param_hint="--toy-pattern")
+
+    mass_list = _parse_mass_tokens(masses)
+    strength_tokens = [tok.strip() for tok in str(strengths).split(",") if tok.strip()]
+    if not mass_list:
+        raise click.BadParameter("No masses provided", param_hint="--masses")
+    if not strength_tokens:
+        raise click.BadParameter("No strengths provided", param_hint="--strengths")
+
+    extra = _build_extra_sbatch(account=account, qos=qos)
+    resolved_cpus_per_task = _infer_injection_cpus_per_task(cfg, override=cpus_per_task)
+    write_qmu_resolved = bool(getattr(cfg, "inj_write_qmu", False) if write_qmu is None else write_qmu)
+
+    job_script, submit_script, n_jobs = generate_funcform_injection_slurm_scripts(
+        config_path=config,
+        output_path=output,
+        dataset=dataset,
+        toy_root=toy_root,
+        toy_names=[spec.toy_name for spec in specs],
+        toy_indices=[spec.toy_index for spec in specs],
+        output_root=cfg.output_dir,
+        container=container,
+        masses=mass_list,
+        strengths=strength_tokens,
+        n_injection_toys=int(n_injection_toys),
+        write_qmu=bool(write_qmu_resolved),
+        job_name=job_name,
+        partition=partition,
+        time_limit=time,
+        memory=memory,
+        cpus_per_task=resolved_cpus_per_task,
+        conda_env=conda_env,
+        extra_sbatch=extra,
+    )
+    print(f"\nPrepared {n_jobs} functional-form injection jobs.")
+    print(f"CPUs per task: {resolved_cpus_per_task}")
+    print("To submit all jobs, run:")
+    print(f"  bash {submit_script}")
+
+
+@main.command("slurm-gen-inject")
+@click.option(
+    "--config",
+    "-c",
+    required=True,
+    type=click.Path(exists=True),
+    help="Path to configuration YAML file",
+)
+@click.option(
+    "--datasets",
+    required=True,
+    help="Comma-separated dataset keys for injection jobs (e.g. 2015,2016,combined)",
+)
+@click.option(
+    "--masses",
+    required=True,
+    help="Comma-separated masses (GeV)",
+)
+@click.option(
+    "--strengths",
+    required=True,
+    help="Comma-separated injection strengths (e.g. 1,2,3,5 or s1,s2,s3,s5)",
+)
+@click.option(
+    "--n-toys",
+    type=int,
+    default=10000,
+    show_default=True,
+    help="Pseudoexperiments per job",
+)
+@click.option(
+    "--output",
+    "-o",
+    default="submit_injection.slurm",
+    help="Output SLURM script path",
+)
+@click.option(
+    "--job-name",
+    default="hps-gpr-inj",
+    help="SLURM job name",
+)
+@click.option(
+    "--partition",
+    default="batch",
+    help="SLURM partition",
+)
+@click.option(
+    "--time",
+    default="4:00:00",
+    help="Time limit per task",
+)
+@click.option(
+    "--memory",
+    default="4G",
+    help="Memory per task",
+)
+@click.option(
+    "--cpus-per-task",
+    type=int,
+    help="SLURM CPUs per task; defaults to inj_n_workers * inj_threads_per_worker",
+)
+@click.option(
+    "--conda-env",
+    help="Conda environment to activate",
+)
+@click.option(
+    "--account",
+    help="SLURM account/project to charge",
+)
+@click.option(
+    "--write-toy-csv/--no-write-toy-csv",
+    default=None,
+    help="Force per-toy CSV writing policy in generated inject jobs (default: use config setting).",
+)
+@click.option(
+    "--qos",
+    help="Optional SLURM QOS to request",
+)
+def slurm_gen_inject(config, datasets, masses, strengths, n_toys, output, job_name, partition, time, memory, cpus_per_task, conda_env, account, write_toy_csv, qos):
+    """Generate SLURM scripts for per-(dataset,mass,strength) injection jobs."""
+    from .config import load_config
+    from .funcform_toys import resolve_funcform_closure_mass_ranges
+    from .slurm import generate_injection_slurm_scripts
+
+    cfg = load_config(config)
+
+    dataset_list = [d.strip() for d in str(datasets).split(",") if d.strip()]
+    mass_list = [float(m.strip()) for m in str(masses).split(",") if m.strip()]
+    try:
+        strength_list = _parse_strength_tokens(str(strengths))
+    except ValueError as exc:
+        raise click.BadParameter(
+            "Could not parse --strengths. Use comma-separated values like 1,2,3,5 or s1,s2,s3,s5.",
+            param_hint="--strengths",
+        ) from exc
+
+    if not dataset_list:
+        raise click.BadParameter("No datasets provided", param_hint="--datasets")
+    if not mass_list:
+        raise click.BadParameter("No masses provided", param_hint="--masses")
+    if not strength_list:
+        raise click.BadParameter("No strengths provided", param_hint="--strengths")
+
+    extra = _build_extra_sbatch(account=account, qos=qos)
+    resolved_cpus_per_task = _infer_injection_cpus_per_task(cfg, override=cpus_per_task)
+
+    ds_ranges = {
+        "2015": tuple(cfg.range_2015),
+        "2016": tuple(cfg.range_2016),
+        "2021": tuple(cfg.range_2021),
+    }
+    if bool(getattr(cfg, "funcform_closure_enable", False)):
+        ds_ranges.update(resolve_funcform_closure_mass_ranges(cfg, ["2015", "2016", "2021"]))
+
+    job_script, submit_script, n_jobs = generate_injection_slurm_scripts(
+        config_path=config,
+        output_path=output,
+        datasets=dataset_list,
+        masses=mass_list,
+        strengths=strength_list,
+        n_toys=int(n_toys),
+        output_root=cfg.output_dir,
+        job_name=job_name,
+        partition=partition,
+        time_limit=time,
+        memory=memory,
+        cpus_per_task=resolved_cpus_per_task,
+        conda_env=conda_env,
+        extra_sbatch=extra,
+        mass_ranges_by_dataset=ds_ranges,
+        write_toy_csv=write_toy_csv,
+    )
+    print(f"\nPrepared {n_jobs} injection jobs.")
+    print(f"CPUs per task: {resolved_cpus_per_task}")
+    print("To submit all jobs, run:")
+    print(f"  bash {submit_script}")
+
+
+@main.command("slurm-gen-extract-display")
+@click.option(
+    "--config",
+    "-c",
+    required=True,
+    type=click.Path(exists=True),
+    help="Path to configuration YAML file",
+)
+@click.option(
+    "--dataset",
+    required=True,
+    type=click.Choice(["2015", "2016", "2021", "combined"], case_sensitive=False),
+    help="Extraction-display target to render in batch jobs.",
+)
+@click.option(
+    "--datasets",
+    type=str,
+    help="Optional comma-separated dataset list for combined extraction-display jobs (for example: 2015,2016,2021).",
+)
+@click.option(
+    "--masses",
+    required=True,
+    help="Comma-separated masses (GeV)",
+)
+@click.option(
+    "--strengths",
+    required=True,
+    help="Comma-separated injection strengths (e.g. 3,5,7 or s3,s5,s7)",
+)
+@click.option(
+    "--output",
+    "-o",
+    default="submit_extraction_display.slurm",
+    help="Output SLURM script path",
+)
+@click.option(
+    "--job-name",
+    default="hps-gpr-exdisp",
+    help="SLURM job name",
+)
+@click.option(
+    "--partition",
+    default="batch",
+    help="SLURM partition",
+)
+@click.option(
+    "--time",
+    default="4:00:00",
+    help="Time limit per task",
+)
+@click.option(
+    "--memory",
+    default="4G",
+    help="Memory per task",
+)
+@click.option(
+    "--conda-env",
+    help="Conda environment to activate",
+)
+@click.option(
+    "--account",
+    help="SLURM account/project to charge",
+)
+@click.option(
+    "--qos",
+    help="Optional SLURM QOS to request",
+)
+@click.option(
+    "--toy-index",
+    type=int,
+    help="Representative functional-form toy index for extraction-display closure jobs.",
+)
+def slurm_gen_extract_display(config, dataset, datasets, masses, strengths, output, job_name, partition, time, memory, conda_env, account, qos, toy_index):
+    """Generate SLURM scripts for per-(dataset set,mass,strength) extraction-display jobs."""
+    from .config import load_config
+    from .funcform_toys import resolve_funcform_closure_mass_ranges
+    from .slurm import generate_extraction_display_slurm_scripts
+
+    cfg = load_config(config)
+
+    mass_list = _parse_mass_tokens(masses)
+    try:
+        strength_list = _parse_strength_tokens(str(strengths))
+    except ValueError as exc:
+        raise click.BadParameter(
+            "Could not parse --strengths. Use comma-separated values like 3,5,7 or s3,s5,s7.",
+            param_hint="--strengths",
+        ) from exc
+
+    if not mass_list:
+        raise click.BadParameter("No masses provided", param_hint="--masses")
+    if not strength_list:
+        raise click.BadParameter("No strengths provided", param_hint="--strengths")
+
+    extra = _build_extra_sbatch(account=account, qos=qos)
+    ds_ranges = {
+        "2015": tuple(cfg.range_2015),
+        "2016": tuple(cfg.range_2016),
+        "2021": tuple(cfg.range_2021),
+    }
+    if bool(getattr(cfg, "funcform_closure_enable", False)):
+        ds_ranges.update(resolve_funcform_closure_mass_ranges(cfg, ["2015", "2016", "2021"]))
+    target = str(dataset).strip().lower()
+    combined_keys = [d.strip() for d in str(datasets or "").split(",") if d.strip()]
+
+    if target == "combined":
+        if not combined_keys:
+            combined_keys = [str(k).strip() for k in getattr(cfg, "extraction_display_dataset_keys", []) if str(k).strip()]
+        if len(combined_keys) < 2:
+            raise click.BadParameter(
+                "Combined extraction-display jobs need at least two dataset keys.",
+                param_hint="--datasets",
+            )
+        ranges = [ds_ranges[k] for k in combined_keys if k in ds_ranges]
+        if len(ranges) != len(combined_keys):
+            raise click.BadParameter(
+                "Combined dataset list must only include 2015, 2016, and/or 2021.",
+                param_hint="--datasets",
+            )
+        mass_range = (
+            max(float(lo) for lo, _ in ranges),
+            min(float(hi) for _, hi in ranges),
+        )
+    else:
+        if combined_keys:
+            raise click.BadParameter(
+                "--datasets is only supported when --dataset combined is selected.",
+                param_hint="--datasets",
+            )
+        mass_range = ds_ranges.get(target)
+
+    job_script, submit_script, n_jobs = generate_extraction_display_slurm_scripts(
+        config_path=config,
+        output_path=output,
+        dataset=target,
+        masses=mass_list,
+        strengths=strength_list,
+        output_root=cfg.output_dir,
+        dataset_keys=combined_keys if target == "combined" else None,
+        job_name=job_name,
+        partition=partition,
+        time_limit=time,
+        memory=memory,
+        conda_env=conda_env,
+        extra_sbatch=extra,
+        mass_range=mass_range,
+        toy_index=toy_index,
+    )
+    print(f"\nPrepared {n_jobs} extraction-display jobs.")
+    print("To submit all jobs, run:")
+    print(f"  bash {submit_script}")
+
+
+@main.command("inject-plot")
+@click.option(
+    "--input-dir",
+    "-i",
+    required=True,
+    type=click.Path(exists=True),
+    help="Root directory containing injection job outputs (injection_jobs/ or injection_flat/)",
+)
+@click.option(
+    "--output-dir",
+    "-o",
+    type=click.Path(),
+    help="Directory to write merged injection tables and summary plots",
+)
+@click.option(
+    "--dataset",
+    "-d",
+    multiple=True,
+    help="Optional dataset filter (repeatable: 2015, 2016, combined)",
+)
+@click.option(
+    "--write-merged-toys/--no-write-merged-toys",
+    default=False,
+    show_default=True,
+    help="Write merged toy-level CSVs (can be very large)",
+)
+def inject_plot(input_dir, output_dir, dataset, write_merged_toys):
+    """Merge distributed injection CSVs and produce publication-ready summary plots."""
+    import glob
+    import pandas as pd
+
+    from .injection import (
+        summarize_injection_grid,
+        collapse_fragmented_injection_summary,
+        combine_injection_toy_tables,
+        _combined_mass_support_summary,
+        format_combined_mass_support_summary,
+    )
+    from .plotting import (
+        ensure_dir,
+        _looks_like_single_toy_summary_rows,
+        plot_linearity,
+        plot_bias_vs_injected_strength,
+        plot_pull_width,
+        plot_coverage,
+        plot_injection_heatmap,
+        plot_z_calibration_residual,
+        plot_delta_z_minus_pull_vs_injected_sigma,
+        plot_pull_histogram_by_mass,
+        plot_pull_vs_mass,
+        plot_combined_search_power,
+    )
+
+    ds_filter = {str(d).strip() for d in (dataset or []) if str(d).strip()}
+    outdir = output_dir or os.path.join(input_dir, "injection_summary")
+    ensure_dir(outdir)
+
+    toy_paths = sorted(
+        set(
+            glob.glob(os.path.join(input_dir, "**", "injection_extraction", "inj_extract_toys_*.csv"), recursive=True)
+            + glob.glob(os.path.join(input_dir, "**", "inj_extract_toys_*.csv"), recursive=True)
+        )
+    )
+    summary_paths = sorted(
+        set(
+            glob.glob(os.path.join(input_dir, "**", "injection_extraction", "inj_extract_summary_*.csv"), recursive=True)
+            + glob.glob(os.path.join(input_dir, "**", "inj_extract_summary_*.csv"), recursive=True)
+        )
+    )
+    if not toy_paths and not summary_paths:
+        print(f"No injection toy/summary CSVs found under {input_dir}")
+        sys.exit(1)
+
+    by_dataset = {}
+    by_dataset_summary = {}
+    toy_like_cols = {"A_hat", "sigma_A", "pull_param", "Zhat"}
+    for fp in toy_paths:
+        base = os.path.basename(fp)
+        ds_token = base.replace("inj_extract_toys_", "").replace(".csv", "").strip()
+        ds = ds_token.split("__", 1)[0]
+        if ds_filter and ds not in ds_filter:
+            continue
+        try:
+            dfi = pd.read_csv(fp)
+        except Exception as e:
+            print(f"Warning: could not read {fp}: {e}")
+            continue
+        if dfi.empty:
+            continue
+        if "dataset" not in dfi.columns:
+            dfi["dataset"] = ds
+        by_dataset.setdefault(ds, []).append(dfi)
+
+    for fp in summary_paths:
+        base = os.path.basename(fp)
+        ds_token = base.replace("inj_extract_summary_", "").replace(".csv", "").strip()
+        ds = ds_token.split("__", 1)[0]
+        if ds_filter and ds not in ds_filter:
+            continue
+        try:
+            dfi = pd.read_csv(fp)
+        except Exception as e:
+            print(f"Warning: could not read {fp}: {e}")
+            continue
+        if dfi.empty:
+            continue
+        if "dataset" not in dfi.columns:
+            dfi["dataset"] = ds
+        # Guardrail for mislabeled summary files that actually contain toy-level rows.
+        if len(toy_like_cols.intersection(set(dfi.columns))) >= 3:
+            print(f"Warning: {fp} appears toy-level despite summary filename; treating as toy table.")
+            by_dataset.setdefault(ds, []).append(dfi)
+            continue
+        by_dataset_summary.setdefault(ds, []).append(dfi)
+
+    if not by_dataset and not by_dataset_summary:
+        print("No valid injection toy/summary tables loaded after filtering.")
+        sys.exit(1)
+
+    all_summaries = []
+    all_toys = []
+    toy_merged = {}
+    mass_policy = "intersection"
+    min_n_contrib = 2
+
+    if by_dataset:
+        for ds, frames in sorted(by_dataset.items()):
+            dft = pd.concat(frames, ignore_index=True)
+            dft = dft.sort_values([c for c in ["mass_GeV", "strength", "toy"] if c in dft.columns]).reset_index(drop=True)
+
+            dedup_cols = [c for c in ["dataset", "mass_GeV", "strength", "toy"] if c in dft.columns]
+            if dedup_cols:
+                dft = dft.drop_duplicates(subset=dedup_cols, keep="last")
+
+            toy_merged[str(ds)] = dft.copy()
+
+            if write_merged_toys:
+                toys_out = os.path.join(outdir, f"inj_extract_toys_{ds}.csv")
+                dft.to_csv(toys_out, index=False)
+                print(f"Wrote {toys_out}")
+
+            all_toys.append(dft.copy())
+            dsum = summarize_injection_grid(dft)
+            dsum["dataset"] = str(ds)
+            sum_out = os.path.join(outdir, f"inj_extract_summary_{ds}.csv")
+            dsum.to_csv(sum_out, index=False)
+            all_summaries.append(dsum)
+            print(f"Wrote {sum_out}")
+
+        non_combined = {k: pd.concat(v, ignore_index=True) for k, v in by_dataset.items() if k != "combined"}
+        if len(non_combined) >= 2:
+            support = _combined_mass_support_summary(
+                non_combined,
+                mass_policy=mass_policy,
+                min_n_contrib=min_n_contrib,
+            )
+            print(format_combined_mass_support_summary(support))
+
+            df_comb = combine_injection_toy_tables(
+                non_combined,
+                mass_policy=mass_policy,
+                min_n_contrib=min_n_contrib,
+            )
+            if not df_comb.empty:
+                if write_merged_toys:
+                    toys_out = os.path.join(outdir, "inj_extract_toys_combined.csv")
+                    df_comb.to_csv(toys_out, index=False)
+                    print(f"Wrote {toys_out}")
+                dsum_c = summarize_injection_grid(df_comb)
+                dsum_c["dataset"] = "combined"
+                sum_out_c = os.path.join(outdir, "inj_extract_summary_combined.csv")
+                dsum_c.to_csv(sum_out_c, index=False)
+                all_summaries = [s for s in all_summaries if not ("dataset" in s.columns and (s["dataset"].astype(str) == "combined").all())]
+                all_summaries.append(dsum_c)
+                toy_merged["combined"] = df_comb.copy()
+                all_toys.append(df_comb.copy())
+                print(f"Wrote {sum_out_c}")
+    else:
+        print("No toy-level CSVs found; building summary plots from summary tables only.")
+        for ds, frames in sorted(by_dataset_summary.items()):
+            dsum = pd.concat(frames, ignore_index=True)
+            dsum = dsum.sort_values([c for c in ["mass_GeV", "strength", "inj_nsigma"] if c in dsum.columns]).reset_index(drop=True)
+            fragment_group_cols = [c for c in ["dataset", "mass_GeV", "inj_nsigma"] if c in dsum.columns]
+            looks_like_fragments = _looks_like_single_toy_summary_rows(dsum, fragment_group_cols)
+            dedup_cols = [c for c in ["dataset", "mass_GeV", "strength"] if c in dsum.columns]
+            if dedup_cols and not looks_like_fragments:
+                dsum = dsum.drop_duplicates(subset=dedup_cols, keep="last")
+            if "dataset" not in dsum.columns:
+                dsum["dataset"] = str(ds)
+            dsum["dataset"] = dsum["dataset"].astype(str)
+            if looks_like_fragments:
+                before = len(dsum)
+                dsum = collapse_fragmented_injection_summary(dsum)
+                print(f"Collapsed fragmented one-toy summary rows for {ds}: {before} -> {len(dsum)}")
+            sum_out = os.path.join(outdir, f"inj_extract_summary_{ds}.csv")
+            dsum.to_csv(sum_out, index=False)
+            all_summaries.append(dsum)
+            print(f"Wrote {sum_out}")
+
+    df_sum = pd.concat(all_summaries, ignore_index=True) if all_summaries else pd.DataFrame()
+    if df_sum.empty:
+        print("No summary rows produced.")
+        sys.exit(1)
+
+    xvar = "inj_nsigma" if "inj_nsigma" in df_sum.columns and np.isfinite(df_sum["inj_nsigma"]).any() else "strength"
+
+    # Cross-dataset overlays
+    plot_linearity(df_sum, xvar=xvar, title="Injection linearity (all datasets)", outpath=os.path.join(outdir, "linearity_all.png"))
+    plot_bias_vs_injected_strength(df_sum, xvar=xvar, title="Injection bias (all datasets)", outpath=os.path.join(outdir, "bias_all.png"))
+    plot_pull_width(df_sum, xvar=xvar, title="Pull width (all datasets)", outpath=os.path.join(outdir, "pull_width_all.png"))
+    plot_coverage(df_sum, xvar=xvar, title="Coverage (all datasets)", outpath=os.path.join(outdir, "coverage_all.png"))
+
+    preferred_order = ["2015", "2016", "combined"]
+    present = [str(x) for x in df_sum["dataset"].astype(str).unique()]
+    ds_order = [d for d in preferred_order if d in present] + sorted(d for d in present if d not in preferred_order)
+
+    for required_ds in preferred_order:
+        if required_ds not in present:
+            print(f"Warning: no summary rows found for required dataset '{required_ds}'")
+
+    for ds_key in ds_order:
+        sub = df_sum[df_sum["dataset"].astype(str) == ds_key].copy()
+        dft = toy_merged.get(ds_key, pd.DataFrame())
+        plot_linearity(sub, xvar=xvar, title=f"{ds_key}: linearity", outpath=os.path.join(outdir, f"linearity_{ds_key}.png"))
+        plot_bias_vs_injected_strength(sub, xvar=xvar, title=f"{ds_key}: bias", outpath=os.path.join(outdir, f"bias_{ds_key}.png"))
+        plot_pull_width(sub, xvar=xvar, title=f"{ds_key}: pull width", outpath=os.path.join(outdir, f"pull_width_{ds_key}.png"))
+        plot_coverage(sub, xvar=xvar, title=f"{ds_key}: coverage", outpath=os.path.join(outdir, f"coverage_{ds_key}.png"))
+        plot_injection_heatmap(sub, value_col="pull_mean", dataset_filter=ds_key, title=f"{ds_key}: mean pull heatmap", outpath=os.path.join(outdir, f"heatmap_pull_mean_{ds_key}.png"))
+        plot_injection_heatmap(sub, value_col="pull_std", dataset_filter=ds_key, title=f"{ds_key}: pull width heatmap", outpath=os.path.join(outdir, f"heatmap_pull_width_{ds_key}.png"))
+        src_pull_vs_mass = dft if not dft.empty else sub
+        plot_pull_vs_mass(
+            src_pull_vs_mass,
+            dataset_key=ds_key,
+            title=f"{ds_key}: pull mean/width vs mass",
+            outpath=os.path.join(outdir, f"pull_vs_mass_{ds_key}.png"),
+        )
+        if not dft.empty:
+            hist_dir = os.path.join(outdir, f"pull_hist_{ds_key}")
+            ensure_dir(hist_dir)
+            paths = plot_pull_histogram_by_mass(
+                dft,
+                dataset_key=ds_key,
+                group_by_strength=True,
+                pvalue_method="ks",
+                outdir=hist_dir,
+            )
+            print(f"Wrote {len(paths)} pull-histogram plots for {ds_key} to {hist_dir}")
+
+    if all_toys:
+        toys_all = pd.concat(all_toys, ignore_index=True)
+        plot_z_calibration_residual(
+            toys_all,
+            outdir=outdir,
+            acceptance_bands=[0.5, 1.0],
+            band_semantic="toy spread",
+        )
+        plot_delta_z_minus_pull_vs_injected_sigma(
+            df_sum,
+            outpath=os.path.join(outdir, "delta_z_minus_pull_vs_inj_sigma_all.png"),
+        )
+
+        try:
+            plot_combined_search_power(toys_all, outdir=outdir)
+        except Exception as e:
+            print(f"Warning: combined-search power plots failed: {e}")
+    else:
+        plot_z_calibration_residual(
+            df_sum,
+            outdir=outdir,
+            acceptance_bands=[0.5, 1.0],
+            band_semantic="summary q16--q84",
+        )
+        plot_delta_z_minus_pull_vs_injected_sigma(
+            df_sum,
+            outpath=os.path.join(outdir, "delta_z_minus_pull_vs_inj_sigma_all.png"),
+        )
+
+    if (not all_toys) and {"dataset", "mass_GeV", "sigmaA_ref"}.issubset(set(df_sum.columns)):
+        try:
+            plot_combined_search_power(df_sum, outdir=outdir)
+        except Exception as e:
+            print(f"Warning: combined-search power plots failed in summary-only mode: {e}")
+
+    print(f"\nSummary rows: {len(df_sum)}")
+    print(df_sum.head(20).to_string())
+
+
+@main.command("extract-display")
+@click.option(
+    "--config",
+    "-c",
+    required=True,
+    type=click.Path(exists=True),
+    help="Path to configuration YAML file",
+)
+@click.option(
+    "--dataset",
+    "-d",
+    type=click.Choice(["2015", "2016", "2021", "combined"], case_sensitive=False),
+    help="Dataset key to render. Defaults to extraction_display_dataset_key from config.",
+)
+@click.option(
+    "--output-dir",
+    "-o",
+    type=click.Path(),
+    help="Override extraction-display output directory",
+)
+@click.option(
+    "--strengths",
+    type=str,
+    help="Optional comma-separated injected sigma levels for this run (e.g. 3,5,7 or s3,s5,s7). Overrides extraction_display_sigma_multipliers.",
+)
+@click.option(
+    "--masses",
+    type=str,
+    help="Optional comma-separated mass list in GeV (for example: 0.040,0.080). Overrides extraction_display_masses_gev.",
+)
+@click.option(
+    "--datasets",
+    type=str,
+    help="Optional comma-separated dataset list for combined displays (for example: 2015,2016,2021).",
+)
+@click.option(
+    "--toy-index",
+    type=int,
+    help="Representative functional-form toy index for extraction-display closure plots.",
+)
+def extract_display(config, dataset, output_dir, strengths, masses, datasets, toy_index):
+    """Generate reviewer-facing extraction displays from one pseudoexperiment per point."""
+    from .config import load_config
+    from .extraction_display import run_extraction_display_suite
+
+    cfg = load_config(config)
+    if output_dir:
+        cfg.output_dir = output_dir
+    cfg.ensure_output_dir()
+
+    written = run_extraction_display_suite(
+        cfg,
+        dataset_key=(dataset.lower() if dataset else None),
+        dataset_keys=([d.strip() for d in str(datasets).split(",") if d.strip()] if datasets else None),
+        output_dir=(os.path.join(cfg.output_dir, "extraction_display", dataset.lower()) if dataset and output_dir else None),
+        masses=(_parse_mass_tokens(masses) if masses else None),
+        sigma_multipliers=(_parse_strength_tokens(strengths) if strengths else None),
+        toy_index=toy_index,
+    )
+    print(f"Wrote {len(written)} extraction display plot(s)")
+    for path in written:
+        print(path)
+
+
+@main.command("project-eps2-reach")
+@click.option(
+    "--input-csv",
+    "-i",
+    required=True,
+    type=click.Path(exists=True),
+    help="Dataset-level epsilon^2 CSV (for example combined_single.csv or merged ul_bands_eps2 table with dataset rows).",
+)
+@click.option(
+    "--output",
+    "-o",
+    default="projected_unblinded_reach_eps2.png",
+    type=click.Path(),
+    show_default=True,
+    help="Output plot path/stem. A CSV sidecar with the projection table is written beside it.",
+)
+@click.option(
+    "--scale-2015",
+    type=float,
+    default=1.0,
+    show_default=True,
+    help="Luminosity/statistics scale factor to apply to 2015.",
+)
+@click.option(
+    "--scale-2016",
+    type=float,
+    default=10.0,
+    show_default=True,
+    help="Luminosity/statistics scale factor to apply to 2016.",
+)
+@click.option(
+    "--scale-2021",
+    type=float,
+    default=100.0,
+    show_default=True,
+    help="Luminosity/statistics scale factor to apply to 2021.",
+)
+def project_eps2_reach(input_csv, output, scale_2015, scale_2016, scale_2021):
+    """Project combined epsilon^2 reach from dataset-level curves using sqrt(L) scaling."""
+    import pandas as pd
+
+    from .plotting import plot_projected_unblinded_eps2_reach
+
+    df = pd.read_csv(input_csv)
+    table = plot_projected_unblinded_eps2_reach(
+        df,
+        outpath=output,
+        lumi_scale_by_dataset={
+            "2015": float(scale_2015),
+            "2016": float(scale_2016),
+            "2021": float(scale_2021),
+        },
+    )
+    root, _ = os.path.splitext(output)
+    table_path = f"{root}.csv"
+    table.to_csv(table_path, index=False)
+    print(f"Wrote projection plot(s) with stem {root}")
+    print(f"Wrote projection table to {table_path}")
+
+
+@main.command("plot-band-summary")
+@click.option(
+    "--input-dir",
+    "-i",
+    required=True,
+    type=click.Path(exists=True, file_okay=False, dir_okay=True),
+    help="Directory containing combined_ul_bands_*.csv files.",
+)
+@click.option(
+    "--output-dir",
+    "-o",
+    type=click.Path(file_okay=False, dir_okay=True),
+    help="Directory for regenerated plots. Defaults to INPUT_DIR/csv_regenerated_plots.",
+)
+@click.option(
+    "--prefix",
+    default="",
+    show_default=True,
+    help="Optional filename prefix for generated plots.",
+)
+@click.option(
+    "--requested-masses-mev",
+    default="85,105,138,170,177,207",
+    show_default=True,
+    help="Comma-separated mass points to summarize in MeV.",
+)
+def plot_band_summary(input_dir, output_dir, prefix, requested_masses_mev):
+    """Regenerate publication-style band/discovery plots directly from merged CSVs."""
+    import ast
+    import pandas as pd
+    import matplotlib.pyplot as plt
+
+    from .plotting import (
+        ensure_dir,
+        plot_analytic_p0,
+        plot_observed_ul_only,
+        plot_observed_ul_overlay,
+        plot_ul_bands,
+        plot_ul_pvalue_components,
+        plot_ul_pvalues,
+        plot_Z_local_global,
+        set_plot_style,
+    )
+
+    in_dir = os.path.abspath(input_dir)
+    out_dir = os.path.abspath(output_dir or os.path.join(in_dir, "csv_regenerated_plots"))
+    ensure_dir(out_dir)
+    set_plot_style("paper")
+
+    def _read_csv(name):
+        path = os.path.join(in_dir, name)
+        if not os.path.exists(path):
+            return None
+        df = pd.read_csv(path)
+        if "mass_GeV" in df.columns:
+            df = df.sort_values("mass_GeV").reset_index(drop=True)
+        return df
+
+    def _stem(name: str) -> str:
+        pfx = str(prefix).strip()
+        return f"{pfx}_{name}" if pfx else str(name)
+
+    written = []
+
+    def _plot_pair(plotter, name: str, *args, **kwargs):
+        for ext in (".png", ".pdf"):
+            outpath = os.path.join(out_dir, f"{_stem(name)}{ext}")
+            plotter(*args, outpath=outpath, **kwargs)
+            if os.path.exists(outpath):
+                written.append(outpath)
+
+    combined = _read_csv("combined_ul_bands_combined_all.csv")
+    dataset_bands = {
+        ds: df for ds in ("2015", "2016", "2021")
+        if (df := _read_csv(f"combined_ul_bands_{ds}.csv")) is not None
+    }
+
+    if combined is not None and not combined.empty:
+        _plot_pair(
+            plot_ul_bands,
+            "combined_eps2_bands_observed_expected",
+            combined,
+            use_eps2=True,
+            title=r"Expected/observed 95% CL upper limits on $\epsilon^2$ (combined)",
+        )
+        _plot_pair(
+            plot_observed_ul_only,
+            "combined_observed_eps2_limit",
+            combined,
+            y="eps2",
+            title=r"Observed 95% CL upper limit on $\epsilon^2$ (combined)",
+        )
+        _plot_pair(
+            plot_ul_pvalues,
+            "combined_toy_limit_tail_areas",
+            combined,
+            title="Toy-limit diagnostic tail areas (combined)",
+        )
+        _plot_pair(
+            plot_ul_pvalue_components,
+            "combined_toy_limit_tail_areas_with_corrected_global_thresholds",
+            combined,
+            title="Toy-limit diagnostics with corrected global-threshold references",
+            indep_width_sigma=(
+                float(combined["bands_train_exclude_nsigma"].dropna().iloc[0])
+                if "bands_train_exclude_nsigma" in combined.columns and combined["bands_train_exclude_nsigma"].notna().any()
+                else 1.96
+            ),
+            sigma_col=("sigma_mass_res_min_GeV" if "sigma_mass_res_min_GeV" in combined.columns else "sigma_mass_res_GeV"),
+        )
+        if "p0_analytic" in combined.columns:
+            lee_width = (
+                float(combined["bands_train_exclude_nsigma"].dropna().iloc[0])
+                if "bands_train_exclude_nsigma" in combined.columns and combined["bands_train_exclude_nsigma"].notna().any()
+                else 1.96
+            )
+            sigma_col_combined = "sigma_mass_res_min_GeV" if "sigma_mass_res_min_GeV" in combined.columns else "sigma_mass_res_GeV"
+            _plot_pair(
+                plot_analytic_p0,
+                "combined_local_p0_with_global_p_overlay",
+                combined,
+                title="Local p0 and global p-value overlay (combined)",
+                apply_lee=True,
+                lee_method="sidak",
+                indep_width_sigma=lee_width,
+                sigma_col=sigma_col_combined,
+            )
+            _plot_pair(
+                plot_Z_local_global,
+                "combined_local_Z_with_global_Z_overlay",
+                combined,
+                title="Local Z and global Z overlay (combined)",
+                apply_lee=True,
+                lee_method="sidak",
+                indep_width_sigma=lee_width,
+                sigma_col=sigma_col_combined,
+            )
+
+    overlay_curves = [(ds, df) for ds, df in sorted(dataset_bands.items())]
+    if combined is not None and not combined.empty:
+        overlay_curves.append(("combined", combined))
+    if len(overlay_curves) >= 2:
+        _plot_pair(
+            plot_observed_ul_overlay,
+            "observed_eps2_limit_overlay_datasets_and_combined",
+            overlay_curves,
+            y="eps2",
+            title=r"Observed 95% CL upper limits on $\epsilon^2$: datasets and combined",
+        )
+
+    for ds, df in sorted(dataset_bands.items()):
+        _plot_pair(
+            plot_ul_bands,
+            f"{ds}_eps2_coupling_bands_observed_expected",
+            df,
+            use_eps2=True,
+            title=rf"{ds}: expected/observed 95% CL upper limits on $\epsilon^2$",
+        )
+        if "A_med" in df.columns:
+            _plot_pair(
+                plot_ul_bands,
+                f"{ds}_signal_yield_bands_observed_expected",
+                df,
+                use_eps2=False,
+                title=f"{ds}: expected/observed 95% CL upper limits on signal yield",
+            )
+        if "p0_analytic" in df.columns:
+            lee_width = (
+                float(df["bands_train_exclude_nsigma"].dropna().iloc[0])
+                if "bands_train_exclude_nsigma" in df.columns and df["bands_train_exclude_nsigma"].notna().any()
+                else 1.96
+            )
+            _plot_pair(
+                plot_analytic_p0,
+                f"{ds}_local_p0_with_global_p_overlay",
+                df,
+                title=f"{ds}: local p0 and global p-value overlay",
+                apply_lee=True,
+                lee_method="sidak",
+                indep_width_sigma=lee_width,
+                sigma_col="sigma_mass_res_GeV",
+            )
+            _plot_pair(
+                plot_Z_local_global,
+                f"{ds}_local_Z_with_global_Z_overlay",
+                df,
+                title=f"{ds}: local Z and global Z overlay",
+                apply_lee=True,
+                lee_method="sidak",
+                indep_width_sigma=lee_width,
+                sigma_col="sigma_mass_res_GeV",
+            )
+
+    if combined is not None and dataset_bands:
+        rows = []
+        for _, row in combined.iterrows():
+            mass = float(row["mass_GeV"])
+            singles = []
+            for ds, df in dataset_bands.items():
+                sub = df[np.isclose(pd.to_numeric(df["mass_GeV"], errors="coerce"), mass, rtol=0.0, atol=5e-10)]
+                if sub.empty:
+                    continue
+                sr = sub.iloc[0]
+                singles.append((ds, float(sr.get("eps2_med", np.nan)), float(sr.get("eps2_obs", sr.get("ul_eps2_obs", np.nan)))))
+            singles = [s for s in singles if np.isfinite(s[1])]
+            if not singles:
+                continue
+            best_med = min(s[1] for s in singles)
+            best_obs_vals = [s[2] for s in singles if np.isfinite(s[2])]
+            rows.append(
+                {
+                    "mass_GeV": mass,
+                    "mass_MeV": 1000.0 * mass,
+                    "dataset_set": row.get("dataset_set", ""),
+                    "combined_eps2_med": float(row.get("eps2_med", np.nan)),
+                    "best_single_eps2_med": best_med,
+                    "combined_over_best_single_median": float(row.get("eps2_med", np.nan)) / best_med if best_med > 0 else np.nan,
+                    "combined_eps2_obs": float(row.get("eps2_obs", row.get("ul_eps2_obs", np.nan))),
+                    "best_single_eps2_obs": min(best_obs_vals) if best_obs_vals else np.nan,
+                    "single_datasets": "+".join(s[0] for s in singles),
+                    "n_single_datasets": len(singles),
+                }
+            )
+        if rows:
+            overlap = pd.DataFrame(rows).sort_values("mass_GeV").reset_index(drop=True)
+            overlap_csv = os.path.join(out_dir, f"{_stem('combined_vs_best_single_limit_diagnostic')}.csv")
+            overlap.to_csv(overlap_csv, index=False)
+            written.append(overlap_csv)
+
+            fig, ax = plt.subplots(figsize=(9.5, 4.8))
+            ax.plot(
+                overlap["mass_MeV"],
+                overlap["combined_over_best_single_median"],
+                color="k",
+                lw=2.0,
+                label="combined median / best single median",
+            )
+            ax.axhline(1.0, color="0.35", ls="--", lw=1.0, label="parity")
+            ax.set_xlabel("Mass hypothesis [MeV]")
+            ax.set_ylabel(r"median $\epsilon^2$ limit ratio")
+            ax.set_title("Combined expected limit compared with best single-dataset limit")
+            ax.legend(loc="best", frameon=True)
+            ax.grid(True, alpha=0.25)
+            fig.tight_layout()
+            for ext in (".png", ".pdf"):
+                path = os.path.join(out_dir, f"{_stem('combined_vs_best_single_limit_diagnostic')}{ext}")
+                fig.savefig(path, dpi=220)
+                written.append(path)
+            plt.close(fig)
+
+    requested = []
+    try:
+        requested = [float(tok.strip()) for tok in str(requested_masses_mev).split(",") if tok.strip()]
+    except Exception:
+        requested = []
+    if requested:
+        summary_rows = []
+        sources = [(f"dataset_{ds}", df) for ds, df in sorted(dataset_bands.items())]
+        if combined is not None:
+            sources.append(("combined", combined))
+        for label, df in sources:
+            for mev in requested:
+                mass = float(mev) / 1000.0
+                sub = df[np.isclose(pd.to_numeric(df["mass_GeV"], errors="coerce"), mass, rtol=0.0, atol=5e-10)]
+                if sub.empty:
+                    continue
+                row = sub.iloc[0]
+                summary_rows.append(
+                    {
+                        "source": label,
+                        "mass_MeV": float(mev),
+                        "dataset_or_set": row.get("dataset", row.get("dataset_set", "")),
+                        "eps2_obs": row.get("eps2_obs", row.get("ul_eps2_obs", np.nan)),
+                        "eps2_med": row.get("eps2_med", np.nan),
+                        "eps2_lo1": row.get("eps2_lo1", np.nan),
+                        "eps2_hi1": row.get("eps2_hi1", np.nan),
+                        "eps2_lo2": row.get("eps2_lo2", np.nan),
+                        "eps2_hi2": row.get("eps2_hi2", np.nan),
+                        "p0_analytic": row.get("p0_analytic", np.nan),
+                        "Z_analytic": row.get("Z_analytic", np.nan),
+                    }
+                )
+        if summary_rows:
+            requested_csv = os.path.join(out_dir, f"{_stem('requested_mass_points_summary')}.csv")
+            pd.DataFrame(summary_rows).to_csv(requested_csv, index=False)
+            written.append(requested_csv)
+
+    if combined is not None and "meta" in combined.columns:
+        density_rows = []
+        for _, row in combined.iterrows():
+            try:
+                meta = ast.literal_eval(str(row["meta"]))
+            except Exception:
+                meta = []
+            for item in meta if isinstance(meta, list) else []:
+                density_rows.append(
+                    {
+                        "mass_GeV": float(row["mass_GeV"]),
+                        "mass_MeV": 1000.0 * float(row["mass_GeV"]),
+                        "dataset_set": row.get("dataset_set", ""),
+                        "dataset": item.get("key", ""),
+                        "sigma_GeV": item.get("sigma", np.nan),
+                        "density_counts_per_GeV": item.get("dens", np.nan),
+                    }
+                )
+        if density_rows:
+            density_csv = os.path.join(out_dir, f"{_stem('combined_density_metadata')}.csv")
+            pd.DataFrame(density_rows).to_csv(density_csv, index=False)
+            written.append(density_csv)
+
+    rerun_script = os.path.join(out_dir, f"{_stem('sdf_rerun_selected_mass_points')}.sh")
+    with open(rerun_script, "w", encoding="utf-8") as fh:
+        fh.write(
+            "#!/bin/bash\n"
+            "set -euo pipefail\n\n"
+            "# Run from the hps-gpr repository on SDF after pulling the merged code.\n"
+            "hps-gpr slurm-gen \\\n"
+            "  --config config_2015_2016_10pct_2021_1pct_10k.yaml \\\n"
+            "  --n-jobs 231 \\\n"
+            "  --job-name hps151621_10k_rerun6 \\\n"
+            "  --partition roma \\\n"
+            "  --account hps:hps-prod \\\n"
+            "  --time 24:00:00 \\\n"
+            "  --memory 8G \\\n"
+            "  --output submit_151621_10k_rerun6.slurm\n\n"
+            "for TASK_ID in 65 85 118 150 157 187; do\n"
+            "  sbatch --export=ALL,TASK_ID=${TASK_ID},N_TASKS=231 submit_151621_10k_rerun6.slurm\n"
+            "done\n\n"
+            "hps-gpr slurm-gen \\\n"
+            "  --config config_2015_2016_10pct_2021_1pct_10k_rpen7.yaml \\\n"
+            "  --n-jobs 231 \\\n"
+            "  --job-name hps151621_rpen7_rerun6 \\\n"
+            "  --partition roma \\\n"
+            "  --account hps:hps-prod \\\n"
+            "  --time 24:00:00 \\\n"
+            "  --memory 8G \\\n"
+            "  --output submit_151621_rpen7_rerun6.slurm\n\n"
+            "for TASK_ID in 65 85 118 150 157 187; do\n"
+            "  sbatch --export=ALL,TASK_ID=${TASK_ID},N_TASKS=231 submit_151621_rpen7_rerun6.slurm\n"
+            "done\n\n"
+            "hps-gpr slurm-combine --output-dir outputs/prod_2015_2016_10pct_2021_1pct_10k_bands\n"
+            "hps-gpr slurm-combine --output-dir outputs/prod_2015_2016_10pct_2021_1pct_10k_bands_rpen7\n"
+        )
+    os.chmod(rerun_script, 0o755)
+    written.append(rerun_script)
+
+    print(f"Wrote {len(written)} band-summary artifact(s) to {out_dir}")
+    for path in written:
+        print(path)
+
+
+@main.command("observed-display")
+@click.option(
+    "--config",
+    "-c",
+    required=True,
+    type=click.Path(exists=True),
+    help="Path to configuration YAML file",
+)
+@click.option(
+    "--mass",
+    required=True,
+    type=float,
+    help="Mass hypothesis in GeV",
+)
+@click.option(
+    "--dataset",
+    "-d",
+    type=click.Choice(["2015", "2016", "2021", "combined"], case_sensitive=False),
+    help="Dataset key to render. Defaults to combined when multiple datasets are enabled.",
+)
+@click.option(
+    "--datasets",
+    type=str,
+    help="Optional comma-separated dataset list for combined displays (for example: 2015,2016,2021).",
+)
+@click.option(
+    "--output-dir",
+    "-o",
+    type=click.Path(),
+    help="Override observed-display output directory",
+)
+def observed_display(config, mass, dataset, datasets, output_dir):
+    """Generate reviewer-facing observed-data bump-validation plots for one mass."""
+    from .config import load_config
+    from .extraction_display import run_observed_display_suite
+
+    cfg = load_config(config)
+    if dataset and dataset.lower() != "combined" and datasets:
+        raise click.BadParameter("--datasets can only be used together with --dataset combined", param_hint="--datasets")
+
+    written = run_observed_display_suite(
+        cfg,
+        mass=float(mass),
+        dataset_key=(dataset.lower() if dataset else None),
+        dataset_keys=([tok.strip() for tok in str(datasets).split(",") if tok.strip()] if datasets else None),
+        output_dir=output_dir,
+    )
+    print(f"Wrote {len(written)} observed display plot(s)")
+    for path in written:
+        print(path)
+
+
+@main.command("slurm-combine")
+@click.option(
+    "--output-dir",
+    "-o",
+    required=True,
+    type=click.Path(exists=True),
+    help="Directory containing task output subdirectories",
+)
+@click.option(
+    "--prefix",
+    default="combined",
+    help="Prefix for combined output files",
+)
+def slurm_combine(output_dir, prefix):
+    """Combine results from parallel SLURM jobs and generate summary plot suites."""
+    import pandas as pd
+
+    from .slurm import combine_results
+    from .plotting import (
+        ensure_dir,
+        plot_ul_bands,
+        plot_observed_ul_only,
+        plot_ul_pvalues,
+        plot_ul_pvalue_components,
+        plot_observed_ul_overlay,
+        plot_analytic_p0,
+        plot_Z_local_global,
+        plot_injection_heatmap,
+        plot_linearity,
+        plot_pull_width,
+    )
+
+    df_single, df_comb, bands_a, bands_eps2, bands_comb = combine_results(output_dir, prefix)
+
+    if df_single is not None:
+        print(f"\nCombined single results: {len(df_single)} rows")
+    if df_comb is not None:
+        print(f"Combined results: {len(df_comb)} rows")
+
+    for name, path in (bands_a or {}).items():
+        try:
+            df = pd.read_csv(path)
+            png = path[:-4] + ".png"
+            plot_ul_bands(df, use_eps2=False, title=f"Expected signal-yield UL bands ({name})", outpath=png)
+            print(f"Wrote {png}")
+        except Exception as e:
+            print(f"Warning: could not plot A bands for {name}: {e}")
+
+    for name, path in (bands_eps2 or {}).items():
+        try:
+            df = pd.read_csv(path)
+            png = path[:-4] + ".png"
+            plot_ul_bands(df, use_eps2=True, title=f"Expected $\epsilon^2$ UL bands ({name})", outpath=png)
+            print(f"Wrote {png}")
+        except Exception as e:
+            print(f"Warning: could not plot eps2 bands for {name}: {e}")
+
+    for name, path in (bands_comb or {}).items():
+        try:
+            df = pd.read_csv(path)
+            png = path[:-4] + ".png"
+            plot_ul_bands(df, use_eps2=True, title=f"Expected combined $\epsilon^2$ UL bands ({name})", outpath=png)
+            print(f"Wrote {png}")
+        except Exception as e:
+            print(f"Warning: could not plot combined bands for {name}: {e}")
+
+    # Publication-style summary suites from merged UL-band CSVs.
+    # Priority: explicit combination bands -> eps2 bands -> generic UL-band tables.
+    summary_inputs = dict((bands_comb or {}))
+    if not summary_inputs:
+        summary_inputs = dict((bands_eps2 or {}))
+    if not summary_inputs:
+        summary_inputs = dict((bands_a or {}))
+
+    for name, path in summary_inputs.items():
+        try:
+            df = pd.read_csv(path).sort_values("mass_GeV").reset_index(drop=True)
+            tag = str(name).replace("__", "_").strip("_")
+            suite_dir = os.path.join(output_dir, f"summary_combined_{tag}")
+            ensure_dir(suite_dir)
+
+            alpha_vals = df["cls_alpha"].to_numpy(float) if "cls_alpha" in df.columns else np.array([0.05])
+            alpha_vals = alpha_vals[np.isfinite(alpha_vals)]
+            alpha_used = float(alpha_vals[0]) if alpha_vals.size else 0.05
+            cl_pct = int(round(100.0 * (1.0 - alpha_used)))
+
+            plot_ul_bands(
+                df,
+                use_eps2=True,
+                title=f"Expected/observed {cl_pct}% CL upper limits on $\epsilon^2$ ({tag})",
+                outpath=os.path.join(suite_dir, "ul_bands_eps2_obsexp.png"),
+            )
+            if "A_obs" in df.columns or "ul_A_obs" in df.columns:
+                plot_ul_bands(
+                    df,
+                    use_eps2=False,
+                    title=f"Expected/observed {cl_pct}% CL upper limits on signal yield ({tag})",
+                    outpath=os.path.join(suite_dir, "ul_bands_signal_yield_obsexp.png"),
+                )
+
+            plot_observed_ul_only(
+                df,
+                y="eps2",
+                title=f"Observed {cl_pct}% CL upper limit on $\epsilon^2$ ({tag})",
+                outpath=os.path.join(suite_dir, "ul_observed_only_eps2.png"),
+            )
+            if "A_obs" in df.columns or "ul_A_obs" in df.columns:
+                plot_observed_ul_only(
+                    df,
+                    y="yield",
+                    title=f"Observed {cl_pct}% CL upper limit on signal yield ({tag})",
+                    outpath=os.path.join(suite_dir, "ul_observed_only_signal_yield.png"),
+                )
+
+            plot_ul_pvalues(
+                df,
+                title=f"Toy-limit diagnostic tail areas ({tag})",
+                outpath=os.path.join(suite_dir, "ul_pvalues.png"),
+            )
+            plot_ul_pvalue_components(
+                df,
+                title=f"Toy-limit diagnostics with local p0 and global-reference curves ({tag})",
+                outpath=os.path.join(suite_dir, "ul_pvalues_components_local_global_refs.png"),
+                indep_width_sigma=float(df["bands_train_exclude_nsigma"].dropna().iloc[0]) if "bands_train_exclude_nsigma" in df.columns and df["bands_train_exclude_nsigma"].notna().any() else 1.96,
+                sigma_col=("sigma_mass_res_min_GeV" if "sigma_mass_res_min_GeV" in df.columns else "sigma_mass_res_GeV"),
+            )
+
+            if "p0_analytic" in df.columns:
+                lee_width = float(df["bands_train_exclude_nsigma"].dropna().iloc[0]) if "bands_train_exclude_nsigma" in df.columns and df["bands_train_exclude_nsigma"].notna().any() else 1.96
+                sigma_col_combined = "sigma_mass_res_min_GeV" if "sigma_mass_res_min_GeV" in df.columns else "sigma_mass_res_GeV"
+                plot_analytic_p0(
+                    df,
+                    title=f"Local p0 with global scan-p-value reference vs mass ({tag})",
+                    outpath=os.path.join(suite_dir, "p0_analytic_local_global.png"),
+                    apply_lee=True,
+                    lee_method="sidak",
+                    indep_width_sigma=lee_width,
+                    sigma_col=sigma_col_combined,
+                )
+                plot_Z_local_global(
+                    df,
+                    title=f"Local Z with global excess-significance reference vs mass ({tag})",
+                    outpath=os.path.join(suite_dir, "Z_local_global.png"),
+                    apply_lee=True,
+                    lee_method="sidak",
+                    indep_width_sigma=lee_width,
+                    sigma_col=sigma_col_combined,
+                )
+
+            # Add per-dataset UL + local/global-reference suites into combined summary folder
+            for ds_name, ds_path in (bands_a or {}).items():
+                try:
+                    dfa = pd.read_csv(ds_path).sort_values("mass_GeV").reset_index(drop=True)
+                    plot_ul_bands(
+                        dfa,
+                        use_eps2=False,
+                        title=f"{ds_name}: expected/observed {cl_pct}% CL signal-yield UL",
+                        outpath=os.path.join(suite_dir, f"{ds_name}_UL_sig_yield_bands.png"),
+                    )
+                except Exception as e:
+                    print(f"Warning: dataset signal-yield UL plot failed for {ds_name}: {e}")
+            for ds_name, ds_path in (bands_eps2 or {}).items():
+                try:
+                    dfe = pd.read_csv(ds_path).sort_values("mass_GeV").reset_index(drop=True)
+                    plot_ul_bands(
+                        dfe,
+                        use_eps2=True,
+                        title=f"{ds_name}: expected/observed {cl_pct}% CL epsilon^2 UL",
+                        outpath=os.path.join(suite_dir, f"{ds_name}_UL_eps2_yield_bands.png"),
+                    )
+                except Exception as e:
+                    print(f"Warning: dataset eps2 UL plot failed for {ds_name}: {e}")
+
+            overlay_curves = []
+            for ds_name, ds_path in sorted((bands_eps2 or {}).items()):
+                try:
+                    overlay_curves.append((str(ds_name), pd.read_csv(ds_path).sort_values("mass_GeV").reset_index(drop=True)))
+                except Exception as e:
+                    print(f"Warning: dataset observed-UL overlay input failed for {ds_name}: {e}")
+            for comb_name, comb_path in sorted((bands_comb or {}).items()):
+                try:
+                    comb_label = "combined" if str(comb_name) in {str(name), "all", "combined", "combined_all"} else f"combined {comb_name}"
+                    overlay_curves.append((comb_label, pd.read_csv(comb_path).sort_values("mass_GeV").reset_index(drop=True)))
+                except Exception as e:
+                    print(f"Warning: combined observed-UL overlay input failed for {comb_name}: {e}")
+            if len(overlay_curves) >= 2:
+                plot_observed_ul_overlay(
+                    overlay_curves,
+                    y="eps2",
+                    title=f"Observed {cl_pct}% CL upper limits on $\\epsilon^2$: datasets and combined ({tag})",
+                    outpath=os.path.join(suite_dir, "ul_observed_overlay_eps2.png"),
+                )
+
+            support_masses_by_ds = {}
+            if df_single is not None and len(df_single) and "dataset_set" in df.columns:
+                sets = df["dataset_set"].fillna("").astype(str)
+                masses_round = np.round(df["mass_GeV"].to_numpy(float), 6)
+                for ds_name in sorted(df_single["dataset"].astype(str).unique()):
+                    mask = sets.apply(lambda s: str(ds_name) in [tok for tok in str(s).split("+") if tok])
+                    support_masses_by_ds[str(ds_name)] = set(masses_round[mask.to_numpy(bool)])
+
+            if df_single is not None and len(df_single):
+                for ds_name, sub in df_single.groupby("dataset"):
+                    try:
+                        sub = sub.sort_values("mass_GeV").reset_index(drop=True)
+                        support = support_masses_by_ds.get(str(ds_name), set())
+                        if support:
+                            sub_round = np.round(sub["mass_GeV"].to_numpy(float), 6)
+                            sub = sub[np.isin(sub_round, list(support))].copy()
+                            sub = sub.sort_values("mass_GeV").reset_index(drop=True)
+                        if sub.empty:
+                            continue
+                        if "p0_analytic" in sub.columns:
+                            sigma_col_single = "sigma_val" if "sigma_val" in sub.columns else "sigma_mass_res_GeV"
+                            plot_analytic_p0(
+                                sub,
+                                title=f"{ds_name}: local p0 with global scan-p-value reference",
+                                outpath=os.path.join(suite_dir, f"{ds_name}_p0_local_global.png"),
+                                apply_lee=True,
+                                lee_method="sidak",
+                                indep_width_sigma=lee_width,
+                                sigma_col=sigma_col_single,
+                            )
+                            plot_Z_local_global(
+                                sub,
+                                title=f"{ds_name}: local Z with global excess-significance reference",
+                                outpath=os.path.join(suite_dir, f"{ds_name}_Z_local_global.png"),
+                                apply_lee=True,
+                                lee_method="sidak",
+                                indep_width_sigma=lee_width,
+                                sigma_col=sigma_col_single,
+                            )
+                    except Exception as e:
+                        print(f"Warning: dataset local/global-reference summary failed for {ds_name}: {e}")
+
+            inj_dir = os.path.join(output_dir, "injection_extraction")
+            inj_all = os.path.join(inj_dir, "inj_extract_summary_all.csv")
+            inj_summary_paths = []
+            if os.path.exists(inj_all):
+                inj_summary_paths = [inj_all]
+            else:
+                inj_summary_paths = sorted(glob.glob(os.path.join(inj_dir, "inj_extract_summary_*.csv")))
+                inj_summary_paths = [p for p in inj_summary_paths if not p.endswith("inj_extract_summary_all.csv")]
+
+            if inj_summary_paths:
+                try:
+                    frames = [pd.read_csv(p) for p in inj_summary_paths]
+                    dfi = pd.concat(frames, ignore_index=True)
+                    xvar = "inj_nsigma" if "inj_nsigma" in dfi.columns and dfi["inj_nsigma"].notna().any() else "strength"
+                    for ds_key in sorted(dfi["dataset"].astype(str).unique()):
+                        sub = dfi[dfi["dataset"].astype(str) == ds_key].copy()
+                        plot_injection_heatmap(sub, value_col="pull_mean", dataset_filter=ds_key, title=f"{ds_key}: mean pull heatmap", outpath=os.path.join(suite_dir, f"{ds_key}_heatmap_pull_mean.png"))
+                        plot_injection_heatmap(sub, value_col="pull_std", dataset_filter=ds_key, title=f"{ds_key}: pull width heatmap", outpath=os.path.join(suite_dir, f"{ds_key}_heatmap_pull_width.png"))
+                        plot_linearity(sub, xvar=xvar, title=f"{ds_key}: linearity", outpath=os.path.join(suite_dir, f"{ds_key}_linearity.png"))
+                        plot_pull_width(sub, xvar=xvar, title=f"{ds_key}: pull width", outpath=os.path.join(suite_dir, f"{ds_key}_pull_width.png"))
+                except Exception as e:
+                    print(f"Warning: could not generate injection summary products: {e}")
+
+            print(f"Wrote summary plot suite: {suite_dir}")
+        except Exception as e:
+            print(f"Warning: could not generate summary suite for {name}: {e}")
+
+
+
+
+@main.command("re-run-2016-bands")
+@click.option(
+    "--config",
+    "-c",
+    required=True,
+    type=click.Path(exists=True),
+    help="Path to configuration YAML file",
+)
+@click.option(
+    "--mass",
+    "-mass",
+    required=True,
+    multiple=True,
+    type=float,
+    help="Mass(es) in MeV to re-run (repeat option, e.g. -mass 37 -mass 48)",
+)
+@click.option(
+    "--output-dir",
+    "-o",
+    type=click.Path(),
+    help="Output directory containing task_#### subdirectories (defaults to config output_dir)",
+)
+@click.option(
+    "--n-tasks",
+    type=int,
+    help="Total number of original SLURM tasks (auto-inferred from task_#### folders when omitted)",
+)
+def re_run_2016_bands(config, mass, output_dir, n_tasks):
+    """Compatibility wrapper for re-running selected masses (MeV)."""
+    ctx = click.get_current_context()
+    ctx.invoke(re_run, config=config, masses=mass, output_dir=output_dir, n_tasks=n_tasks)
+
+@main.command("re-run")
+@click.option(
+    "--config",
+    "-c",
+    required=True,
+    type=click.Path(exists=True),
+    help="Path to configuration YAML file",
+)
+@click.option(
+    "--masses",
+    "-m",
+    required=True,
+    multiple=True,
+    type=float,
+    help="Mass(es) in MeV to re-run (repeat option, e.g. -m 37 -m 48)",
+)
+@click.option(
+    "--output-dir",
+    "-o",
+    type=click.Path(),
+    help="Output directory containing task_#### subdirectories (defaults to config output_dir)",
+)
+@click.option(
+    "--n-tasks",
+    type=int,
+    help="Total number of original SLURM tasks (auto-inferred from task_#### folders when omitted)",
+)
+def re_run(config, masses, output_dir, n_tasks):
+    """Re-run one or more masses by re-executing the owning task IDs."""
+    from .config import load_config
+    from .dataset import make_datasets
+    from .slurm import infer_n_tasks_from_output_dir, get_task_ids_for_masses
+
+    cfg = load_config(config)
+    run_outdir = output_dir or cfg.output_dir
+
+    if not masses:
+        print("No masses were provided. Use --masses/-m with MeV values (e.g. -m 37 -m 48).")
+        sys.exit(1)
+
+    datasets = make_datasets(cfg)
+    if not datasets:
+        print("No datasets enabled. Check configuration.")
+        sys.exit(1)
+
+    if n_tasks is None:
+        n_tasks = infer_n_tasks_from_output_dir(run_outdir)
+        if n_tasks is None:
+            print(
+                "Could not infer --n-tasks from output directory. "
+                "Either provide --n-tasks or ensure task_#### folders exist."
+            )
+            sys.exit(1)
+
+    masses_gev = [float(m) / 1000.0 for m in masses]
+    try:
+        task_ids = get_task_ids_for_masses(datasets, cfg.mass_step_gev, int(n_tasks), masses_gev)
+    except ValueError as e:
+        print(f"Error: {e}")
+        sys.exit(1)
+
+    if not task_ids:
+        print("No tasks selected for re-run.")
+        return
+
+    print(f"Re-running tasks in {run_outdir}: {task_ids}")
+    for tid in task_ids:
+        print(f"\n[re-run] task_{tid:04d}")
+        # Re-use the existing scan command path so output files are overwritten in-place.
+        scan.callback(
+            config=config,
+            output_dir=run_outdir,
+            mass_min=None,
+            mass_max=None,
+            array_task=int(tid),
+            n_tasks=int(n_tasks),
+        )
+
+
+if __name__ == "__main__":
+    main()
