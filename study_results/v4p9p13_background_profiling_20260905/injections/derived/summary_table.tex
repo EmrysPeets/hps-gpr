@@ -1,0 +1,32 @@
+\begin{table}[htbp]\centering\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lrrrrrr}\toprule
+Truth and mass & \multicolumn{2}{c}{B-only pull width} & \multicolumn{2}{c}{Mean pull at $5\sigma_{\rm ref}$} & \multicolumn{2}{c}{True yield excluded} \\
+ & Fixed & Profiled & Fixed & Profiled & Fixed & Profiled \\ \midrule
+\multicolumn{7}{l}{\emph{Known-background control}} \\
+65 MeV & 0.97 & 0.71 & -0.02 & -0.03 & 10.2\% & 5.0\% \\
+71 MeV & 0.97 & 0.75 & 0.01 & 0.00 & 11.0\% & 4.4\% \\
+78 MeV & 1.01 & 0.79 & 0.00 & 0.02 & 9.4\% & 4.6\% \\
+100 MeV & 0.98 & 0.77 & -0.04 & -0.01 & 10.2\% & 5.0\% \\
+182 MeV & 0.98 & 0.76 & -0.02 & -0.03 & 10.8\% & 4.6\% \\
+231 MeV & 0.94 & 0.75 & -0.02 & -0.03 & 10.2\% & 5.2\% \\
+\addlinespace
+\multicolumn{7}{l}{\emph{Conditional GP uncertainty}} \\
+65 MeV & 2.65 & 1.01 & 0.01 & -0.02 & 30.6\% & 10.4\% \\
+71 MeV & 2.34 & 1.01 & -0.08 & -0.09 & 32.2\% & 12.2\% \\
+78 MeV & 2.07 & 1.00 & 0.04 & 0.04 & 25.0\% & 8.6\% \\
+100 MeV & 1.88 & 0.97 & 0.02 & -0.01 & 24.0\% & 11.6\% \\
+182 MeV & 1.85 & 1.05 & -0.02 & -0.01 & 22.0\% & 8.2\% \\
+231 MeV & 2.01 & 0.98 & 0.06 & 0.04 & 25.0\% & 8.8\% \\
+\addlinespace
+\multicolumn{7}{l}{\emph{GP retrained on sidebands}} \\
+65 MeV & 2.41 & 0.95 & -0.43 & -0.13 & 36.0\% & 11.8\% \\
+71 MeV & 2.32 & 0.96 & -2.33 & -0.81 & 69.8\% & 29.0\% \\
+78 MeV & 1.88 & 0.91 & -0.01 & 0.03 & 26.4\% & 8.2\% \\
+100 MeV & 1.87 & 1.01 & -0.00 & 0.00 & 26.0\% & 9.8\% \\
+182 MeV & 1.71 & 0.95 & -0.24 & -0.14 & 28.4\% & 13.0\% \\
+231 MeV & 1.99 & 0.96 & -0.73 & -0.26 & 38.0\% & 13.6\% \\
+\addlinespace
+\bottomrule\end{tabular}
+\caption{Conditional 2021 toy diagnostics. Each cell uses 500 spectra; the fixed and profiled methods are paired on the same spectra. The stronger injection is five times the reference profiled Fisher error, with the same yield for both methods. Exclusion means $CL_s(A_{\rm true})<0.1$. Binomial intervals and both injection strengths are shown in the figures and retained in the CSV.}
+\label{tab:toy-summary}\end{table}
