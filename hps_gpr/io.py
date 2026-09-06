@@ -39,6 +39,15 @@ class BlindPrediction:
     blind_mask: np.ndarray  # Mask of the blind window in the full binning
 
     integral_density: float  # Counts per GeV in signal region
+    density_nsigma: float = float("nan")
+    density_window_lo: float = float("nan")
+    density_window_hi: float = float("nan")
+    density_window_width: float = float("nan")
+    density_source_lo: float = float("nan")
+    density_source_hi: float = float("nan")
+    density_source_n_bins: int = 0
+    density_source_bin_width_median: float = float("nan")
+    density_window_fully_covered: bool = False
     blind_train: Optional[Tuple[float, float]] = None  # GP training exclusion window
 
     # GP/kernel diagnostics for summary CSV/plots
@@ -51,6 +60,42 @@ class BlindPrediction:
     const_opt: float = float("nan")
     lml: float = float("nan")
     n_train: int = 0
+    n_train_low: int = 0
+    n_train_high: int = 0
+    n_full: int = 0
+    n_blind: int = 0
+    train_domain_lo: float = float("nan")
+    train_domain_hi: float = float("nan")
+    bin_width_median: float = float("nan")
+    const_init: float = float("nan")
+    const_lo: float = float("nan")
+    const_hi: float = float("nan")
+    const_at_lower: bool = False
+    const_at_upper: bool = False
+    ls_at_lower: bool = False
+    ls_at_upper: bool = False
+    optimizer_restarts: int = 0
+
+
+def _extract_constant_bounds_and_value(kernel) -> Tuple[float, float, float]:
+    """Return ConstantKernel (lower, upper, value), if present."""
+    try:
+        const = kernel.k1 if hasattr(kernel, "k1") else kernel
+        value = float(getattr(const, "constant_value"))
+        bounds = getattr(const, "constant_value_bounds", None)
+        if bounds is None or (isinstance(bounds, str) and bounds == "fixed"):
+            return value, value, value
+        lo, hi = np.asarray(bounds, dtype=float).reshape(-1)[:2]
+        return float(lo), float(hi), value
+    except Exception:
+        return float("nan"), float("nan"), float("nan")
+
+
+def _at_kernel_bound(value: float, bound: float) -> bool:
+    """Use the scan convention: within 0.1% of a positive kernel bound."""
+    if not np.isfinite(value) or not np.isfinite(bound) or bound <= 0.0:
+        return False
+    return bool(np.isclose(float(value), float(bound), rtol=1.0e-3, atol=1.0e-12))
 
 
 def _gp_model(h, kernel, **kwargs):
@@ -104,7 +149,10 @@ def _build_model(
     upper = min(last_edge, float(data_hi)) if data_hi is not None else last_edge
 
     manip = gp._hist.manipulation.rebin_and_limit(int(rebin), lower, upper)
-    return SimpleNamespace(histogram=manip(histogram))
+    return SimpleNamespace(
+        histogram=manip(histogram),
+        density_histogram=histogram,
+    )
 
 
 def _blind_pred_detail(
@@ -143,33 +191,103 @@ def _compute_integral_density(
     sigma_val: float,
     *,
     density_nsigma: float,
-) -> float:
-    """Compute counts per GeV in the configured signal-density normalization window."""
-    ax = model.histogram.axes[0]
-    vals = model.histogram.values().astype(float)
-    nb = ax.size
+    return_metadata: bool = False,
+):
+    """Compute density in the exact physical window using the uncropped histogram.
 
-    half_width = float(density_nsigma) * float(sigma_val)
-    lo, hi = float(mass) - half_width, float(mass) + half_width
-    i0 = max(0, int(ax.index(lo)))
-    i1 = min(int(nb), int(ax.index(hi)) + 1)
+    Boundary bins are weighted by their fractional overlap with
+    ``mass +/- density_nsigma * sigma_val``.  The conversion must never inherit
+    the cropped/rebinned GP support, and a source histogram that does not cover
+    the requested physical interval is rejected rather than silently clipped.
+    """
+    density_histogram = getattr(model, "density_histogram", None)
+    if density_histogram is None:
+        raise ValueError(
+            "Density computation requires an uncropped density_histogram"
+        )
 
-    if i1 <= i0:
-        i0 = max(0, min(i0, nb - 1))
-        i1 = i0 + 1
+    nsigma = float(density_nsigma)
+    sigma = float(sigma_val)
+    center = float(mass)
+    if not np.isfinite(nsigma) or nsigma <= 0.0:
+        raise ValueError("density_nsigma must be finite and positive")
+    if not np.isfinite(sigma) or sigma <= 0.0:
+        raise ValueError("sigma_val must be finite and positive")
+    if not np.isfinite(center):
+        raise ValueError("mass must be finite")
 
-    integral_counts = float(np.sum(vals[i0:i1]))
-    widths = np.asarray(ax.widths, dtype=float)
+    half_width = nsigma * sigma
+    lo, hi = center - half_width, center + half_width
+    window_width = hi - lo
 
-    if widths.ndim == 0:
-        integral_size = (i1 - i0) * float(widths)
-    else:
-        integral_size = float(np.sum(widths[i0:i1]))
+    ax = density_histogram.axes[0]
+    edges = np.asarray(ax.edges, dtype=float)
+    vals = np.asarray(density_histogram.values(), dtype=float)
+    widths = np.diff(edges)
+    if (
+        edges.ndim != 1
+        or vals.ndim != 1
+        or len(edges) != len(vals) + 1
+        or len(vals) == 0
+    ):
+        raise ValueError("Density source must be a non-empty one-dimensional histogram")
+    if (
+        not np.all(np.isfinite(edges))
+        or not np.all(np.isfinite(widths))
+        or np.any(widths <= 0.0)
+    ):
+        raise ValueError("Density source has invalid bin edges")
 
-    if not np.isfinite(integral_size) or integral_size <= 0:
-        raise ValueError("Non-positive integral_size")
+    source_lo = float(edges[0])
+    source_hi = float(edges[-1])
+    coverage_tolerance = 32.0 * np.finfo(float).eps * max(
+        1.0, abs(source_lo), abs(source_hi), abs(lo), abs(hi)
+    )
+    fully_covered = bool(
+        lo >= source_lo - coverage_tolerance
+        and hi <= source_hi + coverage_tolerance
+    )
+    if not fully_covered:
+        raise ValueError(
+            "Density source does not fully cover physical window "
+            f"[{lo:.12g}, {hi:.12g}] GeV; source is "
+            f"[{source_lo:.12g}, {source_hi:.12g}] GeV"
+        )
 
-    return float(integral_counts / integral_size)
+    overlap = np.maximum(
+        0.0,
+        np.minimum(edges[1:], hi) - np.maximum(edges[:-1], lo),
+    )
+    covered_width = float(np.sum(overlap))
+    if not np.isclose(
+        covered_width,
+        window_width,
+        rtol=1.0e-12,
+        atol=coverage_tolerance,
+    ):
+        raise ValueError(
+            "Density histogram binning does not cover the full physical window"
+        )
+
+    integral_counts = float(np.sum(vals * (overlap / widths)))
+    if not np.isfinite(integral_counts):
+        raise ValueError("Density source produced non-finite integral counts")
+
+    density = float(integral_counts / window_width)
+    metadata = {
+        "density_nsigma": nsigma,
+        "density_window_lo": float(lo),
+        "density_window_hi": float(hi),
+        "density_window_width": float(window_width),
+        "density_source_lo": source_lo,
+        "density_source_hi": source_hi,
+        "density_source_n_bins": int(len(vals)),
+        "density_source_bin_width_median": float(np.median(widths)),
+        "density_window_fully_covered": fully_covered,
+    }
+    if return_metadata:
+        return density, metadata
+    return density
 
 
 def estimate_background_for_dataset(
@@ -179,6 +297,9 @@ def estimate_background_for_dataset(
     rebin: int = None,
     restarts: int = None,
     train_exclude_nsigma: Optional[float] = None,
+    *,
+    kernel=None,
+    optimize: bool = True,
 ) -> BlindPrediction:
     """Estimate background for a dataset at a given mass.
 
@@ -192,6 +313,9 @@ def estimate_background_for_dataset(
             Defaults to config.gp_train_exclude_nsigma (or config.blind_nsigma if
             gp_train_exclude_nsigma is None). The extraction blind window always uses
             config.blind_nsigma; only the GP training mask is affected.
+        kernel: Optional explicit kernel. This is used to reconstruct a reviewed
+            observed GP state for conditional ensembles.
+        optimize: If False, keep the explicit kernel hyperparameters fixed.
 
     Returns:
         BlindPrediction with background estimates
@@ -226,8 +350,19 @@ def estimate_background_for_dataset(
     X_train = X[mask_train]
     y_train = y[mask_train]
 
-    gpr = fit_gpr(X_train, y_train, config, restarts=int(restarts),
-        kernel=make_kernel_for_dataset(ds, config, mass=float(mass)))
+    kernel_used = (
+        make_kernel_for_dataset(ds, config, mass=float(mass))
+        if kernel is None
+        else kernel
+    )
+    gpr = fit_gpr(
+        X_train,
+        y_train,
+        config,
+        restarts=int(restarts),
+        kernel=kernel_used,
+        optimize=bool(optimize),
+    )
 
     mu_blind, cov_blind, obs_blind, edges_blind = _blind_pred_detail(
         model, gpr, blind, config
@@ -238,24 +373,28 @@ def estimate_background_for_dataset(
     density_nsigma = float(
         getattr(config, "eps2_density_nsigma", None) or config.blind_nsigma
     )
-    integral_density = _compute_integral_density(
+    integral_density, density_metadata = _compute_integral_density(
         model,
         mass,
         sigma_val,
         density_nsigma=density_nsigma,
+        return_metadata=True,
     )
 
-    # Kernel diagnostics for scan summary outputs
-    ls_lo = ls_hi = ls_init = sigma_x = float("nan")
+    # Kernel diagnostics for scan summary outputs. Read the actual kernel used
+    # by sklearn so explicit per-dataset overrides cannot be misreported.
+    kernel_initial = getattr(gpr, "kernel", None)
+    ls_lo, ls_hi, ls_init = _extract_rbf_bounds_and_scale(kernel_initial)
+    sigma_x = float("nan")
     try:
         ls_info = compute_kernel_ls_bounds(ds, config, mass=float(mass))
-        ls_lo = float(ls_info.get("ls_lo", float("nan")))
-        ls_hi = float(ls_info.get("ls_hi", float("nan")))
-        ls_init = float(ls_info.get("ls_init", float("nan")))
         sigma_x = float(ls_info.get("sigma_x", float("nan")))
     except Exception:
         pass
 
+    const_lo, const_hi, const_init = _extract_constant_bounds_and_value(
+        kernel_initial
+    )
     const_opt = float("nan")
     ls_opt = float("nan")
     lml = float("nan")
@@ -263,7 +402,9 @@ def estimate_background_for_dataset(
         kopt = getattr(gpr, "kernel_", None)
         if kopt is not None and hasattr(kopt, "k1"):
             const_opt = float(getattr(kopt.k1, "constant_value", float("nan")))
-        _, _, ls_opt = _extract_rbf_bounds_and_scale(kopt if kopt is not None else gpr.kernel)
+        _, _, ls_opt = _extract_rbf_bounds_and_scale(
+            kopt if kopt is not None else gpr.kernel
+        )
     except Exception:
         pass
 
@@ -271,6 +412,12 @@ def estimate_background_for_dataset(
         lml = float(gpr.log_marginal_likelihood_value_)
     except Exception:
         pass
+
+    edges_full = np.asarray(model.histogram.axes[0].edges, float)
+    widths_full = np.diff(edges_full)
+    blind_mask = np.asarray((X >= blind[0]) & (X <= blind[1]), bool)
+    n_train_low = int(np.count_nonzero(X < blind_train[0]))
+    n_train_high = int(np.count_nonzero(X > blind_train[1]))
 
     return BlindPrediction(
         mu=mu_blind,
@@ -282,9 +429,10 @@ def estimate_background_for_dataset(
         x_full=np.asarray(X, float),
         y_full=np.asarray(y, float),
         mu_full=np.asarray(mu_full, float),
-        edges_full=np.asarray(model.histogram.axes[0].edges, float),
-        blind_mask=np.asarray((X >= blind[0]) & (X <= blind[1]), bool),
+        edges_full=edges_full,
+        blind_mask=blind_mask,
         integral_density=integral_density,
+        **density_metadata,
         blind_train=blind_train,
         kernel_str=str(getattr(gpr, "kernel_", "")),
         ls_lo=ls_lo,
@@ -295,4 +443,21 @@ def estimate_background_for_dataset(
         const_opt=const_opt,
         lml=lml,
         n_train=int(np.count_nonzero(mask_train)),
+        n_train_low=n_train_low,
+        n_train_high=n_train_high,
+        n_full=int(len(X)),
+        n_blind=int(np.count_nonzero(blind_mask)),
+        train_domain_lo=float(edges_full[0]) if edges_full.size else float("nan"),
+        train_domain_hi=float(edges_full[-1]) if edges_full.size else float("nan"),
+        bin_width_median=(
+            float(np.median(widths_full)) if widths_full.size else float("nan")
+        ),
+        const_init=const_init,
+        const_lo=const_lo,
+        const_hi=const_hi,
+        const_at_lower=_at_kernel_bound(const_opt, const_lo),
+        const_at_upper=_at_kernel_bound(const_opt, const_hi),
+        ls_at_lower=_at_kernel_bound(ls_opt, ls_lo),
+        ls_at_upper=_at_kernel_bound(ls_opt, ls_hi),
+        optimizer_restarts=int(restarts) if optimize else 0,
     )

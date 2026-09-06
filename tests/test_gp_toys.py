@@ -48,7 +48,7 @@ def test_draw_full_background_toy_fixed_total_preserves_total_and_handles_zero_m
 
 
 def test_integral_density_defaults_to_blind_width_and_allows_legacy_override(monkeypatch):
-    toy_hist = _make_hist([1, 10, 1, 10, 1, 10], lo=0.0, hi=6.0)
+    toy_hist = _make_hist([1, 2, 4, 8, 16, 32], lo=0.0, hi=6.0)
     ds = DatasetConfig(
         key="2015",
         label="HPS 2015",
@@ -63,7 +63,7 @@ def test_integral_density_defaults_to_blind_width_and_allows_legacy_override(mon
 
     import hps_gpr.io as io_mod
 
-    fake_model = SimpleNamespace(histogram=toy_hist)
+    fake_model = SimpleNamespace(histogram=toy_hist, density_histogram=toy_hist)
     fake_gpr = SimpleNamespace(kernel_=None, kernel=None, log_marginal_likelihood_value_=0.0)
     monkeypatch.setattr(io_mod, "_build_model", lambda *args, **kwargs: fake_model)
     monkeypatch.setattr(io_mod, "fit_gpr", lambda *args, **kwargs: fake_gpr)

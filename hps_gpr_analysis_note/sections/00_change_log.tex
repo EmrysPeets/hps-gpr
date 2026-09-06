@@ -1,0 +1,129 @@
+\section*{Change Log}
+\phantomsection
+\addcontentsline{toc}{section}{Change Log}
+\label{sec:change-log}
+
+This page records the analysis-level changes between circulated versions of the note.
+It is not a substitute for the configuration and figure provenance given in the body
+and appendices. Numerical results from different versions should not be combined: each
+version corresponds to a distinct, internally consistent analysis state.
+
+\begingroup
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.04}
+\setlength{\LTleft}{\fill}
+\setlength{\LTright}{\fill}
+\begin{longtable}{P{0.11\textwidth}P{0.16\textwidth}P{0.64\textwidth}}
+\caption{Analysis-note version history. The v4.2 row defines the accepted
+analysis result and the follow-up row defines the additional diagnostic scope
+of the present document. Earlier versions are summarized to keep changes in
+inputs, validation, and statistical interpretation traceable to reviewers.}
+\label{tab:note-change-log}\\
+\toprule
+Version & Circulation date & Principal changes \\
+\midrule
+\endfirsthead
+\multicolumn{3}{l}{\footnotesize\itshape Table~\ref{tab:note-change-log}
+continued from the previous page.}\\
+\toprule
+Version & Circulation date & Principal changes \\
+\midrule
+\endhead
+\midrule
+\multicolumn{3}{r}{\footnotesize\itshape Continued on the next page.}\\
+\endfoot
+\bottomrule
+\endlastfoot
+v1 & March--May 2026 &
+Established the full-range Gaussian-process background model, the blinded local
+signal-extraction likelihood, the radiative-fraction conversion to $\eps^2$, and the
+first single-dataset and combined validation studies. The figures in this version were
+development results and did not define the present candidate configuration. \\
+\addlinespace
+v2 & June 2026 &
+Introduced the $2.25\,\sigma_m$ blind/training geometry, matched-reference full-refit
+pseudoexperiments, the shared-$\eps^2$ simultaneous likelihood, and expanded 2015,
+2016, and 2021 method documentation. This version used common or development-stage
+length-scale choices and retained broader engineering-run scan ranges in several
+studies. \\
+\addlinespace
+v3 & July 10, 2026 &
+Uses the regenerated 2021 1\% high-$p_{\mathrm{sum}}$ histogram, with no vertex-fit
+$\chi^2$ requirement and at least eight electron-track hits; restricts the 2015 and
+2016 scans to \SIrange{19}{90}{MeV} and \SIrange{39}{180}{MeV}; freezes the
+dataset-dependent lower length-scale factors at 1.0, 0.9, and 1.1; and adopts 90\% CL
+upper limits obtained with \CLs{}. The main validation section now contains the
+functional-form seed construction and the injected-signal lower-bound scans, while
+superseded closure and limit studies are retained with their original context in the
+appendices. The results section documents the individual and simultaneous limits,
+local and approximate global $p$-values, and all remaining pre-unblinding audit
+qualifications. \\
+\addlinespace
+v4 & August 3, 2026 &
+Separates the GP fit support from the signal-search interval in all three campaigns.
+The 2015 and 2016 searches keep their reviewed mass grids but regain sidebands beyond
+both endpoints, while the 2021 10\% sample retains the wider support developed in the
+recent endpoint study. The result now uses the full 2015 and 2016 datasets in the
+shared-$\eps^2$ fit and includes conditional background-only expected bands. The same
+pseudoexperiments place the observed limit within the ensemble through the strong-,
+weak-, and bounded two-sided consistency tests used in v3. Those quantities remain
+upper-limit diagnostics rather than discovery significances or a substitute for
+full-procedure coverage. \\
+\addlinespace
+v4.1 & August 4--5, 2026 &
+Responds to the full-2016 length-scale saturation with a controlled observed-only
+scan of $k_{\max,2016}=8,10,12,15,$ and 20. Factor 12 is the first nonbinding value
+and is followed by a stable plateau. The exact combined observed limit and local
+asymptotic $p_0$ scan are recomputed with all other analysis settings fixed. A
+ten-toy 2021 source-and-exposure screen---native 1\%, $1\%\times10$,
+$1\%\times100$, native 10\%, and $10\%\times10$---is included only as a fit-space
+hyperparameter pilot. Its reviewed background-only scan supports factor 20 for the two
+projected-100\% lanes and factor 25 if one bound must cover every pilot exposure;
+the fixed-amplitude screen shows no factor-20 sensitivity loss, while a common 2--3\%
+under-response remains an unresolved ten-toy closure diagnostic. No new expected
+bands, limit-tail ensemble result, toy-calibrated discovery claim, or coverage claim
+is included; the observed result remains a candidate pending production-matched
+closure and direct coverage. The August 5 methodology revision adds explanatory
+schematics for $C$, $\ell$, fixed $\alpha_i$, and the per-hypothesis optimization;
+it changes no configuration or numerical result. \\
+\addlinespace
+v4.2 & August 5, 2026 &
+Accepts $k_{\max,2016}=12$ as the current full-2016 setting and completes the
+232-mass combined 90\% \CLs{} search with exactly 300 conditional background-only
+joint pseudoexperiments at each mass. Central 68\% and 95\% intervals are
+reported for that principal shared-$\eps^2$ search. The note also adds
+standalone observed limits for the individual 2015 full, 2016 full, and 2021
+10\% distributions, auxiliary 100-pseudoexperiment standalone and pairwise
+conditional limit bands, the combined strong-, weak-, and bounded two-sided
+limit-tail diagnostics, and combined and constituent local asymptotic $p_0$
+plots. The auxiliary ensembles select indices 0--99 from the accepted
+300-draw parent stream and reuse campaign pseudo-spectra across scopes. No
+scan-toy-calibrated global discovery probability or direct coverage claim is
+introduced; all bands remain descriptive quantiles conditional on the reviewed
+fixed GP states. The results section also
+adds an exact fixed-state 65~MeV extraction, including sideband context,
+background-subtracted spectra, conditional Pearson-residual diagnostics, and a
+comparison of the three standalone signal estimates with the simultaneous
+shared-$\eps^2$ fit. \\
+\addlinespace
+v4.2 follow-up & August 6, 2026 &
+Adds the observed-equivalent comparison with the published BaBar visible
+90\% limit while scaling only the 2021 count-density response from 10\% to
+100\% statistics.  It adds an exact fixed-mass 0.5~MeV common-binning refit
+and 1.25~MeV stress test after documenting why exact 0.625~MeV aggregation is
+not possible from the histogram-only 2015 and 2016 inputs.  The Figure~62
+coefficient panel now uses the physical-domain nominal asymptotic profile set
+instead of a symmetric signed-Wald bar.  A separate appendix records two
+fixed-seed, background-only conditional replacements of the 2021 central
+window, their complete observed/asymptotic scans, and optimizer-repeat
+ledgers.  A deterministic central-mean follow-up separates the functional
+truth/GP-analysis shoulder below 65~MeV from the additional fluctuation in its
+fixed draw.  Ten paired fixed-GP-mean replacements compare the exactly
+equivalent 2.25/2.5-$\sigma_m$ production-bin scope with a 3-$\sigma_m$
+scope, reporting only descriptive observed-limit and local-$p_0$ summaries.
+This addendum changes no accepted v4.2 card or principal result, adds no
+projected bands or projected $p$-values, and introduces no coverage or
+scan-calibrated global-significance claim. \\
+\end{longtable}
+\endgroup

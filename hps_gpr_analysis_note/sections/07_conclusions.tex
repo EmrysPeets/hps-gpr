@@ -1,62 +1,120 @@
 \section{Conclusions and Outlook}
 \label{sec:conclusions}
 
-This note documents a coherent GPR-based framework for the HPS narrow prompt
-$A^\prime \rightarrow e^+e^-$ search. The workflow now ties the detector-era inputs,
-mass-resolution parameterizations, radiative-fraction normalization, log-count GP
-background model, local profiled signal extraction, \CLs\ limit setting, and
-shared-$\eps^2$ combination into one reviewable chain.
+Version 4.2 adopts the factor-12 upper length-scale setting for the full 2016
+sample and completes the corresponding three-campaign result. The search
+intervals and wider GP supports remain 19--90 and 14--135~MeV for 2015, 39--180
+and 30--210~MeV for 2016, and 50--250 and 40--300~MeV for 2021. The full 2015
+and 2016 samples and the 2021 10\% sample enter a shared-$\eps^2$ likelihood.
 
-The validation suite supports the current blind-window and extraction choices with
-several complementary studies. The training-exclusion scan shows why the GP sidebands
-should begin outside approximately $2.25\,\sigma_m$ rather than immediately outside a
-narrow $1.64\,\sigma_m$ blind region. The refmatched 2015 blind-geometry comparison
-then shows that a $2.25\,\sigma_m$ blind/extraction window gives similar closure to the
-$1.64\,\sigma_m$ blind plus $2.25\,\sigma_m$ guard construction while retaining better
-expected reach. The length-scale lower-bound scan motivates the selected $1\sigma$
-stability bound, and the functional-form seed panels document the analytic backgrounds
-used for the smooth-spectrum toy ensembles. The dataset-level refmatched full-refit
-closure panels for 2015, 2016 10\%, and 2021 1\% document the corresponding pull
-calibration and residual significance calibration.
+The adopted setting follows the controlled factor-8, 10, 12, 15, and 20 range
+study. The v4 ceiling is occupied at all 142 full-2016 hypotheses; factor 10
+remains occupied at 56, while factors 12, 15, and 20 have no occupied
+hypotheses. Factor 12 is the first nonbinding value and is followed by a stable
+plateau in log marginal likelihood, observed yield limits, and local $Z$.
+Repeated actual fits resolve the reviewed branches, and no GP state, limit, or
+$p$-value is interpolated. The rule does not select whichever observed limit is
+tighter or whichever local $p_0$ is smaller.
 
-The current staged internal-review result is the corrected
-2015$+$2016 10\%$+$2021 1\% simultaneous shared-$\eps^2$ analysis. The individual
-dataset limits and local $p_0$ scans are shown as diagnostic inputs, but the combined
-limit is obtained from the joint profiled likelihood rather than from an envelope of
-single-dataset curves. The observed extraction display at \SI{119}{MeV} provides a
-concrete check of how the dataset-level fits enter the shared-coupling result.
+The exact 415-state reconstruction is finite on all 232 combined hypotheses.
+For the combined search, 300 shared mass-local conditional background-only
+pseudoexperiments provide the median and central limit quantiles. They retain the
+reviewed GP states without refitting and use the same asymptotic inner 90\%
+\CLs{} construction as the observed limit. The observed-to-median ratio ranges
+from 0.514396 at 73~MeV to 3.29400 at 65~MeV. The corresponding mass-local tail
+counts reach $0/300$ on the strong side at 71--73~MeV and on the weak side at
+21, 65, and 66~MeV; a zero count is finite ensemble resolution, not an exact
+probability.
 
-The full-statistics curves remain projections. They are useful for comparing the
-expected reach of the GPR strategy with the published HPS prompt result and the BaBar
-visible-dark-photon contour, but they are not observed full-statistics exclusions. The
-local/global significance overlays shown in the note are likewise review diagnostics;
-any final discovery statement should use a frozen scan-level toy calibration of the
-maximum discovery statistic.
+The individual full-2015, full-2016, and 2021 10\% observed limits are reported
+alongside the combined result. Auxiliary 100-pseudoexperiment conditional bands
+document each standalone likelihood and each pairwise shared-$\eps^2$
+combination. They select the first 100 entries from the accepted
+300-pseudoexperiment parent stream, reuse campaign draws across scopes, and are
+not used as direct-coverage or scan-wide discovery ensembles. The smallest
+campaign-level asymptotic $p_0$ values are
+$8.46283\times10^{-4}$ at 51~MeV, $3.08781\times10^{-4}$ at 90~MeV, and
+$1.05702\times10^{-5}$ at 65~MeV, respectively. The combined minimum is
+$3.25918\times10^{-5}$ at 65~MeV ($Z=3.99321$). With
+$N_{\mathrm{eff}}=35.3814$, the fixed-card analytic \v{S}id\'ak reference is
+$p=0.00115250$ ($Z=3.04783$).
 
-\begin{figure}[H]
-\centering
-\graphicorplaceholder{0.98\linewidth}{final_limit_projection_figs/90cls/projections/projected_gpr_phase_space_context.png}
-\caption{Projected full-data HPS GPR reach in the same visible-dark-photon phase space
-as Fig.~\ref{fig:hps-engineering-phase-space}. The subdued world-data contours include
-BaBar, KLOE/KLOE-2, A1/MAMI, APEX, NA48/2, HADES, PHENIX, NA64, LHCb, and the older
-beam-dump or low-mass constraints from E137, E141, E774, Orsay, KEK, and U70
-\cite{BaBarDarkPhoton2014,KLOE2013,KLOE22015,A1MAMI2014,APEX2011,
-NA48DarkPhoton2015,HADESDarkPhoton2014,PHENIXDarkPhoton2015,NA64DarkPhoton2018,
-NA64X17Visible2021,LHCbDarkPhoton2020,E137BeamDump1988,E141BeamDump1987,
-E774BeamDump1991,OrsayBeamDump1989,KEKBeamDump1986,U70DarkPhoton2014}; the thermal
-relic band is shown as a benchmark target \cite{EssigEtAl2011}. The thick purple curve
-is this work's projected full-unblinded 90\% CL GPR observed-equivalent reach, obtained
-from the current combined 90\% CL result by applying the full-density scaling described
-in the projection workflow; the dashed purple curve shows the corresponding projected
-median. The highlighted HPS 2015 and 2016 engineering-run contours are the same
-approximate 90\% CL rescalings shown in Fig.~\ref{fig:hps-engineering-phase-space}
-\cite{HPS2015DarkPhoton,HPS2016PromptLong}.}
-\label{fig:gpr-projected-phase-space}
-\end{figure}
+The exact 65~MeV extraction gives
+$\widehat{\eps^2}=(6.42706\pm1.61009)\times10^{-6}$. Its dataset-block
+decomposition shows that the localized feature is predominantly carried by the
+2021 10\% sample, is modestly supported by 2015, and is opposed by 2016 at the
+common-coupling yield. The displayed background-subtracted spectra and profiled
+residuals document this structure without treating individual bins as independent
+significances.
 
-The remaining work is well bounded. The final production pass should freeze the full
-2016 and 2021 inputs, finalize the radiative-fraction and systematic-penalty model,
-regenerate the complete toy-tail and scan-level look-elsewhere calibration tables, and
-rerender the note figures from the same production outputs used for the final
-unblinding. With those pieces in place, the framework documented here is ready to
-support the first fully combined HPS GPR prompt-resonance result.
+The August 6 follow-ups leave that accepted result unchanged.  Exact common
+0.625~MeV inference bins cannot be constructed from the histogram-only 2015 and
+2016 inputs; the finer nearest source-compatible choice that retains all three
+full supports is 0.5~MeV, and its refit gives
+$Z_{\mathrm{local}}=3.85429$, a fixed-mass shift of $-0.13892$, with an
+essentially unchanged Wald scale.  The repaired coefficient display identifies
+the former negative 2016 endpoint as a signed-Wald convention and instead shows
+the nominal physical profile set $[0,4.08001]\times10^{-6}$.  The
+observed-equivalent 2021-statistics response can be numerically lower than the
+published BaBar visible contour, but it preserves current fluctuations and is
+not an expected sensitivity or a future full-data result.  Finally, both
+fixed-seed background replacements remove the positive estimate specifically
+at 65~MeV; their full-scan boundary excursions remain conditional local
+diagnostics rather than global-null claims.  The lower-mass shoulder in the
+functional-form draw is not purely statistical: the deterministic functional
+mean gives $Z=2.268$ at 61~MeV under the GP analysis, while the particular
+draw moves the maximum to 62~MeV and raises it to $Z=3.690$.  In the separate
+fixed-GP-mean ten-draw screen, the 2.25- and 2.5-$\sigma_m$ requests are the
+same sixteen production bins.  The 3-$\sigma_m$ replacement gives a paired
+median 65~MeV limit ratio of 1.17957 relative to that common narrow scope; the
+reported ribbons are descriptive conditional spreads, not expected bands.
+
+The conditional limit ensemble does not establish direct \CLs{} coverage, refit
+the GP, or supply a scan-wise discovery calibration. The analytic \v{S}id\'ak
+reference likewise does not account for the observed-data upper-bound study.
+Factor 12 is accepted for the v4.2 result, while the post-selection and coverage
+qualifications remain explicit.
+
+A ten-toy 2021 source-and-exposure pilot now exercises the paired Poisson generator,
+production-geometry GP refit, and hyperparameter export for five declared scenarios:
+native 1\%, $1\%\times10$, $1\%\times100$, native 10\%, and $10\%\times10$.
+The native-10\% support total is 11.296 times the native-1\% total, so the
+$1\%\times10$ versus native-10\% comparison probes source/selection shape and native
+normalization rather than a pure exposure scaling. The observed comparisons also move
+downward with data fraction: the median $\ell_{\mathrm{opt}}/\sigma_x$ changes from
+10.782 to 9.716 between 2016 10\% and full data on the factor-12 card, and from
+13.061 to 12.060 between 2021 1\% and 10\% on the factor-15 card. Higher statistics
+therefore do not imply a longer optimized scale.
+
+After actual-fit optimizer review, factor 15 truncates the two projected-100\% lanes,
+whereas factors 20 and 25 are nonbinding and form the likelihood plateau. Factor 20
+is the provisional upper ceiling for the 2021 100\%-statistics projection. If one
+ceiling must instead cover all five pilot exposures, the native-1\% boundary contact
+at factor 20 makes factor 25 the first universally nonbinding tested value. Both
+statements are background-only pilot conclusions, not production-card freezes.
+
+The factor-15-anchored fixed-amplitude screen shows no factor-20 sensitivity loss in
+the projected lanes: three fitted-$\sigma_A$ ratios are unity to the quoted precision,
+and the alternate native-10\%$\times10$ lane improves by 1.43\%. The four factor-20
+paired-response medians lie between 0.971921 and 0.979603 and are essentially unchanged
+at factors 15 and 25. The common 2--3\% under-response is therefore not caused by
+lifting the upper bound. With ten toys it remains an unresolved closure diagnostic,
+not a calibrated bias claim. The pilot itself constructs no expected-limit band or
+coverage result, and its unused $q_\mu$ and immutable-path $\eps^2$ outputs are
+non-promotable.
+
+The production follow-up should use a predeclared larger ensemble, retain paired toy
+identifiers within each truth-source scaling family and across upper-bound settings,
+and include independent smooth truth families and injected-signal closure. Its
+principal outputs should remain $\ell_{\mathrm{opt}}/\sigma_x$,
+$\ell_{\mathrm{opt}}/\ell_{\max}$, boundary occupancy, log marginal likelihood,
+repeat stability, background bias, pull, and signal recovery versus exposure. Only
+that larger closure study can support a frozen numerical range; direct limit coverage
+remains a separate post-freeze requirement.
+
+Production-faithful functional-form closure and direct limit coverage should be
+rerun under a card frozen independently of observed limit direction or local
+significance. A separate scan-wise
+background-only maximum-$q_0$ ensemble would be required for a toy-calibrated global
+discovery statement. The eventual full-2021 observed spectrum remains a new analysis
+input, not a deterministic scale factor applied to the present 10\% observation.

@@ -1,130 +1,196 @@
-\section{Additional Kernel Studies}
+\section{Historical Kernel and Piecewise Studies}
 \label{app:kernel-studies}
 
-This appendix is reserved for non-baseline kernel robustness studies. The production
-workflow documented in the main text uses the single Constant$\times$RBF model of
-Section~\ref{sec:kernel-choice}; alternative kernels are treated only as cross-checks,
-not as competing headline methods.
+The production workflow in the main text uses a Constant$\times$RBF covariance model
+with resolution-scaled, dataset-dependent length-scale bounds. This appendix records
+earlier global, piecewise, and alternative-kernel studies. They are method-development
+cross-checks, not competing result lanes and not inputs to the v3 upper limit.
 
-The first comparison to be frozen here will be a Constant$\times$Mat\'ern$(\nu=3/2)$
-study with the same resolution-scaled length-scale bounds used by the baseline model.
-That choice isolates one physically relevant assumption, namely the degree of smoothness
-allowed in the continuum background, without changing the overall stationary
-smooth-background prior class.
+\subsection{Covariance and uncertainty propagation}
 
-When the comparison suite is finalized, this appendix will summarize the resulting
-shifts in blind-window mean and covariance, fitted signal yield, pull mean and width,
-coverage, and expected $\eps^2$ limits relative to the production RBF baseline.
-Earlier piecewise-window variants and wider/narrower length-scale-bound studies will
-also be collected here once their note-quality exports are frozen.
-\subsection{Uncertainty Propagation}
+Predictive and statistical uncertainties may be added only when they are expressed as
+covariances in the same variable. If $\bm C_{\mathrm{model}}$ is a conditioned
+background covariance and $\bm C_{\mathrm{stat}}$ is an independent observation-noise
+covariance in that same representation, then
+\begin{equation}
+\bm C_{\mathrm{tot}}
+=
+\bm C_{\mathrm{model}}+\bm C_{\mathrm{stat}},
+\qquad
+\sigma_{\mathrm{tot},i}
+=
+\sqrt{(\bm C_{\mathrm{tot}})_{ii}} .
+\label{eq:appendix-covariance-addition}
+\end{equation}
+Standard deviations are not added under the square root. For a GP with training
+covariance $\bm K$, cross-covariance $\bm K_*$, test covariance $\bm K_{**}$, and
+heteroscedastic training-noise covariance $\bm\Sigma_n$, the latent predictive
+covariance is
+\begin{equation}
+\bm C_f
+=
+\bm K_{**}
+-\bm K_*^\mathsf{T}
+  (\bm K+\bm\Sigma_n)^{-1}
+  \bm K_* .
+\label{eq:appendix-gp-predictive-covariance}
+\end{equation}
+The production implementation assigns sideband statistical noise in the GP training
+covariance and propagates the conditioned prediction to count space. An additional
+WhiteKernel variance must therefore not be added again unless it represents a distinct
+noise contribution in the same space.
 
-The total uncertainty $\sigma_{total}$ is calculated as
+\subsection{Kernel definitions}
 
-$\sigma_{total} = \sqrt{\sigma_{model} + \sigma_{n}}$
+For $r_{ij}=|x_i-x_j|$, the Constant$\times$RBF kernel used by the baseline is
+\begin{equation}
+k_{\mathrm{RBF}}(x_i,x_j)
+=
+\sigma_f^2
+\exp\!\left[-\frac{r_{ij}^2}{2\ell^2}\right].
+\label{eq:appendix-rbf}
+\end{equation}
+Its differentiability encodes a very smooth continuum prior; the allowed scale
+$\ell$ is restricted as described in Section~\ref{sec:length-scale}.
 
-where $\sigma_{model}$ is the predictive variance of the GP and $\sigma_n$ is the Poisson statistical uncertainty, typically modeled in our studies with a WhiteKernel. The predictive variance of the GP is found
-$\sigma_{model}^2(x_*) = k(x_*, x_*) - k_*^T \left( K + \sigma_n^2 I \right)^{-1} k_*$
-where K is the covariance between training points, $k_*$ is the covariance between a test point and training points. $k(x_*,x_*)$ is the prior variance of the GP at $x_*$.
+The Mat\'ern family is
+\begin{equation}
+k_\nu(r)
+=
+\sigma_f^2
+\frac{2^{1-\nu}}{\Gamma(\nu)}
+\left(\frac{\sqrt{2\nu}\,r}{\ell}\right)^\nu
+K_\nu\!\left(\frac{\sqrt{2\nu}\,r}{\ell}\right),
+\end{equation}
+where $K_\nu$ is the modified Bessel function of the second kind. The exploratory
+\texttt{Matern32} model corresponds to
+\begin{equation}
+k_{3/2}(r)
+=
+\sigma_f^2
+\left(1+\frac{\sqrt{3}\,r}{\ell}\right)
+\exp\!\left(-\frac{\sqrt{3}\,r}{\ell}\right).
+\end{equation}
+It permits rougher sample functions than the RBF kernel.
 
-\subsection{Kernels Definition}
-All kernels used in these studies will be defined in this section.
-\subsubsection{Radial Basis Function (RBF)}
-$k(x_i, x_j) = \exp\left(-\frac{d(x_i, x_j)^2}{2l^2}\right)$
+For reference, a white-noise covariance and the historical dot-product kernel are
+\begin{align}
+k_{\mathrm{white}}(x_i,x_j)
+&=\sigma_w^2\,\delta_{ij},\\
+k_{\mathrm{dot}}(x_i,x_j)
+&=\sigma_0^2+x_i^\mathsf{T}x_j.
+\end{align}
+The latter reduces to a homogeneous linear kernel when $\sigma_0=0$.
 
+\subsection{Initial global fit of the 2016 10\% sample}
 
-The RBF kernel is defined by a length scale parameter $l$ and Euclidian distance $d(.,.)$ between measurements $x_i$ and $x_j$. Because it is infinitely differentiable, the RBF kernel models smoothness, and thus is very useful in GPR of mass distributions.
-\subsubsection{Matern}
-$C_{\nu}(d) = \sigma^2 \frac{2^{1-\nu}}{\Gamma(\nu)} \left( \sqrt{2\nu} \frac{d}{\rho} \right)^{\nu} K_{\nu}\left( \sqrt{2\nu} \frac{d}{\rho} \right)$
+An early global model used an RBF kernel multiplied by a dot-product kernel and added a
+white-noise term. This construction gave an adequate descriptive fit but was unstable
+when reused across the local upper-limit scan. It is preserved only as historical
+motivation for the later stationary Constant$\times$RBF baseline and local
+blind-window procedure. The lower panel of the historical export shows standardized
+residuals, which were used to judge the overall descriptive fit; satisfactory global
+residuals were not sufficient to ensure stable interpolation at every scanned mass.
 
-
-The Matern kernel defines the covariance between two measurements using the distance $\nu$ between them. $\Gamma$ is the Gamma function and $K_\nu$ is a modified Bessel function of the second kind.
-
-$K_{\nu}(x) = \frac{1}{2} \int_{0}^{\infty} t^{\nu - 1} \exp\left(-\frac{x}{2}\left(t + \frac{1}{t}\right)\right) , dt$
-
-\subsubsection{WhiteKernel}
-$k(x_i, x_j) = noise\_level$ if $x_i == x_j$ else 0
-
-WhiteKernel captures the normally-distributed variance or noise of a signal. It takes one parameter $noise\_level$ which controls the variance of the kernel. 
-
-\subsubsection{DotProduct}
-$k(x_i, x_j) = \sigma_0^2 + x_i + x_j$
-
-The DotProduct parameter $\sigma_0$ is set to zero for these studies, resulting in a homogeneous linear kernel, used to model linear components in distributions.
-
-\subsection{Initial Global Fitting of 2016 Datasets}
-
-Initial studies were global fits, in which a single GPR model was trained over the entire dataset. A combination of kernels was used. The original kernel consisted of an RBF kernel, multiplied by a linear kernel, with an added WhiteNoise kernel. This was meant to capture the linear trend in the dataset due to detector mass resolution while accounting for statistical uncertainty.
-
-\begin{figure}
-    \centering
-    \includegraphics[width=0.86\linewidth]{appendix_figs/2016_10pct_whitenoisefit.png}
-    \caption{Fit with a kernel consisting of a RBF kernel, multiplied by a linear kernel, with an added WhiteNoise kernel on the 2016 10\% dataset, with standardized residual.}
-    \label{fig:appendix-whitenoisefit-2016}
+\begin{figure}[p]
+\centering
+\includegraphics[width=0.96\linewidth]{appendix_figs/2016_10pct_whitenoisefit.png}
+\caption{Historical global fit to the 2016 10\% sample using an RBF kernel multiplied
+by a linear DotProduct kernel, with an added WhiteKernel term. The lower panel gives
+the standardized residuals used in the original study to assess the fit. Although the
+global description was acceptable, repeated use in the mass scan was unstable; the
+figure therefore motivates the later local excluded-window construction and is not the
+v3 Constant$\times$RBF background model.}
+\label{fig:appendix-whitenoisefit-2016}
 \end{figure}
 
-This global model represented an acceptable fit of the mass distribution, but lent itself to instability during applications in setting upper limits and calculating p-values.
+\subsection{Historical piecewise fitting and kernel weighting}
 
-\subsection{Piecewise Fitting and Kernel "Softmax"}
+The subsequent piecewise study trained a separate GP around each mass hypothesis,
+withholding a central region from the background fit. Its kernel ensemble converted
+the log marginal likelihood $\ell_k$ of each candidate $K_k$ to
+\begin{equation}
+w_k
+=
+\frac{\exp(\ell_k-\max_j\ell_j)}
+{\sum_j\exp(\ell_j-\max_j\ell_j)}.
+\end{equation}
+A kernel was then sampled from these weights before producing a blind-region
+prediction. This model-averaging experiment predates the frozen single-kernel
+likelihood and is not used in the current scan. The sampling step made the inferred
+background depend on both candidate-kernel likelihoods and a stochastic kernel choice;
+the v3 analysis instead freezes one kernel family and validates its bounded length
+scale with pseudoexperiments.
 
-A piecewise approach was introduced due to the unreliability of global fitting. In this method, the data was separated into sections surrounding a mass hypothesis mA'. Each section, with an A' at its center, would be fit by a distinct GP model, trained on the outer region while being blinded to the smaller inner section (not receiving the data inside as information during training).
-
-\begin{figure}
-    \centering
-    \includegraphics[scale=0.5]{appendix_figs/piecewise_diagram.png}
-    \caption{A schematic of a section surrounding an mA'. The training region had a total width of 10$\sigma$, where $\sigma$ is the mass resolution. The inner blinded region had a width of 5$\sigma$. The GPR models did not have information about their sections' blinded regions and interpolated the region.}
-    \label{fig:appendix-piecewise-diagram}
+\begin{figure}[p]
+\centering
+\includegraphics[width=0.94\linewidth]{appendix_figs/piecewise_diagram.png}
+\caption{Schematic of the historical piecewise construction around one mass
+hypothesis. A distinct GP was trained in a region of total width $10\,\sigma_m$ while
+the central $5\,\sigma_m$ interval was hidden from that model and filled by
+interpolation. These widths refer to the complete training section and blinded
+interval in the early study; they should not be identified with the v3
+$2.25\,\sigma_m$ half-width used for the blind and extraction window.}
+\label{fig:appendix-piecewise-diagram}
 \end{figure}
 
-The kernel used by each section's model was selected from an ensemble using a procedure that chose the best performing kernel. For each section, every kernel as a part of the kernel ensemble was tested in an interpolation of the blinded region. Each kernel was given a score by log marginal likelihood, and this vector of scores was converted to weights via a softmax function. A kernel would be sampled from the distribution of these weights and used by a GP to determine the distribution of the blinded region. Poisson observed counts are sampled using this chosen distribution.
-\begin{figure}[h!]
-    \centering
-    $w_k = \frac{e^{\ell_k - \max_j \ell_j}}{\sum_j e^{\ell_j - \max_j \ell_j}}$
-    $\quad \text{with} \quad$
-    $\ell_k = \log p(\text{data} \mid K_k).$
-    \caption{the softmax function used to convert the log marginal likelihood of each kernel to a weight.}
-    \label{fig:appendix-softmax}
+The associated signal-yield plot used a direct known-background Poisson construction,
+not the profile-likelihood \CLs{} method used in v3. With fixed background expectation
+$b$, observation $n$, and one-sided tail probability $\alpha$, that historical
+construction was
+\begin{equation}
+\mu_{\mathrm{up}}
+=
+\frac{1}{2}F^{-1}_{\chi^2_{2(n+1)}}(1-\alpha),
+\qquad
+s_{\mathrm{up}}=\max(0,\mu_{\mathrm{up}}-b).
+\end{equation}
+The displayed study used $\alpha=0.05$. It is retained only to identify the
+provenance of the old plot; no conversion between this 95\% construction and the v3
+90\% CL result is performed.
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=0.94\linewidth]{appendix_figs/signal_yield_2016_10.png}
+\caption{Historical signal-yield upper limit for the 2016 10\% sample obtained with
+the piecewise GP construction. The shaded bands record the interval sizes used in that
+study. Limits were computed with the direct known-background Poisson expression above
+at $\alpha=0.05$, rather than the bounded profile-likelihood \CLs{} construction and
+correlated GP-background nuisance parameters used in v3. The numerical curve is
+therefore retained only to document the early method.}
+\label{fig:appendix-signal-yield-2016}
 \end{figure}
 
-\subsection{Piecewise Upper Limits}
-
-Upper limits on the signal yield and coupling strength $\epsilon^2$ were measured using this piecewise method. Values for the upper limit on the signal yield, or the maximum number of expected signal events, were calculated using
-$s_{up} = \frac{1}{2}F^{-1}_{2(n+1)}(p) - b$
-where b is the expected number of Poisson background, alpha = 0.05 for 95$\%$ confidence, F is the chi-squared cumulative distribution for 2(n+1) degrees of freedom, and $n$ is the observed number of events.
-
-
-\begin{figure}
-    \centering
-    \includegraphics[scale=0.5]{appendix_figs/signal_yield_2016_10.png}
-    \caption{The upper limit on the signal yield for the 2016 10\% dataset. The shade of the uncertainty bands reflect the size of each region.}
-    \label{fig:appendix-signal-yield-2016}
-\end{figure}
-
-\subsection{Guard-Band Construction Reference}
+\subsection{Guard-band construction reference}
 \label{app:guard-band-construction}
 
 The guard-band construction considered during the 2015 closure campaign separated each
-mass hypothesis into three regions: a central blind/extraction window, an adjacent
-guard band omitted from both training and extraction, and outer sidebands used to train
-the GP. In the notation of the main text, the central blind region covered
-$|m-m_0|<1.64\,\sigma_m$, while the guard excluded
-$1.64<|m-m_0|/\sigma_m<2.25$ from the sideband training sample. This construction is
-useful as a signal-leakage control diagnostic, but the refmatched geometry comparison in
-Section~\ref{subsec:guard-band-construction} selects the $2.25\,\sigma_m$
-blind/extraction window because it keeps the same training protection while retaining
-the signal tails in the likelihood.
+mass hypothesis into a central blind/extraction window, an adjacent band omitted from
+both training and extraction, and outer GP-training sidebands. The central window
+covered $|m-m_0|<1.64\,\sigma_m$, while the guard excluded
+$1.64<|m-m_0|/\sigma_m<2.25$. The matched geometry study in
+Section~\ref{subsec:guard-band-construction} selects the
+$2.25\,\sigma_m$ blind/extraction window because it preserves the same training
+protection while retaining the signal tails in the extraction likelihood.
 
-\begin{figure}[H]
+\begin{figure}[p]
 \centering
-\graphicorplaceholder{0.88\linewidth}{guard_band_figs/guard_band_signal_leakage_cartoon.png}
+\graphicorplaceholder{0.96\linewidth}{guard_band_figs/guard_band_signal_leakage_cartoon.png}
 \caption{Reference cartoon for the older guard-band construction. The red central
 region is the $1.64\,\sigma_m$ blind/extraction window, the yellow bands are excluded
-from GP training as a guard, and the green sidebands train the background. This
-construction motivated the training-exclusion study but is superseded in the main text
-by the $2.25\,\sigma_m$ blind-window geometry.}
+from GP training as a guard, and the green sidebands train the background. The study
+tested whether preserving this separation reduced signal leakage into the sideband
+fit. The v3 matched-geometry choice instead uses a $2.25\,\sigma_m$ blind/extraction
+window, which protects the training sample while retaining the Gaussian signal tails
+in the likelihood.}
 \label{fig:appendix-guard-band-cartoon}
 \end{figure}
 
-\subsection{Cross-Kernel Closure Study}
+\subsection{Exploratory cross-kernel closure}
 
-Bias of the RBF kernel was tested against the $Matern32$ kernel via a cross-kernel pull-statistic study. First, a GP using the RBF kernel fits the 2016 10$\%$ dataset and 300 background-only toy distributions are thrown using the fitted model. This is repeated for the $Matern32$ kernel; 300 toy distributions using a model fitted by a $Matern32$ kernel are also generated. Next, the toys generated by the RBF kernel are fitted by the $Matern32$ kernel and vice versa. Varying amounts of signal are injected in a Gaussian shape at several mass hypotheses in the toys. Pull statistics are calculated.
+An exploratory protocol fit the 2016 10\% spectrum with RBF and
+\texttt{Matern32} kernels, generated 300 background-only toys from each fitted model,
+and extracted each ensemble with the other kernel after Gaussian signal injection.
+That study was designed to expose misspecification through pull bias. No frozen
+coverage table or production-matched upper-limit export from this comparison is used
+in v3, so it is not cited as evidence for the baseline kernel choice.

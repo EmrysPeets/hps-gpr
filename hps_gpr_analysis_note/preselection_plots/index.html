@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>v13 Signal Overlay — Plot Gallery</title>
+<style>
+  :root {
+    --bg: #0f1216;
+    --panel: #171c22;
+    --panel-2: #1e252d;
+    --border: #2a333d;
+    --text: #e6edf3;
+    --muted: #8b98a5;
+    --accent: #4aa3ff;
+    --accent-2: #ffb454;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+  }
+  header {
+    padding: 28px 32px 20px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, #141a20, #0f1216);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    backdrop-filter: blur(6px);
+  }
+  header h1 { margin: 0 0 4px; font-size: 22px; font-weight: 650; }
+  header p { margin: 0; color: var(--muted); font-size: 13px; }
+  .controls {
+    margin-top: 16px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .controls input[type="search"] {
+    flex: 1 1 240px;
+    min-width: 200px;
+    padding: 8px 12px;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 13px;
+  }
+  .controls input[type="search"]:focus { outline: none; border-color: var(--accent); }
+  .tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tab {
+    padding: 7px 14px;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    color: var(--muted);
+    font-size: 12.5px;
+    cursor: pointer;
+    user-select: none;
+    transition: all .15s;
+  }
+  .tab:hover { color: var(--text); border-color: #3a4552; }
+  .tab.active { background: var(--accent); border-color: var(--accent); color: #06121f; font-weight: 600; }
+  main { padding: 24px 32px 60px; }
+  .section-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 28px 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title .count {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 400;
+    background: var(--panel-2);
+    padding: 2px 9px;
+    border-radius: 12px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 18px;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: border-color .15s, transform .15s;
+  }
+  .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .card .frame {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+  }
+  .card embed, .card iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+  }
+  .card .meta {
+    padding: 10px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+  .card .name {
+    font-size: 12px;
+    color: var(--text);
+    word-break: break-word;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  .card .open {
+    flex-shrink: 0;
+    font-size: 11px;
+    color: var(--accent);
+    text-decoration: none;
+    padding: 4px 9px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+  .card .open:hover { border-color: var(--accent); background: var(--panel-2); }
+  .empty { color: var(--muted); font-size: 13px; padding: 40px; text-align: center; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<header>
+  <h1>v13 Signal Overlay — Plot Gallery</h1>
+  <p>HPS · v9-validation · <span id="total"></span> plots</p>
+  <div class="controls">
+    <input type="search" id="search" placeholder="Filter by name… (e.g. vtx_mass, L1L1, ele_pz)">
+    <div class="tabs" id="tabs">
+      <div class="tab active" data-group="all">All</div>
+      <div class="tab" data-group="signal">Signal overlay</div>
+      <div class="tab" data-group="l1l1">L1L1 overlay</div>
+      <div class="tab" data-group="scatter">XY scatter</div>
+    </div>
+  </div>
+</header>
+<main id="main"></main>
+
+<script>
+const PLOTS = [
+  // Signal overlay (non-L1L1)
+  "signal_overlay_loose_loose_ele_d0.pdf",
+  "signal_overlay_loose_loose_ele_p.pdf",
+  "signal_overlay_loose_loose_ele_pz.pdf",
+  "signal_overlay_loose_loose_ele_z0.pdf",
+  "signal_overlay_loose_loose_min_y0.pdf",
+  "signal_overlay_loose_loose_pos_d0.pdf",
+  "signal_overlay_loose_loose_pos_p.pdf",
+  "signal_overlay_loose_loose_pos_pz.pdf",
+  "signal_overlay_loose_loose_pos_z0.pdf",
+  "signal_overlay_loose_loose_psum.pdf",
+  "signal_overlay_loose_loose_recoil_theta.pdf",
+  "signal_overlay_loose_loose_vtx_chi2.pdf",
+  "signal_overlay_loose_loose_vtx_mass.pdf",
+  "signal_overlay_loose_loose_vtx_z.pdf",
+  // Signal overlay L1L1
+  "signal_overlay_loose_loose_L1L1_ele_d0.pdf",
+  "signal_overlay_loose_loose_L1L1_ele_pz.pdf",
+  "signal_overlay_loose_loose_L1L1_min_y0.pdf",
+  "signal_overlay_loose_loose_L1L1_pos_d0.pdf",
+  "signal_overlay_loose_loose_L1L1_pos_pz.pdf",
+  "signal_overlay_loose_loose_L1L1_psum.pdf",
+  "signal_overlay_loose_loose_L1L1_vtx_chi2.pdf",
+  "signal_overlay_loose_loose_L1L1_vtx_mass.pdf",
+  "signal_overlay_loose_loose_L1L1_vtx_z.pdf",
+  // XY scatter
+  "xy_scatter_xy_mass_vs_ele_chi2_data_loose.pdf",
+  "xy_scatter_xy_mass_vs_ele_chi2_signal_loose.pdf",
+  "xy_scatter_xy_mass_vs_ele_p_data_loose.pdf",
+  "xy_scatter_xy_mass_vs_ele_p_signal_loose.pdf",
+  "xy_scatter_xy_mass_vs_ele_z0_data_loose.pdf",
+  "xy_scatter_xy_mass_vs_ele_z0_signal_loose.pdf",
+  "xy_scatter_xy_mass_vs_pos_chi2_data_loose.pdf",
+  "xy_scatter_xy_mass_vs_pos_chi2_signal_loose.pdf",
+  "xy_scatter_xy_mass_vs_pos_p_data_loose.pdf",
+  "xy_scatter_xy_mass_vs_pos_p_signal_loose.pdf",
+  "xy_scatter_xy_mass_vs_pos_z0_data_loose.pdf",
+  "xy_scatter_xy_mass_vs_pos_z0_signal_loose.pdf",
+  "xy_scatter_xy_mass_vs_psum_data_loose.pdf",
+  "xy_scatter_xy_mass_vs_psum_signal_loose.pdf",
+  "xy_scatter_xy_mass_vs_recoil_theta_data_loose.pdf",
+  "xy_scatter_xy_mass_vs_recoil_theta_signal_loose.pdf",
+  "xy_scatter_xy_mass_vs_vtx_chi2_data_loose.pdf",
+  "xy_scatter_xy_mass_vs_vtx_chi2_signal_loose.pdf",
+];
+
+function groupOf(name) {
+  if (name.startsWith("xy_scatter")) return "scatter";
+  if (name.includes("_L1L1_")) return "l1l1";
+  return "signal";
+}
+const GROUP_TITLES = {
+  signal: "Signal Overlay",
+  l1l1: "Signal Overlay — L1L1",
+  scatter: "XY Scatter (data vs signal)",
+};
+
+document.getElementById("total").textContent = PLOTS.length;
+
+function cardHTML(name) {
+  return `<div class="card" data-name="${name}" data-group="${groupOf(name)}">
+    <div class="frame"><embed src="${name}#toolbar=0&navpanes=0&view=FitH" type="application/pdf"></div>
+    <div class="meta">
+      <span class="name">${name.replace(/\.pdf$/, "")}</span>
+      <a class="open" href="${name}" target="_blank" rel="noopener">open ↗</a>
+    </div>
+  </div>`;
+}
+
+function render() {
+  const main = document.getElementById("main");
+  const order = ["signal", "l1l1", "scatter"];
+  main.innerHTML = order.map(g => {
+    const items = PLOTS.filter(p => groupOf(p) === g);
+    return `<section data-group="${g}">
+      <div class="section-title">${GROUP_TITLES[g]} <span class="count">${items.length}</span></div>
+      <div class="grid">${items.map(cardHTML).join("")}</div>
+    </section>`;
+  }).join("");
+}
+render();
+
+const tabs = document.getElementById("tabs");
+const search = document.getElementById("search");
+let activeGroup = "all";
+
+tabs.addEventListener("click", e => {
+  const tab = e.target.closest(".tab");
+  if (!tab) return;
+  [...tabs.children].forEach(t => t.classList.remove("active"));
+  tab.classList.add("active");
+  activeGroup = tab.dataset.group;
+  applyFilter();
+});
+search.addEventListener("input", applyFilter);
+
+function applyFilter() {
+  const q = search.value.trim().toLowerCase();
+  document.querySelectorAll("section[data-group]").forEach(sec => {
+    const g = sec.dataset.group;
+    const groupOk = activeGroup === "all" || activeGroup === g;
+    let visibleInSection = 0;
+    sec.querySelectorAll(".card").forEach(card => {
+      const match = card.dataset.name.toLowerCase().includes(q);
+      const show = groupOk && match;
+      card.classList.toggle("hidden", !show);
+      if (show) visibleInSection++;
+    });
+    sec.classList.toggle("hidden", !groupOk || visibleInSection === 0);
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,271 @@
+{
+  "accepted_2016_factor12_validation": {
+    "repair_masses_MeV": [
+      43,
+      125,
+      145
+    ],
+    "review_status_counts": {
+      "raw_scan_row": 139,
+      "repair_selected_reproduced_max_lml": 3
+    },
+    "rows": 142,
+    "upper_boundary_occupancy_count": 0,
+    "upper_length_scale_factor": 12.0
+  },
+  "builder": {
+    "path": "study_results/v4p2_combined_2015full_2016full_2021_10pct_300toy_20260805/build_v4p2_individual_ledger.py",
+    "sha256": "6693bc9cc2a4d70d07e2a3670ef40a6319f714741c294695a1f2ef7be213c50b"
+  },
+  "created_utc": "2026-08-05T19:23:31.802391+00:00",
+  "enriched_ledger_validation": {
+    "dataset_rows": {
+      "2015": 72,
+      "2016": 142,
+      "2021": 201
+    },
+    "finite_result_columns": [
+      "A_up",
+      "eps2_up",
+      "p0_analytic",
+      "Z_analytic",
+      "A_hat",
+      "sigma_A",
+      "const_opt",
+      "ls_opt",
+      "ls_hi",
+      "lml",
+      "sigma_val",
+      "integral_density"
+    ],
+    "interpolated_rows": 0,
+    "pending_repair_rows": 0,
+    "preserved_geometry_columns": [
+      "sigma_val",
+      "blind_lo",
+      "blind_hi",
+      "integral_density",
+      "density_nsigma",
+      "density_window_lo",
+      "density_window_hi",
+      "density_window_width",
+      "density_source_lo",
+      "density_source_hi",
+      "density_source_n_bins",
+      "density_source_bin_width_median",
+      "density_window_fully_covered",
+      "n_train",
+      "n_train_low",
+      "n_train_high",
+      "n_full",
+      "n_blind",
+      "train_domain_lo",
+      "train_domain_hi",
+      "bin_width_median",
+      "const_init",
+      "const_lo",
+      "const_hi",
+      "optimizer_restarts",
+      "sigma_x",
+      "ls_lo"
+    ],
+    "rows": 415
+  },
+  "frozen_inputs": {
+    "study_configs/v4p1_2016_ls_upper_optimization_20260804/config_obsUL90_combined_wide_support_v4p1_2016k12_observed_only.yaml": {
+      "sha256": "d8ba2483253b653305d9db3318756fd7c5923d9b414dec1b824e75e226282732"
+    },
+    "study_results/v4_wide_support_2015full_2016full_2021_10pct_20260803/derived/observed_gp_states_reviewed.csv": {
+      "sha256": "0bf70d1516ffab383dc50278b9adf6b568beafac9c4362ad5b6840b776a65dd0"
+    },
+    "study_results/v4p1_2016_ls_upper_optimization_20260804/derived/observed_gp_states_k12_reviewed.csv": {
+      "sha256": "a962c01aa030429c04e2cc102253b6b8750eacc3c9e294a7a99f851a9870aea9"
+    },
+    "study_results/v4p1_2016_ls_upper_optimization_20260804/derived/pointwise_factor_grid.csv": {
+      "sha256": "6b5be702f1b65688f6ce7f86922716f012f72cb8c9f33320b5783c08a0123657"
+    }
+  },
+  "interpretation": {
+    "combined_bands_only": true,
+    "individual_bands_included": false,
+    "individual_limits": "observed_only",
+    "interpolation_permitted": false,
+    "minimal_visible_conversion": "eps2_observed_minimal_visible = eps2_up * (1 + Gamma_mumu/Gamma_ee), with only e+e- and mu+mu- visible channels and unit lepton universality"
+  },
+  "minimal_visible_dimuon": {
+    "corrected_row_count": 39,
+    "first_corrected_mass_MeV": 212,
+    "muon_mass_GeV": 0.1056583745,
+    "threshold_GeV": 0.211316749
+  },
+  "outputs": {
+    "enriched": {
+      "columns": [
+        "dataset",
+        "mass_GeV",
+        "sigma_val",
+        "blind_lo",
+        "blind_hi",
+        "integral_density",
+        "density_nsigma",
+        "density_window_lo",
+        "density_window_hi",
+        "density_window_width",
+        "density_source_lo",
+        "density_source_hi",
+        "density_source_n_bins",
+        "density_source_bin_width_median",
+        "density_window_fully_covered",
+        "A_up",
+        "eps2_up",
+        "p0_analytic",
+        "Z_analytic",
+        "A_hat",
+        "sigma_A",
+        "extract_success",
+        "cls_statistic",
+        "cls_calibration",
+        "signal_model",
+        "global_method",
+        "visibility",
+        "kernel_str",
+        "ls_lo",
+        "ls_hi",
+        "ls_init",
+        "ls_opt",
+        "sigma_x",
+        "const_opt",
+        "lml",
+        "n_train",
+        "n_train_low",
+        "n_train_high",
+        "n_full",
+        "n_blind",
+        "train_domain_lo",
+        "train_domain_hi",
+        "bin_width_median",
+        "const_init",
+        "const_lo",
+        "const_hi",
+        "const_at_lower",
+        "const_at_upper",
+        "ls_at_lower",
+        "ls_at_upper",
+        "optimizer_restarts",
+        "ls_lo_over_sigma_x",
+        "ls_hi_over_sigma_x",
+        "ls_opt_over_sigma_x",
+        "ls_lo_over_sigma",
+        "ls_hi_over_sigma",
+        "ls_opt_over_sigma",
+        "mass_MeV",
+        "selected_attempt",
+        "selected_source",
+        "selected_source_sha256",
+        "row_source",
+        "optimizer_repair_applied",
+        "review_status",
+        "branch_multiplicity",
+        "reproducing_attempts",
+        "reproducing_other_attempts",
+        "reproducing_sources",
+        "max_abs_reproducing_delta_lml",
+        "max_abs_reproducing_delta_const_opt",
+        "max_abs_reproducing_delta_ls_opt",
+        "all_attempt_sources",
+        "interpolated",
+        "selected_repair_reproduced",
+        "repair_reproduction_pending",
+        "candidate_count",
+        "repair_candidate_count",
+        "delta_lml_selected_minus_raw",
+        "geometry_density_source",
+        "geometry_density_source_sha256",
+        "accepted_compact_ledger",
+        "accepted_compact_ledger_sha256",
+        "accepted_config",
+        "accepted_config_sha256"
+      ],
+      "path": "study_results/v4p2_combined_2015full_2016full_2021_10pct_300toy_20260805/derived/observed_gp_states_v4p2_enriched.csv",
+      "rows": 415,
+      "sha256": "899b9c042231788c1cefb9f178f9db3fa9b8750934c29043260da41a5e6c45ef"
+    },
+    "individual": {
+      "columns": [
+        "dataset",
+        "sample_label",
+        "mass_GeV",
+        "mass_MeV",
+        "A_up",
+        "eps2_up",
+        "eps2_observed_ee_channel",
+        "minimal_visible_factor",
+        "BR_ee_minimal",
+        "eps2_observed_minimal_visible",
+        "dimuon_correction_applied",
+        "p0_analytic",
+        "Z_analytic",
+        "sigma_val",
+        "integral_density",
+        "const_opt",
+        "ls_opt",
+        "ls_hi",
+        "ls_opt_over_ls_hi",
+        "lml",
+        "selected_attempt",
+        "selected_source",
+        "selected_source_sha256",
+        "row_source",
+        "optimizer_repair_applied",
+        "review_status",
+        "branch_multiplicity",
+        "interpolated",
+        "accepted_config",
+        "accepted_config_sha256",
+        "source_enriched_ledger",
+        "source_enriched_ledger_sha256",
+        "limit_scope",
+        "bands_included"
+      ],
+      "path": "study_results/v4p2_combined_2015full_2016full_2021_10pct_300toy_20260805/derived/individual_observed_limits_v4p2.csv",
+      "rows": 415,
+      "sha256": "aabef4ed02a56ce924c7d2b5eb1f426144946911b384d1ecd3b2219c9bf02a56"
+    }
+  },
+  "schema_version": "hps-gpr-v4.2-individual-ledger-validation-1",
+  "selected_sources": {
+    "all_hashes_verified": true,
+    "files": [
+      {
+        "path": "study_results/v4_wide_support_2015full_2016full_2021_10pct_20260803/observed_attempt_01/results_single.csv",
+        "sha256": "f9f25a337aa644e5c7e03555e6341f63a6ff30e907db7d718d5fc5055fceb719"
+      },
+      {
+        "path": "study_results/v4_wide_support_2015full_2016full_2021_10pct_20260803/observed_attempt_02/results_single.csv",
+        "sha256": "a56e71628b94169ba0cb858d13f8e09a16131ff7ee7c63d0dd39a221afff32ff"
+      },
+      {
+        "path": "study_results/v4_wide_support_2015full_2016full_2021_10pct_20260803/observed_attempt_03/results_single.csv",
+        "sha256": "fb065cd988534049027c8e3c255b341b97f9ed630b9a27e698ba7452a7f67dcc"
+      },
+      {
+        "path": "study_results/v4p1_2016_ls_upper_optimization_20260804/k12/raw_attempt_01/results_single.csv",
+        "sha256": "0951a83e9615587519ac0aabbd2fbd036e90ca176378e9300b2ed30b829a830e"
+      },
+      {
+        "path": "study_results/v4p1_2016_ls_upper_optimization_20260804/k12/repairs/m043_attempt_01/results_single.csv",
+        "sha256": "6722a6939e61f15c06c8b1192c1c7112c94806946ec52f636f45325f851eabcf"
+      },
+      {
+        "path": "study_results/v4p1_2016_ls_upper_optimization_20260804/k12/repairs/m125_attempt_02/results_single.csv",
+        "sha256": "b8a00dc29a2642c94408e53916a76d4fecf39935755044f4dd04936ecc12301b"
+      },
+      {
+        "path": "study_results/v4p1_2016_ls_upper_optimization_20260804/k12/repairs/m145_attempt_02/results_single.csv",
+        "sha256": "0b146e5b8c4e62f2c55290627acb2ab4ea94d03b824f7a2d1cf0f418a9cfb65a"
+      }
+    ],
+    "unique_file_count": 7
+  },
+  "status": "pass"
+}

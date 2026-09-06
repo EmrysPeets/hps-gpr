@@ -1,0 +1,133 @@
+\section{Gaussian process background model and statistical method}
+\label{sec:gpr-stats}
+
+For each data sample and mass hypothesis, the analysis removes a narrow region around
+the tested mass from the background training set. The nominal observed-limit workflow
+uses a $2.25\,\sigma_m$ blind and extraction half-width, where $\sigma_m$ is the
+data-set-specific mass resolution. The Gaussian process is trained on the remaining
+sideband bins across the full histogram range. Its posterior prediction inside the
+blind window supplies both the background mean and the bin-to-bin covariance used in
+the local likelihood.
+
+\begin{figure*}[t]
+\centering
+\begin{minipage}{0.47\textwidth}
+\centering
+\ifigure{\linewidth}{gpr_intro_cartoon.png}\\
+(a) Sideband-trained GPR interpolation.
+\end{minipage}
+\hfill
+\begin{minipage}{0.47\textwidth}
+\centering
+\ifigure{\linewidth}{gpr_training_steps.png}\\
+(b) Log-count training and blind-window prediction.
+\end{minipage}
+\caption{GPR construction used in the prompt-resonance search. For each mass
+hypothesis, the bins near the signal are excluded from training. The trained Gaussian
+process predicts a background mean and covariance in the excluded window, which are
+then passed to the profile likelihood.}
+\label{fig:gpr-method}
+\end{figure*}
+
+The fit is performed in transformed coordinates,
+\begin{equation}
+x=\log m,\qquad z=\log y,
+\end{equation}
+for occupied mass bins with count $y$. This transformation is useful because the
+prompt spectrum falls steeply and spans a wide dynamic range. The baseline kernel is a
+single constant-times-radial-basis-function kernel,
+\begin{equation}
+k(x,x')=C\exp\left[-\frac{(x-x')^2}{2\ell^2}\right],
+\end{equation}
+with the length-scale bounds tied to the detector resolution in log-mass space. This
+choice follows the smooth-background GPR strategy used in high-energy physics
+applications while keeping the HPS baseline model intentionally simple
+\cite{RasmussenWilliams2006,FrateGP2017,Gandrakota2023,BarrLiu2025}. Alternative
+kernels are treated as robustness studies rather than as competing mainline methods.
+
+After conditioning on the sidebands, the Gaussian process posterior in log-count space
+is mapped back to count space using the standard lognormal moment relations. The
+result is a background mean vector $\bm{b}_d(m)$ and covariance matrix
+$\bm{C}_d(m)$ for the blinded bins of data set $d$ at mass $m$. The covariance is
+factorized as
+\begin{equation}
+\bm{C}_d=L_dL_d^T,
+\end{equation}
+and propagated as correlated Gaussian-constrained nuisance parameters
+$L_d\bm{\theta}_d$ in the likelihood. This is the standard high-energy physics way to
+encode correlated background uncertainty in a profile likelihood
+\cite{HistFactory,Cowan2011}.
+
+The signal template is a detector-resolution Gaussian normalized over the full
+histogram range and then restricted to the blinded bins,
+\begin{equation}
+w_{d,i}(m)=
+\int_{e_i}^{e_{i+1}}
+\frac{1}{\sqrt{2\pi}\sigma_d(m)}
+\exp\left[-\frac{(m'-m)^2}{2\sigma_d^2(m)}\right]dm',
+\end{equation}
+for bins $i$ in the local blind window. The template is not renormalized after this
+restriction. The fitted amplitude $A_d$ is therefore the total local Gaussian signal
+yield, while only the fraction of that Gaussian inside the blind window contributes to
+the local likelihood. This convention preserves the physical meaning of the signal
+yield and avoids silently discarding signal tails.
+
+For a fixed mass, define the expected bin count
+\begin{equation}
+\lambda_{d,i}(A_d,\bm{\theta}_d)=
+b_{d,i}+(L_d\bm{\theta}_d)_i+A_dw_{d,i}.
+\end{equation}
+The single-sample likelihood is then
+\begin{equation}
+\mathcal{L}_d(A_d,\bm{\theta}_d)=
+\left[
+\prod_i \mathrm{Pois}\left(n_{d,i}\middle|\lambda_{d,i}\right)
+\right]
+\exp\left(-\frac{1}{2}\bm{\theta}_d^T\bm{\theta}_d\right).
+\label{eq:single-likelihood}
+\end{equation}
+The local discovery test uses the one-sided profile-likelihood statistic for
+$A_d=0$, with the Gaussian-equivalent local significance obtained using the asymptotic
+mapping of Cowan \textit{et al.} \cite{Cowan2011}. Upper limits use the bounded
+one-sided statistic $\tilde q_A$ and the modified-frequentist construction
+\begin{equation}
+\CLs(A;m)=\frac{\mathrm{CL}_{s+b}(A;m)}{\mathrm{CL}_{b}(A;m)}.
+\end{equation}
+The quoted upper limit is the value for which $\CLs=0.05$ for a 95\% confidence-level
+limit, or $\CLs=0.10$ for a 90\% confidence-level limit. Dividing by
+$\mathrm{CL}_b$ protects against quoting overly strong exclusions from downward
+background fluctuations \cite{Junk1999,Read2002}.
+
+Observed and expected limits differ by the data vector or ensemble used in this
+construction. Observed limits use the actual blinded-bin counts. Expected bands use
+background-only pseudoexperiments, or the equivalent asymptotic background-only
+reference, conditioned on the sideband-trained GPR prediction. The local density
+$\rho_d(m)$ used in Eq.~\eqref{eq:kd} is a normalization input for converting yield to
+$\eps^2$; it is not the definition of observed versus expected limits.
+
+When multiple data samples are active at the same mass, the combined likelihood is the
+product of the sample likelihoods,
+\begin{equation}
+\mathcal{L}_{\mathrm{comb}}(\eps^2,\{\bm{\theta}_d\})
+=
+\prod_{d\in\mathcal{D}(m)}
+\mathcal{L}_d\left(A_d=K_d^{\mathrm{eff}}(m)\eps^2,\bm{\theta}_d\right),
+\label{eq:combined-likelihood}
+\end{equation}
+where $\mathcal{D}(m)$ is the active set of samples. The parameter of interest is the
+shared coupling $\eps^2$. The nuisance parameters, background predictions, mass
+resolutions, and radiative normalizations remain data-set-specific. Thus the combined
+limit is a direct shared-coupling inference, not an average, product, or envelope of
+individual upper-limit curves.
+
+The local look-elsewhere effect is handled separately from the fixed-mass test. The
+preferred global discovery calibration is the background-only distribution of the
+maximum discovery statistic over the mass scan,
+\begin{equation}
+p_{\mathrm{global}}=
+\frac{1}{N_{\mathrm{toys}}}
+\sum_{t=1}^{N_{\mathrm{toys}}}
+\mathbf{1}\left[q_{0,\max}^{(t)}\ge q_{0,\max}^{\mathrm{obs}}\right].
+\end{equation}
+Until that scan-level toy distribution is frozen for the final production result,
+effective-trials overlays are used only as review diagnostics.

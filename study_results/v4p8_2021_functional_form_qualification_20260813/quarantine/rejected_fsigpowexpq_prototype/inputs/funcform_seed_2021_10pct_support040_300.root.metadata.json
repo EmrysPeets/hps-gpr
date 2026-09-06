@@ -1,0 +1,579 @@
+{
+  "dataset": "2021",
+  "input_file": "/Users/emryspeets/Desktop/gp_mods/10pct_2021/final_10pct_invM.root",
+  "hist_name": "preselection/h_invM_8000",
+  "input_histogram_range_GeV": [0, 1],
+  "fit_min_GeV": 0.04,
+  "fit_max_GeV": 0.3,
+  "toy_support_range_GeV": [0.04, 0.3],
+  "scan_range_GeV": [0.05, 0.25],
+  "n_toys": 0,
+  "toy_lumi_scale": 1,
+  "normalization_target_count": 141251508,
+  "normalization_target_count_unscaled": 141251508,
+  "normalization_target_count_scaled": 141251508,
+  "validation_thresholds": {
+    "max_rel_diff_full": 0.05,
+    "max_rel_diff_scan": 0.05,
+    "max_abs_sideband_frac_diff": 0.02
+  },
+  "primary_function": "fGenGammaThresh",
+  "primary_validation_pass": true,
+  "fits": [
+    {
+  "tag": "fSigPowExpQ",
+  "label": "sigmoid*power*exp + raw expquad",
+  "is_primary": false,
+  "fit_ok": false,
+  "fit_min_GeV": 0.055,
+  "fit_max_GeV": 0.3,
+  "trial_index": 0,
+  "trial_label": "default",
+  "toy_lumi_scale": 1,
+  "root_chi2ndf": 6.1864114,
+  "pearson_chi2ndf": 6.1665944,
+  "neyman_chi2ndf": 6.2329985,
+  "nbin_used": 1960,
+  "ndf_sel": 1953,
+  "function_title": "sigmoid*power*exp + raw expquad",
+  "parameters": [
+    {
+      "name": "A",
+      "value": 2.0823095e+12,
+      "error": 1.1583751e+09,
+      "min": 1e-09,
+      "max": 1e+18,
+      "fixed": false
+    },
+    {
+      "name": "a",
+      "value": 4.2595518,
+      "error": 0.0002052848,
+      "min": 0,
+      "max": 40,
+      "fixed": false
+    },
+    {
+      "name": "theta",
+      "value": 0.0083936738,
+      "error": 3.9678851e-07,
+      "min": 0.0001,
+      "max": 0.4,
+      "fixed": false
+    },
+    {
+      "name": "xt",
+      "value": 0.056338861,
+      "error": 7.0878538e-06,
+      "min": 0.045,
+      "max": 0.105,
+      "fixed": false
+    },
+    {
+      "name": "w",
+      "value": 0.006942976,
+      "error": 9.1750833e-06,
+      "min": 0.001,
+      "max": 0.02,
+      "fixed": false
+    },
+    {
+      "name": "c1",
+      "value": 49.999285,
+      "error": 0.029708853,
+      "min": -50,
+      "max": 50,
+      "fixed": false
+    },
+    {
+      "name": "c2",
+      "value": 48.718049,
+      "error": 0.02666133,
+      "min": -2000,
+      "max": 2000,
+      "fixed": false
+    }
+  ],
+  "validation": {
+    "selection_score": 0.013888652,
+    "selection_pass": true,
+    "support_range_GeV": [0.04, 0.3],
+    "scan_range_GeV": [0.05, 0.25],
+    "normalization_target_count": 141251508,
+    "n_toys": 0,
+    "full_range": {
+      "observed": 1.4125151e+08,
+      "fit_expected": 1.4125151e+08,
+      "toy_mean": 0
+    },
+    "scan_range": {
+      "observed": 1.3880722e+08,
+      "fit_expected": 1.3783488e+08,
+      "toy_mean": 0
+    },
+    "low_sideband_fraction": {
+      "observed": 0.011750968,
+      "fit_expected": 0.018489366,
+      "toy_mean": null
+    },
+    "high_sideband_fraction": {
+      "observed": 0.0055535407,
+      "fit_expected": 0.0056988608,
+      "toy_mean": null
+    },
+    "scan_peak": {
+      "observed_height": 232706,
+      "observed_mass_GeV": 0.0773125,
+      "fit_expected_height": 231125.44,
+      "fit_expected_mass_GeV": 0.0774375,
+      "toy_mean_height": 0,
+      "toy_mean_mass_GeV": 0.0500625
+    }
+  }
+},
+    {
+  "tag": "fGenGammaThresh",
+  "label": "thresholded gen-gamma",
+  "is_primary": true,
+  "fit_ok": false,
+  "fit_min_GeV": 0.06,
+  "fit_max_GeV": 0.3,
+  "trial_index": 2,
+  "trial_label": "broad-tail",
+  "toy_lumi_scale": 1,
+  "root_chi2ndf": 2.7872088,
+  "pearson_chi2ndf": 2.7814713,
+  "neyman_chi2ndf": 2.8002441,
+  "nbin_used": 1920,
+  "ndf_sel": 1913,
+  "function_title": "thresholded gen-gamma",
+  "parameters": [
+    {
+      "name": "A",
+      "value": 4.2787996e+11,
+      "error": 4.5052553e+08,
+      "min": 1e-09,
+      "max": 1e+18,
+      "fixed": false
+    },
+    {
+      "name": "a",
+      "value": 3.0343956,
+      "error": 0.00029331844,
+      "min": 0.5,
+      "max": 20,
+      "fixed": false
+    },
+    {
+      "name": "lambda",
+      "value": 0.0037810741,
+      "error": 8.8592453e-07,
+      "min": 0.0001,
+      "max": 0.48,
+      "fixed": false
+    },
+    {
+      "name": "power",
+      "value": 0.65242066,
+      "error": 3.394196e-05,
+      "min": 0.2,
+      "max": 10,
+      "fixed": false
+    },
+    {
+      "name": "x0",
+      "value": 0.037465206,
+      "error": 2.1623679e-05,
+      "min": 0.03,
+      "max": 0.08,
+      "fixed": false
+    },
+    {
+      "name": "xt",
+      "value": 0.051511457,
+      "error": 9.6652409e-05,
+      "min": 0.05,
+      "max": 0.11,
+      "fixed": false
+    },
+    {
+      "name": "w",
+      "value": 0.0042684989,
+      "error": 4.9578936e-05,
+      "min": 0.001,
+      "max": 0.02,
+      "fixed": false
+    }
+  ],
+  "validation": {
+    "selection_score": 0.012724165,
+    "selection_pass": true,
+    "support_range_GeV": [0.04, 0.3],
+    "scan_range_GeV": [0.05, 0.25],
+    "normalization_target_count": 141251508,
+    "n_toys": 0,
+    "full_range": {
+      "observed": 1.4125151e+08,
+      "fit_expected": 1.4125151e+08,
+      "toy_mean": 0
+    },
+    "scan_range": {
+      "observed": 1.3880722e+08,
+      "fit_expected": 1.3966974e+08,
+      "toy_mean": 0
+    },
+    "low_sideband_fraction": {
+      "observed": 0.011750968,
+      "fit_expected": 0.0054426488,
+      "toy_mean": null
+    },
+    "high_sideband_fraction": {
+      "observed": 0.0055535407,
+      "fit_expected": 0.0057556239,
+      "toy_mean": null
+    },
+    "scan_peak": {
+      "observed_height": 232706,
+      "observed_mass_GeV": 0.0773125,
+      "fit_expected_height": 234562.94,
+      "fit_expected_mass_GeV": 0.0778125,
+      "toy_mean_height": 0,
+      "toy_mean_mass_GeV": 0.0500625
+    }
+  }
+},
+    {
+  "tag": "fGenGammaShift",
+  "label": "shifted gen-gamma",
+  "is_primary": false,
+  "fit_ok": false,
+  "fit_min_GeV": 0.06,
+  "fit_max_GeV": 0.3,
+  "trial_index": 1,
+  "trial_label": "early-turnon",
+  "toy_lumi_scale": 1,
+  "root_chi2ndf": 4.2136467,
+  "pearson_chi2ndf": 4.1960971,
+  "neyman_chi2ndf": 4.2518164,
+  "nbin_used": 1920,
+  "ndf_sel": 1915,
+  "function_title": "shifted gen-gamma",
+  "parameters": [
+    {
+      "name": "A",
+      "value": 3.2401596e+10,
+      "error": 1.7140706e+08,
+      "min": 1e-09,
+      "max": 1e+18,
+      "fixed": false
+    },
+    {
+      "name": "a",
+      "value": 2.470854,
+      "error": 0.0013257961,
+      "min": 0.5,
+      "max": 20,
+      "fixed": false
+    },
+    {
+      "name": "lambda",
+      "value": 0.0054814466,
+      "error": 7.3948646e-06,
+      "min": 0.0001,
+      "max": 0.48,
+      "fixed": false
+    },
+    {
+      "name": "power",
+      "value": 0.68586768,
+      "error": 0.00021101135,
+      "min": 0.2,
+      "max": 10,
+      "fixed": false
+    },
+    {
+      "name": "x0",
+      "value": 0.042831979,
+      "error": 2.1994392e-05,
+      "min": 0.03,
+      "max": 0.08,
+      "fixed": false
+    }
+  ],
+  "validation": {
+    "selection_score": 0.0093656254,
+    "selection_pass": true,
+    "support_range_GeV": [0.04, 0.3],
+    "scan_range_GeV": [0.05, 0.25],
+    "normalization_target_count": 141251508,
+    "n_toys": 0,
+    "full_range": {
+      "observed": 1.4125151e+08,
+      "fit_expected": 1.4125151e+08,
+      "toy_mean": 0
+    },
+    "scan_range": {
+      "observed": 1.3880722e+08,
+      "fit_expected": 1.3943205e+08,
+      "toy_mean": 0
+    },
+    "low_sideband_fraction": {
+      "observed": 0.011750968,
+      "fit_expected": 0.0071071029,
+      "toy_mean": null
+    },
+    "high_sideband_fraction": {
+      "observed": 0.0055535407,
+      "fit_expected": 0.0057739001,
+      "toy_mean": null
+    },
+    "scan_peak": {
+      "observed_height": 232706,
+      "observed_mass_GeV": 0.0773125,
+      "fit_expected_height": 232135.79,
+      "fit_expected_mass_GeV": 0.0783125,
+      "toy_mean_height": 0,
+      "toy_mean_mass_GeV": 0.0500625
+    }
+  }
+},
+    {
+  "tag": "fEndpoint",
+  "label": "endpoint-aware sigmoid*power*exp",
+  "is_primary": false,
+  "fit_ok": false,
+  "fit_min_GeV": 0.06,
+  "fit_max_GeV": 0.3,
+  "trial_index": 1,
+  "trial_label": "early-turnon",
+  "toy_lumi_scale": 1,
+  "root_chi2ndf": 25.267682,
+  "pearson_chi2ndf": 25.672938,
+  "neyman_chi2ndf": 24.577933,
+  "nbin_used": 1920,
+  "ndf_sel": 1913,
+  "function_title": "endpoint-aware sigmoid*power*exp",
+  "parameters": [
+    {
+      "name": "A",
+      "value": 1.8646246e+09,
+      "error": 3192723.9,
+      "min": 1e-09,
+      "max": 1e+18,
+      "fixed": false
+    },
+    {
+      "name": "a",
+      "value": 2.25113,
+      "error": 0.00050124754,
+      "min": 0,
+      "max": 40,
+      "fixed": false
+    },
+    {
+      "name": "theta",
+      "value": 0.024796809,
+      "error": 3.379556e-06,
+      "min": 0.0001,
+      "max": 0.4,
+      "fixed": false
+    },
+    {
+      "name": "xt",
+      "value": 0.05895138,
+      "error": 1.1021932e-05,
+      "min": 0.05,
+      "max": 0.11,
+      "fixed": false
+    },
+    {
+      "name": "w",
+      "value": 0.0082602205,
+      "error": 1.0995535e-05,
+      "min": 0.001,
+      "max": 0.02,
+      "fixed": false
+    },
+    {
+      "name": "xmax",
+      "value": 0.68498662,
+      "error": 5.3377367e-05,
+      "min": 0.3003,
+      "max": 0.75,
+      "fixed": false
+    },
+    {
+      "name": "b",
+      "value": 0.0074897277,
+      "error": 0.0006470468,
+      "min": 0,
+      "max": 20,
+      "fixed": false
+    }
+  ],
+  "validation": {
+    "selection_score": 0.027434811,
+    "selection_pass": true,
+    "support_range_GeV": [0.04, 0.3],
+    "scan_range_GeV": [0.05, 0.25],
+    "normalization_target_count": 141251508,
+    "n_toys": 0,
+    "full_range": {
+      "observed": 1.4125151e+08,
+      "fit_expected": 1.4125151e+08,
+      "toy_mean": 0
+    },
+    "scan_range": {
+      "observed": 1.3880722e+08,
+      "fit_expected": 1.3699724e+08,
+      "toy_mean": 0
+    },
+    "low_sideband_fraction": {
+      "observed": 0.011750968,
+      "fit_expected": 0.025355553,
+      "toy_mean": null
+    },
+    "high_sideband_fraction": {
+      "observed": 0.0055535407,
+      "fit_expected": 0.0047628063,
+      "toy_mean": null
+    },
+    "scan_peak": {
+      "observed_height": 232706,
+      "observed_mass_GeV": 0.0773125,
+      "fit_expected_height": 229038.48,
+      "fit_expected_mass_GeV": 0.0776875,
+      "toy_mean_height": 0,
+      "toy_mean_mass_GeV": 0.0500625
+    }
+  }
+},
+    {
+  "tag": "fBern5",
+  "label": "positive Bernstein fallback",
+  "is_primary": false,
+  "fit_ok": false,
+  "fit_min_GeV": 0.06,
+  "fit_max_GeV": 0.3,
+  "trial_index": 0,
+  "trial_label": "default",
+  "toy_lumi_scale": 1,
+  "root_chi2ndf": 2294.7981,
+  "pearson_chi2ndf": 2067.0876,
+  "neyman_chi2ndf": 2921.1915,
+  "nbin_used": 1920,
+  "ndf_sel": 1911,
+  "function_title": "positive Bernstein fallback",
+  "parameters": [
+    {
+      "name": "A",
+      "value": 461131.13,
+      "error": 27.755576,
+      "min": 1e-09,
+      "max": 1e+18,
+      "fixed": false
+    },
+    {
+      "name": "q1",
+      "value": 3.9544678,
+      "error": 0.0031518299,
+      "min": 0,
+      "max": 0,
+      "fixed": true
+    },
+    {
+      "name": "q2",
+      "value": 3.4351348,
+      "error": 0.0032066957,
+      "min": 0,
+      "max": 0,
+      "fixed": true
+    },
+    {
+      "name": "q3",
+      "value": -6.2994139,
+      "error": 0.01002883,
+      "min": 0,
+      "max": 0,
+      "fixed": true
+    },
+    {
+      "name": "q4",
+      "value": -4.7227228,
+      "error": 0.0055708922,
+      "min": 0,
+      "max": 0,
+      "fixed": true
+    },
+    {
+      "name": "q5",
+      "value": -0.015325951,
+      "error": 0.0021026552,
+      "min": 0,
+      "max": 0,
+      "fixed": true
+    },
+    {
+      "name": "q6",
+      "value": -2.1844147,
+      "error": 0.0063551774,
+      "min": 0,
+      "max": 0,
+      "fixed": true
+    },
+    {
+      "name": "xminF",
+      "value": 0.06,
+      "error": 0,
+      "min": 0.06,
+      "max": 0.06,
+      "fixed": true
+    },
+    {
+      "name": "xmaxF",
+      "value": 0.3,
+      "error": 0,
+      "min": 0.3,
+      "max": 0.3,
+      "fixed": true
+    }
+  ],
+  "validation": {
+    "selection_score": 0.023700124,
+    "selection_pass": true,
+    "support_range_GeV": [0.04, 0.3],
+    "scan_range_GeV": [0.05, 0.25],
+    "normalization_target_count": 141251508,
+    "n_toys": 0,
+    "full_range": {
+      "observed": 1.4125151e+08,
+      "fit_expected": 1.4125151e+08,
+      "toy_mean": 0
+    },
+    "scan_range": {
+      "observed": 1.3880722e+08,
+      "fit_expected": 1.4039697e+08,
+      "toy_mean": 0
+    },
+    "low_sideband_fraction": {
+      "observed": 0.011750968,
+      "fit_expected": 0,
+      "toy_mean": null
+    },
+    "high_sideband_fraction": {
+      "observed": 0.0055535407,
+      "fit_expected": 0.0060497576,
+      "toy_mean": null
+    },
+    "scan_peak": {
+      "observed_height": 232706,
+      "observed_mass_GeV": 0.0773125,
+      "fit_expected_height": 272979.61,
+      "fit_expected_mass_GeV": 0.0600625,
+      "toy_mean_height": 0,
+      "toy_mean_mass_GeV": 0.0500625
+    }
+  }
+}
+  ]
+}

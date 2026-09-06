@@ -93,11 +93,12 @@ same mass window, but how their exclusions populate the $(m_{A^\prime},\eps^2)$ 
 over the broader low-mass visible-dark-photon range. In that space HPS occupies a
 distinct fixed-target niche between very-low-mass beam-dump and meson-decay constraints
 and the higher-mass collider reach. Figure~\ref{fig:hps-engineering-phase-space}
-shows that context using the legacy HPS phase-space contour inputs, with the old
+shows that context using legacy HPS phase-space contour inputs, with the old
 lepton-anomaly overlays deliberately omitted. The 2015 and 2016 HPS engineering-run
 prompt contours are highlighted because they are the directly relevant published HPS
 benchmarks for the present GPR analysis; both are displayed at an approximate 90\% CL
-by applying the same Gaussian-ratio rescaling used in the reach-notebook convention.
+using the historical reach-notebook rescaling. This display-only approximation is not a
+recalculation of either published likelihood and is not used in the v3 upper limit.
 
 \begin{figure}[H]
 \centering
@@ -112,10 +113,12 @@ NA64X17Visible2021,LHCbDarkPhoton2020,E137BeamDump1988,E141BeamDump1987,
 E774BeamDump1991,OrsayBeamDump1989,KEKBeamDump1986,U70DarkPhoton2014}. The thermal
 relic target band is shown as a benchmark for sub-GeV dark matter motivation
 \cite{EssigEtAl2011}. The HPS 2015 and 2016 engineering-run prompt limits are
-highlighted and rescaled from 95\% to an approximate 90\% CL by multiplying $\eps^2$ by
-$1.64/1.96$ \cite{HPS2015DarkPhoton,HPS2016PromptLong}; the NA48/2 and BaBar 95\%
-inputs are treated with the same display rescaling. Older $g-2$ contours from the
-source folder are intentionally omitted.}
+highlighted using the legacy display convention that multiplies the published 95\%
+$\eps^2$ contours by $1.64/1.96$ \cite{HPS2015DarkPhoton,HPS2016PromptLong}; the
+NA48/2 and BaBar inputs are treated in the same way. This approximate Gaussian-ratio
+rescaling is retained only for historical context and is not a recalculation of a
+90\% CL upper limit with the \CLs{} construction. Older $g-2$ contours from the source
+folder are intentionally omitted.}
 \label{fig:hps-engineering-phase-space}
 \end{figure}
 
@@ -215,13 +218,27 @@ blinded bins at every mass hypothesis and allows the signal extraction, local
 significance, modified-frequentist \CLs\ limits, radiative-fraction conversion, and shared-$\eps^2$
 combination to be written inside one consistent statistical framework.
 
-This change is especially valuable for the present HPS program because the current GPR
-workflow is already being validated over wider scan windows than the published 2015 and
-2016 resonance searches. A stable global model therefore matters both for numerical
-smoothness and for physics reach: it is what makes it realistic to scan a wider mass
-range without losing narrow-resolution sensitivity, to propagate a consistent
-radiative-fraction treatment across datasets, and to combine statistically independent
-2015, 2016, and 2021 samples in a shared coupling parameter.
+This change is especially valuable for the present HPS program because one statistical
+workflow must describe three campaigns with different mass ranges and detector
+configurations. In v4 the tested signal hypotheses span \SIrange{19}{90}{MeV} for
+2015, \SIrange{39}{180}{MeV} for 2016, and \SIrange{50}{250}{MeV} for 2021, while
+the GP fit supports extend beyond those tested intervals to
+\SIrange{14}{135}{MeV}, \SIrange{30}{210}{MeV}, and
+\SIrange{40}{300}{MeV}, respectively. A stable GP model therefore matters both for
+numerical smoothness and for carrying the same radiative-fraction and uncertainty
+treatment across datasets without sacrificing narrow-resolution sensitivity. It also
+motivates the combined analysis:
+the minimal visible $A^\prime$ model predicts one common coupling $\eps^2$ at a given
+mass, while each HPS run maps that coupling into a different expected signal yield
+through its own integrated luminosity, acceptance, resolution, and radiative
+normalization. The
+statistical combination therefore treats $\eps^2$ as the shared parameter of interest
+and multiplies the independent dataset likelihoods, profiling the dataset-specific
+background nuisance parameters separately. In this common-parameter construction,
+datasets with better local signal-to-background leverage carry more information, while
+weaker channels still contribute correctly; the gain in sensitivity comes from adding
+independent likelihood information for the same minimal-model signal rather than from
+averaging separate limits after the fact.
 
 \subsection{Scope of this note}
 
@@ -231,11 +248,10 @@ inputs: the detector apparatus that defines the mass resolution and acceptance, 
 dataset-specific radiative-fraction normalization that converts signal yield into
 $\eps^2$, and the profile-likelihood methodology used to quote local significance and
 upper limits. The 2015 data are fully unblinded and are used as the most mature
-validation sample. The 2016 and 2021 datasets are treated in staged-analysis form, and
-the combined 2015+2016 10\%+2021 1\% study is presented as the current shared-coupling
-baseline.
+validation sample. The v4 result combines the full 2015 and 2016 samples with the
+reviewed 2021 10\% sample in one shared-coupling likelihood. The 2021 contribution
+remains a staged partial-data result rather than the final full-2021 unblinding.
 
 The 2019 physics run is mentioned only as part of the detector evolution from the
-2015/2016 baseline configuration to the 2019/2021 upgraded configuration. Data were
-recorded in 2019 with the upgraded detector, but their dedicated prompt-resonance
-analysis is beyond the scope of the present note and will be documented separately.
+2015/2016 baseline configuration to the 2019/2021 upgraded configuration. Its data do
+not enter the v4 prompt-resonance analysis.

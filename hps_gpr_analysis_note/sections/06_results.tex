@@ -1,483 +1,404 @@
+% These summaries are generated from the reviewed 232-row v4.2 result tables.
+\providecommand{\VFourPTwoLocalPZeroMinimum}{\ensuremath{3.25918\times10^{-5}}}
+\providecommand{\VFourPTwoLocalPZeroMass}{\SI{65}{MeV}}
+\providecommand{\VFourPTwoLocalZ}{\ensuremath{3.99321}}
+\providecommand{\VFourPTwoEffectiveTrials}{\ensuremath{35.3814}}
+\providecommand{\VFourPTwoSidakValue}{\ensuremath{0.00115250}}
+\providecommand{\VFourPTwoSidakZ}{\ensuremath{3.04783}}
+\providecommand{\VFourPTwoEpsHat}{\ensuremath{6.42706\times10^{-6}}}
+\providecommand{\VFourPTwoEpsHatSigma}{\ensuremath{1.61009\times10^{-6}}}
+
 \section{Results}
 \label{sec:results}
 
-This section summarizes the corrected limit and projection products used for the
-current internal review. The plots shown here are copied from the corrected CSV-driven
-summaries so that the note, Overleaf upload, and local compilation use the same figure
-inputs. The section is organized around five reader questions:
-\begin{itemize}
-\item What are the individual dataset inputs?
-\item What is the corrected simultaneous shared-$\eps^2$ limit?
-\item Which observed fluctuations affect the limit and discovery diagnostics?
-\item What full-statistics reach is projected?
-\item How does that projection compare with published HPS and BaBar exclusions?
-\end{itemize}
+Version 4.2 adopts the v4.1 factor-12 upper length-scale setting for the full
+2016 sample and completes the corresponding three-campaign result. The full 2015
+and 2016 samples and the reviewed 2021 10\% sample enter one shared-$\eps^2$
+likelihood. Relative to v4, only the 2016 resolution-scaled length-scale upper
+factor changes, from 8 to 12; the data, mass grids, fit supports, blind and
+training-exclusion geometry, lower factors, likelihood, and 90\% asymptotic
+\CLs{} construction are unchanged.
 
-The central result remains a simultaneous shared-$\eps^2$ analysis. At a fixed mass
-hypothesis a single coupling value predicts a dataset-dependent signal yield through
-the conversion factors of Sections~\ref{sec:methodology} and
-\ref{sec:event-selection}. The individual 2015, 2016 10\%, and 2021 1\% limits are
-therefore useful diagnostics and comparison curves, but the combined curve is not made
-by taking the envelope of those individual upper limits. It is the direct result of the
-profiled simultaneous likelihood in the common coupling parameter.
+The v4.2 products comprise the combined observed limit and its principal
+300-pseudoexperiment conditional ensemble, the three campaign-level observed
+limits, auxiliary 100-pseudoexperiment standalone and pairwise conditional
+ensembles, and fixed-mass asymptotic $p_0$ scans. The auxiliary bands are
+evaluated from the reviewed campaign states and are not reassigned from the
+three-campaign ensemble.
 
-\subsection{Individual data set inputs}
-\label{sec:results-individual-inputs}
+\subsection{Declared v4.2 result state}
+\label{sec:results-v4p2-analysis-state}
 
-Figure~\ref{fig:results-individual-eps2} shows the corrected individual-dataset
-$\eps^2$ limit summaries for the three inputs that enter the current combination. The
-2015 curve covers the lower mass range, the 2016 10\% curve extends into the middle
-and upper prompt-search region, and the 2021 1\% curve provides the widest high-mass
-coverage. These panels are included for two reasons: they provide a direct check that
-the yield-to-coupling conversion is sensible dataset by dataset, and they make clear
-which single-dataset fluctuations can influence the simultaneous observed limit.
-
-\begin{figure}[p]
+\begin{table}[H]
 \centering
-\begin{subfigure}[t]{0.32\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/individual_datasets/2015_eps2_coupling_bands_observed_expected.png}
-  \caption{2015.}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.32\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/individual_datasets/2016_eps2_coupling_bands_observed_expected.png}
-  \caption{2016 10\%.}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.32\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/individual_datasets/2021_eps2_coupling_bands_observed_expected.png}
-  \caption{2021 1\%.}
-\end{subfigure}
-\caption{Individual 95\% CL upper limits on $\eps^2$ for the three datasets used in
-the corrected simultaneous combination. The observed curves are shown together with
-their expected bands. These figures are diagnostic inputs to the shared-coupling
-combination; the combined result is obtained from the joint likelihood, not by
-selecting the lowest individual curve.}
-\label{fig:results-individual-eps2}
-\end{figure}
+\small
+{\setlength{\tabcolsep}{5pt}
+\begin{tabular}{lccccc}
+\toprule
+Campaign & Sample & Search [MeV] & GP support [MeV] &
+$k_{\min}$ & $k_{\max}$ \\
+\midrule
+2015 & full & 19--90  & 14--135 & 1.0 & 8 \\
+2016 & full & 39--180 & 30--210 & 0.9 & 12 \\
+2021 & 10\% & 50--250 & 40--300 & 1.1 & 15 \\
+\bottomrule
+\end{tabular}
+}
+\caption{Data samples, search intervals, GP fit supports, and
+resolution-scaled length-scale factors used for the v4.2 results. The factor-12
+setting for full 2016 is the accepted outcome of the v4.1 range study. Because
+that study followed the observed v4 boundary diagnostic, this table is not a
+pre-unblinding freeze or a direct-coverage qualification.}
+\label{tab:results-v4p2-configuration}
+\end{table}
 
-The corresponding local discovery $p_0$ scans are shown in
-Figure~\ref{fig:results-individual-p0}. These curves answer a different question than
-the upper limits: they test whether the observed spectrum contains a positive local
-excess at a fixed mass. They are included to identify the mass regions where an
-observed upper limit may weaken because a single dataset fluctuates upward. The global
-overlays are effective-trials references and should not be treated as the final
-discovery calibration.
+At a mass covered by more than one campaign, the simultaneous likelihood profiles
+one common $\eps^2$. Campaign-specific luminosity, radiative fraction, resolution,
+efficiency, and branching inputs map that parameter to separate expected signal
+yields. The combined curve is therefore a direct shared-coupling result rather
+than a pointwise envelope or a luminosity-scaled earlier limit. The
+minimal-visible branching correction above the dimuon threshold is applied
+consistently to every curve.
 
-\begin{figure}[p]
-\centering
-\begin{subfigure}[t]{0.32\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/individual_datasets/2015_local_p0_with_global_p_overlay.png}
-  \caption{2015.}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.32\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/individual_datasets/2016_local_p0_with_global_p_overlay.png}
-  \caption{2016 10\%.}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.32\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/individual_datasets/2021_local_p0_with_global_p_overlay.png}
-  \caption{2021 1\%.}
-\end{subfigure}
-\caption{Individual one-sided local $p_0$ scans. These plots locate the local upward
-fluctuations in the input spectra. They are diagnostic inputs to the combined
-significance discussion; the final global discovery statement should be based on the
-maximum combined discovery statistic over the scan range.}
-\label{fig:results-individual-p0}
-\end{figure}
+\subsection{Controlled 2016 upper-range study}
+\label{sec:results-v4p1-lsupper-study}
+\label{sec:results-v4-support-audit}
 
-\subsection{Corrected simultaneous observed limit}
-\label{sec:results-combined-151621-1pct}
-
-The corrected observed and expected simultaneous limit is shown in
-Figure~\ref{fig:results-combined-corrected-band}. The expected bands are taken from
-the corrected combined-band summary, while the observed curve is the corrected
-CSV-merged observed limit. This separation is useful because the expected bands are
-already stable, whereas the observed curve required targeted checks of several
-mass-point exports. The resulting presentation keeps the full corrected band envelope
-and overlays the corrected observed limit on the same $\eps^2$ axis.
+The study evaluates $k_{\max,2016}=8,10,12,15,$ and 20 on the same 142 hypotheses
+from 39 to 180~MeV. A state is classified as upper-bound occupied when
+$\ell_{\mathrm{opt}}/\ell_{\max}\geq0.999$. The occupancy falls from 142 of 142 at
+factor 8 to 56 of 142 at factor 10 and zero at factors 12, 15, and 20.
 
 \begin{figure}[H]
 \centering
-\graphicorplaceholder{0.90\linewidth}{final_limit_projection_figs/combined/combined_corrected2_bands_with_correct_observed_eps2.png}
-\caption{Corrected simultaneous 2015$+$2016 10\%$+$2021 1\% upper limit on
-$\eps^2$. The green and yellow bands are the corrected expected 68\% and 95\%
-background-only intervals, and the black curve is the corrected observed
-shared-coupling limit. This is the primary current band figure for the simultaneous
-analysis.}
-\label{fig:results-combined-corrected-band}
+\graphicorplaceholder{0.92\linewidth}{final_limit_projection_figs/v4p1_20260804_2016_lsupper/lml_and_length_scale_boundary_occupancy.pdf}
+\caption{Controlled full-2016 upper-length-scale study. The panels show the
+optimized length scale relative to the local resolution and ceiling, together with
+the log-marginal-likelihood response for factors 8, 10, 12, 15, and 20. Factor 12
+is the first scanned value with zero upper-bound occupancy and is followed by a
+stable factor-15 and factor-20 plateau. The scan uses observed data, so it
+diagnoses a numerical-range restriction; it is not a coverage or
+expected-sensitivity optimization.}
+\label{fig:results-v4p1-lsupper-study}
 \end{figure}
 
-Figure~\ref{fig:results-observed-overlay} overlays the corrected combined observed
-limit with the three individual observed limits. This comparison is deliberately not a
-combination prescription. It is a diagnostic showing whether the shared fit behaves in
-a physically recognizable way relative to the constituent datasets. In the genuine
-overlap region, a downward background fluctuation or a stronger expected constraint in
-one dataset can pull the best individual curve below the simultaneous observed curve.
-Conversely, when the datasets have compatible behavior, the simultaneous test can give
-a stronger observed limit than any single input.
+Questionable branches were rerun with the data and card held fixed. Across the four
+new factor scans, 14 selected repair rows use the largest log marginal likelihood
+among actual repeated fits, and each selected row is independently reproduced. No
+limit, significance, or GP coordinate is interpolated. From factor 12 to 15, the
+largest pointwise change in the 2016 observed yield upper limit is 0.083\%, the
+largest $|\Delta Z|$ is 0.00255, and the log-marginal-likelihood differences lie in
+$[-4.5,8.0]\times10^{-6}$. The factor-15 to factor-20 comparison is similarly
+stable. These results define factor 12 as the first nonbinding plateau setting.
+Neither the direction of the observed-limit change nor the local $p_0$ values
+enter that rule.
+
+The ten-toy 2021 source-and-exposure screen in
+Section~\ref{sec:v4p1-ls-exposure-pilot} is not part of this selection rule. It is
+a later fit-space pilot and supplies neither an expected band nor a coverage
+qualification or trials correction for the observed factor scan. None of the
+observed limits or asymptotic $p_0$ values below is conditioned on a conclusion
+drawn from those ten toys.
+
+\subsection{Exact reconstruction and conditional ensemble}
+\label{sec:results-v4p2-reconstruction}
+
+The reviewed state ledger contains exactly 415 campaign--mass GP states: 72 for
+2015, 142 for 2016, and 201 for 2021. The final runner reconstructs the GP mean
+and covariance at those exact optimized coordinates and evaluates the shared
+\texttt{count\_scale} likelihood on the union of 232 mass hypotheses. Every
+reported limit and local asymptotic $p_0$ is evaluated at an actual fitted state;
+no mass point, GP coordinate, limit, or significance is interpolated.
+
+The combined expected distribution uses 300 conditional background-only
+pseudoexperiments at each mass. Within a mass, a common toy index joins the
+campaign-specific draws entering the simultaneous likelihood. Different masses
+are generated independently, so these are mass-local limit pseudoexperiments,
+not 300 scan-wide toy spectra. Each pseudoexperiment holds the reviewed GP
+hyperparameters fixed, without a GP refit, and uses the same asymptotic inner
+90\% \CLs{} construction as the observed limit. This ensemble supports
+descriptive combined-limit quantiles and mass-local limit-tail comparisons; it
+does not establish direct \CLs{} coverage or a scan-wise discovery probability.
+
+\subsection{Combined observed limit and conditional bands}
+\label{sec:results-v4p2-combined-limit}
+\label{sec:results-v4-combined-limit}
 
 \begin{figure}[H]
 \centering
-\graphicorplaceholder{0.90\linewidth}{final_limit_projection_figs/combined/observed_eps2_overlay_individual_and_correct_combined.png}
-\caption{Observed 95\% CL upper limits on $\eps^2$ for the individual datasets and the
-corrected simultaneous combination. The 2016 input is the 10\% subset and the 2021
-input is the 1\% subset. The combined curve is the direct simultaneous result in a
-shared coupling parameter, not the pointwise minimum of the individual curves.}
-\label{fig:results-observed-overlay}
+\graphicorplaceholder{0.92\linewidth}{final_limit_projection_figs/v4p2_20260805_combined300/combined_observed_bands300_minimal_visible.pdf}
+\caption{Combined 90\% asymptotic \CLs{} upper limit on $\eps^2$ in the
+minimal-visible interpretation. The red curve is the observed limit. The median
+and central 68\% and 95\% bands are obtained from the 300 mass-local
+conditional background-only pseudoexperiments described in the text. The full
+2015 and 2016
+samples and the 2021 10\% sample enter the same shared-coupling likelihood. No
+curve or band edge is interpolated.}
+\label{fig:results-v4p2-combined-band}
 \end{figure}
 
-The observed-data extraction display in
-Figure~\ref{fig:results-combined-151621-1pct-display} shows a representative mass point
-from the same corrected simultaneous workflow. It is included here, before the
-projection material, because it exposes the dataset-level spectra, profiled backgrounds,
-and extracted signal components that underlie the shared-coupling limit curve.
+Across the 232 hypotheses, the observed-to-median limit ratio ranges from
+0.514396 at 73~MeV to 3.29400 at 65~MeV. These pointwise ratios locate the
+strongest and weakest observed excursions relative to this conditional ensemble;
+they are not coverage statements.
+
+\subsection{Campaign-level observed limits}
+\label{sec:results-v4p2-individual-limits}
 
 \begin{figure}[H]
 \centering
-\graphicorplaceholder{0.96\linewidth}{observed_display_combined_119MeV.png}
-\caption{Observed shared-coupling extraction display at a mass hypothesis of
-\SI{119}{MeV}. The top row shows, for 2015, 2016, and 2021 separately, the observed
-mass spectrum in the fit region together with the GP background prediction, the
-profiled background, the best-fit signal$+$background model, and the blinded window.
-The middle row recasts the same mass window as residuals relative to the profiled
-background, overlays the extracted signal component for each dataset, and includes the
-residual uncertainty bands used throughout the observed-data validation workflow. The
-lower panel maps the extracted signal templates into the common variable
-$(m-m_0)/\sigma_m$ and shows how the dataset-level extractions sum to the combined
-black curve.}
-\label{fig:results-combined-151621-1pct-display}
+\graphicorplaceholder{0.92\linewidth}{final_limit_projection_figs/v4p2_20260805_combined300/individual_observed_limits_minimal_visible.pdf}
+\caption{Observed 90\% asymptotic \CLs{} upper limits on $\eps^2$ for the full
+2015 sample, the full 2016 sample, and the 2021 10\% sample, shown with the
+simultaneous combined result. All curves use the minimal-visible interpretation
+and the exact reviewed GP states. This compact comparison intentionally shows
+only observed curves. The separately generated standalone conditional bands
+are shown in Figure~\ref{fig:results-v4p2-standalone-bands}; the combined bands
+in Figure~\ref{fig:results-v4p2-combined-band} are not reassigned to the
+individual curves.}
+\label{fig:results-v4p2-individual-limits}
 \end{figure}
 
-The ratio in Figure~\ref{fig:results-combined-best-ratio} makes the same diagnostic
-more quantitative. It plots the observed combined upper limit in $\eps$ divided by the
-best, meaning lowest, active individual observed upper limit in $\eps$ at each mass.
-Values below one indicate that the simultaneous observed result improves on every
-active single-dataset observed limit. Values above one indicate that, at that mass, the
-best individual dataset alone has a stronger observed exclusion than the simultaneous
-fit. This can happen for observed limits because the combined test must accommodate the
-data in all active spectra at one common coupling; it is not evidence by itself that
-the expected simultaneous sensitivity is worse. It is instead a useful audit of where
-observed upward fluctuations, active-dataset changes, or conversion-factor differences
-drive the shape of the combined observed curve.
+The campaign-level curves expose which data set contributes at each mass while
+preserving the distinction between a standalone likelihood and the shared-$\eps^2$
+combination. They should not be read as components that can be combined by taking
+an envelope.
+
+\subsection{Standalone and pairwise conditional limit ensembles}
+\label{sec:results-v4p2-standalone-pairwise-bands}
+
+An auxiliary ensemble documents the expected fixed-state limit distribution for
+each standalone campaign and each of the three pairwise shared-$\eps^2$
+likelihoods. At every mass, it reconstructs the accepted v4.2
+300-pseudoexperiment parent stream and selects toy indices 0--99. The same
+campaign-specific pseudo-spectrum is therefore reused whenever that campaign
+appears at a common toy index. The 415 standalone campaign--mass rows and 224
+genuine two-campaign overlap rows contain exactly 100 finite upper limits each,
+for 63,900 evaluated toy limits. The reviewed GP state is held fixed in every
+pseudoexperiment.
 
 \begin{figure}[H]
 \centering
-\graphicorplaceholder{0.90\linewidth}{final_limit_projection_figs/diagnostics/combined_vs_best_individual_observed_epsilon_ratio.png}
-\caption{Diagnostic ratio of the corrected observed simultaneous upper limit in
-$\eps$ to the best active individual observed upper limit in $\eps$. A ratio below one
-means the simultaneous observed limit is stronger than each individual observed limit;
-a ratio above one means the best individual dataset gives the tighter observed limit at
-that mass. The ratio is not an expected-sensitivity metric; it is an observed-data
-audit of how the shared-coupling fit responds to the active datasets.}
-\label{fig:results-combined-best-ratio}
+\graphicorplaceholder{0.94\linewidth}{final_limit_projection_figs/v4p2_20260805_combined300/standalone_observed_bands100_minimal_visible.pdf}
+\caption{Standalone 90\% asymptotic \CLs{} upper limits on minimal-visible
+$\eps^2$ for (a) the full 2015 sample, (b) the full 2016 sample, and (c) the
+2021 10\% sample. Red curves are the reviewed observed limits. Dashed curves
+and green and yellow bands are the medians and central 68\% and 95\% intervals
+from 100 mass-local conditional background-only pseudoexperiments at each
+hypothesis. Each toy is evaluated with the native standalone amplitude-root
+convention and the same reviewed amplitude-to-$\eps^2$ conversion as its
+observed row. The GP is not refit. These are descriptive fixed-state
+toy-limit quantiles, not direct-coverage intervals or a coherent scan-wide
+ensemble. The dotted line in panel (c) marks the dimuon threshold.}
+\label{fig:results-v4p2-standalone-bands}
 \end{figure}
 
-\subsection{Limit-tail and discovery diagnostics}
-\label{sec:results-discovery-diagnostics}
-
-The limit-tail diagnostics and the discovery $p_0$ scan are intentionally kept
-separate. Figure~\ref{fig:results-limit-tail-diagnostic} compares the observed CL$_s$
-upper limit with the background-only limit ensemble and shows the corrected local and
-global reference thresholds. These quantities test how unusually strong or weak the
-observed limit is. They are not the discovery p-value.
+The pairwise likelihood is evaluated only where both named campaigns are
+active: 39--90~MeV for 2015+2016, 50--90~MeV for 2015+2021, and
+50--180~MeV for 2016+2021. For a complete search display, the curves extend
+over the union of the two campaign ranges by using the exact corresponding
+standalone row outside the overlap. No additional singleton ensemble is drawn,
+and the activity rail records every change in likelihood content.
 
 \begin{figure}[H]
 \centering
-\graphicorplaceholder{0.88\linewidth}{final_limit_projection_figs/diagnostics/combined_toy_limit_tail_areas_with_corrected_global_thresholds.png}
-\caption{Toy-limit diagnostic for the simultaneous upper limit, with corrected global
-reference thresholds. The dashed global-threshold lines use the inverse trials
-correction, so the local p-value required for a fixed global significance lies below
-the corresponding local-only reference. This panel diagnoses the observed limit
-relative to background-only limit toys; it is distinct from the discovery statistic.}
-\label{fig:results-limit-tail-diagnostic}
+\graphicorplaceholder{0.94\linewidth}{final_limit_projection_figs/v4p2_20260805_combined300/pairwise_observed_bands100_minimal_visible.pdf}
+\caption{Pairwise shared-$\eps^2$ 90\% asymptotic \CLs{} upper limits for
+(a) full 2015 + full 2016, (b) full 2015 + 2021 10\%, and (c) full 2016 +
+2021 10\%. Line and band conventions match
+Figure~\ref{fig:results-v4p2-standalone-bands}. In each overlap, a common toy
+index joins independent campaign-specific conditional GP-posterior and Poisson
+draws, and the likelihood profiles one shared $\eps^2$ with campaign-specific
+signal normalizations. Outside the overlap, the displayed search reduces
+exactly to the active standalone likelihood; the activity rails identify those
+regions. These curves are direct simultaneous limits where both campaigns are
+active, not pointwise envelopes or algebraic combinations of standalone
+limits. Their 100-toy bands remain mass-local descriptive fixed-GP quantiles,
+not coverage-calibrated intervals or a scan-wide ensemble.}
+\label{fig:results-v4p2-pairwise-bands}
 \end{figure}
 
-The discovery-oriented local/global curves are shown in
-Figure~\ref{fig:results-combined-significance}. The local $p_0$ curve is the
-one-sided fixed-mass profile-likelihood discovery test. The global overlay is the
-effective-trials approximation to the scan hypertest and should be replaced by a
-toy-calibrated $q_{0,\max}$ distribution for any final discovery claim.
+\subsection{Mass-local combined limit-tail diagnostics}
+\label{sec:results-v4p2-limit-tails}
 
 \begin{figure}[H]
 \centering
-\begin{subfigure}[t]{0.48\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/diagnostics/combined_local_p0_with_global_p_overlay.png}
-  \caption{Local and approximate global $p_0$.}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.48\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/diagnostics/combined_local_Z_with_global_Z_overlay.png}
-  \caption{Equivalent local and approximate global $Z$.}
-\end{subfigure}
-\caption{Discovery-oriented local/global diagnostics for the corrected simultaneous
-analysis. The local curve is the fixed-mass one-sided discovery test. The global curve
-is an effective-trials approximation and is shown to guide review; the final
-look-elsewhere result should come from a simultaneous scan toy calibration.}
-\label{fig:results-combined-significance}
+\graphicorplaceholder{0.90\linewidth}{final_limit_projection_figs/v4p2_20260805_combined300/combined_limit_tail_pvalues300.pdf}
+\caption{Mass-local empirical tail fractions of the combined observed limit
+within the 300-pseudoexperiment conditional ensemble. The strong tail counts toy
+limits at least as tight as observed, the weak tail counts toy limits at least as
+weak as observed, and the bounded two-sided quantity is twice the smaller
+one-sided fraction, capped at unity. A zero count denotes finite ensemble
+resolution, not an exact zero probability. These limit-tail diagnostics are
+distinct from the discovery $p_0$ scan.}
+\label{fig:results-v4p2-limit-tails}
 \end{figure}
 
-\subsection{Full-statistics projections and published HPS comparison}
-\label{sec:results-full-projections}
+The strong-tail count is $0/300$ at 71, 72, and 73~MeV, while the weak-tail
+count is $0/300$ at 21, 65, and 66~MeV. The bounded two-sided diagnostic is
+$2\times(0/300)$ on the union of those masses. The corresponding one-sided
+empirical resolution is therefore no finer than one count in 300. No scan-level
+probability is assigned to these mass-local extrema.
 
-The projected full-data reach is an observed-equivalent scaling study. The 2015 sample
-is held fixed, the 2016 10\% subset is scaled to 100\%, and the 2021 1\% subset is
-scaled to 100\%. The scaling is applied through the local density/exposure factor used
-in the yield-to-$\eps^2$ conversion, so the projected $\eps^2$ limit scales as
-$\sqrt{\rho_{\mathrm{current}}/\rho_{\mathrm{projected}}}$ at each mass before the
-comparison curves are drawn. This is a sensitivity projection, not a substitute for a
-new observed full-statistics simultaneous fit.
-
-Figure~\ref{fig:results-projection-published-combined} compares the projected
-2015$+$2016$+$2021 full-data simultaneous reach with the published 2016 HPS upper
-limit. The lower ratio panel shows that the full-data simultaneous projection is
-substantially stronger than the published 2016 result over most of the plotted range;
-the median projected/published ratio is about 0.11, corresponding to a median
-improvement factor of about 9.2 in $\eps^2$.
+\subsection{Local asymptotic discovery p-values}
+\label{sec:results-v4p2-local-p0}
+\label{sec:results-v4-local-p0}
 
 \begin{figure}[H]
 \centering
-\graphicorplaceholder{0.92\linewidth}{final_limit_projection_figs/projections/published_2016_vs_projected_combined_100pct_eps2.png}
-\caption{Projected 2015$+$2016$+$2021 100\% simultaneous $\eps^2$ reach compared with
-the published 2016 HPS upper limit. The ratio panel shows the projected limit divided
-by the published limit, so values below one indicate an improvement relative to the
-published 2016 result.}
-\label{fig:results-projection-published-combined}
+\graphicorplaceholder{0.90\linewidth}{final_limit_projection_figs/v4p2_20260805_combined300/combined_local_p0_sidak_reference.pdf}
+\caption{Combined fixed-mass asymptotic $p_0$ scan for the v4.2 factor-12
+result. The analytic \v{S}id\'ak reference uses the resolution-spacing
+effective-trials estimate. It adjusts only the mass scan for this fixed card; it
+does not include the post-v4 upper-bound study and is not a toy-calibrated global
+$p$-value.}
+\label{fig:results-v4p2-local-p0}
 \end{figure}
 
-Figure~\ref{fig:results-projection-published-2016} isolates the 2016 scaling by
-promoting the current 2016 10\% observed-equivalent curve to 2016 100\%. This is a
-cleaner check of exposure scaling because it does not mix detector configurations or
-mass ranges. The median projected/published ratio is about 0.71, so the 2016-only
-100\% projection improves on the published curve on average but not uniformly at every
-mass.
+The smallest combined fixed-mass asymptotic value is
+\VFourPTwoLocalPZeroMinimum{} at \VFourPTwoLocalPZeroMass, corresponding to
+$Z_{\mathrm{local}}=\VFourPTwoLocalZ$. Applying the resolution-spacing estimate
+$N_{\mathrm{eff}}=\VFourPTwoEffectiveTrials$ gives the conditional analytic
+reference $p_{\mathrm{Sidak}}=\VFourPTwoSidakValue$
+($Z_{\mathrm{Sidak}}=\VFourPTwoSidakZ$). This reference neither includes the
+observed-data upper-bound scan nor replaces a scan-wise maximum-$q_0$ ensemble.
 
 \begin{figure}[H]
 \centering
-\graphicorplaceholder{0.92\linewidth}{final_limit_projection_figs/projections/published_2016_vs_projected_2016_100pct_eps2.png}
-\caption{Projected 2016 100\% observed-equivalent $\eps^2$ reach compared with the
-published 2016 HPS upper limit. This plot isolates the effect of scaling the 2016
-10\% development sample to the full 2016 exposure. The difference between the 2016
-radiative fraction and the current projection is that the projection uses a constant
-value of 5\% instead of the fitted polynomial; as in other years, this approximation
-has been satisfactory.}
-\label{fig:results-projection-published-2016}
+\graphicorplaceholder{0.90\linewidth}{final_limit_projection_figs/v4p2_20260805_combined300/individual_local_p0.pdf}
+\caption{Campaign-level fixed-mass asymptotic $p_0$ scans for full 2015, full
+2016, and the 2021 10\% sample. Their minima are
+$8.46283\times10^{-4}$ at 51~MeV ($Z=3.13947$),
+$3.08781\times10^{-4}$ at 90~MeV ($Z=3.42378$), and
+$1.05702\times10^{-5}$ at 65~MeV ($Z=4.25249$), respectively. These are
+standalone local diagnostics, not global significances or components of the
+combined tail fractions.}
+\label{fig:results-v4p2-individual-p0}
 \end{figure}
 
-For a compact visual summary, Figure~\ref{fig:results-projection-overlay} overlays the
-published 2016 result, the 2016-only 100\% projection, and the full simultaneous
-100\% projection. The full simultaneous projection is much deeper because the 2021
-sample is promoted from 1\% to 100\% and because the shared-coupling analysis can pool
-independent datasets where their mass ranges overlap.
+The individual and combined $p_0$ curves answer different likelihood questions.
+In particular, the smallest standalone local value need not equal the minimum of
+the simultaneous shared-coupling scan. Neither set receives a toy-derived trials
+correction from the limit ensemble.
+
+\subsection{Observed extraction at the 65 MeV local minimum}
+\label{sec:results-v4p2-m065-extraction}
+
+The observed extraction at the combined local minimum is reconstructed from the
+exact production GP states, with no kernel reoptimization and no interpolation
+between mass hypotheses. The simultaneous fit gives
+$\widehat{\eps^2}=\VFourPTwoEpsHat$ with profile uncertainty
+$\sigma_{\eps^2}=\VFourPTwoEpsHatSigma$. This coefficient is the best-fit
+positive signal component on the fixed v4.2 card; it is not an upper limit.
 
 \begin{figure}[H]
 \centering
-\graphicorplaceholder{0.88\linewidth}{final_limit_projection_figs/projections/published_2016_vs_100pct_projection_overlay_eps2.png}
-\caption{Overlay of the published 2016 HPS upper limit, the projected 2016 100\%
-observed-equivalent reach, and the projected 2015$+$2016$+$2021 100\% simultaneous
-reach.}
-\label{fig:results-projection-overlay}
-\end{figure}
-
-\subsection{BaBar comparison}
-\label{sec:results-babar-comparison}
-
-The observed 90\% upper-limit contour used in
-Figure~\ref{fig:results-babar-projection} is the contour provided by the BaBar
-collaboration for the visible-dark-photon search. For a like-for-like visual comparison
-to the HPS 95\% CL curves, the plotted BaBar curve is converted from a 90\% limit on
-$\eps$ to an approximate 95\% limit on $\eps^2$ with the one-sided Gaussian factor
-\begin{equation}
-\eps^2_{95}=\eps^2_{90}\frac{1.64485362695}{1.28155156554}
-=1.28348610\,\eps^2_{90}.
-\end{equation}
-This is an approximate confidence-level conversion, but it is the appropriate
-normalization for a faithful 95\%-versus-95\% visual comparison in the absence of the
-original BaBar likelihood.
-
-\begin{figure}[H]
-\centering
-\graphicorplaceholder{0.92\linewidth}{final_limit_projection_figs/babar_95_comparison/babar95_vs_projected_full_data_100pct.png}
-\caption{Projected full-data HPS simultaneous reach compared with the BaBar observed
-visible-dark-photon exclusion converted to 95\% CL on $\eps^2$
-\cite{BaBarDarkPhoton2014}. The lower panel shows projected HPS divided by BaBar.
-Values below one indicate projected HPS reach beyond the BaBar curve. In this
-projection HPS improves on BaBar in several low-mass pockets, but BaBar remains
-stronger over much of the high-mass range.}
-\label{fig:results-babar-projection}
-\end{figure}
-
-\FloatBarrier
-
-\subsection{2021 smeared versus unsmeared observed-limit comparison}
-\label{sec:results-2021-smearing-comparison}
-
-\analysisplaceholder{\textbf{2021 mass-resolution smearing comparison.} Reserve this
-subsection for the 2021 observed-limit overlay after the target-constrained smearing
-scale in Section~\ref{sec:massres-2021} is propagated through the production chain.
-The comparison should show smeared and unsmeared 2021 observed $\eps^2$ limits with
-identical radiative-fraction, selection, and GPR settings, plus a ratio panel or short
-summary of the effect on the observed limit.}
-
-\FloatBarrier
-
-\subsection{90\% CLs comparison suite}
-\label{sec:results-90cls-suite}
-
-The 90\% CLs rerun provides a useful cross-check of the final-limit machinery and a
-like-for-like comparison to external 90\% contours. The corrected combined result in
-this subsection uses the \path{v2} combined-only CSV exports from
-\path{obsUL90_combined_only_2015_2016_10pct_2021_1pct_blind2p25_lslb1p0_rpen7_dens1p64_10k_corrected}.
-Where the \path{v2} folder does not contain the corresponding individual observed
-band CSVs, the individual 90\% curves and bands are taken from the \path{v1}
-single-dataset CSVs. This keeps the simultaneous result tied to the corrected
-count-scale combined scan while preserving the individual inputs needed for the same
-diagnostic comparisons shown above at 95\% CL.
-
-For the minimal visible-dark-photon interpretation, the observed upper-limit display
-also includes the dimuon-threshold branching correction described in
-Section~\ref{sec:methodology-dimuon-threshold}. In the current \path{v2_dimuon}
-files this correction is unity below $2m_\mu$ and therefore does not change the
-below-threshold simultaneous observed scan. It affects only the 2021-only rows from
-\SIrange{212}{250}{MeV} in the combined-band plotting table.
-
-\begin{figure}[H]
-\centering
-\begin{subfigure}[t]{0.32\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/90cls/individual_datasets/2015_90cls_eps2_coupling_bands_observed_expected.png}
-  \caption{2015.}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.32\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/90cls/individual_datasets/2016_90cls_eps2_coupling_bands_observed_expected.png}
-  \caption{2016 10\%.}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.32\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/90cls/individual_datasets/2021_90cls_eps2_coupling_bands_observed_expected.png}
-  \caption{2021 1\%.}
-\end{subfigure}
-\caption{Individual 90\% CLs upper limits on $\eps^2$ from the \texttt{v1}
-single-dataset CSVs. These panels are used as diagnostic inputs to the 90\%
-combined-versus-individual comparison; the simultaneous 90\% limit is still obtained
-from the corrected shared-coupling combined scan.}
-\label{fig:results-90cls-individuals}
+\graphicorplaceholder{0.98\linewidth}{final_limit_projection_figs/v4p2_20260805_combined300/observed_extraction_m065_wide.pdf}
+\caption{Observed extraction at 65~MeV for the full 2015 sample, the full 2016
+sample, and the 2021 10\% sample. The top panels show data over
+$m_{A'}\pm5\sigma_m$, the fixed-GP background mean and predictive uncertainty,
+and display extensions of the standalone and simultaneous shared-$\eps^2$
+best-fit signal shapes. The vertical dashed lines mark the configured
+$\pm2.25\sigma_m$ blind-window boundaries; observed data are shown inside the
+former blind region and in the sidebands on both sides. The lower panels show
+data minus the pre-profile GP mean. Their error bars use the diagonal
+prior-predictive scale $\sqrt{\mu_{\mathrm{GP}}+C_{ii}}$ and therefore do not
+represent post-fit independent-bin uncertainties. The standalone estimates for
+2015, 2016, and 2021 are
+$(23.3366\pm9.7468)\times10^{-6}$,
+$(1.51921\pm2.55749)\times10^{-6}$, and
+$(8.99699\pm2.12083)\times10^{-6}$, respectively; the red curve in every panel
+uses the single simultaneous value
+$(6.42706\pm1.61009)\times10^{-6}$. Numerical fit information is kept in this
+caption rather than an in-figure text box.}
+\label{fig:results-v4p2-m065-extraction}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\graphicorplaceholder{0.90\linewidth}{final_limit_projection_figs/90cls/dimuon/combined_90cls_dimuon_corrected_eps2.png}
-\caption{Corrected combined 90\% CLs observed and expected upper limit on $\eps^2$,
-with the minimal-model dimuon-threshold branching factor folded into the
-electron-channel coupling interpretation. The correction is unity below
-$2m_\mu=\SI{211.3167}{MeV}$; in the present \texttt{v2\_dimuon} files it modifies only
-the 2021-only high-mass rows from \SIrange{212}{250}{MeV}. The expected bands are
-repaired only at the isolated coherent expected-band spikes identified in
-Figure~\ref{fig:results-90cls-repair-diagnostics}.}
-\label{fig:results-90cls-combined-band}
+\graphicorplaceholder{0.98\linewidth}{final_limit_projection_figs/v4p2_followups_20260806/figure62_profiled_residuals_physical68.pdf}
+\caption{Profiled residual diagnostics for the same 65~MeV extraction. In the
+first three panels, open blue circles use the background-only profiled
+expectation, orange triangles use the standalone signal-plus-background fit,
+and red points use the simultaneous shared-$\eps^2$ signal-plus-background fit.
+Each plotted quantity is the conditional Pearson residual
+$(n_i-\widehat{\lambda}_i)/\sqrt{\widehat{\lambda}_i}$ in the exact extraction
+window. These correlated post-fit diagnostics are not independent standard
+normal variates or per-bin significances. The lower-right panel shows the
+physical best fits and the nominal asymptotic $\eps^2\geq0$ profile sets
+defined by $\Delta(-2\ln L)\leq1$; these sets are not coverage calibrated.
+The 2016 set starts at the physical boundary, replacing the ambiguous negative
+endpoint of the former symmetric signed-Wald display. At the joint mode, the
+dataset-block contributions to $q_0$ are $+2.72558$, $-3.32200$, and
+$+16.54218$ for 2015, 2016, and 2021, respectively. Negative block
+contributions are allowed and are not standalone $q_0$ values.}
+\label{fig:results-v4p2-m065-residuals}
 \end{figure}
 
-The 90\% combined overlay and ratio diagnostics in
-Figure~\ref{fig:results-90cls-overlay-ratio} follow the same convention as the 95\%
-diagnostics. The combined curve is compared only with active individual datasets at
-each mass hypothesis, and the ratio is formed in $\eps$ so that it directly compares
-coupling reach rather than $\eps^2$ reach.
+The comparison shows that the localized feature is predominantly carried by the
+2021 10\% sample and is modestly supported by 2015. The 2016 spectrum does not
+favor the signal yield implied by the common coupling and lowers the
+simultaneous significance relative to the 2021 standalone value. The largest
+absolute shared-fit Pearson residual in any one displayed bin is approximately
+2.93; the combined $Z_{\mathrm{local}}=\VFourPTwoLocalZ$ is instead a
+correlated multi-bin profile-likelihood result. These plots document an
+apparent localized excess on the selected fixed card. They do not supply a
+scan-toy global significance, and the 300 mass-local limit pseudoexperiments do
+not calibrate such a claim.
+
+\subsection{Observed-equivalent 2021-statistics response compared with BaBar}
+\label{sec:results-v4p2-babar-response}
+
+Figure~\ref{fig:results-v4p2-babar-response} compares the reviewed v4.2
+combined observed 90\% asymptotic \CLs{} limit with the published BaBar visible
+dark-photon result \cite{BaBarDarkPhoton2014}.  The blue curve is a deliberately
+restricted density-response calculation: the full 2015 and 2016 contributions
+are held fixed, while only the observed count density of the 2021 10\% sample
+in the physical $m\pm1.64\sigma_m$ normalization window is multiplied by ten.
+At each mass the observed minimal-visible limit is scaled by the square root of
+the ratio of the current summed active-dataset density to the density after
+that replacement.  Thus the scaling is density weighted in overlap regions and
+is exactly $1/\sqrt{10}$ where only 2021 is active.
 
 \begin{figure}[H]
 \centering
-\begin{subfigure}[t]{0.48\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/90cls/combined/observed_90cls_eps2_overlay_individual_and_combined.png}
-  \caption{Observed individual and combined 90\% CLs limits.}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.48\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/90cls/diagnostics/combined_vs_best_individual_observed_epsilon_ratio_90cls.png}
-  \caption{Combined over best active individual observed limit in $\eps$.}
-\end{subfigure}
-\caption{Observed 90\% CLs combination diagnostics. The overlay shows the individual
-observed limits and the corrected simultaneous observed limit on $\eps^2$. The ratio
-panel shows where the simultaneous fit improves on the best active individual observed
-limit and where an individual observed fluctuation gives a stronger pointwise limit.}
-\label{fig:results-90cls-overlay-ratio}
+\graphicorplaceholder{0.98\linewidth}{final_limit_projection_figs/v4p2_followups_20260806/v4p2_babar_observed_equivalent_projection_eps2.pdf}
+\caption{Observed 90\% upper limits on the minimal-visible dark-photon kinetic
+mixing parameter $\eps^2$.  The dashed gray curve is the reviewed HPS-GPR v4.2
+combined observed asymptotic \CLs{} result from the full 2015 and 2016 samples
+and the 2021 10\% sample.  The blue curve holds 2015 and 2016 fixed and applies
+the observed-equivalent density response for 2021 at 100\% statistics.  The
+orange curve is the published BaBar visible-dark-photon observed 90\% limit
+\cite{BaBarDarkPhoton2014}.  The HPS proxy preserves fluctuations in the
+current observation; it is not an expected sensitivity, a future observed
+limit, or a refit to full-2021 data.  HPS and BaBar use different statistical
+constructions.  No HPS limit bands or projected $p$-values are shown.}
+\label{fig:results-v4p2-babar-response}
 \end{figure}
 
-\begin{figure}[H]
-\centering
-\graphicorplaceholder{0.90\linewidth}{final_limit_projection_figs/90cls/diagnostics/combined_90_vs_95cls_observed_expected_eps2.png}
-\caption{Combined 90\% and 95\% observed and expected-median upper limits on
-$\eps^2$. The lower panel shows the 95\%/90\% ratio and the one-sided Gaussian
-confidence-level scaling for orientation. Deviations from a flat Gaussian ratio track
-the mass-dependent CLs construction, interpolation, and observed-curve corrections.}
-\label{fig:results-90cls-vs-95cls}
-\end{figure}
+The current observed v4.2 curve has a minimum of
+$1.13397\times10^{-6}$ at 72~MeV and remains numerically above the BaBar
+contour on the integer-MeV HPS grid.  The response proxy reaches
+$4.51266\times10^{-7}$ at 73~MeV.  Its smallest pointwise ratio to the
+interpolated BaBar contour is 0.3747 at 98~MeV; the numerical crossings occur
+at 55 grid points in nine disconnected intervals.  Those intervals inherit
+the fluctuations in the present observation and are not probabilities for a
+future result.  The frozen inputs, all crossing intervals, and a ratio
+diagnostic are retained in the accompanying follow-up bundle.  A slide-ready
+companion uses the same upper panel and places
+projected-HPS-proxy/BaBar directly underneath.  Values below unity identify
+the masses where the proxy is numerically stronger; it changes no curve or
+comparison convention.
 
-\begin{figure}[H]
-\centering
-\begin{subfigure}[t]{0.48\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/90cls/projections/projected_full_unblinded_reach_90cls_eps2.png}
-  \caption{Projected full-unblinded 90\% reach.}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.48\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/90cls/babar_90_comparison/babar90_vs_projected_full_data_100pct.png}
-  \caption{Projected HPS reach compared with BaBar at 90\%.}
-\end{subfigure}
-\caption{Projected 90\% CLs reach comparisons. The full-unblinded projection scales
-the current 2016 10\% and 2021 1\% density inputs to 100\% while holding the 2015
-sample fixed. The BaBar comparison is projection-only on the HPS side: the current
-observed 90\% combined curve is intentionally omitted, and the lower panel shows
-projected HPS divided by the BaBar 90\% contour.}
-\label{fig:results-90cls-projection-babar}
-\end{figure}
+\subsection{Relation to v4 and validation boundary}
+\label{sec:results-v4p2-v4-context}
 
-\begin{figure}[H]
-\centering
-\begin{subfigure}[t]{0.48\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/90cls/diagnostics/combined_expected_band_spike_diagnostics_90cls.png}
-  \caption{Expected-band spike repairs.}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.48\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/90cls/diagnostics/combined_toy_limit_tail_areas_90cls.png}
-  \caption{Toy-tail diagnostics.}
-\end{subfigure}
-\caption{90\% CLs diagnostic plots used to audit the two corrected expected-band
-points and the behavior of the observed limit relative to the background-only toy
-limit ensemble. The toy-tail panel is plotted as p-value versus mass on a logarithmic
-y-axis and includes the local and Sidak scan-level global significance-reference
-thresholds used in the corresponding 95\% CLs diagnostic. The expected-band repair is
-limited to coherent one-point excursions at 103 and 198 MeV, where each expected-band
-quantile is replaced by the log-linear
-interpolation between neighboring mass hypotheses in the same active dataset set.}
-\label{fig:results-90cls-repair-diagnostics}
-\end{figure}
-
-\subsection{Forward placeholders}
-\label{sec:results-forward-placeholders}
-
-\analysisplaceholder{\textbf{First-round unblinding.} Reserve this subsection for the
-2015$+$2016 10\%$+$2021 10\% milestone once the corrected look-elsewhere rerun is
-available.}
-
-\analysisplaceholder{\textbf{Final combined analysis.} Reserve this subsection for the
-fully unblinded 2015$+$2016$+$2021 prompt-resonance result. The completed version
-should quote only the validated analysis range, the final scan-level global
-significance calibration, and the final radiative-fraction inputs.}
+Version 4.2 accepts factor 12 as the full-2016 numerical setting and reports the
+completed fixed-GP result on that card. The 300-pseudoexperiment combined
+ensemble and auxiliary 100-pseudoexperiment standalone and pairwise ensembles
+qualify their plotted conditional quantiles, while only the former is used for
+the reported mass-local combined limit-tail fractions. They do not
+retroactively turn the observed-data range study into a pre-unblinding choice.
+They also do not provide direct \CLs{} coverage, a GP-refit ensemble, or a
+scan-wise maximum-$q_0$ calibration. Those qualifications remain separate
+requirements for a coverage or global discovery claim.

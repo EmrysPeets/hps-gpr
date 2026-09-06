@@ -22,7 +22,7 @@ CL95_TO_CL90_EPS2 = 1.64 / 1.96
 FUNCFORM_ROOT_SPECS = [
     ("2015", NOTE_DIR.parent / "outputs" / "funcform_toys" / "funcform_2015_dataset_mod_toys.root"),
     ("2016", NOTE_DIR.parent / "outputs" / "funcform_toys" / "funcform_2016_dataset_mod_toys.root"),
-    ("2021", NOTE_DIR.parent / "outputs" / "funcform_toys" / "funcform_2021_dataset_mod_toys.root"),
+    ("2021", NOTE_DIR.parent / "outputs" / "funcform_toys" / "funcform_2021_1pct_search50_toys.root"),
 ]
 FUNCFORM_TITLES = {
     "2015": "HPS 2015",
@@ -31,6 +31,9 @@ FUNCFORM_TITLES = {
 }
 FUNCFORM_SCAN_RANGE_OVERRIDES_MEV = {
     "2016": (42.0, 210.0),
+}
+FUNCFORM_DISPLAY_RANGE_OVERRIDES_MEV = {
+    "2021": (0.0, 350.0),
 }
 FUNCFORM_COLORS = {
     "data": "#222222",
@@ -154,7 +157,9 @@ def _load_funcform_payload(dataset: str, root_path: Path) -> dict:
 
     support_lo, support_hi = meta["toy_support_range_GeV"]
     occupied = np.flatnonzero(data_vals > 0.0)
-    display_hi = float(edges[occupied[-1] + 1]) if occupied.size else float(support_hi)
+    display_hi = min(float(edges[occupied[-1] + 1]), float(support_hi)) if occupied.size else float(support_hi)
+    display_xlim_mev = (float(support_lo) * 1.0e3, display_hi * 1.0e3)
+    display_xlim_mev = FUNCFORM_DISPLAY_RANGE_OVERRIDES_MEV.get(dataset, display_xlim_mev)
     return {
         "dataset": dataset,
         "title": FUNCFORM_TITLES.get(dataset, dataset),
@@ -166,7 +171,7 @@ def _load_funcform_payload(dataset: str, root_path: Path) -> dict:
         "fit_curves": fit_curves,
         "toy_vals": np.asarray(toy_vals, dtype=float),
         "support_range_mev": (float(support_lo) * 1.0e3, float(support_hi) * 1.0e3),
-        "display_xlim_mev": (float(support_lo) * 1.0e3, display_hi * 1.0e3),
+        "display_xlim_mev": display_xlim_mev,
         "scan_range_mev": _funcform_scan_range_mev(dataset, meta["scan_range_GeV"]),
     }
 
@@ -707,8 +712,7 @@ def _phase_xy(
     sort: bool = True,
     y_max: float = 8.0e-4,
 ) -> tuple[np.ndarray, np.ndarray]:
-    delimiter = None if name.endswith(".dat") else ","
-    x_raw, y_raw = _read_phase_contour(name, delimiter=delimiter)
+    x_raw, y_raw = _read_phase_contour(name, delimiter=",")
     if columns == (1, 0):
         x_raw, y_raw = y_raw, x_raw
 
@@ -966,8 +970,22 @@ def _style_phase_axis(
     ax.set_xlabel(r"$m_{A'}$ [MeV]")
     ax.set_ylabel(r"Kinetic mixing $\epsilon^2$")
     ax.set_title(title, fontsize=12.2)
-    ax.set_xticks([5, 10, 20, 50, 100, 200, 500, 1000])
-    ax.set_xticklabels(["5", "10", "20", "50", "100", "200", "500", "1000"])
+    tick_pairs = [
+        (1, "1"),
+        (2, "2"),
+        (5, "5"),
+        (10, "10"),
+        (20, "20"),
+        (50, "50"),
+        (100, "100"),
+        (200, "200"),
+        (500, "500"),
+        (1000, "1000"),
+    ]
+    ticks = [tick for tick, _ in tick_pairs if xlim[0] <= tick <= xlim[1]]
+    labels = [label for tick, label in tick_pairs if xlim[0] <= tick <= xlim[1]]
+    ax.set_xticks(ticks)
+    ax.set_xticklabels(labels)
     ax.grid(alpha=0.24, which="major", color="#bdbdbd")
     ax.grid(alpha=0.14, which="minor", color="#d9d9d9")
 
@@ -1000,7 +1018,7 @@ def make_hps_engineering_phase_space_context(out_path: Path) -> None:
     ax.text(68.0, 1.15e-4, "HPS 2016", color="#D55E00", fontsize=8.2, weight="bold")
     _style_phase_axis(
         ax,
-        xlim=(5.0, 1000.0),
+        xlim=(1.0, 1000.0),
         ylim=(y_min, y_top),
         title="Visible dark-photon phase space with HPS engineering-run limits",
     )
@@ -1022,8 +1040,8 @@ def make_hps_engineering_phase_space_context(out_path: Path) -> None:
 
 
 def make_projected_gpr_phase_space_context(out_path: Path) -> None:
-    y_min, y_top = 8.0e-11, 5.0e-4
-    fig, ax = plt.subplots(figsize=(11.6, 5.9))
+    y_min, y_top = 4.0e-7, 1.0e-4
+    fig, ax = plt.subplots(figsize=(9.7, 5.8))
     _draw_thermal_targets(ax, y_min=y_min)
     _draw_phase_world_constraints(ax, y_top=y_top, include_legend_labels=False)
 
@@ -1067,12 +1085,13 @@ def make_projected_gpr_phase_space_context(out_path: Path) -> None:
         label=r"This work: projected median",
         zorder=10,
     )
+    ax.axvspan(20.0, 250.0, color="#7A3DBB", alpha=0.045, lw=0, zorder=1)
     ax.text(
-        44.0,
-        7.5e-7,
-        "Projected HPS GPR result",
+        32.0,
+        7.2e-5,
+        "Zoomed HPS GPR\nprojection window",
         color="#5E2A92",
-        fontsize=9.0,
+        fontsize=9.2,
         weight="bold",
         bbox=dict(boxstyle="round,pad=0.18", fc="white", ec="#7A3DBB", alpha=0.86),
         zorder=11,
@@ -1080,9 +1099,9 @@ def make_projected_gpr_phase_space_context(out_path: Path) -> None:
 
     _style_phase_axis(
         ax,
-        xlim=(5.0, 1000.0),
+        xlim=(15.0, 275.0),
         ylim=(y_min, y_top),
-        title="Projected full-data HPS GPR reach in visible dark-photon phase space",
+        title="Projected full-data HPS GPR reach in the HPS prompt-search mass range",
     )
     ax.legend(
         loc="center left",

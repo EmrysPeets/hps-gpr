@@ -1,0 +1,76 @@
+\section{Introduction}
+\label{sec:introduction}
+
+The Heavy Photon Search (HPS) experiment at the Thomas Jefferson National Accelerator
+Facility (Jefferson Lab) searches for light, weakly coupled particles produced in
+electron fixed-target scattering and decaying to charged particles in a compact
+forward spectrometer. A benchmark target is a visibly decaying dark photon, denoted
+$\Ap$, that kinetically mixes with the Standard Model photon with coupling strength
+$\eps$ \cite{Holdom1986,EssigEtAl2011,Fabbrichesi2020DarkPhoton}. In the minimal
+visible model, an $\Ap$ lighter than the dimuon threshold decays promptly to
+$e^+e^-$ for sufficiently large $\eps^2$, producing a narrow resonance in the
+reconstructed electron--positron invariant-mass spectrum. Its natural width is much
+smaller than the HPS mass resolution, so the observed line shape is set by the
+detector response.
+
+The prompt HPS search is built on a simple physical normalization. In fixed-target
+electroproduction, the dark-photon yield is proportional to the radiative trident
+rate,
+\begin{equation}
+\frac{dN_{\Ap}}{dm}\bigg|_{m=m_{\Ap}}
+=
+\frac{3\pi}{2\alpha_{\mathrm{EM}}}
+m_{\Ap}\eps^2
+\frac{dN_{\gamma^\ast}}{dm}\bigg|_{m=m_{\Ap}},
+\label{eq:intro-ap-yield}
+\end{equation}
+below the dimuon threshold. The experimental task is therefore to extract or limit a
+narrow signal yield on top of the smooth quantum electrodynamics (QED) background, and
+then convert that yield to $\eps^2$.
+
+HPS has already published prompt resonance searches using the 2015 and 2016
+engineering-run data sets. The 2015 search used 1170 nb$^{-1}$ at a beam energy of
+1.056 GeV and scanned 19--81 MeV, finding no significant excess
+\cite{HPS2015DarkPhoton}. The 2016 search used 10608 nb$^{-1}$ at 2.3 GeV and scanned
+39--179 MeV, again finding no significant prompt resonance
+\cite{HPS2016PromptLong}. The broader HPS program also includes displaced-vertex dark
+sector searches, including the recent search for dark-sector strongly interacting
+massive particles (SIMPs) in the 2016 data set \cite{HPSSIMP2025}. The present work
+keeps the same HPS publication style and detector language, but addresses a different
+analysis problem: a prompt visible dark-photon search with a modern probabilistic
+background model.
+
+The main methodological advance is the use of Gaussian process regression (GPR) for
+the smooth trident background. For each tested mass, bins near the signal hypothesis
+are excluded from training. The Gaussian process is conditioned on the sideband bins
+and predicts the background mean and covariance in the excluded window. This replaces
+a local analytic background function with a probability distribution over smooth
+backgrounds. The resulting covariance is not discarded: it enters the profiled
+likelihood as correlated nuisance parameters, so the upper limits and local
+significances know how uncertain the sideband interpolation is.
+
+Figure~\ref{fig:intro-context} shows the visible-dark-photon parameter space used as
+context for the HPS prompt program. The figure is a reference and comparison plot, not
+the defining inference for the analysis. The inference is performed directly in the
+selected HPS mass spectra using the likelihood described in Sec.~\ref{sec:gpr-stats}.
+
+\begin{figure*}[t]
+\centering
+\ifigure{0.82\textwidth}{hps_published_context.png}
+\caption{Prompt visible-dark-photon context for the HPS engineering-run results. The
+highlighted HPS curves show the published 2015 and 2016 prompt limits, displayed in
+the same low-mass phase-space convention used by the analysis note. Existing
+constraints and thermal-relic targets are shown for orientation
+\cite{HPS2015DarkPhoton,HPS2016PromptLong,BaBarDarkPhoton2014,KLOE2013,KLOE22015,
+A1MAMI2014,APEX2011,NA48DarkPhoton2015,HADESDarkPhoton2014,PHENIXDarkPhoton2015,
+NA64DarkPhoton2018,NA64X17Visible2021,LHCbDarkPhoton2020,DarkCast2018}.}
+\label{fig:intro-context}
+\end{figure*}
+
+The paper is organized as follows. Section~\ref{sec:detector-data} summarizes the HPS
+detector configurations and data samples. Section~\ref{sec:selection-normalization}
+describes the prompt event selection, mass resolution, and radiative normalization.
+Section~\ref{sec:gpr-stats} gives the GPR background model and statistical inference.
+Section~\ref{sec:validation} summarizes the validation program. Section~\ref{sec:results}
+presents the current staged limits and the comparison figures that will become the
+publication result once the final inputs are frozen.

@@ -15,6 +15,7 @@
 \usepackage{enumitem}
 \usepackage{float}
 \usepackage{placeins}
+\usepackage{pdflscape}
 \usepackage{microtype}
 \usepackage{textcomp}
 % Package used to add line numbers
@@ -32,13 +33,14 @@
 
 \pagestyle{fancy}
 \fancyhf{}
+\setlength{\headheight}{14pt}
 
-\fancyhead[R]{HPS-ANALYSIS-NOTE BH-GPR v2}
+\fancyhead[R]{HPS-ANALYSIS-NOTE BH-GPR v4.2}
 \fancyfoot[C]{\thepage}
 
 \fancypagestyle{plain}{
   \fancyhf{}
-  \fancyhead[R]{HPS-ANALYSIS-NOTE BH-GPR v2}
+  \fancyhead[R]{HPS-ANALYSIS-NOTE BH-GPR v4.2}
   \fancyfoot[C]{\thepage}
 }
 
@@ -72,18 +74,9 @@
   }%
 }
 
-\newcommand{\analysisplaceholder}[1]{%
-  \begin{center}
-  \fbox{%
-    \begin{minipage}{0.94\linewidth}
-      \small #1
-    \end{minipage}
-  }
-  \end{center}
-}
-
 \title{\vspace{-1.0em}HPS Gaussian-Process Resonance Search Analysis Note\\
-\large Global background modeling, limit setting, toy validation, and shared-$\eps^2$ combination}
+\large Version 4.2: accepted 2016 length-scale range and
+combined 300-toy result, with August 6 follow-up studies}
 \author{
 Emrys Peets\\Stanford University and SLAC National Accelerator Laboratory
 \and
@@ -91,7 +84,7 @@ Matthew Gignac\\SLAC National Accelerator Laboratory
 \and
 Eden Hsu\\Stanford University and SLAC National Accelerator Laboratory
 }
-\date{June 22, 2026}
+\date{August 6, 2026}
 
 \begin{document}
 
@@ -99,21 +92,60 @@ Eden Hsu\\Stanford University and SLAC National Accelerator Laboratory
 \maketitle
 
 \begin{abstract}
-This note documents the current Heavy Photon Search (HPS) Gaussian-process-regression (GPR) analysis workflow for the dark-sector-motivated search for a narrow prompt
+This note documents the Heavy Photon Search (HPS) Gaussian-process-regression (GPR)
+workflow for a narrow prompt
 $A^\prime \rightarrow e^+e^-$ resonance in the HPS invariant-mass spectrum. The
 analysis performs global background interpolation, local signal extraction with
-Gaussian-profiled background nuisances, modified-frequentist
+Gaussian-constrained nuisance parameters for the correlated background uncertainty,
+modified-frequentist
 \CLs\ ($\mathrm{CL}_{s+b}/\mathrm{CL}_b$) upper limits in signal-yield and
-$\eps^2$ space, and statistically independent multi-dataset combinations in a shared
+$\eps^2$ space, and a statistically independent multi-dataset combination in a shared
 $\eps^2$ parameter of interest. The signal model is implemented as a full-range
 Gaussian template whose blinded-bin slice enters the local likelihood without
 renormalization, so the fitted amplitude retains the interpretation of a total local
 signal yield. The note also summarizes the radiative-fraction normalization,
-length-scale parameterization, toy-validation program, and the current staged path from
-the published 2015 and 2016 HPS prompt searches to the final combined analysis.
+length-scale parameterization, toy-validation program, and staged path from the
+published 2015 and 2016 HPS prompt searches toward a fully unblinded combination.
+Version 4 separates the mass interval searched for a signal from the wider spectrum
+used to train each GP. Version 4.1 kept those supports and revisited one numerical
+range after the v4 observed scan showed that all 142 full-2016 fits saturated the
+resolution-scaled length-scale ceiling. A controlled scan of
+$k_{\max,2016}=8,10,12,15,$ and 20 identified 12 as the first nonbinding value
+followed by a stable plateau. Version 4.2 accepts that factor-12 setting and completes
+the 90\% confidence-level combined search using the full 2015 and 2016 samples and
+the reviewed 2021 10\% sample. The principal result is the shared-$\eps^2$ observed
+asymptotic \CLs{} limit with central expected intervals from exactly 300
+background-only joint pseudoexperiments per mass. A common pseudoexperiment index is
+shared by every dataset active at that mass. The three constituent distributions
+and the three pairwise combinations are additionally documented with auxiliary
+100-pseudoexperiment conditional limit bands that reuse the first 100 entries of
+the accepted parent stream. Local asymptotic $p_0$ values are shown separately.
+The observed 65~MeV local minimum is
+documented with an exact fixed-state extraction, sideband context, profiled
+residuals, and a comparison of the standalone and shared-coupling estimates.
+An August 6 addendum adds an observed-equivalent BaBar comparison, exact
+fixed-mass common-binning and physical-profile checks, and two fixed-seed
+conditional central-window replacements. These diagnostics do not alter the
+accepted v4.2 card or principal result and introduce no projected bands,
+coverage statement, or scan-calibrated global claim.
+A ten-toy, five-scenario 2021 source-and-exposure screen is included only as a
+fit-space pilot of the hyperparameter-closure machinery. The completed
+background-only audit makes factor 20 the provisional projected-100\% ceiling, while
+factor 25 is required if one common ceiling is imposed on every pilot exposure.
+The fixed-amplitude screen shows no loss of local extraction sensitivity at factor 20.
+Its common 2--3\% under-response is already present at factors 15 and 25 and is retained
+as an unresolved ten-toy closure diagnostic, not a bias claim. The pilot constructs no
+limit bands or coverage result and does not qualify the observed result;
+production-matched hyperparameter closure and direct limit coverage remain required
+before interpreting the conditional bands as coverage-calibrated intervals. The
+300 mass-local pseudoexperiments do not calibrate a scan-wise global discovery
+$p$-value.
 \end{abstract}
 
 \tableofcontents
+\clearpage
+
+\input{sections/00_change_log}
 \clearpage
 
 \input{sections/01_introduction}
@@ -124,8 +156,11 @@ the published 2015 and 2016 HPS prompt searches to the final combined analysis.
 \input{sections/06_results}
 \input{sections/07_conclusions}
 \appendix
+\input{sections/appendix_prior_validation_results}
 \input{sections/appendix_kernel_studies}
 \input{sections/appendix_2015_method_comparison}
+\clearpage
+\input{sections/appendix_v4p2_followups}
 
 \clearpage
 \bibliographystyle{unsrt}

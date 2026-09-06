@@ -1,0 +1,2217 @@
+{
+  "all_scenarios": [
+    "2021_1pct",
+    "2021_1pct_x10",
+    "2021_1pct_x100",
+    "2021_10pct",
+    "2021_10pct_x10"
+  ],
+  "base_seed": 20260813,
+  "created_utc": "2026-08-13T22:46:57+00:00",
+  "generator": "A*expit((m-xt)/w)*(m-x0)^a*exp(-((m-x0)/lambda)^p+d2*T2(u)+d6*T6(u)), u=2*(m-0.040)/0.260-1",
+  "generator_spec": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v4p8_2021_functional_form_qualification_20260813/rigid_generator_spec.json",
+  "generator_spec_sha256": "40feebe17d37a5b24820bfaf63dc0fe36869e43bf663114c5d23f1836530b0b7",
+  "generator_tag": "rigid_ggt26_scaled1pct",
+  "interpretation": "conditional stress-generator screen, not physical truth or coverage",
+  "manifest_content_sha256": "1358fc2084b172fd2dcf0dce9c4ffdb4a2e628dced8bbcba34cdda1f18f415e7",
+  "n_toys_per_source_family": 25,
+  "nesting": "independent Poisson increments within source family; source families independent",
+  "promotion_gate_passed": false,
+  "promotion_scope": "pseudoexperiment generation and conditional extraction screening only",
+  "reported_scenarios": [
+    "2021_1pct_x10",
+    "2021_1pct_x100",
+    "2021_10pct",
+    "2021_10pct_x10"
+  ],
+  "schema_version": 1,
+  "source_policy": {
+    "histogram": "preselection/h_invM_8000",
+    "native_10pct_shape_refit": false,
+    "normalization_rule": "match each source's observed 40-300 MeV support total",
+    "one_pct_mean_sha256_float64": "903c6e9072ec614ec94d8db76a84937fb37dd423535fdcb9e5ae517668859007",
+    "one_pct_source_path": "/Users/emryspeets/Desktop/gp_mods/data_input_21/final_1pct_invM.root",
+    "one_pct_source_sha256": "eecb5b8f40820c8f3c5d9673d2cddc155f2e2282474e20eb4f8930fd0a561ada",
+    "one_pct_total_040_300": 12504044.0,
+    "shape_source": "native 1pct only",
+    "ten_pct_mean_sha256_float64": "ba2143c0a38a5ac9eb8185dfbff7dec5463034e760c2a69d20f7596703a5a37a",
+    "ten_pct_source_path": "/Users/emryspeets/Desktop/gp_mods/10pct_2021/final_10pct_invM.root",
+    "ten_pct_source_sha256": "3944d4c71a453c6c810061248c34d2fca9eceaad1de85c137afdc291c2195ac4",
+    "ten_pct_total_040_300": 141251508.0,
+    "ten_to_one_normalization_ratio": 11.296466007317314
+  },
+  "support_gev": [
+    0.04,
+    0.3
+  ],
+  "toy_key_template": "toys/rigid_ggt26_scaled1pct/{scenario}/toy_{toy_index:04d}",
+  "toys": [
+    {
+      "counts_sha256_int64": "56cbb51bf0df080dd4890d74336d662c201db6f454a321a29fe5d77a76e56e2a",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        1669964786,
+        1895022010,
+        1107384989,
+        4219288878
+      ],
+      "increment_sha256_int64": "56cbb51bf0df080dd4890d74336d662c201db6f454a321a29fe5d77a76e56e2a",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct/toy_0000",
+      "parent_scenario": null,
+      "scenario": "2021_1pct",
+      "source_family": "one_pct",
+      "total_040_300": 12506084,
+      "toy_index": 0
+    },
+    {
+      "counts_sha256_int64": "9e1c8397c9a60fe5f39f4eec5483502ac9fe82a18fe5571771b652e9be729926",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        2062577457,
+        1304511387,
+        3608811401,
+        458273
+      ],
+      "increment_sha256_int64": "1f35657a9ec89f1d21d5a1a512612f2053c4e6246dff0dcf462c7ee917397d4a",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x10/toy_0000",
+      "parent_scenario": "2021_1pct",
+      "scenario": "2021_1pct_x10",
+      "source_family": "one_pct",
+      "total_040_300": 125042186,
+      "toy_index": 0
+    },
+    {
+      "counts_sha256_int64": "a5850032102c3c9a959eb4010f7c4a14feecd556540adab77cd6786257af8e17",
+      "increment_multiplier": 90,
+      "increment_seed_words": [
+        2315963758,
+        1242192040,
+        1171581569,
+        3906812074
+      ],
+      "increment_sha256_int64": "efe52512825d87d8ba593908bfb3a8c8b6b9c924139bbd980889db9b8ed7efc3",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x100/toy_0000",
+      "parent_scenario": "2021_1pct_x10",
+      "scenario": "2021_1pct_x100",
+      "source_family": "one_pct",
+      "total_040_300": 1250427103,
+      "toy_index": 0
+    },
+    {
+      "counts_sha256_int64": "b337b7b1704342345609008207f0bf1d7fa763527ef2d9d8b7850b548a4e6b7b",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        372979604,
+        2393539623,
+        2924141892,
+        3759794797
+      ],
+      "increment_sha256_int64": "b337b7b1704342345609008207f0bf1d7fa763527ef2d9d8b7850b548a4e6b7b",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct/toy_0000",
+      "parent_scenario": null,
+      "scenario": "2021_10pct",
+      "source_family": "ten_pct",
+      "total_040_300": 141257335,
+      "toy_index": 0
+    },
+    {
+      "counts_sha256_int64": "cb8db1ef5ba55bbfacc3359a6a91a0bdaa59ff42e89800d4e75ff01ea7384a98",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        2650440016,
+        1499325083,
+        892337232,
+        3379283331
+      ],
+      "increment_sha256_int64": "74495d60bf493618c1244be43309e720f97c0743f6c4103e3348f917f404260e",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct_x10/toy_0000",
+      "parent_scenario": "2021_10pct",
+      "scenario": "2021_10pct_x10",
+      "source_family": "ten_pct",
+      "total_040_300": 1412503518,
+      "toy_index": 0
+    },
+    {
+      "counts_sha256_int64": "6b62d758528580b0a881268f9089108bdc4edd3df34949bd1be357e8b6c0d70e",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        3565216652,
+        3583859555,
+        3032067486,
+        1833561059
+      ],
+      "increment_sha256_int64": "6b62d758528580b0a881268f9089108bdc4edd3df34949bd1be357e8b6c0d70e",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct/toy_0001",
+      "parent_scenario": null,
+      "scenario": "2021_1pct",
+      "source_family": "one_pct",
+      "total_040_300": 12498166,
+      "toy_index": 1
+    },
+    {
+      "counts_sha256_int64": "e1a2b610d014c8effeba5096f4ee33ffb97fd5876219125d988b702fb7659620",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        3767337325,
+        2626564603,
+        3254673348,
+        3378482675
+      ],
+      "increment_sha256_int64": "56b5b9d20b84e8e7069f6d531eb49091386e28ee71c9257683f69024a27f5056",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x10/toy_0001",
+      "parent_scenario": "2021_1pct",
+      "scenario": "2021_1pct_x10",
+      "source_family": "one_pct",
+      "total_040_300": 125029893,
+      "toy_index": 1
+    },
+    {
+      "counts_sha256_int64": "31ab82a19884c06fe6a9ad05014d8199c6e85a56728907e86351e854019c4099",
+      "increment_multiplier": 90,
+      "increment_seed_words": [
+        3049512158,
+        1040792222,
+        626566628,
+        2760237439
+      ],
+      "increment_sha256_int64": "985b1196dccaffe1e8454f56857df7fe46a1a8ec63956c1e6dc0211580b797e2",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x100/toy_0001",
+      "parent_scenario": "2021_1pct_x10",
+      "scenario": "2021_1pct_x100",
+      "source_family": "one_pct",
+      "total_040_300": 1250373499,
+      "toy_index": 1
+    },
+    {
+      "counts_sha256_int64": "a028ddedec6c45d472da1359e9541fb4f52f252808edbfd23493816e36fdfa61",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        615223790,
+        2263183677,
+        96339312,
+        2290873799
+      ],
+      "increment_sha256_int64": "a028ddedec6c45d472da1359e9541fb4f52f252808edbfd23493816e36fdfa61",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct/toy_0001",
+      "parent_scenario": null,
+      "scenario": "2021_10pct",
+      "source_family": "ten_pct",
+      "total_040_300": 141232020,
+      "toy_index": 1
+    },
+    {
+      "counts_sha256_int64": "e941f9ed322ab54b76c1bbd02ea4a01df1e52c81d4e00f2389b86d27af020c65",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        4201153174,
+        336168508,
+        2507884931,
+        3281215174
+      ],
+      "increment_sha256_int64": "5b31f8ee49bcc2263cec1aa4bde2b06fc6a8015f1d15ecb0524b5718ea8ea7c4",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct_x10/toy_0001",
+      "parent_scenario": "2021_10pct",
+      "scenario": "2021_10pct_x10",
+      "source_family": "ten_pct",
+      "total_040_300": 1412495275,
+      "toy_index": 1
+    },
+    {
+      "counts_sha256_int64": "03d6f9c2defedcd5eb0a4a5973a5d22231eeec96991659278077dd60d9823f55",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        102074640,
+        3528513683,
+        4025600597,
+        3294313300
+      ],
+      "increment_sha256_int64": "03d6f9c2defedcd5eb0a4a5973a5d22231eeec96991659278077dd60d9823f55",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct/toy_0002",
+      "parent_scenario": null,
+      "scenario": "2021_1pct",
+      "source_family": "one_pct",
+      "total_040_300": 12508493,
+      "toy_index": 2
+    },
+    {
+      "counts_sha256_int64": "b95658eca2adce87244eaa0ac4daa5378aa0ad85e76389cbfa4c6e4ef51287b4",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        33117524,
+        833650325,
+        1331242723,
+        636468520
+      ],
+      "increment_sha256_int64": "e3773caab387dd417ac733dd0d0698f990a5de5f80c2c37566602651f54fd37f",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x10/toy_0002",
+      "parent_scenario": "2021_1pct",
+      "scenario": "2021_1pct_x10",
+      "source_family": "one_pct",
+      "total_040_300": 125041985,
+      "toy_index": 2
+    },
+    {
+      "counts_sha256_int64": "6bd112390f0ea35b3c2f469408d597c2ecb69db87abbf99005213aea7ffb348f",
+      "increment_multiplier": 90,
+      "increment_seed_words": [
+        2510021886,
+        108522290,
+        2506962610,
+        3916319170
+      ],
+      "increment_sha256_int64": "45366a6b959e951ca1e4ba6440fdb60daa19e3b1dd7e18bee5559a977a4e6575",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x100/toy_0002",
+      "parent_scenario": "2021_1pct_x10",
+      "scenario": "2021_1pct_x100",
+      "source_family": "one_pct",
+      "total_040_300": 1250440210,
+      "toy_index": 2
+    },
+    {
+      "counts_sha256_int64": "aa87d41d26dfeda5ce81dacdf9219aa657cf33e44357f2e2a1ad30322b612cd9",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        2452406500,
+        4094192274,
+        1642206382,
+        2283907905
+      ],
+      "increment_sha256_int64": "aa87d41d26dfeda5ce81dacdf9219aa657cf33e44357f2e2a1ad30322b612cd9",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct/toy_0002",
+      "parent_scenario": null,
+      "scenario": "2021_10pct",
+      "source_family": "ten_pct",
+      "total_040_300": 141228941,
+      "toy_index": 2
+    },
+    {
+      "counts_sha256_int64": "3c8e4a58b5f09a3a29c67163c74f6755999789081702c80e1771492ce0070ff8",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        1129188167,
+        2077810871,
+        2959310288,
+        3450495141
+      ],
+      "increment_sha256_int64": "044593b35a63f539c083cadc3386cac6026a590e8a9b502c7afe8b309964a3ba",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct_x10/toy_0002",
+      "parent_scenario": "2021_10pct",
+      "scenario": "2021_10pct_x10",
+      "source_family": "ten_pct",
+      "total_040_300": 1412512734,
+      "toy_index": 2
+    },
+    {
+      "counts_sha256_int64": "4c6ebe41231a6c8b3aa9551586421d0d51e37b579b8daef152d271495a07619a",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        3590553781,
+        183199830,
+        4178831431,
+        2670858558
+      ],
+      "increment_sha256_int64": "4c6ebe41231a6c8b3aa9551586421d0d51e37b579b8daef152d271495a07619a",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct/toy_0003",
+      "parent_scenario": null,
+      "scenario": "2021_1pct",
+      "source_family": "one_pct",
+      "total_040_300": 12504554,
+      "toy_index": 3
+    },
+    {
+      "counts_sha256_int64": "f129166993e0118c84a1032f003846febdc100ef5aa0231b6143dc60455670f8",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        3955098320,
+        3691937234,
+        3631018369,
+        3468316824
+      ],
+      "increment_sha256_int64": "0443edf93fcc9f55ac5fa30f7e4d37052f6381ac248cdcda8fd69547ba268c92",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x10/toy_0003",
+      "parent_scenario": "2021_1pct",
+      "scenario": "2021_1pct_x10",
+      "source_family": "one_pct",
+      "total_040_300": 125052565,
+      "toy_index": 3
+    },
+    {
+      "counts_sha256_int64": "ee59e0ac799216c5a1cdfe7fea4931fccc8d0e84e5562a623b398639457f1b2f",
+      "increment_multiplier": 90,
+      "increment_seed_words": [
+        876613262,
+        1775173870,
+        1900764839,
+        2799644312
+      ],
+      "increment_sha256_int64": "2eb26b39ff8e4f5423cb3956f9f9d4ff4d321a2235eef03c4b418495f4f1f00b",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x100/toy_0003",
+      "parent_scenario": "2021_1pct_x10",
+      "scenario": "2021_1pct_x100",
+      "source_family": "one_pct",
+      "total_040_300": 1250389511,
+      "toy_index": 3
+    },
+    {
+      "counts_sha256_int64": "16760e0c9d23fae41f7de2ce7339fca4315faf327e04e8e700ef765227b2bc85",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        261444224,
+        1463490616,
+        4251293996,
+        1319642894
+      ],
+      "increment_sha256_int64": "16760e0c9d23fae41f7de2ce7339fca4315faf327e04e8e700ef765227b2bc85",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct/toy_0003",
+      "parent_scenario": null,
+      "scenario": "2021_10pct",
+      "source_family": "ten_pct",
+      "total_040_300": 141261808,
+      "toy_index": 3
+    },
+    {
+      "counts_sha256_int64": "0c04706a93376365cc455af6dae7e845900feea5668011ca23e6e6fe01d762bb",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        1555807763,
+        967367639,
+        2318515506,
+        2571100319
+      ],
+      "increment_sha256_int64": "1e6260dd80cfd1fb75d32029efbd4eb6851b25958272dbdea9109729933f7e16",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct_x10/toy_0003",
+      "parent_scenario": "2021_10pct",
+      "scenario": "2021_10pct_x10",
+      "source_family": "ten_pct",
+      "total_040_300": 1412527570,
+      "toy_index": 3
+    },
+    {
+      "counts_sha256_int64": "53e304dad908252784d4fbf2133583dc06467b7e879b5c192b8b243608f1c813",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        1177985827,
+        86321306,
+        3631520544,
+        4037772715
+      ],
+      "increment_sha256_int64": "53e304dad908252784d4fbf2133583dc06467b7e879b5c192b8b243608f1c813",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct/toy_0004",
+      "parent_scenario": null,
+      "scenario": "2021_1pct",
+      "source_family": "one_pct",
+      "total_040_300": 12499460,
+      "toy_index": 4
+    },
+    {
+      "counts_sha256_int64": "96710d76dca0c7522226f97314ce27dbf1fd7f9193f86ce9d4a61c302c95eb42",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        4215606265,
+        704380154,
+        854920124,
+        42412839
+      ],
+      "increment_sha256_int64": "819338be1134482881572628d3eeda0c07b9c02aac552f0bffdfbc2c1f868364",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x10/toy_0004",
+      "parent_scenario": "2021_1pct",
+      "scenario": "2021_1pct_x10",
+      "source_family": "one_pct",
+      "total_040_300": 125045693,
+      "toy_index": 4
+    },
+    {
+      "counts_sha256_int64": "b4641aefddfcea0a675957f73a63c2a0da590b85159f28d6ca283cb7c2c6137a",
+      "increment_multiplier": 90,
+      "increment_seed_words": [
+        3549388193,
+        3230203713,
+        2916219428,
+        2188133747
+      ],
+      "increment_sha256_int64": "512ab7a7022551ae2ad2532de82f51db76a4898109edab892e50cf92033b718f",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x100/toy_0004",
+      "parent_scenario": "2021_1pct_x10",
+      "scenario": "2021_1pct_x100",
+      "source_family": "one_pct",
+      "total_040_300": 1250404363,
+      "toy_index": 4
+    },
+    {
+      "counts_sha256_int64": "ce2fc66d8744f17c156a56ca29ce1a97065f9f732b76a9e4e28cb4637b0885c9",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        3507070571,
+        3513350302,
+        2568804609,
+        3919526605
+      ],
+      "increment_sha256_int64": "ce2fc66d8744f17c156a56ca29ce1a97065f9f732b76a9e4e28cb4637b0885c9",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct/toy_0004",
+      "parent_scenario": null,
+      "scenario": "2021_10pct",
+      "source_family": "ten_pct",
+      "total_040_300": 141247197,
+      "toy_index": 4
+    },
+    {
+      "counts_sha256_int64": "4fdf2e9d0d0f958db8a6b32dc7a2b9f72e6afb82e642899f6dc217c5319cebf2",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        1199811844,
+        3445843528,
+        1513281507,
+        1211126021
+      ],
+      "increment_sha256_int64": "d3d3a0e28ef855bfac4320d783bd1a73da18b6e20942318bc9b07cee2de54b17",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct_x10/toy_0004",
+      "parent_scenario": "2021_10pct",
+      "scenario": "2021_10pct_x10",
+      "source_family": "ten_pct",
+      "total_040_300": 1412501187,
+      "toy_index": 4
+    },
+    {
+      "counts_sha256_int64": "c82ace69489c54482953f8153901c7018dc2a54a1f6a5bf0db1db70f86869d14",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        2292239851,
+        320904949,
+        3400487966,
+        1138522937
+      ],
+      "increment_sha256_int64": "c82ace69489c54482953f8153901c7018dc2a54a1f6a5bf0db1db70f86869d14",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct/toy_0005",
+      "parent_scenario": null,
+      "scenario": "2021_1pct",
+      "source_family": "one_pct",
+      "total_040_300": 12500969,
+      "toy_index": 5
+    },
+    {
+      "counts_sha256_int64": "2732d564ef0c95232ee90ac1d1003d2d98a6550a073cb1c0c534eb37639dac49",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        2215795004,
+        2069650549,
+        834909096,
+        254784640
+      ],
+      "increment_sha256_int64": "e9abda89360ea768d7fa8f89c44394ce1ec8057ec47d49d93d70947c7c8b3bd1",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x10/toy_0005",
+      "parent_scenario": "2021_1pct",
+      "scenario": "2021_1pct_x10",
+      "source_family": "one_pct",
+      "total_040_300": 125053068,
+      "toy_index": 5
+    },
+    {
+      "counts_sha256_int64": "da85499b583b059a43d0afb895ee0b0d586304e4fa84473a23f2d8f4970a512f",
+      "increment_multiplier": 90,
+      "increment_seed_words": [
+        1320073256,
+        2374126096,
+        3826134565,
+        1213846648
+      ],
+      "increment_sha256_int64": "e916a0747166f7972aa68e17ad2ebacca8ca1ac02efe5120ddcb8538fedc5058",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x100/toy_0005",
+      "parent_scenario": "2021_1pct_x10",
+      "scenario": "2021_1pct_x100",
+      "source_family": "one_pct",
+      "total_040_300": 1250428540,
+      "toy_index": 5
+    },
+    {
+      "counts_sha256_int64": "d85299ccd5fc28bdbb3ba96151a3bc7a3de28327ce0f12bad572e69b9cfebe67",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        391891138,
+        201214969,
+        3472559504,
+        3005635929
+      ],
+      "increment_sha256_int64": "d85299ccd5fc28bdbb3ba96151a3bc7a3de28327ce0f12bad572e69b9cfebe67",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct/toy_0005",
+      "parent_scenario": null,
+      "scenario": "2021_10pct",
+      "source_family": "ten_pct",
+      "total_040_300": 141269359,
+      "toy_index": 5
+    },
+    {
+      "counts_sha256_int64": "2b311555259d463bf61d756f274cb455deae335465ad3a527f492e776295ae1b",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        1239075614,
+        4072582767,
+        1824075381,
+        1695240539
+      ],
+      "increment_sha256_int64": "48f26ceaae504ad10cdce50cf9c278821244364b303ed1ad7bf454cf9940dee8",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct_x10/toy_0005",
+      "parent_scenario": "2021_10pct",
+      "scenario": "2021_10pct_x10",
+      "source_family": "ten_pct",
+      "total_040_300": 1412503415,
+      "toy_index": 5
+    },
+    {
+      "counts_sha256_int64": "4489e35b1e9bf8d27c697cc084cfef1c4a5f4c53b44e5a259fc2a4f1986e97a1",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        3830214974,
+        3622966492,
+        2222520854,
+        61230925
+      ],
+      "increment_sha256_int64": "4489e35b1e9bf8d27c697cc084cfef1c4a5f4c53b44e5a259fc2a4f1986e97a1",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct/toy_0006",
+      "parent_scenario": null,
+      "scenario": "2021_1pct",
+      "source_family": "one_pct",
+      "total_040_300": 12502936,
+      "toy_index": 6
+    },
+    {
+      "counts_sha256_int64": "7d8474a84edc3a4c1010a956db7d2f89d51878d46ae23f3276193a49c0ffba0e",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        391629151,
+        2488812130,
+        2282070697,
+        1968141696
+      ],
+      "increment_sha256_int64": "267f59f30a8a11617f9b00099ae29be3f68e7b5fc9d0e69eaca1f8f82f852da1",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x10/toy_0006",
+      "parent_scenario": "2021_1pct",
+      "scenario": "2021_1pct_x10",
+      "source_family": "one_pct",
+      "total_040_300": 125041452,
+      "toy_index": 6
+    },
+    {
+      "counts_sha256_int64": "2f79c59fbbf3b4885bc201ef35237321de3d901b2dfe4a63698b34e223965481",
+      "increment_multiplier": 90,
+      "increment_seed_words": [
+        192965799,
+        1627699427,
+        1978246744,
+        43275274
+      ],
+      "increment_sha256_int64": "fce4565cfea0988fb481cd483397be58a37ba4202145031f3ff185acb614b823",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x100/toy_0006",
+      "parent_scenario": "2021_1pct_x10",
+      "scenario": "2021_1pct_x100",
+      "source_family": "one_pct",
+      "total_040_300": 1250409190,
+      "toy_index": 6
+    },
+    {
+      "counts_sha256_int64": "d3891d5543ee6c9128e2209837dbeee2a395f041f6896b5c44abf2f1444f1b18",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        411335151,
+        3504601172,
+        2624766801,
+        1554430828
+      ],
+      "increment_sha256_int64": "d3891d5543ee6c9128e2209837dbeee2a395f041f6896b5c44abf2f1444f1b18",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct/toy_0006",
+      "parent_scenario": null,
+      "scenario": "2021_10pct",
+      "source_family": "ten_pct",
+      "total_040_300": 141256794,
+      "toy_index": 6
+    },
+    {
+      "counts_sha256_int64": "b07a6605716f108c9550e12ddf10d6d5f3c48cae232297b69878548ac6fb00e9",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        2030265123,
+        1248952581,
+        815175410,
+        4060007280
+      ],
+      "increment_sha256_int64": "84fd59aca07b28107cd0e014b9a6abc85f161b2779a98966c0533cdee2c05f73",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct_x10/toy_0006",
+      "parent_scenario": "2021_10pct",
+      "scenario": "2021_10pct_x10",
+      "source_family": "ten_pct",
+      "total_040_300": 1412508333,
+      "toy_index": 6
+    },
+    {
+      "counts_sha256_int64": "c7af26662e76c3433ad23ab20dc82df9bd8b09db87aacdeba9f11f5fc83d47d7",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        3326965844,
+        1741437924,
+        427672310,
+        3938022723
+      ],
+      "increment_sha256_int64": "c7af26662e76c3433ad23ab20dc82df9bd8b09db87aacdeba9f11f5fc83d47d7",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct/toy_0007",
+      "parent_scenario": null,
+      "scenario": "2021_1pct",
+      "source_family": "one_pct",
+      "total_040_300": 12507913,
+      "toy_index": 7
+    },
+    {
+      "counts_sha256_int64": "b9094a408f1546a044495382de9c704bed2f12d4140a2ba8faab3a46c8c1097a",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        4145144655,
+        406662387,
+        1226600823,
+        2428884809
+      ],
+      "increment_sha256_int64": "af2fad37793aada8a48a394de91c2300b60181fd081cb06137ec23876696593d",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x10/toy_0007",
+      "parent_scenario": "2021_1pct",
+      "scenario": "2021_1pct_x10",
+      "source_family": "one_pct",
+      "total_040_300": 125052622,
+      "toy_index": 7
+    },
+    {
+      "counts_sha256_int64": "c5832769297f34e21fe2d19287ef900efd9f655392801500ea6ade6c60dc17ba",
+      "increment_multiplier": 90,
+      "increment_seed_words": [
+        421582292,
+        1958035685,
+        3987807428,
+        2436176773
+      ],
+      "increment_sha256_int64": "1262cd581f6463a05d0f9bfb45bc25dacf9dce17364b2f23a7f7cd8c7c6d6bb8",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x100/toy_0007",
+      "parent_scenario": "2021_1pct_x10",
+      "scenario": "2021_1pct_x100",
+      "source_family": "one_pct",
+      "total_040_300": 1250353194,
+      "toy_index": 7
+    },
+    {
+      "counts_sha256_int64": "f849c67b174aec6af444fc3079b497a7b7f7fbd5250f911766841fb2031bcce1",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        621092909,
+        1544111664,
+        4040747860,
+        224515067
+      ],
+      "increment_sha256_int64": "f849c67b174aec6af444fc3079b497a7b7f7fbd5250f911766841fb2031bcce1",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct/toy_0007",
+      "parent_scenario": null,
+      "scenario": "2021_10pct",
+      "source_family": "ten_pct",
+      "total_040_300": 141240955,
+      "toy_index": 7
+    },
+    {
+      "counts_sha256_int64": "32f1bb0d9563ae0765b8ad82059c0fab2c08ca91eee50bf4050dc9a070db61c6",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        3284940596,
+        342382703,
+        3332450414,
+        810616209
+      ],
+      "increment_sha256_int64": "5657046a1a5be8b177fe61e0a32394d3d635e30b55d4a8879b56b4001eb14690",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct_x10/toy_0007",
+      "parent_scenario": "2021_10pct",
+      "scenario": "2021_10pct_x10",
+      "source_family": "ten_pct",
+      "total_040_300": 1412500484,
+      "toy_index": 7
+    },
+    {
+      "counts_sha256_int64": "936091c4c65d7eef995bddd01273bf04c3cada93eb3251546dd63d30a9bcc12c",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        313862751,
+        2587942239,
+        2002690846,
+        971254039
+      ],
+      "increment_sha256_int64": "936091c4c65d7eef995bddd01273bf04c3cada93eb3251546dd63d30a9bcc12c",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct/toy_0008",
+      "parent_scenario": null,
+      "scenario": "2021_1pct",
+      "source_family": "one_pct",
+      "total_040_300": 12501863,
+      "toy_index": 8
+    },
+    {
+      "counts_sha256_int64": "a8c18a8f175f2c029544f7c2e2d591c79173f683a9baf85e994ae7e0bb9840b7",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        2627109338,
+        1769082816,
+        2004122560,
+        1354487766
+      ],
+      "increment_sha256_int64": "241943fb9c557f1a519cffc9423ccb2c6914409f3986c97fc5b8da7809a611bf",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x10/toy_0008",
+      "parent_scenario": "2021_1pct",
+      "scenario": "2021_1pct_x10",
+      "source_family": "one_pct",
+      "total_040_300": 125051337,
+      "toy_index": 8
+    },
+    {
+      "counts_sha256_int64": "15a447e6f64be0b4cf7691e8deb4731aee54a8e7b6683e1bd22064290a8bf25c",
+      "increment_multiplier": 90,
+      "increment_seed_words": [
+        2475454959,
+        3069752320,
+        388481416,
+        923531346
+      ],
+      "increment_sha256_int64": "29bbe4973e00277fdc5c6339ac7d35170691b9578b56f7aa6c110fea1e8138d6",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x100/toy_0008",
+      "parent_scenario": "2021_1pct_x10",
+      "scenario": "2021_1pct_x100",
+      "source_family": "one_pct",
+      "total_040_300": 1250401912,
+      "toy_index": 8
+    },
+    {
+      "counts_sha256_int64": "4e7a336529f535f6b48dabf9a2427a9e8ac34d941ba00bb800b1a0e14eded3c5",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        1048638357,
+        1410092727,
+        3029827609,
+        619631202
+      ],
+      "increment_sha256_int64": "4e7a336529f535f6b48dabf9a2427a9e8ac34d941ba00bb800b1a0e14eded3c5",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct/toy_0008",
+      "parent_scenario": null,
+      "scenario": "2021_10pct",
+      "source_family": "ten_pct",
+      "total_040_300": 141241037,
+      "toy_index": 8
+    },
+    {
+      "counts_sha256_int64": "66dd356aba1919f80e6853bde4215e5a939d9a90c27069edc44625aaab50106e",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        878365399,
+        3618934755,
+        3353409018,
+        3318333138
+      ],
+      "increment_sha256_int64": "0d57238e85e5cb1fb94f1338aee49b1ab22c3cf31b297bdc25c79ad932b05cb6",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct_x10/toy_0008",
+      "parent_scenario": "2021_10pct",
+      "scenario": "2021_10pct_x10",
+      "source_family": "ten_pct",
+      "total_040_300": 1412452295,
+      "toy_index": 8
+    },
+    {
+      "counts_sha256_int64": "8698ce7a2ad00a1d9096aa6aeaf533001610f31552e8625b902414c39755cc16",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        3131990872,
+        2049042344,
+        61652548,
+        822541524
+      ],
+      "increment_sha256_int64": "8698ce7a2ad00a1d9096aa6aeaf533001610f31552e8625b902414c39755cc16",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct/toy_0009",
+      "parent_scenario": null,
+      "scenario": "2021_1pct",
+      "source_family": "one_pct",
+      "total_040_300": 12499565,
+      "toy_index": 9
+    },
+    {
+      "counts_sha256_int64": "e8b0504724d0a54c3a58ca282765ca05bf9668fc2eef5d066b016cd7f6faca91",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        989266407,
+        1515561711,
+        1119110956,
+        4077579195
+      ],
+      "increment_sha256_int64": "5a336efe8af49ad4d014fd15c158037e211d2dc9e82c6a06be0b09ccde16db3b",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x10/toy_0009",
+      "parent_scenario": "2021_1pct",
+      "scenario": "2021_1pct_x10",
+      "source_family": "one_pct",
+      "total_040_300": 125026546,
+      "toy_index": 9
+    },
+    {
+      "counts_sha256_int64": "beebcaa90f61149caaafccab8c60a899ea862996c3ab44e971a734f9ec1882fd",
+      "increment_multiplier": 90,
+      "increment_seed_words": [
+        665061132,
+        2227973120,
+        1092874188,
+        2890975195
+      ],
+      "increment_sha256_int64": "49d2478a9a04c6b2afb50aa9856e60c64fadeb845ec47925d67d3fe825fee5af",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x100/toy_0009",
+      "parent_scenario": "2021_1pct_x10",
+      "scenario": "2021_1pct_x100",
+      "source_family": "one_pct",
+      "total_040_300": 1250391801,
+      "toy_index": 9
+    },
+    {
+      "counts_sha256_int64": "7589b22b3d5860ae1518f7e8949324fc299c6730f1081e89ffff7163cb5c9b49",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        822113627,
+        1133229259,
+        2553810204,
+        3035823465
+      ],
+      "increment_sha256_int64": "7589b22b3d5860ae1518f7e8949324fc299c6730f1081e89ffff7163cb5c9b49",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct/toy_0009",
+      "parent_scenario": null,
+      "scenario": "2021_10pct",
+      "source_family": "ten_pct",
+      "total_040_300": 141279487,
+      "toy_index": 9
+    },
+    {
+      "counts_sha256_int64": "7b480dc3f9f59363aaa71ad344db3710e0b39b822e1b4d5d5144a86156382907",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        3623528160,
+        2464408261,
+        3039822279,
+        2514805096
+      ],
+      "increment_sha256_int64": "df20bab704909bc074eaf3031b75b9a7ddf7069fe8224229695b750e99c39016",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct_x10/toy_0009",
+      "parent_scenario": "2021_10pct",
+      "scenario": "2021_10pct_x10",
+      "source_family": "ten_pct",
+      "total_040_300": 1412484946,
+      "toy_index": 9
+    },
+    {
+      "counts_sha256_int64": "52db2d2df5b3654473ef4203ce81fafaa5b943a540cc4399e1501d3252c7d21f",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        1187048450,
+        487888077,
+        1821389205,
+        2728024783
+      ],
+      "increment_sha256_int64": "52db2d2df5b3654473ef4203ce81fafaa5b943a540cc4399e1501d3252c7d21f",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct/toy_0010",
+      "parent_scenario": null,
+      "scenario": "2021_1pct",
+      "source_family": "one_pct",
+      "total_040_300": 12507588,
+      "toy_index": 10
+    },
+    {
+      "counts_sha256_int64": "243ea6b846a1b440cb5bc97a2fa85a212b970cf9b776da531b75ca9efb3172bb",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        404197684,
+        267583753,
+        2502890388,
+        595626669
+      ],
+      "increment_sha256_int64": "791327ac98916ef87992541c14373bb6c043a2de39d6d672dd431ca9e130bcc6",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x10/toy_0010",
+      "parent_scenario": "2021_1pct",
+      "scenario": "2021_1pct_x10",
+      "source_family": "one_pct",
+      "total_040_300": 125038629,
+      "toy_index": 10
+    },
+    {
+      "counts_sha256_int64": "61a621d35fd324125a6131690873bd82bd4432d72911352e0560f1049ba94c61",
+      "increment_multiplier": 90,
+      "increment_seed_words": [
+        2559499296,
+        2886577080,
+        832353036,
+        2404146280
+      ],
+      "increment_sha256_int64": "3ba4e6e1499a1e764e7118e465270cff1545743a795dafa28e4dae15d988b194",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x100/toy_0010",
+      "parent_scenario": "2021_1pct_x10",
+      "scenario": "2021_1pct_x100",
+      "source_family": "one_pct",
+      "total_040_300": 1250435083,
+      "toy_index": 10
+    },
+    {
+      "counts_sha256_int64": "3ff0e9ce09f089a71b6fdc932d282a2a12363717398688ab8ec6851adf2d6a1d",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        976700839,
+        578829377,
+        2514705145,
+        4039606200
+      ],
+      "increment_sha256_int64": "3ff0e9ce09f089a71b6fdc932d282a2a12363717398688ab8ec6851adf2d6a1d",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct/toy_0010",
+      "parent_scenario": null,
+      "scenario": "2021_10pct",
+      "source_family": "ten_pct",
+      "total_040_300": 141256553,
+      "toy_index": 10
+    },
+    {
+      "counts_sha256_int64": "d26a230f8afb8eb7dd5ed073f5a0d70e582fba20ccf2cf57171a3925ac4753ff",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        2553297885,
+        1409045744,
+        68025972,
+        981973299
+      ],
+      "increment_sha256_int64": "cc809d3c4cd1979e835616eabaa436d7fbffe8b28f908ba9089edd3adf5490eb",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct_x10/toy_0010",
+      "parent_scenario": "2021_10pct",
+      "scenario": "2021_10pct_x10",
+      "source_family": "ten_pct",
+      "total_040_300": 1412522455,
+      "toy_index": 10
+    },
+    {
+      "counts_sha256_int64": "ef5dbe057ad6b0a089dd0ae90ab99584708d76c3c4febb5c6a62e41a35cb04f9",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        1710309674,
+        3068602796,
+        3991856948,
+        143083930
+      ],
+      "increment_sha256_int64": "ef5dbe057ad6b0a089dd0ae90ab99584708d76c3c4febb5c6a62e41a35cb04f9",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct/toy_0011",
+      "parent_scenario": null,
+      "scenario": "2021_1pct",
+      "source_family": "one_pct",
+      "total_040_300": 12504672,
+      "toy_index": 11
+    },
+    {
+      "counts_sha256_int64": "1e604fc6c6d66fe32b4b3356b1f02fbeba79ed3851ce4fc072edfe256ff7dbc0",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        1112796738,
+        245598231,
+        990008093,
+        728032786
+      ],
+      "increment_sha256_int64": "99a3a4997883b3c56c4ba6e4adff2de8ba80d23245e2b31c091ecf82035fc572",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x10/toy_0011",
+      "parent_scenario": "2021_1pct",
+      "scenario": "2021_1pct_x10",
+      "source_family": "one_pct",
+      "total_040_300": 125044007,
+      "toy_index": 11
+    },
+    {
+      "counts_sha256_int64": "2f479469b219e0e3a38244631508352e180132c8e463381becfea5e80e5cea07",
+      "increment_multiplier": 90,
+      "increment_seed_words": [
+        2992059404,
+        1345368675,
+        1337547936,
+        2045370713
+      ],
+      "increment_sha256_int64": "4dc958ed93de603c1d3310dece6ade6bf8a60cf0b5a329f81817834935da3f6d",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x100/toy_0011",
+      "parent_scenario": "2021_1pct_x10",
+      "scenario": "2021_1pct_x100",
+      "source_family": "one_pct",
+      "total_040_300": 1250352804,
+      "toy_index": 11
+    },
+    {
+      "counts_sha256_int64": "7b860e558aa68d0b9ee27ba43408a042d76b2052468aa6ac3d91f9786af58675",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        772363603,
+        3150595707,
+        3588467450,
+        1493926771
+      ],
+      "increment_sha256_int64": "7b860e558aa68d0b9ee27ba43408a042d76b2052468aa6ac3d91f9786af58675",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct/toy_0011",
+      "parent_scenario": null,
+      "scenario": "2021_10pct",
+      "source_family": "ten_pct",
+      "total_040_300": 141242111,
+      "toy_index": 11
+    },
+    {
+      "counts_sha256_int64": "051d2358fc422b5a8f152955407321bff6e742d9d35b3efe04c255aac510a100",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        4234559334,
+        4234487655,
+        3742872702,
+        1735762994
+      ],
+      "increment_sha256_int64": "582e6ae8281bc5b1ca9e23037f54786ed5b57f386639bddd3437f329522ff08d",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct_x10/toy_0011",
+      "parent_scenario": "2021_10pct",
+      "scenario": "2021_10pct_x10",
+      "source_family": "ten_pct",
+      "total_040_300": 1412537650,
+      "toy_index": 11
+    },
+    {
+      "counts_sha256_int64": "6c3e8baca525c892336f0cc3424abcee73f51a3a268e706ef9d123ac83c9729b",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        634780892,
+        1009023142,
+        1848822653,
+        3234234466
+      ],
+      "increment_sha256_int64": "6c3e8baca525c892336f0cc3424abcee73f51a3a268e706ef9d123ac83c9729b",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct/toy_0012",
+      "parent_scenario": null,
+      "scenario": "2021_1pct",
+      "source_family": "one_pct",
+      "total_040_300": 12493377,
+      "toy_index": 12
+    },
+    {
+      "counts_sha256_int64": "b2650dd5aa230f44eeec63eecf5f0925585811894e3915df3f6b6a81320817d4",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        4241761395,
+        3071546261,
+        291642239,
+        205357351
+      ],
+      "increment_sha256_int64": "7500d67d798554d0d6e61cee4913c3f713b6f50715f17b5e59ec11e0a4315133",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x10/toy_0012",
+      "parent_scenario": "2021_1pct",
+      "scenario": "2021_1pct_x10",
+      "source_family": "one_pct",
+      "total_040_300": 125026511,
+      "toy_index": 12
+    },
+    {
+      "counts_sha256_int64": "1c2c011482abc4b9e66b3d98430e9ca40ac0509a17ae141a4ee2de1dd98a8a60",
+      "increment_multiplier": 90,
+      "increment_seed_words": [
+        355879309,
+        3502294210,
+        3279058067,
+        3253650203
+      ],
+      "increment_sha256_int64": "717eb4129d4a4d361b0b22aab18b043728b6e6ab8864ecf53088f34547e39b4e",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x100/toy_0012",
+      "parent_scenario": "2021_1pct_x10",
+      "scenario": "2021_1pct_x100",
+      "source_family": "one_pct",
+      "total_040_300": 1250372009,
+      "toy_index": 12
+    },
+    {
+      "counts_sha256_int64": "ffc7001e808fe8efa383d7363824ebc4615541048e964b27b33faec339b0d34b",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        397268213,
+        2341549605,
+        1114976073,
+        4111026365
+      ],
+      "increment_sha256_int64": "ffc7001e808fe8efa383d7363824ebc4615541048e964b27b33faec339b0d34b",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct/toy_0012",
+      "parent_scenario": null,
+      "scenario": "2021_10pct",
+      "source_family": "ten_pct",
+      "total_040_300": 141252584,
+      "toy_index": 12
+    },
+    {
+      "counts_sha256_int64": "b7ae566fb03bb5fc0d8b4b46f357c859c59a259805f1732b9f187aeadd6c378d",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        841039090,
+        1500965901,
+        295393674,
+        934594884
+      ],
+      "increment_sha256_int64": "423897f90d04fd3ddc02f19f4deaa1c7ffa66583a71f8f5882d596a4238e23c5",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct_x10/toy_0012",
+      "parent_scenario": "2021_10pct",
+      "scenario": "2021_10pct_x10",
+      "source_family": "ten_pct",
+      "total_040_300": 1412509003,
+      "toy_index": 12
+    },
+    {
+      "counts_sha256_int64": "817cf0678343a9a07fc1d90f0768a520c0a88cfa1d7e5033499b5f92f20cc8d2",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        3447628271,
+        627810531,
+        2486296025,
+        4223158795
+      ],
+      "increment_sha256_int64": "817cf0678343a9a07fc1d90f0768a520c0a88cfa1d7e5033499b5f92f20cc8d2",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct/toy_0013",
+      "parent_scenario": null,
+      "scenario": "2021_1pct",
+      "source_family": "one_pct",
+      "total_040_300": 12508552,
+      "toy_index": 13
+    },
+    {
+      "counts_sha256_int64": "933529ce989520669c9211bd8ccdb771d4f0d5b17815ff3613402b4fafcfba5d",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        3522144563,
+        1542709022,
+        3996884189,
+        1594702199
+      ],
+      "increment_sha256_int64": "920ea39290a6cbd1ddebdbadc7444ed100c9cf9606e32f857b3654e5982e21b9",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x10/toy_0013",
+      "parent_scenario": "2021_1pct",
+      "scenario": "2021_1pct_x10",
+      "source_family": "one_pct",
+      "total_040_300": 125042609,
+      "toy_index": 13
+    },
+    {
+      "counts_sha256_int64": "30b95b231790472c5b3c667eb2f4872702e635be7bfc75c5eb0b73fecff26913",
+      "increment_multiplier": 90,
+      "increment_seed_words": [
+        1281743630,
+        2337453876,
+        4269258595,
+        2984720579
+      ],
+      "increment_sha256_int64": "d1a0a3d48d0f9b44d6647baeef4fa01df793029203c92293a76901d8af506b9f",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x100/toy_0013",
+      "parent_scenario": "2021_1pct_x10",
+      "scenario": "2021_1pct_x100",
+      "source_family": "one_pct",
+      "total_040_300": 1250377901,
+      "toy_index": 13
+    },
+    {
+      "counts_sha256_int64": "975da98c0e42fda5940d62bb71fd03916f36cea041b33a874492c86e95705686",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        3123949030,
+        1056611443,
+        1210283086,
+        3302631595
+      ],
+      "increment_sha256_int64": "975da98c0e42fda5940d62bb71fd03916f36cea041b33a874492c86e95705686",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct/toy_0013",
+      "parent_scenario": null,
+      "scenario": "2021_10pct",
+      "source_family": "ten_pct",
+      "total_040_300": 141247997,
+      "toy_index": 13
+    },
+    {
+      "counts_sha256_int64": "9811db835de68b83a752c26e9cb2fb15b30afaa2a4d277c2595c6b4fd7be3db7",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        2934683088,
+        3299749333,
+        395707479,
+        2004171313
+      ],
+      "increment_sha256_int64": "d645d2ca62dc74a7606b11843178a6f3cd554a4953cc56d139461d33eee11035",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct_x10/toy_0013",
+      "parent_scenario": "2021_10pct",
+      "scenario": "2021_10pct_x10",
+      "source_family": "ten_pct",
+      "total_040_300": 1412491977,
+      "toy_index": 13
+    },
+    {
+      "counts_sha256_int64": "e6bb3f06bfb96940b2737051994d8c534e8301758c3d4a67760bf36c330c7684",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        2075253827,
+        76953442,
+        1954767191,
+        163838571
+      ],
+      "increment_sha256_int64": "e6bb3f06bfb96940b2737051994d8c534e8301758c3d4a67760bf36c330c7684",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct/toy_0014",
+      "parent_scenario": null,
+      "scenario": "2021_1pct",
+      "source_family": "one_pct",
+      "total_040_300": 12502992,
+      "toy_index": 14
+    },
+    {
+      "counts_sha256_int64": "e7d59c2d37969aeb8c955e20a91e4309fc7bc7548caaeed1e8e4a3e8c125d0e5",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        2246225577,
+        1422029686,
+        3593535605,
+        3653826085
+      ],
+      "increment_sha256_int64": "f6b2f46a4c5cd2c3d6062bfbe250cfa6c295c64de49193b1847069ff2ace362b",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x10/toy_0014",
+      "parent_scenario": "2021_1pct",
+      "scenario": "2021_1pct_x10",
+      "source_family": "one_pct",
+      "total_040_300": 125051223,
+      "toy_index": 14
+    },
+    {
+      "counts_sha256_int64": "0cd76e99b39a866729997704d574d5b2d5279a46c304b612ccb6e7c17a028c70",
+      "increment_multiplier": 90,
+      "increment_seed_words": [
+        2182031243,
+        2594688302,
+        31625027,
+        3933405535
+      ],
+      "increment_sha256_int64": "74c0a5f8eb23b21f0bbdadbc49432d86c80242b58aa195daa9a0d10585128e91",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x100/toy_0014",
+      "parent_scenario": "2021_1pct_x10",
+      "scenario": "2021_1pct_x100",
+      "source_family": "one_pct",
+      "total_040_300": 1250450689,
+      "toy_index": 14
+    },
+    {
+      "counts_sha256_int64": "90fe826b639add0aa547db7edfc9f6139ec1966f6adafc2e04254bcf192415b0",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        975701756,
+        1320545946,
+        2190264032,
+        1224609279
+      ],
+      "increment_sha256_int64": "90fe826b639add0aa547db7edfc9f6139ec1966f6adafc2e04254bcf192415b0",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct/toy_0014",
+      "parent_scenario": null,
+      "scenario": "2021_10pct",
+      "source_family": "ten_pct",
+      "total_040_300": 141262286,
+      "toy_index": 14
+    },
+    {
+      "counts_sha256_int64": "2c56f3dc449d1a071bbfa3b62dadd6d4fe21dddda1b3f3e67c574caf2cc6b6ca",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        2350999281,
+        3827908368,
+        3071356888,
+        1701024100
+      ],
+      "increment_sha256_int64": "137a27d9c9ee657835b4f35db803a1c3f30ffe5faddc08c40c67c43b25d686bf",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct_x10/toy_0014",
+      "parent_scenario": "2021_10pct",
+      "scenario": "2021_10pct_x10",
+      "source_family": "ten_pct",
+      "total_040_300": 1412556495,
+      "toy_index": 14
+    },
+    {
+      "counts_sha256_int64": "900cea485258a59134999b0ca53b711a9b3b18005ddb013d24769dca1f79714f",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        3421051373,
+        738542417,
+        3207744490,
+        2332346991
+      ],
+      "increment_sha256_int64": "900cea485258a59134999b0ca53b711a9b3b18005ddb013d24769dca1f79714f",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct/toy_0015",
+      "parent_scenario": null,
+      "scenario": "2021_1pct",
+      "source_family": "one_pct",
+      "total_040_300": 12503740,
+      "toy_index": 15
+    },
+    {
+      "counts_sha256_int64": "2a9a841aa537146ab07fe6e4c3bb8c917d0b0e2d89c86231ce18dc2c5aea54ac",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        133569772,
+        721011698,
+        1059378488,
+        498538582
+      ],
+      "increment_sha256_int64": "ec8082e597cdedb44c6e03db63d06e98dd9d6f20e040c8c12ec88cb0db6ed3b7",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x10/toy_0015",
+      "parent_scenario": "2021_1pct",
+      "scenario": "2021_1pct_x10",
+      "source_family": "one_pct",
+      "total_040_300": 125038202,
+      "toy_index": 15
+    },
+    {
+      "counts_sha256_int64": "4070cf47e563936f5f19b84a15eb02d0905065190a5ec061398b4e5428b3d909",
+      "increment_multiplier": 90,
+      "increment_seed_words": [
+        4021182456,
+        3724290425,
+        1786611157,
+        2631999311
+      ],
+      "increment_sha256_int64": "f63bd1d330b120ebf80cfa302ad3253baadadd640d91cb4ce84a7cf994cb7d94",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x100/toy_0015",
+      "parent_scenario": "2021_1pct_x10",
+      "scenario": "2021_1pct_x100",
+      "source_family": "one_pct",
+      "total_040_300": 1250437550,
+      "toy_index": 15
+    },
+    {
+      "counts_sha256_int64": "d499d35d94079103ed50a04b30541685ba0702683a79a3c6d7f0bbcd46c55172",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        220921703,
+        2649359330,
+        2221077333,
+        194016589
+      ],
+      "increment_sha256_int64": "d499d35d94079103ed50a04b30541685ba0702683a79a3c6d7f0bbcd46c55172",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct/toy_0015",
+      "parent_scenario": null,
+      "scenario": "2021_10pct",
+      "source_family": "ten_pct",
+      "total_040_300": 141261989,
+      "toy_index": 15
+    },
+    {
+      "counts_sha256_int64": "faa9e68bfb6fb5e432d4fa637588b54367b46c7940aa15a7ce39660f25690562",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        1987787258,
+        1306090402,
+        1431259890,
+        1330984823
+      ],
+      "increment_sha256_int64": "5429ca14254948ba0214f479dd87e9f403d7671c52bb9488316569803e852cc5",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct_x10/toy_0015",
+      "parent_scenario": "2021_10pct",
+      "scenario": "2021_10pct_x10",
+      "source_family": "ten_pct",
+      "total_040_300": 1412488835,
+      "toy_index": 15
+    },
+    {
+      "counts_sha256_int64": "184a6b699485e29b569448b0ab5f38d88d16a57ded2d451e28e5e08a19b81b40",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        620640940,
+        2997338724,
+        4210550137,
+        117947071
+      ],
+      "increment_sha256_int64": "184a6b699485e29b569448b0ab5f38d88d16a57ded2d451e28e5e08a19b81b40",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct/toy_0016",
+      "parent_scenario": null,
+      "scenario": "2021_1pct",
+      "source_family": "one_pct",
+      "total_040_300": 12502380,
+      "toy_index": 16
+    },
+    {
+      "counts_sha256_int64": "7c82a111ce4a73522cab6afd132b79708215bd4c2d8a366919553fbf75d17a76",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        2735318469,
+        2768031169,
+        1557389164,
+        643148933
+      ],
+      "increment_sha256_int64": "2a44699115cb8cd17a5eb904f16a997ac272dbf2231a98f159670d1f43321311",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x10/toy_0016",
+      "parent_scenario": "2021_1pct",
+      "scenario": "2021_1pct_x10",
+      "source_family": "one_pct",
+      "total_040_300": 125034634,
+      "toy_index": 16
+    },
+    {
+      "counts_sha256_int64": "501e40654598b88df2c6ddf8ab3e3249010815b19ff41b54ee36ae9cc9f48614",
+      "increment_multiplier": 90,
+      "increment_seed_words": [
+        2117787211,
+        2060634243,
+        1674229815,
+        3117689555
+      ],
+      "increment_sha256_int64": "ae1d02c0b5002c2ec63c7f04e5cd31a4d6c13d75765efda23501871b9eb88612",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x100/toy_0016",
+      "parent_scenario": "2021_1pct_x10",
+      "scenario": "2021_1pct_x100",
+      "source_family": "one_pct",
+      "total_040_300": 1250373273,
+      "toy_index": 16
+    },
+    {
+      "counts_sha256_int64": "79fc9d026bbd35b20a8578d7287fbc6f5132caa2cf1da206646a1b80cbb32892",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        2034150706,
+        2938807207,
+        2041039701,
+        610016860
+      ],
+      "increment_sha256_int64": "79fc9d026bbd35b20a8578d7287fbc6f5132caa2cf1da206646a1b80cbb32892",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct/toy_0016",
+      "parent_scenario": null,
+      "scenario": "2021_10pct",
+      "source_family": "ten_pct",
+      "total_040_300": 141248800,
+      "toy_index": 16
+    },
+    {
+      "counts_sha256_int64": "f4c6c085d0d982f4974737e8d4ea26b609cddd4ee57d36cd5ed12492b9712c86",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        535966585,
+        155840339,
+        1963882431,
+        2755491980
+      ],
+      "increment_sha256_int64": "88ff90b22e7db76afed195c75ac061ac1da89f48c37a44f27805bd60935e1a39",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct_x10/toy_0016",
+      "parent_scenario": "2021_10pct",
+      "scenario": "2021_10pct_x10",
+      "source_family": "ten_pct",
+      "total_040_300": 1412491318,
+      "toy_index": 16
+    },
+    {
+      "counts_sha256_int64": "19e2b1374762494b85bda91f22a9e14aaa3648c8910fa0d76bab219b130ae462",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        3398998965,
+        3198404373,
+        2380577511,
+        3613555483
+      ],
+      "increment_sha256_int64": "19e2b1374762494b85bda91f22a9e14aaa3648c8910fa0d76bab219b130ae462",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct/toy_0017",
+      "parent_scenario": null,
+      "scenario": "2021_1pct",
+      "source_family": "one_pct",
+      "total_040_300": 12502746,
+      "toy_index": 17
+    },
+    {
+      "counts_sha256_int64": "c53dc2e56cf45de11e175cdac45ed193fe88612b91f917697ee749177e891c10",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        3319327871,
+        1872175165,
+        2740415445,
+        1974984990
+      ],
+      "increment_sha256_int64": "53385df24e65529a31e20b0734dad133301902b56a364b32baddecffcdd19ff7",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x10/toy_0017",
+      "parent_scenario": "2021_1pct",
+      "scenario": "2021_1pct_x10",
+      "source_family": "one_pct",
+      "total_040_300": 125038744,
+      "toy_index": 17
+    },
+    {
+      "counts_sha256_int64": "1f3eed1292fdbbeae9ef5f659e1942127376a85f5d9d7758d07a46e6beb7ab61",
+      "increment_multiplier": 90,
+      "increment_seed_words": [
+        2646193757,
+        3584393209,
+        1730741168,
+        2758222057
+      ],
+      "increment_sha256_int64": "2058485ac854d937112f1af7e67837301e719f11a21cf937ce1d585098a9585d",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x100/toy_0017",
+      "parent_scenario": "2021_1pct_x10",
+      "scenario": "2021_1pct_x100",
+      "source_family": "one_pct",
+      "total_040_300": 1250311605,
+      "toy_index": 17
+    },
+    {
+      "counts_sha256_int64": "eaef0ba13a136ad7194835ead4e76b7f0394034cf790287b5aa7930569718ca8",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        1352815920,
+        3281108379,
+        1694195725,
+        2508274922
+      ],
+      "increment_sha256_int64": "eaef0ba13a136ad7194835ead4e76b7f0394034cf790287b5aa7930569718ca8",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct/toy_0017",
+      "parent_scenario": null,
+      "scenario": "2021_10pct",
+      "source_family": "ten_pct",
+      "total_040_300": 141246817,
+      "toy_index": 17
+    },
+    {
+      "counts_sha256_int64": "3d0ea7e03a3d362ae159bb60b891f4aca2ab794ad9e11389d2983cad6cbe51c8",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        2920440305,
+        1471963141,
+        2552140607,
+        2914817946
+      ],
+      "increment_sha256_int64": "70c3b642e7e276d0beb4c162539d1447fe222ba0c59be627d1a060527c7fdf96",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct_x10/toy_0017",
+      "parent_scenario": "2021_10pct",
+      "scenario": "2021_10pct_x10",
+      "source_family": "ten_pct",
+      "total_040_300": 1412456537,
+      "toy_index": 17
+    },
+    {
+      "counts_sha256_int64": "f21fa1db669afff65528845e1ac58ca06cf488076267386b1a0597b255af2b0e",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        856870696,
+        3137354206,
+        2504361336,
+        206816565
+      ],
+      "increment_sha256_int64": "f21fa1db669afff65528845e1ac58ca06cf488076267386b1a0597b255af2b0e",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct/toy_0018",
+      "parent_scenario": null,
+      "scenario": "2021_1pct",
+      "source_family": "one_pct",
+      "total_040_300": 12499278,
+      "toy_index": 18
+    },
+    {
+      "counts_sha256_int64": "ae332f53b0175dc3ecb0a74acf9081dfb8e6dbc0814f13785734b7cbdf146408",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        3629466798,
+        3106095675,
+        1344677452,
+        4227161857
+      ],
+      "increment_sha256_int64": "01529fc311f6df00fb6b0ed47d096b4f770954748fbefca2923ff9018eafeb25",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x10/toy_0018",
+      "parent_scenario": "2021_1pct",
+      "scenario": "2021_1pct_x10",
+      "source_family": "one_pct",
+      "total_040_300": 125010782,
+      "toy_index": 18
+    },
+    {
+      "counts_sha256_int64": "9c51282308507baf60faabd33958d77ec8b8a0952953e12eb53729d85a46718f",
+      "increment_multiplier": 90,
+      "increment_seed_words": [
+        1831445261,
+        3153880638,
+        1380174001,
+        610600436
+      ],
+      "increment_sha256_int64": "f6bee20fd749c397f7c0128e0f04164e0a928d85a837e3233bdced11b13b53c7",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x100/toy_0018",
+      "parent_scenario": "2021_1pct_x10",
+      "scenario": "2021_1pct_x100",
+      "source_family": "one_pct",
+      "total_040_300": 1250390038,
+      "toy_index": 18
+    },
+    {
+      "counts_sha256_int64": "1dfee91a19cd1695149b37a8e4e8dd9a236af03206fe4624fe788ad4d253c346",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        4173495558,
+        409247132,
+        360084866,
+        3556189006
+      ],
+      "increment_sha256_int64": "1dfee91a19cd1695149b37a8e4e8dd9a236af03206fe4624fe788ad4d253c346",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct/toy_0018",
+      "parent_scenario": null,
+      "scenario": "2021_10pct",
+      "source_family": "ten_pct",
+      "total_040_300": 141279038,
+      "toy_index": 18
+    },
+    {
+      "counts_sha256_int64": "e3499760a315eb3b02aa896e3ba431dfc754d003bb7e456e147a5b15829b4c47",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        2937462569,
+        3525831660,
+        2976934878,
+        1096209408
+      ],
+      "increment_sha256_int64": "2d3a18935996c77a5694e90711c56d95fe3f32024f8e097a77fad39a18fa1fce",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct_x10/toy_0018",
+      "parent_scenario": "2021_10pct",
+      "scenario": "2021_10pct_x10",
+      "source_family": "ten_pct",
+      "total_040_300": 1412567350,
+      "toy_index": 18
+    },
+    {
+      "counts_sha256_int64": "7e96c36d22d9bdc9d673baf4ff1a3beef2ffb0dc4fcc166f613668dfdb44466f",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        1410859228,
+        1273707130,
+        3932319553,
+        879595387
+      ],
+      "increment_sha256_int64": "7e96c36d22d9bdc9d673baf4ff1a3beef2ffb0dc4fcc166f613668dfdb44466f",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct/toy_0019",
+      "parent_scenario": null,
+      "scenario": "2021_1pct",
+      "source_family": "one_pct",
+      "total_040_300": 12499785,
+      "toy_index": 19
+    },
+    {
+      "counts_sha256_int64": "8414fe564f68f9a44001e3ab70718c999a43a9060cf0c5d815c071e59d941106",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        2162879850,
+        743911637,
+        2520739646,
+        2554789398
+      ],
+      "increment_sha256_int64": "87865ba35ab14d461cdfa9ea98f0fa66cce07c74cf8eee55704eae463e807ced",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x10/toy_0019",
+      "parent_scenario": "2021_1pct",
+      "scenario": "2021_1pct_x10",
+      "source_family": "one_pct",
+      "total_040_300": 125024362,
+      "toy_index": 19
+    },
+    {
+      "counts_sha256_int64": "3803668afe0b15649a64ffbe9d71acd9f8ee7e0e40277067a71fb1800364d93b",
+      "increment_multiplier": 90,
+      "increment_seed_words": [
+        4205009991,
+        1513806159,
+        1763102127,
+        2803716076
+      ],
+      "increment_sha256_int64": "47fa4e738c113a127b555939c2606e3a53a1f932d066d6e7e417a91cc5773f85",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x100/toy_0019",
+      "parent_scenario": "2021_1pct_x10",
+      "scenario": "2021_1pct_x100",
+      "source_family": "one_pct",
+      "total_040_300": 1250363640,
+      "toy_index": 19
+    },
+    {
+      "counts_sha256_int64": "cf138de8268905f882fc085c72b24ee9d8e50a3da5608dfdd0be8742093c13b0",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        1460054162,
+        3302931521,
+        2974001282,
+        765688221
+      ],
+      "increment_sha256_int64": "cf138de8268905f882fc085c72b24ee9d8e50a3da5608dfdd0be8742093c13b0",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct/toy_0019",
+      "parent_scenario": null,
+      "scenario": "2021_10pct",
+      "source_family": "ten_pct",
+      "total_040_300": 141245812,
+      "toy_index": 19
+    },
+    {
+      "counts_sha256_int64": "ea325fcef7d3c7ef80a25b02ccb584ffb8cb7a74aff83aa4652ff74e44ab4d9a",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        279826024,
+        715115482,
+        190749421,
+        1618281301
+      ],
+      "increment_sha256_int64": "91f4e128519a728a609cad231ebb6112fce43ce579b40034b6e34c2c8058c9ca",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct_x10/toy_0019",
+      "parent_scenario": "2021_10pct",
+      "scenario": "2021_10pct_x10",
+      "source_family": "ten_pct",
+      "total_040_300": 1412431957,
+      "toy_index": 19
+    },
+    {
+      "counts_sha256_int64": "ec003bb351fd4a56c093661a631bc0ca8fc427ee5db842eb9d12a8638ec76f86",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        3901316804,
+        3963868361,
+        835557423,
+        3827726312
+      ],
+      "increment_sha256_int64": "ec003bb351fd4a56c093661a631bc0ca8fc427ee5db842eb9d12a8638ec76f86",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct/toy_0020",
+      "parent_scenario": null,
+      "scenario": "2021_1pct",
+      "source_family": "one_pct",
+      "total_040_300": 12506243,
+      "toy_index": 20
+    },
+    {
+      "counts_sha256_int64": "81158cbf0325d561625ac413bb1b2cece01407c6be1481b0507b7b0bd0465310",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        3296185525,
+        1335100702,
+        3171192673,
+        1816444612
+      ],
+      "increment_sha256_int64": "4f296ccc0b1a49c1aa984224a03f382726cc292c5c54d9a53648dcf5bde67c29",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x10/toy_0020",
+      "parent_scenario": "2021_1pct",
+      "scenario": "2021_1pct_x10",
+      "source_family": "one_pct",
+      "total_040_300": 125057125,
+      "toy_index": 20
+    },
+    {
+      "counts_sha256_int64": "2686f7dc1b82e80f776f3ee93fa06f095e8b11ab0bd3f7c9b71d6ef004ad5242",
+      "increment_multiplier": 90,
+      "increment_seed_words": [
+        4025718752,
+        2455078271,
+        2898482122,
+        148931817
+      ],
+      "increment_sha256_int64": "0286121ca4bdd25658e4df17f42092345e8ac06e008ac91e6f7dd086a36deb45",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x100/toy_0020",
+      "parent_scenario": "2021_1pct_x10",
+      "scenario": "2021_1pct_x100",
+      "source_family": "one_pct",
+      "total_040_300": 1250425744,
+      "toy_index": 20
+    },
+    {
+      "counts_sha256_int64": "257f927acc809a9b8c902a42f78030cb340ef041c3a50e6da847c81f29770154",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        3188571906,
+        2031954187,
+        3601592206,
+        1216681817
+      ],
+      "increment_sha256_int64": "257f927acc809a9b8c902a42f78030cb340ef041c3a50e6da847c81f29770154",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct/toy_0020",
+      "parent_scenario": null,
+      "scenario": "2021_10pct",
+      "source_family": "ten_pct",
+      "total_040_300": 141271963,
+      "toy_index": 20
+    },
+    {
+      "counts_sha256_int64": "1c28a2d6fcfc715ac4f0820cdf7be59499e6d74614b7e8b735408cf75a2b306d",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        3699099806,
+        2955926213,
+        1369624599,
+        3015057083
+      ],
+      "increment_sha256_int64": "d0ceee9c28a20697425ffb7f0b8d08ff8fcfaca15aa960ef2bae157d76f98db5",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct_x10/toy_0020",
+      "parent_scenario": "2021_10pct",
+      "scenario": "2021_10pct_x10",
+      "source_family": "ten_pct",
+      "total_040_300": 1412538224,
+      "toy_index": 20
+    },
+    {
+      "counts_sha256_int64": "5cbddd48bf6d0ebb883df7825cb28d6742e66c7bec26626ae93ae2b99a2a172d",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        3985007319,
+        2220507193,
+        2195580552,
+        1701976452
+      ],
+      "increment_sha256_int64": "5cbddd48bf6d0ebb883df7825cb28d6742e66c7bec26626ae93ae2b99a2a172d",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct/toy_0021",
+      "parent_scenario": null,
+      "scenario": "2021_1pct",
+      "source_family": "one_pct",
+      "total_040_300": 12500033,
+      "toy_index": 21
+    },
+    {
+      "counts_sha256_int64": "5e7e52eac58f272be7e4a8a5b6c2c908708af59bcc652b8299ffe9bf78fe93ba",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        4286165031,
+        2647887448,
+        4081933364,
+        2102034055
+      ],
+      "increment_sha256_int64": "ca683dc0157cc5d8a3327078e9e5d7db18c1c060765fb5353a0fb0818aaa3ada",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x10/toy_0021",
+      "parent_scenario": "2021_1pct",
+      "scenario": "2021_1pct_x10",
+      "source_family": "one_pct",
+      "total_040_300": 125050593,
+      "toy_index": 21
+    },
+    {
+      "counts_sha256_int64": "d14fd6c0896cfe36a7abd7fb0e6ab814a92836f170453fa840a482770c701875",
+      "increment_multiplier": 90,
+      "increment_seed_words": [
+        1333201478,
+        1454821430,
+        1600661703,
+        2248380641
+      ],
+      "increment_sha256_int64": "8f5fdfe98917ebce52f40ba85f1c5abde9e7c16065199ea6b4ef2f36ae407a8b",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x100/toy_0021",
+      "parent_scenario": "2021_1pct_x10",
+      "scenario": "2021_1pct_x100",
+      "source_family": "one_pct",
+      "total_040_300": 1250417465,
+      "toy_index": 21
+    },
+    {
+      "counts_sha256_int64": "e5f10c890c94f56d589f85b78c6becd2e9aeed4ce1424b63bcb70f93dafeb440",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        3349591506,
+        2623059066,
+        749328507,
+        2230437240
+      ],
+      "increment_sha256_int64": "e5f10c890c94f56d589f85b78c6becd2e9aeed4ce1424b63bcb70f93dafeb440",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct/toy_0021",
+      "parent_scenario": null,
+      "scenario": "2021_10pct",
+      "source_family": "ten_pct",
+      "total_040_300": 141258474,
+      "toy_index": 21
+    },
+    {
+      "counts_sha256_int64": "f71904cb58d1018921df2d082681b7ab6dfa78455f6c69b1034fe7e94948c935",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        1964249753,
+        1747111006,
+        3728629088,
+        3383838200
+      ],
+      "increment_sha256_int64": "0baf8adc5cc60bf40cc0fe1d88803db464a10275c7db9469c40ecc15163fb57f",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct_x10/toy_0021",
+      "parent_scenario": "2021_10pct",
+      "scenario": "2021_10pct_x10",
+      "source_family": "ten_pct",
+      "total_040_300": 1412539413,
+      "toy_index": 21
+    },
+    {
+      "counts_sha256_int64": "3a11ce4fa77d55efa024b3bb3c85dfcb9884dc3706b331385c150e13040fb11d",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        2100864874,
+        1313345173,
+        2481235201,
+        3947637189
+      ],
+      "increment_sha256_int64": "3a11ce4fa77d55efa024b3bb3c85dfcb9884dc3706b331385c150e13040fb11d",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct/toy_0022",
+      "parent_scenario": null,
+      "scenario": "2021_1pct",
+      "source_family": "one_pct",
+      "total_040_300": 12506419,
+      "toy_index": 22
+    },
+    {
+      "counts_sha256_int64": "239139e01cc658d7c6a0213aa43bc50aefe4b82434c3b0a5899579571d64dbbb",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        1551599748,
+        2350732494,
+        1541633374,
+        2603317998
+      ],
+      "increment_sha256_int64": "b74dd3f2a0a2528d456aa95ee7936ffbac35174571af50e378e7a405599d5df3",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x10/toy_0022",
+      "parent_scenario": "2021_1pct",
+      "scenario": "2021_1pct_x10",
+      "source_family": "one_pct",
+      "total_040_300": 125052051,
+      "toy_index": 22
+    },
+    {
+      "counts_sha256_int64": "711e5e3077d653e3b68b1e0715c9e942aad7649bc8ed452af527f9068152d312",
+      "increment_multiplier": 90,
+      "increment_seed_words": [
+        309270214,
+        3595029024,
+        858016825,
+        3964497677
+      ],
+      "increment_sha256_int64": "77bea85d717c3b33d0ebddda30fbe1ba2f61b5d6b0827ed997d97e36d132b36c",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x100/toy_0022",
+      "parent_scenario": "2021_1pct_x10",
+      "scenario": "2021_1pct_x100",
+      "source_family": "one_pct",
+      "total_040_300": 1250406980,
+      "toy_index": 22
+    },
+    {
+      "counts_sha256_int64": "437cea8fbe41eec29219101445093e7890558c690650075470e276a019053bf3",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        4265365972,
+        1898513022,
+        3930112253,
+        2050953451
+      ],
+      "increment_sha256_int64": "437cea8fbe41eec29219101445093e7890558c690650075470e276a019053bf3",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct/toy_0022",
+      "parent_scenario": null,
+      "scenario": "2021_10pct",
+      "source_family": "ten_pct",
+      "total_040_300": 141267521,
+      "toy_index": 22
+    },
+    {
+      "counts_sha256_int64": "3bd40bbfc09237385ebf52d2086f5a049a88a6335feca1499e54b096b87705cf",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        4275953070,
+        71078777,
+        1618124412,
+        3221325082
+      ],
+      "increment_sha256_int64": "e9b01d8e894e52f464d235ccdc7b14ac7872bebeb78f8688a28e0b2b3cdf9053",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct_x10/toy_0022",
+      "parent_scenario": "2021_10pct",
+      "scenario": "2021_10pct_x10",
+      "source_family": "ten_pct",
+      "total_040_300": 1412588129,
+      "toy_index": 22
+    },
+    {
+      "counts_sha256_int64": "2c7c63317d157e7fc3296703e36e822341a1f00ea6c80c210ea36083ff871e33",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        2450630094,
+        2015880873,
+        662191574,
+        2718268121
+      ],
+      "increment_sha256_int64": "2c7c63317d157e7fc3296703e36e822341a1f00ea6c80c210ea36083ff871e33",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct/toy_0023",
+      "parent_scenario": null,
+      "scenario": "2021_1pct",
+      "source_family": "one_pct",
+      "total_040_300": 12505614,
+      "toy_index": 23
+    },
+    {
+      "counts_sha256_int64": "317baed44dc3696d389c8b5cb8a7650acf7bcee4691b04c2587cf642d7f2f4fb",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        3450307,
+        723285137,
+        1853095829,
+        1078165012
+      ],
+      "increment_sha256_int64": "63fc8d990b0f785ec4a2d3a7f4dff8a38e1a32db29812eea04302c652626d5f7",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x10/toy_0023",
+      "parent_scenario": "2021_1pct",
+      "scenario": "2021_1pct_x10",
+      "source_family": "one_pct",
+      "total_040_300": 125040985,
+      "toy_index": 23
+    },
+    {
+      "counts_sha256_int64": "fa146ed2f1a13c346b548b0314a675851853e018601ff59d28f8244be3bab2c9",
+      "increment_multiplier": 90,
+      "increment_seed_words": [
+        2186278080,
+        2124067685,
+        2546732002,
+        695840601
+      ],
+      "increment_sha256_int64": "500fcda6e242b1af196e1eedd510c6e410076b92dd65137cb79429df947512aa",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x100/toy_0023",
+      "parent_scenario": "2021_1pct_x10",
+      "scenario": "2021_1pct_x100",
+      "source_family": "one_pct",
+      "total_040_300": 1250374260,
+      "toy_index": 23
+    },
+    {
+      "counts_sha256_int64": "c226acf980c532270fd311499f31a49495299d43cc97db9960026519d48a9e90",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        3336899103,
+        2038094005,
+        2542897527,
+        2125395212
+      ],
+      "increment_sha256_int64": "c226acf980c532270fd311499f31a49495299d43cc97db9960026519d48a9e90",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct/toy_0023",
+      "parent_scenario": null,
+      "scenario": "2021_10pct",
+      "source_family": "ten_pct",
+      "total_040_300": 141257926,
+      "toy_index": 23
+    },
+    {
+      "counts_sha256_int64": "0b0da810d7372e74e3a062abb8e255a9680695f9b2c7ee249367d640ec8eb35d",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        1271872063,
+        2891620264,
+        2567356022,
+        2768660479
+      ],
+      "increment_sha256_int64": "965dfcaa89fcfe17f17af57561f5693ff68ee5f37a59924ce7399395396c20cd",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct_x10/toy_0023",
+      "parent_scenario": "2021_10pct",
+      "scenario": "2021_10pct_x10",
+      "source_family": "ten_pct",
+      "total_040_300": 1412509962,
+      "toy_index": 23
+    },
+    {
+      "counts_sha256_int64": "92ce452d116f04fbdbf62b012664397f9e32ee28ae380cef11721041d7dcb32c",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        4078743314,
+        3031922309,
+        3114176065,
+        830835325
+      ],
+      "increment_sha256_int64": "92ce452d116f04fbdbf62b012664397f9e32ee28ae380cef11721041d7dcb32c",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct/toy_0024",
+      "parent_scenario": null,
+      "scenario": "2021_1pct",
+      "source_family": "one_pct",
+      "total_040_300": 12503903,
+      "toy_index": 24
+    },
+    {
+      "counts_sha256_int64": "79e529eaa78aa25b8e7f5f7a79b649926cbbc0735832ede2e30bc66ecc95a646",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        2040623353,
+        3565894230,
+        3568146276,
+        69662261
+      ],
+      "increment_sha256_int64": "ce46a0ac0e9134f5f58c51fc6885e7bda381c6dff61cdab0331076766ec5c0f8",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x10/toy_0024",
+      "parent_scenario": "2021_1pct",
+      "scenario": "2021_1pct_x10",
+      "source_family": "one_pct",
+      "total_040_300": 125039841,
+      "toy_index": 24
+    },
+    {
+      "counts_sha256_int64": "c8ac40dc0907f15c3d93ee03b733346ceef6c46111dcc38048339222603a0bdf",
+      "increment_multiplier": 90,
+      "increment_seed_words": [
+        134475964,
+        1115412492,
+        1940332114,
+        3600054266
+      ],
+      "increment_sha256_int64": "88bf19c7ac9c2ba9abdfd35de5a94aef7a5bbe2c4cd565300cf7308295153573",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_1pct_x100/toy_0024",
+      "parent_scenario": "2021_1pct_x10",
+      "scenario": "2021_1pct_x100",
+      "source_family": "one_pct",
+      "total_040_300": 1250411465,
+      "toy_index": 24
+    },
+    {
+      "counts_sha256_int64": "37a772807faf8c78d418be80a2778a438510c7e32eb4960b0c4fb8e938edafeb",
+      "increment_multiplier": 1,
+      "increment_seed_words": [
+        2797167386,
+        51921306,
+        85208201,
+        3747808343
+      ],
+      "increment_sha256_int64": "37a772807faf8c78d418be80a2778a438510c7e32eb4960b0c4fb8e938edafeb",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct/toy_0024",
+      "parent_scenario": null,
+      "scenario": "2021_10pct",
+      "source_family": "ten_pct",
+      "total_040_300": 141227801,
+      "toy_index": 24
+    },
+    {
+      "counts_sha256_int64": "7f9da3c9069cf3e2357f015f1747f99a6d5014a13bec27654bfb0777b908121b",
+      "increment_multiplier": 9,
+      "increment_seed_words": [
+        1329442453,
+        2804286543,
+        2453082382,
+        1511843197
+      ],
+      "increment_sha256_int64": "5bcf787e2bd197685a98e6303428e116f58ea4fcf831d4de74f22cebf28fb07b",
+      "output_histogram": "toys/rigid_ggt26_scaled1pct/2021_10pct_x10/toy_0024",
+      "parent_scenario": "2021_10pct",
+      "scenario": "2021_10pct_x10",
+      "source_family": "ten_pct",
+      "total_040_300": 1412430177,
+      "toy_index": 24
+    }
+  ],
+  "truths": [
+    {
+      "analytic_mean_key": "truth/rigid_ggt26_scaled1pct/2021_1pct_mean",
+      "mean_sha256_float64": "903c6e9072ec614ec94d8db76a84937fb37dd423535fdcb9e5ae517668859007",
+      "multiplier": 1,
+      "scenario": "2021_1pct",
+      "source_family": "one_pct",
+      "total_040_300": 12504043.999999998
+    },
+    {
+      "analytic_mean_key": "truth/rigid_ggt26_scaled1pct/2021_1pct_x10_mean",
+      "mean_sha256_float64": "1528c9f880e34025586c1d1ec2839fb6e1f8e3d88c44f213ffbc20e22324e1b4",
+      "multiplier": 10,
+      "scenario": "2021_1pct_x10",
+      "source_family": "one_pct",
+      "total_040_300": 125040439.99999999
+    },
+    {
+      "analytic_mean_key": "truth/rigid_ggt26_scaled1pct/2021_1pct_x100_mean",
+      "mean_sha256_float64": "0634d950c12d92aff1895ad09c107ec5dcbc46893d4d9bb25fc47d0ff0f92fea",
+      "multiplier": 100,
+      "scenario": "2021_1pct_x100",
+      "source_family": "one_pct",
+      "total_040_300": 1250404400.0
+    },
+    {
+      "analytic_mean_key": "truth/rigid_ggt26_scaled1pct/2021_10pct_mean",
+      "mean_sha256_float64": "ba2143c0a38a5ac9eb8185dfbff7dec5463034e760c2a69d20f7596703a5a37a",
+      "multiplier": 1,
+      "scenario": "2021_10pct",
+      "source_family": "ten_pct",
+      "total_040_300": 141251508.0
+    },
+    {
+      "analytic_mean_key": "truth/rigid_ggt26_scaled1pct/2021_10pct_x10_mean",
+      "mean_sha256_float64": "36d1c949e16f46b1ac664d44a6e42d2e50754f06ff28fd66edfc6fa3487f9ea8",
+      "multiplier": 10,
+      "scenario": "2021_10pct_x10",
+      "source_family": "ten_pct",
+      "total_040_300": 1412515080.0000002
+    }
+  ]
+}

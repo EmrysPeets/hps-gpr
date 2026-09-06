@@ -10,10 +10,35 @@ the smooth trident spectrum, but they also made clear where the older strategy b
 fragile. Window-by-window fits produced visibly less smooth limit curves, amplified the
 dependence of the result on local fit boundaries, and complicated any attempt to write
 a statistically coherent multi-dataset combination. The present workflow therefore uses
-a full-range per-hypothesis GP fit over the histogram range of each dataset and
-excludes only a narrow mass-dependent training-exclusion region around the test mass. That choice
-yields a background description that is smoother, easier to validate, and naturally
-compatible with a combined likelihood in a shared parameter of interest.
+a per-hypothesis GP fit over one fixed, dataset-specific support and excludes only a
+narrow mass-dependent training region around the test mass. The fit support is wider
+than the interval searched for a signal, but it need not extend through empty turn-on
+bins or the entire ROOT-histogram axis. That choice yields a background description
+that is smoother, easier to validate, and naturally compatible with a combined
+likelihood in a shared parameter of interest.
+
+\subsection{Search interval and GP fit support}
+\label{sec:fit-support-policy}
+
+The search interval answers where a resonance hypothesis is tested. The GP fit support
+answers which surrounding bins constrain the smooth background at that hypothesis.
+Using the same endpoints for both definitions leaves the first and last test masses
+with a one-sided training sample, even though the input histogram contains usable
+data beyond the search. Version 4 therefore keeps the established 19--90, 39--180,
+and 50--250~MeV search intervals, while using 14--135, 30--210, and 40--300~MeV fit
+supports for 2015, 2016, and 2021, respectively.
+
+These endpoints were declared before the v4 observed scan. The 2015 domain and the
+upper 2016 edge follow the earlier functional-form validation fits. The 2016 lower
+edge is placed at 30~MeV rather than the historical 35~MeV fit edge because the exact
+rebin-five geometry matters: at a 39~MeV hypothesis the blind interval begins at
+35.063~MeV, while the first bin center from a 35~MeV support is 35.125~MeV. A nominal
+35--210~MeV support would therefore still contain no low-side training-bin center at
+the lower search endpoint. The adopted domains retain at least 12 and 20 low-side
+training bins at the 2015 and 2016 lower endpoints, and at least 138 and 51 high-side
+training bins at their upper endpoints. The corresponding 2021 counts are 9 and 55.
+The bin-count audit is applied to every active dataset and mass hypothesis, rather
+than inferred only from continuous support boundaries.
 
 \subsection{Observable, scan grid, and blinding}
 
@@ -70,14 +95,32 @@ $2.25\,\sigma_d$ blind/extraction choice as a signal-recovery improvement after
 full-refit pseudoexperiments showed appreciable training-region absorption at narrower
 exclusions.
 
-The bin assignment is implemented with the histogram bin centers: a bin is part of
-$\mathcal{B}_d(m_0)$ when its center lies inside the blind interval, and it is part of
-the GP sideband training sample when its center lies outside the training-exclusion
-interval. This center-based assignment is stable because the mass bins are narrower than
-the detector resolution in the scanned range. The signal template itself is still
-integrated over the full bin edges in Eq.~\eqref{eq:window-template}; only the choice of
-which pre-existing histogram bins enter the blind window or sidebands uses the center
-mask.
+The bin assignment is implemented with the fixed histogram bin centers, not by splitting
+partly overlapping bins. Let $c_i=(e_i+e_{i+1})/2$ be the center of bin $i$. The full
+bin is included in the blinded likelihood when
+\begin{equation}
+m_0-n_{\mathrm{blind}}\sigma_d(m_0)
+\le c_i \le
+m_0+n_{\mathrm{blind}}\sigma_d(m_0),
+\end{equation}
+and the full bin is included in the GP sideband training sample only when its center
+lies strictly outside the training-exclusion interval. Thus a bin whose edge overlaps
+the blind boundary is treated by its center: if the center is inside the blind interval,
+the entire bin is blinded and enters the local likelihood; if the center is outside,
+the bin remains available for training unless it is removed by a wider
+training-exclusion interval. No fractional observed count is assigned to both regions.
+This same center mask is used consistently for the observed counts, the GP prediction
+points, the covariance slice, and the blinded-bin signal-template slice.
+
+The finite binning is therefore part of the definition of the numerical result. The
+Gaussian signal template is integrated over the full bin edges in
+Eq.~\eqref{eq:window-template}, but the selected set of bins changes discretely when a
+boundary passes a bin center. Consequently the quoted local significance and
+$\eps^2$ limit are not meaningful to a precision finer than the mass binning and scan
+grid used to define these masks. The production toys and validation plots use the same
+binning convention, so this edge-bin effect is accounted for by applying the identical
+discrete procedure to data, pseudoexperiments, background predictions, signal
+templates, and yield-to-coupling conversions.
 
 \subsection{Log-space preprocessing and the choice \texorpdfstring{$\alpha=1/y$}{alpha=1/y}}
 
@@ -142,7 +185,38 @@ after the log transformation. In this high-statistics search such bins are rare,
 floor acts mainly as a conservative legacy-stable safeguard rather than as a dominant
 source of uncertainty.
 
-\subsection{Kernel choice and CMS-motivated background modeling}
+The distinction from Ref.~\cite{BarrLiu2025} is more specific than a difference in
+kernel choice. Barr and Liu also use a Constant$\times$RBF kernel and optimize its
+amplitude and length scale. Their independent methodological study uses a spectrum
+derived from a published CMS search; it is not a CMS Collaboration GPR result. In
+addition to optimizing the kernel, they treat the diagonal array as tunable
+regularization. For occupied bins their nominal prescription is
+\begin{equation}
+\alpha_i^{\mathrm{BL}}
+= \frac{\sqrt{y_i}}{y_i\log y_i}
+= \frac{1}{\sqrt{y_i}\log y_i},
+\end{equation}
+and fixed regional multipliers $f_i$ are then applied to
+$\alpha_i^{\mathrm{BL}}$. Reducing the first eleven multipliers to 0.1 raised the
+fraction of 100 background-only pseudoexperiments passing their BumpHunter criterion
+from 51\% to 87\%, but localized residual structures remained; their high-luminosity
+benchmark subsequently extended the reduced-multiplier region to the first twenty
+bins \cite{BarrLiu2025}. The study therefore demonstrates that diagonal tuning can
+improve a particular benchmark, while also showing that the tuned region is
+sample- and regime-dependent.
+
+The active HPS configuration instead has no regional multiplier
+(\texttt{pre\_alpha\_first\_n=0}) and fixes Eq.~\eqref{eq:alpha-oney} as the
+delta-method variance model. This choice matters because \texttt{scikit-learn}'s
+\texttt{alpha} has both an observation-noise interpretation and a numerical
+Tikhonov-regularization interpretation \cite{ScikitLearnGPRDocs16}. HPS adopts the
+former and places its separately validated smoothness control in the allowed
+length-scale domain. These are complementary controls: changing $\alpha_i$ changes
+the leverage of bin $i$ on the covariance diagonal, whereas changing $\ell$ changes
+the off-diagonal correlation range of the latent function. No matched study presented
+here establishes that one strategy is intrinsically superior to the other.
+
+\subsection{Kernel choice and distinct regularization roles}
 \label{sec:kernel-choice}
 
 The baseline kernel in the current package is a single
@@ -150,26 +224,49 @@ ConstantKernel$\times$RBF model,
 \begin{equation}
 k(x,x') = C \exp\!\left[-\frac{(x-x')^2}{2\ell^2}\right],
 \end{equation}
-with broad amplitude bounds and a resolution-scaled RBF length scale. This is closely
-aligned with the smooth-background prior used in contemporary CMS-oriented GPR
-signal-extraction studies \cite{Gandrakota2023} and with the log-space HEP background
-modeling framework emphasized in Ref.~\cite{BarrLiu2025}. The HPS implementation keeps
-this kernel intentionally simple. The amplitude parameter $C$ sets the overall
-covariance scale, while $\ell$ controls how rapidly the background is allowed to bend
-in log-mass space. For the smooth prompt trident continuum considered here, one overall
-covariance scale $C$ and one smoothness scale $\ell$ are adequate for the baseline
-model: they capture the observed broad curvature without introducing additional poorly
-constrained structure on signal-like mass scales.
+with broad amplitude bounds and a resolution-scaled RBF length-scale domain. This is
+the same simple kernel class used in the methodological studies of
+Refs.~\cite{Gandrakota2023,BarrLiu2025}, but the surrounding noise and validation
+choices need not be the same. The two quantities optimized in every HPS sideband fit
+are $C$ and $\ell$. The ConstantKernel value $C=k(x,x)$ is the pointwise prior
+variance of the latent log-rate, so $\sqrt{C}$ is its prior standard deviation; $C$
+is not a fitted event-count normalization. The length scale $\ell$ controls how
+quickly covariance falls with separation in $x=\log m$, and therefore how rapidly
+the background function may bend. The fixed $\alpha_i$ values are not a third kernel
+parameter and there is no optimized WhiteKernel in the baseline. They enter only
+through the observation-covariance diagonal.
+
+Figure~\ref{fig:gpr-hyperparameter-roles} separates these roles graphically. This
+separation is useful when discussing regularization: changing $C$ rescales the
+covariance amplitude, changing $\ell$ changes the correlation geometry and smoothness
+of the latent function, and changing $\alpha_i$ changes how strongly one observation
+constrains that function.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.99\linewidth}{methodology_figs/gpr_hyperparameter_roles.pdf}
+\caption{Division of labor in the baseline GPR covariance. Panel (a) shows the
+normalized RBF correlation for three illustrative values of
+$\ell/\sigma_x(m_0)$; at a separation equal to $\ell$, every curve has correlation
+$e^{-1/2}\simeq0.61$. The length scale therefore changes the horizontal range over
+which bins communicate. Panel (b) varies $C$ at fixed $\ell$. It changes the
+covariance amplitude, with pointwise prior standard deviation $\sqrt{C}$, without
+changing the normalized correlation range. Panel (c) holds the kernel fixed and
+changes one diagonal variance $\alpha_j$: a smaller value gives the highlighted bin
+more leverage, while a larger value downweights it. HPS optimizes $C$ and $\ell$ on
+the sidebands within configured bounds, but fixes $\alpha_i$ from the count-based
+variance rule. All curves and observations are schematic and are not an HPS fit.}
+\label{fig:gpr-hyperparameter-roles}
+\end{figure}
 
 Earlier studies preserved in the analysis history explored more complicated kernels and
 piecewise procedures, but those variants are no longer the production baseline. This
 note therefore documents the Constant$\times$RBF model as the authoritative kernel
 choice and treats more elaborate alternatives as robustness checks rather than
-competing mainline methods. The first non-baseline comparison reserved for later
-documentation is a Constant$\times$Mat\'ern$(\nu=3/2)$ study with the same
-resolution-scaled bounds, because it relaxes the infinitely differentiable RBF
-assumption without changing the overall smooth-background prior class. A placeholder
-appendix for these comparisons is provided in Appendix~\ref{app:kernel-studies}.
+competing mainline methods. The exploratory Constant$\times$Mat\'ern$(\nu=3/2)$ and
+earlier piecewise-kernel studies are summarized in
+Appendix~\ref{app:kernel-studies}. No production-matched alternative-kernel coverage
+result is used to qualify the v4.2 result.
 
 \subsection{Resolution-scaled length-scale parameterization and bounds}
 \label{sec:length-scale}
@@ -181,108 +278,253 @@ log-mass units. The package defines
 \simeq \frac{\sigma_d(m)}{m}
 \qquad (\sigma_d \ll m),
 \end{equation}
-and uses this local physical scale to set the RBF bounds. In the default
+and uses this local physical scale to set the RBF bounds. In the
 \path{resolution_scaled_local} policy,
 \begin{equation}
-\ell_{\min}(m) = k_{\min}\sigma_x(m),
+\ell_{\min,d}(m) = k_{\min,d}\sigma_x(m),
 \qquad
-\ell_{\max}(m) = k_{\max}\sigma_x(m),
+\ell_{\max,d}(m) = k_{\max,d}\sigma_x(m).
+\label{eq:dataset-lengthscale-bounds}
 \end{equation}
-with the baseline lower factor $k_{\min}=1.0$ for all three datasets. The practical
-bookkeeping point is worth stating explicitly because an older diagnostic overlay
-showed a stale 2016 value of 0.05; that lower-bound curve was incorrect and is not the
-baseline used in the current production configs.
-
-The physics-facing ceiling adopted in this note is
+For the RBF covariance used here,
 \begin{equation}
-k_{\max} =
-\begin{cases}
-8, & \text{2015 and 2016}, \\
-9, & \text{2021}.
-\end{cases}
+k_{\mathrm{RBF}}(x,x') =
+\sigma_f^2\exp\!\left[-\frac{(x-x')^2}{2\ell^2}\right],
+\qquad
+\frac{k_{\mathrm{RBF}}(x,x+\ell)}{k_{\mathrm{RBF}}(x,x)}
+=e^{-1/2}\simeq0.61 .
+\label{eq:rbf-lengthscale-interpretation}
 \end{equation}
-These values are motivated by the dedicated length-scale scans already performed for
-this analysis and by the practical requirement that the upper bound remain tied to a
-detector-scale quantity. Leaving $\ell$ effectively free allowed the GP to become too
-aggressive in smoothing away signal-like structure, which could make the fit appear
-better while reducing signal fidelity. Setting the ceiling too low creates the opposite
-problem: the optimizer rides the boundary and the background model becomes visibly too
-rigid. The adopted 8$\sigma_d$ and 9$\sigma_d$ ceilings are therefore presented as
-stability choices anchored to detector resolution, not as arbitrary tune points.
+Thus $\ell$ is a covariance-decay scale in the GP input coordinate: larger values
+favor smoother background functions, while smaller values admit more rapid
+variation \cite{RasmussenWilliams2006,FrateGP2017}. The ratio
+$\ell/\sigma_x(m)$ expresses that nuisance-model smoothness relative to the width of
+the narrow signal hypothesis. It is not, without an independently validated mapping,
+a detector resolution measurement or a physical background correlation length.
+The fitted $\ell_{\mathrm{opt}}$ is the log-marginal-likelihood optimum conditional
+on the kernel, data support, sideband mask, noise model, and configured optimizer
+domain. Consequently an optimum at $\ell_{\max}$ establishes only that the numerical
+constraint is active; it neither measures a physical scale at the boundary nor
+locates the unconstrained optimum. The implementation optimizes log-transformed
+kernel hyperparameters within these configured bounds
+\cite{ScikitLearnGPRDocs16}.
 
-The current production configs retain one additional guard: a dataset-statistics floor
-on $\ell_{\max}$ prevents the ceiling from becoming artificially small where the local
-resolution is exceptionally tight. The older fixed-xrange cap remains available only as
-an opt-in diagnostic knob in the code and is not enabled in the baseline results shown
-here. A mass-independent lower floor is likewise a reasonable follow-up robustness
-study, but it would constitute a deliberate method variation rather than the bound
-prescription used for the results documented in this note.
+For a fixed dataset $d$ and mass hypothesis $m_0$, let
+$\bm{z}_{\mathrm{sb}}$ contain only the transformed sideband observations and define
+\begin{equation}
+K_y(C,\ell)
+= C\,R_{\ell}(X_{\mathrm{sb}},X_{\mathrm{sb}})
++ \mathrm{diag}(\bm{\alpha}_{\mathrm{sb}}).
+\end{equation}
+The optimized pair maximizes
+\begin{equation}
+\log p(\bm{z}_{\mathrm{sb}}\mid X_{\mathrm{sb}},C,\ell)
+= -\frac{1}{2}\bm{z}_{\mathrm{sb}}^{T}K_y^{-1}\bm{z}_{\mathrm{sb}}
+  -\frac{1}{2}\log|K_y|
+  -\frac{n_{\mathrm{sb}}}{2}\log(2\pi).
+\label{eq:gpr-log-marginal-likelihood}
+\end{equation}
+The quadratic term rewards agreement with the sideband observations, while the
+determinant term accounts for the covariance volume used to obtain that agreement.
+The implementation searches in the logarithms of $C$ and $\ell$ with multiple
+optimizer restarts. This is an empirical-Bayes, or type-II maximum-likelihood,
+selection of the covariance parameters; it is not a profile of $\ell$ as a
+frequentist nuisance parameter in the subsequent local \CLs{} likelihood.
 
-Figure~\ref{fig:lengthscale-bounds} makes the bound prescription explicit. Panel (a)
-shows the detector-resolution scale in the GP coordinate, and panel (b) shows the
-allowed interval for the fitted length scale in each dataset. The key point is that the
-optimization band follows the detector scale across the scan rather than imposing a
-single mass-independent smoothing length.
-
-\begin{figure}[H]
-\centering
-\begin{subfigure}[t]{0.48\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{kernel_lengthscale_figs/sigma_x_logm_overlay.png}
-  \caption{Signal-template width $\sigma_x(m)$ in the GP coordinate $x=\ln m$.}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.48\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{kernel_lengthscale_figs/ls_bounds_band_logm_overlay.png}
-  \caption{Allowed RBF length-scale band imposed for each dataset.}
-\end{subfigure}
-\caption{Length-scale parameterization used in the GPR fit. Panel (a) shows the local
-signal-template width in the GP coordinate, while panel (b) shows the allowed
-length-scale band obtained in the current implementation by applying the common
-$k_{\min}=1.0$ lower factor together with the dataset-specific upper factors. The
-purpose of the bound is to permit smooth background variation without allowing the
-optimizer to drift into an unphysically unconstrained smoothing regime.}
-\label{fig:lengthscale-bounds}
-\end{figure}
-
-The lower-bound scan summarized in
-Figure~\ref{fig:lengthscale-lower-bound-stability} documents the stability study that
-motivated selecting the $1\sigma_x$ lower bound, i.e. the common $k_{\min}=1.0$
-configuration used in the production fits. Panel (a) shows why the looser
-$0.5\sigma_x$ option is unattractive: the optimized length scale can sit close to the
-floor or vary irregularly with mass, which makes the fitted background too sensitive to
-local statistical structure. The most compelling evidence is panel (b). The
-$1.5\sigma_x$ option visibly over-constrains the background response, giving pull
-widths far above the unit reference line, while the selected $1\sigma_x$ floor stays
-near unit pull width across injected strengths without the instability of the looser
-choice. This is why the $1\sigma_x$ lower bound is used as the nominal compromise
-between flexibility and calibration.
+Figure~\ref{fig:gpr-mass-hypothesis-optimization} shows why the optimum is specific
+to a dataset and mass hypothesis. Moving $m_0$ changes which bins are excluded from
+training and changes the resolution-scaled domain through $\sigma_x(m_0)$. The same
+dataset can therefore return a different $(C_{\mathrm{opt}},\ell_{\mathrm{opt}})$ at
+neighboring hypotheses even though the kernel family is unchanged. An interior
+maximum means only that the configured range is nonbinding for that fit. A maximum on
+a boundary means that the range is active, while a long shallow likelihood ridge means
+that the parameters are weakly identified. None of these cases turns
+$\ell_{\mathrm{opt}}$ into a direct measurement of detector resolution or a physical
+background correlation length.
 
 \begin{figure}[H]
 \centering
-\begin{subfigure}[t]{0.88\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{kernel_lengthscale_figs/length_scale_diagnostics_by_lslb.png}
-  \caption{Optimized length-scale diagnostics for candidate lower bounds.}
-\end{subfigure}
-
-\vspace{0.8em}
-
-\begin{subfigure}[t]{0.88\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{kernel_lengthscale_figs/overall_pull_width_vs_injsigma_by_lslb.png}
-  \caption{Overall pull-width response versus injected significance.}
-\end{subfigure}
-\caption{Length-scale lower-bound stability comparison from the 2015 validation scan.
-The selected $1\sigma_x$ lower bound improves fit stability relative to the looser
-$0.5\sigma_x$ option while avoiding the extra rigidity of the $1.5\sigma_x$
-alternative. Panel (b), the average pull width versus injected significance, is the
-primary selection diagnostic: the chosen curve remains close to the horizontal unit
-reference line, while the more aggressive lower bound produces substantially
-over-wide pulls.}
-\label{fig:lengthscale-lower-bound-stability}
+\graphicorplaceholder{0.99\linewidth}{methodology_figs/gpr_mass_hypothesis_optimization.pdf}
+\caption{Meaning of per-mass-hypothesis hyperparameter optimization. Panel (a)
+shows one schematic sideband problem in
+$u=(x-x_0)/\sigma_x(m_0)$. The shaded $2.25\,\sigma_x$ interval is excluded from
+training; the three curves illustrate the different interpolation behavior allowed
+by short, interior, and long candidate length scales. Panel (b) shows the joint
+log-marginal-likelihood surface for the same synthetic sidebands. The star is the
+bounded maximum in $(C,\ell)$, and the elongated contours expose their possible
+tradeoff. Panel (c) shows that moving $m_0$ changes both the sideband mask and the
+local resolution scale that defines the allowed $\ell$ interval. Panel (d) illustrates
+how a scan records an interior optimum differently from repeated upper-bound contact:
+the former is a conditional best fit within a nonbinding range, whereas the latter
+diagnoses an active numerical domain and motivates a predeclared range and closure
+study. The figure is explanatory only; it contains no HPS observations or fit
+results.}
+\label{fig:gpr-mass-hypothesis-optimization}
 \end{figure}
+
+This distinction determines how the hyperparameter study enters a physics result.
+If the allowed range forces $\ell$ too low, the GP retains unnecessary
+signal-scale flexibility and can absorb part of a localized excess; if the fitted
+background is forced too smooth, broad mismodeling can instead leave a biased local
+residual. Raising only the upper bound permits, but does not require, a smoother
+solution. A larger data set also need not prefer a larger $\ell$: additional
+statistics can resolve background structure and move the optimum downward. The
+upper range is therefore selected from boundary occupancy, likelihood ordering,
+optimizer stability, and fixed-amplitude signal-recovery diagnostics, never from a
+favorable observed limit or local $p_0$. Only after those procedural checks and
+coverage qualification may the range be treated as part of a physics analysis
+card.
+
+The v4.2 result uses the dataset-specific factors in
+Table~\ref{tab:production-lengthscale-bounds}. The lower factors retain their earlier
+full-refit closure provenance; changing the 2016 upper factor does not requalify those
+closure studies at full statistics.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lccc}
+\toprule
+Dataset & $k_{\min,d}$ & $k_{\max,d}$ & v4.2 status \\
+\midrule
+2015 full & 1.0 & 8 & unchanged from v4 \\
+2016 full & 0.9 & 12 & accepted; conditional \\
+2021 10\% & 1.1 & 15 & unchanged from v4 \\
+\bottomrule
+\end{tabular}
+\caption{Resolution-scaled RBF length-scale factors in the v4.2 result. The
+factors multiply $\sigma_x(m)$ in
+Eq.~\eqref{eq:dataset-lengthscale-bounds}. Only the 2016 upper factor differs from
+v4. Factor 12 is accepted as the current full-2016 setting, but the
+observed-data selection remains distinct from a pre-unblinding freeze or direct
+coverage qualification.}
+\label{tab:production-lengthscale-bounds}
+\end{table}
+
+The lower factors are based on full-refit functional-form closure scans, with the
+observed-spectrum result kept out of the selection criterion. For 2015, the 100-toy
+scan slightly prefers $k_{\min}=1.1$ in its aggregate score, but $k_{\min}=1.0$ has
+similar pull-width calibration and a weaker expected-reach proxy. The latter is
+therefore retained as the conservative frozen baseline rather than described as the
+numerical score winner. For 2016, the 25-toy continuation directly supports the
+change to $k_{\min}=0.9$: its nonzero-injection RMS pull mean is 0.321 and its median
+pull width is 0.948, compared with 0.403 and 0.889 for $k_{\min}=1.1$. It gives the
+smallest aggregate calibration score among the scanned 0.9, 1.0, and 1.1 rows and
+reduces the coherent apparent signal-recovery bias that motivated the follow-up. For
+2021, the corrected matched-reference scan finds small rank separations among the
+same three settings. The $k_{\min}=1.1$ row has the median pull width closest to
+unity and the best extraction-level $\eps^2$ proxy, while the 0.9 and 1.0 rows have
+slightly smaller aggregate scores. The frozen 1.1 choice is therefore a
+calibration--reach tradeoff, not a claim that it wins every diagnostic. These
+development studies used the data fractions stated in Section~\ref{sec:toys}; they
+should not be read as a new full-statistics validation of the v4.1 upper range.
+
+Version 4 used upper factors 8, 8, and 15 for 2015, 2016, and 2021. In its reviewed
+observed scan, the 2016 optimum reached its upper bound at all 142 hypotheses. The
+v4.1 range study therefore changes only $k_{\max,2016}$ and evaluates factors
+8, 10, 12, 15, and 20 on the same 39--180~MeV mass grid. A fit is counted as
+upper-bound occupied when $\ell_{\mathrm{opt}}/\ell_{\max}\geq0.999$. The respective
+occupancies are 142, 56, 0, 0, and 0 of 142. Factor 12 is the first scanned setting
+with no occupied hypotheses. It is also followed by a numerical plateau: from factor
+12 to 15, the largest pointwise change in the 2016 observed yield upper limit is
+0.083\%, the largest $|\Delta Z|$ is 0.00255, and the log-marginal-likelihood
+differences lie between $-4.5\times10^{-6}$ and $8.0\times10^{-6}$. The factor-15 to
+factor-20 comparison is similarly stable. The selection is based on removal of the
+artificial boundary and the next-setting plateau, not on which observed limit is
+tighter or which local $p_0$ is smaller.
+
+Because this diagnostic was prompted by the v4 observed spectrum, factor 12 is
+accepted for the v4.2 result with an explicit post-selection qualification; it is
+not presented as a pre-unblinding choice or a coverage-calibrated nominal.
+Production-matched functional-form closure and direct coverage remain separate
+requirements.
+The configurations continue to retain a dataset-wide median-resolution floor on
+$\ell_{\max,d}$ so that the ceiling does not become artificially small where the
+local resolution is exceptionally tight. This is a guard based on a representative
+$\sigma_x$ value, not a floor derived from luminosity or event statistics.
+Alternative upper bounds,
+fixed-background fits, and the historical common-lower-bound overlays remain
+robustness studies collected in the appendices.
+
+\subsection{2021 source-and-exposure hyperparameter pilot design}
+\label{sec:planned-2021-exposure-ls-toys}
+
+The 2021 pilot changes the expected count intensity, never a realized histogram or an
+existing limit. Let $\lambda_i^{(1)}$ and $\lambda_i^{(10)}$ denote independently
+constructed smooth expected intensities derived from the native 2021 1\% and 10\%
+sources on the common 40--300~MeV support. The five declared scenarios are
+\begin{align}
+\Lambda_i^{\mathrm{native}\,1\%} &= \lambda_i^{(1)}, &
+\Lambda_i^{1\%\times10} &= 10\lambda_i^{(1)}, &
+\Lambda_i^{1\%\times100} &= 100\lambda_i^{(1)}, \nonumber\\
+\Lambda_i^{\mathrm{native}\,10\%} &= \lambda_i^{(10)}, &
+\Lambda_i^{10\%\times10} &= 10\lambda_i^{(10)}.
+\label{eq:v4p1-ls-pilot-scenarios}
+\end{align}
+Within each source family, paired toys are generated with independent Poisson
+increments,
+\begin{align}
+N_i^{1\%} &\sim \operatorname{Pois}\!\left(\lambda_i^{(1)}\right), &
+N_i^{1\%\times10} &= N_i^{1\%}
+ + \operatorname{Pois}\!\left(9\lambda_i^{(1)}\right), \nonumber\\
+N_i^{1\%\times100} &= N_i^{1\%\times10}
+ + \operatorname{Pois}\!\left(90\lambda_i^{(1)}\right), \nonumber\\
+N_i^{10\%} &\sim \operatorname{Pois}\!\left(\lambda_i^{(10)}\right), &
+N_i^{10\%\times10} &= N_i^{10\%}
+ + \operatorname{Pois}\!\left(9\lambda_i^{(10)}\right).
+\label{eq:v4p1-ls-pilot-increments}
+\end{align}
+Every marginal is therefore a Poisson draw from its declared mean, while the paired
+comparisons share their lower-exposure realization
+\cite{Kingman1993PoissonProcesses,HistFactory}.
+
+The native 10\% source has 11.296 times the native 1\% support total, not exactly ten
+times. The $1\%\times10$ versus native-10\% comparison is consequently a
+source/selection-shape diagnostic, including the different native normalization, rather
+than a pure tenfold-exposure closure test. The primary lane uses the same
+\texttt{fGenGammaThresh} analytic family for both native sources; the independently
+declared \texttt{fSigPowExpQ} lane is an alternate smooth-truth stress test. Neither
+family is asserted to be the physical trident generator. Testing a second smooth
+family probes background-shape dependence, but it does not implement the
+discrete-profiled function-choice nuisance of Ref.~\cite{Dauncey2015DiscreteProfiling}.
+
+Every pseudo-spectrum is passed through a fresh GP sideband fit with the production
+40--300~MeV support, 50--250~MeV search interval, rebin-five geometry, and
+$2.25\,\sigma_m$ training exclusion. The ten-toy pilot scans
+$k_{\max}=6,9,12,15,20,$ and 25 on the predeclared
+\SIlist{50;70;90;110;130;150;170;190;210;230;250}{MeV} grid. Per fit it records
+$\ell_{\mathrm{opt}}/\sigma_x$, $\ell_{\mathrm{opt}}/\ell_{\max}$, boundary
+occupancy, log marginal likelihood, optimizer status, count-space amplitude
+diagnostics, and repeat stability. Questionable optimizer branches must be rerun with
+the toy and card unchanged; they must not be repaired by interpolation.
+
+The signal-response screen uses fixed absolute amplitudes at the predeclared
+\SIlist{60;120;220}{MeV} injection masses. For each truth, scenario, toy, and mass,
+the factor-15 background-only prefit-Asimov calibration defines
+$\sigma_{A,\mathrm{ref}}^{(15)}$, and the predeclared levels
+$z\in\{0,1,3,5\}$ define
+\begin{equation}
+A_{\mathrm{inj}}(z)=z\,\sigma_{A,\mathrm{ref}}^{(15)} .
+\label{eq:v4p1-fixed-amplitude-anchor}
+\end{equation}
+The same numerical $A_{\mathrm{inj}}$ is then reused at every tested upper factor;
+otherwise an apparent factor dependence could be produced simply by moving the
+injection target. This is an Asimov calibration of the local response axis in the
+sense of Ref.~\cite{Cowan2011}, not an expected-limit construction. At fixed
+$A_{\mathrm{inj}}$, an increase in $\sigma_A$ indicates degraded local extraction
+sensitivity, a displacement of $\hat A-A_{\mathrm{inj}}$ diagnoses signed bias, and
+a response $(\hat A_z-\hat A_0)/A_{\mathrm{inj}}$ below unity diagnoses signal
+absorption. Pull widths test the associated uncertainty calibration. With ten toys
+these quantities are implementation screens, not precise ensemble statements.
+
+This is a screening pilot in fit space. The immutable fit path used for the scan
+predates the v4 uncropped fractional-bin density conversion, so its exported
+$\eps^2$ values are explicitly non-promotable. The pilot produces no expected-limit
+bands and does not establish \CLs{} coverage or a scan-wise global discovery
+$p$-value. A larger production-matched closure ensemble, including signal-injection
+bias and direct post-freeze coverage studies, remains necessary before a candidate
+upper range can become a physics card. The pilot implementation and its deliberately
+limited interpretation are documented in
+Section~\ref{sec:v4p1-ls-exposure-pilot}.
 
 Figure~\ref{fig:gpr-window-construction} summarizes the same construction in the
 language used by the implemented likelihood. The sideband bins set the log-count
@@ -370,7 +612,7 @@ w^{\mathrm{full}}_{d,i}(m_0) =
 \exp\!\left[-\frac{(m-m_0)^2}{2\sigma_d(m_0)^2}\right]\,dm,
 \end{equation}
 where $e_i$ and $e_{i+1}$ are the lower and upper edges of histogram bin $i$.
-normalized so that
+The template is normalized so that
 \begin{equation}
 \sum_{i \in \mathrm{full\ range}} w^{\mathrm{full}}_{d,i}(m_0) = 1.
 \end{equation}
@@ -581,13 +823,17 @@ and
 \end{equation}
 Dividing by $\mathrm{CL}_b$ prevents a downward background fluctuation from producing
 an artificially aggressive exclusion in a region with little intrinsic sensitivity
-\cite{Junk1999,Read2002}. The quoted single-dataset 95\% limit is
+\cite{Junk1999,Read2002}. At confidence level $1-\alpha$, the single-dataset upper
+limit is
 \begin{equation}
-A_{95,d}(m)=\min\{A_d:\mathrm{CL}_s(A_d;m)=0.05\}.
-\label{eq:a95-single}
+A_{\mathrm{UL},d}(m;\alpha)
+=\min\{A_d:\mathrm{CL}_s(A_d;m)\le\alpha\}.
+\label{eq:aul-single}
 \end{equation}
-The package reports this limit both in signal-yield space and, after applying the
-dataset-specific conversion factor of Eq.~\eqref{eq:Kd-conversion}, in $\eps^2$ space.
+The v4 result uses $\alpha=0.10$, corresponding to a 90\% CL upper limit; retained
+historical 95\% studies use $\alpha=0.05$. The package reports the limit both in
+signal-yield space and, after applying the dataset-specific conversion factor of
+Eq.~\eqref{eq:Kd-conversion}, in $\eps^2$ space.
 
 \subsection{Asymptotic and toy calibration}
 
@@ -630,21 +876,22 @@ Eq.~\eqref{eq:q0-single}, summarized through $q_0(m)$, $p_0(m)$, and
 $Z_{\mathrm{local}}(m)$. The second family is a set of reviewer-facing diagnostics
 derived from the background-only \CLs{} limit ensemble at each mass. For
 $N_{\mathrm{toys}}$ background-only pseudoexperiments and an observed limit
-$\eps^2_{95,\mathrm{obs}}(m)$, those quantities are
+$\eps^2_{\mathrm{UL},\mathrm{obs}}(m)$ at the confidence level under study, those
+quantities are
 \begin{align}
 p_{\mathrm{strong}}(m)
 &=
 \frac{1}{N_{\mathrm{toys}}}
 \sum_{t=1}^{N_{\mathrm{toys}}}
 \mathbf{1}\!\left[
-\eps^2_{95,t}(m)\le \eps^2_{95,\mathrm{obs}}(m)
+\eps^2_{\mathrm{UL},t}(m)\le \eps^2_{\mathrm{UL},\mathrm{obs}}(m)
 \right], \\
 p_{\mathrm{weak}}(m)
 &=
 \frac{1}{N_{\mathrm{toys}}}
 \sum_{t=1}^{N_{\mathrm{toys}}}
 \mathbf{1}\!\left[
-\eps^2_{95,t}(m)\ge \eps^2_{95,\mathrm{obs}}(m)
+\eps^2_{\mathrm{UL},t}(m)\ge \eps^2_{\mathrm{UL},\mathrm{obs}}(m)
 \right], \\
 p_{\mathrm{two}}(m)
 &=
@@ -690,10 +937,12 @@ These quantities are therefore limit diagnostics rather than discovery-significa
 measures in the sense of $p_0$. If the observed limit lies near the median of the
 background-only ensemble, then roughly half of the toys lie above it and half lie
 below it, making both $p_{\mathrm{strong}}$ and $p_{\mathrm{weak}}$ naturally
-$\mathcal{O}(0.5)$. With $N_{\mathrm{toys}}=\num{10000}$, the smallest non-zero
-empirical tail probability is still only of order $10^{-4}$, so these toy-limit
-diagnostics cannot by themselves establish or refute a high-significance local excess
-in the discovery statistic defined by the one-sided local $p_0$ mapping above.
+$\mathcal{O}(0.5)$. Their finite resolution is $1/N_{\mathrm{toys}}$. In the v4.2
+combined ensemble, $N_{\mathrm{toys}}=300$, so a one-count change is
+$1/300\simeq0.0033$ and a zero-count tail is reported as 0 of 300 rather than as an
+exact zero probability. These toy-limit diagnostics cannot by themselves establish
+or refute a high-significance local excess in the discovery statistic defined by the
+one-sided local $p_0$ mapping above.
 
 \subsection{Shared-\texorpdfstring{$\eps^2$}{epsilon2} combination across datasets}
 \label{sec:combination}
@@ -788,9 +1037,11 @@ merging of already-compressed outputs. This is the standard common-POI structure
 in multi-channel HEP combinations \cite{HistFactory,ATLASCMSHiggs2016}. The combined
 upper limit is set directly on the shared coupling,
 \begin{equation}
-\eps^2_{95}(m) = \min\{\eps^2 : \mathrm{CL}_s(\eps^2)=0.05\},
+\eps^2_{\mathrm{UL}}(m;\alpha)
+= \min\{\eps^2 : \mathrm{CL}_s(\eps^2)\le\alpha\},
 \end{equation}
-while the combined local significance is evaluated from the same profiled likelihood
+with $\alpha=0.10$ for the v4 90\% CL result. The combined local significance is
+evaluated from the same profiled likelihood
 with the common signal vector $\eps^2 \bm{s}_{\mathrm{unit}}$. By contrast, the
 inverse-variance expressions shown later in the search-power figures are auxiliary
 interpretations of combined sensitivity, not the defining inference.
@@ -834,65 +1085,16 @@ Z_{\mathrm{global}}^{\mathrm{Sidak}}
 For small $p_{0,\min}^{\mathrm{obs}}$, Eq.~\eqref{eq:sidak-global} reduces to the
 familiar $p_{\mathrm{global}}\simeq N_{\mathrm{eff}}p_{0,\min}$ form.
 
-The preferred final calibration is therefore toy based: if the background-only
-distribution of $q_{0,\max}$ is available, Eq.~\eqref{eq:pglobal-toy} is the
-physics-facing look-elsewhere result. When that distribution has not yet been frozen,
-the summary products fall back to the \v{S}id\'ak approximation of
-Eq.~\eqref{eq:sidak-global}. The present note uses these quantities asymmetrically.
-The combined 2015$+$2016 10\%$+$2021 1\% radiative-penalty summary is the only place
-where the global conversion is interpreted as part of the final look-elsewhere
-discussion. The single-dataset overlays retained in
-Figure~\ref{fig:local-significances-across-datasets} are used only to show where each
-dataset has its largest \emph{local} upward fluctuation; any global overlays in those
-auxiliary PNGs should be read as approximations rather than as finalized toy-calibrated
-claims.
-
-\begin{figure}[p]
-\centering
-\begin{subfigure}[t]{0.32\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/individual_datasets/2015_local_p0_with_global_p_overlay.png}
-  \caption{2015.}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.32\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/individual_datasets/2016_local_p0_with_global_p_overlay.png}
-  \caption{2016 10\%.}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.32\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/individual_datasets/2021_local_p0_with_global_p_overlay.png}
-  \caption{2021 1\%.}
-\end{subfigure}
-\caption{Local discovery p-value scans for the individual input datasets. The blue
-curves are the one-sided local $p_0(m)$ values entering the fixed-mass discovery
-interpretation. The global overlays are effective-trials diagnostics and are shown only
-to indicate the approximate local threshold required for a scan-level statement.}
-\label{fig:local-significances-across-datasets}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\begin{subfigure}[t]{0.48\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/diagnostics/combined_local_p0_with_global_p_overlay.png}
-  \caption{Combined local $p_0$ curve with the current global approximation overlay.}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.48\linewidth}
-  \centering
-  \graphicorplaceholder{\linewidth}{final_limit_projection_figs/diagnostics/combined_local_Z_with_global_Z_overlay.png}
-  \caption{Equivalent local-$Z$ representation with the current global approximation.}
-\end{subfigure}
-\caption{Analytic significance curves for the corrected three-dataset combination. When
-a full scan-level toy calibration of $q_{0,\max}$ is unavailable, the global curve
-shown here is the effective-trials approximation described by
-Eq.~\eqref{eq:sidak-global}; a toy-calibrated $q_{0,\max}$ distribution would take
-precedence for a final discovery claim.}
-\label{fig:combined-significance-rpen}
-\end{figure}
+For the present result, Eq.~\eqref{eq:sidak-global} supplies a separate analytic
+look-elsewhere reference for the local scan. The effective number of trials is
+evaluated from the stated scan range and the mass-dependent resolution, so the
+approximation accounts for the strong correlation between adjacent
+\SI{1}{MeV}-spaced hypotheses rather than treating every scan point as independent.
+It is shown alongside the local $p$-values in Section~\ref{sec:results}, but it is not
+called a toy-calibrated global discovery probability. A background-only ensemble of
+the frozen search maximum, $q_{0,\max}$, remains the required calibration for any
+future discovery-level claim; when that ensemble is available,
+Eq.~\eqref{eq:pglobal-toy} supersedes the analytic approximation.
 
 \subsection{Signal absorption and alternative background-profile treatments}
 
@@ -910,9 +1112,9 @@ especially the effective length scale, and the flexibility of the Gaussian-profi
 background nuisance itself. For that reason, the current note keeps the
 Gaussian-profile model as the mainline baseline while reserving fixed-background and
 alternative Poisson-style treatments as targeted robustness studies. Those alternatives
-are not presented as equally mature production choices, but they remain important if
-future pseudoexperiments show that the current nuisance model still absorbs an
-unacceptable fraction of injected signal.
+are not presented as equally mature production choices. They become necessary
+follow-up tests if production-faithful pseudoexperiments demonstrate that the current
+nuisance model absorbs an unacceptable fraction of injected signal.
 
 \subsection{Dimuon-threshold interpretation}
 \label{sec:methodology-dimuon-threshold}
@@ -963,7 +1165,7 @@ N_{\mathrm{eff}}^{\mathrm{BR}}(m_{A^\prime})\,\eps^2_{ee}(m_{A^\prime}).
 This operation does not change the local fit, the signal-yield upper limit, the
 \CLs{} value, or the local $p_0$ scan; it changes only the coupling interpretation of
 an electron-channel result. Figure~\ref{fig:methodology-dimuon-factor} shows the
-factor applied in the 90\% CLs cross-check files. The factor is unity below
+factor applied in the v4 90\% CL result obtained with \CLs{}. The factor is unity below
 $2m_\mu$, rises continuously above threshold, and reaches
 $N_{\mathrm{eff}}^{\mathrm{BR}}=1.725$ at \SI{250}{MeV}
 ($\mathcal{B}_{ee}=0.580$).

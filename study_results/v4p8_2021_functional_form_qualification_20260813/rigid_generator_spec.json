@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "generator_tag": "rigid_ggt26_scaled1pct",
+  "status": "reviewed_conditional_stress_generator",
+  "promotion_scope": "pseudoexperiment generation and conditional extraction screening only",
+  "support_gev": [0.04, 0.3],
+  "source_shape_policy": "fit the six-coordinate shape to native 1pct once; freeze it; scale only normalization for native 10pct and all exposure lanes",
+  "formula": "A*expit((m-xt)/w)*(m-x0)^a*exp(-((m-x0)/lambda)^p+d2*T2(u)+d6*T6(u)), u=2*(m-0.040)/0.260-1",
+  "continuous_parameters_learned_in_final_1pct_fit": 6,
+  "continuous_parameters_refit_in_native_10pct_application": 1,
+  "development_constants": {
+    "x0_gev": 0.03363345155039034,
+    "xt_gev": 0.049809441846273214,
+    "w_gev": 0.006359634013934425,
+    "provenance": "frozen from native-1pct thresholded generalized-gamma reconnaissance"
+  },
+  "one_pct_shape_parameters": {
+    "a": 4.091830655668498,
+    "lambda_gev": 0.0008089940109764157,
+    "power": 0.5253920171300509,
+    "d2": -0.10924815651511673,
+    "d6": 0.01173442680911302
+  },
+  "mode_selection": {
+    "candidate_modes": [1, 2, 3, 4, 5, 6, 7],
+    "tested_pairs": 21,
+    "selected_pair": [2, 6],
+    "selection_rule": "lowest native-1pct Poisson deviance per ndf; native-10pct was used only as an external validation display",
+    "development_scan": "scratch_rigid_fit_agent/derived/sparse_mode_pair_scan.csv"
+  },
+  "source_metrics_native_0p125mev_bins": {
+    "one_pct_six_coordinate_fit": {
+      "pearson_chi2_ndf": 1.10584861398065,
+      "poisson_deviance_ndf": 1.1032476930569073,
+      "max_abs_pearson_residual": 4.348488549152688
+    },
+    "native_10pct_shape_frozen_normalization_scaled": {
+      "pearson_chi2_ndf": 2.7894533241276886,
+      "poisson_deviance_ndf": 2.772898087972939,
+      "max_abs_pearson_residual": 11.024610197681493
+    },
+    "native_10pct_six_coordinate_refit_comparator": {
+      "pearson_chi2_ndf": 2.6793351385224637,
+      "poisson_deviance_ndf": 2.668920624071894
+    }
+  },
+  "primary_search_region_metrics_0p125mev_bins": {
+    "region_gev": [0.05, 0.25],
+    "one_pct_frozen_shape": {
+      "pearson_chi2_ndf": 1.0880686700550892,
+      "poisson_deviance_ndf": 1.0881804840578926,
+      "max_abs_pearson_residual": 3.6478503896592214
+    },
+    "native_10pct_shape_frozen_normalization_scaled": {
+      "pearson_chi2_ndf": 2.6761323637001517,
+      "poisson_deviance_ndf": 2.6756514738020796,
+      "max_abs_pearson_residual": 5.7748782286765845
+    },
+    "role": "primary functional-fidelity and anti-signal region"
+  },
+  "optimizer_reproducibility": {
+    "one_pct_restarts": 24,
+    "one_pct_best_branch_repeats_within_1e-9_objective": 12,
+    "ten_pct_comparator_restarts": 24,
+    "ten_pct_comparator_best_branch_repeats_within_1e-9_objective": 14,
+    "ledger": "scratch_rigid_fit_agent/derived/finalist_restart_audit.json"
+  },
+  "signal_absorption_policy": {
+    "native_10pct_shape_refit_allowed": false,
+    "normalization_only_poisson_projection_fraction_range": [0.013, 0.104],
+    "normalization_only_window_fraction_range": [0.017, 0.137],
+    "six_coordinate_refit_poisson_projection_fraction_range": [0.173, 0.322],
+    "six_coordinate_refit_rejected_for_generation": true,
+    "ledger": "scratch_rigid_fit_agent/derived/scaled_one_pct_seed_absorption.csv"
+  },
+  "known_limitations": [
+    "The less-than-three score is a native-fine-bin engineering average, not formal Poisson model acceptance.",
+    "Five-bin and wider aggregation exposes coherent broad residuals; these must be displayed rather than hidden.",
+    "Three threshold constants and the sparse mode pair were fixed during development, so six free coordinates is not six total data-informed choices.",
+    "The generator is a reconstructed-spectrum conditional stress mean, not physical background truth.",
+    "The same family fails the 30-MeV support test and is not authorized below 40 MeV."
+  ],
+  "support_shoulder_policy": {
+    "ranges_gev": [[0.04, 0.05], [0.25, 0.3]],
+    "role": "positive stable GP training support only",
+    "selection_weight": "secondary; edge residuals do not override the 50-250 MeV search-region decision"
+  },
+  "support30_status": "rejected_for_this_family",
+  "production_card_impact": "none",
+  "kernel_ceiling_selection_allowed": false,
+  "confidence_contract": {
+    "test_statistic": "tilde_q_mu",
+    "cls_alpha": 0.1,
+    "confidence_level_percent": 90
+  }
+}

@@ -1,0 +1,442 @@
+{
+  "created_utc": "2026-08-06T17:58:11.465162+00:00",
+  "exact_width_and_integer_count_checks": [
+    {
+      "actual_width_GeV": 0.0005000000000000004,
+      "dataset": "2015",
+      "expected_width_GeV": 0.0005,
+      "integer_counts": true,
+      "passed": true,
+      "variant": "common_0p5MeV"
+    },
+    {
+      "actual_width_GeV": 0.0005000000000000004,
+      "dataset": "2016",
+      "expected_width_GeV": 0.0005,
+      "integer_counts": true,
+      "passed": true,
+      "variant": "common_0p5MeV"
+    },
+    {
+      "actual_width_GeV": 0.0005000000000000004,
+      "dataset": "2021",
+      "expected_width_GeV": 0.0005,
+      "integer_counts": true,
+      "passed": true,
+      "variant": "common_0p5MeV"
+    },
+    {
+      "actual_width_GeV": 0.0012500000000000011,
+      "dataset": "2015",
+      "expected_width_GeV": 0.00125,
+      "integer_counts": true,
+      "passed": true,
+      "variant": "common_1p25MeV"
+    },
+    {
+      "actual_width_GeV": 0.0012500000000000011,
+      "dataset": "2016",
+      "expected_width_GeV": 0.00125,
+      "integer_counts": true,
+      "passed": true,
+      "variant": "common_1p25MeV"
+    },
+    {
+      "actual_width_GeV": 0.0012500000000000011,
+      "dataset": "2021",
+      "expected_width_GeV": 0.00125,
+      "integer_counts": true,
+      "passed": true,
+      "variant": "common_1p25MeV"
+    }
+  ],
+  "impossible_0p625MeV": {
+    "decision": "REJECT: exact 0.625 MeV inference bins cannot be constructed from the histogram-only 2015/2016 inputs. Fractional bin splitting, weighting, rounding, or truncation is forbidden for the Poisson likelihood.",
+    "exact_for_all_inputs": false,
+    "rows": [
+      {
+        "dataset": "2015",
+        "event_level_objects_in_input_root": [],
+        "integer_aggregation": false,
+        "source_bin_width_MeV": 0.04999999999999796,
+        "target_bin_width_MeV": 0.625,
+        "target_over_source": 12.50000000000051
+      },
+      {
+        "dataset": "2016",
+        "event_level_objects_in_input_root": [],
+        "integer_aggregation": false,
+        "source_bin_width_MeV": 0.04999999999999449,
+        "target_bin_width_MeV": 0.625,
+        "target_over_source": 12.500000000001377
+      },
+      {
+        "dataset": "2021",
+        "event_level_objects_in_input_root": [],
+        "integer_aggregation": true,
+        "source_bin_width_MeV": 0.1250000000000001,
+        "target_bin_width_MeV": 0.625,
+        "target_over_source": 4.999999999999996
+      }
+    ],
+    "target_bin_width_MeV": 0.625
+  },
+  "interpretation_boundary": "Fixed-mass 65 MeV local asymptotic extraction robustness only; not a full rebinned scan, analytic Sidak refresh, scan-toy global significance, expected band, or coverage study.",
+  "native_2016_signed_wald_diagnostic": {
+    "K_events_per_eps2": 2680109309.064007,
+    "conversion_factor_positive": true,
+    "diagnosis": "The negative extension is the symmetric Wald uncertainty of an unconstrained estimator. It is not a negative physical coupling and not a sign or epsilon-squared conversion bug.",
+    "eps2_hat_signed": 1.5192071548537748e-06,
+    "eps2_sigma_wald": 2.557491825414111e-06,
+    "eps2_wald_high": 4.076698980267886e-06,
+    "eps2_wald_low": -1.0382846705603362e-06,
+    "estimator_semantics": "signed unconstrained signal-strength estimator mapped linearly to epsilon squared; not a physical confidence interval",
+    "extends_below_zero": true,
+    "physical_interval_semantics": "epsilon squared >= 0 profile-likelihood set with Delta(-2 ln L)=1; nominal asymptotic 68 percent set, not coverage calibrated",
+    "physical_profile68_high": 4.0800111994466316e-06,
+    "physical_profile68_low": 0.0
+  },
+  "native_reconstruction": {
+    "all_passed": true,
+    "checks": [
+      {
+        "abs_delta": 3.3881317890172014e-21,
+        "actual": 2.3336632759187418e-05,
+        "authoritative": 2.3336632759187415e-05,
+        "passed": true,
+        "quantity": "eps2_hat",
+        "scope": "2015"
+      },
+      {
+        "abs_delta": 0.0,
+        "actual": 9.746810879226396e-06,
+        "authoritative": 9.746810879226396e-06,
+        "passed": true,
+        "quantity": "eps2_sigma",
+        "scope": "2015"
+      },
+      {
+        "abs_delta": 1.5612511283791264e-17,
+        "actual": 0.008307450052188615,
+        "authoritative": 0.0083074500521886,
+        "passed": true,
+        "quantity": "p0",
+        "scope": "2015"
+      },
+      {
+        "abs_delta": 4.440892098500626e-16,
+        "actual": 2.3951205835984806,
+        "authoritative": 2.395120583598481,
+        "passed": true,
+        "quantity": "Z",
+        "scope": "2015"
+      },
+      {
+        "abs_delta": 0.0,
+        "actual": 1.5192071548537748e-06,
+        "authoritative": 1.5192071548537748e-06,
+        "passed": true,
+        "quantity": "eps2_hat",
+        "scope": "2016"
+      },
+      {
+        "abs_delta": 0.0,
+        "actual": 2.557491825414111e-06,
+        "authoritative": 2.557491825414111e-06,
+        "passed": true,
+        "quantity": "eps2_sigma",
+        "scope": "2016"
+      },
+      {
+        "abs_delta": 1.1102230246251565e-16,
+        "actual": 0.2757783713674194,
+        "authoritative": 0.2757783713674193,
+        "passed": true,
+        "quantity": "p0",
+        "scope": "2016"
+      },
+      {
+        "abs_delta": 1.1102230246251565e-16,
+        "actual": 0.5954290040724302,
+        "authoritative": 0.59542900407243,
+        "passed": true,
+        "quantity": "Z",
+        "scope": "2016"
+      },
+      {
+        "abs_delta": 0.0,
+        "actual": 8.996993239880149e-06,
+        "authoritative": 8.996993239880149e-06,
+        "passed": true,
+        "quantity": "eps2_hat",
+        "scope": "2021"
+      },
+      {
+        "abs_delta": 0.0,
+        "actual": 2.120833809469555e-06,
+        "authoritative": 2.120833809469555e-06,
+        "passed": true,
+        "quantity": "eps2_sigma",
+        "scope": "2021"
+      },
+      {
+        "abs_delta": 0.0,
+        "actual": 1.0570174746584504e-05,
+        "authoritative": 1.0570174746584504e-05,
+        "passed": true,
+        "quantity": "p0",
+        "scope": "2021"
+      },
+      {
+        "abs_delta": 0.0,
+        "actual": 4.252493351343015,
+        "authoritative": 4.252493351343015,
+        "passed": true,
+        "quantity": "Z",
+        "scope": "2021"
+      },
+      {
+        "abs_delta": 0.0,
+        "actual": 6.427062585562607e-06,
+        "authoritative": 6.427062585562607e-06,
+        "passed": true,
+        "quantity": "eps2_hat",
+        "scope": "combined"
+      },
+      {
+        "abs_delta": 0.0,
+        "actual": 1.6100905512431245e-06,
+        "authoritative": 1.6100905512431245e-06,
+        "passed": true,
+        "quantity": "eps2_sigma",
+        "scope": "combined"
+      },
+      {
+        "abs_delta": 0.0,
+        "actual": 3.25917492694424e-05,
+        "authoritative": 3.25917492694424e-05,
+        "passed": true,
+        "quantity": "p0",
+        "scope": "combined"
+      },
+      {
+        "abs_delta": 4.440892098500626e-16,
+        "actual": 3.9932146934458284,
+        "authoritative": 3.993214693445829,
+        "passed": true,
+        "quantity": "Z",
+        "scope": "combined"
+      }
+    ]
+  },
+  "optimizer_repeats": {
+    "all_stable": true,
+    "groups": [
+      {
+        "any_ls_at_lower": false,
+        "any_ls_at_upper": false,
+        "const_relative_span": 0.00015045207944039898,
+        "dataset": "2015",
+        "lml_span": 5.1109850573993754e-08,
+        "ls_relative_span": 9.914156130026012e-06,
+        "n_repeats": 2,
+        "stable": true,
+        "variant": "common_0p5MeV"
+      },
+      {
+        "any_ls_at_lower": false,
+        "any_ls_at_upper": false,
+        "const_relative_span": 0.00022904094315643478,
+        "dataset": "2016",
+        "lml_span": 8.586598596593831e-07,
+        "ls_relative_span": 1.646846536746517e-05,
+        "n_repeats": 2,
+        "stable": true,
+        "variant": "common_0p5MeV"
+      },
+      {
+        "any_ls_at_lower": false,
+        "any_ls_at_upper": false,
+        "const_relative_span": 0.00019667387508023158,
+        "dataset": "2021",
+        "lml_span": 1.6255971786449663e-06,
+        "ls_relative_span": 7.2828488246671435e-06,
+        "n_repeats": 2,
+        "stable": true,
+        "variant": "common_0p5MeV"
+      },
+      {
+        "any_ls_at_lower": false,
+        "any_ls_at_upper": false,
+        "const_relative_span": 5.303858753624427e-06,
+        "dataset": "2015",
+        "lml_span": 4.537810127658304e-08,
+        "ls_relative_span": 2.55101304850293e-07,
+        "n_repeats": 2,
+        "stable": true,
+        "variant": "common_1p25MeV"
+      },
+      {
+        "any_ls_at_lower": false,
+        "any_ls_at_upper": false,
+        "const_relative_span": 5.511703444946494e-06,
+        "dataset": "2016",
+        "lml_span": 2.4783957996987738e-08,
+        "ls_relative_span": 8.506150262502106e-07,
+        "n_repeats": 2,
+        "stable": true,
+        "variant": "common_1p25MeV"
+      },
+      {
+        "any_ls_at_lower": false,
+        "any_ls_at_upper": false,
+        "const_relative_span": 1.450150864255146e-06,
+        "dataset": "2021",
+        "lml_span": 2.4535324882890563e-07,
+        "ls_relative_span": 1.4603532281296232e-07,
+        "n_repeats": 2,
+        "stable": true,
+        "variant": "common_1p25MeV"
+      }
+    ]
+  },
+  "output_hashes": [
+    {
+      "bytes": 7654,
+      "path": "study_results/v4p2_followups_20260806/m065_extraction/tables/extraction_comparison.csv",
+      "sha256": "3671f33532a0731ae93417494b17b2f3200254e6512d3b4097882bd9f082dd21"
+    },
+    {
+      "bytes": 1736,
+      "path": "study_results/v4p2_followups_20260806/m065_extraction/tables/profile_intervals68.csv",
+      "sha256": "25df9945b83943c89ceca680f351e079a55ce9a3580c11b8cfa6cf5502d7e83b"
+    },
+    {
+      "bytes": 2850,
+      "path": "study_results/v4p2_followups_20260806/m065_extraction/tables/optimizer_repeats.csv",
+      "sha256": "6fa0736e5dd4585e6b157bed78969ff45d125ea8ddb184035d7c122d9ad07306"
+    },
+    {
+      "bytes": 80206,
+      "path": "study_results/v4p2_followups_20260806/m065_extraction/tables/bin_level_common_0p5MeV.csv",
+      "sha256": "530a9a439356417a270f729f131e366d971ebee1dfc3015680bc6b2501f4e086"
+    },
+    {
+      "bytes": 51460,
+      "path": "study_results/v4p2_followups_20260806/m065_extraction/figures/figure61_common_0p5MeV.pdf",
+      "sha256": "c24c2e329347c171c0695b25d4d37f4a7b68ceebb18fee02b0464aea2cb8d7af"
+    },
+    {
+      "bytes": 591085,
+      "path": "study_results/v4p2_followups_20260806/m065_extraction/figures/figure61_common_0p5MeV.png",
+      "sha256": "d24928a116051539b434d08a2cb452b4b95ebfa7d8c68a9d9db4c1c698769d66"
+    },
+    {
+      "bytes": 40969,
+      "path": "study_results/v4p2_followups_20260806/m065_extraction/figures/figure61_common_0p5MeV_profiled.pdf",
+      "sha256": "5d175ba841d36aa00fac3694161159f131b786c063e66631c432ddb863778996"
+    },
+    {
+      "bytes": 527970,
+      "path": "study_results/v4p2_followups_20260806/m065_extraction/figures/figure61_common_0p5MeV_profiled.png",
+      "sha256": "ff73fedcc5563e54ea00a0bcf40d4a360d63916212247eade5c72c20b1b595a4"
+    },
+    {
+      "bytes": 43710,
+      "path": "study_results/v4p2_followups_20260806/m065_extraction/figures/figure62_profiled_residuals_physical68.pdf",
+      "sha256": "57ce280c8def83eee979a01c4386fe9be2a3081a783c5417006e638f3e450870"
+    },
+    {
+      "bytes": 424774,
+      "path": "study_results/v4p2_followups_20260806/m065_extraction/figures/figure62_profiled_residuals_physical68.png",
+      "sha256": "8fe10e1a94d36a5d0e0252d3754c4de20a30cff1c9b88fdfbc32430e5a1f5d04"
+    },
+    {
+      "bytes": 29222,
+      "path": "study_results/v4p2_followups_20260806/m065_extraction/figures/figure62_coefficients_physical68.pdf",
+      "sha256": "b7602ee743926b9de7dbb03f90e1cc8b197cfe982194abaf657b2961e84e2242"
+    },
+    {
+      "bytes": 122523,
+      "path": "study_results/v4p2_followups_20260806/m065_extraction/figures/figure62_coefficients_physical68.png",
+      "sha256": "96fcab1a55ffa7f85b340e6e6dc9f55e0b3bb4fb3052774e1b6570fa5cd5f1e5"
+    }
+  ],
+  "physical_profile_interval_checks": [
+    {
+      "low_nonnegative": true,
+      "ordered": true,
+      "scope": "2015",
+      "variant": "native_v4p2"
+    },
+    {
+      "low_nonnegative": true,
+      "ordered": true,
+      "scope": "2016",
+      "variant": "native_v4p2"
+    },
+    {
+      "low_nonnegative": true,
+      "ordered": true,
+      "scope": "2021",
+      "variant": "native_v4p2"
+    },
+    {
+      "low_nonnegative": true,
+      "ordered": true,
+      "scope": "combined",
+      "variant": "native_v4p2"
+    },
+    {
+      "low_nonnegative": true,
+      "ordered": true,
+      "scope": "2015",
+      "variant": "common_0p5MeV"
+    },
+    {
+      "low_nonnegative": true,
+      "ordered": true,
+      "scope": "2016",
+      "variant": "common_0p5MeV"
+    },
+    {
+      "low_nonnegative": true,
+      "ordered": true,
+      "scope": "2021",
+      "variant": "common_0p5MeV"
+    },
+    {
+      "low_nonnegative": true,
+      "ordered": true,
+      "scope": "combined",
+      "variant": "common_0p5MeV"
+    },
+    {
+      "low_nonnegative": true,
+      "ordered": true,
+      "scope": "2015",
+      "variant": "common_1p25MeV"
+    },
+    {
+      "low_nonnegative": true,
+      "ordered": true,
+      "scope": "2016",
+      "variant": "common_1p25MeV"
+    },
+    {
+      "low_nonnegative": true,
+      "ordered": true,
+      "scope": "2021",
+      "variant": "common_1p25MeV"
+    },
+    {
+      "low_nonnegative": true,
+      "ordered": true,
+      "scope": "combined",
+      "variant": "common_1p25MeV"
+    }
+  ],
+  "reasons": [],
+  "schema_version": 1,
+  "status": "PASS"
+}

@@ -1,0 +1,1058 @@
+"""SLURM job generation and result combination utilities."""
+
+import glob
+import os
+import re
+from pathlib import Path
+from typing import List, Optional, TYPE_CHECKING
+
+import numpy as np
+import pandas as pd
+
+if TYPE_CHECKING:
+    from .config import Config
+    from .dataset import DatasetConfig
+
+
+def generate_slurm_script(
+    config_path: str,
+    n_jobs: int,
+    output_path: str,
+    job_name: str = "hps-gpr",
+    partition: str = "batch",
+    time_limit: str = "4:00:00",
+    memory: str = "4G",
+    cpus_per_task: Optional[int] = None,
+    conda_env: Optional[str] = None,
+    extra_sbatch: Optional[List[str]] = None,
+) -> tuple:
+    """Generate a single-job SLURM script and a bash submission loop script.
+
+    Produces two files:
+      - output_path (e.g. job.slurm): the single-job SLURM script that reads
+        TASK_ID and N_TASKS from environment variables passed at sbatch time.
+      - submit_all.sh (alongside output_path): a bash loop that calls sbatch
+        once per task, passing TASK_ID and N_TASKS via --export.
+
+    Args:
+        config_path: Path to configuration YAML file
+        n_jobs: Number of individual jobs to submit
+        output_path: Path to write the SLURM job script
+        job_name: SLURM job name
+        partition: SLURM partition
+        time_limit: Time limit per job
+        memory: Memory per job
+        conda_env: Conda environment to activate (optional)
+        extra_sbatch: Additional SBATCH directives
+
+    Returns:
+        Tuple of (job_script_path, submit_script_path)
+    """
+    # --- Job script (no --array; TASK_ID/N_TASKS injected at submission) ---
+    job_lines = [
+        "#!/bin/bash",
+        f"#SBATCH --job-name={job_name}",
+        f"#SBATCH --partition={partition}",
+        f"#SBATCH --time={time_limit}",
+        f"#SBATCH --mem={memory}",
+        "#SBATCH --output=logs/%j.out",
+        "#SBATCH --error=logs/%j.err",
+    ]
+    if cpus_per_task is not None:
+        job_lines.append(f"#SBATCH --cpus-per-task={int(cpus_per_task)}")
+
+    if extra_sbatch:
+        for directive in extra_sbatch:
+            job_lines.append(f"#SBATCH {directive}")
+
+    job_lines.append("")
+    job_lines.append("mkdir -p logs")
+    job_lines.append("")
+
+    if conda_env:
+        job_lines.append("# Activate conda environment")
+        job_lines.append("source $(conda info --base)/etc/profile.d/conda.sh")
+        job_lines.append(f"conda activate {conda_env}")
+        job_lines.append("")
+
+    job_lines.extend([
+        "# TASK_ID and N_TASKS are passed via --export at submission time",
+        f"hps-gpr scan \\",
+        f"    --config {config_path} \\",
+        f"    --array-task ${{TASK_ID}} \\",
+        f"    --n-tasks ${{N_TASKS}}",
+    ])
+
+    job_content = "\n".join(job_lines) + "\n"
+
+    with open(output_path, "w") as f:
+        f.write(job_content)
+    os.chmod(output_path, 0o755)
+    print(f"Wrote SLURM job script to {output_path}")
+
+    # --- Submit loop script ---
+    submit_path = os.path.join(os.path.dirname(os.path.abspath(output_path)), "submit_all.sh")
+    abs_job = os.path.abspath(output_path)
+
+    submit_lines = [
+        "#!/bin/bash",
+        "set -euo pipefail",
+        f"# Submit {n_jobs} individual SLURM jobs for hps-gpr scan",
+        'SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"',
+        f"N_TASKS={n_jobs}",
+        f'JOB_SCRIPT="{abs_job}"',
+        'SBATCH_ARGS=("$@")',
+        "",
+        'cd "${SCRIPT_DIR}"',
+        "mkdir -p logs",
+        "",
+        f"for TASK_ID in $(seq 0 $(( N_TASKS - 1 ))); do",
+        f'    sbatch "${{SBATCH_ARGS[@]}}" --export=ALL,TASK_ID=${{TASK_ID}},N_TASKS=${{N_TASKS}} "${{JOB_SCRIPT}}"',
+        "done",
+        "",
+        f'echo "Submitted ${{N_TASKS}} jobs."',
+    ]
+
+    submit_content = "\n".join(submit_lines) + "\n"
+
+    with open(submit_path, "w") as f:
+        f.write(submit_content)
+    os.chmod(submit_path, 0o755)
+    print(f"Wrote submission loop script to {submit_path}")
+
+    return output_path, submit_path
+
+
+def generate_injection_slurm_scripts(
+    config_path: str,
+    output_path: str,
+    datasets: List[str],
+    masses: List[float],
+    strengths: List[float],
+    n_toys: int,
+    output_root: str,
+    job_name: str = "hps-gpr-inj",
+    partition: str = "batch",
+    time_limit: str = "4:00:00",
+    memory: str = "4G",
+    cpus_per_task: Optional[int] = None,
+    conda_env: Optional[str] = None,
+    extra_sbatch: Optional[List[str]] = None,
+    mass_ranges_by_dataset: Optional[dict] = None,
+    write_toy_csv: Optional[bool] = None,
+) -> tuple:
+    """Generate SLURM scripts for one injection job per (dataset, mass, strength)."""
+    job_lines = [
+        "#!/bin/bash",
+        f"#SBATCH --job-name={job_name}",
+        f"#SBATCH --partition={partition}",
+        f"#SBATCH --time={time_limit}",
+        f"#SBATCH --mem={memory}",
+        "#SBATCH --output=logs/%j.out",
+        "#SBATCH --error=logs/%j.err",
+    ]
+    if cpus_per_task is not None:
+        job_lines.append(f"#SBATCH --cpus-per-task={int(cpus_per_task)}")
+
+    if extra_sbatch:
+        for directive in extra_sbatch:
+            job_lines.append(f"#SBATCH {directive}")
+
+    job_lines.extend([
+        "",
+        "mkdir -p logs",
+        "",
+    ])
+
+    if conda_env:
+        job_lines.extend([
+            "# Activate conda environment",
+            "source $(conda info --base)/etc/profile.d/conda.sh",
+            f"conda activate {conda_env}",
+            "",
+        ])
+
+    csv_flag_line = None
+    if write_toy_csv is True:
+        csv_flag_line = "    --write-toy-csv \\"
+    elif write_toy_csv is False:
+        csv_flag_line = "    --no-write-toy-csv \\"
+
+    job_lines.extend([
+        "# INJECT_* and BASE_OUTPUT_DIR are passed via --export at submission time",
+        'JOB_OUTDIR="${BASE_OUTPUT_DIR}/injection_jobs/${INJECT_DATASET}/m_${INJECT_MASS_TAG}/s_${INJECT_STRENGTH_TAG}"',
+        'FLAT_OUTDIR="${BASE_OUTPUT_DIR}/injection_flat"',
+        "mkdir -p \"${JOB_OUTDIR}\"",
+        "mkdir -p \"${FLAT_OUTDIR}\"",
+        "",
+        "hps-gpr inject \\",
+        f"    --config {config_path} \\",
+        "    --dataset ${INJECT_DATASET} \\",
+        "    --masses ${INJECT_MASS} \\",
+        "    --strengths ${INJECT_STRENGTH} \\",
+        f"    --n-toys {int(n_toys)} \\",
+    ])
+    if csv_flag_line is not None:
+        job_lines.append(csv_flag_line)
+    job_lines.extend([
+        "    --output-dir \"${JOB_OUTDIR}\"",
+        "",
+        "if [ \"${INJECT_DATASET}\" = \"combined\" ]; then",
+        '  FILE_GLOB="${JOB_OUTDIR}/injection_extraction/*_combined.csv"',
+        "else",
+        '  FILE_GLOB="${JOB_OUTDIR}/injection_extraction/*_${INJECT_DATASET}.csv"',
+        "fi",
+        "for f in ${FILE_GLOB}; do",
+        "  [ -f \"$f\" ] || continue",
+        "  b=$(basename \"$f\" .csv)",
+        '  cp "$f" "${FLAT_OUTDIR}/${b}__jobds_${INJECT_DATASET}__m_${INJECT_MASS_TAG}__s_${INJECT_STRENGTH_TAG}.csv"',
+        "done",
+    ])
+
+    with open(output_path, "w") as f:
+        f.write("\n".join(job_lines) + "\n")
+    os.chmod(output_path, 0o755)
+    print(f"Wrote injection SLURM job script to {output_path}")
+
+    submit_path = os.path.join(os.path.dirname(os.path.abspath(output_path)), "submit_injection_all.sh")
+    abs_job = os.path.abspath(output_path)
+
+    submit_lines = [
+        "#!/bin/bash",
+        "set -euo pipefail",
+        "# Submit one SLURM job per (dataset, mass, strength) injection point",
+        'SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"',
+        f'JOB_SCRIPT="{abs_job}"',
+        f'BASE_OUTPUT_DIR="{output_root}"',
+        'SBATCH_ARGS=("$@")',
+        "",
+        'cd "${SCRIPT_DIR}"',
+        "mkdir -p logs",
+        "",
+    ]
+
+    n_jobs = 0
+    n_skipped = 0
+    for ds in datasets:
+        ds_range = (mass_ranges_by_dataset or {}).get(str(ds))
+        for mass in masses:
+            mass_f = float(mass)
+            if ds_range is not None and str(ds) != "combined":
+                lo, hi = float(ds_range[0]), float(ds_range[1])
+                if mass_f < lo or mass_f > hi:
+                    n_skipped += 1
+                    continue
+            mass_str = f"{mass_f:.6f}".rstrip("0").rstrip(".")
+            mass_tag = mass_str.replace("-", "m").replace(".", "p")
+            for strength in strengths:
+                strength_str = f"{float(strength):.6g}"
+                strength_tag = strength_str.replace("-", "m").replace(".", "p")
+                submit_lines.append(
+                    'sbatch "${SBATCH_ARGS[@]}" --export=ALL,'
+                    f"INJECT_DATASET={ds},"
+                    f"INJECT_MASS={mass_str},"
+                    f"INJECT_MASS_TAG={mass_tag},"
+                    f"INJECT_STRENGTH={strength_str},"
+                    f"INJECT_STRENGTH_TAG={strength_tag},"
+                    "BASE_OUTPUT_DIR=${BASE_OUTPUT_DIR} "
+                    "\"${JOB_SCRIPT}\""
+                )
+                n_jobs += 1
+
+    submit_lines.extend([
+        "",
+        f'echo "Submitted {n_jobs} injection jobs."',
+        f'echo "Skipped {n_skipped} out-of-range (dataset,mass) combinations."',
+    ])
+
+    with open(submit_path, "w") as f:
+        f.write("\n".join(submit_lines) + "\n")
+    os.chmod(submit_path, 0o755)
+    print(f"Wrote injection submission loop script to {submit_path}")
+
+    return output_path, submit_path, n_jobs
+
+
+def generate_toy_scan_slurm_scripts(
+    config_path: str,
+    output_path: str,
+    dataset: str,
+    toy_root: str,
+    toy_names: List[str],
+    output_root: str,
+    *,
+    toy_indices: Optional[List[int]] = None,
+    container: Optional[str] = None,
+    job_name: str = "hps-gpr-toys",
+    partition: str = "batch",
+    time_limit: str = "4:00:00",
+    memory: str = "4G",
+    cpus_per_task: Optional[int] = None,
+    conda_env: Optional[str] = None,
+    extra_sbatch: Optional[List[str]] = None,
+) -> tuple:
+    """Generate SLURM scripts for one functional-form toy scan per job."""
+    dataset_key = str(dataset).strip()
+    toy_container = str(container or "").strip()
+    repo_root = str(Path(__file__).resolve().parents[1])
+    config_abs = os.path.abspath(config_path)
+    toy_root_abs = os.path.abspath(toy_root)
+    output_root_abs = os.path.abspath(output_root)
+
+    if toy_indices is not None and len(toy_indices) != len(toy_names):
+        raise ValueError("toy_indices must have the same length as toy_names")
+    if toy_indices is None:
+        resolved_toy_indices = []
+        for fallback_index, toy_name in enumerate(toy_names):
+            m = re.search(r"_toy_(\d+)$", str(toy_name))
+            resolved_toy_indices.append(int(m.group(1)) if m is not None else int(fallback_index))
+    else:
+        resolved_toy_indices = [int(idx) for idx in toy_indices]
+
+    job_lines = [
+        "#!/bin/bash",
+        "set -euo pipefail",
+        f"#SBATCH --job-name={job_name}",
+        f"#SBATCH --partition={partition}",
+        f"#SBATCH --time={time_limit}",
+        f"#SBATCH --mem={memory}",
+        "#SBATCH --output=logs/%j.out",
+        "#SBATCH --error=logs/%j.err",
+    ]
+    if cpus_per_task is not None:
+        job_lines.append(f"#SBATCH --cpus-per-task={int(cpus_per_task)}")
+
+    if extra_sbatch:
+        for directive in extra_sbatch:
+            job_lines.append(f"#SBATCH {directive}")
+
+    job_lines.extend([
+        "",
+        "mkdir -p logs",
+        "",
+        'cd "${REPO_ROOT}"',
+        "",
+    ])
+
+    job_lines.extend([
+        "# REPO_ROOT, TOY_* and BASE_OUTPUT_DIR are passed via --export at submission time",
+        'if [ -f "${REPO_ROOT}/startup.sh" ]; then',
+        '  source "${REPO_ROOT}/startup.sh"',
+        'elif [ -n "${TOY_CONDA_ENV}" ]; then',
+        "  source $(conda info --base)/etc/profile.d/conda.sh",
+        '  conda activate "${TOY_CONDA_ENV}"',
+        "fi",
+        "",
+        'JOB_OUTDIR="${BASE_OUTPUT_DIR}/jobs/${TOY_DIR_NAME}"',
+        'mkdir -p "${JOB_OUTDIR}"',
+        "",
+        "export PYTHONUNBUFFERED=1",
+        'echo "[toy-scan] dataset=${TOY_DATASET} toy=${TOY_NAME} output=${JOB_OUTDIR}"',
+        'echo "[toy-scan] mass-hypothesis progress will appear below as one [scan] testing mass hypothesis ... GeV line per mass"',
+        "",
+        'CMD=(python -m hps_gpr.cli toy-scan',
+        f'  --config "{config_abs}"',
+        '  --dataset "${TOY_DATASET}"',
+        '  --toy-root "${TOY_ROOT}"',
+        '  --output-dir "${JOB_OUTDIR}"',
+        '  --max-toys 1)',
+        'if [ -n "${TOY_INDEX}" ]; then',
+        '  CMD+=(--toy-name-fmt "${TOY_NAME}")',
+        '  CMD+=(--toy-index "${TOY_INDEX}")',
+        "else",
+        '  CMD+=(--toy-pattern "${TOY_NAME}")',
+        "fi",
+        'if [ -n "${TOY_CONTAINER}" ]; then',
+        '  CMD+=(--container "${TOY_CONTAINER}")',
+        "fi",
+        '"${CMD[@]}"',
+    ])
+
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(job_lines) + "\n")
+    os.chmod(output_path, 0o755)
+    print(f"Wrote toy-scan SLURM job script to {output_path}")
+
+    submit_path = os.path.join(os.path.dirname(os.path.abspath(output_path)), "submit_toy_scan_all.sh")
+    abs_job = os.path.abspath(output_path)
+
+    submit_lines = [
+        "#!/bin/bash",
+        "set -euo pipefail",
+        "# Submit one SLURM job per functional-form toy histogram",
+        'SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"',
+        f'JOB_SCRIPT="{abs_job}"',
+        f'REPO_ROOT="{repo_root}"',
+        f'BASE_OUTPUT_DIR="{output_root_abs}"',
+        f'TOY_DATASET="{dataset_key}"',
+        f'TOY_ROOT="{toy_root_abs}"',
+        f'TOY_CONTAINER="{toy_container}"',
+        f'TOY_CONDA_ENV="{str(conda_env or "").strip()}"',
+        'SBATCH_ARGS=("$@")',
+        "",
+        'cd "${SCRIPT_DIR}"',
+        "mkdir -p logs",
+        "",
+    ]
+
+    n_jobs = 0
+    for toy_name, toy_index in zip(toy_names, resolved_toy_indices):
+        toy_dir_name = re.sub(r"[^A-Za-z0-9._-]+", "_", str(toy_name)).strip("._-") or "toy"
+        submit_lines.append(
+            'sbatch "${SBATCH_ARGS[@]}" --export=ALL,'
+            "REPO_ROOT=${REPO_ROOT},"
+            "TOY_DATASET=${TOY_DATASET},"
+            "TOY_ROOT=${TOY_ROOT},"
+            "TOY_CONTAINER=${TOY_CONTAINER},"
+            f"TOY_NAME={toy_name},"
+            f"TOY_INDEX={int(toy_index)},"
+            f"TOY_DIR_NAME={toy_dir_name},"
+            "TOY_CONDA_ENV=${TOY_CONDA_ENV},"
+            "BASE_OUTPUT_DIR=${BASE_OUTPUT_DIR} "
+            "\"${JOB_SCRIPT}\""
+        )
+        n_jobs += 1
+
+    submit_lines.extend([
+        "",
+        f'echo "Submitted {n_jobs} toy-scan jobs."',
+    ])
+
+    with open(submit_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(submit_lines) + "\n")
+    os.chmod(submit_path, 0o755)
+    print(f"Wrote toy-scan submission loop script to {submit_path}")
+
+    return output_path, submit_path, n_jobs
+
+
+def generate_funcform_injection_slurm_scripts(
+    config_path: str,
+    output_path: str,
+    dataset: str,
+    toy_root: str,
+    toy_names: List[str],
+    output_root: str,
+    *,
+    masses: List[float],
+    strengths: List[str],
+    toy_indices: Optional[List[int]] = None,
+    container: Optional[str] = None,
+    n_injection_toys: int = 1,
+    write_qmu: bool = False,
+    job_name: str = "hps-gpr-ffinj",
+    partition: str = "batch",
+    time_limit: str = "4:00:00",
+    memory: str = "4G",
+    cpus_per_task: Optional[int] = None,
+    conda_env: Optional[str] = None,
+    extra_sbatch: Optional[List[str]] = None,
+) -> tuple:
+    """Generate SLURM scripts for one functional-form injection job per toy histogram."""
+    dataset_key = str(dataset).strip()
+    toy_container = str(container or "").strip()
+    repo_root = str(Path(__file__).resolve().parents[1])
+    config_abs = os.path.abspath(config_path)
+    toy_root_abs = os.path.abspath(toy_root)
+    output_root_abs = os.path.abspath(output_root)
+    masses_arg = ",".join(f"{float(m):.12g}" for m in masses)
+    strengths_arg = ",".join(str(s) for s in strengths)
+
+    if toy_indices is not None and len(toy_indices) != len(toy_names):
+        raise ValueError("toy_indices must have the same length as toy_names")
+    if toy_indices is None:
+        resolved_toy_indices = []
+        for fallback_index, toy_name in enumerate(toy_names):
+            m = re.search(r"_toy_(\d+)$", str(toy_name))
+            resolved_toy_indices.append(int(m.group(1)) if m is not None else int(fallback_index))
+    else:
+        resolved_toy_indices = [int(idx) for idx in toy_indices]
+
+    job_lines = [
+        "#!/bin/bash",
+        "set -euo pipefail",
+        f"#SBATCH --job-name={job_name}",
+        f"#SBATCH --partition={partition}",
+        f"#SBATCH --time={time_limit}",
+        f"#SBATCH --mem={memory}",
+        "#SBATCH --output=logs/%j.out",
+        "#SBATCH --error=logs/%j.err",
+    ]
+    if cpus_per_task is not None:
+        job_lines.append(f"#SBATCH --cpus-per-task={int(cpus_per_task)}")
+    if extra_sbatch:
+        for directive in extra_sbatch:
+            job_lines.append(f"#SBATCH {directive}")
+
+    qmu_flag = "--write-qmu" if bool(write_qmu) else "--no-write-qmu"
+    job_lines.extend([
+        "",
+        "mkdir -p logs",
+        "",
+        "# REPO_ROOT, TOY_* and BASE_OUTPUT_DIR are passed via --export at submission time",
+        'cd "${REPO_ROOT}"',
+        'if [ -f "${REPO_ROOT}/startup.sh" ]; then',
+        '  source "${REPO_ROOT}/startup.sh"',
+        'elif [ -n "${TOY_CONDA_ENV}" ]; then',
+        "  source $(conda info --base)/etc/profile.d/conda.sh",
+        '  conda activate "${TOY_CONDA_ENV}"',
+        "fi",
+        "",
+        'JOB_OUTDIR="${BASE_OUTPUT_DIR}/jobs/${TOY_DIR_NAME}"',
+        'FLAT_OUTDIR="${BASE_OUTPUT_DIR}/injection_flat"',
+        'mkdir -p "${JOB_OUTDIR}" "${FLAT_OUTDIR}"',
+        "",
+        "export PYTHONUNBUFFERED=1",
+        'echo "[funcform-inj] dataset=${TOY_DATASET} toy=${TOY_NAME} output=${JOB_OUTDIR}"',
+        "",
+        'CMD=(python -m hps_gpr.cli funcform-inject',
+        f'  --config "{config_abs}"',
+        '  --dataset "${TOY_DATASET}"',
+        '  --toy-root "${TOY_ROOT}"',
+        '  --output-dir "${JOB_OUTDIR}"',
+        f'  --masses "{masses_arg}"',
+        f'  --strengths "{strengths_arg}"',
+        f'  --n-injection-toys {int(n_injection_toys)}',
+        '  --write-toy-csv',
+        f'  {qmu_flag}',
+        '  --toy-name-fmt "${TOY_NAME}"',
+        '  --toy-index "${TOY_INDEX}")',
+        'if [ -n "${TOY_CONTAINER}" ]; then',
+        '  CMD+=(--container "${TOY_CONTAINER}")',
+        "fi",
+        '"${CMD[@]}"',
+        "",
+        'FILE_GLOB="${JOB_OUTDIR}/injection_extraction/*_${TOY_DATASET}.csv"',
+        "for f in ${FILE_GLOB}; do",
+        "  [ -f \"$f\" ] || continue",
+        "  b=$(basename \"$f\" .csv)",
+        '  cp "$f" "${FLAT_OUTDIR}/${b}__toy_${TOY_INDEX}.csv"',
+        "done",
+    ])
+
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(job_lines) + "\n")
+    os.chmod(output_path, 0o755)
+    print(f"Wrote functional-form injection SLURM job script to {output_path}")
+
+    submit_path = os.path.join(os.path.dirname(os.path.abspath(output_path)), "submit_funcform_injection_all.sh")
+    abs_job = os.path.abspath(output_path)
+    submit_lines = [
+        "#!/bin/bash",
+        "set -euo pipefail",
+        "# Submit one SLURM job per functional-form injection toy histogram",
+        'SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"',
+        f'JOB_SCRIPT="{abs_job}"',
+        f'REPO_ROOT="{repo_root}"',
+        f'BASE_OUTPUT_DIR="{output_root_abs}"',
+        f'TOY_DATASET="{dataset_key}"',
+        f'TOY_ROOT="{toy_root_abs}"',
+        f'TOY_CONTAINER="{toy_container}"',
+        f'TOY_CONDA_ENV="{str(conda_env or "").strip()}"',
+        'SBATCH_ARGS=("$@")',
+        "",
+        'cd "${SCRIPT_DIR}"',
+        "mkdir -p logs",
+        "",
+    ]
+
+    n_jobs = 0
+    for toy_name, toy_index in zip(toy_names, resolved_toy_indices):
+        toy_dir_name = re.sub(r"[^A-Za-z0-9._-]+", "_", str(toy_name)).strip("._-") or "toy"
+        submit_lines.append(
+            'sbatch "${SBATCH_ARGS[@]}" --export=ALL,'
+            "REPO_ROOT=${REPO_ROOT},"
+            "TOY_DATASET=${TOY_DATASET},"
+            "TOY_ROOT=${TOY_ROOT},"
+            "TOY_CONTAINER=${TOY_CONTAINER},"
+            f"TOY_NAME={toy_name},"
+            f"TOY_INDEX={int(toy_index)},"
+            f"TOY_DIR_NAME={toy_dir_name},"
+            "TOY_CONDA_ENV=${TOY_CONDA_ENV},"
+            "BASE_OUTPUT_DIR=${BASE_OUTPUT_DIR} "
+            "\"${JOB_SCRIPT}\""
+        )
+        n_jobs += 1
+
+    submit_lines.extend(["", f'echo "Submitted {n_jobs} functional-form injection jobs."'])
+    with open(submit_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(submit_lines) + "\n")
+    os.chmod(submit_path, 0o755)
+    print(f"Wrote functional-form injection submission loop script to {submit_path}")
+
+    return output_path, submit_path, n_jobs
+
+
+def generate_gp_toy_scan_slurm_scripts(
+    config_path: str,
+    output_path: str,
+    dataset: str,
+    n_toys: int,
+    output_root: str,
+    *,
+    job_name: str = "hps-gpr-gp-toys",
+    partition: str = "batch",
+    time_limit: str = "4:00:00",
+    memory: str = "4G",
+    cpus_per_task: Optional[int] = None,
+    conda_env: Optional[str] = None,
+    extra_sbatch: Optional[List[str]] = None,
+) -> tuple:
+    """Generate SLURM scripts for one GP-generated toy scan per job."""
+    dataset_key = str(dataset).strip()
+    repo_root = str(Path(__file__).resolve().parents[1])
+    config_abs = os.path.abspath(config_path)
+    output_root_abs = os.path.abspath(output_root)
+
+    job_lines = [
+        "#!/bin/bash",
+        "set -euo pipefail",
+        f"#SBATCH --job-name={job_name}",
+        f"#SBATCH --partition={partition}",
+        f"#SBATCH --time={time_limit}",
+        f"#SBATCH --mem={memory}",
+        "#SBATCH --output=logs/%j.out",
+        "#SBATCH --error=logs/%j.err",
+    ]
+    if cpus_per_task is not None:
+        job_lines.append(f"#SBATCH --cpus-per-task={int(cpus_per_task)}")
+
+    if extra_sbatch:
+        for directive in extra_sbatch:
+            job_lines.append(f"#SBATCH {directive}")
+
+    job_lines.extend([
+        "",
+        "mkdir -p logs",
+        "",
+        'cd "${REPO_ROOT}"',
+        "",
+        "# REPO_ROOT, GP_TOY_* and BASE_OUTPUT_DIR are passed via --export at submission time",
+        'if [ -f "${REPO_ROOT}/startup.sh" ]; then',
+        '  source "${REPO_ROOT}/startup.sh"',
+        'elif [ -n "${GP_TOY_CONDA_ENV}" ]; then',
+        "  source $(conda info --base)/etc/profile.d/conda.sh",
+        '  conda activate "${GP_TOY_CONDA_ENV}"',
+        "fi",
+        "",
+        'JOB_OUTDIR="${BASE_OUTPUT_DIR}/jobs/${GP_TOY_DIR_NAME}"',
+        'mkdir -p "${JOB_OUTDIR}"',
+        "",
+        "export PYTHONUNBUFFERED=1",
+        'echo "[gp-toy-scan] dataset=${GP_TOY_DATASET} toy_index=${GP_TOY_INDEX} output=${JOB_OUTDIR}"',
+        'echo "[gp-toy-scan] mass-hypothesis progress will appear below as one [scan] testing mass hypothesis ... GeV line per mass"',
+        "",
+        'python -m hps_gpr.cli gp-toy-scan \\',
+        f'  --config "{config_abs}" \\',
+        '  --dataset "${GP_TOY_DATASET}" \\',
+        '  --toy-index "${GP_TOY_INDEX}" \\',
+        '  --output-dir "${JOB_OUTDIR}"',
+    ])
+
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(job_lines) + "\n")
+    os.chmod(output_path, 0o755)
+    print(f"Wrote GP toy-scan SLURM job script to {output_path}")
+
+    submit_path = os.path.join(os.path.dirname(os.path.abspath(output_path)), "submit_gp_toy_scan_all.sh")
+    abs_job = os.path.abspath(output_path)
+
+    submit_lines = [
+        "#!/bin/bash",
+        "set -euo pipefail",
+        "# Submit one SLURM job per GP-generated toy histogram",
+        'SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"',
+        f'JOB_SCRIPT="{abs_job}"',
+        f'REPO_ROOT="{repo_root}"',
+        f'BASE_OUTPUT_DIR="{output_root_abs}"',
+        f'GP_TOY_DATASET="{dataset_key}"',
+        f'GP_TOY_CONDA_ENV="{str(conda_env or "").strip()}"',
+        'SBATCH_ARGS=("$@")',
+        "",
+        'cd "${SCRIPT_DIR}"',
+        "mkdir -p logs",
+        "",
+    ]
+
+    n_jobs = 0
+    for toy_index in range(int(n_toys)):
+        toy_dir_name = f"gp_toy_{int(toy_index):04d}"
+        submit_lines.append(
+            'sbatch "${SBATCH_ARGS[@]}" --export=ALL,'
+            "REPO_ROOT=${REPO_ROOT},"
+            "GP_TOY_DATASET=${GP_TOY_DATASET},"
+            f"GP_TOY_INDEX={int(toy_index)},"
+            f"GP_TOY_DIR_NAME={toy_dir_name},"
+            "GP_TOY_CONDA_ENV=${GP_TOY_CONDA_ENV},"
+            "BASE_OUTPUT_DIR=${BASE_OUTPUT_DIR} "
+            "\"${JOB_SCRIPT}\""
+        )
+        n_jobs += 1
+
+    submit_lines.extend([
+        "",
+        f'echo "Submitted {n_jobs} GP toy-scan jobs."',
+    ])
+
+    with open(submit_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(submit_lines) + "\n")
+    os.chmod(submit_path, 0o755)
+    print(f"Wrote GP toy-scan submission loop script to {submit_path}")
+
+    return output_path, submit_path, n_jobs
+
+
+def generate_extraction_display_slurm_scripts(
+    config_path: str,
+    output_path: str,
+    dataset: str,
+    masses: List[float],
+    strengths: List[float],
+    output_root: str,
+    *,
+    dataset_keys: Optional[List[str]] = None,
+    toy_index: Optional[int] = None,
+    mass_range: Optional[tuple] = None,
+    job_name: str = "hps-gpr-exdisp",
+    partition: str = "batch",
+    time_limit: str = "4:00:00",
+    memory: str = "4G",
+    conda_env: Optional[str] = None,
+    extra_sbatch: Optional[List[str]] = None,
+) -> tuple:
+    """Generate SLURM scripts for one extraction-display job per (mass, strength)."""
+    dataset_key = str(dataset).strip().lower()
+    combined_keys = [str(k).strip() for k in (dataset_keys or []) if str(k).strip()]
+
+    job_lines = [
+        "#!/bin/bash",
+        f"#SBATCH --job-name={job_name}",
+        f"#SBATCH --partition={partition}",
+        f"#SBATCH --time={time_limit}",
+        f"#SBATCH --mem={memory}",
+        "#SBATCH --output=logs/%j.out",
+        "#SBATCH --error=logs/%j.err",
+    ]
+
+    if extra_sbatch:
+        for directive in extra_sbatch:
+            job_lines.append(f"#SBATCH {directive}")
+
+    job_lines.extend([
+        "",
+        "mkdir -p logs",
+        "",
+    ])
+
+    if conda_env:
+        job_lines.extend([
+            "# Activate conda environment",
+            "source $(conda info --base)/etc/profile.d/conda.sh",
+            f"conda activate {conda_env}",
+            "",
+        ])
+
+    job_lines.extend([
+        "# EXTRACT_* and BASE_OUTPUT_DIR are passed via --export at submission time",
+        'JOB_OUTDIR="${BASE_OUTPUT_DIR}/extraction_display_jobs/${EXTRACT_DATASET}/m_${EXTRACT_MASS_TAG}/s_${EXTRACT_STRENGTH_TAG}"',
+        'mkdir -p "${JOB_OUTDIR}"',
+        "",
+        'EXTRACT_DATASET_KEYS_CSV="${EXTRACT_DATASET_KEYS//:/,}"',
+        "",
+        'CMD=(hps-gpr extract-display',
+        f'  --config "{config_path}"',
+        '  --dataset "${EXTRACT_DATASET}"',
+        '  --masses "${EXTRACT_MASS}"',
+        '  --strengths "${EXTRACT_STRENGTH}"',
+        '  --output-dir "${JOB_OUTDIR}"',
+    ])
+    if toy_index is not None:
+        job_lines.append(f'  --toy-index "{int(toy_index)}"')
+    job_lines.extend([
+        ')',
+        'if [ -n "${EXTRACT_DATASET_KEYS_CSV}" ]; then',
+        '  CMD+=(--datasets "${EXTRACT_DATASET_KEYS_CSV}")',
+        "fi",
+        '"${CMD[@]}"',
+    ])
+
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(job_lines) + "\n")
+    os.chmod(output_path, 0o755)
+    print(f"Wrote extraction-display SLURM job script to {output_path}")
+
+    submit_path = os.path.join(os.path.dirname(os.path.abspath(output_path)), "submit_extract_display_all.sh")
+    abs_job = os.path.abspath(output_path)
+    dataset_keys_str = ":".join(combined_keys)
+
+    submit_lines = [
+        "#!/bin/bash",
+        "set -euo pipefail",
+        "# Submit one SLURM job per (mass, strength) extraction-display point",
+        'SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"',
+        f'JOB_SCRIPT="{abs_job}"',
+        f'BASE_OUTPUT_DIR="{output_root}"',
+        f'EXTRACT_DATASET="{dataset_key}"',
+        f'EXTRACT_DATASET_KEYS="{dataset_keys_str}"',
+        'SBATCH_ARGS=("$@")',
+        "",
+        'cd "${SCRIPT_DIR}"',
+        "mkdir -p logs",
+        "",
+    ]
+
+    n_jobs = 0
+    n_skipped = 0
+    for mass in masses:
+        mass_f = float(mass)
+        if mass_range is not None:
+            lo, hi = float(mass_range[0]), float(mass_range[1])
+            if mass_f < lo or mass_f > hi:
+                n_skipped += 1
+                continue
+        mass_str = f"{mass_f:.6f}".rstrip("0").rstrip(".")
+        mass_tag = mass_str.replace("-", "m").replace(".", "p")
+        for strength in strengths:
+            strength_str = f"{float(strength):.6g}"
+            strength_tag = strength_str.replace("-", "m").replace(".", "p")
+            submit_lines.append(
+                'sbatch "${SBATCH_ARGS[@]}" --export=ALL,'
+                "EXTRACT_DATASET=${EXTRACT_DATASET},"
+                f"EXTRACT_MASS={mass_str},"
+                f"EXTRACT_MASS_TAG={mass_tag},"
+                f"EXTRACT_STRENGTH={strength_str},"
+                f"EXTRACT_STRENGTH_TAG={strength_tag},"
+                "EXTRACT_DATASET_KEYS=${EXTRACT_DATASET_KEYS},"
+                "BASE_OUTPUT_DIR=${BASE_OUTPUT_DIR} "
+                "\"${JOB_SCRIPT}\""
+            )
+            n_jobs += 1
+
+    submit_lines.extend([
+        "",
+        f'echo "Submitted {n_jobs} extraction-display jobs."',
+        f'echo "Skipped {n_skipped} out-of-range masses for dataset selection {dataset_key}."',
+    ])
+
+    with open(submit_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(submit_lines) + "\n")
+    os.chmod(submit_path, 0o755)
+    print(f"Wrote extraction-display submission loop script to {submit_path}")
+
+    return output_path, submit_path, n_jobs
+
+def get_mass_range_for_task(
+    datasets: dict,
+    mass_step: float,
+    task_id: int,
+    n_tasks: int,
+) -> tuple:
+    """Get the mass range for a specific array task.
+
+    Args:
+        datasets: Dictionary of dataset configurations
+        mass_step: Mass step size (GeV)
+        task_id: Array task ID (0-indexed)
+        n_tasks: Total number of tasks
+
+    Returns:
+        Tuple of (mass_min, mass_max) for this task
+    """
+    lo = min([d.m_low for d in datasets.values()])
+    hi = max([d.m_high for d in datasets.values()])
+
+    all_masses = np.arange(lo, hi + 0.5 * mass_step, mass_step)
+    all_masses = np.round(all_masses, 3)
+
+    n_masses = len(all_masses)
+    chunk_size = n_masses // n_tasks
+    remainder = n_masses % n_tasks
+
+    # Distribute remainder across first tasks
+    if task_id < remainder:
+        start_idx = task_id * (chunk_size + 1)
+        end_idx = start_idx + chunk_size + 1
+    else:
+        start_idx = task_id * chunk_size + remainder
+        end_idx = start_idx + chunk_size
+
+    if start_idx >= n_masses:
+        return None, None
+
+    end_idx = min(end_idx, n_masses)
+
+    mass_min = float(all_masses[start_idx])
+    mass_max = float(all_masses[end_idx - 1])
+
+    return mass_min, mass_max
+
+
+def infer_n_tasks_from_output_dir(output_dir: str) -> Optional[int]:
+    """Infer the total task count from ``task_####`` folders in an output directory."""
+    if not os.path.isdir(output_dir):
+        return None
+
+    task_ids: List[int] = []
+    for name in os.listdir(output_dir):
+        m = re.fullmatch(r"task_(\d{4})", str(name))
+        if m:
+            task_ids.append(int(m.group(1)))
+
+    if not task_ids:
+        return None
+
+    # Tasks are generated with contiguous IDs [0, N_TASKS-1].
+    return max(task_ids) + 1
+
+
+def get_task_ids_for_masses(
+    datasets: dict,
+    mass_step: float,
+    n_tasks: int,
+    masses_gev: List[float],
+) -> List[int]:
+    """Map requested masses to the SLURM task IDs that own those mass points."""
+    lo = min([d.m_low for d in datasets.values()])
+    hi = max([d.m_high for d in datasets.values()])
+
+    all_masses = np.arange(lo, hi + 0.5 * mass_step, mass_step)
+    all_masses = np.round(all_masses, 3)
+    n_masses = len(all_masses)
+
+    if n_tasks <= 0:
+        raise ValueError(f"n_tasks must be > 0, got {n_tasks}")
+
+    task_ids = set()
+    for req_mass in masses_gev:
+        req_mass = float(np.round(req_mass, 3))
+        idx = np.where(np.isclose(all_masses, req_mass, atol=1e-9))[0]
+        if idx.size == 0:
+            raise ValueError(
+                f"Requested mass {req_mass:.3f} GeV is not on the scan grid "
+                f"[{lo:.3f}, {hi:.3f}] with step {mass_step:.3f} GeV"
+            )
+        i = int(idx[0])
+
+        chunk_size = n_masses // n_tasks
+        remainder = n_masses % n_tasks
+
+        boundary = (chunk_size + 1) * remainder
+        if i < boundary:
+            task_id = i // (chunk_size + 1)
+        else:
+            task_id = remainder + (i - boundary) // max(chunk_size, 1)
+
+        task_ids.add(int(task_id))
+
+    return sorted(task_ids)
+
+
+
+
+def _combine_band_family(output_dir: str, output_prefix: str, stem: str, subset_cols: List[str]):
+    """Combine per-task UL-band CSV files with matching stem pattern."""
+    files = glob.glob(os.path.join(output_dir, "**", "*.csv"), recursive=True)
+    if not files:
+        return {}
+
+    out = {}
+    by_name = {}
+    pat = re.compile(rf"^{re.escape(stem)}_(.+)\.csv$")
+    for f in files:
+        base = os.path.basename(f)
+        m = pat.match(base)
+        if not m:
+            continue
+        # keep families disjoint: ul_bands_* should not absorb ul_bands_eps2_* or ul_bands_combined_*
+        name = str(m.group(1))
+        if stem == "ul_bands" and (name.startswith("eps2_") or name.startswith("combined_")):
+            continue
+        by_name.setdefault(name, []).append(f)
+
+    for name, paths in by_name.items():
+        dfs = []
+        for fp in paths:
+            try:
+                dfs.append(pd.read_csv(fp))
+            except Exception as e:
+                print(f"Warning: Could not read {fp}: {e}")
+        if not dfs:
+            continue
+        df = pd.concat(dfs, ignore_index=True)
+        keep = [c for c in subset_cols if c in df.columns]
+        if keep:
+            df = df.drop_duplicates(subset=keep)
+        sort_cols = [c for c in ["dataset", "dataset_set", "mass_GeV"] if c in df.columns]
+        if sort_cols:
+            df = df.sort_values(sort_cols).reset_index(drop=True)
+        else:
+            df = df.reset_index(drop=True)
+        out_path = os.path.join(output_dir, f"{output_prefix}_{stem}_{name}.csv")
+        df.to_csv(out_path, index=False)
+        print(f"Wrote combined band table to {out_path}")
+        out[name] = out_path
+
+    return out
+def combine_results(output_dir: str, output_prefix: str = "combined") -> tuple:
+    """Combine results from parallel SLURM jobs.
+
+    Args:
+        output_dir: Directory containing task output subdirectories
+        output_prefix: Prefix for combined output files
+
+    Returns:
+        Tuple of (combined_single_df, combined_comb_df)
+    """
+    # Find all single results files
+    single_files = glob.glob(os.path.join(output_dir, "**/results_single.csv"), recursive=True)
+    comb_files = glob.glob(os.path.join(output_dir, "**/results_combined.csv"), recursive=True)
+
+    if not single_files:
+        print(f"No results_single.csv files found in {output_dir}")
+        return None, None
+
+    # Combine single results
+    single_dfs = []
+    for f in single_files:
+        try:
+            df = pd.read_csv(f)
+            single_dfs.append(df)
+        except Exception as e:
+            print(f"Warning: Could not read {f}: {e}")
+
+    if single_dfs:
+        df_single = pd.concat(single_dfs, ignore_index=True)
+        df_single = df_single.drop_duplicates(subset=["dataset", "mass_GeV"])
+        df_single = df_single.sort_values(["dataset", "mass_GeV"]).reset_index(drop=True)
+
+        single_out = os.path.join(output_dir, f"{output_prefix}_single.csv")
+        df_single.to_csv(single_out, index=False)
+        print(f"Wrote combined single results to {single_out}")
+    else:
+        df_single = None
+
+    # Combine combined results
+    comb_dfs = []
+    for f in comb_files:
+        try:
+            df = pd.read_csv(f)
+            comb_dfs.append(df)
+        except Exception as e:
+            print(f"Warning: Could not read {f}: {e}")
+
+    if comb_dfs:
+        df_comb = pd.concat(comb_dfs, ignore_index=True)
+        df_comb = df_comb.drop_duplicates(subset=["mass_GeV"])
+        df_comb = df_comb.sort_values("mass_GeV").reset_index(drop=True)
+
+        comb_out = os.path.join(output_dir, f"{output_prefix}_combined.csv")
+        df_comb.to_csv(comb_out, index=False)
+        print(f"Wrote combined results to {comb_out}")
+    else:
+        df_comb = None
+
+    combined_ul_bands = _combine_band_family(output_dir, output_prefix, "ul_bands", ["dataset", "mass_GeV"])
+    combined_ul_bands_eps2 = _combine_band_family(output_dir, output_prefix, "ul_bands_eps2", ["dataset", "mass_GeV"])
+    combined_ul_bands_combined = _combine_band_family(output_dir, output_prefix, "ul_bands_combined", ["dataset_set", "mass_GeV"])
+
+    return df_single, df_comb, combined_ul_bands, combined_ul_bands_eps2, combined_ul_bands_combined
