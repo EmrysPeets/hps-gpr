@@ -1,0 +1,256 @@
+HPS GPR analysis note v4.9.16
+2015 low-mass rising-edge side study
+6 September 2026
+1 Exploratory 2015 search on the 15–20 MeV rising edge
+Result. This short-support study does not reveal a persuasive narrow excess in 15–20 MeV. The largest
+nominal-GP upward fluctuation is at 17.25 MeV. Releasing an active smoothness ceiling gives a stable
+fit with r = 1.58 and local asymptotic p0 = 0.057; the independently fitted polynomial background gives
+p0 = 0.254 there. These values are model-conditional, selected from a scan, and do not establish or exclude
+a heavy photon.
+Why a separate support is useful
+The released 2015 scan begins at 19 MeV, with GP training support 14–135 MeV. Its input histogram
+extends below that support. The spectrum contains 81 events in 12–13 MeV, 7,653 in 14–15 MeV and
+330,090 in 19–20 MeV. A local GP can isolate this turn-on without fitting the distant falling spectrum. It
+must still describe the steep background accurately across a missing signal window.
+10.0 12.5 15.0 17.5 20.0 22.5 25.0 27.5 30.0
+e + e −  invariant mass [MeV]
+100
+101
+102
+103
+104
+105
+Events / 0.25 MeV
+2015: a short support isolates the rising edge
+Short GP support: 12–28 MeV
+Requested search: 15–20 MeV
+Established scan starts at 19 MeV
+2015 full data: 0.25 MeV bins
+Figure 1: The same released full-2015 histogram, summed from 0.05 to 0.25 MeV bins. The chosen GP support is
+12–28 MeV; the requested search is 15–20 MeV. The dashed line marks the lower boundary of the established scan,
+not the lower boundary of the available counts.
+The new scan has 21 hypotheses, separated by 0.25 MeV. A labelled continuation to 22 MeV connects it
+to the previously selected 21 MeV point; that continuation is excluded from selection of the leading 15–20
+MeV feature. The comparison supports 12–26, 12–30 and 12.5–28 MeV were declared before examining
+the new signal fits. Their p-values do not select the nominal support.
+Detector boundary . The inherited Gaussian width is σm = −0.09223 + 0 .053219m MeV for m in
+MeV, giving about 0.71–0.97 MeV here. Below 19 MeV it is an extrapolated shape assumption. The
+published 2015 prompt search covered 19–81 MeV [ 1]. Low-mass signal eﬀiciency, acceptance and the
+selected signal shape need direct simulation and control checks before a physical coupling result can be
+quoted.
+1
+Local probabilities and dependence on the background
+The GP fits log counts versus log mass outside m ± 2.25σm. Its prediction and correlated count covari-
+ance constrain the background in an exact Poisson window likelihood. Both the signal amplitude and
+background nuisance coordinates are fitted; the auxiliary amplitude may be negative while every total
+expectation remains positive. We report
+r = sign( bA)
+q
+2[NLL(0) − NLL( bA)], p 0 = Φ(max(r, 0)) .
+Thus the asymptotic convention assigns p0 = 0 .5 to negative fits [ 2]. No GP estimate of a global trials
+factor is used in this section.
+−4
+−2
+0
+2
+4
+6
+Signed profile root r
+20–22 MeV:
+context only
+12–26, ceiling 8
+12–30, ceiling 8
+12.5–28, ceiling 8
+12–28, ceiling 8
+12–28, ceiling 16 (stable optimum)
+Local exp(Chebyshev-5)
+Frozen wide-support GP (integer masses)
+15 16 17 18 19 20 21 22
+Mass hypothesis [MeV]
+10−6
+10−5
+10−4
+10−3
+10−2
+10−1
+Local asymptotic p0
+1σ reference
+2σ reference
+3σ reference
+15–20 MeV: modest excesses; background choice matters
+GP sidebands exclude ±2.25σ  |  No global or detector-response calibration below 19 MeV
+Figure 2: Signed roots and local asymptotic excess probabilities. All four initial GP supports reach the inherited
+ceiling of eight resolution units. Raising the nominal-support ceiling to 16 removes every active boundary; ceilings
+32 and 64 recover the same optima, with maximum root changes below 0.00054. The local polynomial is a separate
+background-family check. Gray shading identifies the 20–22 MeV bridge. Triangles mark the 10−6 display floor, not
+resolved global tails.
+For the polynomial check, a positive exp(Chebyshev5) background and Gaussian signal are integrated
+over each 0.25 MeV bin. All background coeﬀicients are profiled over a moving ±7σm support, clipped at
+12 MeV. Its form and window scale follow the published low-mass procedure [ 1]; its suitability below 19
+MeV is tested here rather than assumed. In 15–20 MeV its largest positive root is only 0.74. At 21 MeV
+it gives a much larger root, 6.15, but a signal-plus-background Poisson deviance of 98.7 for 51 nominal
+degrees of freedom. That poor-fit diagnostic and the GP dependence prevent interpreting the large value
+as a robust signal.
+2
+Signal extraction at fixed low-mass anchors
+The displays use the stable ceiling-16 GP on 12–28 MeV. The 15 and 17 MeV hypotheses were fixed before
+the scan. Curves for profiled components are confined to the fitted window. Outside it, only data and the
+sideband GP constraint are shown. The gold uncertainty is the GP constraint before fitting the window,
+not an uncertainty band for the final fitted background.
+0
+8
+16
+24
+32Events / 0.25 MeV
+1e3
+ 15 MeV  |  local p₀ = 0.236
+13 14 15 16 17
+e + e −  invariant mass [MeV]
+−160
+−80
+0
+80
+160
+Data − background
+Fitted Gaussian yield: 303 ± 422
+0
+40
+80
+120
+160Events / 0.5 MeV
+1e3
+ 17 MeV  |  local p₀ = 0.173
+15 16 17 18 19
+e + e −  invariant mass [MeV]
+0
+200
+400
+600Data − background
+Fitted Gaussian yield: 1,423 ± 1,512
+2015 signal extraction: fixed 15 and 17 MeV hypotheses
+2015 full  |  GP support 12–28 MeV, stable ceiling 16  |  Shading: fitted signal window
+Counting error bars only. Residuals share fitted-background uncertainty; they are not independent significances.
+Sideband GP mean
+GP constraint ±1 SD
+Background profiled with signal
+Signal + background
+Data
+Figure 3: Fixed 15 and 17 MeV hypotheses. Top: data, sideband background constraint, profiled background
+and signal-plus-background prediction. Bottom: data minus the background profiled with signal, with the fitted
+Gaussian contribution. The error bars describe counting uncertainty only. The subtraction uses the same data to
+fit the background and is not an independent pull test.
+The likelihood uses 0.25 MeV bins. For these figures, complete groups of bins are chosen nearest to
+half a mass resolution and anchored at the original zero edge. The resulting display widths are 0.25 MeV
+at 15 MeV and 0.50 MeV at the other displayed masses. Boundary groups crossing the fitted window are
+omitted from the profiled display, while all original window bins remain in the likelihood. No grouping or
+phase is chosen to make a peak sharper.
+m [MeV] r, ceiling 8 r, ceiling 16 p0, ceiling 16 p0, polynomial Fitted yield, ceiling 16
+15 1.00 0.72 0.236 0.284 303 ± 422
+17 0.70 0.94 0.173 0.298 1, 423 ± 1, 512
+17.25 1.43 1.58 0.057 0.254 2, 542 ± 1, 612
+20 0.33 0.16 0.438 0.230 514 ± 3, 312
+Yield errors are local curvature errors for the assumed Gaussian template; they are not post-selection
+confidence intervals. No conversion to ϵ2 is made.
+3
+The leading fluctuation and the upper edge of the requested interval
+At 17.25 MeV the stable GP fit gives approximately 2,542 ±1,612 Gaussian-template events. Its maximum
+is selected after scanning 15–20 MeV, so this amplitude can be upward biased. It does not acquire a
+stronger interpretation because the scan was restricted to a rising edge. The 20 MeV panel supplies the
+fixed upper anchor.
+0
+40
+80
+120
+160Events / 0.5 MeV
+1e3
+ 17.25 MeV  |  local p₀ = 0.057
+15 16 17 18 19
+e + e −  invariant mass [MeV]
+−300
+0
+300
+600
+900
+Data − background
+Fitted Gaussian yield: 2,542 ± 1,612
+80
+160
+240
+320Events / 0.5 MeV
+1e3
+ 20 MeV  |  local p₀ = 0.438
+17 18 19 20 21 22 23
+e + e −  invariant mass [MeV]
+−1000
+−500
+0
+500
+1000
+Data − background
+Fitted Gaussian yield: 514 ± 3,312
+2015 signal extraction: the leading fluctuation and 20 MeV
+2015 full  |  GP support 12–28 MeV, stable ceiling 16  |  Shading: fitted signal window
+Counting error bars only. Residuals share fitted-background uncertainty; they are not independent significances.
+Sideband GP mean
+GP constraint ±1 SD
+Background profiled with signal
+Signal + background
+Data
+Figure 4: The selected 17.25 MeV upward fluctuation and the fixed 20 MeV hypothesis, with the same conventions
+and fixed-phase grouping as the preceding displays. Their local asymptotic roots are 1.58 and 0.16. A convincing
+resonance would need a stable excess across defensible background choices and a validated accepted signal shape.
+At 21 MeV, the nominal GP changes from r = 1.46 to r = 3.24 when its active smoothness restriction
+is removed; the frozen wide-support fit has r ≃ 2.52. This is evidence that the inference is sensitive to the
+background description. It is not evidence that the low-mass study has uncovered a second established
+particle feature. Resolving this dependence requires predictive background controls and detector-level
+checks, not choosing the smallest p-value.
+4
+Small conditional toy checks and what remains to establish
+Ten pilot spectra were first generated at each of the four displayed masses, then extended to 100 at
+each mass for each of ceilings 8 and 16: 800 distinct mass/model toy fits in total. The first ten are
+included in each 100. Each Poisson spectrum covers the complete 12–28 MeV support, and its GP
+hyperparameters and background are fitted again. The generating mean is the continuous sideband-
+conditioned GP prediction at that mass, without an observed-window adjustment. These mass-local
+backgrounds cannot be joined into one global experiment.
+15 16 17 18 19 20
+Fixed mass hypothesis [MeV]
+0.0
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+0.8Local excess probability
+Small conditional toy checks expose shifts in the null statistic
+Asymptotic reference, ceiling 8
+Asymptotic reference, ceiling 16
+100 conditional toys / mass, ceiling 8
+100 conditional toys / mass, ceiling 16
+Figure 5: Toy upper-tail fractions with central 95% binomial intervals, compared with the asymptotic local reference.
+The two ceiling choices have their own conditional generating backgrounds. These small plug-in ensembles assess this
+fitting procedure under those means; they are not independent background validation or a final p-value calibration.
+Ceiling m [MeV] Tails/toys Fraction 95% interval Mean r SD r
+8 15 20/100 0.20 [0.127, 0.292] +0.23 0.89
+8 17 11/100 0.11 [0.056, 0.188] -0.48 0.95
+8 17.25 2/100 0.02 [0.002, 0.070] -0.43 0.99
+8 20 57/100 0.57 [0.467, 0.669] +0.52 0.92
+16 15 24/100 0.24 [0.160, 0.336] +0.07 1.04
+16 17 10/100 0.10 [0.049, 0.176] -0.31 0.97
+16 17.25 1/100 0.01 [0.00025, 0.054] -0.38 0.94
+16 20 62/100 0.62 [0.517, 0.715] +0.42 1.01
+The shifts of the toy-root means away from zero demonstrate why an asymptotic reference alone is
+insuﬀicient to qualify this extension. A small toy-tail fraction is conditional on a data-derived mean and
+has finite sampling uncertainty. It does not remove the choice of mass, support or background family.
+Next, validate accepted signal templates and the turn-on; test background prediction and signal recov-
+ery under alternative smooth truths; fix choices independently of signal-window residuals; and calibrate a
+coherent scan for a global probability. A shorter GP support does not remove look-elsewhere accounting.
+The accompanying study bundle retains scripts, fit components, display maps, 800 toy roots and source
+hashes.
+References
+[1] P. H. Adrian et al. (HPS), Search for a Dark Photon in Electro-Produced e+e− Pairs with the Heavy
+Photon Search Experiment at JLab , Phys. Rev. D 98 (2018) 091101. arXiv:1807.11530.
+[2] G. Cowan, K. Cranmer, E. Gross and O. Vitells, Asymptotic formulae for likelihood-based tests of new
+physics, Eur. Phys. J. C 71 (2011) 1554. arXiv:1007.1727.
+5

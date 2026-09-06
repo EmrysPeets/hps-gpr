@@ -1,0 +1,49 @@
+\section{What the probability audit found}
+\label{sec:prob-audit}
+\textbf{The fits are consistent; the reference distributions answer different questions.} All 232 masses are present. Recomputing every saved probability and tail count reproduces the original scan. All 15 selected extraction roots agree with their source scans to below $10^{-15}$. Display grouping only adds whole native bins; it cannot change a likelihood root. The apparently more significant extraction panels and the tiny conditional probabilities therefore did not arise from a new fit or a change of binning.
+
+The earlier Figure 1 placed the nominal local curve beside a background-reference Gaussian local curve, then placed scan-wide tails underneath. Their labels did not sufficiently explain that they use different null references. The revised Figure 1 displays the unchanged upper limit, the observed root, and its nominal asymptotic local reference. Figures~\ref{fig:prob-full}--\ref{fig:prob-zoom} retain the original conditional calculation as an explicit diagnostic. This presentation change does not substitute a newly calibrated significance or select a more favorable statistical test.
+
+\subsection*{What ``common-background Gaussian local'' actually means}
+For each year, choose one complete generating background spectrum $B_d$. Use that same spectrum at every tested mass; different years retain their different spectra. The entire moving-mask training and signal fit is then applied to it. The fitted root at a mass can have a nonzero reference value $a_m=r_m(B)$, even though the generating spectrum has no added signal. Perturbing its bins gives a response width $s_m$ and correlations across masses.
+
+The Gaussian approximation concerns the resulting \emph{statistic}, $r_m^*\simeq a_m+s_m Z_m$, not a Gaussian-shaped invariant-mass background. At one mass, $Z_m$ has a standard-normal marginal. Across the scan, the $Z_m$ are correlated. The retained local rule is
+\[
+ p_{\rm ref}(m)=\begin{cases}
+ \overline\Phi\!\left[(r_m-a_m)/s_m\right],&r_m>0,\\
+ 1,&r_m\leq0.
+ \end{cases}
+\]
+The principal global rule compares this observed threshold with the largest standardized score over positive-root masses in a complete background experiment. Under a correct reference distribution, this is a conditional one-sided test. Its probability is not the chance that a particle exists. Its numerical value need not equal the nominal asymptotic $p_0$ in Figure~\ref{fig:main}.
+
+\subsection*{Why the plot jumped and why the 76 MeV tail looked extreme}
+There are 23 transitions between positive and nonpositive raw roots; 117 masses are assigned $p_{\rm ref}=1$ by the sign rule. At 75 MeV, $r=-0.666$ and the reference is $a=-10.831$: the standardized score is $10.38$, but the sign rule sets the probability to one. At 76 MeV, $r$ becomes slightly positive, $+0.166$, while $a=-8.700$ and $s=0.979$. The score is then $9.05$, giving the formal Gaussian tail $6.98\times10^{-20}$. The corresponding nominal local value is $0.4342$. The discontinuity is built into the declared sign rule plus the large moving reference offset; it is not evidence that the data suddenly acquire a large peak.
+
+The rule is retained and its gated points are marked. Smoothing this jump or removing the sign requirement would change the test. The former global curve also broke where the GP sample had zero exceedances (76 and 77 MeV), and it showed direct-toy checks at only six representative masses. The revised diagnostics show every mass, with zero counts represented by upper bounds and sparse positive counts by open symbols and intervals.
+\begin{table}[H]\centering\small
+\begin{tabular}{rrrrrrrr}\toprule
+Mass & $r$ & $a$ & $s$ & Nominal $p_0$ & Formal $p_{m ref}$ & GP global tails & Direct global\\\midrule
+21 & +2.516 & +0.204 & 0.956 & 0.0059 & 0.0078 & 93598/200000 & 479/1000\\
+66 & +2.760 & +8.987 & 0.980 & 0.0029 & 1.0000 & 200000/200000 & 1000/1000\\
+72 & -3.490 & -7.160 & 0.978 & 0.5000 & 1.0000 & 200000/200000 & 1000/1000\\
+75 & -0.666 & -10.831 & 0.979 & 0.5000 & 1.0000 & 200000/200000 & 1000/1000\\
+76 & +0.166 & -8.700 & 0.979 & 0.4342 & $6.98\times10^{-20}$ & 0/200000 & 0/1000\\
+78 & +1.529 & -1.839 & 0.980 & 0.0631 & $2.95\times10^{-4}$ & 6140/200000 & 26/1000\\
+92 & +2.416 & -2.999 & 0.984 & 0.0078 & $1.89\times10^{-8}$ & 2/200000 & 0/1000\\
+\bottomrule\end{tabular}
+\caption{An arithmetic audit, not a table of established particle significances. The formal column extrapolates a Gaussian marginal; global columns give actual exceedance counts for the conditional ordering. Nonpositive roots are gated to one. Counts and pointwise intervals for all 232 masses are in the probability ledger.}\end{table}
+
+\textbf{The defensible tail statement is limited by both the null model and validation.} Zero of 1,000 independent direct spectra gives a one-sided 95\% binomial upper bound of $0.00299$ under that generating model. Zero of 200,000 GP fields gives $1.50\times10^{-5}$ within the Gaussian approximation. Neither is a measured zero, and neither validates a $10^{-20}$ physical tail. At 92 MeV there are only two GP exceedances and no direct exceedance; the point estimate $10^{-5}$ has substantial Monte Carlo uncertainty. Agreement in the bulk or a satisfactory KS diagnostic cannot verify such far tails.
+
+\clearpage
+\fig{0.96}{../figures/probability_reference_full.pdf}{Complete conditional probability audit. Top: observed signed root and the background-reference offset; the shade is the response width, not an uncertainty band on the observed fit. Middle: the formal Gaussian local rule and direct local counts; crosses at one mark nonpositive roots. Bottom: global tails for the same reference-centered ordering using all 232 masses, with direct checks at every mass. Bars are pointwise central 95\% binomial intervals. Open symbols have fewer than 25 exceedances. Red or green downward triangles denote one-sided 95\% upper bounds after zero exceedances; blue triangles only indicate Gaussian local values below the $10^{-4}$ display floor. The two meanings are deliberately distinguished: no displayed floor is a measured probability. Correlation between mass points remains; intervals are not simultaneous.}{fig:prob-full}
+\clearpage
+\fig{0.96}{../figures/probability_reference_zoom.pdf}{Detail of the same frozen scan and probability rules, without refitting or resampling. At 76 MeV the observed fitted signal is near zero, while the reference spectrum produces a large negative root. Centering against it creates the extreme formal local tail. At 75 MeV the observed root is negative, so the sign rule instead assigns one. The global search still covers the full 19--250 MeV grid; restricting the display to 60--100 MeV does not restrict the trials factor. At 92 MeV, two GP exceedances are shown with their interval rather than as a precise resolved tail. Symbols and interval conventions match Fig.~\ref{fig:prob-full}.}{fig:prob-zoom}
+
+\clearpage
+\subsection*{Can the asymptotic profiled method support a final analysis?}
+Yes, profiling and asymptotic likelihood methods are defensible when their background model, constraints and sampling approximations are qualified~\cite{cowan}. This implementation has not established those conditions for a final discovery probability. The nominal curve assumes an appropriately centered, unit-width root under a suitable background null. The large offsets in the current reference construction show that this assumption does not hold for that construction. Subtracting those offsets answers a different conditional question; it does not, by itself, establish the appropriate physical null. Existing source-fit, 2016 numerical and development-sample qualifications still apply.
+
+The GP trials-factor method~\cite{ananiev} efficiently describes correlations of a suitably modeled significance field. Here it has been extended to retain nonzero offsets and measured response widths. It accelerates a declared probability calculation; it does not decide whether the chosen background is an adequate physical description. The very small conditional tails should be presented as tension with that reference, with explicit approximation and sampling limits, rather than as evidence for a particle. The separate raw-maximum test has tail estimate one for the observed maximum in both stored ensembles because the reference itself produces large positive roots elsewhere. This is another diagnostic of the reference and ordering, not a favorable global correction to choose in place of the first test.
+
+The upper limits and apparent calibration changes should be judged separately. A weaker \emph{observed} calibrated limit is not evidence for a loss of expected sensitivity. Expected sensitivity requires the relevant ensembles under qualified backgrounds, while coverage requires signal-plus-background hypotheses. Neither display rebinning nor the GP look-elsewhere calculation supplies that missing qualification.
