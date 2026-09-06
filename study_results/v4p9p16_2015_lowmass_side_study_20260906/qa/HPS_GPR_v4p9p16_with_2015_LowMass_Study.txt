@@ -1,0 +1,1385 @@
+HPS Gaussian-Process Resonance Search
+Combined Global Search and Observed Limits
+Analysis note v4.9.16: signal extractions and staged exposure checks
+Emrys Peets
+6 September 2026
+Scope of the result. Full 2015 and 2016 data, plus native 2021 10%, are combined over 19–250 MeV.
+The upper limits are pointwise, asymptotic 90% CL s limits. The GP calculation estimates scan-wide
+probabilities under one archived joint stress background. It does not establish a final discovery significance
+or calibrate confidence-interval coverage.
+1 What the combined calculation adds
+At each mass, the datasets that cover that mass share one possible particle coupling. Their information is
+combined in a single likelihood. Membership follows the established ranges; the analysis does not choose
+whichever dataset gives the strongest-looking result.
+The upper curve limits the allowed particle contribution at each mass. The probability curves below
+it ask how often the chosen background would produce something this unusual somewhere in the entire
+search. The look-elsewhere calculation changes those probabilities and does not automatically rescale
+the upper limits. The principal profiled scan has no exceedance in 1,000 direct joint experiments. Its
+conditional probability is unresolved; the one-sided 95% upper bound is 0.003. The Gaussian field also
+has no sampled exceedance. An extreme stress-centered score is not an established particle significance.
+Statistic Mass [MeV] Local p GP global p Direct count
+Profiled 76 6.98 × 10−20 <1.50 × 10−5 0/1000
+Fixed 76 3.67 × 10−13 <1.50 × 10−5 0/1000
+Table 1: Principal minimum-local-p ordering under the common stress background. Less-than signs are one-sided
+95% Monte Carlo upper bounds, not measured zero probabilities. Fixed-background results are a separate diagnostic
+method.
+Mass [MeV] Active data
+19–38 2015 full
+39–49 2015 full + 2016 full
+50–90 2015 full + 2016 full + 2021 10%
+91–180 2016 full + 2021 10%
+181–250 2021 10%
+Table 2: The complete search uses 1 MeV spacing and established dataset ranges.
+1
+2 Full combined search
+Active
+data 2015 2015
++2016 All three 2016 + 2021 2021
+10−6
+10−5
+90% CLs upper limit on ε2
+Pointwise observed limit: asymptotic CLs
+v4.9.12 reference
+Observed, dense profiled likelihood
+Dimuon threshold 2mμ
+10−8
+10−6
+10−4
+10−2
+100
+Local tail probability
+Local probabilities from the combined likelihood
+Asymptotic local (dense fit)
+Common-background Gaussian local
+50 100 150 200 250
+Mass hypothesis mA0 [MeV]
+10−6
+10−5
+10−4
+10−3
+10−2
+10−1
+100
+Union-global tail probability
+Look-elsewhere correction over all 232 masses
+GP global: minimum-local-p ordering
+GP global: separate raw-peak ordering
+Zero tails: one-sided 95% upper bounds
+Direct: minimum-local-p, 95% intervals
+Combined HPS search over the full mass region
+2015 full + 2016 full + 2021 10%  |  19–250 MeV  |  1 MeV grid
+Global probabilities condition on one archived joint stress background.
+Figure 1: The complete 232-point search: the profiled observed upper limit above local and global probabilities. The
+activity strip fixes which data enter each mass. The upper curve includes the visible branching correction once above
+the dimuon threshold. Lower panels condition on one common joint stress background. Gray local probabilities use
+the dense observed root and the asymptotic convention; the Gaussian-response local rule assigns one to nonpositive
+raw roots. Local triangles mark values below the 10−8 display floor. Global triangles are one-sided 95% Monte
+Carlo upper bounds for zero simulated tails, separated from probability estimates. Green points check the principal
+ordering; their error bars are central 95% intervals. The two global orderings are different tests. Expected-limit
+bands are not shown.
+2
+3 Illustrative scan of deficits
+A negative auxiliary signal amplitude describes missing events with the signal-template shape; it is not a
+physical negative rate or coupling. This figure mirrors the excess scan without changing its fits or limits.
+Active
+data 2015 2015
++2016 All three 2016 + 2021 2021
+−10
+−5
+0
+5
+10
+Signed root r
+Negative fitted signals and the background offset
+Observed signed root
+Stress-background Asimov offset
+10−8
+10−5
+10−2
+Local deficit
+probability
+Local deficit tails: only negative raw fits are eligible
+Raw-root reference: N(0, 1)
+Stress-centered Gaussian deficit
+50 100 150 200 250
+Mass hypothesis mA0 [MeV]
+10−6
+10−4
+10−2
+100
+Global deficit
+probability
+Deficit maxima over the complete 232-point scan
+GP global: centered deficit
+GP global: separate raw-depth ordering
+Zero tails: one-sided 95% upper bounds
+Direct centered deficit: 95% intervals
+Combined deficit scan: an illustrative check
+2015 full + 2016 full + 2021 10%  |  19–250 MeV  |  Profiled likelihood
+Conditional stress background; direction-specific tests after the excess scan.
+Figure 2: Profiled deficit scan. Top: observed signed roots and the stress-background offset; shading marks negative
+fitted contributions. Middle: raw-root Gaussian reference and conditional Gaussian-response tails. Both assign
+one to nonnegative raw roots. Local triangles mark the 10−8 display floor. Bottom: two separate global orderings;
+triangles mark one-sided 95% zero-count bounds. Direct error bars are central 95% intervals.
+For z = ( r − a)/s, the conditional local rule is p− = Φ( z) when r < 0, and one otherwise. The
+principal scan score is T − = max m:rm<0(−zm), with −∞ for an empty set. The separate raw-depth
+statistic is D− = max m max(0, −rm).
+The deepest raw profiled deficit is at 72 MeV, with r = −3.490 and an uncalibrated local reference of
+2.41 × 10−4. The largest stress-centered deficit instead occurs at 83 MeV: r = −0.676, a = +7 .707 and
+s = 0 .983. Its raw reference is 0.2495, whereas the conditional local value is 7.18 × 10−18. This contrast
+again comes mainly from the stress offset.
+The latter threshold has 0/200,000 GP and 0/1,000 direct exceedances. The one-sided 95% global
+upper bounds are 1.50 × 10−5 and 0.003, respectively. Every simulated raw-depth maximum exceeds the
+observed deficit. These are the same realizations used for the excess scan; no new fits or independent toys
+were needed.
+These illustrative tails follow the excess scan and do not adjust for choosing directions, methods or
+orderings. The unresolved tails establish neither a particle signal nor physical background validity.
+3
+4 Selected signal extractions and staged exposure checks
+What the displays establish. The largest observed combined excess is at 66 MeV. All three years
+prefer a positive fitted signal there, although each estimate has substantial uncertainty. The next peak in
+the complete search is 21 MeV, where only 2015 contributes. The next leading peak covered by several
+datasets is 92 MeV, where 2016 and 2021 prefer noticeably different rates. These are useful locations for
+follow-up; the selected plots alone do not establish a particle or a failure of the background model.
+The strongest raw combined deficit is at 72 MeV. Showing it alongside the excesses matters: a back-
+ground interpolation error can produce both positive and negative residuals, while a positive narrow
+signal does not by itself explain a nearby missing-event feature. Statistical fluctuations can also produce
+such patterns. An independent data increment and predictive background checks can distinguish these
+possibilities more directly than enlarging a selected peak display.
+Which locations are shown
+Selection uses the dense observed profiled signed root, whose ordering matches its one-sided asymptotic
+local reference on the positive branch. Select positive local maxima, ordered by decreasing root, with a
+separation greater than 2.25 times the larger resolution at the two coordinates. For the combined rule use
+the largest active resolution. Endpoints remain eligible and are identified. The stress-centered ordering is
+discussed separately; it does not choose the leading extraction panels.
+Data First excess Second excess Deepest deficit
+2015 full 51 (+3.14) 21 (+2.52) 19 (-3.21)
+2016 full 90 (+3.42) 117 (+3.28) 102 (-4.50)
+2021 10% 78 (+2.81) 65 (+2.40) 71 (-4.02)
+Full combined union 66 (+2.76) 21 (+2.52) 72 (-3.49)
+Table 3: Selected mass in MeV, followed by the signed root in parentheses. These are selected local fit summaries,
+not global significances. The 19 MeV deficit is the 2015 search endpoint. The additional combined 92 MeV display
+has r = +2.42 and uses 2016 plus 2021.
+How to read the figures
+The top row shows event counts, the GP mean before profiling, the background fitted together with the
+signal, and their sum. The lower row subtracts that fitted background and overlays the fitted signal. Black
+bars show counting uncertainty only. The gray envelope is a zero-centered width guide from the original
+correlated GP constraint, projected into the display bins. It does not depict that constraint’s center, an
+error band on the fitted background, or the full residual covariance. These residuals are not independent
+significance measurements.
+Display bins are whole original bins grouped to approximately half the mass resolution, with a fixed
+histogram-edge origin. The likelihood retains every native fit bin. Multi-year sums use a common 1.25
+MeV grid restricted to the overlap of the fitted windows. Each year keeps its own resolution, acceptance
+and count-to-coupling conversion in the likelihood. No fitted curve is extended outside its fit window.
+4
+The leading combined excess: 66 MeV
+50
+75
+100
+125
+150Events / bin [103]
+2015 full
+60 63 66 69 72
+mee [MeV]
+−1.0
+−0.5
+0.0
+0.5
+1.0
+Data − fitted B
+[103 events / bin]
+1.75 MeV bins
+σm = 3.42 MeV
+1600
+1650
+1700
+1750Events / bin [103]
+2016 full
+60.0 62.5 65.0 67.5 70.0
+mee [MeV]
+−5.0
+−2.5
+0.0
+2.5
+5.0
+Data − fitted B
+[103 events / bin]
+1.25 MeV bins
+σm = 2.70 MeV
+1800
+1950
+2100Events / bin [103]
+2021 10%
+62.5 65.0 67.5 70.0
+mee [MeV]
+−4
+0
+4
+Data − fitted B
+[103 events / bin]
+1.25 MeV bins
+σm = 2.13 MeV
+3600
+3680
+3760
+3840Events / bin [103]
+Combined display sum
+62.5 65.0 67.5 70.0
+mee [MeV]
+−10
+−5
+0
+5
+10
+Data − fitted B
+[103 events / bin]
+1.25 MeV bins
+Leading combined observed excess: 66 MeV
+Common-amplitude profile fit  |  signed root r = +2.76  |  fitted amplitude = +4.55 × 10⁻⁶
+All panels use the same fitted amplitude. The summed panel uses only common whole bins; the likelihood uses the complete native windows.
+Bars: counting error only. Gray shading: zero-centered GP constraint width; not fitted-background error or total residual uncertainty.
+Observed data
+GP mean before profiling
+Background fitted with signal
+S+B (top); fitted S (bottom)
+GP constraint SD (width guide)
+Figure 3: The 66 MeV common-amplitude fit, shown separately for each year and as a display sum. The shared signed amplitude is bϵ2 = 4 .55 × 10−6 and
+r = 2.76. Every panel uses the same amplitude, with the appropriate year-specific yield and resolution. Summed panels omit boundary pieces; the likelihood
+root and quoted fitted yields use the full native windows.
+5
+A second location with multiple datasets: 92 MeV
+1000
+1200
+1400
+1600Events / bin [103]
+2016 full
+84 88 92 96 100
+mee [MeV]
+−5.0
+−2.5
+0.0
+2.5
+5.0
+Data − fitted B
+[103 events / bin]
+2 MeV bins
+σm = 3.79 MeV
+1980
+2040
+2100
+2160Events / bin [103]
+2021 10%
+87.5 90.0 92.5 95.0
+mee [MeV]
+−6
+−3
+0
+3
+6
+Data − fitted B
+[103 events / bin]
+1.25 MeV bins
+σm = 2.45 MeV
+2700
+2850
+3000
+3150Events / bin [103]
+Combined display sum
+87.5 90.0 92.5 95.0
+mee [MeV]
+−8
+−4
+0
+4
+8
+Data − fitted B
+[103 events / bin]
+1.25 MeV bins
+Second leading peak with multiple datasets: 92 MeV
+Common-amplitude profile fit  |  signed root r = +2.42  |  fitted amplitude = +2.97 × 10⁻⁶
+All panels use the same fitted amplitude. The summed panel uses only common whole bins; the likelihood uses the complete native windows.
+Bars: counting error only. Gray shading: zero-centered GP constraint width; not fitted-background error or total residual uncertainty.
+Observed data
+GP mean before profiling
+Background fitted with signal
+S+B (top); fitted S (bottom)
+GP constraint SD (width guide)
+Figure 4: The 92 MeV fit uses 2016 and 2021. The common amplitude is bϵ2 = 2.97 × 10−6 and r = 2.42. Both separate fits are positive, but their preferred
+rates differ (Fig. 10). A persistence illustration at this common rate is a testable assumption.
+6
+The deepest combined observed deficit: 72 MeV
+15
+30
+45
+60
+75Events / bin [103]
+2015 full
+68 72 76 80
+mee [MeV]
+−1.0
+−0.5
+0.0
+0.5
+1.0
+Data − fitted B
+[103 events / bin]
+1.75 MeV bins
+σm = 3.74 MeV
+1700
+1800
+1900
+2000Events / bin [103]
+2016 full
+67.5 70.0 72.5 75.0 77.5
+mee [MeV]
+−8
+−4
+0
+4
+8
+Data − fitted B
+[103 events / bin]
+1.5 MeV bins
+σm = 2.94 MeV
+2150
+2200
+2250
+2300Events / bin [103]
+2021 10%
+68 70 72 74 76
+mee [MeV]
+−4
+0
+4
+Data − fitted B
+[103 events / bin]
+1.25 MeV bins
+σm = 2.19 MeV
+3775
+3800
+3825
+3850Events / bin [103]
+Combined display sum
+68 70 72 74 76
+mee [MeV]
+−10
+−5
+0
+5
+10
+Data − fitted B
+[103 events / bin]
+1.25 MeV bins
+Deepest combined observed deficit: 72 MeV
+Common-amplitude profile fit  |  signed root r = -3.49  |  fitted amplitude = -4.88 × 10⁻⁶
+All panels use the same fitted amplitude. The summed panel uses only common whole bins; the likelihood uses the complete native windows.
+Bars: counting error only. Gray shading: zero-centered GP constraint width; not fitted-background error or total residual uncertainty.
+Observed data
+GP mean before profiling
+Background fitted with signal
+S+B (top); fitted S (bottom)
+GP constraint SD (width guide)
+Figure 5: The deepest raw combined deficit has r = −3.49 and a signed auxiliary amplitude bϵ2 = −4.88 × 10−6. All three separate amplitudes are negative,
+with 2021 providing the strongest individual contribution. Negative templates describe missing events relative to the fitted background, not a physical
+negative coupling.
+7
+Individual signal extractions: 2015 full
+The 51 MeV point is the largest observed profiled excess in 2015. The 21 MeV point is also the second
+leading peak of the full combined union, because 2015 is the only active dataset at this mass. It is only
+2 MeV above the search endpoint; the 19 MeV deficit in Fig. 9 makes boundary and background-shape
+controls particularly relevant. More 2021 data cannot test this 21 MeV location.
+160
+240
+320
+400Events / bin [103]
+51 MeV: r = +3.14
+47.5 50.0 52.5 55.0
+mee [MeV]
+−3.0
+−1.5
+0.0
+1.5
+3.0
+Data − fitted B
+[103 events / bin]
+1.25 MeV bins
+σm = 2.62 MeV
+160
+200
+240
+280Events / bin [103]
+21 MeV: r = +2.52
+19 20 21 22 23
+mee [MeV]
+−1.5
+0.0
+1.5
+Data − fitted B
+[103 events / bin]
+0.5 MeV bins
+σm = 1.03 MeV
+2015 full: two leading observed excesses
+Separate single-dataset fits  |  observed-profiled ranking  |  display bins ≈ half the mass resolution
+Selected after scanning. Local signed roots describe the fitted templates; these panels do not establish a global particle significance.
+Bars: counting error only. Gray shading: zero-centered GP constraint width; not fitted-background error or total residual uncertainty.
+Observed data
+GP mean before profiling
+Background fitted with signal
+S+B (top); fitted S (bottom)
+GP constraint SD (width guide)
+Figure 6: The two leading separated observed profiled excesses in 2015 full. Each panel is an independent single-
+dataset fit. Binning is chosen from the resolution and original histogram origin, not from the observed residual
+shape.
+The lower panels are background-subtracted displays conditioned on the fitted template. A visible
+peak here should be assessed together with the background constraint, the fitted amplitude uncertainty,
+the scan selection and independent-data checks.
+8
+Individual signal extractions: 2016 full
+The two leading individual 2016 peaks are at 90 and 117 MeV. Their positions differ from the leading
+combined mass because a common coupling also has to describe the other active dataset contributions.
+These panels retain the inherited 2016 source-fit waiver, development overlap and numerical qualifications;
+cleaner presentation does not resolve them.
+1000
+1200
+1400
+1600Events / bin [103]
+90 MeV: r = +3.42
+84 88 92 96
+mee [MeV]
+−6
+−3
+0
+3
+6
+Data − fitted B
+[103 events / bin]
+1.75 MeV bins
+σm = 3.70 MeV
+300
+450
+600
+750Events / bin [103]
+117 MeV: r = +3.28
+110 115 120 125
+mee [MeV]
+−4
+−2
+0
+2
+4
+Data − fitted B
+[103 events / bin]
+2.5 MeV bins
+σm = 4.99 MeV
+2016 full: two leading observed excesses
+Separate single-dataset fits  |  observed-profiled ranking  |  display bins ≈ half the mass resolution
+Selected after scanning. Local signed roots describe the fitted templates; these panels do not establish a global particle significance.
+Bars: counting error only. Gray shading: zero-centered GP constraint width; not fitted-background error or total residual uncertainty.
+Observed data
+GP mean before profiling
+Background fitted with signal
+S+B (top); fitted S (bottom)
+GP constraint SD (width guide)
+Figure 7: The two leading separated observed profiled excesses in 2016 full. Each panel is an independent single-
+dataset fit. Binning is chosen from the resolution and original histogram origin, not from the observed residual
+shape.
+The lower panels are background-subtracted displays conditioned on the fitted template. A visible
+peak here should be assessed together with the background constraint, the fitted amplitude uncertainty,
+the scan selection and independent-data checks.
+9
+Individual signal extractions: 2021 10%
+The released 2021 sample has leading individual peaks at 78 and 65 MeV. These are near, but not
+interchangeable with, the combined coordinates. Changing the mass or window after seeing a new sample
+would create another selection. Freeze these individual locations as a declared secondary family if they
+are followed at the 30% checkpoint.
+2288
+2296
+2304
+2312
+2320Events / bin [103]
+78 MeV: r = +2.81
+74 76 78 80 82
+mee [MeV]
+−8
+−4
+0
+4
+8
+Data − fitted B
+[103 events / bin]
+1.25 MeV bins
+σm = 2.26 MeV
+1800
+1950
+2100Events / bin [103]
+65 MeV: r = +2.40
+62 64 66 68
+mee [MeV]
+−8
+−4
+0
+4
+8
+Data − fitted B
+[103 events / bin]
+1.25 MeV bins
+σm = 2.12 MeV
+2021 10%: two leading observed excesses
+Separate single-dataset fits  |  observed-profiled ranking  |  display bins ≈ half the mass resolution
+Selected after scanning. Local signed roots describe the fitted templates; these panels do not establish a global particle significance.
+Bars: counting error only. Gray shading: zero-centered GP constraint width; not fitted-background error or total residual uncertainty.
+Observed data
+GP mean before profiling
+Background fitted with signal
+S+B (top); fitted S (bottom)
+GP constraint SD (width guide)
+Figure 8: The two leading separated observed profiled excesses in 2021 10%. Each panel is an independent single-
+dataset fit. Binning is chosen from the resolution and original histogram origin, not from the observed residual
+shape.
+The lower panels are background-subtracted displays conditioned on the fitted template. A visible
+peak here should be assessed together with the background constraint, the fitted amplitude uncertainty,
+the scan selection and independent-data checks.
+10
+Individual deficits as a background diagnostic
+80
+120
+160
+200Events / bin [103]
+2015 full: 19 MeV, r = -3.21 (endpoint)
+17 18 19 20 21
+mee [MeV]
+−3.0
+−1.5
+0.0
+1.5
+3.0
+Data − fitted B
+[103 events / bin]
+0.5 MeV bins
+σm = 0.92 MeV
+600
+800
+1000
+1200Events / bin [103]
+2016 full: 102 MeV, r = -4.50
+96 100 104 108
+mee [MeV]
+−6
+−3
+0
+3
+6
+Data − fitted B
+[103 events / bin]
+2.25 MeV bins
+σm = 4.25 MeV
+2100
+2160
+2220
+2280Events / bin [103]
+2021 10%: 71 MeV, r = -4.02
+67.5 70.0 72.5 75.0
+mee [MeV]
+−8
+−4
+0
+4
+8
+Data − fitted B
+[103 events / bin]
+1.25 MeV bins
+σm = 2.18 MeV
+Deepest observed deficit in each dataset
+Independent fitted amplitudes  |  same profile construction and resolution-based binning
+The negative signal template is an auxiliary diagnostic of missing events; it is not a physical negative event rate.
+Bars: counting error only. Gray shading: zero-centered GP constraint width; not fitted-background error or total residual uncertainty.
+Observed data
+GP mean before profiling
+Background fitted with signal
+S+B (top); fitted S (bottom)
+GP constraint SD (width guide)
+Figure 9: Deepest observed negative roots in 2015, 2016 and 2021. The 2015 point lies at the scan endpoint. The 2016 and 2021 minima are at 102 and 71
+MeV, respectively. The negative branch provides a diagnostic with the same narrow template; no physical negative signal rate or calibrated deficit discovery
+is inferred.
+11
+Do separate years support the same rate?
+0 10 20 30
+Signed fitted amplitude [10−6]
+2015 full
+2016 full
+2021 10%
+66 MeV
+ΔD = 2.84 for 2 constraints
+0 4 8 12
+Signed fitted amplitude [10−6]
+2016 full
+2021 10%
+92 MeV
+ΔD = 5.36 for 1 constraint
+−24 −16 −8 0
+Signed fitted amplitude [10−6]
+2015 full
+2016 full
+2021 10%
+72 MeV
+ΔD = 0.71 for 2 constraints
+−20 −10 0 10
+Signed fitted amplitude [10−6]
+2015 full
+2016 full
+2021 10%
+76 MeV
+ΔD = 9.40 for 2 constraints
+Do the years prefer a compatible signal rate?
+Points: separate profiled fits  |  Red line and shading: shared-amplitude fit ± local curvature SD
+At 66 MeV all three fitted amplitudes are positive. At 92 MeV the preferred rates differ; at 76 MeV the years pull in opposite directions.
+ΔD compares independent amplitudes with one shared amplitude at a selected mass. No post-selection or global compatibility probability is claimed.
+Figure 10: Independent signed amplitude estimates and local curvature standard errors, compared with the common fit. Define ∆D = 2[NLL common −P
+d NLLd,free]. The number of additional amplitude parameters is one fewer than the number of datasets. These masses were selected from the data, so the
+displayed likelihood losses are conditional descriptive comparisons; no post-selection compatibility probabilities are quoted.
+12
+Why the most extreme stress-centered tail need not look like a peak
+The stress-background centering changes the reference distribution of the statistic; it does not change
+the observed fitted signal. At 76 MeV the combined raw root is only +0.166, but the generating stress
+construction has Asimov root a = −8.700 and response width s = 0.979. Subtracting this large negative
+offset produces a standardized value of 9.05. At 83 MeV the observed raw root is −0.676, with a = +7.707
+and s = 0.983, giving a standardized deficit depth of 8.53.
+The very small conditional tails therefore ask about departure from those particular stress construc-
+tions. They do not mean that the data contain a correspondingly large positive or negative fitted signal.
+At 76 MeV, 2016 prefers a negative amplitude while 2021 prefers a positive one. The common-versus-
+independent likelihood loss is ∆D = 9.40 for two additional amplitudes. This provides another reason to
+avoid presenting the stress-centered tail as a coherent resonance.
+3600
+3680
+3760
+3840Events / bin [103]
+76 MeV: observed r = +0.17
+72.5 75.0 77.5 80.0
+mee [MeV]
+−8
+−4
+0
+4
+8
+Data − fitted B
+[103 events / bin]
+1.25 MeV bins
+3150
+3300
+3450
+3600Events / bin [103]
+83 MeV: observed r = −0.68
+80.0 82.5 85.0 87.5
+mee [MeV]
+−6
+−3
+0
+3
+6
+Data − fitted B
+[103 events / bin]
+1.25 MeV bins
+Extreme stress-centered tails can have small fitted signals
+76 MeV: stress offset a = −8.70  |  83 MeV: stress offset a = +7.71
+Centering changes the probability assigned to a fit. It does not turn the small red template into a larger fitted signal.
+Bars: counting error only. Gray shading: zero-centered GP constraint width; not fitted-background error or total residual uncertainty.
+Observed data
+GP mean before profiling
+Background fitted with signal
+S+B (top); fitted S (bottom)
+GP constraint SD (width guide)
+Figure 11: Common-window sums at the two principal stress-centered extrema. The small fitted signal templates
+are consistent with their small raw roots. Large stress offsets cause the extreme centered-tail interpretation. These
+sums have no independent fit.
+The asymptotic profiled method is not invalid merely because calibration changes a probability or an
+observed limit. Its use in a final analysis requires qualification of the background family, the prediction
+uncertainty, signal response and the relevant sampling distributions. The present displays do not measure
+expected sensitivity. A weaker calibrated observed limit can reflect a correction to background behavior
+rather than information being removed from the data.
+13
+A 30% checkpoint before the full 2021 sample
+Use the released 10% to define the hypotheses. Treat an additional, disjoint 20% as the next independent
+test of those fixed locations and rates. Only then inspect the cumulative 30% combination. This is more
+informative than a cumulative display alone, because the latter still contains the fluctuation that selected
+the peak. The same original-event membership and processing must be documented for every increment.
+Let N10 be the observed first sample, B10 its background fitted in the selected common-amplitude
+model, and S10 the signal template at that fitted rate. Figure 12 compares two illustrative conditional
+means for a total exposure f times the original 10%:
+background only in added data: N10 + (f − 1)B10,
+selected rate persists: N10 + (f − 1)(B10 + S10).
+The independent additional 20% has means 2B10 or 2(B10 + S10). For the conditional cumulative 30%
+and 100% views the background-only counting variances from the future sample are 2B10 and 9B10,
+respectively. The observed first 10% is held fixed. These figures are mean scenarios, not new observations,
+toy experiments or discovery projections. They omit uncertainty in the assumed background and selected
+signal rate. The 92 MeV common-rate assumption is less consistent with the individual estimates than
+the 66 MeV assumption.
+Mass [MeV] 10% new 20% 30% total 100% total
+66 14.6 29.2 43.7 145.8
+92 13.6 27.2 40.9 136.2
+Table 4: Illustrative mean signal yields in thousands of events in the complete 2021 fitted window if the selected
+common-fit rate persists. These are template yields, not the raw total counts or measured future yields. Display
+sums may omit boundary pieces.
+A statistics-dominated precision reference can be computed without toys. With the original per-year
+signal yield vector ud, GP constraint covariance Cd and GP mean bd, define
+Id = uT
+d [diag(bd) + Cd]−1ud, I (f ) = I2015 + I2016 + f I2021.
+An absent dataset has Id = 0 . This local background-Asimov reference follows the usual information-
+scaling argument [ 2] and assumes that the entire 2021 count covariance scales as f , with unchanged
+acceptance and resolution. Fractional systematic effects or background bias need not improve this way.
+The factor
+p
+I(f )/I(1) below is a precision illustration, not a multiplier for the observed combined root
+or a forecast global significance.
+Mass [MeV] Current 2021 information share 30% gain 100% gain
+66 55.3% 1.45 2.44
+92 82.4% 1.63 2.90
+Table 5: Combined precision gain with 2015 and 2016 held fixed, under the stated covariance-scaling assumption.
+For 2021 alone the corresponding factors would be
+√
+3 and
+√
+10. There is no 2021 gain at 21 MeV.
+14
+Conditional exposure displays: 10%, new 20%, 30%, 100%
+63 66 69
+mee [MeV]
+0.0
+2.5
+5.0
+66 MeV hypothesis
+Residual / bin [103 events]
+ Observed 10%
+63 66 69
+mee [MeV]
+−2.5
+0.0
+2.5
+5.0
+Mean residual [103]
+Independent new sample
+Additional 20% only
+63 66 69
+mee [MeV]
+0
+4
+8
+12Mean residual [103]
+Includes observed 10%
+Cumulative 30%
+63 66 69
+mee [MeV]
+0
+15
+30Mean residual [103]
+Includes observed 10%
+Cumulative 100%
+90 93 96
+mee [MeV]
+−2.5
+0.0
+2.5
+5.0
+92 MeV hypothesis
+Residual / bin [103 events]
+90 93 96
+mee [MeV]
+0.0
+2.5
+5.0Mean residual [103]
+Independent new sample
+90 93 96
+mee [MeV]
+0
+4
+8Mean residual [103]
+Includes observed 10%
+90 93 96
+mee [MeV]
+0
+10
+20Mean residual [103]
+Includes observed 10%
+A 30% checkpoint before opening the full 2021 sample
+Illustrative persistence of the selected common-fit rate at 66 and 92 MeV  |  2015 and 2016 stay fixed
+Future panels are conditional expectations. Cumulative panels retain the actual first 10%; y-axis ranges differ to show the change in event yield.
+The 92 MeV rates differ between years. These selected-rate examples omit background-model uncertainty; future data and global significances are not supplied.
+Observed 10% residual
+Selected rate persists (mean)
+Only background in added data (mean)
+Added-sample background counting SD
+Figure 12: Background-subtracted 2021 views at fixed 66 and 92 MeV hypotheses. Only the first column contains observed points. Future curves keep the
+first sample fixed where included and add the mean of either hypothesis. Gray envelopes show only the background counting standard deviation of the added
+sample. They exclude fitted-background uncertainty and do not imply independent residual bins after a future refit. The vertical scales differ.
+15
+What would make the next comparison decisive?
+First, define a disjoint additional 20% with the same selection, calibrations, mass resolution and nor-
+malization convention. Freeze the 66 and 92 MeV primary locations, and state in advance whether the
+individual 2021 locations at 65 and 78 MeV and the 71/72 MeV deficit checks are a secondary family. Do
+not reselect the mass from the new spectrum when reporting the fixed-location validation.
+Fit the additional 20% on its own before combining it with the old 10% or the 2015/2016 samples.
+Compare its fitted rate, width behavior and background residuals with the stored predictions. A stable
+signal should reproduce a compatible rate, not merely increase the height of a cumulative display. Rate
+agreement alone would still leave detector effects or common background structure to investigate.
+Use predeclared sideband and predictive checks to test the background interpolation and relevant
+detector/selection effects, including both positive and negative residuals. The 2016 background-source
+transition and existing numerical/source qualifications remain part of that work. Model choices must not
+be selected by whichever one makes the observed peak more impressive.
+The 30% and 100% cumulative looks share events. Before treating either as a formal discovery or
+exclusion result, declare the family of mass, direction and exposure tests and the treatment of sequential
+looks. Rebuild the appropriate signal and background sampling distributions for the new exposure and
+background family. The existing GP global-tail bank describes the current released sample and cannot
+calibrate a different exposure.
+For an eﬀicient follow-on calculation, begin with ten complete pilot spectra per declared generating
+hypothesis, retaining each same full spectrum throughout its mass scan. Use new deterministic seed
+namespaces and nonoverlapping toy IDs. Time the pilot, test exact-fit and approximation closure, then
+scale in restartable batches only if the validated cost is acceptable. Background-only scans address global
+discovery tails; calibrated limits additionally require signal-plus-background hypotheses. No new toys
+were necessary for the present extraction and mean-scenario displays.
+16
+Display and reconstruction checks
+Fifteen selected likelihoods were reconstructed with the archived dense solver and exact prediction hashes.
+There are 24 dataset components. Every background-plus-signal vector closes to the original fitted expec-
+tation; all expected Poisson counts stay positive. Every grouping matrix contains only zero or one, with
+no fractional reassignment or reused bin within a panel. The quoted roots and upper endpoints reproduce
+the frozen dense scan; display grouping never changes a fit.
+Mass [MeV] Dataset Counts retained in sum Signal template retained
+66 2015 60.1% 87.7%
+66 2016 83.6% 96.1%
+66 2021 100.0% 100.0%
+92 2016 57.8% 83.3%
+92 2021 93.8% 98.8%
+72 2015 48.0% 77.3%
+72 2016 68.0% 88.4%
+72 2021 93.1% 98.3%
+Table 6: Common-window summed-display retention relative to the complete native fitted window of each year.
+The full likelihood, amplitude estimates and total-window yield tables use all fit bins. Individual panels have their
+own resolution-based grouping.
+The reusable PDF and PNG figures, native and rebinned arrays, exact grouping maps, exposure tables,
+build scripts and independent HEP audit are retained in
+study_results/v4p9p16_presentation_extractions_20260906/
+The prior studies were committed, pushed and merged in PR 67; all 4,778 published file blobs were verified
+on the merged branch. This presentation extension has a separate artifact manifest. The original study
+inputs and outputs remain frozen.
+17
+5 One shared-coupling likelihood
+Let D(m) be the predeclared active dataset set. The model combines Poisson bins and independent
+Gaussian background constraints:
+Lm(ϵ2, θ) =
+Y
+d∈D(m)
+Y
+i∈Wd(m)
+Pois
+ 
+ndi
+ bdi + (Ldθd)i + ϵ2Sdi(m)
+ Y
+d∈D(m)
+e−θT
+d θd/2.
+Sdi = BR eeTdi is the visible yield per unit physical coupling, where Tdi is the stored unit-electron-branching
+template. The fitted coordinate is ϵ2
+eﬀ = ϵ2
+physBRee; the display restores ϵ2
+phys = ϵ2
+eﬀ /BRee. The implemen-
+tation rescales this coordinate into a total window amplitude. No independent signal strength is fitted in
+each year.
+An auxiliary unrestricted amplitude supplies the signed likelihood-ratio root,
+rm = sign( bAm)
+r
+2
+h
+NLLm(A = 0) − NLLm( bAm)
+i
+.
+Here NLLm(A) is the negative log likelihood minimized over the background nuisances at fixed A. Poisson
+expectations remain positive. Physical discovery and upper-limit tests retain the nonnegative signal
+boundary; the auxiliary negative branch is needed to model the signed field.
+Complete joint experiments
+Ten pilot and 1,000 separate validation spectra per year are reused from v4.9.14/v4.9.15. The year-specific
+random streams are distinct. Pairing equal row indices gives 1,000 joint experiments, not 3,000. Each
+experiment supplies exactly the same full spectrum at every mass in which its dataset participates.
+Kernels, templates, support and exclusion masks remain frozen. Every toy retrains its log-count back-
+ground prediction and count-dependent training errors. All multi-dataset intervals receive new common-
+amplitude fits. Only the single-dataset intervals reuse existing likelihood-root columns.
+The generating means are the archived smooth stress spectra. Event-level independence of the 2016
+development input from its full observed sample has not been established. Independence here describes
+the conditional toy model; omitted experimental systematic correlations have not been newly quantified.
+One response basis across boundaries
+Following Ananiev and Read [ 1], perturb each data bin by its Poisson standard deviation. This extension
+retains the nonzero offset and response width:
+am = rm(B), D im = rm(B +
+p
+Biei) − am, C = DTD, s m =
+p
+Cmm, K mn = Cmn
+smsn
+.
+The basis has 484, 720 and 422 bins from 2015, 2016 and 2021. An inactive dataset has exactly zero
+response at that mass. This retains correlations across boundaries that share data; separately sampled
+segment maxima are not joined.
+For each statistic, 200,000 vectors Z ∼ N (0, K) generate r∗
+m = am + smZm. The principal maximum is
+T = max m:r∗m>0 Zm (or −∞ for an empty set); the secondary maximum is R = max m max(0, r∗
+m). Their
+respective tails are compared with the independent joint Poisson scans.
+18
+6 Offsets and widths of the combined statistic
+−10
+−5
+0
+5
+10
+Mean signed root
+Profiled
+−20
+−10
+0
+10
+20
+Fixed
+50 100 150 200 250
+Mass [MeV]
+0.925
+0.950
+0.975
+1.000
+1.025
+1.050Standard deviation
+50 100 150 200 250
+Mass [MeV]
+2.0
+2.5
+3.0
+3.5
+Unfluctuated background
+1,000 joint toy means
+Asimov response width
+Joint toy spread
+Figure 13: Asimov-response predictions compared with 1,000 joint Poisson scans. Top panels show the offset in
+the signed root; bottom panels show its spread. Vertical lines mark membership changes. Agreement tests the
+approximation under the generating means, without establishing their physical validity.
+Statistic Standardized mean range Spread range Flags
+Profiled -0.079 to +0.076 0.957 to 1.074 0
+Fixed -0.093 to +0.080 0.943 to 1.050 0
+Table 7: Normality flags use a Holm adjustment across 232 masses within each method. Non-rejection has finite
+power and cannot certify extreme Gaussian tails.
+Centering, scaling and covariance come from deterministic bin perturbations. Validation scans do not
+tune them. Profiled and fixed-background statistics use identical spectra but can have different sampling
+widths.
+Large oscillating offsets can make an ordinary observed value unusual relative to a particular stress
+construction. A small probability can diagnose that construction without identifying a particle. The in-
+herited 2016 numerical exception, source-fit waiver, development overlap and 75–85 MeV source transition
+remain unresolved by this extension.
+19
+7 Correlations and the look-elsewhere check
+50 100 150 200 250
+Mass [MeV]
+50
+100
+150
+200
+250Mass [MeV]
+Profiled
+50 100 150 200 250
+Mass [MeV]
+50
+100
+150
+200
+250Mass [MeV]
+Fixed
+−1.00
+−0.75
+−0.50
+−0.25
+0.00
+0.25
+0.50
+0.75
+1.00
+Signed-root correlation
+Figure 14: Response correlations across the union grid. Dotted lines show membership changes. Shared datasets
+retain correlations across boundaries; regions with no common dataset have zero response covariance in this model.
+0 1 2 3 4 5
+Scan threshold
+10−5
+10−4
+10−3
+10−2
+10−1
+100
+Probability the union scan exceeds threshold
+Profiled
+0 1 2 3 4 5
+Scan threshold
+Fixed
+Direct: pointwise 95% interval
+200,000 GP fields
+1,000 joint Poisson scans
+One standard-normal point
+Figure 15: Principal scan-maximum tails. Direct-toy bands are pointwise central 95% binomial intervals, not
+expected-limit bands or simultaneous coverage bands. Triangles mark the upper endpoint of the central interval at
+the first unresolved direct tail. More GP draws reduce sampling error within the approximation, without replacing
+direct validation.
+Profiled: the maximum-distribution KS diagnostic gives nominal p=0.8625 for the principal ordering and
+0.6389 for the raw ordering. The correlation RMS difference is 0.031.
+Fixed: the maximum-distribution KS diagnostic gives nominal p=0.9974 for the principal ordering
+and 0.2034 for the raw ordering. The correlation RMS difference is 0.030.
+These diagnostics compare simulation methods, not the data significance. Two methods are checked
+per ordering. Direct Poisson counts calibrate the declared score under the generating spectrum without
+requiring a jointly Gaussian field; the GP estimate has that additional approximation.
+20
+8 Representative probabilities
+For positive raw roots, the principal local rule is pm = Φ[(rm − am)/sm]; otherwise pm = 1 . Its global
+curve counts how often any of the 232 masses reaches that local threshold. The separate raw ordering
+scans maxm max(0, rm). These tests cannot be selected according to which gives the smaller probability.
+Mass Active years Asymp. local GP local GP global Direct Raw global
+30 2015 0.1291 0.01 0.5479 543/1000 1
+65 2015+2016+2021 0.0052 1 1 1000/1000 1
+66 2015+2016+2021 0.0029 1 1 1000/1000 1
+76 2015+2016+2021 0.4342 6.98 × 10−20 <1.50 × 10−5 0/1000 1
+120 2016+2021 0.0795 0.0598 0.9813 975/1000 1
+220 2021 0.5 1 1 1000/1000 1
+Table 8: Profiled representative masses: the principal and raw extrema, plus 30, 65, 120 and 220 MeV. GP local
+uses the common-background Gaussian response. Both global columns use the full union at the threshold observed
+at that mass. Raw global is the separate raw-peak test.
+Statistic Mass Raw r Offset a Width s (r − a)/s
+Profiled 76 +0.166 -8.700 0.979 +9.053
+Fixed 76 +0.175 -15.348 2.164 +7.173
+Table 9: Principal peak decomposition. The final column is a conditional score, not an independently established
+discovery significance.
+At the profiled principal peak, the unadjusted asymptotic local probability is 0.4342, while centering
+and scaling against the stress background gives 6.98 × 10−20. The observed raw root is close to zero; the
+extreme centered score arises mainly because the stress background predicts a large negative root.
+At 74 and 75 MeV, the centered scores are 10.20 and 10.38, but the raw roots are negative. The
+declared boundary therefore assigns local p=1 there. The next positive raw root becomes the principal
+peak. This abrupt change comes from the signal boundary together with the stress offset; it is not a
+numerical sign flip.
+The raw maximum occurs at 66 MeV. All 200,000 GP fields and all 1,000 direct experiments exceed
+it. These differences reflect the specified orderings and background offsets; they are not a free choice of
+significance. The raw maximum tests positive peaks; it does not assess full-spectrum goodness of fit.
+Statistic Full 1 MeV grid First 2 MeV subgrid Second subgrid
+Profiled <1.50 × 10−5 <1.50 × 10−5 <1.50 × 10−5
+Fixed <1.50 × 10−5 <1.50 × 10−5 <1.50 × 10−5
+Table 10: GP probabilities at the same original peak threshold. Zero-count bounds do not establish fine-tail
+convergence.
+Subgrids remove alternate masses at the original observed threshold. They test finite-grid dependence,
+not convergence to a continuous search. Probabilities include neither a choice between methods nor
+uncounted searches over widths, kernels or other analysis choices.
+21
+9 Observed limits and the v4.9.12 comparison
+10−6
+10−5
+90% CLs upper limit on ε2
+v4.9.12 cached solver
+v4.9.16 dense solver
+50 100 150 200 250
+Mass [MeV]
+0
+1
+2Change from v4.9.12 [%]
+Figure 16: The pointwise upper-limit construction with the current dense and earlier cached solvers. The lower
+panel shows their relative difference. Both curves have the same membership and branching correction. Their
+difference is not a look-elsewhere adjustment or a sensitivity measurement.
+The largest absolute relative change from the corresponding v4.9.12 limit is 2.502%. The largest difference
+in the nonnegative discovery root is 0.0267. Fresh dense fits reproduce v4.9.13 dense references where the
+same scope exists. The old optimizer does not select a preferred answer. Above 211.317 MeV, displayed
+limits include 1 +
+q
+1 − 4m2µ/m2(1 + 2m2
+µ/m2) once; the CSV retains the electron-channel values.
+The upper limit inverts the bounded, piecewise-asymptotic CL s statistic at each mass [ 2]. The
+background-only joint scans test the discovery-score approximation. They do not supply the signal-
+plus-background distributions needed to calibrate the full CL s curve. A GP global probability is not
+a replacement CL s tail.
+The v4.9.13 study contains conditional calibrated individual limits and the common all-three interval.
+It has no calibrated pairwise endpoints over the remaining union. Splicing different calibrations would
+conceal a change of construction. A fully calibrated union limit requires additional declared signal-plus-
+background work; this note supplies the complete observed asymptotic curve.
+22
+10 Numerical checks, provenance and continuation
+All 2736 numerical and product-identity checks passed. There are 142 newly fitted joint coordinates and
+90 reused single-dataset coordinates. Summed coordinate execution took 24.1 minutes with one worker
+and one BLAS thread. The exact backend was retained at 1 new coordinates (41 MeV). The largest paired
+pilot-root difference is 2.10 × 10−5, the largest complete-response relative vector error is 4.73 × 10−6, and
+the largest sentinel-correlation error is 4.65×10−7. No paired pilot changed its raw-positive classification.
+Every new joint mass has ten paired exact pilot fits, an exact baseline and a fixed bin-response stencil.
+Complete exact responses are retained at 39, 49, 50, 90, 91 and 180 MeV. The accelerator must pass root,
+centered-response, width and correlation gates. Otherwise all ensembles at that coordinate use the exact
+backend. Failed exact references halt; no toy or hypothesis is removed.
+The v4.9.14 and v4.9.15 inputs are checked against their full frozen manifests. The v4.9.12 comparison
+table is checked against its specific frozen-manifest entry. The isolated derivative is
+study_results/v4p9p16_combined_global_20260906/
+It retains spectra, joint root vectors, limits, covariance, GP maxima, probability tables and per-mass
+audits. The independent HEP review is under review/. The original manifest remains unchanged. The
+deficit extension and this revised report have a separate manifest under
+study_results/v4p9p16_deficit_extension_20260906/
+The independent deficit audit passed 939 conditions.
+From the repository root, verify the completed numerical products with
+python3 -B \
+study_results/v4p9p16_combined_global_20260906/verify_combined.py
+Preserve the finished version before reanalysis or new generation. NEXT_STEPS.md gives resume commands,
+new-seed requirements and the additional work for calibrated limits.
+The next scientific priority is to qualify the joint background family with predeclared predictive controls.
+Direct tail precision, finer grids and signal injections answer separate questions. Additional GP sampling
+alone cannot establish physical background validity, expected sensitivity or interval coverage.
+23
+11 Exploratory 2015 search on the 15–20 MeV rising edge
+Result. This short-support study does not reveal a persuasive narrow excess in 15–20 MeV. The largest
+nominal-GP upward fluctuation is at 17.25 MeV. Releasing an active smoothness ceiling gives a stable
+fit with r = 1.58 and local asymptotic p0 = 0.057; the independently fitted polynomial background gives
+p0 = 0.254 there. These values are model-conditional, selected from a scan, and do not establish or exclude
+a heavy photon.
+Why a separate support is useful
+The released 2015 scan begins at 19 MeV, with GP training support 14–135 MeV. Its input histogram
+extends below that support. The spectrum contains 81 events in 12–13 MeV, 7,653 in 14–15 MeV and
+330,090 in 19–20 MeV. A local GP can isolate this turn-on without fitting the distant falling spectrum. It
+must still describe the steep background accurately across a missing signal window.
+10.0 12.5 15.0 17.5 20.0 22.5 25.0 27.5 30.0
+e + e −  invariant mass [MeV]
+100
+101
+102
+103
+104
+105
+Events / 0.25 MeV
+2015: a short support isolates the rising edge
+Short GP support: 12–28 MeV
+Requested search: 15–20 MeV
+Established scan starts at 19 MeV
+2015 full data: 0.25 MeV bins
+Figure 17: The same released full-2015 histogram, summed from 0.05 to 0.25 MeV bins. The chosen GP support is
+12–28 MeV; the requested search is 15–20 MeV. The dashed line marks the lower boundary of the established scan,
+not the lower boundary of the available counts.
+The new scan has 21 hypotheses, separated by 0.25 MeV. A labelled continuation to 22 MeV connects it
+to the previously selected 21 MeV point; that continuation is excluded from selection of the leading 15–20
+MeV feature. The comparison supports 12–26, 12–30 and 12.5–28 MeV were declared before examining
+the new signal fits. Their p-values do not select the nominal support.
+Detector boundary . The inherited Gaussian width is σm = −0.09223 + 0 .053219m MeV for m in
+MeV, giving about 0.71–0.97 MeV here. Below 19 MeV it is an extrapolated shape assumption. The
+published 2015 prompt search covered 19–81 MeV [ 3]. Low-mass signal eﬀiciency, acceptance and the
+selected signal shape need direct simulation and control checks before a physical coupling result can be
+quoted.
+24
+Local probabilities and dependence on the background
+The GP fits log counts versus log mass outside m ± 2.25σm. Its prediction and correlated count covari-
+ance constrain the background in an exact Poisson window likelihood. Both the signal amplitude and
+background nuisance coordinates are fitted; the auxiliary amplitude may be negative while every total
+expectation remains positive. We report
+r = sign( bA)
+q
+2[NLL(0) − NLL( bA)], p 0 = Φ(max(r, 0)) .
+Thus the asymptotic convention assigns p0 = 0 .5 to negative fits [ 2]. No GP estimate of a global trials
+factor is used in this section.
+−4
+−2
+0
+2
+4
+6
+Signed profile root r
+20–22 MeV:
+context only
+12–26, ceiling 8
+12–30, ceiling 8
+12.5–28, ceiling 8
+12–28, ceiling 8
+12–28, ceiling 16 (stable optimum)
+Local exp(Chebyshev-5)
+Frozen wide-support GP (integer masses)
+15 16 17 18 19 20 21 22
+Mass hypothesis [MeV]
+10−6
+10−5
+10−4
+10−3
+10−2
+10−1
+Local asymptotic p0
+1σ reference
+2σ reference
+3σ reference
+15–20 MeV: modest excesses; background choice matters
+GP sidebands exclude ±2.25σ  |  No global or detector-response calibration below 19 MeV
+Figure 18: Signed roots and local asymptotic excess probabilities. All four initial GP supports reach the inherited
+ceiling of eight resolution units. Raising the nominal-support ceiling to 16 removes every active boundary; ceilings
+32 and 64 recover the same optima, with maximum root changes below 0.00054. The local polynomial is a separate
+background-family check. Gray shading identifies the 20–22 MeV bridge. Triangles mark the 10−6 display floor, not
+resolved global tails.
+For the polynomial check, a positive exp(Chebyshev5) background and Gaussian signal are integrated
+over each 0.25 MeV bin. All background coeﬀicients are profiled over a moving ±7σm support, clipped at
+12 MeV. Its form and window scale follow the published low-mass procedure [ 3]; its suitability below 19
+MeV is tested here rather than assumed. In 15–20 MeV its largest positive root is only 0.74. At 21 MeV
+it gives a much larger root, 6.15, but a signal-plus-background Poisson deviance of 98.7 for 51 nominal
+degrees of freedom. That poor-fit diagnostic and the GP dependence prevent interpreting the large value
+as a robust signal.
+25
+Signal extraction at fixed low-mass anchors
+The displays use the stable ceiling-16 GP on 12–28 MeV. The 15 and 17 MeV hypotheses were fixed before
+the scan. Curves for profiled components are confined to the fitted window. Outside it, only data and the
+sideband GP constraint are shown. The gold uncertainty is the GP constraint before fitting the window,
+not an uncertainty band for the final fitted background.
+0
+8
+16
+24
+32Events / 0.25 MeV
+1e3
+ 15 MeV  |  local p₀ = 0.236
+13 14 15 16 17
+e + e −  invariant mass [MeV]
+−160
+−80
+0
+80
+160
+Data − background
+Fitted Gaussian yield: 303 ± 422
+0
+40
+80
+120
+160Events / 0.5 MeV
+1e3
+ 17 MeV  |  local p₀ = 0.173
+15 16 17 18 19
+e + e −  invariant mass [MeV]
+0
+200
+400
+600Data − background
+Fitted Gaussian yield: 1,423 ± 1,512
+2015 signal extraction: fixed 15 and 17 MeV hypotheses
+2015 full  |  GP support 12–28 MeV, stable ceiling 16  |  Shading: fitted signal window
+Counting error bars only. Residuals share fitted-background uncertainty; they are not independent significances.
+Sideband GP mean
+GP constraint ±1 SD
+Background profiled with signal
+Signal + background
+Data
+Figure 19: Fixed 15 and 17 MeV hypotheses. Top: data, sideband background constraint, profiled background
+and signal-plus-background prediction. Bottom: data minus the background profiled with signal, with the fitted
+Gaussian contribution. The error bars describe counting uncertainty only. The subtraction uses the same data to
+fit the background and is not an independent pull test.
+The likelihood uses 0.25 MeV bins. For these figures, complete groups of bins are chosen nearest to
+half a mass resolution and anchored at the original zero edge. The resulting display widths are 0.25 MeV
+at 15 MeV and 0.50 MeV at the other displayed masses. Boundary groups crossing the fitted window are
+omitted from the profiled display, while all original window bins remain in the likelihood. No grouping or
+phase is chosen to make a peak sharper.
+m [MeV] r, ceiling 8 r, ceiling 16 p0, ceiling 16 p0, polynomial Fitted yield, ceiling 16
+15 1.00 0.72 0.236 0.284 303 ± 422
+17 0.70 0.94 0.173 0.298 1, 423 ± 1, 512
+17.25 1.43 1.58 0.057 0.254 2, 542 ± 1, 612
+20 0.33 0.16 0.438 0.230 514 ± 3, 312
+Yield errors are local curvature errors for the assumed Gaussian template; they are not post-selection
+confidence intervals. No conversion to ϵ2 is made.
+26
+The leading fluctuation and the upper edge of the requested interval
+At 17.25 MeV the stable GP fit gives approximately 2,542 ±1,612 Gaussian-template events. Its maximum
+is selected after scanning 15–20 MeV, so this amplitude can be upward biased. It does not acquire a
+stronger interpretation because the scan was restricted to a rising edge. The 20 MeV panel supplies the
+fixed upper anchor.
+0
+40
+80
+120
+160Events / 0.5 MeV
+1e3
+ 17.25 MeV  |  local p₀ = 0.057
+15 16 17 18 19
+e + e −  invariant mass [MeV]
+−300
+0
+300
+600
+900
+Data − background
+Fitted Gaussian yield: 2,542 ± 1,612
+80
+160
+240
+320Events / 0.5 MeV
+1e3
+ 20 MeV  |  local p₀ = 0.438
+17 18 19 20 21 22 23
+e + e −  invariant mass [MeV]
+−1000
+−500
+0
+500
+1000
+Data − background
+Fitted Gaussian yield: 514 ± 3,312
+2015 signal extraction: the leading fluctuation and 20 MeV
+2015 full  |  GP support 12–28 MeV, stable ceiling 16  |  Shading: fitted signal window
+Counting error bars only. Residuals share fitted-background uncertainty; they are not independent significances.
+Sideband GP mean
+GP constraint ±1 SD
+Background profiled with signal
+Signal + background
+Data
+Figure 20: The selected 17.25 MeV upward fluctuation and the fixed 20 MeV hypothesis, with the same conventions
+and fixed-phase grouping as the preceding displays. Their local asymptotic roots are 1.58 and 0.16. A convincing
+resonance would need a stable excess across defensible background choices and a validated accepted signal shape.
+At 21 MeV, the nominal GP changes from r = 1.46 to r = 3.24 when its active smoothness restriction
+is removed; the frozen wide-support fit has r ≃ 2.52. This is evidence that the inference is sensitive to the
+background description. It is not evidence that the low-mass study has uncovered a second established
+particle feature. Resolving this dependence requires predictive background controls and detector-level
+checks, not choosing the smallest p-value.
+27
+Small conditional toy checks and what remains to establish
+Ten pilot spectra were first generated at each of the four displayed masses, then extended to 100 at
+each mass for each of ceilings 8 and 16: 800 distinct mass/model toy fits in total. The first ten are
+included in each 100. Each Poisson spectrum covers the complete 12–28 MeV support, and its GP
+hyperparameters and background are fitted again. The generating mean is the continuous sideband-
+conditioned GP prediction at that mass, without an observed-window adjustment. These mass-local
+backgrounds cannot be joined into one global experiment.
+15 16 17 18 19 20
+Fixed mass hypothesis [MeV]
+0.0
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+0.8Local excess probability
+Small conditional toy checks expose shifts in the null statistic
+Asymptotic reference, ceiling 8
+Asymptotic reference, ceiling 16
+100 conditional toys / mass, ceiling 8
+100 conditional toys / mass, ceiling 16
+Figure 21: Toy upper-tail fractions with central 95% binomial intervals, compared with the asymptotic local refer-
+ence. The two ceiling choices have their own conditional generating backgrounds. These small plug-in ensembles
+assess this fitting procedure under those means; they are not independent background validation or a final p-value
+calibration.
+Ceiling m [MeV] Tails/toys Fraction 95% interval Mean r SD r
+8 15 20/100 0.20 [0.127, 0.292] +0.23 0.89
+8 17 11/100 0.11 [0.056, 0.188] -0.48 0.95
+8 17.25 2/100 0.02 [0.002, 0.070] -0.43 0.99
+8 20 57/100 0.57 [0.467, 0.669] +0.52 0.92
+16 15 24/100 0.24 [0.160, 0.336] +0.07 1.04
+16 17 10/100 0.10 [0.049, 0.176] -0.31 0.97
+16 17.25 1/100 0.01 [0.00025, 0.054] -0.38 0.94
+16 20 62/100 0.62 [0.517, 0.715] +0.42 1.01
+The shifts of the toy-root means away from zero demonstrate why an asymptotic reference alone is
+insuﬀicient to qualify this extension. A small toy-tail fraction is conditional on a data-derived mean and
+has finite sampling uncertainty. It does not remove the choice of mass, support or background family.
+Next, validate accepted signal templates and the turn-on; test background prediction and signal recov-
+ery under alternative smooth truths; fix choices independently of signal-window residuals; and calibrate a
+coherent scan for a global probability. A shorter GP support does not remove look-elsewhere accounting.
+The accompanying study bundle retains scripts, fit components, display maps, 800 toy roots and source
+hashes.
+28
+References
+[1] V. Ananiev and A. L. Read, Gaussian Process-based calculation of look-elsewhere trials factor , JINST
+18 (2023) P05041. arXiv:2206.12328v3.
+[2] G. Cowan, K. Cranmer, E. Gross and O. Vitells, Asymptotic formulae for likelihood-based tests of new
+physics, Eur. Phys. J. C 71 (2011) 1554. arXiv:1007.1727.
+[3] P. H. Adrian et al. (HPS), Search for a Dark Photon in Electro-Produced e+e− Pairs with the Heavy
+Photon Search Experiment at JLab , Phys. Rev. D 98 (2018) 091101. arXiv:1807.11530.
+29
