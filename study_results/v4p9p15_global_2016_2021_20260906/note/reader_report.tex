@@ -1,0 +1,125 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.78in]{geometry}
+\usepackage{graphicx,booktabs,amsmath,amssymb,siunitx,xcolor,xurl}
+\usepackage[hidelinks]{hyperref}
+\usepackage{microtype}
+\usepackage[font=small]{caption}
+\usepackage{float}
+\definecolor{statusblue}{HTML}{EAF2F8}
+\newcommand{\fig}[4]{\begin{figure}[H]\centering\includegraphics[width=#1\linewidth]{#2}\caption{#3}\label{#4}\end{figure}}
+\hypersetup{pdftitle={HPS global-significance study: full 2016 and 2021 10 percent},pdfauthor={Emrys Peets},pdfsubject={v4.9.15 conditional extension of the Gaussian-process scan study}}
+\title{HPS Gaussian-Process Resonance Search\\The Global-Significance Study\\\large Full 2016 and 2021 10\%: a v4.9.15 reader's report}
+\author{Emrys Peets}
+\date{6 September 2026}
+\begin{document}
+\maketitle
+\begin{center}\fcolorbox{blue!35!black}{statusblue}{\parbox{0.91\linewidth}{\small
+\textbf{How to read these results.} The study asks how often a complete background-only search would look this unusual somewhere on its mass grid. All probabilities condition on one archived background per dataset. They do not establish that background as physically correct, and they do not yet constitute a final particle-significance claim.}}
+\end{center}
+
+\section{What has been extended}
+The 2015 study now has two companions: all of the 2016 dataset and the native 10\% 2021 dataset. Each starts with ten complete simulated searches. Separate, larger simulations test the approximation before its scan-wide probabilities are interpreted. The original 2015 results and earlier calibration releases remain unchanged.
+
+The new GP describes how the \emph{likelihood-based search results at different masses move together}. The local signal-and-background likelihood is the same as before. This is a method for calculating a look-elsewhere correction, rather than a new simultaneous fit of the whole search.
+
+\input{summary_table.tex}
+\input{headline.tex}
+
+\clearpage
+\section{How one simulated search becomes a global probability}
+Imagine scanning a long spectrum for a bump. Nearby mass tests share events and sidebands, so they are correlated. Counting every mass as an independent chance is inaccurate. The global calculation must reproduce those relationships.
+
+\textbf{First, simulate a whole experiment.} Draw one complete spectrum from its stated no-particle background, then scan exactly those same counts at every mass. This preserves the shared fluctuations. The ten pilot scans are kept separate from the 1,000 independent validation scans; old mass-by-mass toy collections are not spliced together.
+
+\textbf{Second, measure the response of the search.} Following the construction of Ananiev and Read~\cite{ananiev}, perturb each data bin of an unfluctuated background spectrum in turn. This estimates how fluctuations in that bin affect the scan. The resulting covariance describes correlations across the mass grid.
+
+\textbf{Third, draw inexpensive correlated scan curves.} Generate 200,000 curves from that covariance and count how often any mass reaches the observed threshold. Independent full Poisson experiments test the approximation's means, spreads, correlations and maximum tails.
+
+\input{scope_table.tex}
+
+The extension retains the nonzero background offset and the response width explicitly. If $r(m)$ is the signed likelihood-ratio root, write
+\[
+ a(m)=r(B;m),\qquad D_i(m)=r(B+\sqrt{B_i}e_i;m)-a(m),
+ \qquad C=D^{\mathsf T}D,
+\]
+and set $s_m=\sqrt{C_{mm}}$, $K_{mn}=C_{mn}/(s_ms_n)$. A sampled GP vector has covariance $K$; the corresponding raw-root curve is $a+sZ$. Thus the method does not silently assume that the original statistic is already centered at zero with unit width.
+
+The principal rule uses $p_m=\overline\Phi[(r_m-a_m)/s_m]$ when $r_m>0$, and $p_m=1$ otherwise. It scans the smallest $p_m$. A separate raw-root maximum retains the original asymptotic ordering. These are different tests; their probabilities cannot be selected according to which gives the stronger-looking result.
+
+\clearpage
+\section{Full 2016: the p-value scan}
+\input{results2016.tex}
+\fig{0.96}{../figures/global_pvalues_2016.pdf}{Full 2016 on its declared 142-point grid. The blue and red curves use the new common-background local-probability rule; the dotted curve uses the separate raw-root ordering. The gray curve retains the old asymptotic display, including its 0.5 convention for nonpositive roots; the calibrated rule assigns one there. Triangles at $10^{-8}$ mark smaller analytic probabilities. Zero simulated tails are shown at the upper endpoint of their 95\% binomial interval, never as a measured zero probability.}{fig:p2016}
+\input{peak2016.tex}
+
+\clearpage
+\section{Why the 2016 interpretation needs care}
+The selected stress background can itself cause the fitting procedure to infer large alternating positive and negative signals, even though no particle was injected. Centering the scan against that background changes which masses are most unusual. This is the same background-recovery issue exposed in the earlier calibration study.
+\fig{0.88}{../figures/global_marginal_checks_2016.pdf}{The unfluctuated-background prediction compared with 1,000 independent full-spectrum Poisson scans. The top panels show the offset in the raw signed root; the bottom panels show its spread. Agreement assesses the response approximation under the selected generating spectrum. It does not qualify that spectrum as the physical background.}{fig:m2016}
+\input{diagnostics2016.tex}
+
+The 2016 source was built from a pre-existing 10\% development subset and joined to an archived broad-tail continuation over 75--85 MeV. Event-level independence from the full data was not established. The continuation retains a failed fit-status flag, with a waiver only for conditional stress testing. The inherited 2016 numerical exception is also unresolved by this extension. These qualifications remain attached to every 2016 number here.
+
+\clearpage
+\section{2021 at 10\% exposure: the p-value scan}
+\input{results2021.tex}
+\fig{0.96}{../figures/global_pvalues_2021.pdf}{Native 2021 10\% data on its declared 201-point grid. Definitions and markers match Figure~\ref{fig:p2016}. Both statistics use the same complete toy spectra. This study does not rescale the result to full 2021 exposure and does not include trials for choosing between years or analysis methods.}{fig:p2021}
+\input{peak2021.tex}
+
+\clearpage
+\section{Checking the 2021 response approximation}
+The 2021 calculation uses the archived native-10\% smooth background and the already selected 36--300 MeV GP support. Its search interval remains 50--250 MeV. The background is held fixed as a generating model, while toy fits retrain their log-count means and count-dependent errors. The observed kernel settings remain frozen.
+\fig{0.96}{../figures/global_marginal_checks_2021.pdf}{The same mean-and-width checks for 2021 10\%. A narrower raw fixed-background fit does not guarantee a unit-width sampling distribution: fluctuations in the estimated background remain present across repeated experiments.}{fig:m2021}
+\input{diagnostics2021.tex}
+
+The earlier support study established practical recovery under its source-conditioned controls, with disclosed exceptions. It was not a proof of exact closure for every mass or every possible background. The present global study tests a different, fixed-kernel sampling procedure and retains that distinction.
+
+\clearpage
+\section{How neighboring mass tests are related}
+\fig{0.96}{../figures/global_correlation_2016.pdf}{The 2016 response correlation matrices. Red entries mean that two tested masses tend to move in the same direction; blue entries mean opposite motion. Each diagonal entry is one by construction. This pattern replaces an assumption of independent mass tests.}{fig:c2016}
+\fig{0.96}{../figures/global_correlation_2021.pdf}{The corresponding 2021 matrices. The fixed and profiled statistics can have different correlation patterns despite using identical input spectra. These are correlations of search statistics, not correlations of physical signal production.}{fig:c2021}
+\input{correlation_text.tex}
+
+\clearpage
+\section{Do the GP curves reproduce complete Poisson experiments?}
+\fig{0.85}{../figures/global_tail_validation_2016.pdf}{2016 scan-maximum tails for the principal minimum-local-p ordering. Green bands are pointwise 95\% binomial intervals from 1,000 direct scans; the red curve uses 200,000 GP draws. Triangles mark the first unresolved zero-count tail. The vertical range deliberately focuses on probabilities that the direct sample can begin to test.}{fig:t2016}
+\fig{0.85}{../figures/global_tail_validation_2021.pdf}{The equivalent validation for 2021. Agreement in the displayed range does not validate arbitrarily rare tails. The bands are pointwise sampling intervals, not a simultaneous coverage statement for the entire curve.}{fig:t2021}
+\input{tail_text.tex}
+
+\clearpage
+\section{What this does and does not imply}
+\input{interpretation.tex}
+
+\textbf{Profiling and calibration answer different questions.} Profiling accounts for the background freedom represented in the likelihood~\cite{cowan}. Calibration checks the statistic's sampling behavior. The global correction accounts for searching many masses. Passing one layer does not establish the other two, and none of these calculations by itself measures expected sensitivity or improves an upper limit.
+
+\textbf{The original calibration envelope is a separate target.} The v4.9.13 local result takes an envelope over different background constructions. Here each complete scan uses one common spectrum. Neither new global ordering is a global calibration of that earlier envelope. The local GP generating models vary with mass and cannot simply be joined into one hypothetical experiment.
+
+\input{raw_table.tex}
+
+\textbf{Next scientific steps.} Qualify the 2016 background family using predeclared predictive controls, including its transition region. Compare fixed and reestimated kernel policies on the same spectra. Resolve the inherited numerical exception. Add direct scans where the tail of interest remains unresolved, and test a finer mass grid using a declared rule for intermediate kernel states. A joint result requires a shared-coupling likelihood and coherent joint background scenarios; multiplying or combining the individual probabilities here is not that calculation.
+
+\clearpage
+\section{Reproducibility and references}
+All new numerical products are under
+\begin{center}\small\path{study_results/v4p9p15_global_2016_2021_20260906/}.\end{center}
+The statistical procedure and spectrum seeds match the 2015 extension plan. A separately audited numerical accelerator makes the larger calculation practical. The byte-identical exact reference runner, all exact pilot scans and the partially completed exact 2016 validation remain available. Dataset-specific seeds separate experiments; pilot and validation seeds are also distinct. Source and count contracts bind every numerical ensemble. Every mass has a saved audit, including checks against the scalar fitter and the frozen observed result. No failed fits are removed. The independent HEP review is retained under \path{review/}.
+
+\input{numerical_accuracy.tex}
+\input{execution_text.tex}
+
+Run these commands from the repository root. Replace \path{2016} with \path{2021} for the second dataset. Completed numerical phases resume only when their contracts agree.
+\begin{verbatim}
+nice -n 10 python3 -B \
+  study_results/v4p9p15_global_2016_2021_20260906/run_global_accelerated.py \
+  --dataset 2016
+python3 -B \
+  study_results/v4p9p15_global_2016_2021_20260906/analyze_global.py \
+  --dataset 2016
+\end{verbatim}
+The CSV curves, covariance matrices, complete scan vectors and GP maxima are retained for independent checks. \path{NEXT_STEPS.md} describes additional precision, finer grids and combined searches. \path{MANIFEST.csv} binds the final products; the earlier 2015 report and its manifest are checked without being rewritten.
+
+\begin{thebibliography}{9}
+\bibitem{ananiev} V.~Ananiev and A.~L.~Read, ``Gaussian Process-based calculation of look-elsewhere trials factor,'' JINST \textbf{18} (2023) P05041. \href{https://arxiv.org/abs/2206.12328v3}{arXiv:2206.12328v3}.
+\bibitem{cowan} G.~Cowan, K.~Cranmer, E.~Gross and O.~Vitells, ``Asymptotic formulae for likelihood-based tests of new physics,'' Eur. Phys. J. C \textbf{71} (2011) 1554. \href{https://arxiv.org/abs/1007.1727}{arXiv:1007.1727}.
+\end{thebibliography}
+\end{document}

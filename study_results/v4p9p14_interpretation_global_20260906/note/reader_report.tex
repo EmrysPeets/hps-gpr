@@ -1,0 +1,232 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.78in]{geometry}
+\usepackage{graphicx,booktabs,amsmath,amssymb,siunitx,xcolor,xurl}
+\usepackage[hidelinks]{hyperref}
+\usepackage{microtype}
+\usepackage[font=small]{caption}
+\usepackage{float}
+\definecolor{statusblue}{HTML}{EAF2F8}
+\newcommand{\eps}{\ensuremath{\epsilon}}
+\newcommand{\CLs}{\ensuremath{CL_s}}
+\newcommand{\fig}[4]{\begin{figure}[H]\centering\includegraphics[width=#1\linewidth]{#2}\caption{#3}\label{#4}\end{figure}}
+\input{generated_values.tex}
+\hypersetup{pdftitle={Understanding the HPS background-calibration study: v4.9.14 companion report},pdfauthor={Emrys Peets},pdfsubject={Plain-language interpretation of v4.9.13 and a conditional 2015 global-significance pilot}}
+\title{HPS Gaussian-Process Resonance Search\\Understanding the Background Calibration\\\large A reader's report on v4.9.13, with a v4.9.14 global-significance study}
+\author{Emrys Peets}
+\date{6 September 2026}
+\begin{document}
+\maketitle
+\begin{center}\fcolorbox{blue!35!black}{statusblue}{\parbox{0.91\linewidth}{\small
+\textbf{What this report establishes.} The calibration tests how the search behaves in simulated experiments. It exposes large background-dependent effects in part of the 2016 scan and their effect on the combination. It does not identify the true background or establish a particle signal. The new 2015 global-significance result is a conditional pilot on a specified mass grid.}}
+\end{center}
+
+\section{Why this study matters}
+A particle search looks for a small peak above a much larger, smoothly varying background. The difficult part is deciding how much of a bump could come from an imperfect estimate of that background. A Gaussian process (GP) is a statistical way to estimate that smooth curve and the uncertainty in its shape. Collecting many events makes ordinary counting fluctuations smaller, but also makes small background-shape errors more consequential.
+
+The v4.9.13 study asks a practical question: \emph{if we repeated this experiment with no new particle, or with a known injected signal, would our quoted probabilities and limits behave as advertised?} It compares the familiar mathematical approximation with repeated simulated experiments, usually called \emph{toys}.
+
+The main finding is that allowing the background to adjust---\emph{profiling}---is well motivated, but does not by itself guarantee reliable probabilities. A particular archived 2016 background shape produces large alternating false peaks and deficits when processed by the frozen fitting procedure. Calibrating against that possibility substantially changes some results.
+
+The visible hump is therefore informative. It identifies a region where the statistical answer depends strongly on which background shapes are treated as possible. It is neither a new physical bump nor proof that a previously interesting fluctuation was fake. The next scientific decision concerns the plausibility and recoverability of those background shapes.
+
+The earlier studies and their 31-page technical note are now merged into the repository as \href{https://github.com/EmrysPeets/hps-gpr/pull/66}{PR~66}. This companion explains their meaning and adds a separate look-elsewhere study. Numerical completion, successful simulation checks, and readiness for a final physics result remain different milestones.
+
+\clearpage
+\section{Three choices that are easy to confuse}
+\textbf{Fixing the background} means treating the GP's predicted curve as exactly known while fitting a possible signal. This can produce very small fit errors. But that curve was estimated from data; it may fluctuate or miss part of the underlying shape.
+
+\textbf{Profiling the background} allows correlated changes in its shape while fitting the signal. The fit pays a statistical penalty for large changes. This accounts for the uncertainty represented by the model~\cite{frate}, but cannot automatically cover every shape that the model cannot reproduce.
+
+\textbf{Calibrating the result} uses repeated experiments to determine how often the resulting statistic would be as extreme as the observed one. The observed signal fit does not change merely because its probability is recalculated. Both a fixed and a profiled fit can be used as test statistics and then calibrated.
+
+\fig{0.93}{../figures/fixed_profiled_comparison.pdf}{The apparent advantage of fixing the background reverses after the stated calibration. A ratio below one means the fixed method gives the smaller observed upper limit. After calibration it gives a larger limit on the typical scanned point in every dataset. These are medians of observed-limit ratios; they are not measurements of expected sensitivity.}{fig:fixed}
+
+Before calibration, the fixed curves were typically only 42--61\% of the profiled limits. After calibration, they are typically 20--45\% larger. The small raw fixed-background errors were not evidence that the search had gained that much reliable information.
+
+The alternative positive log-GP profile was also tested in v4.9.13. With the same numerical solver, its 2021 limits changed by at most 0.232\%. The peak--dip pattern persisted. That comparison points away from the Gaussian-versus-log-Gaussian choice as the main explanation.
+
+\clearpage
+\section{Why a small p-value became a plateau}
+A local p-value asks how often background alone would look at least this signal-like at one chosen mass. A smaller value is more surprising \emph{under the specified background model}. It is not the probability that a particle exists.
+
+At 66 MeV in the combined search, the observed signed likelihood-ratio root is about $+2.76$. The asymptotic formula assigns a local p-value of about 0.0029. Under the local GP generating model, calibration gives a similar value, 0.0018. Under the archived stress background, essentially every no-signal toy looks more signal-like than the observed result.
+
+\fig{1.00}{../figures/pvalue_hump_explained.pdf}{Left: the combined local p-value, with each generating background shown separately. The release uses the larger tail probability at every mass. Right: independent background-only toy distributions at 66 MeV. Their spreads are similar, but their centers are far apart. The black line is the same observed result in both comparisons. Probabilities below $10^{-4}$ leave the left panel; deficits also differ between the old 0.5 display convention and the empirical bounded-statistic value of one.}{fig:pvalue}
+
+The stress toys have mean signed root $+8.94$ and standard deviation 0.97; the GP toys have mean $-0.11$ and standard deviation 1.01. This is predominantly a \textbf{shift in the expected fitted signal}, not simply a larger error bar. All 500 stress toys exceed the observed root. Their exact 95\% binomial interval for that fraction is 0.9927--1.
+
+The envelope is near one because it protects against both declared backgrounds. The slight clipping of a noisy importance-weighted estimate from 1.009 to one is a display detail; it cannot explain the enormous change from 0.0029.
+
+\clearpage
+\section{Why a tight upper limit became a hump}
+An upper limit asks how large a signal remains compatible with the data under the stated test. The plotted $\eps^2$ is a squared coupling parameter controlling production of the hypothetical particle; a lower limit is a tighter restriction within that model. A downward fluctuation can make an observed limit look particularly strong. A trough in an upper-limit curve is therefore not necessarily an excess of events.
+
+\fig{0.99}{../figures/limit_hump_explained.pdf}{The profiled limit hump appears where the asymptotic curve was unusually low. The shaded region describes finite calibration Monte Carlo precision, not the spread expected from repeating the experiment. Both curves use the same data; calibration changes the probability calculation.}{fig:limits}
+
+\begin{table}[H]\centering\small
+\begin{tabular}{lrrr}\toprule
+Scope and mass & Signed root & Asymptotic $\eps^2$ limit & Calibrated limit\\\midrule
+2016, 75 MeV & $-2.60$ & $1.81\times10^{-6}$ & $4.19\times10^{-5}$\\
+Combined, 73 MeV & $-3.00$ & $8.94\times10^{-7}$ & $1.14\times10^{-5}$\\
+\bottomrule\end{tabular}
+\caption{Rounded values from the same numerical solver used for calibration. These selected points explain the visible feature; they were not independent controls used to choose a model.}
+\end{table}
+
+For the 2016 stress model at 75 MeV, the mean fitted no-signal offset is about $-17.5$ fixed reference errors. A real positive signal could be partly hidden by this tendency to overpredict the background in the gap. A calibration that allows that background must permit a larger signal than the naive deficit suggests. The 2016 limit rises by about a factor of 23; the combined 73 MeV limit rises by about a factor of 13.
+
+This is the negative side of the same alternating interpolation problem that produces the false positive peak near 66 MeV. The fitted deficits remain diagnostics, not physical negative particle yields.
+
+\clearpage
+\section{What the 2016 background is telling us}
+The largest effect comes from the archived 2016 stress shape. At 66 MeV its background-only fitted-yield offset is about $+12.4$ reference errors, compared with $+0.32$ for 2015 and $+1.10$ for 2021. A deterministic calculation on the unfluctuated stress spectrum reproduces the large 2016 offset. Random toy fluctuations are not needed to create it.
+
+This alternative is not an independently measured truth. It joins a fitted low-mass shape to an archived continuation over 75--85 MeV and scales to the full-sample count. Its development sample overlaps the available data context; event-level independence was not established. The broad component retains a failed fit-quality flag and was permitted only as a conditional stress construction. Those qualifications were already recorded in the earlier study.
+
+That leaves two scientific possibilities to investigate: the stress construction may be a poor description of physically plausible backgrounds, and/or the frozen GP procedure may fail to recover relevant smooth structure. Both can contribute. This study does not isolate their relative importance. Historical closure also reoptimized kernels, whereas this calibration keeps the observed kernel settings fixed.
+
+\textbf{The appropriate next step is a background-model investigation.} Compare predeclared plausible shapes, their interpolation residuals, and fixed versus reestimated kernel policies on the same simulated spectra. Use sidebands and independent or explicitly held-out controls to qualify the models. Keep the current failures visible.
+
+Removing the stress shape simply because it weakens the observed result would make the model choice depend on the answer. Conversely, treating every unqualified stress construction as a mandatory physical possibility can impose a large and poorly motivated loss of power. The family must be justified by the physics and predictive checks.
+
+A look-elsewhere correction cannot settle this issue. That correction accounts for searching many masses; it does not establish whether the background model at one mass gives trustworthy probabilities.
+
+\clearpage
+\section{Is asymptotic profiling defensible for the final analysis?}
+\textbf{Profiling is defensible. The current uncorrected asymptotic probabilities need further justification.} Profile-likelihood methods are standard in HEP. Their simple large-sample formulas require the fitted model and sampling behavior to meet the relevant assumptions~\cite{cowan}. A large event count alone does not protect against background misspecification or regularization-induced offsets.
+
+The independent validation gives concrete evidence against applying the current mapping without qualification across the tested family:
+
+\begin{table}[H]\centering\small
+\begin{tabular}{lrr}\toprule
+Profiled method, raw asymptotic mapping & GP truth & Stress truth\\\midrule
+Excess local-rejection flags & 50/456 & 140/456\\
+Excess true-signal-exclusion flags & 179/912 & 326/912\\
+\bottomrule\end{tabular}
+\caption{Counts of flagged test cells after the release's multiple-testing adjustment, not counts of rejected events or toys. The local threshold is 5\%; the true-signal-exclusion threshold is 10\%. Each cell has 500 independent validation spectra.}
+\end{table}
+
+The calibrated procedure has no corresponding adjusted flags. This is encouraging within its specified family, but a 500-toy check has limited power. It does not establish percent-level accuracy at every mass, and cannot validate background shapes that were never tested.
+
+The result does not imply that one must abandon asymptotic formulas forever. A final procedure could use them where independent validation shows adequate centering, spread and tails, with a declared treatment elsewhere. Alternatively, the same likelihood statistic can use calibrated distributions throughout. Either choice must follow a fixed, justified rule.
+
+The present release still conditions on observed kernels, support choices, resolution and signal normalization. It does not repeat all historical model choices, include every mixed background assignment in the combination, or resolve the separate 2016 numerical exception. Those are material remaining qualifications for a final physics interpretation.
+
+\clearpage
+\section{What can we say about lost sensitivity?}
+Most profiled observed limits change modestly: their median calibrated-to-asymptotic ratios are approximately 1.08 for 2015, 1.09 for 2016, 1.04 for 2021, and 1.21 for the combination. The large humps are localized exceptions. Calibration can also strengthen individual limits; it is not a uniform penalty.
+
+An observed limit is one outcome of one dataset. To measure sensitivity, we should compare how often a method detects specified signals, or the distribution of limits it would produce in repeated experiments. These comparisons must use methods with comparable false-positive control.
+
+The existing injections do show a substantial conditional loss of local detection power at combined 66 MeV:
+
+\begin{table}[H]\centering\small
+\begin{tabular}{lrr}\toprule
+Simulated experiment & Raw local rejection & Calibrated local rejection\\\midrule
+GP background, no signal & 22/500 & 0/500\\
+GP background, five-reference-error signal & 499/500 & 0/500\\
+Stress background, no signal & 500/500 & 26/500\\
+Stress background, five-reference-error signal & 500/500 & 500/500\\
+\bottomrule\end{tabular}
+\caption{Fractions passing a local $p_0<0.05$ threshold. A reference error fixes the injected event yield; it is not a measured significance. Counts condition on the selected calibration bank and generating background. Zero of 500 means an upper 95\% binomial bound of about 0.74\%, not exactly zero probability.}
+\end{table}
+
+The conservative envelope protects against the stress background, which otherwise produces a false positive in every tested no-signal experiment. That protection makes a smaller signal on the GP background difficult to recognize. More calibration toys improve the precision of this conclusion but do not eliminate the separation between the two background predictions.
+
+This is a reason to improve and justify the background family, not to recover the attractive raw curve by ignoring calibration. A fair comparison of expected performance should use paired experiments, fixed physical signals, and validated error rates. No new expected-limit bands are claimed here.
+
+\clearpage
+\section{A separate study of global significance}
+\subsection{Why looking in many places changes the probability}
+Even a rare fluctuation at one mass becomes less surprising when a search examines many possible masses. Nearby points overlap and share sideband data, so they are correlated. Counting every mass as independent would exaggerate the number of separate opportunities.
+
+There are two different GPs in this discussion. The \emph{background GP} estimates the smooth mass spectrum. The \emph{significance GP} models the correlated curve of search statistics obtained when one simulated experiment is scanned across masses.
+
+Ananiev and Read propose estimating that second GP's covariance from specially constructed background spectra, then sampling many inexpensive correlated fields~\cite{ananiev}. Their construction uses signed likelihood-ratio roots and approximately Gaussian behavior. It also warns that a coarse mass grid can miss peaks. This method is an accelerator for a specified null model and statistic; it does not qualify the underlying background.
+
+\subsection{What was actually run}
+We began with ten complete 2015 background-only scans, giving ten toys at every one of the 72 hypotheses from 19 to 90 MeV. They passed in 10.9 seconds. We then generated 1,000 independent complete scans for validation, followed by an unfluctuated spectrum and 484 spectra with one bin raised by its Poisson standard deviation. Every spectrum was scanned with both methods.
+
+The same full toy spectrum is reused across masses. Sideband predictions and count-dependent errors are refitted at every hypothesis. The reviewed kernel settings remain fixed. One numerical worker was used. The archived 2015 smooth stress spectrum provides one coherent background over the full support.
+
+The old pointwise toy collections cannot simply be joined by toy number: their mass points were generated independently or from different backgrounds. They remain useful for the preceding local diagnosis, but do not supply the correlations needed here.
+
+The new figure uses a single common stress background. It is \textbf{not a global correction of the earlier two-truth envelope}. It shows two declared ways to select the most extreme point. Using the largest raw root preserves the ordering of the asymptotic p-value curve. Using the smallest locally calibrated p-value first accounts for the mass-dependent null offset. These are different tests, not competing estimates of one probability.
+
+For the profiled scan, the raw ordering gives a global probability of 0.542, supported by 539/1,000 direct scans. The locally calibrated ordering gives about 0.019. The difference shows how much the chosen stress background changes the meaning of a peak at different masses. Choosing whichever result looks more interesting would require accounting for that additional selection.
+
+\clearpage
+\subsection{2015 local and global p-value curves}
+\fig{0.95}{../figures/global_pvalues_2015.pdf}{A separate application of the GP global-significance method to the 2015 scan. Grey: the original asymptotic mapping. Blue: the common-stress-background local Gaussian pilot. Red: the global probability for the minimum of those local probabilities. Orange: the global probability using the original raw-root ordering. Both global curves use 200,000 GP fields across 72 masses; they order fluctuations differently. Nonpositive raw roots retain $p=1$ in the calibrated curves. The two-truth envelope has not been globally calibrated. \GlobalPlotFloorText}{fig:global}
+\input{global_results_text.tex}
+
+\clearpage
+\subsection{Does the GP reproduce full simulated scans?}
+\fig{0.92}{../figures/global_correlation_2015.pdf}{The Asimov-response correlation matrices. The diagonal is one; nearby mass points share much of their statistical fluctuation. Negative correlations can arise when a bin is in the signal window for one hypothesis and in the sideband for another. This structure is measured from the fitting procedure rather than assumed to have a stationary kernel.}{fig:correlation}
+\fig{0.94}{../figures/global_tail_validation_2015.pdf}{The chance that a whole scan exceeds a threshold, compared with 1,000 independent direct Poisson scans. The green interval is their pointwise exact 95\% binomial interval. Zero observed exceedances provide an upper bound, not a measured zero tail. The GP line's much smaller sampling error does not include model-approximation error. Lines below their sampling floors are truncated for display.}{fig:tails}
+
+\clearpage
+\subsection{The local checks matter before global extrapolation}
+\fig{0.99}{../figures/global_marginal_checks_2015.pdf}{Top: the signed-root offset on the unfluctuated background compared with the average of independent toys. Bottom: the spread predicted by the one-bin responses compared with the direct toy spread. The raw fixed-background statistic has neither zero mean nor unit spread in general. Those effects must be exposed before interpreting a significance GP.}{fig:marginal}
+\input{global_validation_text.tex}
+
+\clearpage
+\section{What the study implies for the next analysis step}
+The immediate priority is the 2016 background mismatch. Qualify the source construction and test whether the fitting procedure recovers independently justified smooth alternatives. Compare fixed and reestimated kernel policies on paired spectra to identify why historical closure and the present conditional calibration differ. Use controls chosen without selecting a favorable observed limit or p-value.
+
+Once that policy is set, validate its local probabilities, signal recovery and exclusion decisions at the precision needed for the final result. Retain truth-specific results beside any conservative envelope. Include the relevant common experimental systematics and justify or extend the joint background scenarios. Address the existing 2016 numerical exception separately.
+
+Then extend the global pilot using coherent whole scans for the same final rule. The current code supports individual 2016 and 2021 scans with a ten-toy first step. Their extension should follow the same numerical and background checks. A combined scan also needs the exact shared-coupling likelihood and the declared joint generating scenarios; combining separate p-values would not reproduce it.
+
+The 2015 pilot is useful evidence about execution and the Gaussian-field approximation. It does not certify the stress background, the complete model-selection procedure, or a rare discovery tail. In particular, background-family choices made after examining these results need independent confirmation.
+
+\begin{center}\fcolorbox{blue!35!black}{statusblue}{\parbox{0.91\linewidth}{\small
+The calibration has exposed where confidence in the background model controls the conclusion. Improving that understanding can recover justified sensitivity. Merely restoring the old asymptotic curve would restore its demonstrated failure modes as well.}}
+\end{center}
+
+\appendix
+\clearpage
+\section{Exact definition of the new GP pilot}
+For each hypothesis $m$, let $r(n;m)$ be the signed likelihood-ratio root from the same fitting engine as the calibration. For the common expected spectrum $B$, this study stores
+\begin{align}
+ \mu_m &= r(B;m),\\
+ D_{im} &= r(B+\sqrt{B_i}e_i;m)-r(B;m),\\
+ C_{mn} &= \sum_i D_{im}D_{in},\qquad
+ s_m=\sqrt{C_{mm}},\qquad K_{mn}=C_{mn}/(s_ms_n).
+\end{align}
+The subtraction explicitly removes the deterministic response offset from the \emph{covariance estimate}. It does not remove events from the data. The construction agrees with the paper's outer-product prescription when its unbiased, unit-width assumptions hold; using a nonzero $\mu_m$ and nonunit $s_m$ is an explicit conditional extension in this pilot.
+
+We sample $z^*\sim N(0,K)$ and reconstruct $r_m^*=\mu_m+s_mz_m^*$. The local pilot probability is
+\begin{equation}
+ p_m(r)=\begin{cases}1,&r\leq0,\\1-\Phi[(r-\mu_m)/s_m],&r>0.\end{cases}
+\end{equation}
+The scan statistic minimizes these local probabilities over the specified grid. Equivalently, it maximizes $(r_m-\mu_m)/s_m$ over points with $r_m>0$, assigning $-\infty$ if none is positive. Each plotted global value estimates the probability that this maximum exceeds the observed score at that point. This preserves the discovery atom and specifies the ordering completely.
+
+A separate saved comparison uses $\max_m\max(0,r_m)$, which orders candidate fluctuations differently. Neither statistic globally calibrates the earlier envelope over two mass-specific generating backgrounds. No trials for choosing between methods, datasets, widths or background families are included.
+
+The 1,000 validation scans are independent of the ten-toy pilot and of the deterministic response calculation. They are not used to tune the mean or covariance. Their pointwise normality checks use a Holm adjustment across 72 masses per method. This is an approximation check, not a proof of Gaussian extreme tails.
+
+\clearpage
+\section{Artifacts, reproduction and references}
+The report is built from the frozen v4.9.13 ledgers and the new derivative
+\begin{center}\small\path{study_results/v4p9p14_interpretation_global_20260906/}.\end{center}
+Its principal artifacts are the independent HEP review and numerical extracts under \path{review/}; full toy spectra, Asimov responses and signed-root vectors under \path{global/2015/}; the resulting CSV curves, covariance and Monte Carlo maxima under \path{global/2015/analysis/}; and the source and release records under \path{provenance/}. The final manifest binds the figures, report and numerical products.
+
+Run the following from the repository root, with the parent's native inputs in their documented locations. Completed phases resume only with an unchanged source/count contract. Changed procedures require a new output directory.
+\begin{verbatim}
+python3 -B study_results/v4p9p14_interpretation_global_20260906/\
+run_global.py --ensemble pilot10
+python3 -B study_results/v4p9p14_interpretation_global_20260906/\
+run_global.py --ensemble validation1000
+python3 -B study_results/v4p9p14_interpretation_global_20260906/\
+run_global.py --ensemble asimov
+python3 -B study_results/v4p9p14_interpretation_global_20260906/\
+analyze_global.py
+\end{verbatim}
+For another individual dataset, start with \path{--dataset 2016 --ensemble pilot10} or the corresponding 2021 command. Use the measured runtime and retained numerical checks before scaling. See \path{NEXT_STEPS.md} for the continuation plan, including final-tail and finer-grid requirements.
+
+\begin{thebibliography}{9}
+\bibitem{cowan} G.~Cowan, K.~Cranmer, E.~Gross and O.~Vitells, ``Asymptotic formulae for likelihood-based tests of new physics,'' Eur. Phys. J. C \textbf{71} (2011) 1554. \href{https://arxiv.org/abs/1007.1727}{arXiv:1007.1727}.
+\bibitem{ananiev} V.~Ananiev and A.~L.~Read, ``Gaussian Process-based calculation of look-elsewhere trials factor,'' JINST \textbf{18} (2023) P05041. \href{https://arxiv.org/abs/2206.12328v3}{arXiv:2206.12328v3}.
+\bibitem{frate} M.~Frate et al., ``Modeling Smooth Backgrounds and Generic Localized Signals with Gaussian Processes.'' \href{https://arxiv.org/abs/1709.05681}{arXiv:1709.05681}.
+\end{thebibliography}
+\end{document}
