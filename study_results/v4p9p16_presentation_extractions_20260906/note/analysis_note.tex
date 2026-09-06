@@ -1,0 +1,129 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.78in]{geometry}
+\usepackage{graphicx,booktabs,amsmath,amssymb,xcolor,xurl,float}
+\usepackage[hidelinks]{hyperref}
+\usepackage{microtype,pdflscape}
+\usepackage[font=small]{caption}
+\definecolor{statusblue}{HTML}{EAF2F8}
+\newcommand{\fig}[4]{\begin{figure}[H]\centering\includegraphics[width=#1\linewidth]{#2}\caption{#3}\label{#4}\end{figure}}
+\hypersetup{pdftitle={HPS GPR analysis note v4.9.16: combined global search, signal extractions and staged exposure checks},pdfauthor={Emrys Peets}}
+\title{HPS Gaussian-Process Resonance Search\\Combined Global Search and Observed Limits\\\large Analysis note v4.9.16: signal extractions and staged exposure checks}
+\author{Emrys Peets}
+\date{6 September 2026}
+\begin{document}
+\maketitle
+\begin{center}\fcolorbox{blue!35!black}{statusblue}{\parbox{0.91\linewidth}{\small
+\textbf{Scope of the result.} Full 2015 and 2016 data, plus native 2021 10\%, are combined over 19--250 MeV. The upper limits are pointwise, asymptotic 90\% CL$_s$ limits. The GP calculation estimates scan-wide probabilities under one archived joint stress background. It does not establish a final discovery significance or calibrate confidence-interval coverage.}}\end{center}
+
+\section{What the combined calculation adds}
+At each mass, the datasets that cover that mass share one possible particle coupling. Their information is combined in a single likelihood. Membership follows the established ranges; the analysis does not choose whichever dataset gives the strongest-looking result.
+
+The upper curve limits the allowed particle contribution at each mass. The probability curves below it ask how often the chosen background would produce something this unusual somewhere in the entire search. The look-elsewhere calculation changes those probabilities and does not automatically rescale the upper limits.
+\input{headline.tex}
+\input{summary_table.tex}
+\input{scope_table.tex}
+
+\clearpage
+\section{Full combined search}
+\fig{0.97}{../../v4p9p16_combined_global_20260906/figures/combined_observed_limit_and_pvalues.pdf}{The complete 232-point search: the profiled observed upper limit above local and global probabilities. The activity strip fixes which data enter each mass. The upper curve includes the visible branching correction once above the dimuon threshold. Lower panels condition on one common joint stress background. Gray local probabilities use the dense observed root and the asymptotic convention; the Gaussian-response local rule assigns one to nonpositive raw roots. Local triangles mark values below the $10^{-8}$ display floor. Global triangles are one-sided 95\% Monte Carlo upper bounds for zero simulated tails, separated from probability estimates. Green points check the principal ordering; their error bars are central 95\% intervals. The two global orderings are different tests. Expected-limit bands are not shown.}{fig:main}
+
+\clearpage
+\input{deficit_section.tex}
+
+\clearpage
+\input{extraction_section.tex}
+\clearpage
+\section{One shared-coupling likelihood}
+Let $\mathcal D(m)$ be the predeclared active dataset set. The model combines Poisson bins and independent Gaussian background constraints:
+\[
+ \mathcal L_m(\epsilon^2,\theta)=
+ \prod_{d\in\mathcal D(m)}\prod_{i\in W_d(m)}
+ {\rm Pois}\!\left(n_{di}\,\middle|\,b_{di}+(L_d\theta_d)_i+
+                   \epsilon^2 S_{di}(m)\right)
+ \prod_{d\in\mathcal D(m)} e^{-\theta_d^{\mathsf T}\theta_d/2}.
+\]
+$S_{di}={\rm BR}_{ee}T_{di}$ is the visible yield per unit physical coupling, where $T_{di}$ is the stored unit-electron-branching template. The fitted coordinate is $\epsilon_{\rm eff}^2=\epsilon_{\rm phys}^2{\rm BR}_{ee}$; the display restores $\epsilon_{\rm phys}^2=\epsilon_{\rm eff}^2/{\rm BR}_{ee}$. The implementation rescales this coordinate into a total window amplitude. No independent signal strength is fitted in each year.
+
+An auxiliary unrestricted amplitude supplies the signed likelihood-ratio root,
+\[
+ r_m=\operatorname{sign}(\widehat A_m)
+ \sqrt{2\left[\operatorname{NLL}_m(A=0)-\operatorname{NLL}_m(\widehat A_m)\right]}.
+\]
+Here $\operatorname{NLL}_m(A)$ is the negative log likelihood minimized over the background nuisances at fixed $A$. Poisson expectations remain positive. Physical discovery and upper-limit tests retain the nonnegative signal boundary; the auxiliary negative branch is needed to model the signed field.
+
+\subsection*{Complete joint experiments}
+Ten pilot and 1,000 separate validation spectra per year are reused from v4.9.14/v4.9.15. The year-specific random streams are distinct. Pairing equal row indices gives 1,000 joint experiments, not 3,000. Each experiment supplies exactly the same full spectrum at every mass in which its dataset participates.
+
+Kernels, templates, support and exclusion masks remain frozen. Every toy retrains its log-count background prediction and count-dependent training errors. All multi-dataset intervals receive new common-amplitude fits. Only the single-dataset intervals reuse existing likelihood-root columns.
+
+The generating means are the archived smooth stress spectra. Event-level independence of the 2016 development input from its full observed sample has not been established. Independence here describes the conditional toy model; omitted experimental systematic correlations have not been newly quantified.
+
+\subsection*{One response basis across boundaries}
+Following Ananiev and Read~\cite{ananiev}, perturb each data bin by its Poisson standard deviation. This extension retains the nonzero offset and response width:
+\[
+ a_m=r_m(B),\quad D_{im}=r_m(B+\sqrt{B_i}e_i)-a_m,\quad
+ C=D^{\mathsf T}D,\quad s_m=\sqrt{C_{mm}},\quad K_{mn}=\frac{C_{mn}}{s_ms_n}.
+\]
+The basis has 484, 720 and 422 bins from 2015, 2016 and 2021. An inactive dataset has exactly zero response at that mass. This retains correlations across boundaries that share data; separately sampled segment maxima are not joined.
+
+For each statistic, 200,000 vectors $Z\sim N(0,K)$ generate $r_m^*=a_m+s_mZ_m$. The principal maximum is $T=\max_{m:r_m^*>0}Z_m$ (or $-\infty$ for an empty set); the secondary maximum is $R=\max_m\max(0,r_m^*)$. Their respective tails are compared with the independent joint Poisson scans.
+
+\clearpage
+\section{Offsets and widths of the combined statistic}
+\fig{0.97}{../../v4p9p16_combined_global_20260906/figures/combined_null_response.pdf}{Asimov-response predictions compared with 1,000 joint Poisson scans. Top panels show the offset in the signed root; bottom panels show its spread. Vertical lines mark membership changes. Agreement tests the approximation under the generating means, without establishing their physical validity.}{fig:response}
+\input{marginal_table.tex}
+Centering, scaling and covariance come from deterministic bin perturbations. Validation scans do not tune them. Profiled and fixed-background statistics use identical spectra but can have different sampling widths.
+
+Large oscillating offsets can make an ordinary observed value unusual relative to a particular stress construction. A small probability can diagnose that construction without identifying a particle. The inherited 2016 numerical exception, source-fit waiver, development overlap and 75--85 MeV source transition remain unresolved by this extension.
+
+\clearpage
+\section{Correlations and the look-elsewhere check}
+\fig{0.93}{../../v4p9p16_combined_global_20260906/figures/combined_correlations.pdf}{Response correlations across the union grid. Dotted lines show membership changes. Shared datasets retain correlations across boundaries; regions with no common dataset have zero response covariance in this model.}{fig:correlation}
+\fig{0.93}{../../v4p9p16_combined_global_20260906/figures/combined_tail_validation.pdf}{Principal scan-maximum tails. Direct-toy bands are pointwise central 95\% binomial intervals, not expected-limit bands or simultaneous coverage bands. Triangles mark the upper endpoint of the central interval at the first unresolved direct tail. More GP draws reduce sampling error within the approximation, without replacing direct validation.}{fig:tails}
+\input{tail_diagnostics.tex}
+
+\clearpage
+\section{Representative probabilities}
+For positive raw roots, the principal local rule is $p_m=\overline\Phi[(r_m-a_m)/s_m]$; otherwise $p_m=1$. Its global curve counts how often any of the 232 masses reaches that local threshold. The separate raw ordering scans $\max_m\max(0,r_m)$. These tests cannot be selected according to which gives the smaller probability.
+\input{representative_table.tex}
+\input{peak_table.tex}
+\input{peak_interpretation.tex}
+The raw maximum tests positive peaks; it does not assess full-spectrum goodness of fit.
+\input{grid_table.tex}
+Subgrids remove alternate masses at the original observed threshold. They test finite-grid dependence, not convergence to a continuous search. Probabilities include neither a choice between methods nor uncounted searches over widths, kernels or other analysis choices.
+
+\clearpage
+\section{Observed limits and the v4.9.12 comparison}
+\fig{0.97}{../../v4p9p16_combined_global_20260906/figures/observed_limit_v12_comparison.pdf}{The pointwise upper-limit construction with the current dense and earlier cached solvers. The lower panel shows their relative difference. Both curves have the same membership and branching correction. Their difference is not a look-elsewhere adjustment or a sensitivity measurement.}{fig:limitcomparison}
+\input{limit_comparison.tex}
+
+The upper limit inverts the bounded, piecewise-asymptotic CL$_s$ statistic at each mass~\cite{cowan}. The background-only joint scans test the discovery-score approximation. They do not supply the signal-plus-background distributions needed to calibrate the full CL$_s$ curve. A GP global probability is not a replacement CL$_s$ tail.
+
+The v4.9.13 study contains conditional calibrated individual limits and the common all-three interval. It has no calibrated pairwise endpoints over the remaining union. Splicing different calibrations would conceal a change of construction. A fully calibrated union limit requires additional declared signal-plus-background work; this note supplies the complete observed asymptotic curve.
+
+\clearpage
+\section{Numerical checks, provenance and continuation}
+\input{numerical_summary.tex}
+
+Every new joint mass has ten paired exact pilot fits, an exact baseline and a fixed bin-response stencil. Complete exact responses are retained at 39, 49, 50, 90, 91 and 180 MeV. The accelerator must pass root, centered-response, width and correlation gates. Otherwise all ensembles at that coordinate use the exact backend. Failed exact references halt; no toy or hypothesis is removed.
+
+The v4.9.14 and v4.9.15 inputs are checked against their full frozen manifests. The v4.9.12 comparison table is checked against its specific frozen-manifest entry. The isolated derivative is
+\begin{center}\small\path{study_results/v4p9p16_combined_global_20260906/}\end{center}
+It retains spectra, joint root vectors, limits, covariance, GP maxima, probability tables and per-mass audits. The independent HEP review is under \path{review/}. The original manifest remains unchanged. The deficit extension and this revised report have a separate manifest under
+\begin{center}\small\path{study_results/v4p9p16_deficit_extension_20260906/}\end{center}
+The independent deficit audit passed 939 conditions.
+
+From the repository root, verify the completed numerical products with
+\begin{verbatim}
+python3 -B \
+  study_results/v4p9p16_combined_global_20260906/verify_combined.py
+\end{verbatim}
+Preserve the finished version before reanalysis or new generation. \path{NEXT_STEPS.md} gives resume commands, new-seed requirements and the additional work for calibrated limits.
+
+The next scientific priority is to qualify the joint background family with predeclared predictive controls. Direct tail precision, finer grids and signal injections answer separate questions. Additional GP sampling alone cannot establish physical background validity, expected sensitivity or interval coverage.
+
+\begin{thebibliography}{9}
+\bibitem{ananiev} V.~Ananiev and A.~L.~Read, \emph{Gaussian Process-based calculation of look-elsewhere trials factor}, JINST \textbf{18} (2023) P05041. \href{https://arxiv.org/abs/2206.12328v3}{arXiv:2206.12328v3}.
+\bibitem{cowan} G.~Cowan, K.~Cranmer, E.~Gross and O.~Vitells, \emph{Asymptotic formulae for likelihood-based tests of new physics}, Eur. Phys. J. C \textbf{71} (2011) 1554. \href{https://arxiv.org/abs/1007.1727}{arXiv:1007.1727}.
+\end{thebibliography}
+\end{document}

@@ -1,0 +1,169 @@
+\section{Selected signal extractions and staged exposure checks}
+\label{sec:extractions}
+\textbf{What the displays establish.} The largest observed combined excess is at 66 MeV. All three years prefer a positive fitted signal there, although each estimate has substantial uncertainty. The next peak in the complete search is 21 MeV, where only 2015 contributes. The next leading peak covered by several datasets is 92 MeV, where 2016 and 2021 prefer noticeably different rates. These are useful locations for follow-up; the selected plots alone do not establish a particle or a failure of the background model.
+
+The strongest raw combined deficit is at 72 MeV. Showing it alongside the excesses matters: a background interpolation error can produce both positive and negative residuals, while a positive narrow signal does not by itself explain a nearby missing-event feature. Statistical fluctuations can also produce such patterns. An independent data increment and predictive background checks can distinguish these possibilities more directly than enlarging a selected peak display.
+
+\subsection*{Which locations are shown}
+Selection uses the dense \emph{observed profiled} signed root, whose ordering matches its one-sided asymptotic local reference on the positive branch. Select positive local maxima, ordered by decreasing root, with a separation greater than $2.25$ times the larger resolution at the two coordinates. For the combined rule use the largest active resolution. Endpoints remain eligible and are identified. The stress-centered ordering is discussed separately; it does not choose the leading extraction panels.
+
+\begin{table}[H]\centering\small
+\begin{tabular}{lrrr}\toprule
+Data & First excess & Second excess & Deepest deficit\\\midrule
+2015 full & 51 (+3.14) & 21 (+2.52) & 19 (-3.21)\\
+2016 full & 90 (+3.42) & 117 (+3.28) & 102 (-4.50)\\
+2021 10\% & 78 (+2.81) & 65 (+2.40) & 71 (-4.02)\\
+Full combined union & 66 (+2.76) & 21 (+2.52) & 72 (-3.49)\\
+\bottomrule\end{tabular}
+\caption{Selected mass in MeV, followed by the signed root in parentheses. These are selected local fit summaries, not global significances. The 19 MeV deficit is the 2015 search endpoint. The additional combined 92 MeV display has $r=+2.42$ and uses 2016 plus 2021.}\end{table}
+
+\subsection*{How to read the figures}
+The top row shows event counts, the GP mean before profiling, the background fitted together with the signal, and their sum. The lower row subtracts that fitted background and overlays the fitted signal. Black bars show counting uncertainty only. The gray envelope is a zero-centered width guide from the original correlated GP constraint, projected into the display bins. It does not depict that constraint's center, an error band on the fitted background, or the full residual covariance. These residuals are not independent significance measurements.
+
+Display bins are whole original bins grouped to approximately half the mass resolution, with a fixed histogram-edge origin. The likelihood retains every native fit bin. Multi-year sums use a common 1.25 MeV grid restricted to the overlap of the fitted windows. Each year keeps its own resolution, acceptance and count-to-coupling conversion in the likelihood. No fitted curve is extended outside its fit window.
+
+\clearpage
+\begin{landscape}
+\subsection*{The leading combined excess: 66 MeV}
+\fig{0.99}{../figures/extraction_combined_66.pdf}{The 66 MeV common-amplitude fit, shown separately for each year and as a display sum. The shared signed amplitude is $\widehat\epsilon^2=4.55\times10^{-6}$ and $r=2.76$. Every panel uses the same amplitude, with the appropriate year-specific yield and resolution. Summed panels omit boundary pieces; the likelihood root and quoted fitted yields use the full native windows.}{fig:extraction-combined66}
+
+\end{landscape}
+
+\clearpage
+\begin{landscape}
+\subsection*{A second location with multiple datasets: 92 MeV}
+\fig{0.90}{../figures/extraction_combined_92.pdf}{The 92 MeV fit uses 2016 and 2021. The common amplitude is $\widehat\epsilon^2=2.97\times10^{-6}$ and $r=2.42$. Both separate fits are positive, but their preferred rates differ (Fig.~\ref{fig:extraction-consistency}). A persistence illustration at this common rate is a testable assumption.}{fig:extraction-combined92}
+
+\end{landscape}
+
+\clearpage
+\begin{landscape}
+\subsection*{The deepest combined observed deficit: 72 MeV}
+\fig{0.99}{../figures/extraction_combined_72.pdf}{The deepest raw combined deficit has $r=-3.49$ and a signed auxiliary amplitude $\widehat\epsilon^2=-4.88\times10^{-6}$. All three separate amplitudes are negative, with 2021 providing the strongest individual contribution. Negative templates describe missing events relative to the fitted background, not a physical negative coupling.}{fig:extraction-combined72}
+
+\end{landscape}
+
+\clearpage
+\subsection*{Individual signal extractions: 2015 full}
+The 51 MeV point is the largest observed profiled excess in 2015. The 21 MeV point is also the second leading peak of the full combined union, because 2015 is the only active dataset at this mass. It is only 2 MeV above the search endpoint; the 19 MeV deficit in Fig.~\ref{fig:extraction-individualdeficits} makes boundary and background-shape controls particularly relevant. More 2021 data cannot test this 21 MeV location.
+
+\fig{0.99}{../figures/extraction_2015_peaks.pdf}{The two leading separated observed profiled excesses in 2015 full. Each panel is an independent single-dataset fit. Binning is chosen from the resolution and original histogram origin, not from the observed residual shape.}{fig:extraction-individual2015}
+
+The lower panels are background-subtracted displays conditioned on the fitted template. A visible peak here should be assessed together with the background constraint, the fitted amplitude uncertainty, the scan selection and independent-data checks.
+
+\clearpage
+\subsection*{Individual signal extractions: 2016 full}
+The two leading individual 2016 peaks are at 90 and 117 MeV. Their positions differ from the leading combined mass because a common coupling also has to describe the other active dataset contributions. These panels retain the inherited 2016 source-fit waiver, development overlap and numerical qualifications; cleaner presentation does not resolve them.
+
+\fig{0.99}{../figures/extraction_2016_peaks.pdf}{The two leading separated observed profiled excesses in 2016 full. Each panel is an independent single-dataset fit. Binning is chosen from the resolution and original histogram origin, not from the observed residual shape.}{fig:extraction-individual2016}
+
+The lower panels are background-subtracted displays conditioned on the fitted template. A visible peak here should be assessed together with the background constraint, the fitted amplitude uncertainty, the scan selection and independent-data checks.
+
+\clearpage
+\subsection*{Individual signal extractions: 2021 10\%}
+The released 2021 sample has leading individual peaks at 78 and 65 MeV. These are near, but not interchangeable with, the combined coordinates. Changing the mass or window after seeing a new sample would create another selection. Freeze these individual locations as a declared secondary family if they are followed at the 30\% checkpoint.
+
+\fig{0.99}{../figures/extraction_2021_peaks.pdf}{The two leading separated observed profiled excesses in 2021 10\%. Each panel is an independent single-dataset fit. Binning is chosen from the resolution and original histogram origin, not from the observed residual shape.}{fig:extraction-individual2021}
+
+The lower panels are background-subtracted displays conditioned on the fitted template. A visible peak here should be assessed together with the background constraint, the fitted amplitude uncertainty, the scan selection and independent-data checks.
+
+\clearpage
+\begin{landscape}
+\subsection*{Individual deficits as a background diagnostic}
+\fig{0.90}{../figures/extraction_individual_deficits.pdf}{Deepest observed negative roots in 2015, 2016 and 2021. The 2015 point lies at the scan endpoint. The 2016 and 2021 minima are at 102 and 71 MeV, respectively. The negative branch provides a diagnostic with the same narrow template; no physical negative signal rate or calibrated deficit discovery is inferred.}{fig:extraction-individualdeficits}
+
+\end{landscape}
+
+\clearpage
+\begin{landscape}
+\subsection*{Do separate years support the same rate?}
+\fig{0.99}{../figures/dataset_amplitude_consistency.pdf}{Independent signed amplitude estimates and local curvature standard errors, compared with the common fit. Define $\Delta D=2[\mathrm{NLL}_{\rm common}-\sum_d\mathrm{NLL}_{d,\rm free}]$. The number of additional amplitude parameters is one fewer than the number of datasets. These masses were selected from the data, so the displayed likelihood losses are conditional descriptive comparisons; no post-selection compatibility probabilities are quoted.}{fig:extraction-consistency}
+
+\end{landscape}
+
+\clearpage
+\subsection*{Why the most extreme stress-centered tail need not look like a peak}
+The stress-background centering changes the reference distribution of the statistic; it does not change the observed fitted signal. At 76 MeV the combined raw root is only $+0.166$, but the generating stress construction has Asimov root $a=-8.700$ and response width $s=0.979$. Subtracting this large negative offset produces a standardized value of $9.05$. At 83 MeV the observed raw root is $-0.676$, with $a=+7.707$ and $s=0.983$, giving a standardized deficit depth of $8.53$.
+
+The very small conditional tails therefore ask about departure from those particular stress constructions. They do not mean that the data contain a correspondingly large positive or negative fitted signal. At 76 MeV, 2016 prefers a negative amplitude while 2021 prefers a positive one. The common-versus-independent likelihood loss is $\Delta D=9.40$ for two additional amplitudes. This provides another reason to avoid presenting the stress-centered tail as a coherent resonance.
+
+\fig{0.99}{../figures/extraction_stress_extrema.pdf}{Common-window sums at the two principal stress-centered extrema. The small fitted signal templates are consistent with their small raw roots. Large stress offsets cause the extreme centered-tail interpretation. These sums have no independent fit.}{fig:extraction-stress}
+
+The asymptotic profiled method is not invalid merely because calibration changes a probability or an observed limit. Its use in a final analysis requires qualification of the background family, the prediction uncertainty, signal response and the relevant sampling distributions. The present displays do not measure expected sensitivity. A weaker calibrated observed limit can reflect a correction to background behavior rather than information being removed from the data.
+
+\clearpage
+\subsection*{A 30\% checkpoint before the full 2021 sample}
+Use the released 10\% to define the hypotheses. Treat an additional, disjoint 20\% as the next independent test of those fixed locations and rates. Only then inspect the cumulative 30\% combination. This is more informative than a cumulative display alone, because the latter still contains the fluctuation that selected the peak. The same original-event membership and processing must be documented for every increment.
+
+Let $N_{10}$ be the observed first sample, $B_{10}$ its background fitted in the selected common-amplitude model, and $S_{10}$ the signal template at that fitted rate. Figure~\ref{fig:extraction-exposure} compares two illustrative conditional means for a total exposure $f$ times the original 10\%:
+\[
+\begin{aligned}
+\text{background only in added data:}&\quad N_{10}+(f-1)B_{10},\\
+\text{selected rate persists:}&\quad N_{10}+(f-1)(B_{10}+S_{10}).
+\end{aligned}
+\]
+The independent additional 20\% has means $2B_{10}$ or $2(B_{10}+S_{10})$. For the conditional cumulative 30\% and 100\% views the background-only counting variances from the future sample are $2B_{10}$ and $9B_{10}$, respectively. The observed first 10\% is held fixed. These figures are mean scenarios, not new observations, toy experiments or discovery projections. They omit uncertainty in the assumed background and selected signal rate. The 92 MeV common-rate assumption is less consistent with the individual estimates than the 66 MeV assumption.
+
+\begin{table}[H]\centering\small
+\begin{tabular}{rrrrr}\toprule
+Mass [MeV] & 10\% & new 20\% & 30\% total & 100\% total\\\midrule
+66 & 14.6 & 29.2 & 43.7 & 145.8\\
+92 & 13.6 & 27.2 & 40.9 & 136.2\\
+\bottomrule\end{tabular}
+\caption{Illustrative mean signal yields in thousands of events in the complete 2021 fitted window if the selected common-fit rate persists. These are template yields, not the raw total counts or measured future yields. Display sums may omit boundary pieces.}\end{table}
+
+A statistics-dominated precision reference can be computed without toys. With the original per-year signal yield vector $u_d$, GP constraint covariance $C_d$ and GP mean $b_d$, define
+\[
+I_d=u_d^{\mathsf T}[\operatorname{diag}(b_d)+C_d]^{-1}u_d,
+\qquad I(f)=I_{2015}+I_{2016}+fI_{2021}.
+\]
+An absent dataset has $I_d=0$. This local background-Asimov reference follows the usual information-scaling argument~\cite{cowan} and assumes that the \emph{entire} 2021 count covariance scales as $f$, with unchanged acceptance and resolution. Fractional systematic effects or background bias need not improve this way. The factor $\sqrt{I(f)/I(1)}$ below is a precision illustration, not a multiplier for the observed combined root or a forecast global significance.
+
+\begin{table}[H]\centering\small
+\begin{tabular}{rrrr}\toprule
+Mass [MeV] & Current 2021 information share & 30\% gain & 100\% gain\\\midrule
+66 & 55.3\% & 1.45 & 2.44\\
+92 & 82.4\% & 1.63 & 2.90\\
+\bottomrule\end{tabular}
+\caption{Combined precision gain with 2015 and 2016 held fixed, under the stated covariance-scaling assumption. For 2021 alone the corresponding factors would be $\sqrt{3}$ and $\sqrt{10}$. There is no 2021 gain at 21 MeV.}\end{table}
+
+\clearpage
+\begin{landscape}
+\subsection*{Conditional exposure displays: 10\%, new 20\%, 30\%, 100\%}
+\fig{0.99}{../figures/exposure_2021_10_30_100.pdf}{Background-subtracted 2021 views at fixed 66 and 92 MeV hypotheses. Only the first column contains observed points. Future curves keep the first sample fixed where included and add the mean of either hypothesis. Gray envelopes show only the background counting standard deviation of the added sample. They exclude fitted-background uncertainty and do not imply independent residual bins after a future refit. The vertical scales differ.}{fig:extraction-exposure}
+
+\end{landscape}
+
+\clearpage
+\subsection*{What would make the next comparison decisive?}
+First, define a disjoint additional 20\% with the same selection, calibrations, mass resolution and normalization convention. Freeze the 66 and 92 MeV primary locations, and state in advance whether the individual 2021 locations at 65 and 78 MeV and the 71/72 MeV deficit checks are a secondary family. Do not reselect the mass from the new spectrum when reporting the fixed-location validation.
+
+Fit the additional 20\% on its own before combining it with the old 10\% or the 2015/2016 samples. Compare its fitted rate, width behavior and background residuals with the stored predictions. A stable signal should reproduce a compatible rate, not merely increase the height of a cumulative display. Rate agreement alone would still leave detector effects or common background structure to investigate.
+
+Use predeclared sideband and predictive checks to test the background interpolation and relevant detector/selection effects, including both positive and negative residuals. The 2016 background-source transition and existing numerical/source qualifications remain part of that work. Model choices must not be selected by whichever one makes the observed peak more impressive.
+
+The 30\% and 100\% cumulative looks share events. Before treating either as a formal discovery or exclusion result, declare the family of mass, direction and exposure tests and the treatment of sequential looks. Rebuild the appropriate signal and background sampling distributions for the new exposure and background family. The existing GP global-tail bank describes the current released sample and cannot calibrate a different exposure.
+
+For an efficient follow-on calculation, begin with ten complete pilot spectra per declared generating hypothesis, retaining each same full spectrum throughout its mass scan. Use new deterministic seed namespaces and nonoverlapping toy IDs. Time the pilot, test exact-fit and approximation closure, then scale in restartable batches only if the validated cost is acceptable. Background-only scans address global discovery tails; calibrated limits additionally require signal-plus-background hypotheses. No new toys were necessary for the present extraction and mean-scenario displays.
+
+\clearpage
+\subsection*{Display and reconstruction checks}
+Fifteen selected likelihoods were reconstructed with the archived dense solver and exact prediction hashes. There are 24 dataset components. Every background-plus-signal vector closes to the original fitted expectation; all expected Poisson counts stay positive. Every grouping matrix contains only zero or one, with no fractional reassignment or reused bin within a panel. The quoted roots and upper endpoints reproduce the frozen dense scan; display grouping never changes a fit.
+
+\begin{table}[H]\centering\small
+\begin{tabular}{rrrr}\toprule
+Mass [MeV] & Dataset & Counts retained in sum & Signal template retained\\\midrule
+66 & 2015 & 60.1\% & 87.7\%\\
+66 & 2016 & 83.6\% & 96.1\%\\
+66 & 2021 & 100.0\% & 100.0\%\\
+92 & 2016 & 57.8\% & 83.3\%\\
+92 & 2021 & 93.8\% & 98.8\%\\
+72 & 2015 & 48.0\% & 77.3\%\\
+72 & 2016 & 68.0\% & 88.4\%\\
+72 & 2021 & 93.1\% & 98.3\%\\
+\bottomrule\end{tabular}
+\caption{Common-window summed-display retention relative to the complete native fitted window of each year. The full likelihood, amplitude estimates and total-window yield tables use all fit bins. Individual panels have their own resolution-based grouping.}\end{table}
+
+The reusable PDF and PNG figures, native and rebinned arrays, exact grouping maps, exposure tables, build scripts and independent HEP audit are retained in
+\begin{center}\small\path{study_results/v4p9p16_presentation_extractions_20260906/}\end{center}
+The prior studies were committed, pushed and merged in \href{https://github.com/EmrysPeets/hps-gpr/pull/67}{PR 67}; all 4,778 published file blobs were verified on the merged branch. This presentation extension has a separate artifact manifest. The original study inputs and outputs remain frozen.
