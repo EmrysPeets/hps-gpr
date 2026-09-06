@@ -1,0 +1,60 @@
+{
+  "detail": "Estimated peak 16.958 GiB exceeds explicit 4.000 GiB guard",
+  "diagnostics": {
+    "conservative_rank": 36,
+    "estimated_peak_bytes": 18208957504,
+    "estimated_peak_gib": 16.958413183689117,
+    "full_bins": 1626,
+    "gp_backend": "eigenfeature_rtol_1e-15",
+    "interpretation": "Explicit array bound with factor/padding copies, Hessian workspaces, mixture matrices and both retained banks; not measured host memory",
+    "limit_gib": 4.0,
+    "passed": false,
+    "per_truth": {
+      "gp": {
+        "persistent_bytes": 423886848,
+        "spectra": 8448,
+        "transient_bytes": 1927766016
+      },
+      "stress": {
+        "persistent_bytes": 3159883776,
+        "spectra": 62976,
+        "transient_bytes": 14551990272
+      }
+    },
+    "window_bins": 109
+  },
+  "entry": {
+    "baseline_checkpoint_path": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v4p9p13_calibration_20260905/derived/all_2015_2016_2021/m057/result.json",
+    "baseline_checkpoint_sha256": "1e6097e723dccf1eb557c026a4278949f1e9c7633a67943f064959112dfb4299",
+    "components": [
+      {
+        "failed_gates": [
+          "tail_ess"
+        ],
+        "method": "profiled",
+        "priority": 2,
+        "reason": "envelope_controlling",
+        "truth": "stress",
+        "worst_ess": 82.4219434780256
+      },
+      {
+        "failed_gates": [
+          "tail_ess",
+          "normalization"
+        ],
+        "method": "fixed",
+        "priority": 2,
+        "reason": "envelope_controlling",
+        "truth": "stress",
+        "worst_ess": 5.192910653112302
+      }
+    ],
+    "mass_MeV": 57,
+    "priority": 2,
+    "scope_key": "all_2015_2016_2021",
+    "source_checkpoint_path": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v4p9p13_calibration_20260905/derived/all_2015_2016_2021/m057/result.json",
+    "source_checkpoint_sha256": "1e6097e723dccf1eb557c026a4278949f1e9c7633a67943f064959112dfb4299",
+    "worst_ess": 5.192910653112302
+  },
+  "reason": "declared_geometry_or_memory_cap"
+}

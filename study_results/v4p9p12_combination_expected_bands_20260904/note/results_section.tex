@@ -1,0 +1,253 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.78in]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{siunitx}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{microtype}
+\definecolor{statusblue}{HTML}{EAF2F8}
+\newcommand{\eps}{\ensuremath{\epsilon}}
+\newcommand{\CLs}{\ensuremath{CL_s}}
+\input{generated_values.tex}
+\title{HPS Gaussian-Process Resonance Search\\
+Analysis Note v4.9.12: Expected-Limit Bands and Observed Diagnostics}
+\author{Emrys Peets}
+\date{\StageDate}
+
+\begin{document}
+\maketitle
+
+\begin{center}
+\fcolorbox{blue!35!black}{statusblue}{%
+\parbox{0.91\linewidth}{\small
+\textbf{\StageStatusTitle.} This results-only note uses \StageToys{} background-only
+toys per mass (toy IDs \StageToyMin--\StageToyMax). \StageStatusText{} All bands
+and empirical limit-tail diagnostics are pointwise and conditional on frozen GP
+states.}}
+\end{center}
+
+\section{Inputs and construction}
+
+The seven scopes are the exact final-sample curves used in the most recent
+Harvard results section: full 2015, full 2016, the optimized-support 2021 10\%
+sample, their three pairs, and the all-three shared-$\eps^2$ combination. The
+2021 configuration uses the frozen 36--300 MeV GP support and factor-15
+resolution-scaled length ceiling. No 2021 1\% or 2016 10\% comparison enters
+these results.
+
+At each mass, a latent background vector is drawn from the conditioned
+mass-local GP prediction and then Poisson sampled. The same dataset draw is
+reused by every scope containing that dataset at a fixed mass and toy ID, so
+the standalone and combined comparisons are paired. GP hyperparameters are not
+refit inside toys. Each pseudoexperiment is evaluated with the same bounded,
+piecewise-asymptotic 90\% \CLs{} construction as the observed v4.9.12 curve.
+For numerical stability, fixed-strength nuisance fits minimize a
+data-constant-centered Poisson deviance; the fitted likelihood, statistic, and
+root acceptance gates are unchanged from the parent solver. During the 100-toy
+continuation, an inherited free-strength optimizer status failed at one
+deterministic coordinate despite a finite candidate. The contracted solver now
+uses the same likelihood-equivalent centering as a retry only when a raw free fit
+is unsuccessful. The released ensemble records \CenteredProfileRetries{} centered-profile
+retry activations (\FreeProfileRetries{} free-profile and \NullProfileRetries{} null-profile);
+every retry still passes the original likelihood-nesting and root gates, and no toy is dropped
+or reseeded.
+
+The bands are empirical 2.5\%, 16\%, 50\%, 84\%, and 97.5\% quantiles. Because
+different mass points are generated independently, these are pointwise
+expected-limit bands rather than a scan-wide ensemble. They do not establish
+unconditional coverage, toy-calibrated \CLs{}, a look-elsewhere correction, or
+global significance. Full-2016 and 2016-inclusive curves also retain the
+previously disclosed cross-process GP-state replay exception.
+
+\section{Results}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.99\linewidth]{../figures/final_total_search_window_expected_bands_\StageToys toys.pdf}
+  \caption{The ``final'' mass-by-mass maximal-available-dataset observed limit and
+  expected bands from \StageToys{} background-only toys per mass over the total
+  search window, 19--250 MeV. The bands are pointwise and conditional on the frozen
+  GP states. The scope strip
+  states which final datasets enter each interval: 2015 at 19--38 MeV,
+  2015+2016 at 39--49 MeV, all three at 50--90 MeV, 2016+2021 at
+  91--180 MeV, and 2021 at 181--250 MeV. Scope boundaries are explicit because
+  this stitched display is not one invariant likelihood across the whole range.}
+  \label{fig:total-window-bands}
+\end{figure}
+
+Figure~\ref{fig:total-window-bands} supplies the requested standalone total-window
+view. It always selects the combination containing every final dataset available
+at that mass; it does not select among scopes according to the observed or expected
+limit. Thus the stitching rule is fixed by dataset support rather than by a favorable
+fluctuation. The displayed 2021 pieces use the optimized-support 10\% configuration.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.98\linewidth]{../figures/all_three_expected_bands_\StageToys toys.pdf}
+  \caption{Observed and expected 90\% \CLs{} upper limit for the all-three
+  shared-coupling combination, using \StageToys{} background-only toys per mass.
+  Yellow and green show the central 95\% and 68\%
+  pointwise background-only ranges; the dashed curve is the expected median.
+  The expected ranges are conditional on the frozen GP states.}
+  \label{fig:all-three-bands}
+\end{figure}
+
+Figure~\ref{fig:all-three-bands} is the direct Brazil-band analogue of the
+earlier v4.2/v4.5 combination display, now evaluated on the current final
+inputs. Local motion in the outer envelope should still be read with the
+finite-ensemble granularity of the current \StageToys-toy stage in mind.
+
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=0.99\linewidth]{../figures/combination_expected_band_panels_\StageToys toys.pdf}
+  \caption{Pairwise and all-three shared-$\eps^2$ limits with \StageToys{}
+  background-only toys per mass. Each panel uses the same constituent
+  pseudo-observations at a given mass and toy ID. Bands show the conditional
+  central 68\% and 95\% ranges.}
+  \label{fig:combination-panels}
+\end{figure}
+
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=0.94\linewidth,height=0.82\textheight,keepaspectratio]{../figures/individual_expected_band_panels_\StageToys toys.pdf}
+  \caption{Individual 2015 full, 2016 full, and 2021 10\% observed limits with
+  \StageToys{} background-only toys per mass. Bands show the conditional central
+  68\% and 95\% ranges. The 2021 panel uses the optimized native-10\% configuration
+  with 36--300 MeV GP support.}
+  \label{fig:individual-panels}
+\end{figure}
+
+\clearpage
+\subsection{Observed-limit and analytic p-values}
+
+Two different diagnostic families are reported and must not be conflated. For an
+observed upper limit $U_{\rm obs}(m)$ and toy limits $U_t(m)$ at a fixed mass,
+\begin{align}
+p_{\rm strong}(m)&=\frac{1}{N}\sum_t
+  \mathbf{1}\!\left[U_t(m)\leq U_{\rm obs}(m)\right],\\
+p_{\rm weak}(m)&=\frac{1}{N}\sum_t
+  \mathbf{1}\!\left[U_t(m)\geq U_{\rm obs}(m)\right],\\
+p_{\rm two}(m)&=\min\!\left[1,2\min(p_{\rm strong},p_{\rm weak})\right].
+\end{align}
+A small $p_{\rm strong}$ marks an unusually tight observed limit, while a small
+$p_{\rm weak}$ marks an unusually loose observed limit. The two-sided number is a
+symmetric reviewer diagnostic. These are upper-limit ensemble positions, not
+discovery p-values and not coverage measurements. The one-sided fractions have
+granularity $1/N=1/\StageToys\simeq\EmpiricalPResolution$, while $p_{\rm two}$ is constructed from
+them; zero counts are retained as zero in the CSV and shown at half a count only
+for logarithmic plotting.
+
+The analytic $p_0$ is separate: it is the frozen observed curve's one-sided,
+fixed-mass, asymptotic profile-likelihood background-only p-value. It is not derived
+from these \StageToys{} band toys. The local values themselves have no trials
+correction. Section~\ref{sec:global} gives separate analytic scan-level references.
+
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=0.99\linewidth]{../figures/combination_pvalue_panels_\StageToys toys.pdf}
+  \caption{For each shared-$\eps^2$ combination, the three empirical observed-limit
+  tail diagnostics from \StageToys{} background-only toys per mass, alongside the
+  analytic local discovery $p_0$. A downward triangle at $1/(2\times\StageToys)$ denotes
+  exactly zero toys in that tail. The plotted marker is only a display position;
+  the recorded count remains zero. The dotted line marks 0.05.}
+  \label{fig:combination-pvalues}
+\end{figure}
+
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=0.94\linewidth,height=0.82\textheight,keepaspectratio]{../figures/individual_pvalue_panels_\StageToys toys.pdf}
+  \caption{Individual final-sample limit-tail diagnostics using \StageToys{}
+  background-only toys per mass and the analytic local $p_0$. Definitions, the
+  zero-count marker at $1/(2\times\StageToys)$, and the dotted 0.05 reference are the same
+  as in Figure~\ref{fig:combination-pvalues}.}
+  \label{fig:individual-pvalues}
+\end{figure}
+
+\clearpage
+\input{generated_pvalue_summary.tex}
+
+Table~\ref{tab:pvalue-summary} gives explicit values at the smallest analytic local
+$p_0$ in each scope. These entries retain their fixed-mass interpretation. Complete values
+for all \ScopeMassRows{} scope--mass coordinates are in the machine-readable p-value
+ledger.
+
+\subsection{Compact limit summary}
+
+Table~\ref{tab:band-minima} reports, for each scope, the mass at which the
+\StageToys-toy expected median is smallest. These minima summarize the plotted
+curves; they are not optimization inputs and do not select the analysis card.
+
+\input{generated_summary.tex}
+
+Across all \ScopeMassRows{} scope--mass coordinates, all \ToyLimitRows{} toy
+limits were finite and closed at \CLs{}=0.10 within the frozen numerical
+tolerance. No latent GP draw used the clipping fallback. The exact per-toy
+limits and pseudo-observation hashes are retained in machine-readable ledgers.
+
+\section{Reproducibility and continuation}
+
+The ensemble is cumulative. \ContinuationText{} Atomic per-mass checkpoints make
+the continuation resumable. The contract binds the analysis card, GP states,
+observed curves, solver, and protocol to the saved toys.
+
+\clearpage
+\section{Equivalent global and trials-adjusted p-values}
+\label{sec:global}
+
+For each stated search window, let $p_{\min}$ be the smallest analytic local
+$p_0$ among its $M$ tested masses. The \v{S}id\'ak equivalent global reference and
+the Bonferroni trials adjustment are
+\begin{align}
+p_{\rm Sidak}&=1-(1-p_{\min})^{N_{\rm eff}},\\
+p_{\rm Bonferroni}&=\min(1,Mp_{\min}).
+\end{align}
+The \v{S}id\'ak expression is exact for independent uniform null p-values when the
+exponent is the number of tests. Here $N_{\rm eff}$ is a resolution-spacing
+approximation, following the earlier analysis-note convention. At ordered masses
+$m_i$, set $\sigma_i$ to the smallest mass resolution among the datasets entering
+that scope. We use the fixed spacing convention $W=2.25$ and
+\[
+N_{\rm eff}=\max\!\left(1,\min\!\left[M,
+\sum_{i=1}^{M-1}\frac{m_{i+1}-m_i}{W(\sigma_i+\sigma_{i+1})/2}
+\right]\right).
+\]
+The frozen analysis card supplies every resolution, including the total-window
+composition changes. The resulting \v{S}id\'ak value approximates a scan-global
+probability with an effective count that has not been calibrated with scan toys.
+
+The Bonferroni column uses every tested grid point and gives a conservative
+trials-adjusted value without requiring independence~\cite{sas}. Its guarantee
+assumes valid local p-values; here those local inputs are conditional asymptotic
+results and retain the disclosed 2016 numerical exception. The empirical
+$p_{\rm strong}$, $p_{\rm weak}$, and $p_{\rm two}$ are not inputs to either
+correction.
+
+\input{generated_global_summary.tex}
+
+For the fixed total 19--250 MeV search, the minimum remains at
+\GlobalMinMass{} MeV, with local $p_0=\GlobalLocalP$. The resolution model gives
+$N_{\rm eff}=\GlobalNeff$ and $p_{\rm Sidak}=\GlobalSidakP$
+($Z_{\rm Sidak}=\GlobalSidakZ$). Using all \GlobalGridCount{} tested masses gives
+$p_{\rm Bonferroni}=\GlobalBonferroniP$.
+
+Each row corrects its own mass window. Treating all seven displayed scopes as
+one family gives 680 tests and $p_{\rm Bonferroni}=\AllScopesBonferroniP$,
+using that family's own minimum local $p_0$.
+
+A scan-toy trials p-value is unavailable from this ensemble because the
+\StageToys{} band toys are generated independently at each mass. A calibrated
+scan-tail calculation requires coherent whole-spectrum pseudoexperiments and
+the maximum discovery statistic over each scan, or a separately validated
+upcrossing calculation~\cite{grossvitells}.
+
+\begin{thebibliography}{2}
+\bibitem{sas} SAS/STAT User's Guide, The MULTTEST Procedure,
+\href{https://support.sas.com/documentation/cdl/en/statug/66859/HTML/default/statug_multtest_details11.htm}{``p-Value Adjustments.''}
+\bibitem{grossvitells} E. Gross and O. Vitells, ``Trial factors for the
+look elsewhere effect in high energy physics,'' Eur. Phys. J. C \textbf{70},
+525--530 (2010), \href{https://arxiv.org/abs/1005.1891}{arXiv:1005.1891}.
+\end{thebibliography}
+
+\end{document}

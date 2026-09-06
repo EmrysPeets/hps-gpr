@@ -1,0 +1,137 @@
+\documentclass[11pt]{article}
+
+\newif\ifwritingsample
+\writingsampletrue
+
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,mathtools,bm}
+\usepackage{booktabs,tabularx,array,makecell,longtable}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{siunitx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{xurl}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{placeins}
+\usepackage{microtype}
+\usepackage{textcomp}
+\usepackage{fancyhdr}
+\urlstyle{same}
+
+\hypersetup{
+  hidelinks,
+  pdfdisplaydoctitle=true,
+  pdftitle={HPS Gaussian-Process Resonance Search: Selected Sections 2--6},
+  pdfauthor={Emrys Peets; Matthew Gignac; Eden Hsu},
+  pdfsubject={Harvard fellowship writing sample; edited excerpt from a collaborative HPS analysis note},
+  pdfkeywords={Heavy Photon Search, Gaussian processes, resonance search, statistical inference}
+}
+\pdfstringdefDisableCommands{%
+  \def\eps{epsilon}%
+  \def\CLs{CLs}%
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\setlength{\headheight}{14pt}
+\fancyhead[L]{\small HPS Gaussian-Process Resonance Search}
+\fancyhead[R]{\small Writing Sample}
+\fancyfoot[C]{\thepage}
+\fancypagestyle{plain}{%
+  \fancyhf{}%
+  \fancyhead[L]{\small HPS Gaussian-Process Resonance Search}%
+  \fancyhead[R]{\small Writing Sample}%
+  \fancyfoot[C]{\thepage}%
+}
+
+\setlist[itemize]{leftmargin=*}
+\setlist[enumerate]{leftmargin=*}
+\setlength{\tabcolsep}{5pt}
+\setlength{\emergencystretch}{2em}
+\renewcommand{\arraystretch}{1.12}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\CLs}{CL$_\mathrm{s}$}
+\newcommand{\Pre}{\textbf{Pre:}\ }
+\newcommand{\Pro}{\textbf{Prompt:}\ }
+\newcommand{\xspace}{}
+
+% The shared sections retain this historical command name.  In the writing
+% sample it is deliberately strict: a missing asset stops the build.
+\newcommand{\graphicorplaceholder}[2]{%
+  \includegraphics[width=#1]{#2}%
+}
+
+\input{sections/generated_v4p9_results}
+\input{sections/generated_v4p9p1_results}
+
+\title{\vspace{1.3in}HPS Gaussian-Process Resonance Search\\[0.5em]
+\large Selected Sections: Data, Statistical Method, Validation, and Results}
+\author{
+Emrys Peets\\Stanford University and SLAC National Accelerator Laboratory
+\and
+Matthew Gignac\\SLAC National Accelerator Laboratory
+\and
+Eden Hsu\\Stanford University and SLAC National Accelerator Laboratory
+}
+\date{September 2, 2026}
+
+\begin{document}
+
+\hypersetup{pageanchor=false}
+\begin{titlepage}
+\maketitle
+\vfill
+\begin{center}
+\begin{minipage}{0.84\textwidth}
+\small
+Submitted by Emrys Peets. This excerpt comes from a collaborative Heavy Photon Search
+analysis note; all three note authors are listed above. HPS searches for a dark photon,
+$A^\prime$, as a narrow peak in the invariant mass of an electron--positron pair above
+a large, smoothly varying trident background. The selected sections follow that search
+from the detector configurations and $e^+e^-$ spectra to a Gaussian-process prediction
+of the background beneath each blinded mass window, and finally to pseudoexperiments
+that test whether the procedure creates or absorbs a narrow signal. The numerical
+results and their statistical qualifications are unchanged from the analysis note.
+\end{minipage}
+\end{center}
+\vfill
+\thispagestyle{empty}
+\end{titlepage}
+
+\hypersetup{pageanchor=true}
+\setcounter{page}{1}
+\setcounter{section}{1}
+\setcounter{tocdepth}{2}
+\tableofcontents
+\clearpage
+
+\input{sections/02_datasets}
+\FloatBarrier
+\clearpage
+
+\input{sections/03_event_selection}
+\FloatBarrier
+\clearpage
+
+\input{sections/04_methodology}
+\FloatBarrier
+\clearpage
+
+\input{sections/05_toys_validation}
+\FloatBarrier
+
+\clearpage
+\input{sections/06_selected_results}
+\FloatBarrier
+
+\clearpage
+\bibliographystyle{unsrt}
+\bibliography{hps_gpr_analysis_note}
+
+\end{document}

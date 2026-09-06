@@ -1,0 +1,2951 @@
+HPS Gaussian-Process Resonance Search
+Selected Sections 2–5: Data, Method, and Validation
+Emrys Peets
+Stanford University and SLAC National Accelerator Laboratory
+Matthew Gignac
+SLAC National Accelerator Laboratory
+Eden Hsu
+Stanford University and SLAC National Accelerator Laboratory
+September 2, 2026
+Submitted by Emrys Peets. This excerpt comes from a collaborative Heavy Photon Search
+analysis note; all three note authors are listed above. HPS searches for a narrow resonance
+in the reconstructed e+e− mass spectrum. Sections 2–5 describe the data sets, detector
+inputs, Gaussian-process search method, and background-model validation.
+
+HPS Gaussian-Process Resonance Search Writing Sample
+Contents
+2 HPS apparatus and data sets 2
+2.1 Detector conﬁgurations for the prompt search . . . . . . . . . . . . . . . . . . . . . . 2
+2.2 Data-taking campaigns and analysis scope . . . . . . . . . . . . . . . . . . . . . . . . 3
+3 Event selection, mass resolution, and radiative fraction 6
+3.1 Prompt event selection . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 6
+3.2 2015 mass resolution . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 8
+3.3 2016 mass resolution . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 13
+3.4 2021 mass resolution . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 14
+3.5 Radiative fraction and the ε2 normalization . . . . . . . . . . . . . . . . . . . . . . . 16
+3.6 Systematic penalties from the radiative fraction . . . . . . . . . . . . . . . . . . . . . 19
+4 Methodology 22
+4.1 From piecewise windows to ﬁxed-support GP ﬁts . . . . . . . . . . . . . . . . . . . . 22
+4.2 Search interval and GP ﬁt support . . . . . . . . . . . . . . . . . . . . . . . . . . . . 22
+4.3 Observable, scan grid, and blinding . . . . . . . . . . . . . . . . . . . . . . . . . . . . 23
+4.4 Log-space preprocessing and the choice α = 1/y . . . . . . . . . . . . . . . . . . . . . 24
+4.5 Kernel choice and distinct regularization roles . . . . . . . . . . . . . . . . . . . . . . 26
+4.6 Resolution-scaled length-scale parameterization and bounds . . . . . . . . . . . . . . 27
+4.7 Blind-window prediction in count space . . . . . . . . . . . . . . . . . . . . . . . . . 31
+4.8 Signal model and conversion to ε2 . . . . . . . . . . . . . . . . . . . . . . . . . . . . 32
+4.9 Statistical inference in a single dataset . . . . . . . . . . . . . . . . . . . . . . . . . . 34
+4.10 Asymptotic and toy calibration . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 35
+4.11 Matched-reference injection–extraction diagnostics . . . . . . . . . . . . . . . . . . . 36
+4.12 Observed-limit toy diagnostics . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 36
+4.13 Shared- ε2 combination across datasets . . . . . . . . . . . . . . . . . . . . . . . . . . 38
+4.14 Global signiﬁcance and the look-elsewhere treatment . . . . . . . . . . . . . . . . . . 39
+4.15 Signal absorption and alternative background-proﬁle treatments . . . . . . . . . . . . 39
+4.16 Dimuon-threshold interpretation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 40
+5 Background-model validation with full-reﬁt pseudoexperiments 42
+5.1 Validation question and scope . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 42
+5.2 Closure observables and decision rules . . . . . . . . . . . . . . . . . . . . . . . . . . 43
+5.3 Training exclusion and blind-window choice . . . . . . . . . . . . . . . . . . . . . . . 43
+5.4 Generating spectra and the role of functional forms . . . . . . . . . . . . . . . . . . . 43
+5.5 Four-lane 2021 full-reﬁt ensemble . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 45
+5.6 Targeted validation of the rising threshold . . . . . . . . . . . . . . . . . . . . . . . . 45
+5.7 Matched reﬁts and numerical selection . . . . . . . . . . . . . . . . . . . . . . . . . . 48
+5.8 Full-100 spurious-signal results . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 48
+5.9 Recovery of injected signals . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 49
+5.10 What the validation establishes . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 53
+5.11 Selecting the 2021 GP support . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 55
+1
+
+HPS Gaussian-Process Resonance Search Writing Sample
+2 HPS apparatus and data sets
+2.1 Detector conﬁgurations for the prompt search
+HPS is a forward spectrometer optimized for narrow e+e− resonances and displaced vertices in the
+high-rate environment immediately downstream of a thin tungsten target. Its prompt A′→ e+e−
+sensitivity is set primarily by three subsystems: the Silicon Vertex Tracker (SVT), which deter-
+mines the mass and vertex resolution; the electromagnetic calorimeter (ECal), which provides the
+trigger and track–cluster matching; and the beamline/target geometry, which deﬁnes the forward
+acceptance and the occupancy environment [ 1, 2].
+The 2015 and 2016 engineering runs used the baseline six-station SVT. In that conﬁguration,
+six axial/stereo tracking stations were distributed between z = 10 cm to 90 cm downstream of
+the target, with the ﬁrst active silicon only about 1. 5 mm from the beam plane [ 3, 1]. The ECal
+geometry used in the engineering runs was already close to the ﬁnal HPS layout: two PbWO 4
+crystal halves with the highest-rate crystals nearest the beam removed, leaving the beam to pass
+between the two halves [ 3, 1].
+Before the ﬁrst physics run in 2019, HPS upgraded the front tracker. The 2019 and 2021
+conﬁgurations added a seventh double layer at z = 5 cm and used thin, slim-edge sensors with
+short split striplets [ 1, 4]. Moving the ﬁrst precision measurements closer to the beam reduced
+material and occupancy while improving acceptance for low-mass, small-opening-angle pairs. The
+ECal crystal layout was unchanged, but a positron hodoscope was installed before the 2019 run to
+support a single-arm trigger for events near the ECal beam gap [ 1]. Figure 1 compares the tracker
+layouts used in the engineering and physics runs.
+2
+
+HPS Gaussian-Process Resonance Search Writing Sample
+(a) Baseline six-layer SVT used in the 2015 and 2016 engineering runs [ 3].
+(b) Front-layer upgrade used in the 2019 and 2021 physics runs, including the added
+seventh double layer and slim-edge front sensors [ 1, 4].
+Figure 1: SVT conﬁgurations used in the prompt-resonance analyses. The 2015/2016 baseline
+tracker and the 2019/2021 tracker diﬀer in both layer count and the design of the innermost
+stations. The ECal crystal layout was unchanged; the physics-run conﬁguration added a positron
+hodoscope.
+2.2 Data-taking campaigns and analysis scope
+This note contains two related analysis states. The accepted v4.2 combined result uses the full 2015
+and 2016 engineering-run samples together with a distributed 10% sample from the 2021 physics
+run. The later v4.9.5 pass examines that 2021 sample alone with a diﬀerent lower support edge.
+The engineering data share the baseline tracker used in the published prompt searches; the 2021
+data were recorded with the upgraded tracker and positron hodoscope. Although the 2019 run
+used the same upgraded detector, no 2019 data enter either analysis.
+Table 1 summarizes the run periods, analyzed samples, search intervals, and GP ﬁt supports.
+A mass hypothesis is tested only inside the search interval, whereas the GP is trained on the wider
+support after removing the local 2. 25 σm exclusion.
+3
+
+HPS Gaussian-Process Resonance Search Writing Sample
+Run period Beam
+energy
+Sample Search interval v4.2 GP ﬁt
+support
+2015 engineering run 1. 056 GeV 1170 nb − 1 19 MeV to
+90 MeV
+14 MeV to
+135 MeV
+2016 engineering run 2. 3 GeV 10 608 nb− 1 39 MeV to
+180 MeV
+30 MeV to
+210 MeV
+2021 physics run 3. 74 GeV Native 10% sample from a
+∼ 160 pb− 1 parent run
+50 MeV to
+250 MeV
+40 MeV to
+300 MeV
+Table 1: Data sets and mass domains in the accepted v4.2 three-campaign conﬁguration. The
+2015 and 2016 inputs are the full engineering-run samples; the 2021 input is the distributed native
+10% sample. The wider GP supports provide training sidebands beyond both ends of each search
+interval. The 2016 lower edge is 30 MeV because a 35 MeV edge leaves no rebinned training-bin
+center below the exclusion at the 39 MeV search endpoint. The corresponding published prompt
+searches covered 19 MeV to 81 MeV in 2015 and 39 MeV to 179 MeV in 2016 [ 5, 2].
+The later v4.9.5 study changes only the lower support edge for a 2021-only extraction: it uses
+36–300 MeV while retaining the 50–250 MeV search interval. The accepted v4.2 three-campaign
+conﬁguration in Table 1 continues to use 40–300 MeV for 2021.
+Integrated luminosity and analyzed fraction do not enter the GP interpolation. They enter later,
+with the target, acceptance, eﬃciency, and radiative fraction, when an extracted prompt yield is
+converted to an equivalent ϵ2 limit.
+The 2015 and 2016 samples are fully unblinded. The 2021 input is distributed across the run
+rather than drawn from a contiguous block, so it samples varied run conditions while leaving most
+of the exposure unopened. The ROOT ﬁle does not contain enough exposure metadata to infer
+an integrated luminosity; “10%” describes how the sample was constructed. The three-campaign
+result combines the full 2015 and 2016 samples with this 2021 sample and is not the ﬁnal result for
+the 2021 run.
+Figure 2 compares the unit-normalized invariant-mass shapes. Figure 3 shows the same spectra
+in events per MeV and marks the v4.2 ﬁt supports and search intervals.
+4
+
+HPS Gaussian-Process Resonance Search Writing Sample
+Figure 2: Unit-normalized invariant-mass shapes for the full 2015 and 2016 samples and the native
+2021 10% sample. Each histogram is divided by its event count and bin width, so the comparison
+shows spectral shape rather than sample size.
+Figure 3: Invariant-mass distributions for the three inputs in the accepted v4.2 three-campaign
+conﬁguration. Gray shading marks the GP ﬁt support and gold shading marks the narrower
+interval in which signal hypotheses are tested. The mass-dependent 2. 25 σm exclusion is removed
+from the GP support separately at every tested mass.
+5
+
+HPS Gaussian-Process Resonance Search Writing Sample
+3 Event selection, mass resolution, and radiative fraction
+Each HPS input is an invariant-mass spectrum formed after a run-speciﬁc event selection. The
+selection ﬁxes the composition of the prompt e+e− sample, while the detector response sets the
+signal width and the radiative fraction sets its normalization. This section describes those three
+ingredients together.
+3.1 Prompt event selection
+Across the three HPS campaigns, the prompt selection follows the same experimental logic: oppo-
+sitely charged tracks matched to ECal clusters, tight cluster-time coincidence, track-quality and
+vertex-reconstruction requirements, and momentum cuts that retain prompt radiative tridents while
+suppressing accidentals and converted wide-angle bremsstrahlung. The 2015 and 2016 selections
+are inherited from the published prompt searches. For 2021, Table 2 distinguishes the upgraded-
+detector preselection in the full analysis note from the v16 prompt-TC production used for the
+native 10% v4.9.5 source. The production record establishes psum > 2. 8 GeV and no additional
+vertex-ﬁt χ2 requirement. It stores a three-dimensional hit count but does not establish the previ-
+ously quoted eight-hit two-dimensional electron requirement, so no such requirement is imposed in
+this description.
+Table 2: Comparison of the prompt-resonance selections. The 2015 and 2016 columns follow the
+published and internal engineering-run summaries. For 2021, the baseline entries follow the full-
+analysis-note preselection [ 6, Sec. 4.8, Table 38 and App. A]. The prompt entries list only additional
+requirements established for the v16 prompt-TC production used for the native 10% v4.9.5 source.
+Cut type 2015 (Eng. run 1) 2016 (Eng. run 2) 2021 (native 10%)
+Trigger /
+topology
+Pre: pairs-1 trigger; ECAL
+halves:
+yclu
+e+ yclu
+e− < 0.
+Prompt: same.
+Pre: Pair1 trigger bit;
+opposite ECal halves; the
+trigger does not encode
+track charge.
+Prompt: same.
+Pre: Single-2 or Single-3
+positron single-cluster
+trigger; Single-3 also requires
+the matched hodoscope
+condition used by the 2021
+trigger menu.
+Prompt: no additional v16
+requirement.
+Track momenta Pre: p(e− ) < 0. 75 Ebeam.
+Prompt: psum > 0. 8 Ebeam
+and psum < 1. 2 Ebeam.
+Pre: p(e± ) < 2. 15 GeV;
+psum < 1. 2 Ebeam.
+Prompt: psum > 1. 90 GeV
+and psum < 2. 4 GeV.
+Pre: ptrk > 0. 4 GeV for each
+track; FEE veto
+p(e− ) < 2. 9 GeV; vertex
+momentum pvtx < 4. 0 GeV.
+Prompt: the v16
+prompt-TC source requires
+psum > 2. 8 GeV.
+Track ﬁt / hits Pre: loose track–cluster
+match: χ2
+trk− clu < 10.
+Prompt: GBL track
+χ2
+trk < 40.
+Pre: χ2
+trk < 12; PID
+goodness < 10.
+Prompt: no additional
+prompt requirement is
+documented.
+Pre: χ2
+trk/ ndf < 20 and
+N2D hits ≥ 10 for the tracks.
+Prompt: no additional
+2D-hit requirement is
+established; the available
+v16 ﬁeld counts 3D hits.
+6
+
+HPS Gaussian-Process Resonance Search Writing Sample
+Cut type 2015 (Eng. run 1) 2016 (Eng. run 2) 2021 (native 10%)
+Track–cluster
+timing
+Pre: —
+Prompt:
+|tclu − ttrk − 43 ns |< 4. 5 ns .
+Pre: |ttrk − tclu|< 6 ns .
+Prompt: no additional
+value stated.
+Pre: full-note data timing
+windows:
+∆( te−,trk, t e+,clu) < 6. 0 ns ,
+∆( te+,trk, t e+,clu) < 5. 1 ns ,
+and
+∆( te−,trk, t e+,trk) < 7. 8 ns .
+Prompt: no additional v16
+timing requirement.
+Cluster–cluster
+coincidence
+Pre: —
+Prompt: |∆ tclu− clu|< 2 ns .
+Pre: |∆ tclu− clu|< 2 ns .
+Prompt:
+|∆ tclu− clu|< 1. 43 ns .
+Pre: no separate oﬄine
+cluster–cluster coincidence
+appears in the full
+preselection table; the Pair-0
+hardware trigger has a
+cluster-pair timing window
+|∆ t|< 12 ns and VTP
+prescale 100.
+Prompt: no additional v16
+oﬄine coincidence
+requirement.
+Vertex / V0
+quality
+Pre: if multiple V0 remain,
+choose the best χ2
+vtx.
+Prompt: χ2
+vtx < 75 and
+p(V0) < 1. 2 Ebeam.
+Pre: target-constrained V0
+candidates.
+Prompt: no additional
+prompt χ2
+vtx requirement is
+documented.
+Pre: full-note
+upgraded-detector values:
+pvtx < 4. 0 GeV and
+χ2
+vtx < 20.
+Prompt: no additional v16
+vertex-ﬁt χ2 requirement.
+Positron cluster
+energy
+Pre: —
+Prompt: —
+Pre: —
+Prompt: —
+Pre: full-note sanity cut
+Eclu
+e+ > 0. 2 GeV.
+Prompt: no additional v16
+positron-cluster threshold.
+cW AB
+suppression
+Pre: —
+Prompt: e+ must have L1
+and L2 hits;
+d0(e+) < 1. 1 mm ; and
+(p−
+T − p+
+T )/ (p−
+T + p+
+T ) < 0. 47.
+Pre: —
+Prompt: not applied in the
+ﬁnal 2016 prompt selection
+summary.
+Pre: no explicit
+cW AB-suppression cut is
+listed in the full 2021
+preselection table.
+Prompt: no additional v16
+cW AB requirement.
+Candidate
+multiplicity
+Pre: unique-V0 policy: keep
+the best χ2
+vtx.
+Prompt: enforced by the
+unique-V0 logic.
+Pre: —
+Prompt: require a single
+surviving V0 candidate.
+Pre: exactly one selected
+good vertex: Nvtx > 0 and
+Nvtx < 2.
+Prompt: no additional v16
+multiplicity requirement.
+The baseline 2021 entries follow the full analysis note [ 6, Sec. 4.8, Table 38 and App. A]. The
+native 10% spectrum comes from the v16 prompt-TC production. The GPR ﬁt adds no event-level
+cuts. Each campaign enters the analysis through its selected invariant-mass histogram and the
+detector-response and normalization inputs for the same event category.
+The engineering-run notes use preselection for the broad reconstruction sample and prompt
+selection for the tighter resonance-search sample. The 2021 source is closer to the latter because the
+v16 prompt-TC production retains the high- psum side. Table 2 preserves that distinction without
+inferring an unrecorded two-dimensional hit requirement.
+The 2021 preselection ﬁgures below show selected reconstruction variables. The signal simula-
+7
+
+HPS Gaussian-Process Resonance Search Writing Sample
+tion has an arbitrary normalization, so only the distribution shapes can be compared, not yields or
+eﬃciencies.
+0.00 0.05 0.10 0.15 0.20 0.25 0.30
+mvtx [GeV]
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+1.2
+Events
+×106
+HPS Internal Data (12511367)
+mA′ = 60 MeV (x3.1)
+mA′ = 120 MeV (x0.2)
+mA′ = 180 MeV (x0.4)
+(a) Vertex invariant mass.
+0 20 40 60 80 100
+2
+vtx
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+Events
+×106
+HPS Internal Data (11909488)
+mA′ = 60 MeV (x3.1)
+mA′ = 120 MeV (x0.2)
+mA′ = 180 MeV (x0.4)
+ (b) Vertex-ﬁt χ2.
+Figure 4: Reconstructed-vertex distributions after the loose preselection, comparing data (points)
+with the signal MC (ﬁlled histogram). The vertex-ﬁt χ2 is shown as a diagnostic; no vertex-ﬁt χ2
+requirement is applied to the regenerated 2021 GPR input.
+3.2 2015 mass resolution
+The 2015 signal width is calibrated with Møller data and propagated across mass with simulated
+A′ samples [ 7]. The Møller peak ﬁxes the detector resolution at a known mass, and the data–
+MC momentum-resolution diﬀerence determines the additional smearing applied to the simulation.
+Rescaling the ﬁtted A′ widths to that data anchor gives
+σ2015(m) = −9. 22 × 10− 5 + 5. 322 × 10− 2 m, (1)
+with m and σ2015 expressed in GeV.
+The Møller measurement supplies the absolute response, while the simulated mass grid supplies
+its mass dependence. The associated uncertainty therefore reﬂects the Møller calibration, the target
+position, and the residual momentum-response mismodelling [ 5, 7]. At each test mass this curve
+sets both the Gaussian signal width and the width of the excluded training interval.
+8
+
+HPS Gaussian-Process Resonance Search Writing Sample
+0.0 0.5 1.0 1.5 2.0 2.5 3.0
+pe  [GeV]
+10 1
+100
+101
+102
+103
+104
+105
+106
+Events
+HPS Internal Data (12441718)
+mA′ = 60 MeV (x3.1)
+mA′ = 120 MeV (x0.2)
+mA′ = 180 MeV (x0.4)
+(a) Electron momentum p.
+0 1 2 3 4 5
+pe
+z  [GeV]
+10 1
+100
+101
+102
+103
+104
+105
+106
+Events
+HPS Internal Data (12527623)
+mA′ = 60 MeV (x3.1)
+mA′ = 120 MeV (x0.2)
+mA′ = 180 MeV (x0.4)
+ (b) Electron longitudinal momentum pz.
+4
+ 2
+ 0 2 4
+de
+0  [mm]
+10 1
+100
+101
+102
+103
+104
+105
+106
+107
+Events
+HPS Internal Data (12430754)
+mA′ = 60 MeV (x3.1)
+mA′ = 120 MeV (x0.2)
+mA′ = 180 MeV (x0.4)
+(c) Electron transverse impact parameter d0.
+1.00
+ 0.75
+ 0.50
+ 0.25
+ 0.00 0.25 0.50 0.75 1.00
+ze
+0  [mm]
+10 1
+100
+101
+102
+103
+104
+105
+106
+107
+Events
+HPS Internal Data (12497000)
+mA′ = 60 MeV (x3.1)
+mA′ = 120 MeV (x0.2)
+mA′ = 180 MeV (x0.4)
+ (d) Electron longitudinal impact parameter z0.
+Figure 5: Electron-track kinematic distributions after the loose preselection, comparing data
+(points) with the signal MC (ﬁlled histogram).
+9
+
+HPS Gaussian-Process Resonance Search Writing Sample
+0.0 0.5 1.0 1.5 2.0 2.5 3.0
+pe +
+ [GeV]
+10 1
+100
+101
+102
+103
+104
+105
+106
+Events
+HPS Internal Data (12426214)
+mA′ = 60 MeV (x3.1)
+mA′ = 120 MeV (x0.2)
+mA′ = 180 MeV (x0.4)
+(a) Positron momentum p.
+0 1 2 3 4 5
+pe +
+z  [GeV]
+10 1
+100
+101
+102
+103
+104
+105
+106
+Events
+HPS Internal Data (12534361)
+mA′ = 60 MeV (x3.1)
+mA′ = 120 MeV (x0.2)
+mA′ = 180 MeV (x0.4)
+ (b) Positron longitudinal momentum pz.
+4
+ 2
+ 0 2 4
+de +
+0  [mm]
+10 1
+100
+101
+102
+103
+104
+105
+106
+107
+Events
+HPS Internal Data (12497202)
+mA′ = 60 MeV (x3.1)
+mA′ = 120 MeV (x0.2)
+mA′ = 180 MeV (x0.4)
+(c) Positron transverse impact parameter d0.
+1.00
+ 0.75
+ 0.50
+ 0.25
+ 0.00 0.25 0.50 0.75 1.00
+ze +
+0  [mm]
+10 1
+100
+101
+102
+103
+104
+105
+106
+107
+Events
+HPS Internal Data (12497245)
+mA′ = 60 MeV (x3.1)
+mA′ = 120 MeV (x0.2)
+mA′ = 180 MeV (x0.4)
+ (d) Positron longitudinal impact parameter z0.
+Figure 6: Positron-track kinematic distributions after the loose preselection, comparing data
+(points) with the signal MC (ﬁlled histogram).
+10
+
+HPS Gaussian-Process Resonance Search Writing Sample
+0.00 0.05 0.10 0.15 0.20 0.25 0.30
+mvtx [GeV]
+0.0
+0.5
+1.0
+1.5
+2.0
+2.5
+3.0
+pe  [GeV]
+HPS Internal
+Lint = 1 pb 1
+Loose
+100
+101
+102
+103
+104
+Events / bin
+(a) Mass vs. electron p (data).
+0.00 0.05 0.10 0.15 0.20 0.25 0.30
+mvtx [GeV]
+0.0
+0.5
+1.0
+1.5
+2.0
+2.5
+3.0
+pe  [GeV]
+HPS Internal
+Lint = 1 pb 1
+Loose
+10 6
+10 4
+10 2
+100
+102
+104
+Weighted events / bin (b) Mass vs. electron p (signal).
+0.00 0.05 0.10 0.15 0.20 0.25 0.30
+mvtx [GeV]
+0.0
+0.5
+1.0
+1.5
+2.0
+2.5
+3.0
+pe +
+ [GeV]
+HPS Internal
+Lint = 1 pb 1
+Loose
+100
+101
+102
+103
+104
+Events / bin
+(c) Mass vs. positron p (data).
+0.00 0.05 0.10 0.15 0.20 0.25 0.30
+mvtx [GeV]
+0.0
+0.5
+1.0
+1.5
+2.0
+2.5
+3.0
+pe +
+ [GeV]
+HPS Internal
+Lint = 1 pb 1
+Loose
+10 6
+10 4
+10 2
+100
+102
+104
+Weighted events / bin (d) Mass vs. positron p (signal).
+Figure 7: Reconstructed invariant mass versus momentum observables, for data (left) and signal
+MC (right), after the loose preselection.
+11
+
+HPS Gaussian-Process Resonance Search Writing Sample
+0.00 0.05 0.10 0.15 0.20 0.25 0.30
+mvtx [GeV]
+0
+10
+20
+30
+40
+50
+Track 2 (e )
+HPS Internal
+Lint = 1 pb 1
+Loose
+100
+101
+102
+103
+Events / bin
+(a) Mass vs. electron χ2 (data).
+0.00 0.05 0.10 0.15 0.20 0.25 0.30
+mvtx [GeV]
+0
+10
+20
+30
+40
+50
+Track 2 (e )
+HPS Internal
+Lint = 1 pb 1
+Loose
+10 6
+10 4
+10 2
+100
+102
+104
+Weighted events / bin (b) Mass vs. electron χ2 (signal).
+0.00 0.05 0.10 0.15 0.20 0.25 0.30
+mvtx [GeV]
+0
+10
+20
+30
+40
+50
+Track 2 (e + )
+HPS Internal
+Lint = 1 pb 1
+Loose
+100
+101
+102
+103
+Events / bin
+(c) Mass vs. positron χ2 (data).
+0.00 0.05 0.10 0.15 0.20 0.25 0.30
+mvtx [GeV]
+0
+10
+20
+30
+40
+50
+Track 2 (e + )
+HPS Internal
+Lint = 1 pb 1
+Loose
+10 6
+10 4
+10 2
+100
+102
+104
+Weighted events / bin (d) Mass vs. positron χ2 (signal).
+0.00 0.05 0.10 0.15 0.20 0.25 0.30
+mvtx [GeV]
+0
+20
+40
+60
+80
+100
+2
+vtx
+HPS Internal
+Lint = 1 pb 1
+Loose
+100
+101
+102
+103
+104
+Events / bin
+(e) Mass vs. vertex χ2 (data).
+0.00 0.05 0.10 0.15 0.20 0.25 0.30
+mvtx [GeV]
+0
+20
+40
+60
+80
+100
+2
+vtx
+HPS Internal
+Lint = 1 pb 1
+Loose
+10 6
+10 4
+10 2
+100
+102
+104
+Weighted events / bin (f) Mass vs. vertex χ2 (signal).
+Figure 8: Reconstructed invariant mass versus track- and vertex-ﬁt quality, for data (left) and
+signal MC (right), after the loose preselection.
+12
+
+HPS Gaussian-Process Resonance Search Writing Sample
+Figure 9: 2015 mass-resolution parameterization from scaled A′MC and Møller data [ 7]. The Møller
+point anchors the absolute detector response in data, while the scaled A′ simulation supplies the
+mass dependence across the search window. Because the prompt dark-photon width is negligible,
+this curve directly sets the resonance width assumed in the search and therefore the local background
+entering the limit.
+3.3 2016 mass resolution
+The 2016 calibration follows the same strategy over a broader mass range [ 3, 2]. Møller events
+ﬁx the absolute response at 48. 5 MeV; full-energy-electron momentum peaks determine the extra
+smearing needed to match data; and smeared A′ samples carry that calibration across the search
+range. A fourth-order polynomial ﬁt to those samples deﬁnes the 2016 signal model,
+σ2016(m) = 3 . 8 × 10− 4 + 4. 1 × 10− 2m − 2. 7 × 10− 1m2
++ 3. 49 m3 − 11. 11 m4, m ≤ 0. 18 GeV, (2)
+Earlier extended-range studies continued the polynomial linearly above m0 = 0. 18 GeV with slope
+0. 0239 to avoid its high-mass turnover. The v4 2016 scan ends at 180 MeV, close to the published
+39 MeV to 179 MeV interval, so that continuation is not used. The 2015 scan similarly remains near
+its published 19 MeV to 81 MeV interval, with only the upper endpoint extended to 90 MeV.
+13
+
+HPS Gaussian-Process Resonance Search Writing Sample
+The smearing correction reconciles the Møller and simulated A′widths with the observed track-
+ing response [ 3, 2]. Because the resolution worsens with mass, both the signal template and the
+excluded training window broaden, increasing the prompt background beneath a narrow signal
+hypothesis.
+Figure 10: 2016 smeared- A′and Møller-based mass-resolution summary [ 3]. The smeared A′points
+show how the data-driven momentum-smearing correction is propagated away from the single Møller
+calibration point. The worsening resolution with mass broadens the signal window and is one of
+the main detector eﬀects limiting prompt sensitivity at higher mass.
+3.4 2021 mass resolution
+The upgraded 2019/2021 tracker requires a separate resolution parameterization. We use the
+inclusive target-constrained V0 ﬁt without hit requirements shown in Figure 11. Before the ﬁnal
+data–MC broadening, the red curve is
+σTC, raw
+2021 (mMeV) =
+(
+1. 4786 − 1. 1 × 10− 3mMeV + 6. 87 × 10− 5m2
+MeV
+)
+MeV, (3)
+where mMeV is the numerical mass value in MeV. The analysis then applies the target-constrained
+data/MC scale derived from the 2021 smearing study,
+sTC = 2. 186
+1. 745 ≃ 1. 25, σ TC, smear
+2021 (m) = sTC σTC, raw
+2021 (m). (4)
+The scale comes from the target-constrained row after hit and curvature ( Ω ) smearing are applied
+to the simulation. Equation 4 then sets the 2021 signal width and the corresponding excluded
+training interval at each mass.
+14
+
+HPS Gaussian-Process Resonance Search Writing Sample
+Figure 11: 2021 mass-resolution summary used for the prompt analysis. The red curve is the
+inclusive target-constrained V0 quadratic ﬁt without hit requirements before the TC data/MC
+broadening in Eq. 4. The blue curve shows the corresponding unconstrained V0 reference ﬁt
+included in the underlying study for comparison.
+Figure 12: 2021 Møller run data/MC mass-resolution comparison used to set the smearing scale.
+Here UC denotes the unconstrained vertex sample, BSC denotes the beamspot-constrained vertex
+sample, and TC denotes the target-constrained vertex sample. The TC row is the most relevant
+row for the prompt analysis; comparing the data value 2. 186 MeV to the Ω +hit-smeared Monte
+Carlo value 1. 745 MeV gives the applied scale factor 2. 186/ 1. 745 ≃ 1. 25.
+Figure 13 compares the three implemented resolution curves over their scan ranges. The preced-
+ing panels show the measurements underlying each parameterization; the combined ﬁgure shows
+the smooth curves used to construct the signal templates and excluded training windows.
+15
+
+HPS Gaussian-Process Resonance Search Writing Sample
+Figure 13: Mass-resolution parameterizations used by the analysis over the adopted scan ranges.
+The 2016 scan ends at the polynomial boundary of 180 MeV, so its conﬁgured high-mass continua-
+tion does not enter the v4 result. The 2021 panel shows the target-constrained V0 parameterization
+after multiplication by the TC smearing scale sTC = 2. 186/ 1. 745 ≃ 1. 25 and extended to 250 MeV.
+3.5 Radiative fraction and the ε2 normalization
+The radiative fraction encodes the fraction of the selected prompt background arising from the
+purely radiative trident process,
+frad,d (m) = dNγ∗ ,d /dm
+dNtri,d /dm + dNwab,d /dm , (5)
+where the numerator is the selected radiative-trident component and the denominator is the full
+selected prompt background for dataset d [5, 2]. Because heavy-photon production is normalized
+to the radiative trident rate, frad is the physics quantity that converts a ﬁtted prompt signal yield
+16
+
+HPS Gaussian-Process Resonance Search Writing Sample
+into a limit on the coupling. With this notation,
+Kd(m) ≡ Ad(ε2 = 1) = 3π m frad,d (m) ρd(m)
+2αEM
+, A d = Kd(m) ε2, (6)
+where ρd(m) is the selected prompt-spectrum density in dataset d. The engineering-run inputs
+follow the corresponding prompt searches, while the 2021 normalization remains provisional for the
+native 10% sample.
+3.5.1 2015 radiative fraction
+The 2015 prompt search used a constant approximation,
+frad, 2015(m) = 0 . 085, (7)
+which the analysis retains as its 2015 baseline. The dedicated 2015 radiative-fraction study com-
+pares the selected radiative-trident component with the total prompt background and adopts the
+red horizontal line at 8.5% as a conservative description across the search interval. The constant
+comes from the internal HPS normalization study rather than from the GP ﬁt and is retained for
+consistency with the published 2015 analysis.
+Figure 14: Dedicated 2015 radiative-fraction inputs. The left panel shows the selected cross-section
+composition, while the right panel shows the radiative fraction used for normalization. The red hor-
+izontal line denotes the 8.5% constant adopted as the conservative ﬁt across the 2015 prompt-search
+dataset. This quantity converts the measured prompt spectrum into the expected A′normalization,
+so it aﬀects the ﬁnal ε2 interpretation rather than the local spectral ﬁt itself.
+3.5.2 2016 radiative fraction
+The 2016 prompt search used a ﬁfth-order polynomial derived from radiative, trident, and converted-
+W AB MC after the full prompt selection. Those components determine the mass-dependent con-
+version from ﬁtted signal yield to ε2 over the 2016 search range. For the 2016 input, we instead
+use the constant approximation
+frad, 2016(m) = 0 . 05, (8)
+17
+
+HPS Gaussian-Process Resonance Search Writing Sample
+which is numerically stable over the wider scan range. Figure 15 shows the mass-dependent simu-
+lation used in the published determination; the constant used here is a working numerical approxi-
+mation to that richer model.
+Figure 15: 2016 radiative-fraction study from radiative, trident, and converted-W AB MC [ 3]. The
+simulation gives an intrinsically mass-dependent normalization, although this analysis uses the
+constant frad, 2016 = 0. 05 for numerical stability.
+3.5.3 2021 radiative fraction
+For the native 2021 10% sample, the radiative-fraction input remains provisional. We use
+frad, 2021(m) = 0 . 05. (9)
+The 2021 full analysis note constructs the ratio from selected radiative-trident, tritrig, and W AB
+samples after preselection and a high-momentum requirement quoted as pvtx > 2. 8 GeV. A ﬁt over
+0. 05 < m < 0. 25 GeV gives the constant average f const
+rad = 0. 0496 [6, Sec. 6.1, Figs. 92–93, Eqs. 25–
+26]. Thus 0.05 is a reasonable approximation over most of the 2021 search range, but it is not frozen
+for the ﬁnal unblinded result. That result will require a direct check of the normalization category
+against the v16 prompt-TC psum selection and its threshold convention, with the mass-dependent
+parameterization retained as a cross-check.
+18
+
+HPS Gaussian-Process Resonance Search Writing Sample
+Figure 16: 2021 selected-mass distributions used to form the radiative fraction in the full-analysis
+note [ 6]. The upper panel shows the selected radiative, tritrig, and W AB components, while the
+lower panel gives frad(m) = Nrad/N bkg.
+Figure 17: Fifth-order 2021 full-analysis-note ﬁt to the binned radiative fraction [ 6]. The ﬁtted
+curve is close to the constant value 0. 05 across most of the range used by the 2021 analysis.
+3.6 Systematic penalties from the radiative fraction
+The analysis applies a data-set-dependent radiative-fraction penalty,
+f eﬀ
+rad,d (m) = (1 − δf,d ) frad,d (m). (10)
+19
+
+HPS Gaussian-Process Resonance Search Writing Sample
+The penalty enters only when signal yield is converted to ε2. It changes the normalization of the
+inferred coupling without altering the blind-window likelihood.
+The v4 conﬁguration uses
+(δf, 2015, δ f, 2016, δ f, 2021) = (0 . 070, 0. 070, 0. 046). (11)
+For a ﬁxed signal-yield limit, these shifts weaken the coupling-squared limit by factors 1/ 0. 93
+for 2015 and 2016 and 1/ 0. 954 for 2021. In the combined ﬁt each Kd(m) is reduced by its own
+amount, so a larger shared ε2 is required to produce the same yields. The factors are ﬁxed, one-
+sided normalization shifts; they do not enter the GP interpolation and are not proﬁled as nuisance
+parameters.
+The 7% engineering-run penalties reﬂect the several-percent uncertainty in the 2015 radiative
+and total e+e− composition and the corresponding 2016 uncertainty from the selected radiative,
+trident, and converted-W AB inputs [7, 2]. We retain 7% as a conservative ﬁrst-order treatment for
+both engineering runs. The 2021 term uses the upgraded-detector estimate below.
+The 2021 full analysis note derives a direct estimate from the generated RAD and W AB cross-
+section distributions shown in Fig. 18; propagating the quoted RAD and W AB cross-section widths
+with the relative normalization R = 0. 244 gives a bounded fractional uncertainty of 3.5% [ 6, Sec. 9.1,
+Fig. 161]. The same note assigns an additional 3% preselection/radiative-fraction modeling uncer-
+tainty, motivated by W AB-selective mismodeling in the selected background [ 6, Sec. 9.2]. Treating
+these two direct radiative-fraction normalization terms as independent gives
+δnote
+f, 2021 =
+√
+(0. 035)2 + (0. 030)2 = 0. 046, f eﬀ
+rad, 2021 = 0. 954 frad, 2021. (12)
+The resulting one-sided 2021 penalty is 4.6%, corresponding to a multiplicative factor of 0.954. The
+2015 and 2016 terms remain at 7%.
+Figure 18: Generated cross-section distributions for the 2021 tritrig, radiative, and W AB back-
+ground MC samples [ 6]. These distributions set the cross-section normalization inputs for the 2021
+radiative-fraction calculation.
+20
+
+HPS Gaussian-Process Resonance Search Writing Sample
+Figure 19: RAD and W AB cross-section distributions used in the 2021 note’s radiative-fraction
+cross-section uncertainty propagation [ 6]. Together with the relative normalization R = 0 . 244,
+these inputs lead to the 3.5% MC cross-section contribution.
+The 4.6% term covers only the radiative-fraction normalization. The broader 2021 displaced-
+search uncertainty model in Fig. 20 also includes mass resolution, target position, and tight-selection
+eﬀects that must be revisited before applying it to the full data set [ 6, Sec. 9, Table 58]. Those
+signal-yield and acceptance uncertainties are not included in Eq. ( 10).
+Figure 20: Broader 2021 full-analysis-note systematic summary [ 6]. Only the MC cross-section and
+preselection entries are folded into the radiative-fraction-only penalty in Eq. ( 12); the other entries
+remain separate signal-yield or acceptance eﬀects.
+21
+
+HPS Gaussian-Process Resonance Search Writing Sample
+4 Methodology
+4.1 From piecewise windows to ﬁxed-support GP ﬁts
+The original HPS GPR studies explored piecewise mass windows, redeﬁned the sidebands at each
+hypothesis, and considered several background proﬁles. They established that a GP could interpo-
+late the smooth trident spectrum, but the window-by-window ﬁts also produced less smooth limit
+curves, increased sensitivity to local ﬁt boundaries, and made a coherent multi-dataset combina-
+tion diﬃcult. The present workﬂow instead ﬁts the GP separately at each hypothesis on a ﬁxed,
+dataset-speciﬁc support, excluding only a narrow mass-dependent training region around the test
+mass. The support extends beyond the signal-search interval, but need not include empty turn-on
+bins or the full ROOT-histogram axis. This construction gives a smoother background prediction
+that can be validated and used in a combined likelihood with a shared parameter of interest.
+4.2 Search interval and GP ﬁt support
+The search interval answers where a resonance hypothesis is tested. The GP ﬁt support answers
+which surrounding bins constrain the smooth background at that hypothesis. Using the same
+endpoints for both deﬁnitions leaves the ﬁrst and last test masses with a one-sided training sample,
+even though the input histogram contains usable data beyond the search. The accepted v4.2
+three-campaign analysis uses the established 19–90, 39–180, and 50–250 MeV search intervals, with
+14–135, 30–210, and 40–300 MeV ﬁt supports for 2015, 2016, and 2021, respectively. The separate
+v4.9.5 2021-only pass keeps the 50–250 MeV search interval and changes that dataset’s ﬁt support
+to 36–300 MeV.
+These endpoints were declared before the v4 observed scan. The 2015 domain and the upper
+2016 edge follow the earlier functional-form validation ﬁts. The 2016 lower edge is placed at
+30 MeV rather than the historical 35 MeV ﬁt edge because the exact rebin-ﬁve geometry matters:
+at a 39 MeV hypothesis the blind interval begins at 35.063 MeV, while the ﬁrst bin center from a
+35 MeV support is 35.125 MeV. A nominal 35–210 MeV support would therefore still contain no
+low-side training-bin center at the lower search endpoint. The adopted domains retain at least 12
+and 20 low-side training bins at the 2015 and 2016 lower endpoints, and at least 138 and 51 high-
+side training bins at their upper endpoints. For the accepted v4.2 geometry, the corresponding 2021
+counts are 9 and 55. The bin-count audit is applied to every active dataset and mass hypothesis,
+rather than inferred only from continuous support boundaries.
+For 2021, v4.9 distinguished the support used to generate counts from the support retained in
+a GP ﬁt. Counts were generated once over 30–300 MeV; paired extractions then used 30–300 and
+40–300 MeV supports. This same-toy construction isolated the eﬀect of the lower edge, but did not
+freeze a new analysis support.
+Version 4.9.5 tested lower edges at 32, 34, 36, 38, and 40 MeV, with 30 MeV retained as an
+ineligible control, on the same 100 archived native-10% conditional backgrounds. The tests used
+masses of 55, 60, 65, and 70 MeV and injected strengths of z = 0 , 2, 5. Under the original strict
+protocol, a candidate failed if any injected cell had |p| ≥ 0. 5 and its two-sided 90% Student- t
+interval excluded zero; no edge passed. The practical rule adopted after that phase required at
+least 9 of the 12 mass–strength means, including at least 3 of the 4 background-only means, to have
+|p|< 0. 75, with none at or above 1.25; the technical gates were unchanged. Both 36 and 38 MeV
+qualiﬁed. The declared minimax tie rule selected 36 MeV because its score lay within the 0.10
+tie margin and it retained more support. The continuation and the full 100-background summary
+passed without further retuning. This conditional result froze the 36–300 MeV support for the
+22
+
+HPS Gaussian-Process Resonance Search Writing Sample
+v4.9.5 2021-only observed pass; it is not a direct coverage result and does not revise the accepted
+v4.2 combined-analysis card. The four conﬁguration states are summarized in Table 3.
+Analysis state 2021 mass domains Fixed settings Interpretation
+v4.2 analysis
+card
+search 50–250; GP
+support:
+40–300 MeV
+Rebin ﬁve; log-mass/log-count
+preprocessing; kmin = 1. 1,
+kmax = 15; 2. 25σm extraction
+and training exclusion; signed
+amplitude and asymptotic
+90% CL s
+Historical inference baseline.
+Its accepted observed result is
+not changed or recomputed by
+the support study.
+v4.5
+matched-reﬁt
+contract
+inherits the v4.2
+domains
+Reﬁt the GP for the matched
+background-only reference and
+every injected state; deﬁne
+σA,ref from that reference; use
+z = 0, 1, 3, 5 and retain signed
+pulls
+Deﬁnes the toy construction
+only; it neither changes the
+production settings nor
+overrides the ﬁt support.
+v4.9 support
+diagnostic
+search 50–250;
+generated spectra:
+30–300 MeV; paired
+GP supports:
+30–300 and
+40–300 MeV
+The paired extractions use
+identical cached counts, 25
+backgrounds per generating
+source, and the same
+v4.2/v4.5 ﬁt rules
+Completed conditional
+diagnostic. The lower-edge
+eﬀect is isolated by a same-toy,
+full-support control; no new
+production support is frozen.
+v4.9.5
+2021-only card
+search 50–250; GP
+support:
+36–300 MeV
+1 MeV grid; kmin = 1. 1,
+kmax = 15; 2. 25σm extraction
+and training exclusion; 1. 64σm
+density window; signed
+amplitude; asymptotic 90%
+CLs with α = 0. 10
+Frozen for the native-10% 2021
+observed pass after the
+declared continuation. The
+support decision is conditional,
+is not direct coverage, and
+does not update the v4.2
+three-campaign card.
+Table 3: Analysis states from v4.2 through v4.9.5. Search interval, toy-generating support, and GP
+ﬁt support are separate quantities. The accepted v4.2 combined result and the v4.9.5 2021-only
+observed pass therefore retain distinct 2021 supports.
+4.3 Observable, scan grid, and blinding
+The input observable is the reconstructed e+e− invariant-mass histogram for each dataset. Through-
+out this section, d labels the dataset, m denotes the reconstructed e+e− invariant mass, m0 is the
+test-mass hypothesis, and σd(m) is the dataset-speciﬁc mass resolution introduced in Section 3.
+The default scan step in the package is
+∆ m = 1 MeV, (13)
+and the blind window for a mass hypothesis m0 is centered on the detector resolution,
+Bd(m0) = [ m0 − nblindσd(m0), m 0 + nblindσd(m0)] . (14)
+The package exposes the extraction half-width and GP training exclusion as independent conﬁg-
+uration values. Earlier injection and GP-toy validation studies used nblind = 1 . 64 with the same
+1. 64 σd training exclusion. The current observed-limit and refmatched closure baseline documented
+23
+
+HPS Gaussian-Process Resonance Search Writing Sample
+later in this note uses a wider 2. 25 σd blind/extraction window with the GP training exclusion also
+set to 2. 25 σd. For an ideal Gaussian line shape, the 1. 64 σd interval contains
+f ideal
+blind(1. 64) = erf
+(1. 64√
+2
+)
+≃ 0. 899, (15)
+while the 2. 25 σd interval contains
+f ideal
+blind(2. 25) = erf
+(2. 25√
+2
+)
+≃ 0. 976. (16)
+This point matters conceptually and numerically: the current code does not renormalize the signal
+template inside either blind window. Instead, it keeps the full Gaussian normalization and lets only
+the blinded subset enter the local likelihood.
+The notation Bd(m0) denotes the set of histogram bins that lie inside the blinded interval for
+dataset d at test mass m0. In the current production conﬁguration there is no additional gap
+between the extraction window and the GP training sample: when the extraction and training-
+exclusion half-widths are equal, the training exclusion starts immediately outside Bd(m0). A wider
+exclusion, for example 1. 96 σd instead of 1. 64 σd, reduces signal leakage into the training region but
+also increases the interpolation distance and therefore the GP predictive uncertainty. In the simple
+background-dominated proxy S/
+√
+B ∝ F (k)/
+√
+k with F (k) = erf( k/
+√
+2), the optimum lies near
+k ≃ 1. 4, so the historical 1. 64 σd extraction was close to the pure-sensitivity optimum. Section 5
+then motivates the current 2. 25 σd blind/extraction choice as a signal-recovery improvement after
+full-reﬁt pseudoexperiments showed appreciable training-region absorption at narrower exclusions.
+The bin assignment is implemented with the ﬁxed histogram bin centers, not by splitting partly
+overlapping bins. Let ci = ( ei + ei+1)/ 2 be the center of bin i. The full bin is included in the
+blinded likelihood when
+m0 − nblindσd(m0) ≤ ci ≤ m0 + nblindσd(m0), (17)
+and the full bin is included in the GP sideband training sample only when its center lies strictly
+outside the training-exclusion interval. Thus a bin whose edge overlaps the blind boundary is
+treated by its center: if the center is inside the blind interval, the entire bin is blinded and enters
+the local likelihood; if the center is outside, the bin remains available for training unless it is removed
+by a wider training-exclusion interval. No fractional observed count is assigned to both regions.
+This same center mask is used consistently for the observed counts, the GP prediction points, the
+covariance slice, and the blinded-bin signal-template slice.
+The ﬁnite binning is therefore part of the deﬁnition of the numerical result. The Gaussian
+signal template is integrated over the full bin edges in Eq. ( 33), but the selected set of bins changes
+discretely when a boundary passes a bin center. Consequently the quoted local signiﬁcance and ε2
+limit are not meaningful to a precision ﬁner than the mass binning and scan grid used to deﬁne these
+masks. The production toys and validation plots use the same binning convention, so this edge-bin
+eﬀect is accounted for by applying the identical discrete procedure to data, pseudoexperiments,
+background predictions, signal templates, and yield-to-coupling conversions.
+4.4 Log-space preprocessing and the choice α = 1/y
+Following recent HEP GPR background-modeling studies [ 8, 9], the package ﬁts the GP in trans-
+formed coordinates:
+x = log m, z =
+{
+log y, y > 0,
+0, y = 0, (18)
+24
+
+HPS Gaussian-Process Resonance Search Writing Sample
+where y is the observed bin count. The log transformation is used for two related reasons. First,
+the prompt trident spectrum spans a wide dynamic range, and modeling z rather than y turns
+multiplicative shape variations into approximately additive ones. Second, x = log m makes equal
+distances in the GP coordinate correspond to equal fractional changes in mass, which is the relevant
+scale once the detector resolution is written in the transformed coordinate as σx(m) ≃ σd(m)/m .
+Barr and Liu emphasize that applying logarithms to both axes improves convergence and perfor-
+mance for wide, steeply falling spectra [ 8]. The GP regression step uses scikit-learn’s GaussianPro-
+cessRegressor estimator [ 10]; the surrounding HPS analysis code supplies the histogram handling,
+mass-dependent sideband masks, signal templates, proﬁle likelihood, and CL s limit construction.
+The GP is therefore used to model an unobserved smooth mean function ztrue,d (x) for the log-
+count spectrum. In that language, “latent” means only that the smooth log-rate is not observed
+directly; it is inferred from the histogram counts through the transformed coordinates and the het-
+eroscedastic variance term. The GP mean vector is the vector of latent log-count means evaluated
+at the selected training-bin coordinate. For Poisson counts Yi ∼ Pois(λi), the delta method gives
+Var[log Yi] ≈ Var[Yi]/E [Yi]2 ≈ 1/λ i, which motivates the plug-in choice αi ≈ 1/y i for occupied bins.
+A heteroscedastic diagonal term αi is then added to the training covariance,
+αi =
+{
+1/y i, y i > 0,
+1, y i = 0, (19)
+Kobs = K(X, X ) + diag(α), (20)
+so that each αi plays the role of an observation-variance term for bin i. This is the quantity that
+GaussianProcessRegressor adds to the diagonal during ﬁtting, so it is treated here as a variance
+model rather than an arbitrary tuning parameter.
+This is a deliberate departure from the earlier Barr–Liu-inspired draft parameterization. In
+the present analysis, αi is treated as the latent-space variance assignment associated with the
+transformed counts, while avoiding the extra log y weighting explored in the ﬁrst rough drafts. For
+empty bins the adopted ﬂoor αi = 1 is a unit variance in log-count space, not a pseudo-count of one
+event. It simply prevents zero-count bins from receiving ill-deﬁned or disproportionate weight after
+the log transformation. In this high-statistics search such bins are rare, so the ﬂoor acts mainly as
+a conservative legacy-stable safeguard rather than as a dominant source of uncertainty.
+The distinction from Ref. [ 8] is more speciﬁc than a diﬀerence in kernel choice. Barr and Liu
+also use a Constant ×RBF kernel and optimize its amplitude and length scale. Their independent
+methodological study uses a spectrum derived from a published CMS search; it is not a CMS
+Collaboration GPR result. In addition to optimizing the kernel, they treat the diagonal array as
+tunable regularization. For occupied bins their nominal prescription is
+αBL
+i =
+√ yi
+yi log yi
+= 1√ yi log yi
+, (21)
+and ﬁxed regional multipliers fi are then applied to αBL
+i . Reducing the ﬁrst eleven multipliers to 0.1
+raised the fraction of 100 background-only pseudoexperiments passing their BumpHunter criterion
+from 51% to 87%, but localized residual structures remained; their high-luminosity benchmark
+subsequently extended the reduced-multiplier region to the ﬁrst twenty bins [ 8]. The study therefore
+demonstrates that diagonal tuning can improve a particular benchmark, while also showing that
+the tuned region is sample- and regime-dependent.
+The active HPS conﬁguration applies no regional multiplier to the early bins and ﬁxes Eq. ( 19) as
+the delta-method variance model. This choice matters because scikit-learn’s alpha parameter has
+25
+
+HPS Gaussian-Process Resonance Search Writing Sample
+both an observation-noise interpretation and a numerical Tikhonov-regularization interpretation
+[11]. HPS adopts the former and places its separately validated smoothness control in the allowed
+length-scale domain. These are complementary controls: changing αi changes the leverage of bin
+i on the covariance diagonal, whereas changing ℓ changes the oﬀ-diagonal correlation range of the
+latent function. No matched study presented here establishes that one strategy is intrinsically
+superior to the other.
+4.5 Kernel choice and distinct regularization roles
+The baseline kernel in the current package is a single ConstantKernel ×RBF model,
+k(x, x ′) = C exp
+[
+− (x − x′)2
+2ℓ2
+]
+, (22)
+with broad amplitude bounds and a resolution-scaled RBF length-scale domain. This is the same
+simple kernel class used in the methodological studies of Refs. [ 9, 8], but the surrounding noise and
+validation choices need not be the same. The two quantities optimized in every HPS sideband ﬁt
+are C and ℓ. The ConstantKernel value C = k(x, x ) is the pointwise prior variance of the latent log-
+rate, so
+√
+C is its prior standard deviation; C is not a ﬁtted event-count normalization. The length
+scale ℓ controls how quickly covariance falls with separation in x = log m, and therefore how rapidly
+the background function may bend. The ﬁxed αi values are not a third kernel parameter and there
+is no optimized WhiteKernel in the baseline. They enter only through the observation-covariance
+diagonal.
+Figure 21 separates these roles graphically. This separation is useful when discussing regulariza-
+tion: changing C rescales the covariance amplitude, changing ℓ changes the correlation geometry
+and smoothness of the latent function, and changing αi changes how strongly one observation
+constrains that function.
+26
+
+HPS Gaussian-Process Resonance Search Writing Sample
+0.0 2.5 5.0 7.5 10.0
+separation |Δx|/σx(m0)
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0correlation k(Δx)/k(0)
+e−1/2 = 0.61
+signal-scale
+reference
+optimized: bounded ℓ domain
+(a) ℓ: correlation reach
+ℓ/σx = 1.5
+ℓ/σx = 4
+ℓ/σx = 9
+0.0 2.5 5.0 7.5 10.0
+separation |Δx|/σx(m0)
+0
+1
+2
+3
+4
+covariance k(Δx) [log-count2]
+same ℓ
+optimized: broad C domain
+(b) C: covariance amplitude
+C = 0.25
+C = 1
+C = 4
+−4 −2 0 2 4
+GP coordinate x
+−0.4
+−0.2
+0.0
+0.2
+0.4
+latent log-rate
+only diagonal entry αj changes
+small αj: bin has leverage
+large αj: bin downweighted
+fixed: αi = 1/yi
+(c) αi: per-bin trust
+C × RBF plus observation noise: three different roles
+Figure 21: Division of labor in the baseline GPR covariance. Panel (a) shows the normalized RBF
+correlation for three illustrative values of ℓ/σ x(m0); at a separation equal to ℓ, every curve has
+correlation e− 1/ 2 ≃ 0. 61. The length scale therefore changes the horizontal range over which bins
+communicate. Panel (b) varies C at ﬁxed ℓ. It changes the covariance amplitude, with pointwise
+prior standard deviation
+√
+C, without changing the normalized correlation range. Panel (c) holds
+the kernel ﬁxed and changes one diagonal variance αj: a smaller value gives the highlighted bin
+more leverage, while a larger value downweights it. HPS optimizes C and ℓ on the sidebands within
+conﬁgured bounds, but ﬁxes αi from the count-based variance rule. All curves and observations
+are schematic and are not an HPS ﬁt.
+Earlier studies explored more complicated kernels and piecewise procedures, but those variants
+are no longer the production baseline. The Constant ×RBF model is the analysis kernel; exploratory
+Constant×Matérn(ν = 3/ 2) and piecewise-kernel studies remain robustness checks. None provides
+a production-matched alternative-kernel coverage result for the v4.2 analysis.
+4.6 Resolution-scaled length-scale parameterization and bounds
+Because the GP is trained in x = log m, detector resolution must be translated into log-mass units.
+The package deﬁnes
+σx(m) = log( m + σd(m)) − log m ≃ σd(m)
+m (σd ≪ m), (23)
+and uses this local physical scale to set the RBF bounds. Under the local, resolution-scaled policy,
+ℓmin,d (m) = kmin,d σx(m), ℓ max,d (m) = kmax,d σx(m). (24)
+For the RBF covariance used here,
+kRBF(x, x ′) = σ2
+f exp
+[
+− (x − x′)2
+2ℓ2
+]
+, kRBF(x, x + ℓ)
+kRBF(x, x ) = e− 1/ 2 ≃ 0. 61. (25)
+Thus ℓ is a covariance-decay scale in the GP input coordinate: larger values favor smoother back-
+ground functions, while smaller values admit more rapid variation [ 12, 13]. The ratio ℓ/σ x(m)
+27
+
+HPS Gaussian-Process Resonance Search Writing Sample
+expresses that nuisance-model smoothness relative to the width of the narrow signal hypothesis.
+It is not, without an independently validated mapping, a detector resolution measurement or a
+physical background correlation length. The ﬁtted ℓopt is the log-marginal-likelihood optimum
+conditional on the kernel, data support, sideband mask, noise model, and conﬁgured optimizer
+domain. Consequently an optimum at ℓmax establishes only that the numerical constraint is active;
+it neither measures a physical scale at the boundary nor locates the unconstrained optimum. The
+implementation optimizes log-transformed kernel hyperparameters within these conﬁgured bounds
+[11].
+For a ﬁxed dataset d and mass hypothesis m0, let zsb contain only the transformed sideband
+observations and deﬁne
+Ky(C, ℓ ) = C Rℓ(Xsb, X sb) + diag(α sb). (26)
+The optimized pair maximizes
+log p(zsb |Xsb, C, ℓ ) = − 1
+2 zT
+sbK− 1
+y zsb − 1
+2 log |Ky| −nsb
+2 log(2π). (27)
+The quadratic term rewards agreement with the sideband observations, while the determinant term
+accounts for the covariance volume used to obtain that agreement. The implementation searches in
+the logarithms of C and ℓ with multiple optimizer restarts. This is an empirical-Bayes, or type-II
+maximum-likelihood, selection of the covariance parameters; it is not a proﬁle of ℓ as a frequentist
+nuisance parameter in the subsequent local CL s likelihood.
+Figure 22 shows why the optimum is speciﬁc to a dataset and mass hypothesis. Moving m0
+changes which bins are excluded from training and changes the resolution-scaled domain through
+σx(m0). The same dataset can therefore return a diﬀerent (Copt, ℓ opt) at neighboring hypotheses
+even though the kernel family is unchanged. An interior maximum means only that the conﬁgured
+range is nonbinding for that ﬁt. A maximum on a boundary means that the range is active, while a
+long shallow likelihood ridge means that the parameters are weakly identiﬁed. None of these cases
+turns ℓopt into a direct measurement of detector resolution or a physical background correlation
+length.
+28
+
+HPS Gaussian-Process Resonance Search Writing Sample
+−10.0 −7.5 −5.0 −2.5 0.0 2.5 5.0 7.5 10.0
+local coordinate u = (x − x0)/σx(m0)
+−0.20
+−0.15
+−0.10
+−0.05
+0.00
+0.05
+0.10
+0.15
+0.20
+schematic latent log-rate
+excluded from training
+(a) Sidebands at one mass hypothesis
+sideband observations
+short ℓ: local flexibility
+interior optimum ℓ/σx = 5.0
+long ℓ: broad smoothing
+100 101
+RBF length scale ℓ/σx(m0)
+10−2
+10−1
+ConstantKernel value C
+ℓmin ℓmax
+bounded maximum
+(b) Joint optimization of C and ℓ
+Δlog L = − 8
+ΔlogL=
+−
+8
+ΔlogL=
+−
+4.5
+ΔlogL=
+−
+2
+60 70 80 90 100 110
+invariant mass m [MeV]
+m0 = 72 MeV, σm = 1.25 MeV
+m0 = 96 MeV, σm = 1.55 MeV
+filled: training bin
+open: excluded bin
+(c) Moving m0 changes the mask and local scale
+60 80 100 120 140 160 180
+scanned mass hypothesis m0 [MeV]
+0
+2
+4
+6
+8
+10
+12
+ℓopt/σx(m0)
+domain is active;
+range study required
+not a measurement of a physical correlation length
+configured domain
+interior conditional optimum
+upper-bound contact
+(d) Interior optimum versus boundary contact
+−12
+−10
+−8
+−6
+−4
+−2
+0
+Δlog p(zsb|C, ℓ)
+What an optimized length scale means at a mass hypothesis
+Figure 22: Meaning of per-mass-hypothesis hyperparameter optimization. Panel (a) shows one
+schematic sideband problem in u = (x − x0)/σ x(m0). The shaded 2. 25 σx interval is excluded from
+training; the three curves illustrate the diﬀerent interpolation behavior allowed by short, interior,
+and long candidate length scales. Panel (b) shows the joint log-marginal-likelihood surface for the
+same synthetic sidebands. The star is the bounded maximum in (C, ℓ ), and the elongated contours
+expose their possible tradeoﬀ. Panel (c) shows that moving m0 changes both the sideband mask and
+the local resolution scale that deﬁnes the allowed ℓ interval. Panel (d) illustrates how a scan records
+an interior optimum diﬀerently from repeated upper-bound contact: the former is a conditional
+best ﬁt within a nonbinding range, whereas the latter diagnoses an active numerical domain and
+motivates a predeclared range and closure study. The ﬁgure is explanatory only; it contains no
+HPS observations or ﬁt results.
+This distinction determines how the hyperparameter study enters a physics result. If the allowed
+range forces ℓ too low, the GP retains unnecessary signal-scale ﬂexibility and can absorb part of
+a localized excess; if the ﬁtted background is forced too smooth, broad mismodeling can instead
+leave a biased local residual. Raising only the upper bound permits, but does not require, a
+smoother solution. A larger data set also need not prefer a larger ℓ: additional statistics can
+resolve background structure and move the optimum downward. The upper range is therefore
+selected from boundary occupancy, likelihood ordering, optimizer stability, and ﬁxed-amplitude
+29
+
+HPS Gaussian-Process Resonance Search Writing Sample
+signal-recovery diagnostics, never from a favorable observed limit or local p0. These checks can
+justify a bounded candidate range, but they do not by themselves establish frequentist coverage.
+The v4.2 result uses the dataset-speciﬁc factors in Table 4. The lower factors retain their earlier
+full-reﬁt closure support; changing the 2016 upper factor does not requalify those closure studies
+at full statistics.
+Dataset kmin,d kmax,d v4.2 status
+2015 full 1.0 8 unchanged from v4
+2016 full 0.9 12 accepted; conditional
+2021 10% 1.1 15 unchanged from v4
+Table 4: Resolution-scaled RBF length-scale factors in the v4.2 result. The factors multiply σx(m)
+in Eq. ( 24). Only the 2016 upper factor diﬀers from v4. Factor 12 is accepted as the current
+full-2016 setting, but the observed-data selection remains distinct from a pre-unblinding freeze or
+direct coverage qualiﬁcation.
+The lower factors are based on full-reﬁt functional-form closure scans, with the observed-
+spectrum result kept out of the selection criterion. For 2015, the 100-toy scan slightly prefers
+kmin = 1 . 1 in its aggregate score, but kmin = 1 . 0 has similar pull-width calibration and a weaker
+expected-reach proxy. The latter is therefore retained as the conservative frozen baseline rather
+than described as the numerical score winner. For 2016, the 25-toy continuation directly supports
+the change to kmin = 0. 9: its nonzero-injection RMS pull mean is 0.321 and its median pull width
+is 0.948, compared with 0.403 and 0.889 for kmin = 1. 1. It gives the smallest aggregate calibration
+score among the scanned 0.9, 1.0, and 1.1 rows and reduces the coherent apparent signal-recovery
+bias that motivated the follow-up. For 2021, the corrected matched-reference scan ﬁnds small rank
+separations among the same three settings. The kmin = 1. 1 row has the median pull width closest
+to unity and the best extraction-level ε2 proxy, while the 0.9 and 1.0 rows have slightly smaller
+aggregate scores. The frozen 1.1 choice is therefore a calibration–reach tradeoﬀ, not a claim that it
+wins every diagnostic. These development studies used the data fractions stated in Section 5; they
+should not be read as a new full-statistics validation of the v4.1 upper range.
+Version 4 used upper factors 8, 8, and 15 for 2015, 2016, and 2021. In its reviewed observed scan,
+the 2016 optimum reached its upper bound at all 142 hypotheses. The v4.1 range study therefore
+changes only kmax, 2016 and evaluates factors 8, 10, 12, 15, and 20 on the same 39–180 MeV mass
+grid. A ﬁt is counted as upper-bound occupied when ℓopt/ℓ max ≥ 0. 999. The respective occupancies
+are 142, 56, 0, 0, and 0 of 142. Factor 12 is the ﬁrst scanned setting with no occupied hypotheses.
+It is also followed by a numerical plateau: from factor 12 to 15, the largest pointwise change in
+the 2016 observed yield upper limit is 0.083%, the largest |∆ Z|is 0.00255, and the log-marginal-
+likelihood diﬀerences lie between −4. 5× 10− 6 and 8. 0× 10− 6. The factor-15 to factor-20 comparison
+is similarly stable. The selection is based on removal of the artiﬁcial boundary and the next-setting
+plateau, not on which observed limit is tighter or which local p0 is smaller.
+Because this diagnostic was prompted by the v4 observed spectrum, factor 12 is accepted for the
+v4.2 result with an explicit post-selection qualiﬁcation; it is not presented as a pre-unblinding choice
+or a coverage-calibrated nominal. Production-matched functional-form closure and direct cover-
+age remain separate requirements. The conﬁgurations continue to retain a dataset-wide median-
+resolution ﬂoor on ℓmax,d so that the ceiling does not become artiﬁcially small where the local
+resolution is exceptionally tight. This is a guard based on a representative σx value, not a ﬂoor
+derived from luminosity or event statistics. Alternative upper bounds, ﬁxed-background ﬁts, and
+30
+
+HPS Gaussian-Process Resonance Search Writing Sample
+the historical common-lower-bound overlays remain robustness studies collected in the appendices.
+An earlier 2021 source/exposure pilot used a nested-Poisson construction. It motivated the
+later matched-reﬁt studies but is not part of the v4.9 statistical deﬁnition.
+Figure 23 summarizes the same construction in the language used by the implemented likelihood.
+The sideband bins set the log-count training sample and its heteroscedastic bin-noise assignment,
+the kernel hyperparameters are optimized only on those sidebands, and the trained GP is then
+conditioned to predict the mean and covariance in the blinded mass window. That predicted count-
+space mean and covariance are the background inputs passed to the local proﬁled signal extraction.
+(a) Log-count transform, noise-aware covariance training,
+and window prediction. The ﬁlled covariance boxes in-
+dicate the sideband-sideband, sideband-blind, and blind-
+blind kernel blocks used when conditioning the GP.
+(b) Sideband-only training and blinded-window
+prediction. Filled markers show binned count
+data, vertical error bars show the ﬁxed per-bin
+statistical noise, and the horizontal reference
+lines are count-axis guides used to compare side-
+band and blinded-window scales.
+Figure 23: Kernel and blinded-window construction used by the GPR workﬂow. The GP is trained
+on sideband bins with ﬁxed bin-noise variances, not on the blinded bins. The posterior prediction
+in the blind window supplies the background mean and covariance that enter the local likelihood;
+the shaded band in the schematic denotes the GP posterior interval and the dashed vertical lines
+mark the blinded-window boundaries.
+4.7 Blind-window prediction in count space
+For each mass point, the package trains the GP only on the bins outside the training exclusion
+window and predicts the posterior mean and covariance of the latent smooth log-rate in the blinded
+bins. Since the ﬁt is performed in log-count space, that posterior is mapped back to count space
+through the standard lognormal moment relations:
+µi = exp
+(
+µ(log)
+i + 1
+2 Σ (log)
+ii
+)
+, (28)
+Cov(λi, λ j) = µiµj
+[
+exp
+(
+Σ (log)
+ij
+)
+− 1
+]
+. (29)
+31
+
+HPS Gaussian-Process Resonance Search Writing Sample
+The resulting blind-window mean vector bd(m) and covariance matrix Cd(m) are the central sta-
+tistical objects entering both the local extraction ﬁt and the CL s limit. In other words, once the
+GP prediction has been translated back into count space, the analysis no longer works with an
+abstract regression model; it works with an explicit multivariate background prediction for the
+latent expected counts in the blinded bins. The Poisson counting ﬂuctuation of the observed nd,i is
+handled separately by the likelihood, so Cd should be read as the covariance of the GP-predicted
+background mean rather than the covariance of the observed histogram counts themselves.
+To propagate that correlated GP uncertainty into the proﬁle likelihood, the analysis uses the
+Cholesky factorization
+Cd(m) = Ld(m)L⊤
+d (m), (30)
+with Ld(m) the lower-triangular Cholesky factor of the positive-semideﬁnite blind-window covari-
+ance. Introducing an auxiliary standard-normal nuisance vector θd ∼ N (0, I ) and the background-
+deformation ﬁeld ∆ bd(m) = Ld(m)θd then gives ∆ bd ∼ N (0, Cd). This is the standard HEP
+construction for encoding correlated Gaussian-constrained nuisance variations inside a proﬁle like-
+lihood model [ 14, 15]. In the present analysis it is especially important because the GP prediction
+induces nontrivial bin-to-bin correlations across the blinded window; carrying those correlations
+through Ldθd lets the local signiﬁcance and CL s limit respond to coherent background deforma-
+tions rather than misinterpreting the GP uncertainty as independent per-bin noise.
+4.8 Signal model and conversion to ε2
+For each dataset d and mass hypothesis m0, the package ﬁrst constructs a full-range Gaussian
+line-shape template over the histogram binning,
+wfull
+d,i (m0) =
+∫ ei+1
+ei
+1√
+2πσd(m0) exp
+[
+− (m − m0)2
+2σd(m0)2
+]
+dm, (31)
+where ei and ei+1 are the lower and upper edges of histogram bin i. The template is normalized so
+that ∑
+i∈full range
+wfull
+d,i (m0) = 1 . (32)
+The template entering the local likelihood is then the blinded-bin slice of this full-range object,
+wd,i (m0) =
+{
+wfull
+d,i (m0), i ∈ Bd(m0),
+not used in the local ﬁt , i / ∈ Bd(m0). (33)
+By the blinded-bin slice we mean exactly this restriction of the full normalized Gaussian template to
+the subset of bins in Bd(m0); the template is not renormalized after the restriction. Its blinded-bin
+sum is therefore
+fblind,d (m0) =
+∑
+i∈Bd(m0)
+wd,i (m0) < 1, (34)
+with a value near 0.90 for a 1. 64 σd half-width and near 0.98 for the current 2. 25 σd observed-limit
+half-width. The signal amplitude Ad is deﬁned as the total local Gaussian signal yield associated
+with the mass hypothesis, not merely the yield inside the blind window. The expected signal
+contribution entering bin i of the local likelihood is therefore
+sd,i (Ad; m0) = Ad wd,i (m0), (35)
+so the total expected signal actually visible inside the blind window is fblind,d (m0) Ad.
+32
+
+HPS Gaussian-Process Resonance Search Writing Sample
+This convention is more physical than blind-window renormalization because it preserves the
+fact that a ﬁnite blind region never contains the entire Gaussian line shape. It also keeps the signal
+parameter used in the ﬁt aligned with the full-histogram injection model used in the procedural
+toy studies.
+The conversion between signal yield and dark-photon coupling follows the standard ﬁxed-target
+relation between A′production and radiative trident production [ 16, 5, 2]. In the present notation,
+dNA′
+dm
+⏐⏐⏐⏐
+m=mA′
+= 3π
+2Neﬀ αEM
+mA′ ε2 dNγ∗
+dm
+⏐⏐⏐⏐
+m=mA′
+, (36)
+where αEM is the ﬁne-structure constant, the factor 3π/ 2 is the standard narrow-width coeﬃcient
+relating on-shell A′ production to radiative trident production, and Neﬀ counts the number of
+kinematically open visible decay channels contributing to the total A′ width. Below the dimuon
+threshold, only the e+e− channel is open and the minimal-model conversion has Neﬀ = 1 . The
+present GPR implementation keeps this e+e− normalization as the analysis convention for the
+prompt electron-channel yield; minimal dark-photon interpretations above 2mµ require updating
+the visible branching factor to include the newly open µ+µ− channel. Writing the radiative diﬀer-
+ential rate as dNγ∗
+dm = frad,d (m) ρd(m), (37)
+where ρd(m) is the diﬀerential prompt background rate in the selected invariant-mass spectrum,
+the package converts between Ad and ε2 through
+ε2 = 2αEM Ad
+3π m frad,d (m) ρd(m) , (38)
+where ρd(m) is estimated from the observed histogram as a local counts-per-GeV density in the
+same mass interval used for the nominal blind window,
+ρd(m) ≡ Nd[m − nblindσd(m), m + nblindσd(m)]
+2 nblindσd(m) , (39)
+with nblind = 1 . 64 retained as the current prompt-density normalization window even when the
+extraction blind window is widened to 2. 25 σd. This keeps the yield-to- ε2 conversion tied to the
+historically used local density scale while the likelihood itself can recover the wider signal tails.
+The density-window width remains conﬁgurable so that alternative conventions can be reproduced
+when needed. It is convenient to deﬁne the dataset-speciﬁc conversion factor
+Kd(m) ≡ Ad(ε2 = 1) = 3π m frad,d (m) ρd(m)
+2αEM
+, (40)
+so that a shared coupling ε2 predicts a dataset-speciﬁc total signal yield Ad = Kd(m)ε2.
+Unless stated otherwise, the methodology section uses the nominal radiative fraction frad,d (m).
+The optional penalty that propagates normalization uncertainty into ε2 is treated as a systematic
+variation rather than as part of the core GP ﬁt and is discussed separately in Section 3.6. The nu-
+merical penalty values are therefore result-conﬁguration choices, not ingredients of the background
+interpolation or local extraction ﬁt. When that systematic option is enabled for dataset d, the
+eﬀective radiative fraction is
+f eﬀ
+rad,d (m) = (1 − δf,d ) frad,d (m), (41)
+so the same signal-yield limit maps to a weaker ε2 limit.
+33
+
+HPS Gaussian-Process Resonance Search Writing Sample
+4.9 Statistical inference in a single dataset
+For a ﬁxed dataset d and mass hypothesis m, let nd denote the vector of observed blinded-bin counts,
+bd the GP-predicted blinded-bin mean, Cd = LdL⊤
+d the corresponding covariance of Section 4.7 and
+Eq. ( 30), and wd(m) the non-renormalized blinded-bin slice of the full Gaussian template deﬁned
+in Eq. ( 33). The proﬁled local likelihood is
+Ld(Ad, θd) =
+
+
+Nd(m)∏
+i=1
+Pois(nd,i |bd,i + (Ldθd)i + Adwd,i (m))
+
+ exp
+(
+− 1
+2 θ⊤
+d θd
+)
+, (42)
+where the Gaussian nuisance vector θd ∼ N (0, I ) induces the correlated background-deformation
+ﬁeld Ldθd deﬁned below Eq. ( 30), and Nd(m) is the number of bins in the local blinded set Bd(m).
+The signal contribution entering the Poisson mean is exactly the blinded-bin restriction of Eq. ( 35).
+At ﬁxed m, proﬁling Eq. ( 42) with no physical sign constraint on Ad yields the unconstrained
+extraction estimator ˆA unc
+d and its local uncertainty σA,d . This unconstrained ﬁt is used for closure,
+linearity, and pull studies because it allows downward background ﬂuctuations to be captured by
+the estimator itself rather than being clipped at zero. For discovery and production upper limits,
+however, the parameter of interest is restricted to the physical region Ad ≥ 0, and the corresponding
+physical best ﬁt is
+ˆAd = max
+(
+0, ˆA unc
+d
+)
+. (43)
+We denote by ˆθd the nuisance-parameter maximizer at the unconditional best ﬁt and by ˆˆθd(Ad)
+the conditional maximum likelihood estimator of θd for ﬁxed Ad.
+4.9.1 Local signiﬁcance
+The single-dataset discovery statistic is the bounded proﬁle-likelihood ratio
+q0,d (m) = −2 ln
+Ld
+(
+Ad = 0, ˆˆθd(0)
+)
+Ld
+(
+ˆAd, ˆθd
+) , (44)
+with ˆAd ≥ 0. The local one-sided discovery p-value and the corresponding Gaussian signiﬁcance
+are then obtained with the asymptotic Cowan-et-al. mapping [ 15]. The resulting local-signiﬁcance
+deﬁnition is explicitly one-sided and discovery facing: downward ﬂuctuations are allowed in the
+unconstrained ﬁt used for closure studies, but they do not generate a positive local discovery
+signiﬁcance. This proﬁled multi-bin test replaces the older sum-count approximation used in the
+earliest drafts and is the only local-signiﬁcance deﬁnition treated as current in this note.
+34
+
+HPS Gaussian-Process Resonance Search Writing Sample
+4.9.2 CL s upper limits
+To test a ﬁxed non-negative signal amplitude Ad, the production limit setting uses the bounded
+one-sided proﬁle-likelihood statistic
+˜qAd(m) =
+
+
+
+0, ˆA unc
+d > A d,
+−2 ln
+Ld
+(
+Ad, ˆˆθd(Ad)
+)
+Ld
+(
+ˆA unc
+d , ˆθd
+) , 0 ≤ ˆA unc
+d ≤ Ad,
+−2 ln
+Ld
+(
+Ad, ˆˆθd(Ad)
+)
+Ld
+(
+0, ˆˆθd(0)
+) , ˆA unc
+d < 0,
+(45)
+which is the standard bounded Cowan construction for upper limits [ 15]. The corresponding
+modiﬁed-frequentist tail areas are
+CLs+b(Ad; m) = P
+(
+˜qAd ≥ ˜qobs
+Ad
+⏐⏐⏐ Ad + bkg
+)
+, CLb(Ad; m) = P
+(
+˜qAd ≥ ˜qobs
+Ad
+⏐⏐⏐ bkg
+)
+, (46)
+and
+CLs(Ad; m) = CLs+b(Ad; m)
+CLb(Ad; m) . (47)
+Dividing by CLb prevents a downward background ﬂuctuation from producing an artiﬁcially ag-
+gressive exclusion in a region with little intrinsic sensitivity [ 17, 18]. At conﬁdence level 1 − α, the
+single-dataset upper limit is
+AUL,d (m; α) = min {Ad : CL s(Ad; m) ≤ α}. (48)
+The v4 result uses α = 0 . 10, corresponding to a 90% CL upper limit; retained historical 95%
+studies use α = 0. 05. The package reports the limit both in signal-yield space and, after applying
+the dataset-speciﬁc conversion factor of Eq. ( 40), in ε2 space.
+4.10 Asymptotic and toy calibration
+The local-signiﬁcance mapping introduced above is treated asymptotically throughout the produc-
+tion scan. For upper limits, the same bounded statistic ˜qAd is calibrated in one of two ways. In
+asymptotic mode, the background-only Asimov data set is used to evaluate the reference quantity
+˜qAd,A , so that
+CLs+b(Ad; m) = 1 − Φ
+(√
+˜qobs
+Ad
+)
+, CLb(Ad; m) = Φ
+(√
+˜qAd,A −
+√
+˜qobs
+Ad
+)
+. (49)
+In toy mode, the same statistic ˜qAd is calibrated directly with background-only and signal-plus-
+background pseudoexperiments rather than by switching to a diﬀerent ordering variable. The
+shared-coupling combination described below uses the identical logic after replacing the single-
+dataset amplitude Ad with the common parameter of interest ε2.
+The pseudoexperiment program remains important even with the asymptotic formulae in place
+because the HPS likelihood combines a multi-bin Poisson term, a GP-conditioned blind-window
+covariance, a non-renormalized Gaussian signal template, and a mass-dependent yield-to- ε2 conver-
+sion. The pull, spurious-signal, and injection-recovery diagnostics of Section 5 test this machinery
+under the declared conditional backgrounds. They are not direct CL s coverage studies or a scan-
+wide calibration of Z.
+35
+
+HPS Gaussian-Process Resonance Search Writing Sample
+4.11 Matched-reference injection–extraction diagnostics
+The v4.5 contract deﬁnes an injection axis through a background-only reference ﬁt that uses the
+same support, binning, exclusion mask, kernel bounds, preprocessing, and GP-reﬁt path as the
+corresponding toy extraction. If F[n; w] denotes that full procedure for counts n and the blind-
+window slice of the unit-normalized full-range signal template w, then
+( ˆAref , σ A, ref ) = F[nref ; w], A inj(z) = z σA, ref , z ∈ {0, 1, 3, 5}. (50)
+The reference uncertainty is a ﬁxed calibration of the injection coordinate at a given source, toy
+index, and mass. It is not the post-injection uncertainty returned for an individual extraction.
+For accepted state t, the signed pull and paired response are
+pt(z) =
+ˆAt(z) − Ainj,t (z)
+σA,t (z) , (51)
+Rt(z) =
+ˆAt(z) − ˆAt(0)
+Ainj,t (z) , z > 0. (52)
+The zero-injection mean pull diagnoses a conditional spurious-signal oﬀset under the declared gener-
+ating truth. Its width probes the returned uncertainty scale, while Rt separates injection response
+from a background-speciﬁc zero-signal oﬀset. These quantities use the toy-level σA,t in the denomi-
+nator. A ﬁnite 25-background sample supports two-sided 90% Student- t intervals on the mean and
+descriptive widths, not a direct coverage statement.
+Full reﬁtting and no-reﬁt displays answer diﬀerent questions. Holding a GP state ﬁxed isolates
+the local proﬁle-likelihood extraction. Reﬁtting the GP on every pseudo-spectrum additionally tests
+background adaptation and possible signal absorption. Version 4.9 uses the latter matched-reﬁt
+path. Optimizer acceptance is decided from ﬁt state, likelihood, reproducibility, covariance, and
+kernel-coordinate diagnostics before amplitudes or pulls are summarized; no row is selected because
+its pull is favorable.
+4.12 Observed-limit toy diagnostics
+The analysis uses two distinct families of p-values for diﬀerent purposes. The ﬁrst is the discov-
+ery statistic of Eq. ( 44), summarized through q0(m), p0(m), and Zlocal(m). The second consists
+of diagnostics derived from the background-only CL s limit ensemble at each mass. For Ntoys
+background-only pseudoexperiments and an observed limit ε2
+UL, obs(m) at the conﬁdence level under
+study, those quantities are
+pstrong(m) = 1
+Ntoys
+Ntoys∑
+t=1
+1
+[
+ε2
+UL,t (m) ≤ ε2
+UL, obs(m)
+]
+, (53)
+pweak(m) = 1
+Ntoys
+Ntoys∑
+t=1
+1
+[
+ε2
+UL,t (m) ≥ ε2
+UL, obs(m)
+]
+, (54)
+ptwo(m) = min[1 , 2 min(pstrong(m), p weak(m))] . (55)
+Here pstrong quantiﬁes how unusually strong the observed limit is relative to the background-only toy
+ensemble, while pweak quantiﬁes how unusually weak it is. The two-sided quantity ptwo is retained
+only as a symmetric diagnostic; because it responds to both unusually strong and unusually weak
+limits, it is less targeted than the one-sided discovery or exclusion tests and is not used as a search
+36
+
+HPS Gaussian-Process Resonance Search Writing Sample
+statistic. Figure 24 gives the compact ﬁxed-mass deﬁnition of these quantities, while Figure 25
+shows representative strong-limit, weak-limit, and bounded median-case examples from the same
+toy-limit logic.
+Figure 24: Illustrative toy-limit diagnostic at ﬁxed mass. The left panel shows a background-only
+ensemble of observed CL s upper limits, and the right panel shows the corresponding empirical
+cumulative distribution. The vertical line marks the observed limit. The lower-tail area deﬁnes
+pstrong, the upper-tail area deﬁnes pweak, and ptwo = min[1 , 2 min(pstrong, p weak)] is used only as a
+symmetric diagnostic summary.
+Figure 25: Representative ﬁxed-mass observed-limit toy diagnostics. The left panel shows an
+unusually strong observed limit relative to the background-only toy ensemble, the middle panel
+shows an unusually weak observed limit, and the right panel shows a near-median case where the
+bounded symmetric summary saturates at ptwo = 1 . These are limit diagnostics, not discovery
+statistics.
+These quantities are therefore limit diagnostics rather than discovery-signiﬁcance measures in
+the sense of p0. If the observed limit lies near the median of the background-only ensemble, then
+roughly half of the toys lie above it and half lie below it, making both pstrong and pweak naturally
+O(0. 5). Their ﬁnite resolution is 1/N toys. In the v4.2 combined ensemble, Ntoys = 300 , so a
+one-count change is 1/ 300 ≃ 0. 0033 and a zero-count tail is reported as 0 of 300 rather than as
+an exact zero probability. These toy-limit diagnostics cannot by themselves establish or refute a
+high-signiﬁcance local excess in the discovery statistic deﬁned by the one-sided local p0 mapping
+above.
+37
+
+HPS Gaussian-Process Resonance Search Writing Sample
+4.13 Shared- ε2 combination across datasets
+At a common mass hypothesis m, each active dataset contributes a distinct blinded-bin count
+vector, GP background prediction, covariance matrix, and Gaussian signal template. Let the set of
+datasets that cover the hypothesis be D(m). For each d ∈ D(m), deﬁne
+nd(m), bd(m), Cd(m) = LdL⊤
+d , wd(m), K d(m), (56)
+where wd(m) is the blinded-bin template slice of Eq. ( 33), Kd(m) is the yield-per-unit- ε2 conversion
+of Eq. ( 40), and Ld is the Cholesky factor of the GP covariance in that dataset. When the radiative-
+fraction penalty of Eq. ( 10) is enabled, the conversion becomes
+Keﬀ
+d (m) = (1 − δf,d ) Kd(m), (57)
+so the expected signal vector per unit ε2 is reduced coherently in every active dataset. The per-
+dataset likelihood is then
+Ld(ε2, θd) =
+
+
+Nd(m)∏
+i=1
+Pois
+(
+nd,i
+⏐⏐⏐ bd,i + (Ldθd)i + ε2Keﬀ
+d (m)wd,i (m)
+)
+
+ exp
+(
+− 1
+2 θ⊤
+d θd
+)
+. (58)
+The baseline combined likelihood is the product over datasets,
+Lcomb(ε2, {θd}) =
+∏
+d∈D(m)
+Ld(ε2, θd). (59)
+Equivalently, one may concatenate all blinded-bin vectors into a single object. In the following
+equations, ∥ denotes vector concatenation, e.g. n1 ∥n2:
+n = n1 ∥n2 ∥ · · ·, (60)
+b = b1 ∥b2 ∥ · · ·, (61)
+sunit =
+(
+Keﬀ
+1 w1
+)
+∥
+(
+Keﬀ
+2 w2
+)
+∥ · · ·, (62)
+θ = θ1 ∥θ2 ∥ · · ·, (63)
+Ccomb = blockdiag(C1, C2, . . . ), L comb = blockdiag(L1, L 2, . . . ), (64)
+so that the total expected mean is
+λ(ε2, θ) = b + Lcombθ + ε2sunit, Ccomb = LcombL⊤
+comb. (65)
+The bounded upper-limit statistic for the shared coupling, ˜qε2(m), is deﬁned exactly as in Eq. ( 45)
+after replacing the single-dataset amplitude with the common parameter of interest ε2 and the single-
+dataset likelihood with Lcomb. Two points are essential. First, the baseline combination shares only
+the parameter of interest ε2. The nuisance vectors θd are independent between datasets, and no
+common radiative-fraction, luminosity, or resolution nuisance parameters are proﬁled across runs
+in the current production model. Second, the combination is performed at the likelihood level, not
+by averaging precomputed upper-limit curves. At ﬁxed ε2,
+−2 ln λcomb(ε2) =
+∑
+d∈D(m)
+−2 ln λd(ε2), (66)
+after proﬁling the independent nuisance blocks. The sensitivity gain therefore comes from the addi-
+tive information content of statistically independent channels, each with its own detector response
+38
+
+HPS Gaussian-Process Resonance Search Writing Sample
+and normalization factor, rather than from any post hoc merging of already-compressed outputs.
+This is the standard common-POI structure used in multi-channel HEP combinations [ 14, 19]. The
+combined upper limit is set directly on the shared coupling,
+ε2
+UL(m; α) = min {ε2 : CL s(ε2) ≤ α}, (67)
+with α = 0 . 10 for the v4 90% CL result. The combined local signiﬁcance is evaluated from the
+same proﬁled likelihood with the common signal vector ε2sunit. Inverse-variance combinations are
+useful diagnostic proxies; they do not deﬁne the combined inference.
+4.14 Global signiﬁcance and the look-elsewhere treatment
+The physics-facing local signiﬁcance is the minimum one-sided p0 in the scan,
+pobs
+0, min = minm pobs
+0 (m), q obs
+0, max = maxm qobs
+0 (m). (68)
+The cleanest global-signiﬁcance deﬁnition is then scan based:
+ptoy
+global = 1
+Ntoys
+Ntoys∑
+t=1
+1
+[
+q(t)
+0, max ≥ qobs
+0, max
+]
+, (69)
+with
+Ztoy
+global = Φ − 1
+(
+1 − ptoy
+global
+)
+. (70)
+When a dense full-scan toy calibration is not yet frozen, the workﬂow monitors the look-elsewhere
+eﬀect through an eﬀective-trials approximation based on the scan span and detector resolution [ 20].
+In that representation,
+pSidak
+global = 1 −
+(
+1 − pobs
+0, min
+) Neﬀ
+, Z Sidak
+global = Φ − 1
+(
+1 − pSidak
+global
+)
+. (71)
+For small pobs
+0, min, Eq. ( 71) reduces to the familiar pglobal ≃ Neﬀ p0, min form.
+For the present result, Eq. ( 71) supplies a separate analytic look-elsewhere reference for the local
+scan. The eﬀective number of trials is evaluated from the stated scan range and the mass-dependent
+resolution, so the approximation accounts for the strong correlation between adjacent 1 MeV-spaced
+hypotheses rather than treating every scan point as independent. It can be compared with the local
+p-value scan, but it is not a toy-calibrated global discovery probability. A background-only ensemble
+of the frozen search maximum, q0, max, remains the required calibration for any future discovery-level
+claim; when that ensemble is available, Eq. ( 69) supersedes the analytic approximation.
+4.15 Signal absorption and alternative background-proﬁle treatments
+The production baseline documented here is the additive Gaussian-proﬁle treatment of blind-
+window background uncertainty. That choice is natural because the GP delivers an additive mean
+vector and covariance matrix in the blinded bins, and the entire current toy-validation program is
+built around that object. At the same time, the remaining signal-absorption question should be
+stated explicitly. The newly adopted leakage-retaining signal model removes one obvious source
+of bias associated with blind-window renormalization, but it does not by itself prove that the full
+procedural toy workﬂow is free of absorption once the GP is reﬁt toy by toy.
+The most likely residual sources are the reﬁtting freedom of the GP hyperparameters, especially
+the eﬀective length scale, and the ﬂexibility of the Gaussian-proﬁle background nuisance itself. For
+39
+
+HPS Gaussian-Process Resonance Search Writing Sample
+that reason, the current note keeps the Gaussian-proﬁle model as the mainline baseline while
+reserving ﬁxed-background and alternative Poisson-style treatments as targeted robustness studies.
+Those alternatives are not presented as equally mature production choices. They become necessary
+follow-up tests if production-faithful pseudoexperiments demonstrate that the current nuisance
+model absorbs an unacceptable fraction of injected signal.
+4.16 Dimuon-threshold interpretation
+The yield-to-coupling conversion in Eq. ( 38) is an electron-channel normalization: the ﬁtted res-
+onance amplitude is the A′ → e+e− yield visible in the prompt invariant-mass spectrum. For
+the minimal kinetically mixed dark photon, this is also the full visible branching interpretation
+below the dimuon threshold, mA′ < 2mµ = 211. 3167 MeV, where the µ+µ− ﬁnal state is kinemati-
+cally closed. This is the same ﬁxed-target convention used in the published HPS prompt searches
+[16, 5, 2]. Above threshold, the same electron-channel yield corresponds to a weaker minimal-model
+limit on ε2 because the total width includes the newly open A′→ µ+µ− mode [ 21, 22].
+Neglecting the electron mass and remaining below the two-pion hadronic threshold, the charged-
+lepton width ratio is
+Rµ/e (mA′) ≡ Γ(A′→ µ+µ− )
+Γ(A′→ e+e− ) =
+√
+1 − 4m2µ
+m2
+A′
+(
+1 + 2m2
+µ
+m2
+A′
+)
+, m A′ > 2mµ , (72)
+with Rµ/e = 0 below threshold. The inverse electron branching fraction used for the minimal-model
+reinterpretation is therefore
+N BR
+eﬀ (mA′) ≡ 1
+B(A′→ e+e− ) = 1 + Rµ/e (mA′), (73)
+and an electron-channel coupling limit is mapped to the minimal visible-dark-photon convention
+by
+ε2
+min(mA′) = N BR
+eﬀ (mA′) ε2
+ee(mA′). (74)
+This operation does not change the local ﬁt, the signal-yield upper limit, the CL s value, or the local
+p0 scan; it changes only the coupling interpretation of an electron-channel result. Figure 26 shows
+the factor applied in the v4 90% CL result obtained with CL s. The factor is unity below 2mµ , rises
+continuously above threshold, and reaches N BR
+eﬀ = 1. 725 at 250 MeV (Bee = 0. 580).
+The scan range used for a look-elsewhere statement must match the range of the quoted physics
+claim [20]. If the minimal-dark-photon exclusion is quoted only below 210 MeV, the ﬁnal scan-level
+toy or eﬀective-trials calibration should use that same below-threshold range. If the high-mass
+electron-channel scan is promoted to a 170 MeV to 250 MeV minimal-model result, the correspond-
+ing look-elsewhere calibration should include the full extended range as well.
+40
+
+HPS Gaussian-Process Resonance Search Writing Sample
+Figure 26: Minimal-model branching factor used to reinterpret electron-channel ε2 limits above the
+dimuon threshold. The red curve shows N BR
+eﬀ = 1/ B(A′→ e+e− ) and the blue dashed curve shows
+B(A′→ e+e− ).
+41
+
+HPS Gaussian-Process Resonance Search Writing Sample
+5 Background-model validation with full-reﬁt pseudoexperiments
+5.1 Validation question and scope
+The validation begins with a concrete local question. If a smooth, data-like spectrum contains no
+resonance, does the complete GPR sideband ﬁt return a spurious signal? If a known signal is added,
+does the same procedure recover it with an uncertainty of the right scale? The pseudoexperiments
+exercise the count-space prediction, the mass-dependent blind and training masks, the full-range
+Gaussian signal template, the matched-reference injection convention, and a fresh GP optimization
+for every pseudo-spectrum. The statistical deﬁnitions are given in Section 4.11; this section presents
+the physical motivation, the generating spectra, the ensembles, the numerical safeguards, and the
+closure evidence.
+Figure 27: Analysis and validation ﬂow. In the data path, sidebands around each mass hypothesis
+train the GP and the blinded bins enter the signal-plus-background likelihood. In the validation
+path, a smooth source-ﬁtted mean is Poisson ﬂuctuated, a known signal may be added, and the
+complete GP ﬁt and extraction are repeated. The zero-injection ensemble tests spurious signal;
+nonzero injections test signal recovery and uncertainty calibration. These are extraction-closure
+tests, not conﬁdence-limit coverage or a scan-wide signiﬁcance calibration.
+Three distinctions are important throughout this section. First, a generating function is a
+smooth stress truth ﬁtted to an HPS source spectrum; it is not claimed to be the unique physical
+42
+
+HPS Gaussian-Process Resonance Search Writing Sample
+parameterization of the trident continuum. Second, closure is conditional on that speciﬁed truth
+and on the analysis card used for the extraction. It therefore tests the behavior of the procedure
+for data-like spectra without measuring a bias in the observed data. Third, the four exposure lanes
+are not interchangeable. The 1% × 10 and 1% × 100 spectra derive from the native 1% source,
+while native 10% and 10% × 10 derive from an independently selected 10% source. Cross-source
+diﬀerences include source and selection shape as well as normalization.
+5.2 Closure observables and decision rules
+At zero injection, the signed pull p = ˆA/ ˆσA is a spurious-signal statistic. The ensemble mean
+tests whether the extraction is centered and the sample standard deviation tests whether the
+returned uncertainty has the appropriate scale. At nonzero injection, the pull of Eq. ( 51) tests
+centering about the known amplitude and the paired response of Eq. ( 52) separates recovery of the
+added signal from a background-speciﬁc zero-signal oﬀset. Strengths z = 0 , 1, 3, 5 reuse the same
+background pseudo-spectrum and are consequently correlated; they are one response curve, not
+four independent conﬁrmations.
+For each 100-background cell we report the usable count n, the pull mean and its two-sided 90%
+Student-t interval, and the pull width with its exact normal-theory 90% chi-square interval. A cell
+is reported only if at least 95 of its 100 ﬁts pass the numerical criteria. We account for multiplicity
+in two ways: a Holm correction over the two planned replacement points at z = 0, and a separate
+Holm correction over the twenty displayed four-lane, ﬁve-mass points at z = 0 after substitution.
+The correlated nonzero injections are response diagnostics and do not enter either family. We ﬂag
+a mean only when its Holm-adjusted two-sided p value is below 0.05 and |p| ≥0. 2. The absence of
+such a ﬂag is not proof that the bias is zero.
+A practical centering tolerance, |p|< 0. 5, was chosen after the 100-background results were
+available. It is therefore a descriptive criterion, not a predeclared equivalence test. We report it
+alongside the t/Holm results, which are more sensitive to small but statistically resolved oﬀsets.
+For the two replacement points we also ask whether the full 90% interval on the mean lies inside
+the practical band. A pull width is called consistent with one only when its 90% interval contains
+one. None of these tests measures CL s coverage.
+5.3 Training exclusion and blind-window choice
+The GP must not be trained on the core or near tails of the signal it is later asked to test. A Gaussian
+signal retains non-negligible weight outside a 1. 64σm central interval, so training immediately beside
+that interval can oﬀer signal-like counts to the background ﬁt and reduce the recovered amplitude.
+The training-exclusion study therefore varied the sideband boundary before any observed limit was
+used to choose it.
+The widened 2. 25σm interval was then used for both the training exclusion and the extraction
+likelihood. Compared with a 1. 64σm extraction plus a separate 1. 64– 2. 25σm guard band, this
+construction gives comparable closure while retaining the near signal tails in the likelihood. The
+production outcome is a single, explicit mass-dependent geometry for the background and signal
+ﬁts.
+5.4 Generating spectra and the role of functional forms
+The principal background toys are generated independently of the GP used for their extraction. A
+positive analytic intensity is ﬁtted to a native HPS mass spectrum, normalized on the speciﬁed toy
+support, integrated over every histogram bin, and Poisson ﬂuctuated. A complete signal template is
+43
+
+HPS Gaussian-Process Resonance Search Writing Sample
+Figure 28: Selected 2. 25σm blind and training-exclusion geometry. The GP is trained outside the
+widened interval, while all bins inside it enter the local signal-plus-background likelihood. This
+retains the signal tails for extraction without allowing those same bins to inﬂuence the sideband
+ﬁt.
+ktrain median expected ε2
+95 proxy ⟨ˆA/A inj⟩z=3 ⟨ˆA/A inj⟩z=5 max ftrain
+1.96 7. 92 × 10− 5 0.730 0.715 0.0530
+2.25 9. 53 × 10− 5 0.961 0.943 0.0258
+2.58 1. 08 × 10− 4 1.052 1.036 0.0106
+3.00 1. 19 × 10− 4 1.049 1.037 0.00288
+Table 5: Evidence used to choose the training exclusion. The train- 2. 25 row substantially reduces
+the fraction of the signal template available to the GP while recovering the injected amplitude and
+retaining useful local precision. The ﬁrst column is a Gaussian-equivalent comparison proxy, not
+the ﬁnal CLs limit. The complete note retains the mass-resolved reach, leakage, recovery, and pull
+batteries.
+44
+
+HPS Gaussian-Process Resonance Search Writing Sample
+then added when z > 0. Every pseudo-spectrum is subsequently analyzed with a new GP sideband
+ﬁt. This analytic truth/full-reﬁt construction is the central background-model test because success
+is not guaranteed by generating toys from the GP model that will later ﬁt them.
+The earlier 2015 and 2016 studies used independently ﬁtted shifted sigmoid–power–exponential
+families. The initial 2021 catalogue selected an unshifted sigmoid–power–exponential model (inter-
+nal label fSigPowExpQ) for the native 1% source. The later four-lane study used a generalized-
+gamma threshold model (internal label fGenGammaThresh), ﬁtted independently to the native 1%
+and native 10% sources. These choices span smooth threshold, power-law, and broad-tail curvature
+without adding resonance-scale structure. Figure 29 shows the source spectra, selected means, and
+Poisson-ensemble construction.
+The mass-resolved injection scans selected the lower RBF length-scale factors without using
+the observed limit curve. For the frozen settings, the aggregate zero-signal mean pulls are +0. 029,
+−0. 016, and −0. 005 for the 2015, 2016 10%, and 2021 1% studies, respectively; the corresponding
+nonzero-injection signed averages are −0. 223, −0. 262, and −0. 034. Mass-resolved mean, width,
+signiﬁcance-residual, and recovery checks support these summaries. They motivate the chosen
+lower factors but do not replace direct mass-by-mass closure.
+5.5 Four-lane 2021 full-reﬁt ensemble
+The full-100 2021 validation uses four exposure lanes and ﬁve mass hypotheses. The historical
+baseline is the frozen v4.2/v4.5 matched-reﬁt contract: 40–300 MeV GP support, 50–250 MeV
+search range, kmin = 1. 1, kmax = 15, ﬁve-bin local rebinning, log-mass/log-count preprocessing, the
+2. 25σm blind and training exclusions, two required sidebands, and twelve randomized optimizer
+restarts in addition to the nominal start. The original four lanes use the common generalized-
+gamma threshold model ﬁtted independently to the native 1% and native 10% sources. Their
+source Pearson χ2/ ndf values are 1.108 and 2.781, respectively. The latter misdescription is largest
+through the steep threshold turn-on and motivates a separately qualiﬁed 65 MeV replacement rather
+than a post-hoc change to all other masses.
+5.6 Targeted validation of the rising threshold
+1% × 10 threshold-turn-on truth. The ﬁrst replacement is the source-ﬁtted model developed
+in the dedicated near-threshold study. Over 35–80 MeV it is a logistic turn-on multiplied by an
+exponentiated degree-ﬁve Chebyshev expansion and is joined smoothly to the speciﬁed high-mass
+tail. The degree is selected before any GP extraction: the native-bin deviance per degree of freedom
+is 0.994 for the native 1% source and the ﬁve-bin value is 0.850, with no parameter-bound contact.
+Its disclosed 80–300 MeV tail Poisson deviance per degree of freedom is 1.122, so this selected
+1%-source truth is broadly data-like over the complete 40–300 MeV support rather than only in
+the ﬁtted turn-on interval. The earlier 20-background result at 65 MeV had mean pull 0.300 and
+width 1.109; version 4.9.1 replaces that pilot with a predeclared 100-background continuation and
+reports 90% intervals.
+Native-10% 30–300 Me V support. The second replacement models the measured 30–40 MeV
+shoulder and analyzes it with the complete 30–300 MeV GP support. Its threshold component is
+a logistic turn-on times a degree-six exponentiated Chebyshev form ﬁtted over 30–80 MeV, joined
+with a C2 taper to the frozen smooth anchor. In the native 10% source, the local native-bin
+and ﬁve-bin deviances per degree of freedom are 1.140 and 1.421. Thus the generating spectrum
+is data-like in the threshold-sensitive region even though the simple historical family is not. Its
+45
+
+HPS Gaussian-Process Resonance Search Writing Sample
+Figure 29: Analytic generating means used in the year-matched functional-form studies. Each
+dataset row compares the source spectrum with the candidate families and then shows the selected
+mean against the generated toy ensemble. The functions deﬁne smooth positive pseudo-data means
+and are not asserted to be unique physical models of the continuum.
+46
+
+HPS Gaussian-Process Resonance Search Writing Sample
+Displayed cell Generating mean GP support Reason for scheme
+1% × 10,
+m ̸= 65 MeV
+generalized-gamma
+threshold model
+40–300 MeV historical 100-background
+functional-form suite
+1% × 10, 65 MeV degree-ﬁve
+threshold-turn-on
+continuation
+40–300 MeV dedicated near-threshold
+description extended to 100
+backgrounds
+1% × 100, all
+masses
+generalized-gamma
+threshold model
+40–300 MeV historical 100-background
+functional-form suite
+native 10%,
+m ̸= 65 MeV
+generalized-gamma
+threshold model
+40–300 MeV historical 100-background
+functional-form suite
+native 10%,
+65 MeV
+threshold-focused
+sigmoid–power–
+exponential mean
+30–300 MeV includes the measured
+30–40 MeV turn-on omitted by
+the historical support
+10% × 10, all
+masses
+generalized-gamma
+threshold model
+40–300 MeV historical 100-background
+functional-form suite
+Table 6: Composition of the 2021 background-validation display. The two special 65 MeV cells
+replace the corresponding historical cells; they are never pooled with them. Distinct markers in
+Figs. 30 and 32 identify the change of generating truth and, for native 10%, the change of GP
+support.
+85–300 MeV tail deviance per degree of freedom is 6.220; this native-10% lane therefore relies on
+the explicit weak-correlation and tail-inﬂuence qualiﬁcation below rather than on a support-wide
+goodness-of-ﬁt claim.
+This study tests the 65 MeV extraction under the 30–300 MeV support considered in v4.9.1; it
+does not determine the 36–300 MeV support adopted in v4.9.5. The question here is whether a
+data-like generating mean that passes the local source-ﬁt tests can be processed by the complete
+extraction without material signal bias. With log preprocessing, the direct RBF correlation between
+masses m and m′ is
+ρ(m, m ′) = exp
+[
+− log2(m′/m )
+2ℓ2
+]
+. (75)
+At 65 MeV, the accepted optimized length scales in the two actual replacement ensembles span
+0.2784–0.3185 for 1% × 10 and 0.2468–0.2691 for native 10%, with medians 0.2963 and 0.2592. The
+corresponding direct correlations with 150 MeV span 1.10–3.19% and 0.321–0.800%, respectively.
+Across the complete 55–70 MeV set the largest direct correlations with 150 MeV occur at 70 MeV
+and are 5.71% and 1.81%. The correlation decreases rapidly above 150 MeV. These results quantify
+why a threshold-focused source ﬁt can provide a meaningful local test while the generated spectrum
+and extraction still retain the full GP support.
+The correlation calculation is a ﬁxed-hyperparameter statement, not a claim that high-mass
+bins have mathematically zero inﬂuence. All retained bins still enter the global marginal likelihood
+and can shift the optimized length scale or kernel constant. A same-input diagnostic makes the
+aggregate eﬀect explicit: after ﬁxing the selected hyperparameters, removing the training bins above
+150 MeV shifts the 65 MeV pull by a mean of −0. 130 with a paired 90% interval [−0. 151, −0. 110] in
+1%× 10, and by −0. 195 [−0. 211, −0. 179] in native 10%. The maximum absolute shifts are 0.376 and
+0.400. In the ﬁrst lane the mean changes from 0.139 to 0.009; in the second it changes from −0. 246
+to −0. 441, whose 90% interval [−0. 611, −0. 271] crosses the adopted practical boundary. Counts
+above 150 MeV therefore have modest, statistically resolved collective inﬂuence even though every
+47
+
+HPS Gaussian-Process Resonance Search Writing Sample
+pairwise RBF correlation is small. This diagnostic holds the chosen hyperparameters ﬁxed and
+does not test their global-likelihood response to tail removal.
+The optimized kernels nevertheless explain why a threshold-focused source ﬁt is scientiﬁcally
+informative for the complete card: the low-mass extraction is directly coupled most strongly to the
+turn-on region, while the generated spectrum, speciﬁed smooth continuation, and full extraction
+retain the actual support. The restricted source ﬁt thus provides a targeted conditional validation
+of local 65 MeV behavior under that full-card construction. It does not establish tail-independence
+or universal GP closure for every possible high-mass truth.
+5.7 Matched reﬁts and numerical selection
+For every background, mass, and scheme, an independently optimized background-only ﬁt supplies
+the matched reference uncertainty. Signals with z = 1 , 3, 5 are generated with mean amplitude
+Ainj = zσA, ref , their full Gaussian templates are added to the same background counts, and the GP
+is reﬁtted after applying the same training mask. The injected amplitude is therefore calibrated to
+the local background-only ﬁt, whereas the pull denominator is always the uncertainty returned by
+the injected ﬁt.
+Whether a ﬁt is kept never depends on its ﬁtted signal or pull. Repeated attempts use the same
+pseudo-data with independent optimizer starts. We choose among them using the GP log marginal
+likelihood, reproducibility of the length scale and kernel constant, covariance validity, uncertainty-
+ratio checks, and contact with the kernel bounds. The choice never uses ˆA, the pull, agreement
+with the injected value, ε2, or a local p value. A statistical outlier is retained whenever it passes
+these numerical checks.
+The historical study attempted 8000 ﬁts and retained 7994; every cell contains 99 or 100 usable
+ﬁts. The six rejected ﬁts failed reproducibility checks. Each new continuation contains 400 usable
+ﬁts—100 backgrounds at each of z = 0 , 1, 3, 5—with no rejection and no kernel-bound contact.
+Reaching those solutions required 614 optimizer attempts in the 1% × 10 threshold-turn-on lane
+and 610 in the native 10% lane. Failed starts remain recorded, and checks of the covariance, counts,
+and pull calculation agree. Numerical selection is therefore independent of the physics result.
+5.8 Full-100 spurious-signal results
+Table 7 gives the two targeted 65 MeV results. The historical rows are shown only to explain why
+each replacement was required; no old and new pulls are combined. Both replacement samples
+exceed the 95-of-100 reporting threshold and pass the numerical checks above. We compare the
+results under the original statistical test, the post-result practical |p| < 0. 5 criterion, and the
+separate unit-width diagnostic.
+The 100-background continuations sharpen, rather than simply conﬁrm, the pilot interpretation.
+The 1%× 10 threshold-turn-on truth is practically centered in the full sample and in the independent
+reserve-80, but its pull distribution is mildly overdispersed: the 90% width interval excludes one in
+both samples. Native 10% with 30–300 MeV support moves from the historical +0. 716 response to
+−0. 246; its full and reserve mean intervals both remain inside the practical band. The native full
+sample is statistically displaced under the targeted two-endpoint t/Holm screen, and the reserve-75
+independently reproduces the negative direction. This is evidence for a small signed oﬀset, not
+a failure of the adopted practical mean-closure margin. Moving the support and improving the
+turn-on description reduces the original 65 MeV oﬀset enough to meet the post-result practical
+criterion, while exact unit pull-width calibration remains a separate caveat.
+After substitution, all twenty displayed zero-signal point means satisfy |p|< 0. 5; the largest
+48
+
+HPS Gaussian-Process Resonance Search Writing Sample
+Lane and 65 MeV scheme n p [90% CI] sp [90% CI] mean assessment
+1% × 10, historical 100 0.7890
+[0.6293,0.9488]
+0.9622
+[0.8625,1.0907]
+practical fail
+1% × 10, threshold turn-on,
+full
+100 0.1394
+[−0. 0499,0.3288]
+1.1404
+[1.0222,1.2927]
+practical pass
+1% × 10, threshold turn-on,
+reserve
+80 0.0993
+[−0. 1150,0.3135]
+1.1514
+[1.0196,1.3265]
+practical pass
+native 10%, historical 100 0.7160
+[0.5452,0.8867]
+1.0284
+[0.9218,1.1657]
+practical fail
+native 10%, 30–300 support,
+full
+100 −0. 2463
+[−0. 4165,−0. 0761]
+1.0253
+[0.9190,1.1622]
+practical pass †
+native 10%, 30–300 support,
+reserve
+75 −0. 2840
+[−0. 4943,−0. 0737]
+1.0934
+[0.9646,1.2661]
+practical pass
+Table 7: Targeted 65 MeV background-only closure. All headline intervals are two-sided 90%
+intervals: Student- t for the mean and exact normal-theory chi-square for the population standard
+deviation. Historical entries are unpaired context and are replaced, not pooled, in the composite
+validation ﬁgures. Both replacement full-100 mean intervals lie entirely within the post-result
+[−0. 5, 0. 5] practical band, whereas the two historical means do not. †The native-10% full sample
+nevertheless has targeted Holm-2 p = 0 . 03632 and |p|> 0. 2; statistical resolution of a small oﬀset
+and practical centering are reported as distinct statements. The 1% × 10 width interval excludes
+one in both the full and reserve samples.
+absolute value is 0.338 at the historical 10% × 10, 180 MeV cell. Under the separate Holm-20
+inferential screen that 180 MeV cell remains the only ﬂag, while the native-10%, 65 MeV composite
+adjusted value is 0.291. The larger multiplicity family is not used to erase the targeted Holm-2
+result. Rather, the note distinguishes practical magnitude from evidence that a nonzero oﬀset is
+statistically resolved. The original two 65 MeV cells failed the practical margin with means 0.789
+and 0.716; their replacements do not.
+The same practical pattern holds when the correlated nonzero strengths are displayed: all 80
+lane–mass–strength point means lie inside [−0. 5, 0. 5], and 75 of their 80 pointwise 90% intervals
+are wholly contained. Exact unit-width calibration is less uniform. Three of the twenty zero-signal
+width intervals and ﬁfteen of all eighty width intervals exclude one. At zero injection these are
+the replacement 1% × 10, 65 MeV cell, historical 1% × 10 at 90 MeV, and historical native 10% at
+120 MeV. Thus practical mean/background-model-bias closure and exact normal-pull calibration
+are separate outcomes of the same ﬁgure.
+Figure 31 directly compares the earlier and targeted 65 MeV ensembles, showing why the
+threshold-speciﬁc study was needed.
+5.9 Recovery of injected signals
+A centered zero-signal ensemble is necessary but not suﬃcient: a background model could remove
+the false oﬀset and still absorb a real narrow signal. The nonzero rows therefore repeat the full GP
+ﬁt after adding matched one-, three-, and ﬁve-reference-sigma signals. Figure 32 displays the mean
+and width at every strength and mass; Table 8 gives the numerical 65 MeV replacement results,
+including the paired response R = ( ˆAz − ˆA0)/A inj.
+For the historical four-lane suite, the paired response separates signal recovery from the ad-
+ditive background oﬀset. In the two replacements, the mean response is stable at 0.966–0.969
+49
+
+HPS Gaussian-Process Resonance Search Writing Sample
+65 90 120 180 210
+mass [MeV]
+−3
+−2
+−1
+0
+1
+2
+zero-signal pull
+2021 1% source ×10: accepted pulls
+65 90 120 180 210
+mass [MeV]
+−0.4
+−0.2
+0.0
+0.2
+0.4
+mean pull
+Spurious-signal mean
+65 90 120 180 210
+mass [MeV]
+0.9
+1.0
+1.1
+1.2
+1.3sample pull width
+Spurious-signal width
+65 90 120 180 210
+mass [MeV]
+−3
+−2
+−1
+0
+1
+2
+3
+4
+zero-signal pull
+2021 1% source ×100: accepted pulls
+65 90 120 180 210
+mass [MeV]
+−0.4
+−0.2
+0.0
+0.2
+0.4
+mean pull
+Spurious-signal mean
+65 90 120 180 210
+mass [MeV]
+0.8
+0.9
+1.0
+1.1
+1.2sample pull width
+Spurious-signal width
+65 90 120 180 210
+mass [MeV]
+−3
+−2
+−1
+0
+1
+2
+3
+zero-signal pull
+2021 native 10% source: accepted pulls
+65 90 120 180 210
+mass [MeV]
+−0.4
+−0.2
+0.0
+0.2
+0.4
+mean pull
+Spurious-signal mean
+65 90 120 180 210
+mass [MeV]
+0.9
+1.0
+1.1
+1.2
+1.3sample pull width
+Spurious-signal width
+65 90 120 180 210
+mass [MeV]
+−3
+−2
+−1
+0
+1
+2
+3
+zero-signal pull
+2021 10% source ×10: accepted pulls
+65 90 120 180 210
+mass [MeV]
+−0.4
+−0.2
+0.0
+0.2
+0.4
+mean pull
+Spurious-signal mean
+65 90 120 180 210
+mass [MeV]
+0.80
+0.85
+0.90
+0.95
+1.00
+1.05
+1.10
+1.15
+1.20sample pull width
+Spurious-signal width
+Consolidated full-100 zero-signal diagnostics
+65 MeV substitutions use threshold-focused alternate validation schemes; every accepted pull remains included
+historical functional-form truth (90% interval) 65 MeV Table-17 scheme (1% × 10, 40--300 MeV) 65 MeV fSig-anchored scheme (native 10%, 30--300 MeV)
+Figure 30: Full-100 zero-signal diagnostics for the four 2021 exposure lanes. The historical circular
+markers use the generalized-gamma threshold ensembles, ﬁtted independently to the native 1% and
+native 10% sources. At 65 MeV only, distinct diamond and star markers replace—and are not pooled
+with—the historical values: 1% × 10 uses the full-100 dedicated threshold-turn-on continuation of
+the dedicated near-threshold study, while native 10% uses the full-100 threshold-focused extraction
+with 30–300 MeV GP support. The substituted points form a diﬀerent, explicitly labeled validation
+scheme because the original analytic family did not adequately model the rising threshold. The
+panels retain all accepted pulls, two-sided 90% Student- t intervals for means, and exact normal-
+theory 90% chi-square intervals for widths; no accepted pull is clipped. The gray mean band is the
+post-result ±0. 5 practical centering tolerance. Connecting lines are visual guides only.
+50
+
+HPS Gaussian-Process Resonance Search Writing Sample
+−2 −1 0 1 2 3
+zero-signal pull
+0.0
+0.1
+0.2
+0.3
+0.4density
+Full-100 pull distributions
+historical fGenGammaThresh
+T able-17 threshold truth
+20 40 60 80 100
+number of backgrounds
+−0.25
+0.00
+0.25
+0.50
+0.75
+1.00
+1.25
+1.50
+1.75
+running mean pull (90% interval)
+Background-only stability
+historical truth
+T able-17 truth
+T able-17 pilot/reserve split
+0 1 3 5
+injected significance z
+−0.2
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+mean pull (90% t interval)
+Mean response at 65 MeV
+historical truth
+T able-17 truth
+0 1 3 5
+injected significance z
+0.9
+1.0
+1.1
+1.2
+1.3sample pull width (90% normal-theory interval)
+Width response at 65 MeV
+historical truth
+T able-17 truth
+Updated 1%×10, 65 MeV threshold-modeling diagnostic
+Figure 31: Targeted 1% × 10, 65 MeV conﬁrmation for the dedicated threshold-turn-on truth
+compared with the historical generalized-gamma threshold ensemble. The upper panels show the
+zero-injection pull distribution and the running mean; the lower panels show the mean and width
+across the correlated z = 0, 1, 3, 5 extractions. Mean intervals are two-sided 90% Student- t intervals
+and width intervals are exact normal-theory 90% chi-square intervals. The full-100 sample contains
+the original 20-background pilot; the reserve-only result in Table 7 demonstrates the same practical
+centering and the same mild overdispersion. Historical and replacement pulls are compared, not
+pooled. The gray ±0. 2 bands in this legacy-style focused display show the inherited material-eﬀect
+reference; they are not the post-result ±0. 5 practical centering band used in this section. The
+native-10% replacement is shown in Figs. 30 and 32 and in Table 7.
+51
+
+HPS Gaussian-Process Resonance Search Writing Sample
+−0.4
+−0.2
+0.0
+0.2
+0.4
+pull mean (90% t interval)
+2021 1% source ×10
+−0.4
+−0.2
+0.0
+0.2
+0.4
+2021 1% source ×100
+−0.6
+−0.4
+−0.2
+0.0
+0.2
+0.4
+2021 native 10% source
+−0.4
+−0.2
+0.0
+0.2
+0.4
+2021 10% source ×10
+65 90 120 180 210
+mass [MeV]
+0.9
+1.0
+1.1
+1.2
+1.3sample pull width (90% normal-theory interval)
+65 90 120 180 210
+mass [MeV]
+0.8
+0.9
+1.0
+1.1
+1.2
+1.3
+65 90 120 180 210
+mass [MeV]
+0.9
+1.0
+1.1
+1.2
+1.3
+65 90 120 180 210
+mass [MeV]
+0.8
+0.9
+1.0
+1.1
+1.2
+1.3
+Consolidated 2021 functional-form pull diagnostics
+z = 0 z = 1 z = 3 z = 5 65 MeV Table-17 substitution (1% × 10) 65 MeV 30--300 substitution (native 10%)
+Figure 32: Compact composite background-validation summary. Columns correspond to 1% × 10,
+1% × 100, native 10%, and 10% × 10; the upper row shows pull means and the lower row pull widths
+as functions of mass. The four series are z = 0, 1, 3, 5, with zero injection visually emphasized and
+the correlated nonzero response series drawn more lightly. Circular markers are the original full-100
+common-family generalized-gamma threshold ensembles. At 65 MeV, diamonds in 1%× 10 and stars
+in native 10% replace the complete z = 0 , 1, 3, 5 historical sets with the targeted studies deﬁned
+in Table 6. Mean bars are two-sided 90% Student- t intervals and width bars are exact normal-
+theory two-sided 90% chi-square intervals. The substituted points are conditionally validated under
+diﬀerent source-ﬁtted truths; they are not a homogeneous pooled ensemble, and the four strengths
+share backgrounds. Connecting lines are omitted across scheme replacements. The gray mean
+bands show the post-result ±0. 5 practical centering tolerance.
+52
+
+HPS Gaussian-Process Resonance Search Writing Sample
+over z = 1 , 3, 5, with mutually consistent 90% intervals and no worsening with strength. The full
+procedure therefore recovers 96.6–96.9% of the tested amplitude, corresponding to a stable 3.1–
+3.4% attenuation. This is disclosed as a conditional response calibration, not rounded to exact
+unity. Agreement across strengths is not counted multiple times because the same 100 background
+realizations are reused.
+65 MeV scheme z p [90% CI] sp [90% CI] R [90% CI]
+1% × 10, threshold turn-on 0 0. 139 [−0. 050,0.329] 1.140 [1.022,1.293] —
+1 0. 107 [−0. 082,0.297] 1.141 [1.023,1.293] 0.9678 [0.9643,0.9713]
+3 0. 039 [−0. 149,0.227] 1.134 [1.016,1.285] 0.9665 [0.9646,0.9684]
+5 −0. 025 [−0. 216,0.165] 1.147 [1.028,1.300] 0.9670 [0.9654,0.9686]
+native 10%, 30–300 support 0 −0. 246 [−0. 417,−0. 076] 1.025 [0.919,1.162] —
+1 −0. 280 [−0. 450,−0. 109] 1.025 [0.919,1.162] 0.9664 [0.9629,0.9700]
+3 −0. 346 [−0. 515,−0. 177] 1.019 [0.913,1.155] 0.9666 [0.9649,0.9684]
+5 −0. 402 [−0. 571,−0. 234] 1.015 [0.909,1.150] 0.9686 [0.9669,0.9703]
+Table 8: Full-100 65 MeV extraction at all matched-reference strengths for the two replacement
+schemes. Mean intervals are two-sided 90% Student- t intervals and width intervals are exact normal-
+theory two-sided 90% chi-square intervals. The response summaries are paired background-by-
+background and use two-sided 90% Student- t intervals. All strengths share the same backgrounds
+and are correlated. The 1% × 10 widths are mildly high at every strength; the native-10% widths
+are compatible with one at this precision.
+5.10 What the validation establishes
+Taken together, these tests show practical mean closure and stable signal recovery for the source-
+like spectra that were studied. The training exclusion keeps the GP from learning the signal tails,
+the pseudo-data means are ﬁtted independently of the GP, and every pseudo-spectrum receives a
+fresh sideband ﬁt. Numerical branches are chosen without reference to the ﬁtted signal or pull.
+Near threshold, the historical analytic family is replaced only in the two cells where its description
+of the source is inadequate; tables and ﬁgures identify those replacements explicitly.
+Under the adopted practical criterion, the near-threshold concern is resolved within this source-
+conditioned suite. The two replacement 100-background intervals and their independent reserve
+samples lie inside the ±0. 5 mean-pull band. So do all twenty zero-signal point estimates and all
+eighty correlated injected-strength point estimates in the four-lane display. The paired response
+remains 96.6–96.9%. The practical mean-bias requirement is therefore met for these tests, provided
+that each replacement remains identiﬁed by its generating model and GP support.
+The stricter diagnostics remain important. The original 10% × 10, 180 MeV cell retains an
+exploratory Holm-20 ﬂag with mean 0.338, and the native-10%, 65 MeV replacement retains a
+targeted Holm-2 ﬂag. Three of twenty zero-signal width intervals and ﬁfteen of eighty all-strength
+width intervals exclude one; the stable signal attenuation is 3.1–3.4%; and the ﬁxed-hyperparameter
+tail-removal shifts are nonzero. The study therefore does not prove zero bias for arbitrary smooth
+spectra, exact pull calibration, conﬁdence-limit coverage, bias in the observed data, or a scan-
+global signiﬁcance calibration. Any larger study should retain the source, support, optimizer, and
+post-result tolerance labels used here.
+53
+
+HPS Gaussian-Process Resonance Search Writing Sample
+Validation component Evidence Interpretation
+Training leakage and blind
+geometry
+train-2. 25, widened
+extraction window,
+recovery and leakage
+scans
+supports the production mask
+Functional-form source
+description
+source-ﬁt and
+bin-integral diagnostics;
+threshold-speciﬁc
+replacements at
+65 MeV
+the 1%-source threshold model is data-like over
+the support; the native-10% model is locally
+data-like and conditional on its tail
+Spurious-signal means Fig. 30 and Table 7 all 20 zero-signal point means meet |p|< 0. 5; both
+replacement 90% intervals lie inside the band
+Pull widths exact normal-theory
+90% chi-square
+intervals in Fig. 32
+exact unit-width calibration is not global: 3/20
+zero-signal and 15/80 all-strength intervals
+exclude one
+Signal injection paired z = 1, 3, 5
+response with a fresh
+GP ﬁt
+stable 96.6–96.9% response; tests extraction, not
+direct conﬁdence-limit coverage
+Numerical stability multistart and
+reproducibility checks
+independent of the
+ﬁtted signal
+all 800 ﬁts in the new lanes are usable
+High-mass inﬂuence on
+threshold
+direct RBF correlations
+and
+ﬁxed-hyperparameter
+tail-removal diagnostic
+local validation is meaningful, but the aggregate
+tail eﬀect is nonzero and tail independence is not
+claimed
+Observed inference no observed spectrum
+or limit enters
+truth/branch selection
+unchanged by these conditional toys
+Table 9: Summary of the background-validation evidence. The practical mean criterion, statistical
+tests, pull-width calibration, signal response, and tail inﬂuence are kept separate; none is promoted
+into a coverage or universality claim.
+54
+
+HPS Gaussian-Process Resonance Search Writing Sample
+5.11 Selecting the 2021 GP support
+The signal search tests masses from 50 to 250 MeV, but the GP also needs data outside that interval
+to constrain the background near its endpoints. At low mass, the native 2021 spectrum has a sparse
+shoulder followed by a rapid turn-on: its 0.125 MeV bins contain only a few hundred events around
+30–32 MeV and several thousand by 40 MeV. We therefore compared several lower support edges
+while holding the upper edge at 300 MeV and leaving the search interval unchanged. The aim was
+to exclude the least stable part of the turn-on without discarding useful sideband information.
+5.11.1 Source shape and candidate supports
+Figure 33 shows the source spectrum and the tested lower edges. The 30 MeV setting is retained
+as a control but was not eligible for selection; the candidate edges were 32, 34, 36, 38, and 40 MeV.
+30.0 32.5 35.0 37.5 40.0 42.5 45.0 47.5 50.0
+Invariant mass me + e  [MeV]
+103
+104
+105
+Candidates per 0.625 MeV
+2021 native-10% threshold spectrum and scanned GP-support edges
+30 MeV control
+32 MeV
+34 MeV
+36 MeV
+38 MeV
+40 MeV
+Figure 33: Native 2021 10% source histogram near threshold. Vertical lines mark the 30 MeV
+control and the ﬁve candidate lower edges of the GP support. The logarithmic vertical scale makes
+the low-count shoulder and rapid turn-on visible.
+5.11.2 Initial scan
+The ﬁrst stage reuses the 100 source-conditioned backgrounds archived with v4.9.1; no new pseudo-
+data are generated. At each support edge, matched-reference extractions are performed at 55, 60,
+65, and 70 MeV with 0-, 2-, and 5- σA injections. The scan changes only the lower support edge. Its
+binning, preprocessing, blind and training masks, kernel bounds, signed extraction, and optimizer
+checks are inherited from the v4.2/v4.5 analysis deﬁnition. Optimizer branches are chosen using ﬁt
+reproducibility, covariance validity, kernel state, and GP log marginal likelihood; neither the pull
+nor any limit or p-value enters that choice.
+55
+
+HPS Gaussian-Process Resonance Search Writing Sample
+The ﬁrst 25 backgrounds were processed at all six edges. All 1800 ﬁts passed the numerical
+checks, with no invalid covariance matrix or kernel-bound contact. Under the original rule, an edge
+was rejected when any injection cell had |p| ≥0. 5 and its two-sided 90% Student- t interval excluded
+zero. Every candidate was rejected. Table 10 records that outcome under the rule used for the
+initial scan.
+Table 10: Initial 25-background minimax summary. Every candidate is rejected by the original
+injection criterion. The 30 MeV row is a control and was never eligible for selection.
+Lower edge [MeV] Worst |p| Worst zero-signal |p| Initial rule
+30 1.624 1.300 fail (control)
+32 1.530 1.331 fail
+34 1.447 1.277 fail
+36 1.134 0.959 fail
+38 1.072 0.864 fail
+40 1.152 1.152 fail
+5.11.3 Practical criterion and independent conﬁrmation
+After the ﬁrst stage, we adopted a less stringent practical criterion: at least 9 of the 12 mass–
+injection means and at least 3 of the 4 zero-signal means had to satisfy |p|< 0. 75, and no mean
+could reach 1.25 in magnitude. The numerical checks, the minimax score, and the 0.10 tie margin
+were left unchanged. Among candidates within that margin, the lower edge was preferred so that
+the ﬁt retained more data. Because this criterion was formulated after the ﬁrst 25 backgrounds had
+been examined, it is a post-selection practical rule, not a predeclared equivalence test or a coverage
+criterion. It was ﬁxed before the remaining 75 backgrounds were processed.
+Only the 36 and 38 MeV candidates pass the practical rule in the ﬁrst stage. The 38 MeV edge
+has the smaller worst-cell pull, but 36 MeV lies within the retained tie margin and is therefore
+selected for conﬁrmation. The independent continuation uses backgrounds 25–99 at 34, 36, and
+38 MeV. At 36 MeV, 10 of 12 cell means and all four zero-signal means satisfy the 0.75 condition
+in the continuation alone; the worst magnitude is 0.901. In the complete 100-background sample,
+the corresponding counts are 9 of 12 and 3 of 4, with a worst magnitude of 0.960. Every ﬁt passes
+the numerical checks. With the criterion already ﬁxed, these results freeze the 2021 GP support at
+36–300 MeV without further tuning.
+At the selected edge, the full-sample means at 55 MeV are −0. 773, −0. 841, and −0. 960 for the
+0-, 2-, and 5- σA injections. Their 90% intervals exclude zero, so the low-mass under-recovery is
+retained as a real limitation of this test. Across the nine cells from 60 to 70 MeV, the means range
+from −0. 110 to +0. 325 and the pull widths from 0.939 to 1.034. The 65 MeV zero-signal mean is
+0.253, with a 90% interval of [0. 086, 0. 421].
+Each accepted toy also provides a bounded Wald ˜qµ 90% CL s yield limit. We use those values
+only to check that the limit is stable under nearby support choices; the smallest limit never de-
+termines the selected edge. This study therefore supports the 36–300 MeV choice for the declared
+source-conditioned ensemble, with the 55 MeV caveat above. It does not establish direct coverage
+or truth-independent background closure.
+56
+
+HPS Gaussian-Process Resonance Search Writing Sample
+1.0
+0.5
+0.0
+0.5
+1.0
+Mean pull
+Matched-reference injection: 0
+34 MeV 36 MeV selected 38 MeV
+1.0
+0.5
+0.0
+0.5
+1.0
+Mean pull
+Matched-reference injection: 2
+56 58 60 62 64 66 68 70
+Signal hypothesis mass [MeV]
+1.5
+1.0
+0.5
+0.0
+0.5
+1.0
+Mean pull
+Matched-reference injection: 5
+Independent-confirmed full-100 support comparison
+Figure 34: Mean pulls in the complete 100-background sample for the selected edge and its two
+neighboring candidates. Error bars are two-sided 90% Student- t intervals on the mean. The shaded
+band denotes the post-selection |p|< 0. 75 practical region; dotted lines show the magnitude-1.25
+guard. The remaining exceptions are conﬁned to the 55 MeV hypothesis.
+57
+
+HPS Gaussian-Process Resonance Search Writing Sample
+References
+[1] Omar Moreno et al. The heavy photon search experiment at Jeﬀerson Lab. arXiv preprint
+arXiv:2203.08324, 2022.
+[2] P. H. Adrian et al. Searching for prompt and long-lived dark photons in electro-produced e+e−
+pairs with the heavy photon search experiment at JLab. arXiv preprint arXiv:2212.10629 ,
+2023.
+[3] HPS Collaboration. 2016 bump hunt internal note, 2017. HPS internal note.
+[4] Vitaliy Fadeyev et al. New technology for the heavy photon search silicon vertex tracker. Nucl.
+Instrum. Meth. A , 959:163567, 2020.
+[5] P. H. Adrian et al. Search for a dark photon in electroproduced e+e− pairs with the heavy
+photon search experiment at JLab. Phys. Rev. Lett. , 121:031802, 2018.
+[6] Elizabeth Berzin, Sarah Gaiser, Matthew Gignac, Rory O’Dwyer, and Lewis Wolf. HPS-
+ANALYSIS-NOTE v2: 2021 displaced vertex search analysis note, 2026. HPS internal analysis
+note.
+[7] HPS Collaboration. 2015 resonance search internal note, 2016. HPS internal note.
+[8] J. Barr and B. Liu. Gaussian process regression as a sustainable data-driven background
+estimate method at the (HL)-LHC. Eur. Phys. J. C , 85:846, 2025.
+[9] A. Gandrakota, A. Lath, A. V. Morozov, and S. Murthy. Model selection and signal extraction
+using gaussian process regression. JHEP, 02:230, 2023.
+[10] Fabian Pedregosa, Gael Varoquaux, Alexandre Gramfort, Vincent Michel, Bertrand Thirion,
+Olivier Grisel, Mathieu Blondel, Peter Prettenhofer, Ron Weiss, Vincent Dubourg, Jake
+Vanderplas, Alexandre Passos, David Cournapeau, Matthieu Brucher, Matthieu Perrot, and
+Edouard Duchesnay. Scikit-learn: Machine learning in python. Journal of Machine Learning
+Research, 12:2825–2830, 2011.
+[11] scikit-learn developers. Gaussian processes: scikit-learn 1.6.1 documentation, 2025. Version
+1.6.1; accessed August 4, 2026.
+[12] Carl Edward Rasmussen and Christopher K. I. Williams. Gaussian Processes for Machine
+Learning. Adaptive Computation and Machine Learning. MIT Press, Cambridge, Mas-
+sachusetts, 2006.
+[13] Meghan Frate, Kyle Cranmer, Saarik Kalia, Alexander Vandenberg-Rodes, and Daniel White-
+son. Modeling smooth backgrounds and generic localized signals with gaussian processes. arXiv
+preprint, 2017.
+[14] Kyle Cranmer et al. HistFactory: A tool for creating statistical models for use with RooFit
+and RooStats. Technical Report CERN-OPEN-2012-016, CERN, 2012. CERN Open Report.
+[15] Glen Cowan, Kyle Cranmer, Eilam Gross, and Ofer Vitells. Asymptotic formulae for likelihood-
+based tests of new physics. Eur. Phys. J. C , 71:1554, 2011.
+[16] Rouven Essig, Philip Schuster, Natalia Toro, and Bogdan Wojtsekhowski. An electron ﬁxed
+target experiment to search for a new vector boson A ′decaying to e+e− . JHEP, 02:009, 2011.
+58
+
+HPS Gaussian-Process Resonance Search Writing Sample
+[17] Thomas Junk. Conﬁdence level computation for combining searches with small statistics. Nucl.
+Instrum. Meth. A , 434:435–443, 1999.
+[18] Alexander L. Read. Presentation of search results: The CL s technique. J. Phys. G , 28:2693–
+2704, 2002.
+[19] ATLAS Collaboration and CMS Collaboration. Measurements of the higgs boson production
+and decay rates and constraints on its couplings from a combined ATLAS and CMS analysis
+of the LHC pp collision data at √ s = 7 and 8 tev. JHEP, 08:045, 2016.
+[20] Eilam Gross and Ofer Vitells. Trial factors for the look elsewhere eﬀect in high energy physics.
+Eur. Phys. J. C , 70:525–530, 2010.
+[21] Bob Holdom. Two U(1)’s and epsilon charge shifts. Phys. Lett. B , 166:196–198, 1986.
+[22] Marco Fabbrichesi, Emidio Gabrielli, and Gaia Lanfranchi. The Dark Photon . SpringerBriefs
+in Physics. Springer, 2020.
+59

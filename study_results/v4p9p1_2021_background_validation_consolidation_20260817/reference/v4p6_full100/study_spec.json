@@ -1,0 +1,180 @@
+{
+  "schema_version": 1,
+  "study_id": "v4p6_2021_exposure_refmatched_100toy_20260812",
+  "created_utc": "2026-08-12",
+  "purpose": "Full 100-toy frozen-v4.2 refmatched injection-extraction continuation with deterministic optimizer-repeat gating and an independent reserve-90 bias test.",
+  "declared_result_state": {
+    "version": "v4.2",
+    "result_commit": "4c7698e28f0c2c9eedf531a5b614ca727d7c305b",
+    "integration_commit": "675b1c65be9238d6d97d7eeb0f09fd860404d13a",
+    "archived_config_path": "inputs/frozen_v4p2_analysis_card.yaml",
+    "base_hps_gpr_tree": "574a1e3af16c14b60ff0d26ee1bdbd316beecb46",
+    "base_runtime_module_sha256": {
+      "hps_gpr/gpr.py": "c57c4cdc05cc9e5b923cf7ec303aab9b9c72a6027413a282699ad9dfa3a4ca76",
+      "hps_gpr/io.py": "acbd0639fa979d957128aeb222701aa11b3d93b3392cc30171e0ae9f6f144010"
+    },
+    "config_path": "study_configs/v4p2_combined_2015full_2016full_2021_10pct_300toy_20260805/config_obsUL90_combined_wide_support_v4p2_2016k12_combined300.yaml",
+    "config_sha256": "5a52abb41896b161bd6dd8f66859737b6d98ea7d40d2eb8d8c677c3161ed6055"
+  },
+  "runtime_instrumentation": {
+    "version": "v4p6_deterministic_restart_instrumentation_v1",
+    "applied_to_base_hps_gpr_tree": "574a1e3af16c14b60ff0d26ee1bdbd316beecb46",
+    "production_driver": "run_study.py",
+    "production_driver_sha256": "693eca77c7c9e67d05fe8fb9ff8738d91e3effa4d894374395153791902719b0",
+    "archive_readme": "runtime_overlay/README.md",
+    "archive_readme_sha256": "5e0103e1f1e954085b296a385762c0dfc8d522bf25feabc106099d09ab998189",
+    "modules": {
+      "hps_gpr/gpr.py": {
+        "archived_path": "runtime_overlay/hps_gpr/gpr.py",
+        "sha256": "1c83cae238e87a4e94928c97fb737947c22a3f88b16dfaf955d48ab6b4771dd5",
+        "base_sha256": "c57c4cdc05cc9e5b923cf7ec303aab9b9c72a6027413a282699ad9dfa3a4ca76",
+        "instrumentation": "explicit optimizer-restart random_state plus captured optimizer warnings"
+      },
+      "hps_gpr/io.py": {
+        "archived_path": "runtime_overlay/hps_gpr/io.py",
+        "sha256": "b36f8da7671a0fc0958b663e11d83a1a4421e90d1aab9b10e40c31ce078035db",
+        "base_sha256": "acbd0639fa979d957128aeb222701aa11b3d93b3392cc30171e0ae9f6f144010",
+        "instrumentation": "propagation of optimizer seed and warning diagnostics into BlindPrediction"
+      }
+    },
+    "analysis_semantics_unchanged": [
+      "analysis card",
+      "GP kernel and bounds",
+      "likelihood and covariance construction",
+      "signal injection",
+      "amplitude extraction"
+    ]
+  },
+  "background_toy_product": {
+    "root": "inputs/paired_exposure_toys_100.root",
+    "root_sha256": "7f38af2d5577db14a535bf1b1ef736a28d80fce36fefd141e011c98cce7dba87",
+    "manifest": "inputs/paired_exposure_toys_100.manifest.json",
+    "manifest_sha256": "d1f732dd8eab9c06b340aeca807a25769fa72b14ccad8f5f3bec53072c8a9493",
+    "indices": [0, 99],
+    "pilot_indices": [0, 9],
+    "independent_confirmation_indices": [10, 99]
+  },
+  "masses_gev": [0.065, 0.090, 0.120, 0.180, 0.210],
+  "sigma_strengths": [0.0, 1.0, 3.0, 5.0],
+  "headline_truth": "gengamma",
+  "headline_function": "fGenGammaThresh",
+  "scenarios": {
+    "2021_1pct_x10": {"label": "2021 1% source x10", "source_family": "one_pct", "source_multiplier": 10},
+    "2021_10pct": {"label": "2021 native 10% source", "source_family": "ten_pct", "source_multiplier": 1},
+    "2021_1pct_x100": {"label": "2021 1% source x100", "source_family": "one_pct", "source_multiplier": 100},
+    "2021_10pct_x10": {"label": "2021 10% source x10", "source_family": "ten_pct", "source_multiplier": 10}
+  },
+  "source_inputs": {
+    "one_pct": {
+      "root": "inputs/funcform_seed_2021_1pct_support040_300.root",
+      "root_sha256": "3baf09030b73147d2ddbab7bca922c56dbdf08a2b75e7010f73b89996d733f4b",
+      "metadata": "inputs/funcform_seed_2021_1pct_support040_300.root.metadata.json",
+      "metadata_sha256": "ac4455ebe5ff8ca1d944f878970b9b20dfd07a246441a9824cfe0a434141584e"
+    },
+    "ten_pct": {
+      "root": "inputs/funcform_seed_2021_10pct_support040_300.root",
+      "root_sha256": "4f85e102540c496ca32ee2728a2fbf9a2a5494241a53e4dc2351a4ad56a9ce98",
+      "metadata": "inputs/funcform_seed_2021_10pct_support040_300.root.metadata.json",
+      "metadata_sha256": "aa9fb4f3c75a7c089bd9254bdc795e54dc1780484d8cfd412f3f64ed0d566c71"
+    }
+  },
+  "analysis_card": {
+    "search_range_gev": [0.050, 0.250],
+    "gp_support_range_gev": [0.040, 0.300],
+    "kernel_ls_res_lower_factor_2021": 1.1,
+    "kernel_ls_res_upper_factor_2021": 15.0,
+    "blind_nsigma": 2.25,
+    "gp_train_exclude_nsigma": 2.25,
+    "scan_edge_guard_nsigma": 2.25,
+    "neighborhood_rebin": 5,
+    "eps2_density_nsigma": 1.64,
+    "optimizer_restarts_per_attempt": 12,
+    "extract_allow_negative": true,
+    "injection_mode": "poisson",
+    "injection_shape_mode": "full",
+    "background_mode": "fixed_hist",
+    "reference_mode": "matched_refit_bonly_multistart_v1"
+  },
+  "optimizer_gate": {
+    "version": "v4p6_restart_v1",
+    "reference_initial_attempts": 3,
+    "maximum_attempts": 5,
+    "top_branch_min_replicates": 2,
+    "delta_lml_per_train_max": 0.001,
+    "abs_log_length_ratio_max": 0.01,
+    "abs_log_constant_ratio_max": 0.05,
+    "abs_log_sigma_ratio_max": 0.02,
+    "exact_start_abs_log_theta_max": 1e-8,
+    "bound_ratio_window": 0.02,
+    "sigma_over_reference_trigger": [0.5, 2.0],
+    "covariance_min_eigenvalue_relative": -0.01,
+    "minimum_accepted_per_cell_for_closure_claim": 95,
+    "selection_rule": "maximum GP log marginal likelihood among a reproducible branch; never use pull, fitted amplitude, recovery, or epsilon-squared"
+  },
+  "bias_test": {
+    "confirmatory_endpoint": "2021_1pct_x10, 65 MeV, zero-signal mean pull on toys 10-99",
+    "test": "two-sided one-sample Student-t test against zero",
+    "alpha": 0.05,
+    "materiality_abs_mean_pull": 0.2,
+    "decision": "material bias only when p<0.05 and absolute mean pull>=0.2",
+    "other_zero_signal_tests": "exploratory Holm correction across 20 scenario-mass cells"
+  },
+  "covariance_repair_audit": {
+    "version": "v4p6_covariance_repair_path_sensitivity_v2",
+    "script": "covariance_repair_audit.py",
+    "script_sha256": "262bb56e5cf834079339e7b723124150a5749033e9c805a0b67f73294320a4e1",
+    "input_accepted_rows_sha256": "b23f31975b5027e2b11ad45cf78f8ecfcc90620ea9b6995801c77a4d3f9af97b",
+    "ledger": "derived/covariance_repair_sensitivity.csv",
+    "ledger_sha256": "38e0c7249ba22299f233735c86a10ddffe549395de29aa5078386d28c5ac711c",
+    "summary": "derived/covariance_repair_sensitivity_summary.json",
+    "summary_sha256": "f96e723d68aa3a87cd04b30aca43c7d4479a315ae40bf130b7a53d68df0a8a13",
+    "repair_floor_relative": 1e-10,
+    "validation_thresholds": {
+      "archived_raw_relative_minimum_floor": -0.01,
+      "maximum_actual_path_abs_delta_pull_from_archive": 0.0031,
+      "maximum_actual_path_abs_rel_delta_sigma_A_from_archive": 0.00032,
+      "maximum_diagonal_loading_abs_delta_pull_from_actual": 0.0029,
+      "maximum_diagonal_loading_abs_rel_delta_sigma_from_actual": 0.0007,
+      "maximum_diagonal_loading_abs_cell_mean_delta_from_actual": 0.000051,
+      "maximum_diagonal_loading_abs_cell_width_delta_from_actual": 0.00011,
+      "maximum_spectral_floor_abs_delta_pull_from_actual": 0.0009,
+      "maximum_spectral_floor_abs_rel_delta_sigma_from_actual": 0.00029,
+      "severe_row_omission_influence_max_abs_cell_mean_delta": 0.031,
+      "severe_row_omission_influence_max_abs_cell_width_delta": 0.015,
+      "expected_severe_row_omission_minimum_cell_n": 94
+    },
+    "recorded_summary": {
+      "rows": 7994,
+      "archived_raw_relative_minimum": -0.0096282040529215,
+      "archived_raw_relative_below_minus_1e_3": 498,
+      "archived_raw_relative_below_minus_5e_3": 22,
+      "archived_severe_rows_scenarios": [
+        "2021_10pct_x10",
+        "2021_1pct_x100"
+      ],
+      "archived_severe_rows_masses_MeV": [
+        90.0
+      ],
+      "reconstructed_raw_relative_minimum": -0.009628204052921564,
+      "reconstructed_raw_relative_below_minus_1e_3": 495,
+      "reconstructed_raw_relative_below_minus_5e_3": 19,
+      "maximum_actual_path_abs_delta_pull_from_archive": 0.00306431819657238,
+      "maximum_actual_path_abs_rel_delta_sigma_A_from_archive": 0.00031336394692615954,
+      "maximum_diagonal_loading_abs_delta_pull_from_actual": 0.002868832541700339,
+      "maximum_diagonal_loading_abs_rel_delta_sigma_from_actual": 0.0006931643758782968,
+      "maximum_diagonal_loading_abs_cell_mean_delta_from_actual": 0.00004991587991809432,
+      "maximum_diagonal_loading_abs_cell_width_delta_from_actual": 0.00010679292432902443,
+      "maximum_spectral_floor_abs_delta_pull_from_actual": 0.0008687778751457209,
+      "maximum_spectral_floor_abs_rel_delta_sigma_from_actual": 0.0002847577115647759,
+      "severe_row_omission_influence_max_abs_cell_mean_delta": 0.03088569276408573,
+      "severe_row_omission_influence_max_abs_cell_width_delta": 0.014005702014061261,
+      "severe_row_omission_minimum_cell_n": 94
+    }
+  },
+  "interpretation": {
+    "truth_scope": "Common fGenGammaThresh smooth stress truth fitted independently to native 1% and native 10% sources; not a physical background generator.",
+    "pairwise_scope": "Unpaired source/selection comparisons with expected normalization ratio 1.1296466007; not pure exposure tests.",
+    "coverage_scope": "Conditional injection-extraction closure study; not a coverage-calibrated limit band, exclusion, or scan-wide global calibration.",
+    "exclusion_scope": "Exclusion eligibility is defined solely by predeclared optimizer and covariance reproducibility checks. Pull, fitted amplitude, recovery, and epsilon-squared are never selection inputs; every reproducible numerical branch remains included independent of pull magnitude or boundary occupancy."
+  }
+}

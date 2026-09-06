@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v4p9p13_calibration_20260905/run_chunked_refinement_8gib.py", line 337, in main
+    result = run_point(core, frozen, Bank, ctx, base_data, entry, plan, destination, contract)
+  File "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v4p9p13_calibration_20260905/run_chunked_refinement.py", line 455, in run_point
+    bank = Bank(ctx, ctx.truths[truth], whole, arrays[truth], np.repeat(np.arange(len(arrays[truth])), n),
+  File "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v4p9p13_calibration_20260905/run_chunked_refinement.py", line 210, in __init__
+    self.models = ctx.make_models(whole)
+  File "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v4p9p13_calibration_20260905/run_chunked_refinement.py", line 184, in make_models
+    models = core.Context.make_models(self, whole[start:stop])
+  File "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v4p9p13_calibration_20260905/calibration_core.py", line 136, in make_models
+    scalar=c.Profile(model.b[i],model.L[i],self.w,'linear');f=scalar.fit(counts[i]);z=scalar.fit(counts[i],0.)
+  File "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/background_profile_comparison_20260905/run_comparison.py", line 106, in fit
+    raise RuntimeError(f'Unconverged fit, score={score}')
+RuntimeError: Unconverged fit, score=4.4949521033066375e-07

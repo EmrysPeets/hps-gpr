@@ -1,0 +1,149 @@
+\section{HPS apparatus and data sets}
+\label{sec:datasets}
+
+\subsection{Detector configurations for the prompt search}
+
+HPS is a forward spectrometer optimized for narrow $e^+e^-$ resonances and displaced
+vertices in the high-rate environment immediately downstream of a thin tungsten target.
+Its prompt $A^\prime \rightarrow e^+e^-$ sensitivity is set primarily by three
+subsystems: the Silicon Vertex Tracker (SVT), which determines the mass and vertex
+resolution; the electromagnetic calorimeter (ECal), which provides the trigger and
+track--cluster matching; and the beamline/target geometry, which defines the forward
+acceptance and the occupancy environment \cite{HPSExperiment2022,HPS2016PromptLong}.
+
+The 2015 and 2016 engineering runs used the baseline six-station SVT. In that
+configuration, six axial/stereo tracking stations were distributed between
+$z=\SIrange{10}{90}{cm}$ downstream of the target, with the first active silicon only
+about \SI{1.5}{mm} from the beam plane \cite{HPS2016BumpInternal,HPSExperiment2022}.
+The ECal geometry used in the engineering runs was already close to the final HPS
+layout: two PbWO$_4$ crystal halves with the highest-rate crystals nearest the beam
+removed, leaving the beam to pass between the two halves
+\cite{HPS2016BumpInternal,HPSExperiment2022}.
+
+Before the first physics run in 2019, HPS upgraded the front tracker. The 2019 and
+2021 configurations added a seventh double layer at $z=\SI{5}{cm}$ and used thin,
+slim-edge sensors with short split striplets
+\cite{HPSExperiment2022,HPSSlimEdgeSensors2020}. Moving the first precision
+measurements closer to the beam reduced material and occupancy while improving
+acceptance for low-mass, small-opening-angle pairs. The ECal crystal layout was
+unchanged, but a positron hodoscope was installed before the 2019 run to support a
+single-arm trigger for events near the ECal beam gap \cite{HPSExperiment2022}.
+Figure~\ref{fig:hps-svt-eras} compares the tracker layouts used in the engineering and
+physics runs.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[t]{0.90\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{apparatus_figs/hps_2015_2016_svt_baseline.png}
+  \caption{Baseline six-layer SVT used in the 2015 and 2016 engineering runs
+  \cite{HPS2016BumpInternal}.}
+\end{subfigure}
+
+\vspace{0.9em}
+
+\begin{subfigure}[t]{0.78\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{apparatus_figs/hps_2019_2021_svt_upgrade.png}
+  \caption{Front-layer upgrade used in the 2019 and 2021 physics runs, including the
+  added seventh double layer and slim-edge front sensors
+  \cite{HPSExperiment2022,HPSSlimEdgeSensors2020}.}
+\end{subfigure}
+\caption{SVT configurations used in the prompt-resonance analyses. The 2015/2016
+baseline tracker and the 2019/2021 tracker differ in both layer count and the design
+of the innermost stations. The ECal crystal layout was unchanged; the physics-run
+configuration added a positron hodoscope.}
+\label{fig:hps-svt-eras}
+\end{figure}
+
+\subsection{Data-taking campaigns and analysis scope}
+
+This note contains two related analysis states. The accepted v4.2 combined result uses
+the full 2015 and 2016 engineering-run samples together with a distributed 10\% sample
+from the 2021 physics run. The later v4.9.5 pass examines that 2021 sample alone with a
+different lower support edge. The engineering data share the baseline tracker used in
+the published prompt searches; the 2021 data were recorded with the upgraded tracker
+and positron hodoscope. Although the 2019 run used the same upgraded detector, no 2019
+data enter either analysis.
+
+Table~\ref{tab:dataset-summary} summarizes the run periods, analyzed samples, search
+intervals, and GP fit supports. A mass hypothesis is tested only inside the search
+interval, whereas the GP is trained on the wider support after removing the local
+$2.25\,\sigma_m$ exclusion.
+
+\begin{table}[H]
+\centering
+\small
+{\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\linewidth}{@{} P{0.20\linewidth} P{0.12\linewidth} P{0.28\linewidth} P{0.16\linewidth} Y @{}}
+\toprule
+Run period & Beam energy & Sample & Search interval & v4.2 GP fit support \\
+\midrule
+2015 engineering run &
+\SI{1.056}{GeV} &
+\SI{1170}{nb^{-1}} &
+\SIrange{19}{90}{MeV} &
+\SIrange{14}{135}{MeV} \\
+2016 engineering run &
+\SI{2.3}{GeV} &
+\SI{10608}{nb^{-1}} &
+\SIrange{39}{180}{MeV} &
+\SIrange{30}{210}{MeV} \\
+2021 physics run &
+\SI{3.74}{GeV} &
+Native 10\% sample from a $\sim\SI{160}{pb^{-1}}$ parent run &
+\SIrange{50}{250}{MeV} &
+\SIrange{40}{300}{MeV} \\
+\bottomrule
+\end{tabularx}
+}
+\caption{Data sets and mass domains in the accepted v4.2 three-campaign
+configuration. The 2015 and 2016 inputs are the full engineering-run samples; the
+2021 input is the distributed native 10\% sample. The wider GP supports provide
+training sidebands beyond both ends of each search interval. The 2016 lower edge is
+\SI{30}{MeV} because a \SI{35}{MeV} edge leaves no rebinned training-bin center below
+the exclusion at the \SI{39}{MeV} search endpoint. The corresponding published
+prompt searches covered \SIrange{19}{81}{MeV} in 2015 and
+\SIrange{39}{179}{MeV} in 2016 \cite{HPS2015DarkPhoton,HPS2016PromptLong}.}
+\label{tab:dataset-summary}
+\end{table}
+
+The later v4.9.5 study changes only the lower support edge for a 2021-only extraction:
+it uses 36--300~MeV while retaining the 50--250~MeV search interval. The accepted v4.2
+three-campaign configuration in Table~\ref{tab:dataset-summary} continues to use
+40--300~MeV for 2021.
+
+Integrated luminosity and analyzed fraction do not enter the GP interpolation. They
+enter later, with the target, acceptance, efficiency, and radiative fraction, when an
+extracted prompt yield is converted to an equivalent $\epsilon^2$ limit.
+
+The 2015 and 2016 samples are fully unblinded. The 2021 input is distributed across
+the run rather than drawn from a contiguous block, so it samples varied run conditions
+while leaving most of the exposure unopened. The ROOT file does not contain enough
+exposure metadata to infer an integrated luminosity; ``10\%'' describes how the sample
+was constructed. The three-campaign result combines the full 2015 and 2016 samples
+with this 2021 sample and is not the final result for the 2021 run.
+
+Figure~\ref{fig:dataset-mass-shape-overlay} compares the unit-normalized invariant-mass
+shapes. Figure~\ref{fig:dataset-mass-distributions-log} shows the same spectra in
+events per MeV and marks the v4.2 fit supports and search intervals.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.86\linewidth}{dataset_summary_figs/invariant_mass_distributions_2015_2016_2021_normalized.png}
+\caption{Unit-normalized invariant-mass shapes for the full 2015 and 2016 samples
+and the native 2021 10\% sample. Each histogram is divided by its event count and bin
+width, so the comparison shows spectral shape rather than sample size.}
+\label{fig:dataset-mass-shape-overlay}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.98\linewidth}{dataset_summary_figs/invariant_mass_distributions_2015_2016_2021_log.png}
+\caption{Invariant-mass distributions for the three inputs in the accepted v4.2
+three-campaign configuration. Gray shading marks the GP fit support and gold shading
+marks the narrower interval in which signal hypotheses are tested. The mass-dependent
+$2.25\,\sigma_m$ exclusion is removed from the GP support separately at every tested
+mass.}
+\label{fig:dataset-mass-distributions-log}
+\end{figure}

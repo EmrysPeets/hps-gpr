@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "study_id": "v4p9p7_2016_support_combined_100toy_20260902",
+  "status": "scaffold_complete_awaiting_frozen_2016_support_and_reviewed_states",
+  "production_run": false,
+  "source_repository": {
+    "ref": "origin/main",
+    "commit": "e2c930f3f879742b2846e3fca1ee1b7e8d99ecc6"
+  },
+  "v4p2_numerical_lineage": {
+    "cached_profile_solver_sha256": "fb9c02e2a3a8fc6240d15357945e2a5c73c5859492f23ef17012f98c022e316e",
+    "runner_sha256": "513b3440d343a9b963761fe6ac69057975cd09a4ca299ae24a469d5d6da22688",
+    "benchmark_sha256": "164aff565d0b1de212dd191fd69207eca4da401ae468953b671c0c774de0ab85"
+  },
+  "production_contract": {
+    "datasets": "2015-full + 2016-full + 2021-10%",
+    "mass_grid_MeV": [
+      19,
+      250,
+      1
+    ],
+    "n_masses": 232,
+    "combined_mode": "count_scale",
+    "shared_parameter": "epsilon_squared_nonnegative",
+    "n_toys_per_mass": 100,
+    "mass_local_toy_limits": 23200,
+    "stored_mass_local_toy_limits": 23200,
+    "master_seed": 24680,
+    "refit_gp_on_toy": false,
+    "inner_cls": "90% asymptotic tilde_q_mu",
+    "data_range_2021_GeV": [
+      0.036,
+      0.3
+    ]
+  },
+  "files": {
+    "README_COMBINED_SCAFFOLD.md": "2c5eaa154c673e467ec11914cf739a45012f97a79280092ffff35bb3b7d713ed",
+    "assemble_reviewed_state_ledger.py": "7e749adb00ef8d552580217616e4732e838d08b8295bde7509b36d668ca6854e",
+    "benchmark_cached_profile_closure.py": "ae0669c11da6212b9e0491475576513eb4cda83c080c33a8393fafc5ce55abaf",
+    "cached_profile_solver.py": "fb9c02e2a3a8fc6240d15357945e2a5c73c5859492f23ef17012f98c022e316e",
+    "make_combined_card.py": "afd2f60d6f0a2781d781407f0a00c7ea39cc0e535290396364a03dd8531ae4df",
+    "run_combined_bands_cached_fixed_reviewed.py": "a9f96364feae38ed2c8f42221c39f8ae4d604f859df7a37cd669304ceb66bc4b",
+    "runtime_guard.py": "f4e38fce87ff70f0999939eef9d26e75fe22a2af06a586abe09304aec9218ca3",
+    "validate_combined_release.py": "782b0ba47837fff5d303c830d1e659acdab660dda9b9f04a6fef1f24eb93e591",
+    "runtime_combined/runtime_manifest.json": "8d20a7f44db25574e20114171d6f014bc116546d0b97c189454d9fceacec767c",
+    "qa/combined_scaffold_smoke.json": "a3b100a57df01655dd305411a9569df7a83a9c3c7b14e0966635098db4480d3e",
+    "inputs/frozen_v4p2_analysis_card.yaml": "5a52abb41896b161bd6dd8f66859737b6d98ea7d40d2eb8d8c677c3161ed6055",
+    "inputs/source_2015_full.root": "58ce717cde753d8566c754a73cb056560ed19e781fe9a43e8634111cc746531f",
+    "inputs/source_2016_full.root": "c2119a4ac9b91df9ae619857877b91cedba7fa6a58c10ece76b7d3a673a4e301",
+    "inputs/source_2021_10pct.root": "3944d4c71a453c6c810061248c34d2fca9eceaad1de85c137afdc291c2195ac4",
+    "inputs/archived_2015_source_ledger.csv": "a962c01aa030429c04e2cc102253b6b8750eacc3c9e294a7a99f851a9870aea9",
+    "inputs/archived_2021_source_ledger.csv": "e1b568a841c2dded8048e467f67528a90fd5a26b8542803c0cdb3e60109de447"
+  },
+  "missing_production_inputs": [
+    "support_freeze_decision.json",
+    "142-row reviewed 2016 observed-state CSV"
+  ],
+  "claim_boundary": "Conditional fixed-GP expected-limit quantiles with asymptotic inner CLs; not direct coverage, toy-calibrated inner CLs, calibrated sensitivity, or global significance."
+}

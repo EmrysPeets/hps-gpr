@@ -1,0 +1,151 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,mathtools,bm}
+\usepackage{booktabs,tabularx,array,makecell,longtable}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{siunitx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{xurl}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{placeins}
+\usepackage{pdflscape}
+\usepackage{microtype}
+\usepackage{textcomp}
+\usepackage[left]{lineno}
+\linenumbers
+\urlstyle{same}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!60!black,
+  citecolor=blue!60!black,
+  urlcolor=blue!60!black,
+  pdfdisplaydoctitle=true,
+  pdftitle={HPS Gaussian-Process Resonance Search Analysis Note, Version 4.9.7},
+  pdfauthor={Emrys Peets; Matthew Gignac; Eden Hsu},
+  pdfsubject={Full-2016 GP-support qualification and halted three-campaign recombination},
+  pdfkeywords={Heavy Photon Search, Gaussian processes, resonance search, statistical inference}
+}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\setlength{\headheight}{14pt}
+\fancyhead[R]{HPS-ANALYSIS-NOTE BH-GPR v4.9.7}
+\fancyfoot[C]{\thepage}
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \fancyhead[R]{HPS-ANALYSIS-NOTE BH-GPR v4.9.7}
+  \fancyfoot[C]{\thepage}
+}
+
+\setlist[itemize]{leftmargin=*}
+\setlist[enumerate]{leftmargin=*}
+\setlength{\tabcolsep}{5pt}
+\setlength{\emergencystretch}{2em}
+\renewcommand{\arraystretch}{1.12}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\CLs}{CL$_\mathrm{s}$}
+\newcommand{\Pre}{\textbf{Pre:}\ }
+\newcommand{\Pro}{\textbf{Prompt:}\ }
+\newcommand{\xspace}{}
+\newif\ifwritingsample
+\writingsamplefalse
+
+\newcommand{\graphicorplaceholder}[2]{%
+  \includegraphics[width=#1]{#2}%
+}
+
+\input{sections/generated_v4p9_results}
+\input{sections/generated_v4p9p1_results}
+
+\title{\vspace{-1.0em}HPS Gaussian-Process Resonance Search Analysis Note\\
+\large Version 4.9.7: full-2016 support qualification and recombination gate}
+\author{
+Emrys Peets\\Stanford University and SLAC National Accelerator Laboratory
+\and
+Matthew Gignac\\SLAC National Accelerator Laboratory
+\and
+Eden Hsu\\Stanford University and SLAC National Accelerator Laboratory
+}
+\date{September 2, 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This note describes a Gaussian-process search for narrow prompt $e^+e^-$ resonances
+in HPS data.  Version 4.9.7 adds a source-conditioned test of the lower GP-support
+edge for full-2016 inference and a post-unblinding audit of the earlier 2021 65~MeV
+feature.  The accepted v4.2 combination and the v4.9.5 2021-only scan remain distinct
+historical result states.
+
+The 2016 study uses the pre-existing 10\% development sample/subset for partial
+observed-shape information.  Before the support decision, the full-2016 array enters
+only through one scalar normalization over 26--210~MeV; no support-specific full-data
+fitted amplitude, local $p_0$, or upper limit enters selection.  The hybrid generating
+mean also contains an explicitly waived broad-tail component whose archived ROOT fit
+record has \texttt{fit\_ok=false}.  It is used only as a conditional stress truth, not
+as a qualified physical background truth or coverage generator.
+
+Phase~1 tests lower edges from 28 through 34~MeV at 44, 49, 54, and 59~MeV using 25
+paired backgrounds and matched 0-, 2-, and 5-$\sigma_A$ injections.  Every edge has
+only 3 of 12 cell means below 0.75 in magnitude and only 1 of 4 background-only means
+below 0.75; every edge violates the predeclared 1.25 gross-bias guard.  A uniform
+analytic-mean diagnostic shows the same alternating mass-dependent mismatch without
+Poisson fluctuations.  The frozen rule therefore returns no provisional edge and
+requires the study to stop without retuning.
+
+Consequently no 75-background continuation, support-specific full-2016 observed
+scan, updated combined upper limit on $\eps^2$, or 100-toy combined band is produced.
+Their absence is an enforced analysis decision, not a zero result.  Separately, the
+unchanged 2021 counts at 65~MeV give local asymptotic $Z=4.252$ with the v4.2 support
+and 2.403 with the v4.9.5 support.  The support-dependent GP state assigns more
+continuum to the masked region and leaves a smaller narrow-signal coefficient.  The
+defensible conclusion is that the narrow-signal attribution is not robust to the GP
+support prescription, not that the feature has been proved background or signal has
+been excluded.
+\end{abstract}
+
+\tableofcontents
+\clearpage
+
+\input{sections/00_change_log}
+\clearpage
+
+\input{sections/01_introduction}
+\input{sections/02_datasets}
+\input{sections/03_event_selection}
+\input{sections/04_methodology}
+\input{sections/05_toys_validation}
+\input{sections/05a_2021_support_selection}
+\input{sections/05b_2016_support_selection}
+\input{sections/05c_2021_signal_robustness}
+\input{sections/06_results}
+\input{sections/06a_2021_observed_result}
+\input{sections/06b_v4p9p7_combined_result}
+\input{sections/07_conclusions}
+
+\appendix
+\input{sections/appendix_v4p9_threshold_qualification}
+\input{sections/appendix_v4p8_validation_archive}
+\input{sections/appendix_prior_validation_results}
+\input{sections/appendix_kernel_studies}
+\input{sections/appendix_2015_method_comparison}
+\clearpage
+\input{sections/appendix_v4p2_followups}
+\input{sections/appendix_signal_candidate_catalogue}
+\input{sections/appendix_v4p5_ten_toy_source_exposure}
+
+\clearpage
+\bibliographystyle{unsrt}
+\bibliography{hps_gpr_analysis_note}
+
+\end{document}

@@ -1,0 +1,129 @@
+{
+  "all_scope_family": {
+    "N_eff_resolution_spacing": null,
+    "interpretation": "Adjustment for choosing the minimum among all 680 scope-mass tests; distinct from the fixed total-window selection.",
+    "mass_at_min_p0_MeV": 90,
+    "n_tests": 680,
+    "p0_min": 0.0001265983596407,
+    "p_bonferroni_grid": 0.086086884555676,
+    "p_sidak_resolution_spacing_analytic": null,
+    "reason_no_sidak": "Overlapping dataset scopes do not define an additional calibrated effective trials count.",
+    "scope_key_at_min": "pair_2015_2016"
+  },
+  "checks": {
+    "complete_unique_grids": true,
+    "local_p0_Z_consistent": true,
+    "positive_finite_resolutions": true,
+    "pvalue_ordering_and_bounds": true,
+    "runtime_sigma_agrees_with_independent_card_polynomial": true,
+    "runtime_sigma_max_absolute_difference_GeV": 0.0
+  },
+  "claim_boundary": "Resolution-Sidak is an approximation; grid Bonferroni is a union-bound adjustment conditional on valid fixed-model asymptotic local p0. Neither calibrates the partially unblinded model history or a continuum between grid points.",
+  "formulas": {
+    "N_eff": "clip(sum_i((m[i+1]-m[i])/(W*(sigma_eff[i]+sigma_eff[i+1])/2)),1,M)",
+    "Z_sidak": "norm.isf(p_sidak)",
+    "p_bonferroni_grid": "min(1,M*p0_min)",
+    "p_sidak": "-expm1(N_eff*log1p(-p0_min))"
+  },
+  "independence_width_sigma": 2.25,
+  "outputs": {
+    "resolution_ledger": {
+      "path": "study_results/v4p9p12_combination_expected_bands_20260904/derived/global_resolution_ledger_300toys.csv",
+      "sha256": "02b0ecb65eeecdc07325610eaecd10d468dfd268a590ec76379871d924303a7d"
+    },
+    "summary": {
+      "path": "study_results/v4p9p12_combination_expected_bands_20260904/derived/global_pvalue_summary_300toys.csv",
+      "sha256": "03c8cb89d769a9797123c939cea33651fe3398b7327332f36faf3fd0e6064d77"
+    }
+  },
+  "references": [
+    {
+      "title": "SAS/STAT: p-Value Adjustments",
+      "url": "https://support.sas.com/documentation/cdl/en/statug/66859/HTML/default/statug_multtest_details11.htm",
+      "use": "Sidak formula and independence conditions; Bonferroni grid adjustment"
+    },
+    {
+      "title": "NIST/SEMATECH: Bonferroni's method",
+      "url": "https://www.itl.nist.gov/div898/handbook/prc/section4/prc473.htm",
+      "use": "Union bound for arbitrary dependence, conditional on valid local tests"
+    },
+    {
+      "title": "Gross and Vitells, Trial factors for the look elsewhere effect in high energy physics",
+      "url": "https://arxiv.org/abs/1005.1891",
+      "use": "Scan-level look-elsewhere calibration and correlation-aware trial factors"
+    }
+  ],
+  "report_target_toys": 300,
+  "requires_completed_band_stage": false,
+  "resolution_integration_rule": "Sum adjacent mass steps divided by W times the arithmetic mean of the two endpoint effective resolutions; cap at [1, number of tested masses].",
+  "resolution_ledger_rows": 912,
+  "scan_calibrated_empirical_pvalue": null,
+  "scan_calibrated_empirical_pvalue_status": "unavailable_from_mass_independent_band_toys",
+  "scan_calibrated_empirical_pvalue_unavailable_reason": "Band pseudoexperiments are generated independently at different masses. Their toy IDs do not define coherent whole-spectrum scans, so they cannot supply the null distribution of scan maxima or a scan-calibrated p-value.",
+  "schema_version": 1,
+  "sigma_effective_rule": "Minimum detector mass resolution among the datasets selected at each mass; no observed p0 or limit enters selection.",
+  "sources": {
+    "analysis_card": {
+      "path": "study_results/v4p9p12_final_dataset_combinations_20260902/inputs/analysis_card.yaml",
+      "sha256": "4a3f3365584743ac1f8b62515ec37c9ca1b908968cfa7497a22609dedbfb79df"
+    },
+    "frozen_config_module": {
+      "path": "study_results/v4p9p7_2016_support_combined_100toy_20260902/runtime_combined/hps_gpr/config.py",
+      "sha256": "ec4f50345aebbf5c062e8daaefaaeca9b0e96df12f12b2d726172979df61cf9d"
+    },
+    "frozen_dataset_module": {
+      "path": "study_results/v4p9p7_2016_support_combined_100toy_20260902/runtime_combined/hps_gpr/dataset.py",
+      "sha256": "ab704592994ee54bf0e3cb16524e5cfb85eb00635ab887dabd79f7a618bf1ff6"
+    },
+    "frozen_runtime_manifest": {
+      "path": "study_results/v4p9p7_2016_support_combined_100toy_20260902/runtime_combined/runtime_manifest.json",
+      "sha256": "8d20a7f44db25574e20114171d6f014bc116546d0b97c189454d9fceacec767c"
+    },
+    "method_document": {
+      "path": "study_results/v4p9p12_combination_expected_bands_20260904/GLOBAL_PVALUE_METHOD.md",
+      "sha256": "eb7ac16a9c1126bbf0299fb0a4e0274cb1fe6d25919a84a210290f07cb1cc8d4"
+    },
+    "observed_result_curves": {
+      "path": "study_results/v4p9p12_final_dataset_combinations_20260902/derived/final_dataset_result_curves.csv",
+      "sha256": "6f60467b8051ac23d6b7d357d7f325d0fea6be0f6e184497a7c94769ae6e9adc"
+    },
+    "parent_runner": {
+      "path": "study_results/v4p9p12_final_dataset_combinations_20260902/run_final_combinations.py",
+      "sha256": "adce498af91372f31321dd96731f41157d25d6121f524fa169d363f13efe5926"
+    },
+    "producer": {
+      "path": "study_results/v4p9p12_combination_expected_bands_20260904/make_global_diagnostics.py",
+      "sha256": "4534ac9284bf912d32f6c0a44b6195447ddadcebfce0eae4af972292a702c66d"
+    }
+  },
+  "target_toys_role": "Report-stage identifier only; all quantities depend on frozen observed p0 and resolution, not band-toy count or completion.",
+  "total_window_segments": [
+    {
+      "mass_max_MeV": 38,
+      "mass_min_MeV": 19,
+      "scope_key": "individual_2015_full"
+    },
+    {
+      "mass_max_MeV": 49,
+      "mass_min_MeV": 39,
+      "scope_key": "pair_2015_2016"
+    },
+    {
+      "mass_max_MeV": 90,
+      "mass_min_MeV": 50,
+      "scope_key": "all_2015_2016_2021"
+    },
+    {
+      "mass_max_MeV": 180,
+      "mass_min_MeV": 91,
+      "scope_key": "pair_2016_2021"
+    },
+    {
+      "mass_max_MeV": 250,
+      "mass_min_MeV": 181,
+      "scope_key": "individual_2021_10pct"
+    }
+  ],
+  "uses_limit_tail_pvalues": false,
+  "window_summary_rows": 8
+}

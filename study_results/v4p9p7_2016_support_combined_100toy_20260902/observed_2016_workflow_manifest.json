@@ -1,0 +1,78 @@
+{
+  "schema_version": 2,
+  "status": "production_blocked_no_provisional_edge",
+  "study_id": "v4p9p7_2016_support_combined_100toy_20260902",
+  "observed_data_evaluated": false,
+  "study_spec_sha256": "4382bfa6298cafe43d45026708017ca3e43179700f2ab5c76a557411874c8b3f",
+  "frozen_protocol_sha256": "81e5954c6bb1073010f32af8ab2fccc94d922f94018abe6416238e9d92cbec02",
+  "frozen_v4p2_card_sha256": "5a52abb41896b161bd6dd8f66859737b6d98ea7d40d2eb8d8c677c3161ed6055",
+  "source_2016_full_root_sha256": "c2119a4ac9b91df9ae619857877b91cedba7fa6a58c10ece76b7d3a673a4e301",
+  "observed_scan_authorized": false,
+  "combined_production_authorized": false,
+  "required_protocol_action": "stop without retuning",
+  "canonical_support_freeze_present": false,
+  "confirmation_authorization_present": false,
+  "independent_audit_sha256": {
+    "audit/independent_freeze_audit.py": "c53bd7bc066d37bc593b910a109912c26719ecd5d61bd13974a6b2e826a51058",
+    "audit/static_truth_audit.json": "f27ff7400a82a8b0667e172766026b9007e2155eb447ccae05bf6adf17094964",
+    "audit/phase1_selection_audit.json": "1118f5b293719bffe17217c5d24a6bf32f74a7a453b4ffd038fae7a34fce9416",
+    "audit/production_authorization_denied.json": "c71b569da432723715922532e763b79dec6c0f9f04a08f84c0e190345c9d2b60",
+    "derived/analysis/phase1_selection_decision.json": "be1ac60e7b0420fc762a030ad579c855f65b20e41e4c32b03d514a804c82e71d",
+    "SCIENTIFIC_SCOPE_CLARIFICATION.md": "7e90ed186396f3e209f6591ccdd28df714b642137797c07e0ed048bd02656b2c"
+  },
+  "expected_mass_grid_MeV": {
+    "low": 39,
+    "high": 180,
+    "step": 1,
+    "rows": 142
+  },
+  "runtime_overlay_sha256": {
+    "hps_gpr/__init__.py": "342aaa16dc390a3b79ef605987de8dc610b87e9bc774fe5edfec5e7a56883687",
+    "hps_gpr/gpr.py": "1c83cae238e87a4e94928c97fb737947c22a3f88b16dfaf955d48ab6b4771dd5",
+    "hps_gpr/io.py": "b36f8da7671a0fc0958b663e11d83a1a4421e90d1aab9b10e40c31ce078035db"
+  },
+  "workflow_files_sha256": {
+    "OBSERVED_2016_WORKFLOW.md": "f970b0223cf94d66268060d3c988c36a062511907979605d2bda0b24d20ed1ab",
+    "assemble_reviewed_state_ledger.py": "7e749adb00ef8d552580217616e4732e838d08b8295bde7509b36d668ca6854e",
+    "build_observed_2016_card.py": "9e0ca06ab7bebec66934b5a2c3f40cec5dd523882c9b8bc204b7077c92acb630",
+    "observed_2016_contract.py": "19cdb862550334e4cb9197d6db7fc0f6ad2ebd8369d9f4732a4fbc5c3683ad9e",
+    "review_observed_2016.py": "7f0d7f6948859d2143952171c25b4422e001a1aae1d0c74e578cb7437cc12284",
+    "run_observed_2016_cli.py": "bacca0be96d94b34ea17e9af1b404c61790fd60a53dbd464129e7d70924f3311",
+    "validate_observed_2016.py": "babdec4af916f68d0279a7ecdba3f2e9e81459245af4c2a147cadddb1e502951"
+  },
+  "prohibited_absent_observed_products": {
+    "confirmation_authorization": "audit/confirmation_freeze_audit.json",
+    "canonical_support_freeze": "derived/analysis/support_freeze_decision.json",
+    "card": "inputs/v4p9p7_observed_2016_full_frozen_support_card.yaml",
+    "card_manifest": "inputs/v4p9p7_observed_2016_full_frozen_support_card.manifest.json",
+    "primary_results": "observed_scan/2016_full_primary/results_single.csv",
+    "repair_plan": "observed_scan/final_2016/optimizer_repair_plan.json",
+    "reviewed_csv": "observed_scan/final_2016/results_single_reviewed.csv",
+    "repair_ledger": "observed_scan/final_2016/optimizer_repair_ledger.csv",
+    "review_summary": "observed_scan/final_2016/review_summary.json",
+    "validation": "qa/observed_2016_review_validation.json"
+  },
+  "blocked_state_validation": {
+    "command": "python3 validate_observed_2016.py blocked-state",
+    "status": "pass",
+    "observed_data_evaluated": false,
+    "all_prohibited_products_absent": true
+  },
+  "scientific_scope": {
+    "ten_percent_source_description": "pre-existing 2016 10% development sample/subset supplying partial observed-shape information",
+    "ten_percent_statistical_independence_established": false,
+    "full_100pct_values_entered_truth_only_as_scalar_26_210MeV_normalization": true,
+    "support_specific_full_100pct_fit_p0_or_upper_limit_used_for_ranking": false,
+    "broad_tail_scope": "conditional source-conditioned stress truth only",
+    "claim_boundary": "terminal failure of the conditional pull-recovery gate; not an observed exclusion, sensitivity, coverage, or significance statement"
+  },
+  "branch_selection": {
+    "unchanged_card_repeats_per_flagged_mass": 3,
+    "minimum_branch_multiplicity": 2,
+    "maximum_lml_among_reproduced_eligible_branches": true,
+    "requires_covariance_valid": true,
+    "rejects_kernel_bounds": true,
+    "interpolation_permitted": false,
+    "uses_amplitude_limit_epsilon2_or_pvalue": false
+  }
+}

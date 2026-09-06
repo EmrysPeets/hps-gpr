@@ -1,0 +1,49 @@
+{
+  "detail": "Estimated peak 13.588 GiB exceeds explicit 4.000 GiB guard",
+  "diagnostics": {
+    "conservative_rank": 36,
+    "estimated_peak_bytes": 14589731296,
+    "estimated_peak_gib": 13.587746113538742,
+    "full_bins": 1626,
+    "gp_backend": "eigenfeature_rtol_1e-15",
+    "interpretation": "Explicit array bound with factor/padding copies, Hessian workspaces, mixture matrices and both retained banks; not measured host memory",
+    "limit_gib": 4.0,
+    "passed": false,
+    "per_truth": {
+      "gp": {
+        "persistent_bytes": 521207808,
+        "spectra": 8448,
+        "transient_bytes": 2317049856
+      },
+      "stress": {
+        "persistent_bytes": 2558656512,
+        "spectra": 41472,
+        "transient_bytes": 11438309376
+      }
+    },
+    "window_bins": 145
+  },
+  "entry": {
+    "baseline_checkpoint_path": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v4p9p13_calibration_20260905/derived/all_2015_2016_2021/m077/result.json",
+    "baseline_checkpoint_sha256": "e63dff9c8adbfba11f704fc002b7f4f9158a46b1007aef4ebbc9987a6769538b",
+    "components": [
+      {
+        "failed_gates": [
+          "tail_ess"
+        ],
+        "method": "fixed",
+        "priority": 2,
+        "reason": "envelope_controlling",
+        "truth": "stress",
+        "worst_ess": 10.455018438788887
+      }
+    ],
+    "mass_MeV": 77,
+    "priority": 2,
+    "scope_key": "all_2015_2016_2021",
+    "source_checkpoint_path": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v4p9p13_calibration_20260905/derived/all_2015_2016_2021/m077/result.json",
+    "source_checkpoint_sha256": "e63dff9c8adbfba11f704fc002b7f4f9158a46b1007aef4ebbc9987a6769538b",
+    "worst_ess": 10.455018438788887
+  },
+  "reason": "declared_geometry_or_memory_cap"
+}

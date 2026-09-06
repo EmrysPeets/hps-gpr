@@ -1,0 +1,51 @@
+{
+  "claim_boundary": "Conditional pointwise expected-limit quantiles and upper-limit tail diagnostics; not coverage or scan-global calibration. Analytic p0 is local.",
+  "figures": [
+    "all_three_expected_bands_100toys",
+    "individual_expected_band_panels_100toys",
+    "combination_expected_band_panels_100toys",
+    "final_total_search_window_expected_bands_100toys",
+    "combination_pvalue_panels_100toys"
+  ],
+  "layout": "one curve family per axis; figure-level legends outside data regions",
+  "pvalue_diagnostics": "study_results/v4p9p12_combination_expected_bands_20260904/derived/pvalue_diagnostics_100toys.csv",
+  "pvalue_diagnostics_definition": "p_strong=Pr(UL_toy<=UL_obs); p_weak=Pr(UL_toy>=UL_obs); p_two=min(1,2*min(p_strong,p_weak)); analytic p0 is the frozen one-sided fixed-mass asymptotic profile-LRT discovery p-value",
+  "pvalue_diagnostics_sha256": "8e3cb8a52c40e53ea9d403c1b9c60764dbc4abc555e727572e7b4e9d55ca5c70",
+  "source_observed": "study_results/v4p9p12_final_dataset_combinations_20260902/derived/final_dataset_result_curves.csv",
+  "source_observed_sha256": "6f60467b8051ac23d6b7d357d7f325d0fea6be0f6e184497a7c94769ae6e9adc",
+  "source_summary": "study_results/v4p9p12_combination_expected_bands_20260904/derived/expected_band_summary_100toys.csv",
+  "source_summary_sha256": "41dc39a0875c02620c768c4a7c72d4a01144af31c1a6e9d456d99de605960ba5",
+  "source_toy_limits": "study_results/v4p9p12_combination_expected_bands_20260904/derived/toy_limits_100toys.csv",
+  "source_toy_limits_sha256": "a93a4f2dd37edeb2223f5970b86f4285e3c860d6aad2ff92f1664ef3f51e5d1c",
+  "stage_toys_per_mass": 100,
+  "style_reference": "v4.2/v4.5 Brazil-band convention: yellow central 95%, green central 68%, dashed black median, solid observed curve",
+  "total_search_window_rule": [
+    {
+      "mass_max_MeV": 38,
+      "mass_min_MeV": 19,
+      "scope_key": "individual_2015_full"
+    },
+    {
+      "mass_max_MeV": 49,
+      "mass_min_MeV": 39,
+      "scope_key": "pair_2015_2016"
+    },
+    {
+      "mass_max_MeV": 90,
+      "mass_min_MeV": 50,
+      "scope_key": "all_2015_2016_2021"
+    },
+    {
+      "mass_max_MeV": 180,
+      "mass_min_MeV": 91,
+      "scope_key": "pair_2016_2021"
+    },
+    {
+      "mass_max_MeV": 250,
+      "mass_min_MeV": 181,
+      "scope_key": "individual_2021_10pct"
+    }
+  ],
+  "total_search_window_summary": "study_results/v4p9p12_combination_expected_bands_20260904/derived/final_total_search_window_summary_100toys.csv",
+  "total_search_window_summary_sha256": "c2b7c53d5b8b18d036071526996a5ad906d76707ef67a494c8490779b77f52f0"
+}

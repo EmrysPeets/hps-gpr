@@ -1,0 +1,458 @@
+% Numerical values below are unchanged from the validated 100-background study.
+
+\section{Background-model validation with full-refit pseudoexperiments}
+\label{sec:toys}
+
+\subsection{Validation question and scope}
+
+If a smooth, data-like spectrum contains no resonance, does the GPR sideband fit return
+a spurious signal? If a known signal is added, does the same procedure recover it with
+an uncertainty of the right scale? For each pseudoexperiment we Poisson-fluctuate a
+smooth function fitted independently of the GP, refit the GP, and extract the signal.
+These tests exercise the count-space prediction,
+the mass-dependent blind and training masks, the full-range Gaussian signal
+template, the matched-reference injection convention, and a fresh GP optimization
+for every pseudo-spectrum. The statistical definitions are given in
+Section~\ref{sec:matched-reference-diagnostics}.
+
+\begin{figure}[htbp]
+\centering
+\graphicorplaceholder{0.98\linewidth}{guard_band_figs/hps_gpr_bump_hunt_flowchart.png}
+\caption{Analysis and validation flow.  In the data path, sidebands around each mass
+hypothesis train the GP and the blinded bins enter the signal-plus-background
+likelihood.  In the validation path, a smooth source-fitted mean is Poisson
+fluctuated, a known signal may be added, and the complete GP fit and extraction are
+repeated.  The zero-injection ensemble tests spurious signal; nonzero injections test
+signal recovery and uncertainty calibration.  These are extraction-closure tests,
+not confidence-limit coverage or a scan-wide significance calibration.}
+\label{fig:v491-hps-gpr-flowchart}
+\end{figure}
+
+Each generating function is a smooth stress model fitted to an HPS source spectrum,
+not a unique physical parameterization of the trident continuum. The resulting closure
+statement is conditional on that model and the stated extraction settings; it does not
+measure bias in the observed data. We use four exposure ensembles. The
+$1\%\times10$ and $1\%\times100$ ensembles rescale the expected counts from the native
+1\% source by factors of ten and one hundred. The native-10\% ensemble comes from a
+separately selected 10\% sample, and $10\%\times10$ rescales its expected counts by a
+factor of ten. Because the two source samples also differ in selection and shape, equal
+effective exposure does not make them interchangeable.
+
+\subsection{Training exclusion and blind-window choice}
+\label{subsec:v491-guard-band-construction}
+
+The GP must not be trained on the core or near tails of the signal it is later asked
+to test.  A Gaussian signal retains non-negligible weight outside a
+$1.64\sigma_m$ central interval, so training immediately beside that interval can
+offer signal-like counts to the background fit and reduce the recovered amplitude.
+The training-exclusion study therefore varied the sideband boundary before any
+observed limit was used to choose it.
+
+\begin{figure}[htbp]
+\centering
+\graphicorplaceholder{0.90\linewidth}{guard_band_figs/guard_band_5sigma_fake_data_gp_band_no_guard_2p25_extended2sigma.png}
+\caption{Selected $2.25\sigma_m$ blind and training-exclusion geometry.  The GP is
+trained outside the widened interval, while all bins inside it enter the local
+signal-plus-background likelihood.  This retains the signal tails for extraction
+without allowing those same bins to influence the sideband fit.}
+\label{fig:v491-blind225-cartoon}
+\end{figure}
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{ccccc}
+\toprule
+$k_{\rm train}$ & median expected $\eps^2_{95}$ proxy &
+$\langle\widehat A/A_{\rm inj}\rangle_{z=3}$ &
+$\langle\widehat A/A_{\rm inj}\rangle_{z=5}$ & max $f_{\rm train}$ \\
+\midrule
+1.96 & \num{7.92e-5} & 0.730 & 0.715 & 0.0530 \\
+2.25 & \num{9.53e-5} & 0.961 & 0.943 & 0.0258 \\
+2.58 & \num{1.08e-4} & 1.052 & 1.036 & 0.0106 \\
+3.00 & \num{1.19e-4} & 1.049 & 1.037 & 0.00288 \\
+\bottomrule
+\end{tabular}
+\caption{Evidence used to choose the training exclusion.  The train-$2.25$ row
+substantially reduces the fraction of the signal template available to the GP while
+recovering the injected amplitude and retaining useful local precision.  The first
+column is a Gaussian-equivalent comparison proxy, not the final \CLs{} limit.}
+\label{tab:v491-guard-band-choice-summary}
+\end{table}
+
+The widened $2.25\sigma_m$ interval is used for both the training exclusion
+and the extraction likelihood.  Compared with a $1.64\sigma_m$ extraction plus a
+separate $1.64$--$2.25\sigma_m$ guard band, this construction gives comparable
+closure while retaining the near signal tails in the likelihood. This gives one
+mass-dependent geometry for the background and signal fits.
+
+\subsection{Generating spectra and the role of functional forms}
+
+We generate the background pseudoexperiments independently of the GP used for their
+extraction. A positive analytic intensity is fitted to a native HPS mass spectrum,
+normalized on the specified toy support, integrated over every histogram bin, and
+Poisson fluctuated.  A complete signal template is then added when $z>0$.  Every
+pseudo-spectrum is subsequently analyzed with a new GP sideband fit.  This analytic
+truth/full-refit construction is the central background-model test because success is
+not guaranteed by generating toys from the GP model that will later fit them.
+
+The 2015 and 2016 studies used independently fitted shifted
+sigmoid--power--exponential families. For the native 2021 1\% source we used an
+unshifted sigmoid--power--exponential model. The four-exposure study used a
+generalized-gamma threshold model fitted independently to the native 1\% and native
+10\% sources. These choices span smooth threshold, power-law, and broad-tail
+curvature without adding resonance-scale structure.  Figure~\ref{fig:v491-functional-form-seed-overview}
+shows the source spectra, selected means, and Poisson-ensemble construction.
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.99\linewidth}{toy_generation_figs/funcform_publication_overview.png}
+\caption{Analytic generating means used in the year-matched functional-form studies.
+Each dataset row compares the source spectrum with the candidate families and then
+shows the selected mean against the generated toy ensemble.  The functions define
+smooth positive pseudo-data means and are not asserted to be unique physical models
+of the continuum.}
+\label{fig:v491-functional-form-seed-overview}
+\end{figure}
+
+The mass-resolved injection scans selected the lower RBF length-scale factors without
+using the observed limit curve. For the resulting settings, the aggregate zero-signal
+mean pulls are $+0.029$, $-0.016$, and $-0.005$ for the 2015, 2016 10\%, and 2021
+1\% studies, respectively; the corresponding nonzero-injection signed averages are
+$-0.223$, $-0.262$, and $-0.034$.  Mass-resolved mean, width,
+significance-residual, and recovery checks support these summaries.  They motivate the
+chosen lower factors but do not replace direct mass-by-mass
+closure.
+
+\subsection{2021 validation ensembles at four effective exposures}
+\label{sec:v491-four-lane-ensemble}
+
+The 2021 study uses 100 pseudoexperiments in each of four exposure ensembles and five
+mass hypotheses. The baseline extraction uses 40--300~MeV GP
+support, 50--250~MeV search range, $k_{\min}=1.1$, $k_{\max}=15$,
+five-bin local rebinning, log-mass/log-count preprocessing, the
+$2.25\sigma_m$ blind and training exclusions, two required sidebands, and twelve
+randomized optimizer restarts in addition to the nominal start. The four baseline
+ensembles use the same generalized-gamma threshold family, fitted independently to the
+native 1\% and native 10\% sources.  Their source Pearson
+$\chi^2/{\rm ndf}$ values are 1.108 and 2.781, respectively.  The latter
+misdescription is largest through the steep threshold
+turn-on. We therefore use a threshold-refined model at 65~MeV while leaving the other
+mass points unchanged.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabularx}{\textwidth}{P{0.17\textwidth}P{0.20\textwidth}P{0.24\textwidth}Y}
+\toprule
+Displayed ensemble & Generating model & GP support & Role in the test \\
+\midrule
+$1\%\times10$, except 65~MeV & generalized-gamma threshold model & 40--300~MeV & baseline smooth-threshold test \\
+$1\%\times10$, 65~MeV & degree-five threshold-turn-on continuation & 40--300~MeV & threshold-refined 65~MeV test \\
+$1\%\times100$, all masses & generalized-gamma threshold model & 40--300~MeV & baseline smooth-threshold test \\
+native 10\%, except 65~MeV & generalized-gamma threshold model & 40--300~MeV & baseline smooth-threshold test \\
+native 10\%, 65~MeV & threshold-focused sigmoid--power--exponential mean & 30--300~MeV & extended-support 65~MeV test of the measured turn-on \\
+$10\%\times10$, all masses & generalized-gamma threshold model & 40--300~MeV & baseline smooth-threshold test \\
+\bottomrule
+\end{tabularx}
+\caption{Models used in the 2021 background-validation figures. At 65~MeV, the two
+threshold-focused tests replace the baseline points rather than being pooled with
+them. Distinct markers identify the change of generating model and, for native 10\%,
+the extension of the GP support.}
+\label{tab:v491-composite-scheme-map}
+\end{table}
+
+\subsection{Targeted validation of the rising threshold}
+\label{sec:v491-threshold-validation}
+
+\paragraph{$1\%\times10$ threshold-refined model.}
+The first 65~MeV test uses a source-fitted near-threshold model. Over 35--80~MeV it is a logistic turn-on multiplied by an exponentiated
+degree-five Chebyshev expansion and is joined smoothly to the specified high-mass tail.
+The degree is selected before any GP extraction: the native-bin deviance per degree of
+freedom is 0.994 for the native 1\% source and the five-bin value is 0.850, with no
+parameter-bound contact.  Its disclosed 80--300~MeV tail Poisson deviance per degree
+of freedom is 1.122, so this selected 1\%-source truth is broadly data-like over the
+complete 40--300~MeV support rather than only in the fitted turn-on interval. An
+initial 20-background development subset gave a mean pull of 0.300 and a width of
+1.109. We then analyzed an independently specified continuation, bringing the total to
+100 backgrounds and allowing 90\% intervals to be reported.
+
+\paragraph{Native-10\% extended-support model.}
+The second 65~MeV test models the measured 30--40~MeV shoulder and analyzes it with
+the complete 30--300~MeV GP support.  Its threshold component is a logistic turn-on
+times a degree-six exponentiated Chebyshev form fitted over 30--80~MeV, joined with a
+$C^2$ taper to a smooth high-mass continuation. In the native 10\% source, the local
+native-bin and five-bin deviances per degree of freedom are 1.140 and 1.421.  Thus the
+generating spectrum is data-like in the threshold-sensitive region even though the
+baseline family is not. Its 85--300~MeV tail deviance per degree of freedom
+is 6.220; this native-10\% ensemble therefore relies on the weak-correlation and
+tail-influence qualification below rather than on a support-wide goodness-of-fit
+claim.
+
+This study tests the 65~MeV extraction with 30--300~MeV support; it is separate from
+the lower-edge study that selected 36--300~MeV for the 2021-only analysis. The question
+here is whether a data-like generating mean that passes the local
+source-fit tests can be processed by the complete extraction without material signal
+bias.  With log preprocessing, the direct RBF correlation between masses $m$ and
+$m'$ is
+\begin{equation}
+ \rho(m,m')=\exp\!\left[-\frac{\log^2(m'/m)}{2\ell^2}\right].
+\end{equation}
+At 65~MeV, the optimized length scales in the two targeted
+ensembles span 0.2784--0.3185 for $1\%\times10$ and 0.2468--0.2691 for native
+10\%, with medians 0.2963 and 0.2592.  The corresponding direct correlations with
+150~MeV span 1.10--3.19\% and 0.321--0.800\%, respectively.  Across the complete
+55--70~MeV set the largest direct correlations with 150~MeV occur at 70~MeV and are
+5.71\% and 1.81\%.  The correlation decreases rapidly above 150~MeV.  These results quantify why a
+threshold-focused source fit can provide a meaningful local test while the generated
+spectrum and extraction still retain the full GP support.
+
+The correlation calculation is a fixed-hyperparameter statement, not a claim that
+high-mass bins have mathematically zero influence.  All retained bins still enter the
+global marginal likelihood and can shift the optimized length scale or kernel
+constant.  A same-input diagnostic makes the aggregate effect explicit: after fixing
+the selected hyperparameters, removing the training bins above 150~MeV shifts the
+65~MeV pull by a mean of $-0.130$ with a paired 90\% interval
+$[-0.151,-0.110]$ in $1\%\times10$, and by $-0.195$
+$[-0.211,-0.179]$ in native 10\%.  The maximum absolute shifts are 0.376 and
+0.400. In the first ensemble the mean changes from 0.139 to 0.009; in the second it
+changes from $-0.246$ to $-0.441$, whose 90\% interval
+$[-0.611,-0.271]$ crosses the descriptive $|\overline p|=0.5$ boundary used below.
+Counts above 150~MeV
+therefore have modest, statistically resolved collective influence even though every
+pairwise RBF correlation is small.  This diagnostic holds the chosen hyperparameters
+fixed and does not test their global-likelihood response to tail removal.
+
+The optimized kernels explain why a threshold-focused source fit is informative for
+the full extraction: the low-mass result is
+directly coupled most strongly to the turn-on region, while the generated spectrum,
+specified smooth continuation, and full extraction retain the actual support.  The
+restricted source fit thus provides a targeted conditional validation of local
+65~MeV behavior with the stated support. It does not establish
+tail-independence or universal GP closure for every possible high-mass truth.
+
+\subsection{Matched refits and numerical selection}
+
+For every background, mass, and generating model, an independently optimized background-only
+fit supplies the matched reference uncertainty.  Signals with
+$z=1,3,5$ are generated with mean amplitude
+$A_{\rm inj}=z\sigma_{A,{\rm ref}}$, their full Gaussian templates are added to the
+same background counts, and the GP is refitted after applying the same training mask.
+The injected amplitude is therefore calibrated to the local background-only fit,
+whereas the pull denominator is always the uncertainty returned by the injected fit.
+
+Whether a fit is kept never depends on its fitted signal or pull.  Repeated attempts
+use the same pseudo-data with independent optimizer starts.  We choose among them using
+the GP log marginal likelihood, reproducibility of the length scale and kernel
+constant, covariance validity, uncertainty-ratio checks, and contact with the kernel
+bounds.  The choice never uses $\widehat A$, the pull, agreement with the injected
+value, $\eps^2$, or a local $p$ value.  A statistical outlier is retained whenever it
+passes these numerical checks.
+
+The baseline study retained 7994 of 8000 fits; every ensemble contains 99 or 100 usable
+fits. The six rejected fits failed reproducibility checks. Each threshold-focused study
+contains 400 usable fits---100 backgrounds at each of $z=0,1,3,5$---with no rejection
+and no kernel-bound contact. Covariance, count, and pull checks agree, and the numerical
+selection is made without reference to the extracted physics result.
+
+\subsection{Closure observables and decision rules}
+
+At zero injection, the signed pull
+$p=\widehat A/\widehat\sigma_A$ is a spurious-signal statistic. The ensemble mean
+tests whether the extraction is centered and the sample standard deviation tests
+whether the returned uncertainty has the appropriate scale. At nonzero injection,
+the pull of Eq.~\eqref{eq:v4p9-pull} tests centering about the known amplitude and the
+paired response of Eq.~\eqref{eq:v4p9-paired-response} separates recovery of the
+added signal from a background-specific zero-signal offset. Strengths
+$z=0,1,3,5$ reuse the same background pseudo-spectrum and are consequently
+correlated; they are one response curve, not four independent confirmations.
+
+For each 100-background ensemble at one mass and signal strength, we report the usable
+count $n$, the pull mean and its two-sided 90\% Student-$t$ interval, and the pull width
+with its exact normal-theory 90\% chi-square interval. An ensemble is reported only if
+at least 95 of its 100 fits meet the numerical criteria. We use a Holm correction for
+the two planned threshold-focused points at $z=0$, and a separate correction for the
+twenty displayed four-exposure, five-mass points. The correlated nonzero injections are
+response diagnostics and do not enter either family. We flag a mean only when its
+Holm-adjusted two-sided $p$ value is below 0.05 and $|\overline p|\geq0.2$.
+
+The practical centering tolerance $|\overline p|<0.5$ was chosen after the
+100-background results were available. It is a descriptive criterion, not a
+predeclared equivalence test. We report it alongside the $t$/Holm results, which are
+more sensitive to small but statistically resolved offsets. For the two targeted
+points we also ask whether the full 90\% interval on the mean lies inside the practical
+band. A pull width is consistent with one only when its 90\% interval contains one.
+None of these tests measures \CLs{} coverage.
+
+\subsection{Spurious-signal results from 100 pseudoexperiments}
+\label{sec:v491-spurious-signal}
+
+Table~\ref{tab:v491-sixtyfive-results} gives the two targeted 65~MeV results. The
+baseline rows show why the threshold-focused tests were needed; the two sets of pulls
+are not combined. Both targeted samples exceed the 95-of-100 reporting
+threshold and pass the numerical checks above.  We compare the results under the
+original statistical test, the post-result practical
+$|\overline p|<0.5$ criterion, and the separate unit-width diagnostic.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabularx}{\textwidth}{P{0.27\textwidth}cP{0.20\textwidth}P{0.20\textwidth}Y}
+\toprule
+65~MeV ensemble and model & $n$ & $\overline p$ [90\% CI] & $s_p$ [90\% CI] & centering \\
+\midrule
+$1\%\times10$, baseline & 100 & 0.7890 [0.6293,0.9488] & 0.9622 [0.8625,1.0907] & outside band \\
+$1\%\times10$, threshold-refined, full sample & 100 & 0.1394 [$-0.0499$,0.3288] & 1.1404 [1.0222,1.2927] & inside band \\
+$1\%\times10$, threshold-refined, independent continuation & 80 & 0.0993 [$-0.1150$,0.3135] & 1.1514 [1.0196,1.3265] & inside band \\
+native 10\%, baseline & 100 & 0.7160 [0.5452,0.8867] & 1.0284 [0.9218,1.1657] & outside band \\
+native 10\%, extended support, full sample & 100 & $-0.2463$ [$-0.4165$,$-0.0761$] & 1.0253 [0.9190,1.1622] & inside band$^\dagger$ \\
+native 10\%, extended support, independent continuation & 75 & $-0.2840$ [$-0.4943$,$-0.0737$] & 1.0934 [0.9646,1.2661] & inside band \\
+\bottomrule
+\end{tabularx}
+\caption{Background-only closure at 65~MeV. Intervals are two-sided 90\% intervals:
+Student-$t$ for the mean and exact normal-theory chi-square for the population standard
+deviation. The two full-sample targeted intervals lie inside the post-result
+$[-0.5,0.5]$ practical band, whereas the baseline means do not.
+$^\dagger$The native-10\% full sample nevertheless has targeted Holm-2
+$p=0.03632$ and $|\overline p|>0.2$; statistical resolution of a small offset and
+practical centering are distinct statements. The $1\%\times10$ width interval excludes
+one in both the full sample and independent continuation.}
+\label{tab:v491-sixtyfive-results}
+\end{table}
+
+Both threshold-focused samples meet the post-result practical centering criterion in
+the full sample and in the independent continuation. The $1\%\times10$ pull width is
+mildly high, while the native-10\% mean retains a statistically resolved negative
+offset in the targeted two-point test. We therefore report practical centering,
+evidence for a nonzero offset, and pull-width calibration as separate results.
+
+Across the full display, all twenty zero-signal mean pulls lie inside $[-0.5,0.5]$; the
+largest magnitude is 0.338 for $10\%\times10$ at 180~MeV. That point is the only flag
+after the separate twenty-point Holm correction. With the correlated nonzero
+injections included, all eighty mean pulls remain inside the practical band and 75 of
+their 90\% intervals are wholly contained. Exact unit-width calibration is less
+uniform: three of twenty zero-signal width intervals and fifteen of eighty all-strength
+intervals exclude one.
+
+\ifwritingsample
+\else
+To preserve established cross-references in the complete analysis note, the three
+consolidated displays below retain their earlier figure numbers.
+\setcounter{figure}{63}
+\fi
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.99\linewidth}{toy_generation_figs/v4p9p1_2021_background_validation_20260817/figure64_spurious_signal_consolidated_full100_90cl.pdf}
+\caption{Zero-signal diagnostics for four 2021 exposure ensembles, with 100
+pseudoexperiments per point. Circular markers show the baseline smooth-threshold
+model. At 65~MeV, diamonds and stars show the two threshold-focused tests defined in
+Table~\ref{tab:v491-composite-scheme-map}; they replace, rather than pool with, the
+baseline points. Bars are two-sided 90\% intervals. The gray mean band is the
+post-result $\pm0.5$ practical centering tolerance.}
+\label{fig:v491-zero-signal-full}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.99\linewidth}{toy_generation_figs/v4p9p1_2021_background_validation_20260817/figure65_onepctx10_65mev_table17_vs_historical_90cl.pdf}
+\caption{Targeted $1\%\times10$ test at 65~MeV, comparing the threshold-refined and
+baseline smooth-threshold models. The upper panels show the zero-injection pull
+distribution and the running mean; the lower panels show the mean and width across
+the correlated $z=0,1,3,5$ extractions.  Mean intervals are two-sided 90\%
+Student-$t$ intervals and width intervals are exact normal-theory 90\% chi-square
+intervals. The full sample contains the 20-background development subset; the
+independent continuation in Table~\ref{tab:v491-sixtyfive-results} gives the same
+qualitative result. The gray $\pm0.2$ band is a narrow visual reference, not the
+$\pm0.5$ practical criterion used in the text.}
+\label{fig:v491-sixtyfive-confirmation}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.99\linewidth}{toy_generation_figs/v4p9p1_2021_background_validation_20260817/pull_means_widths_consolidated_2x4_full100_90cl.pdf}
+\caption{Background-validation summary. Columns correspond to
+$1\%\times10$, $1\%\times100$, native 10\%, and $10\%\times10$; the upper row
+shows pull means and the lower row pull widths as functions of mass.  The four series
+are $z=0,1,3,5$, with zero injection visually emphasized and the correlated nonzero
+response series drawn more lightly. Circular markers show the baseline model; at
+65~MeV, diamonds and stars show the targeted studies defined in
+Table~\ref{tab:v491-composite-scheme-map}. Mean bars are
+two-sided 90\% Student-$t$ intervals and width bars are exact normal-theory two-sided
+90\% chi-square intervals. The four strengths share backgrounds. The gray mean bands show the post-result $\pm0.5$ practical
+centering tolerance.}
+\label{fig:v491-pull-summary}
+\end{figure}
+
+Figure~\ref{fig:v491-sixtyfive-confirmation} directly compares the baseline and targeted
+65~MeV ensembles, showing why the threshold-specific study was needed.
+
+\subsection{Recovery of injected signals}
+
+A centered zero-signal ensemble is necessary but not sufficient: a background model
+could remove the false offset and still absorb a real narrow signal.  The nonzero
+rows therefore repeat the full GP fit after adding matched one-, three-, and
+five-reference-sigma signals.  Figure~\ref{fig:v491-pull-summary} displays the mean
+and width at every strength and mass; Table~\ref{tab:v491-injection-recovery} gives
+the numerical 65~MeV replacement results, including the paired response
+$R=(\widehat A_z-\widehat A_0)/A_{\rm inj}$.
+
+The paired response separates signal recovery from the additive background offset. In
+the two threshold-focused tests, the mean response is
+stable at 0.966--0.969 over $z=1,3,5$, with mutually consistent 90\% intervals and no
+worsening with strength.  The full procedure therefore recovers 96.6--96.9\% of the
+tested amplitude, corresponding to a stable 3.1--3.4\% attenuation. We retain that
+attenuation in the interpretation.
+Agreement across strengths is not counted multiple times because the same 100
+background realizations are reused.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{llccc}
+\toprule
+65~MeV model & $z$ & $\overline p$ [90\% CI] & $s_p$ [90\% CI] & $\overline R$ [90\% CI] \\
+\midrule
+$1\%\times10$, threshold turn-on & 0 & $0.139$ [$-0.050$,0.329] & 1.140 [1.022,1.293] & --- \\
+ & 1 & $0.107$ [$-0.082$,0.297] & 1.141 [1.023,1.293] & 0.9678 [0.9643,0.9713] \\
+ & 3 & $0.039$ [$-0.149$,0.227] & 1.134 [1.016,1.285] & 0.9665 [0.9646,0.9684] \\
+ & 5 & $-0.025$ [$-0.216$,0.165] & 1.147 [1.028,1.300] & 0.9670 [0.9654,0.9686] \\
+\addlinespace
+native 10\%, 30--300 support & 0 & $-0.246$ [$-0.417$,$-0.076$] & 1.025 [0.919,1.162] & --- \\
+ & 1 & $-0.280$ [$-0.450$,$-0.109$] & 1.025 [0.919,1.162] & 0.9664 [0.9629,0.9700] \\
+ & 3 & $-0.346$ [$-0.515$,$-0.177$] & 1.019 [0.913,1.155] & 0.9666 [0.9649,0.9684] \\
+ & 5 & $-0.402$ [$-0.571$,$-0.234$] & 1.015 [0.909,1.150] & 0.9686 [0.9669,0.9703] \\
+\bottomrule
+\end{tabular}
+\caption{Full-sample 65~MeV extraction at all matched-reference strengths for the two
+threshold-focused models. Mean intervals are two-sided 90\% Student-$t$ intervals and
+width intervals are exact normal-theory two-sided 90\% chi-square intervals.  The
+response summaries are paired background-by-background and use two-sided 90\%
+Student-$t$ intervals.  All strengths share the same backgrounds and are correlated.  The
+$1\%\times10$ widths are mildly high at every strength; the native-10\% widths are
+compatible with one at this precision.}
+\label{tab:v491-injection-recovery}
+\end{table}
+
+\ifwritingsample
+The validation above assumes fixed GP supports. For the 2021-only scan, we must also
+choose where that support begins.
+
+\input{sections/05a_2021_support_selection}
+\fi
+
+\subsection{What the validation establishes}
+
+For the source-like spectra tested here, the GP extraction is practically centered and
+recovers an injected narrow signal with a stable response of 96.6--96.9\%. All twenty
+zero-signal mean pulls and all eighty correlated injection-strength mean pulls lie
+inside the post-result $\pm0.5$ band. The result rests on an independent generating
+model, a fresh sideband fit for every pseudoexperiment, and numerical choices made
+without reference to the fitted signal or pull.
+
+The departures from ideal behavior are equally informative. The response is 3.1--3.4\%
+low; three of twenty zero-signal width intervals and fifteen of eighty all-strength
+width intervals exclude one; and the native-10\%, 65~MeV test retains a small resolved
+offset. The support study also finds under-recovery at 55~MeV. These tests therefore
+establish conditional extraction closure for the spectra and supports studied, not
+zero bias for arbitrary smooth backgrounds, exact pull calibration, confidence-limit
+coverage, bias in the observed data, or a scan-global significance calibration.

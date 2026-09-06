@@ -1,0 +1,198 @@
+{
+  "attempt": 1,
+  "baseline_contract_sha256": "246e8411c4737b51c44271db3eb21cf3c4c767efa8c59faf0722f0162e272170",
+  "calibration_spectra": 74496,
+  "mass_MeV": 74,
+  "max_memory_gib": 4.0,
+  "memory_estimates": {
+    "eigenfeature_rtol_1e-15": {
+      "conservative_rank": 12,
+      "estimated_peak_bytes": 3911665408,
+      "estimated_peak_gib": 3.643022298812866,
+      "full_bins": 720,
+      "interpretation": "Explicit array bound with factor/padding copies, Hessian workspaces, mixture matrices and both retained banks; not measured host memory",
+      "per_truth": {
+        "gp": {
+          "persistent_bytes": 116649984,
+          "spectra": 8448,
+          "transient_bytes": 333864960
+        },
+        "stress": {
+          "persistent_bytes": 911990784,
+          "spectra": 66048,
+          "transient_bytes": 2813116416
+        }
+      },
+      "window_bins": 54
+    },
+    "exact_cached_cholesky": {
+      "conservative_rank": 54,
+      "estimated_peak_bytes": 22279522048,
+      "estimated_peak_gib": 20.74942183494568,
+      "full_bins": 720,
+      "interpretation": "Explicit array bound with factor/padding copies, Hessian workspaces, mixture matrices and both retained banks; not measured host memory",
+      "per_truth": {
+        "gp": {
+          "persistent_bytes": 286961664,
+          "spectra": 8448,
+          "transient_bytes": 2491146240
+        },
+        "stress": {
+          "persistent_bytes": 2243518464,
+          "spectra": 66048,
+          "transient_bytes": 19679133696
+        }
+      },
+      "window_bins": 54
+    }
+  },
+  "numerical_policy": "original_proposals_then_nuisance1e-7_replay_v1",
+  "policy": "fisher075_fresh512_retry1024_centers96_v1",
+  "scope_key": "individual_2016_full",
+  "selection_sha256": "0a99258a7803283e7c0bcfd36b48cddb4773ed40aba44efbf42f1e0c52d1d66a",
+  "sigma_reference": 6519.91901490628,
+  "signal_yield_per_eps2": 2561084501.791276,
+  "source_checkpoint_sha256": "d8277a33e9666979b7208334c69b1a747a4de9f888473634223fbfb32c0c3097",
+  "truths": {
+    "gp": {
+      "calibration_spectra": 8448,
+      "candidates": [],
+      "ceiling": 12.0,
+      "ntoys_per_proposal": 256,
+      "proposal_count": 33,
+      "proposal_nodes": [
+        0.0,
+        0.5,
+        1.0,
+        1.5,
+        2.0,
+        3.0,
+        4.0,
+        5.0,
+        6.0,
+        8.0,
+        12.0
+      ],
+      "refined": false,
+      "scan_nodes": [
+        0.0,
+        0.5,
+        1.0,
+        1.5,
+        2.0,
+        3.0,
+        4.0,
+        5.0,
+        6.0,
+        8.0,
+        12.0
+      ],
+      "windows": []
+    },
+    "stress": {
+      "calibration_spectra": 66048,
+      "candidates": [
+        {
+          "centers": [
+            19.81842842729678
+          ],
+          "first_or_previous_endpoint": null,
+          "influence_hint": 19.81842842729678,
+          "method": "fixed",
+          "propagated_sd_sigma": 1.1899223660446787,
+          "window": [
+            12.0,
+            23.388195525430817
+          ]
+        },
+        {
+          "centers": [
+            17.363077797980164
+          ],
+          "first_or_previous_endpoint": null,
+          "influence_hint": 17.363077797980164,
+          "method": "profiled",
+          "propagated_sd_sigma": 0.9813259853365708,
+          "window": [
+            12.0,
+            20.30705575398988
+          ]
+        }
+      ],
+      "ceiling": 23.388195525430817,
+      "ntoys_per_proposal": 512,
+      "proposal_count": 129,
+      "proposal_nodes": [
+        0.0,
+        0.5,
+        1.0,
+        1.5,
+        2.0,
+        3.0,
+        4.0,
+        5.0,
+        6.0,
+        8.0,
+        12.0,
+        12.399579159443908,
+        12.799206810104039,
+        13.198882950562709,
+        13.598607579402753,
+        13.998380695207521,
+        14.398202296560882,
+        14.798072382047222,
+        15.197990950251443,
+        15.597957999758965,
+        15.997973529155722,
+        16.398037537028166,
+        16.798150021963263,
+        17.1983109825485,
+        17.363077797980164,
+        17.598520417371866,
+        17.99877832502188,
+        18.39908470408757,
+        18.799439553158475,
+        19.199842870824646,
+        19.60029465567666,
+        19.81842842729678,
+        20.000794906305593,
+        20.30705575398988,
+        20.401343621303045,
+        20.801940799261125,
+        21.202586438772453,
+        21.603280538430162,
+        22.0040230968279,
+        22.404814112559826,
+        22.805653584220607,
+        23.206541510405426,
+        23.388195525430817
+      ],
+      "refined": true,
+      "scan_nodes": [
+        0.0,
+        0.5,
+        1.0,
+        1.5,
+        2.0,
+        3.0,
+        4.0,
+        5.0,
+        6.0,
+        8.0,
+        12.0,
+        17.363077797980164,
+        19.81842842729678,
+        20.30705575398988,
+        23.388195525430817
+      ],
+      "windows": [
+        [
+          12.0,
+          23.388195525430817
+        ]
+      ]
+    }
+  },
+  "type": "independent_poisson_mixture_refinement",
+  "validation_spectra": 3000
+}

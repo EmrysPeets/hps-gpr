@@ -1,0 +1,43 @@
+{
+  "status": "terminal_failed_independent_validation",
+  "combination_authorized": false,
+  "reason": "The frozen runner provisionally resolved 142/142 states, but the prospectively frozen independent validator passed only 14/17 checks and independently replayed only 87/142 selected-state certificates within the unchanged 1e-6 fixed-LML closure tolerance.",
+  "support_lower_MeV": 30,
+  "support_upper_MeV": 210,
+  "upper_length_factor_2016": 12.0,
+  "runner_provisional_decision": {
+    "path": "derived/state_certification_decision.json",
+    "sha256": "832c1c02df8ecee4b6daa19676fe14ed4117874107f0fb5397b61df1ec7f7471",
+    "status": "all_142_states_certified",
+    "resolved_rows": 142,
+    "combination_authorized": true
+  },
+  "independent_validation": {
+    "path": "qa/final_validation.json",
+    "sha256": "892b9de6be2a8cdc8f822672bf69662fcfffa7bf37943db102e27852905df500",
+    "status": "validation_failure",
+    "checks_passed": 14,
+    "checks_total": 17,
+    "independently_resolved_rows": 87,
+    "independently_unresolved_rows": 55
+  },
+  "optimizer_paths": {
+    "path": "derived/optimizer_paths.csv",
+    "rows": 2556,
+    "sha256": "adba668f9cee7c87a73f373af9a25a0318575c0653b8650b40812de5ac34ba3b"
+  },
+  "provisional_states": {
+    "path": "derived/observed_2016_gp_states_reviewed.csv",
+    "rows": 142,
+    "sha256": "a2fbf0f05ad44297ee62c094379119106e7ae21c433062b365fe521cbaed9f8c"
+  },
+  "execution_freeze_sha256": "4b148acd081d087cf1a61dfa59087084eaed051f6b778644f314506f8b029f99",
+  "protocol_sha256": "ae3f0bde2978f07c3e135d1e978fe9528482556b12cecef3f8dc5173776a9235",
+  "spec_sha256": "4a90696216afbd78d41d4a5f0e249a70488fae823ee32a1b0004d31d327557b6",
+  "runner_sha256": "9327afde235ef655ab8895a305972fba65e89200529c07bd2377cba38cba5a27",
+  "validator_sha256": "2cc77a1dd24cc138d26dc43c5b8525d46b1de1ff5487e40c892a36c0747ed654",
+  "inference_fields_accessed": [],
+  "inference_artifacts_produced": [],
+  "retry_or_gate_change_performed": false,
+  "claim_boundary": "Terminal fit-state numerical reproducibility failure; no 2016-full or combined inference is authorized from this release."
+}

@@ -1,0 +1,60 @@
+{
+  "detail": "Estimated peak 17.674 GiB exceeds explicit 4.000 GiB guard",
+  "diagnostics": {
+    "conservative_rank": 36,
+    "estimated_peak_bytes": 18977486560,
+    "estimated_peak_gib": 17.67416164278984,
+    "full_bins": 1626,
+    "gp_backend": "eigenfeature_rtol_1e-15",
+    "interpretation": "Explicit array bound with factor/padding copies, Hessian workspaces, mixture matrices and both retained banks; not measured host memory",
+    "limit_gib": 4.0,
+    "passed": false,
+    "per_truth": {
+      "gp": {
+        "persistent_bytes": 421183488,
+        "spectra": 8448,
+        "transient_bytes": 1916952576
+      },
+      "stress": {
+        "persistent_bytes": 3292889088,
+        "spectra": 66048,
+        "transient_bytes": 15189983232
+      }
+    },
+    "window_bins": 108
+  },
+  "entry": {
+    "baseline_checkpoint_path": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v4p9p13_calibration_20260905/derived/all_2015_2016_2021/m056/result.json",
+    "baseline_checkpoint_sha256": "e96d7a3da444e83c8edc3f5d42d8af73acbb395f53ada763c897019c52796327",
+    "components": [
+      {
+        "failed_gates": [
+          "tail_ess"
+        ],
+        "method": "profiled",
+        "priority": 2,
+        "reason": "envelope_controlling",
+        "truth": "stress",
+        "worst_ess": 96.01990187747413
+      },
+      {
+        "failed_gates": [
+          "tail_ess",
+          "normalization"
+        ],
+        "method": "fixed",
+        "priority": 2,
+        "reason": "envelope_controlling",
+        "truth": "stress",
+        "worst_ess": 7.970850341555921
+      }
+    ],
+    "mass_MeV": 56,
+    "priority": 2,
+    "scope_key": "all_2015_2016_2021",
+    "source_checkpoint_path": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v4p9p13_calibration_20260905/derived/all_2015_2016_2021/m056/result.json",
+    "source_checkpoint_sha256": "e96d7a3da444e83c8edc3f5d42d8af73acbb395f53ada763c897019c52796327",
+    "worst_ess": 7.970850341555921
+  },
+  "reason": "declared_geometry_or_memory_cap"
+}

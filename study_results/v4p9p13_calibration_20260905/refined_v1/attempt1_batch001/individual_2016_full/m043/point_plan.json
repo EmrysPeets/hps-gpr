@@ -1,0 +1,213 @@
+{
+  "attempt": 1,
+  "baseline_contract_sha256": "246e8411c4737b51c44271db3eb21cf3c4c767efa8c59faf0722f0162e272170",
+  "calibration_spectra": 92928,
+  "mass_MeV": 43,
+  "max_memory_gib": 4.0,
+  "memory_estimates": {
+    "eigenfeature_rtol_1e-15": {
+      "conservative_rank": 12,
+      "estimated_peak_bytes": 3946202368,
+      "estimated_peak_gib": 3.675187349319458,
+      "full_bins": 720,
+      "interpretation": "Explicit array bound with factor/padding copies, Hessian workspaces, mixture matrices and both retained banks; not measured host memory",
+      "per_truth": {
+        "gp": {
+          "persistent_bytes": 95023104,
+          "spectra": 8448,
+          "transient_bytes": 247357440
+        },
+        "stress": {
+          "persistent_bytes": 950231040,
+          "spectra": 84480,
+          "transient_bytes": 2830417920
+        }
+      },
+      "window_bins": 34
+    },
+    "exact_cached_cholesky": {
+      "conservative_rank": 34,
+      "estimated_peak_bytes": 12332025088,
+      "estimated_peak_gib": 11.485093355178833,
+      "full_bins": 720,
+      "interpretation": "Explicit array bound with factor/padding copies, Hessian workspaces, mixture matrices and both retained banks; not measured host memory",
+      "per_truth": {
+        "gp": {
+          "persistent_bytes": 154497024,
+          "spectra": 8448,
+          "transient_bytes": 1020518400
+        },
+        "stress": {
+          "persistent_bytes": 1544970240,
+          "spectra": 84480,
+          "transient_bytes": 10562027520
+        }
+      },
+      "window_bins": 34
+    }
+  },
+  "numerical_policy": "original_proposals_then_nuisance1e-7_replay_v1",
+  "policy": "fisher075_fresh512_retry1024_centers96_v1",
+  "scope_key": "individual_2016_full",
+  "selection_sha256": "0a99258a7803283e7c0bcfd36b48cddb4773ed40aba44efbf42f1e0c52d1d66a",
+  "sigma_reference": 5322.187694142229,
+  "signal_yield_per_eps2": 983989163.9298545,
+  "source_checkpoint_sha256": "e5ce8ebe4b4b0dc2f40b70abbdc4537eefad6e682581c7a6c7204e961d6e0f7f",
+  "truths": {
+    "gp": {
+      "calibration_spectra": 8448,
+      "candidates": [],
+      "ceiling": 12.0,
+      "ntoys_per_proposal": 256,
+      "proposal_count": 33,
+      "proposal_nodes": [
+        0.0,
+        0.5,
+        1.0,
+        1.5,
+        2.0,
+        3.0,
+        4.0,
+        5.0,
+        6.0,
+        8.0,
+        12.0
+      ],
+      "refined": false,
+      "scan_nodes": [
+        0.0,
+        0.5,
+        1.0,
+        1.5,
+        2.0,
+        3.0,
+        4.0,
+        5.0,
+        6.0,
+        8.0,
+        12.0
+      ],
+      "windows": []
+    },
+    "stress": {
+      "calibration_spectra": 84480,
+      "candidates": [
+        {
+          "centers": [
+            16.253316700062197
+          ],
+          "first_or_previous_endpoint": null,
+          "influence_hint": 16.253316700062197,
+          "method": "fixed",
+          "propagated_sd_sigma": 1.2767902051283637,
+          "window": [
+            12.0,
+            20.08368731544729
+          ]
+        },
+        {
+          "centers": [
+            10.0625,
+            10.754084881689636
+          ],
+          "first_or_previous_endpoint": 10.0625,
+          "influence_hint": 10.754084881689636,
+          "method": "profiled",
+          "propagated_sd_sigma": 0.9629464198161851,
+          "window": [
+            8.13660716036763,
+            12.679977721322006
+          ]
+        }
+      ],
+      "ceiling": 20.08368731544729,
+      "ntoys_per_proposal": 512,
+      "proposal_count": 165,
+      "proposal_nodes": [
+        0.0,
+        0.5,
+        1.0,
+        1.5,
+        2.0,
+        3.0,
+        4.0,
+        5.0,
+        6.0,
+        8.0,
+        8.13660716036763,
+        8.448780970645922,
+        8.761014054302303,
+        9.073306408672085,
+        9.385658031092108,
+        9.698068918900733,
+        10.01053906943784,
+        10.0625,
+        10.323068480044833,
+        10.635657148064634,
+        10.754084881689636,
+        10.948305070841682,
+        11.261012245721933,
+        11.573778670052858,
+        11.886604341183444,
+        12.0,
+        12.19948925646419,
+        12.512433413247104,
+        12.679977721322006,
+        12.825436808885707,
+        13.138499440735028,
+        13.451621306151605,
+        13.76480240249348,
+        14.078042727120204,
+        14.391342277392829,
+        14.70470105067391,
+        15.018119044327506,
+        15.331596255719173,
+        15.64513268221597,
+        15.958728321186449,
+        16.253316700062197,
+        16.272383170000662,
+        16.58609722603016,
+        16.899870486647977,
+        17.21370294922865,
+        17.52759461114821,
+        17.841545469784165,
+        18.155555522515524,
+        18.469624766722777,
+        18.78375319978791,
+        19.097940819094383,
+        19.412187622027147,
+        19.72649360597264,
+        20.04085876831877,
+        20.08368731544729
+      ],
+      "refined": true,
+      "scan_nodes": [
+        0.0,
+        0.5,
+        1.0,
+        1.5,
+        2.0,
+        3.0,
+        4.0,
+        5.0,
+        6.0,
+        8.0,
+        8.13660716036763,
+        10.0625,
+        10.754084881689636,
+        12.0,
+        12.679977721322006,
+        16.253316700062197,
+        20.08368731544729
+      ],
+      "windows": [
+        [
+          8.13660716036763,
+          20.08368731544729
+        ]
+      ]
+    }
+  },
+  "type": "independent_poisson_mixture_refinement",
+  "validation_spectra": 3000
+}

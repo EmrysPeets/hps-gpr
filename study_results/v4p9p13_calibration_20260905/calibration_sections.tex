@@ -1,0 +1,308 @@
+\clearpage
+\section{Conditional 90\% $CL_s$ calibration}\label{sec:calibration}
+\input{calibration_values.tex}
+
+The calibration target is $CL_s=0.10$ throughout. This extension retains the
+nominal correlated Gaussian profile and the fixed-GP-mean likelihood, and
+replaces their asymptotic tail probabilities with full-spectrum Poisson
+pseudoexperiments. The observed comparisons cover \CalComplete{} of the 456
+requested dataset/mass coordinates. The selected results use \CalSpectra{} calibration
+spectra and \ValidationSpectra{} separately seeded validation spectra.
+The signal parameter in the combination is one shared $\epsilon^2$; each
+constituent receives its own correctly normalized signal template.
+
+This is a calibration conditional on the reviewed kernel coordinates, signal
+resolution, support, masks and conversion factors. The GP posterior and
+count-dependent training errors are refitted for every pseudoexperiment.
+Kernel optimization and the earlier support/model-selection procedure are
+not repeated. The 2016 numerical exception remains. These boundaries matter
+when comparing this study with the historical closure results.
+
+\subsection{What the earlier closure studies established}
+
+The recent v4.9 studies separate practical recovery from exact centering.
+At 65 MeV, v4.9.1 reported a native-10\% mean pull of $-0.246$, with 90\%
+interval $[-0.417,-0.076]$; an independent continuation gave $-0.284$.
+The $\pm0.5$ practical band, adopted after seeing the result, accepted this offset, while the recorded
+zero-null screen still resolved it. The corresponding 1\% source scaled
+by ten, with a different threshold truth and 40--300 MeV support, gave
+$+0.139$ and pull width $1.140$. These are distinct statements about mean,
+width, generating shape and support.
+
+The v4.9.5 support study found no edge satisfying its original uniform
+$|\langle\mathrm{pull}\rangle|<0.5$ requirement. A documented post-phase-1
+amendment accepted generally smaller-than-0.75 means with a 1.25 gross-bias
+guard. The frozen 36 MeV edge was confirmed on independent backgrounds;
+its three 55 MeV means remained $-0.773$, $-0.841$ and $-0.960$. Its other
+nine tested means, at 60--70 MeV, lay between $-0.110$ and $+0.325$.
+This supports the practical recovery claim made there, rather than an
+absence of all conditional offsets.
+
+The scaled-data composite also changed truth and support at its two
+lower-exposure 65 MeV replacement points. It is therefore not a controlled
+luminosity-scaling experiment at that coordinate. Historical reference and
+injected fits reoptimized the GP, and their injected yields used each
+background toy's fitted reference error. Here the physical injected yield
+is fixed across an ensemble. A mean pull with a random fitted denominator
+and the bias $E[\hat A]-A_{\mathrm{true}}$ are different quantities.
+The new validation records both the fitted-yield mean and its deviation in
+units of one fixed reference error. A nonzero value describes conditional
+estimator miscentering; it does not measure a bias in the observed data or
+identify a unique cause.
+
+\clearpage
+\subsection{Generating truths and repeated analysis}
+
+Each individual dataset has two declared generating intensities: its
+mass-local observed GP mean extended over the complete support, and an
+archived alternative shape. For 2015 the alternative is the saved
+\texttt{fShiftSigPowTail} expected-count spectrum. For 2016 it is the archived
+threshold-qualified blend. For native 2021 it is the v4.9.5
+\texttt{fSigPowExpQ}-anchored logistic--Chebyshev6 residual stress spectrum.
+Native bins are summed to the exact production edges, with no additional
+exposure factor or post-crop renormalization.
+
+These alternatives retain their source-fit limitations. In particular,
+the native-2021 construction was motivated by threshold recovery; its
+85--300 MeV tail deviance per degree of freedom was 6.220. It is not a
+globally qualified pure \texttt{fSigPowExpQ} truth. The data-selected
+reverse-injection smooth shape used in the original 71 MeV diagnostic
+remains outside these two calibration truths. Its separate follow-up status
+is reported in Sec.~\ref{sec:reverse_truth_validation}. A failure under that
+shape should not be equated to a historical closure result obtained under
+a different truth and fitting procedure.
+
+For the combination, the two scenarios are all constituent local-GP
+truths and all constituent archived stress truths. Their endpoint envelope
+covers this declared finite set; it does not cover every mixed assignment
+of constituent truths or arbitrary background misspecification.
+
+Given a truth $t$, pseudoexperiments fluctuate every support bin as
+\begin{equation}
+ N_{di}\sim\operatorname{Pois}\!\left(b^{(t)}_{di}
+       +\epsilon^2 s^{(1)}_{di}\right).
+\end{equation}
+The complete signal, including the tails outside the moving mask, enters
+generation. Each spectrum is processed through log-count training, the
+updated $\alpha_i=1/N_i$ prescription for positive counts (and the archived
+$\alpha_i=1$ convention for zero counts), and the GP posterior prediction.
+The resulting count mean and covariance enter the same two likelihoods
+used for the observed comparison. Both methods receive identical spectra.
+The count-to-$\epsilon^2$ factors are kept at their frozen release values.
+
+\subsection{Empirical likelihood-ratio tails}
+
+Let $T_\mu$ denote the bounded one-sided $\widetilde q_\mu$ statistic of
+Sec.~2, with the physical lower bound implemented in the denominator as prescribed
+by Ref.~\cite{cowan}. The denominator uses the null refit when the unbounded
+best-fit signal is negative, and $T_\mu=0$ when that best fit exceeds $\mu$. For each generating truth the calibrated quantity is
+\begin{equation}
+ CL_s^{(t)}(\mu)=
+ \frac{P_{\mu,t}(T_\mu\ge T_\mu^{\mathrm{obs}})}
+      {P_{0,t}(T_\mu\ge T_\mu^{\mathrm{obs}})}.
+\end{equation}
+Both probabilities are upper tails of the same statistic, including ties.
+The larger truth-specific upper endpoint defines the reported finite-set
+envelope. This applies the modified-frequentist construction of
+Ref.~\cite{readcls}; it does not rescale a Gaussian significance or replace
+the statistic by a fitted-yield proxy.
+
+\clearpage
+\subsection{Efficient sampling and numerical checks}
+
+Pseudoexperiments are generated in equal strata from full-spectrum Poisson
+proposal means at several injected strengths. Additional proposals shift
+both the window and sidebands toward the observed tail. An approximate
+linear influence calculation chooses those proposals only. Every spectrum
+is still fitted, and its exact generating probability supplies the weight.
+If $g_k(n)$ is proposal $k$, then
+\begin{equation}
+ g(n)=\frac{1}{K}\sum_{k=1}^K g_k(n),\qquad
+ \widehat p_{\mu,t}=\frac{1}{N}\sum_j
+ \frac{f_{\mu,t}(n_j)}{g(n_j)}
+ \mathbf{1}[T_\mu(n_j)\ge T_\mu^{\mathrm{obs}}].
+\end{equation}
+This is the mixture-reuse identity discussed by Berns~\cite{berns}, applied
+here to $CL_s$ tails rather than Feldman--Cousins ordering. The full Poisson
+density ratio includes every support bin. Independent direct-Poisson
+validation samples do not use the proposal mixture. An analytic one-bin
+Poisson test with 120,000 draws separately checks the weighting and
+stratified variance calculation.
+
+The initial run uses 256 spectra per proposal stratum and 500 independent
+validation spectra per truth at each of 0, 2 and 5 reference sigmas. Tail
+effective sample sizes, B and S+B normalization checks and stratified
+Monte Carlo errors accompany every endpoint. The approximate 95\% MC
+interval describes numerical uncertainty in a 90\% limit. It is not an
+expected experimental band or a change to the requested confidence level.
+The displayed envelope shading takes the componentwise maxima of the two
+truth-specific approximate intervals; it is not a simultaneous confidence band.
+A resolved endpoint requires both tail effective sample sizes above 100,
+MC relative half-width at most 10\%, a numerical bracket at most 1.5\%,
+and the normalization and monotonicity checks in the archived protocol.
+
+The implementation exploits the smooth kernel through eigenfeatures at
+relative cutoff $10^{-15}$. Very small nuisance-covariance eigenvalues
+below $10^{-5}$ in Poisson-variance units can also be removed. At every
+coordinate, dense-reference comparisons must keep the mean discrepancy
+below $0.001$ predictive standard deviations, covariance discrepancy below
+$0.001$ of its maximum diagonal, and absolute signed-root and test-statistic
+differences below $0.001$. Failed approximation checks restore the dense
+implementation. Observed predictions always use the original dense GP.
+Separate scalar-versus-batch likelihood checks, complete fit-failure
+retention and source hashes prevent an optimizer or approximation failure
+from being counted as successful calibration.
+
+\input{sampling_refinement.tex}
+\input{calibration_table.tex}
+%%LIMIT_2015%%
+%%LIMIT_2016%%
+%%LIMIT_2021%%
+%%LIMIT_COMBINED%%
+\clearpage
+\subsection{Dependence on the generating background}
+\fig{0.99}{../figures/truth_dependence.pdf}{
+Ratio of the archived-stress endpoint to the local-GP endpoint, retaining
+the two likelihood methods separately. Values above one identify an envelope
+controlled by the stress shape; values below one identify a local-GP-controlled
+endpoint. Open circles flag limited MC precision in either component. Missing
+or right-censored endpoints remain gaps rather than finite ratios. The all-three
+comparison contains two joint generating scenarios, not all mixed assignments.
+}{fig:cal_truth_dependence}
+
+This dependence is propagated through the same reviewed kernel coordinates
+and full-spectrum retraining procedure in each case. It quantifies the effect
+of these declared generating alternatives on the observed endpoint; it does
+not qualify either alternative as a complete description of the true background.
+In particular, the source-fit limitations documented above remain relevant
+when an archived stress shape controls the envelope.
+\clearpage
+\subsection{Local p-values}
+\fig{0.99}{../figures/local_pvalues.pdf}{
+Asymptotic and calibrated local p-values. The calibrated value is the larger
+B-only tail probability from the two declared generating truths. Downward
+triangles mark asymptotic values below the displayed floor;
+complete values remain in the CSV ledger. The empirical convention includes
+the bounded-statistic atom and assigns $p_0=1$ when the observed discovery
+statistic is zero; the earlier asymptotic display instead maps $Z=0$ to
+$p_0=0.5$. Open circles mark limited precision or an importance-weighted
+estimate within three MC standard errors above one, displayed at one;
+the unclipped estimate is retained in the ledger.
+Neither curve includes a global trials correction.
+}{fig:cal_pzero}
+\input{calibrated_pzero_table.tex}
+
+\clearpage
+\subsection{Conditional mean response}
+\fig{0.99}{../figures/bias_by_truth.pdf}{
+Background-only mean fitted yield in units of a fixed reference standard error.
+Each point uses 500 independently generated full spectra. The reference scale
+is constant within that mass ensemble; this is not the historical mean pull,
+whose denominator was a random fitted uncertainty. Solid and dashed curves
+retain the two generating truths separately. These conditional offsets do
+not identify a bias of the observed data or isolate kernel-selection effects.
+Shading shows approximate pointwise 95\% Monte Carlo intervals for the mean,
+using the saved sample variance and Student-$t$ quantile; it is not simultaneous.
+}{fig:cal_bias}
+
+The comparison across truths tests whether a proposed calibration depends
+strongly on a particular generating spectrum. The local-GP control itself
+need not reproduce its original window prediction after retraining: the
+prediction is estimated from fluctuated sidebands through a regularized
+smoother. The archived stress shapes can introduce additional interpolation
+errors. Neither mechanism is removed by merely replacing a linear-Gaussian
+background constraint with its positive log-GP counterpart.
+
+\clearpage
+\subsection{Interpolation offsets}
+The saved proposal diagnostics provide a separate, approximate check of this
+structure without another toy study. Let $b_t$ be a generating spectrum and
+$\bar b_t$ the prediction after training on its unfluctuated sidebands.
+The linearized signal offset is
+\begin{equation}
+ \delta A_{\mathrm{lin}}=
+ \frac{w^T V^{-1}(b_t-\bar b_t)}{w^T V^{-1}w},\qquad
+ V=\operatorname{diag}(\bar b_t)+C
+\end{equation}
+for the profiled fit, with $C=0$ for the fixed-mean fit. The ledger retains
+this deterministic residual projection beside the actual ensemble mean.
+Agreement would support an interpolation offset as a sufficient explanation
+under that truth; disagreement can also reflect nonlinear training and
+finite-count effects. This diagnostic neither changes the toy statistic nor
+identifies the effect of reoptimizing the kernels.
+\input{bias_projection_table.tex}
+
+\clearpage
+\subsection{Independent validation}
+\fig{0.99}{../figures/validation_exclusion.pdf}{
+Independent five-reference-sigma injections. Every marker represents one
+mass, generating truth and method, with 500 spectra in that cell. The axes
+compare the fraction excluding the true injected yield before and after
+calibration; the guides mark 0.10. Results are not pooled across masses.
+The calibrated decision uses the declared two-truth envelope. This is a
+conditional repeated-analysis test, not a measurement of physics sensitivity.
+}{fig:cal_validation}
+\input{validation_results.tex}
+
+\clearpage
+Each positive injection is tested at its true fixed physical signal yield.
+For the envelope, a validation spectrum is excluded only when its
+$CL_s$ is below 0.10 for both calibration truths. Background-only spectra
+separately test local rejection at $p_0<0.05$. Exact binomial intervals and
+one-sided excess-rate tests accompany the observed fractions; Holm
+adjustment controls the reported family of validation tests. Absence of a
+rejection in this finite suite would support only the stated conditional
+procedure, rather than uniform or truth-independent coverage.
+With 500 spectra per cell and 3,648 exclusion tests, the first Holm step
+requires at least 81 exclusions (16.2\%) to reject the 10\% null at the
+family level. The analogous local-rejection screen, with 1,824 tests,
+starts at 48 of 500 (9.6\%) against a 5\% null. Thus an absence of flags
+cannot certify coverage to percent-level accuracy at every mass.
+
+\input{reverse_truth_validation.tex}
+
+\clearpage
+\subsection{Interpretation of the two methods}
+
+%%CALIBRATED_COMPARISON%%
+
+The fixed-background likelihood can be used as a test statistic whose
+sampling distribution is calibrated. Its narrow uncorrected error is not
+retained as an assumption of known background in the generating ensemble.
+An unbiased fitted yield is not a prerequisite for correct frequentist
+coverage: a reproducible conditional offset can enter the simulated tail
+distributions. This does not protect against an unmodeled offset or a
+missing generating background. Extraction centering, coverage and expected
+power therefore remain separate checks.
+Whether it gives a smaller observed bound after calibration is an empirical
+comparison; it cannot be inferred from its much narrower asymptotic curve.
+The Gaussian-profiled likelihood uses the correlated uncertainty during
+fitting as well as in the repeated-analysis study. A global trials factor
+addresses the mass search, and cannot repair a local extraction offset or
+misestimated uncertainty.
+
+These observed scans do not define a method-selection rule. A final choice
+should use independent closure and expected-power evidence. Selecting the
+smaller observed limit at each mass would define a third procedure whose
+selection must be included in its calibration.
+
+\subsection{Release boundary and reproducibility}
+
+The calibration derivative is under
+\path{study_results/v4p9p13_calibration_20260905/}. The protocol, historical
+review, frozen source contract, per-coordinate result traces, validation
+ledgers and final summary identify the exact computation. Seeds are
+separated by calibration/validation purpose, scope, mass and truth.
+Calibration banks reuse their draws across tested strengths; validation
+seeds additionally distinguish the injected strength.
+Full arrays have recorded hashes; large banks are reproducible
+from the saved seed rules. The original v4.9.13 report is preserved.
+
+The results in this extension do not constitute calibration of the entire
+historical hyperparameter-selection procedure. A paired truth-by-kernel-policy
+study would be needed to separate the effects of reoptimization from the
+conditional offsets shown here. A final physics-coverage claim would also
+require justified background alternatives over the complete support,
+appropriate treatment of remaining common systematics, and resolution of
+the disclosed 2016 numerical status. These are separate from Monte Carlo
+precision on the conditional limits reported in this note.

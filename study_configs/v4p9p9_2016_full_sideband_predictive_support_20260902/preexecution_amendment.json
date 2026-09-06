@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "amends_study_spec_sha256": "f9f410977114cc9a6a9ea3ad381782a017b90cf2a86c7c8e3b2c9db89f3cfecd",
+  "status": "frozen_before_any_fit_or_score",
+  "primary_selector": {
+    "region": "low_only",
+    "blocks": ["L1", "L2", "L3", "L4"],
+    "candidate_specific_training_GeV": ["lower_edge", 0.03525],
+    "common_control_GeV": [0.03525, 0.03875],
+    "forbidden_training_and_scoring_GeV": [[0.03875, 0.181]],
+    "paired_se": "sample_sd_of_four_block_deltas_div_sqrt_4",
+    "require_nlpd_improvement_se": 1.0,
+    "require_poisson_deviance_improvement_nonnegative": true,
+    "require_positive_delta_after_each_single_block_deletion": true
+  },
+  "high_control_check": {
+    "region_GeV": [0.181, 0.21],
+    "blocks": ["H1", "H2", "H3", "H4"],
+    "candidate_independent": true,
+    "training": "other_high_blocks_only",
+    "required_technical_pass": true,
+    "used_for_lower_edge_ranking": false
+  },
+  "bridge_low_and_high_controls": false,
+  "use_search_bins_for_training": false,
+  "use_search_bins_for_scoring": false
+}
