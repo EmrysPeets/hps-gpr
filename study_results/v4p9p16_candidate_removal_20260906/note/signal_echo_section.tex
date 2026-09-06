@@ -1,0 +1,41 @@
+\section{Can a real peak make signal echoes?}
+\label{sec:echo}
+\textbf{Yes: the extraction procedure can produce them. Whether it explains the observed pattern remains unresolved.} When the tested mass moves, its excluded signal region moves. A real signal hidden from the background training at its own mass can enter the sidebands for a neighboring test. The background GP then changes its prediction and correlated nuisance constraint. Relative to that changed background, the next fit can prefer a negative signal or a smaller positive signal elsewhere. Every added generating component can remain nonnegative throughout. A negative fitted residual is not a physical removal of events by the positive particle.
+
+This is the \emph{background-regression} GP. The second GP used for global significance emulates the correlated field of scan statistics. Accounting for correlations of background fluctuations in a trials factor does not automatically identify which observed peak, if any, generated other features under a signal alternative.
+
+\subsection*{Replay with the current solver}
+The earlier 2021 peak--dip study used ten background and ten signal-plus-background toy spectra. Its paired 66 MeV injection shifted the median roots at 71 and 72 MeV by approximately $-1.65$ and $-1.74$. Its later reverse-injection study used a wider, smooth reference trained outside 60--86 MeV, with a kernel anchored at 66 MeV. The latter is a separate reference from the combined global-probability stress spectrum; the two studies must not be conflated.
+
+We reused that wider smooth reference and the saved positive signal templates, then retrained and profiled with the \emph{current dense solver}. There are 29 test masses (60--88 MeV), four deterministic generating spectra, and 29 reconstructions of the current observed spectrum. This adds 116 deterministic profile tests and no random toys. The full injected yields are 17,142 events at 66 MeV, 19,273 at 78 MeV, and 36,373 for the 65+78 MeV pair. These are selected illustrative strengths from the earlier single-signal fits, not an equal-strength comparison or a joint two-signal fit. The standalone low-mass injection is at 66 MeV, whereas the pair contains 65 MeV; the displayed curves are not an additivity test.
+
+Subtracting the result for the same smooth background isolates the injection-induced change, $\Delta r(m)=r_m(B+S)-r_m(B)$. A positive 66 MeV injection gives negative changes at 71/72 MeV and positive changes near 78/80 MeV. A positive 78 MeV injection gives a smaller positive feature near 65/66 MeV and negative features near 71/72 and 85 MeV. Thus some features currently being inspected are precisely in regions where the analysis response can create echoes.
+\begin{table}[H]\centering\small
+\begin{tabular}{rrrr}\toprule
+Test mass [MeV] & 66 MeV injection & 78 MeV injection & 65+78 MeV injection\\\midrule
+66 & +2.292 & +0.916 & +2.839\\
+71 & -1.646 & -1.825 & -3.579\\
+72 & -1.740 & -1.968 & -3.385\\
+78 & +0.734 & +2.707 & +3.565\\
+80 & +0.829 & +1.489 & +2.180\\
+85 & -0.083 & -1.833 & -2.132\\
+\bottomrule\end{tabular}
+\caption{Current-solver deterministic changes in the 2021 signed root, relative to the same background-only reconstruction. A change is a response diagnostic, not a significance, probability, or observed signal yield.}\end{table}
+
+\clearpage
+\fig{0.96}{../../v4p9p16_probability_echo_review_20260906/figures/signal_echo_dense_replay.pdf}{Signal echoes reproduced with the current dense 2021 solver and archived positive templates. Top: deterministic one-signal responses, the same background-only response, and the observed 2021 10\% root. Middle: subtracting the background-only response isolates positive and negative echoes. Bottom: a 65+78 MeV injection can make a deep fitted deficit without a negative generating component, but the selected pair also produces peaks larger than observed. These are conditional mechanism demonstrations. No amplitudes were optimized to the current scan, no new data were opened, and the curves do not assign probabilities to one or two particles. The small differences from the old reconstruction (maximum $|\Delta r|=0.0273$ for shared deterministic lanes) do not remove the echo pattern.}{fig:echo-current}
+
+\clearpage
+\subsection*{What the observed pattern does and does not establish}
+The selected full 65+78 MeV injection gives $r(71)=-4.177$, close to the observed $-4.019$. That agreement alone is incomplete: it predicts $r(65)=3.395$ and $r(78)=3.796$, above the observed $2.396$ and $2.809$, and a 72 MeV dip of $-3.915$ versus $-3.186$. The earlier three-quarter-strength pair reduced the peaks but also made the 71 MeV dip shallower. Those handpicked deterministic cases are not a likelihood comparison between one particle, two particles and background structure.
+
+The stored combined background correlation study supports treating nearby extrema as dependent. For example, its GP correlations are $\rho(66,72)=-0.689$ and $\rho(71,78)=-0.661$; the corresponding direct-toy estimates are $-0.693$ and $-0.638$. The 66/78 MeV roots have positive correlation $+0.162$ in the GP approximation ($+0.119$ directly). These correlations concern fluctuations under the declared combined background. The injection replay concerns a change of generating mean in 2021 alone. They are complementary evidence for a correlated scan response, not interchangeable calculations and not proof of the same causal explanation in every year.
+
+It is therefore plausible that some observed positive features or deficits are echoes of another feature. It is also plausible that a mismodeled continuum, detector/selection structure or correlated fluctuations produce them. The present results establish that an independent-particle interpretation of every extremum is unwarranted; they do not decide which physical explanation is correct. The extreme conditional tail at 76 MeV is separately explained by its reference offset and sign gate, not by an observed large 76 MeV signal.
+
+\subsection*{How to test the echo explanation at 30\%}
+Freeze a small family of parent-signal hypotheses and a background treatment before inspecting the next data increment. A useful comparison fits a single positive template near 65/66 MeV, a single template near 78 MeV, and a joint positive two-template model. Use a common signal-protected training interval that excludes both candidates for this comparison, qualify its interpolation with predeclared predictive controls, and retain each year's own response and normalization. Compare the complete native spectra and the scan pattern predicted after rerunning the moving-mask procedure. Separate one-template fits cannot supply the joint two-signal amplitude estimates or their covariance.
+
+Generate or reuse properly matched paired background and signal-plus-background experiments for those declared hypotheses. Start with ten complete pilot spectra per hypothesis to check fit closure, response and runtime; those ten do not calibrate a far tail. Scale only after those checks pass, keeping full-spectrum mass correlations and nonoverlapping toy IDs. A formal preference must account for the mass and model choices already examined. Existing toys from a different generating spectrum cannot be relabeled as the new hypothesis.
+
+Most decisively, test the additional disjoint 20\% on its own before examining cumulative 30\%. A parent peak and its echoes may all become visually stronger with more data; persistence of several extrema is not several independent confirmations. Predict their relative signs, shapes and fitted responses together. Background bias can also grow in units of statistical error. The staged-exposure displays below remain useful mean scenarios, but their simple signal overlays do not include a fresh background refit and therefore do not predict the full echo pattern. This revision does not unblind the 30\% or 100\% sample.

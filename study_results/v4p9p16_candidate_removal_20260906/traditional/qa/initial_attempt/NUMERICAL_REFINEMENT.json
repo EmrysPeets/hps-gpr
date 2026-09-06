@@ -1,0 +1,7 @@
+{
+  "issue": "High-count likelihood roundoff stalled two fixed free-fit starts at scaled scores near 3e-7 despite positive Hessians and sub-1e-6 Newton decrements.",
+  "change": "Evaluate deviance in extended precision where supported; near stationary points allow a full Newton step only if the scaled score decreases by a factor of at least two and NLL agrees within 1e-9.",
+  "unchanged_acceptance": "Final scaled score below 1e-7, Newton decrement below 1e-6, positive covariance, fixed multistart agreement and doubled quadrature gates.",
+  "statistical_design_changed": false,
+  "action": "Replay all 30 predetermined fits with the common corrected numerical path."
+}

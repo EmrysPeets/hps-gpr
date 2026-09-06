@@ -1,0 +1,95 @@
+{
+  "fit_id": "2021_m078",
+  "dataset": "2021",
+  "mass_MeV": 78,
+  "variant": "width_plus",
+  "status": "passed",
+  "basis": "legendre",
+  "degree": 3,
+  "total_width_sigma": 10,
+  "sigma_MeV": 2.2634635,
+  "n_bins": 36,
+  "low_MeV": 66.625,
+  "high_MeV": 89.125,
+  "shifted_at_support": false,
+  "amplitude_full": -23806.295284351672,
+  "sigma_amplitude_full": 7172.788439327827,
+  "signal_window_fraction": 0.9999993050826866,
+  "signal_window_yield": -23806.278740944912,
+  "root": -3.3194065772067316,
+  "p0_nominal": 0.5,
+  "q_raw": 11.01846002480331,
+  "nll": 18.44230372090891,
+  "null_nll": 23.951533733310566,
+  "deviance": 36.88460744181782,
+  "ndof": 31,
+  "deviance_per_dof": 1.1898260465102524,
+  "nominal_GOF_p": 0.21528242446666757,
+  "null_deviance": 47.90306746662113,
+  "null_ndof": 32,
+  "gp_root": 2.8086449518656287,
+  "gp_full_yield": 19284.29013053502,
+  "max_scaled_score": 3.6735720722390428e-09,
+  "max_newton_decrement": 5.796026013543299e-09,
+  "min_lambda": 1039573.8247292766,
+  "multistart_NLL_spread": 9.983125437429408e-13,
+  "multistart_amplitude_spread_in_SE": 4.1257610783006595e-09,
+  "quadrature_relative_error": 8.881784197001252e-16,
+  "quadrature_q_error": 7.986500349943526e-12,
+  "amplitude_scale": 6362.176671548818,
+  "geometry": {
+    "requested_bounds_MeV": [
+      66.6826825,
+      89.3173175
+    ],
+    "shifted_bounds_MeV": [
+      66.6826825,
+      89.3173175
+    ],
+    "effective_bounds_MeV": [
+      66.625,
+      89.125
+    ],
+    "shifted_at_support": false,
+    "bin_rule": "Native bins with centers in the declared shifted window; no fractional counts."
+  },
+  "starts": [
+    {
+      "nll": 18.44230372090891,
+      "amplitude": -23806.295284351672,
+      "iterations": 2,
+      "scaled_score": 1.9188967908107993e-10,
+      "newton_decrement": 3.905915171936186e-10,
+      "hessian_shifts": 0,
+      "stationary_refinements": 0
+    },
+    {
+      "nll": 18.44230372090991,
+      "amplitude": -23806.295313944884,
+      "iterations": 2,
+      "scaled_score": 3.6735720722390428e-09,
+      "newton_decrement": 5.796026013543299e-09,
+      "hessian_shifts": 0,
+      "stationary_refinements": 0
+    },
+    {
+      "nll": 18.442303720909628,
+      "amplitude": -23806.2952988725,
+      "iterations": 2,
+      "scaled_score": 6.660698800168502e-10,
+      "newton_decrement": 1.7283361563825521e-09,
+      "hessian_shifts": 0,
+      "stationary_refinements": 0
+    }
+  ],
+  "null_diagnostics": {
+    "iterations": 2,
+    "scaled_score": 2.4521509181957362e-12,
+    "newton_decrement": 2.563279171928906e-12,
+    "hessian_shifts": 0,
+    "stationary_refinements": 1
+  },
+  "amplitude_definition": "Total untruncated unit-normal Gaussian yield; expected window signal equals amplitude times stored signal_bin_probability sum.",
+  "polynomial_definition": "exp(sum beta_k P_k(t)), integrated in each native bin; t maps the actual fit window to [-1,1].",
+  "probability_scope": "Nominal asymptotic local reference at a GP-selected mass; five variants retained without selecting a preferred p-value."
+}
