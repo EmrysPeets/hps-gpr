@@ -1,0 +1,187 @@
+{
+  "case_count": 16,
+  "cases": [
+    {
+      "actual_acceptance": true,
+      "error_type": null,
+      "expected_acceptance": true,
+      "name": "strict_candidate_accepted_with_retained_old_failure",
+      "passed": true
+    },
+    {
+      "actual_acceptance": false,
+      "error_type": "AssertionError",
+      "expected_acceptance": false,
+      "name": "dropped_original_stage_row_rejected",
+      "passed": true
+    },
+    {
+      "actual_acceptance": false,
+      "error_type": "AssertionError",
+      "expected_acceptance": false,
+      "name": "dropped_extended_stage_row_rejected",
+      "passed": true
+    },
+    {
+      "actual_acceptance": false,
+      "error_type": "AssertionError",
+      "expected_acceptance": false,
+      "name": "duplicated_original_coordinate_at_unchanged_row_count_rejected",
+      "passed": true
+    },
+    {
+      "actual_acceptance": false,
+      "error_type": "AssertionError",
+      "expected_acceptance": false,
+      "name": "duplicated_extended_coordinate_at_unchanged_row_count_rejected",
+      "passed": true
+    },
+    {
+      "actual_acceptance": false,
+      "error_type": "AssertionError",
+      "expected_acceptance": false,
+      "name": "strict_candidate_wrong_matching_top_level_cut_rejected",
+      "passed": true
+    },
+    {
+      "actual_acceptance": false,
+      "error_type": "AssertionError",
+      "expected_acceptance": false,
+      "name": "active_metric_failed_despite_passed_flag_rejected",
+      "passed": true
+    },
+    {
+      "actual_acceptance": false,
+      "error_type": "AssertionError",
+      "expected_acceptance": false,
+      "name": "active_failed_flag_rejected",
+      "passed": true
+    },
+    {
+      "actual_acceptance": false,
+      "error_type": "KeyError",
+      "expected_acceptance": false,
+      "name": "missing_plan_hash_rejected",
+      "passed": true
+    },
+    {
+      "actual_acceptance": false,
+      "error_type": "AssertionError",
+      "expected_acceptance": false,
+      "name": "wrong_plan_hash_rejected",
+      "passed": true
+    },
+    {
+      "actual_acceptance": false,
+      "error_type": "FileNotFoundError",
+      "expected_acceptance": false,
+      "name": "missing_sibling_plan_rejected",
+      "passed": true
+    },
+    {
+      "actual_acceptance": false,
+      "error_type": "AssertionError",
+      "expected_acceptance": false,
+      "name": "modified_sibling_plan_rejected",
+      "passed": true
+    },
+    {
+      "actual_acceptance": false,
+      "error_type": null,
+      "expected_acceptance": false,
+      "name": "missing_derivative_candidate_audit_rejected",
+      "passed": true
+    },
+    {
+      "actual_acceptance": false,
+      "error_type": "AssertionError",
+      "expected_acceptance": false,
+      "name": "wrong_numerical_policy_rejected",
+      "passed": true
+    },
+    {
+      "actual_acceptance": true,
+      "error_type": null,
+      "expected_acceptance": true,
+      "name": "exact_fallback_with_retained_candidate_failures_accepted",
+      "passed": true
+    },
+    {
+      "actual_acceptance": false,
+      "error_type": "AssertionError",
+      "expected_acceptance": false,
+      "name": "exact_fallback_nonzero_matching_cut_rejected",
+      "passed": true
+    }
+  ],
+  "claim_boundary": "Pure acceptance-ledger test only; no numerical GP accuracy, calibration or speed claim",
+  "created_utc": "2026-09-06T05:00:28.661536+00:00",
+  "fits_run": 0,
+  "fixture": {
+    "fixture_sha256": "38f68cbde666e1e1e8e95d03ad103b586eb1ee85481566b55429a2d5e9f70751",
+    "original_rows": 18,
+    "plan": {
+      "truths": {
+        "gp": {
+          "candidates": [],
+          "proposal_nodes": [
+            0.0,
+            2.0,
+            5.0,
+            12.0
+          ],
+          "scan_nodes": [
+            0.0,
+            2.0,
+            5.0,
+            12.0
+          ]
+        },
+        "stress": {
+          "candidates": [
+            {
+              "centers": [
+                9.0,
+                10.0
+              ]
+            }
+          ],
+          "proposal_nodes": [
+            0.0,
+            2.0,
+            5.0,
+            9.0,
+            10.0,
+            18.0
+          ],
+          "scan_nodes": [
+            0.0,
+            2.0,
+            5.0,
+            9.0,
+            10.0,
+            18.0
+          ]
+        }
+      }
+    },
+    "plan_sha256": "f51267db72fec8899b7404e1ab362d28c647190baf357ca0b0eb987ea4c562c6",
+    "retained_original_failure_count": 1,
+    "strict_extended_rows": 12,
+    "strict_replay_rows": 18
+  },
+  "frozen_source_hash_mismatches": 0,
+  "frozen_source_hashes_checked": 47,
+  "passed": true,
+  "schema_version": 1,
+  "source_sha256": {
+    "study_results/v4p9p13_calibration_20260905/REFINEMENT_PROTOCOL.md": "16e6be34c74c9bf0ca0d0a93df9ee1a6fa62f2b988b9681f33c784b852edb83e",
+    "study_results/v4p9p13_calibration_20260905/collect_results.py": "564b15aed20d93c5c37c8a213dab6f3d6be95b933188c3b41d1826c288fbbc0a",
+    "study_results/v4p9p13_calibration_20260905/run_sampling_refinement.py": "0391dba3b0753754c678773660d5ba90e61b6e04634e2508b83d4cffa383a2b9",
+    "study_results/v4p9p13_calibration_20260905/validate_candidate_contract.py": "77fc6af27cb0f5b8b931543141520d43776a1d2a67b28a630b445230ad393e3b"
+  },
+  "source_unchanged_during_test": true,
+  "statistical_runtime_imported": false,
+  "test": "synthetic driver.candidate_metadata to collector.candidate_qa integration",
+  "toy_draws": 0
+}

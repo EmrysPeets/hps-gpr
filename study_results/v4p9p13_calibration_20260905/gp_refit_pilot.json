@@ -1,0 +1,2800 @@
+{
+  "status": "completed",
+  "wall_seconds": 2.7209600419999997,
+  "time_cap_seconds": 25.0,
+  "requested_toys_per_coordinate": 32,
+  "total_toys": 96,
+  "recommendation": "Use cached invariant kernels plus one fresh Cholesky per toy; retain direct fit_gpr for audit.",
+  "preconditioned_recommendation": "Diagnostic only; use the exact cached-Cholesky path unless an independent numerical gate approves this candidate.",
+  "archived_semantics": {
+    "pre_log": true,
+    "alpha_model": "1/y",
+    "pre_zero_alpha": 1.0,
+    "pre_alpha_first_n": 0,
+    "pre_alpha_first_factor": 0.1,
+    "normalize_y": false,
+    "alpha_updated_per_toy": true,
+    "kernel_optimized": false,
+    "counts_transform": "exp(mu+0.5*max(diag(C),0)); outer(E,E)*(exp(clip(C,-40,40))-1)"
+  },
+  "sklearn_version": "1.6.1",
+  "numpy_version": "2.0.2",
+  "threads_requested": 1,
+  "threadpool_info": [
+    {
+      "user_api": "blas",
+      "internal_api": "openblas",
+      "num_threads": 1,
+      "prefix": "libopenblas",
+      "filepath": "/Users/emryspeets/Library/Python/3.9/lib/python/site-packages/scipy/.dylibs/libopenblas.0.dylib",
+      "version": "0.3.27",
+      "threading_layer": "pthreads",
+      "architecture": "neoversen1"
+    },
+    {
+      "user_api": "openmp",
+      "internal_api": "openmp",
+      "num_threads": 1,
+      "prefix": "libomp",
+      "filepath": "/Users/emryspeets/Library/Python/3.9/lib/python/site-packages/sklearn/.dylibs/libomp.dylib",
+      "version": null
+    }
+  ],
+  "sources_sha256": {
+    "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v4p9p13_calibration_20260905/gp_refit_pilot.py": "1841a36dfed842cf3eb0bd57dcfeddfa420111bcfddd58a9ca1686ed2ca7b74c",
+    "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v4p9p12_final_dataset_combinations_20260902/inputs/analysis_card.yaml": "4a3f3365584743ac1f8b62515ec37c9ca1b908968cfa7497a22609dedbfb79df",
+    "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v4p9p12_final_dataset_combinations_20260902/inputs/reviewed_gp_states.csv": "fa87f1cc310dc40c04b9731e89e86bcc175444cb1510582f94f35e4cf21df5d7",
+    "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v4p9p7_2016_support_combined_100toy_20260902/runtime_combined/hps_gpr/gpr.py": "c57c4cdc05cc9e5b923cf7ec303aab9b9c72a6027413a282699ad9dfa3a4ca76",
+    "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/background_profile_comparison_20260905/run_comparison.py": "ec2b0c0883c8272c65c5716c13806dc29ab2399cea4b1c1a05306562a47ab87a"
+  },
+  "sources_unchanged": true,
+  "points": [
+    {
+      "dataset": "2015",
+      "mass_MeV": 51,
+      "training_bins": 436,
+      "query_bins": 48,
+      "completed_toys": 32,
+      "native_prediction_hash_exact": true,
+      "direct_median_seconds": 0.005448791499999883,
+      "cached_cholesky_median_seconds": 0.0018472290000000058,
+      "cached_cholesky_speedup": 2.922043215097857,
+      "cached_cholesky_speedup_including_setup": 2.8714379769796388,
+      "cached_kernel_setup_seconds": 0.0010532500000000056,
+      "preconditioned_setup_seconds": 0.0024387080000001227,
+      "cached_closure_maxima": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0
+      },
+      "all_cached_means_bit_exact": true,
+      "all_cached_covariances_bit_exact": true,
+      "preconditioned_converged_toys": 16,
+      "preconditioned_guarded_speedup": 0.3792103058031494,
+      "preconditioned_guarded_speedup_including_setup": 0.37635648644858094,
+      "preconditioned_maxima": {
+        "mean_max_relative": 2.0371446159782597e-10,
+        "mean_max_over_poisson_sd": 5.009753874080059e-08,
+        "cov_max_abs_over_max_diag": 4.5413068635235674e-08,
+        "cov_diag_max_relative": 3.2414509062859223e-08,
+        "iterations": 32
+      }
+    },
+    {
+      "dataset": "2016",
+      "mass_MeV": 88,
+      "training_bins": 656,
+      "query_bins": 64,
+      "completed_toys": 32,
+      "native_prediction_hash_exact": true,
+      "direct_median_seconds": 0.013638604000000054,
+      "cached_cholesky_median_seconds": 0.005107374999999914,
+      "cached_cholesky_speedup": 2.639885724306438,
+      "cached_cholesky_speedup_including_setup": 2.5967840499000734,
+      "cached_kernel_setup_seconds": 0.002740874999999754,
+      "preconditioned_setup_seconds": 0.006229999999999958,
+      "cached_closure_maxima": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0
+      },
+      "all_cached_means_bit_exact": true,
+      "all_cached_covariances_bit_exact": true,
+      "preconditioned_converged_toys": 29,
+      "preconditioned_guarded_speedup": 0.45704601566973224,
+      "preconditioned_guarded_speedup_including_setup": 0.4527873556278986,
+      "preconditioned_maxima": {
+        "mean_max_relative": 1.6298304532322058e-09,
+        "mean_max_over_poisson_sd": 8.153623428310091e-07,
+        "cov_max_abs_over_max_diag": 3.2330781732388204e-06,
+        "cov_diag_max_relative": 1.3637714631674873e-06,
+        "iterations": 29
+      }
+    },
+    {
+      "dataset": "2021",
+      "mass_MeV": 71,
+      "training_bins": 406,
+      "query_bins": 16,
+      "completed_toys": 32,
+      "native_prediction_hash_exact": true,
+      "direct_median_seconds": 0.0041435620000001006,
+      "cached_cholesky_median_seconds": 0.001250437499999979,
+      "cached_cholesky_speedup": 3.2925800349778247,
+      "cached_cholesky_speedup_including_setup": 3.1774944830765706,
+      "cached_kernel_setup_seconds": 0.0014945829999999383,
+      "preconditioned_setup_seconds": 0.0018025420000000736,
+      "cached_closure_maxima": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0
+      },
+      "all_cached_means_bit_exact": true,
+      "all_cached_covariances_bit_exact": true,
+      "preconditioned_converged_toys": 32,
+      "preconditioned_guarded_speedup": 1.426468658299124,
+      "preconditioned_guarded_speedup_including_setup": 1.3787420801279,
+      "preconditioned_maxima": {
+        "mean_max_relative": 7.656276116767198e-10,
+        "mean_max_over_poisson_sd": 7.976398110272427e-07,
+        "cov_max_abs_over_max_diag": 5.746081754404665e-07,
+        "cov_diag_max_relative": 2.561950782298725e-07,
+        "iterations": 11
+      }
+    }
+  ],
+  "toy_details": [
+    {
+      "dataset": "2015",
+      "mass_MeV": 51,
+      "toy_id": 0,
+      "direct_seconds": 0.005322166999999878,
+      "cached_cholesky_seconds": 0.0017301250000001378,
+      "preconditioned_seconds": 0.02303812500000002,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "convergence_fallback",
+        "contraction_bound": 0.4433683124016563,
+        "iterations": 32,
+        "relative_step": 3.719044469646993e-12,
+        "effective_seconds_with_cached_fallback": 0.024768250000000158
+      }
+    },
+    {
+      "dataset": "2015",
+      "mass_MeV": 51,
+      "toy_id": 1,
+      "direct_seconds": 0.0057754170000001714,
+      "cached_cholesky_seconds": 0.0017582080000000389,
+      "preconditioned_seconds": 0.022227124999999903,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.41758308823126566,
+        "iterations": 31,
+        "relative_step": 1.5681122029767004e-12,
+        "effective_seconds_with_cached_fallback": 0.022227124999999903,
+        "mean_max_relative": 1.3096547498946404e-10,
+        "mean_max_over_poisson_sd": 3.752901559587066e-08,
+        "cov_max_abs_over_max_diag": 3.1135594149124304e-08,
+        "cov_diag_max_relative": 1.6432053113418673e-08,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2015",
+      "mass_MeV": 51,
+      "toy_id": 2,
+      "direct_seconds": 0.005214541999999822,
+      "cached_cholesky_seconds": 0.0017963750000000722,
+      "preconditioned_seconds": 2.3875000000117552e-05,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "guard_fallback",
+        "contraction_bound": 0.6825131819273286,
+        "effective_seconds_with_cached_fallback": 0.0018202500000001898
+      }
+    },
+    {
+      "dataset": "2015",
+      "mass_MeV": 51,
+      "toy_id": 3,
+      "direct_seconds": 0.005662625000000032,
+      "cached_cholesky_seconds": 0.0018422080000000118,
+      "preconditioned_seconds": 0.018399209000000027,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.3524831899869958,
+        "iterations": 26,
+        "relative_step": 1.1909067714424151e-12,
+        "effective_seconds_with_cached_fallback": 0.018399209000000027,
+        "mean_max_relative": 1.3826092867681354e-10,
+        "mean_max_over_poisson_sd": 4.098046110169902e-08,
+        "cov_max_abs_over_max_diag": 3.434230826374876e-08,
+        "cov_diag_max_relative": 1.8100127043278143e-08,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2015",
+      "mass_MeV": 51,
+      "toy_id": 4,
+      "direct_seconds": 0.004776416999999977,
+      "cached_cholesky_seconds": 0.0017294169999999554,
+      "preconditioned_seconds": 2.2250000000001435e-05,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "guard_fallback",
+        "contraction_bound": 0.51843569647251,
+        "effective_seconds_with_cached_fallback": 0.0017516669999999568
+      }
+    },
+    {
+      "dataset": "2015",
+      "mass_MeV": 51,
+      "toy_id": 5,
+      "direct_seconds": 0.005470665999999902,
+      "cached_cholesky_seconds": 0.0019967499999999916,
+      "preconditioned_seconds": 0.02427337499999993,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "convergence_fallback",
+        "contraction_bound": 0.47725433760606883,
+        "iterations": 32,
+        "relative_step": 2.618432324552282e-11,
+        "effective_seconds_with_cached_fallback": 0.026270124999999922
+      }
+    },
+    {
+      "dataset": "2015",
+      "mass_MeV": 51,
+      "toy_id": 6,
+      "direct_seconds": 0.005792041000000081,
+      "cached_cholesky_seconds": 0.0020182090000000485,
+      "preconditioned_seconds": 0.02344933299999985,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "convergence_fallback",
+        "contraction_bound": 0.3967764097045981,
+        "iterations": 32,
+        "relative_step": 3.317790486789818e-12,
+        "effective_seconds_with_cached_fallback": 0.0254675419999999
+      }
+    },
+    {
+      "dataset": "2015",
+      "mass_MeV": 51,
+      "toy_id": 7,
+      "direct_seconds": 0.005161042000000116,
+      "cached_cholesky_seconds": 0.0019500419999998186,
+      "preconditioned_seconds": 2.7916999999932912e-05,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "guard_fallback",
+        "contraction_bound": 0.5396604715033317,
+        "effective_seconds_with_cached_fallback": 0.0019779589999997516
+      }
+    },
+    {
+      "dataset": "2015",
+      "mass_MeV": 51,
+      "toy_id": 8,
+      "direct_seconds": 0.005748415999999867,
+      "cached_cholesky_seconds": 0.0017972909999999231,
+      "preconditioned_seconds": 0.018906166000000058,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.33160505090997,
+        "iterations": 25,
+        "relative_step": 8.075568132224404e-13,
+        "effective_seconds_with_cached_fallback": 0.018906166000000058,
+        "mean_max_relative": 2.0371446159782597e-10,
+        "mean_max_over_poisson_sd": 4.542405736220535e-08,
+        "cov_max_abs_over_max_diag": 3.454978504989669e-08,
+        "cov_diag_max_relative": 2.7100889043247735e-08,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2015",
+      "mass_MeV": 51,
+      "toy_id": 9,
+      "direct_seconds": 0.004850916999999955,
+      "cached_cholesky_seconds": 0.0018598750000000663,
+      "preconditioned_seconds": 0.023131000000000013,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "convergence_fallback",
+        "contraction_bound": 0.480442761060896,
+        "iterations": 32,
+        "relative_step": 2.8160312744263157e-11,
+        "effective_seconds_with_cached_fallback": 0.02499087500000008
+      }
+    },
+    {
+      "dataset": "2015",
+      "mass_MeV": 51,
+      "toy_id": 10,
+      "direct_seconds": 0.005976749999999864,
+      "cached_cholesky_seconds": 0.0018365000000000187,
+      "preconditioned_seconds": 0.018392000000000186,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.350253466992196,
+        "iterations": 26,
+        "relative_step": 1.1828234267195035e-12,
+        "effective_seconds_with_cached_fallback": 0.018392000000000186,
+        "mean_max_relative": 1.454890024699821e-10,
+        "mean_max_over_poisson_sd": 3.985000451888699e-08,
+        "cov_max_abs_over_max_diag": 3.7538427513635884e-08,
+        "cov_diag_max_relative": 3.210871072945647e-08,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2015",
+      "mass_MeV": 51,
+      "toy_id": 11,
+      "direct_seconds": 0.005233499999999891,
+      "cached_cholesky_seconds": 0.0018137920000000918,
+      "preconditioned_seconds": 0.0184018749999999,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.35347384629149436,
+        "iterations": 26,
+        "relative_step": 1.6044943151882762e-12,
+        "effective_seconds_with_cached_fallback": 0.0184018749999999,
+        "mean_max_relative": 7.640985385177935e-11,
+        "mean_max_over_poisson_sd": 2.3172879459612405e-08,
+        "cov_max_abs_over_max_diag": 3.2077088795849266e-08,
+        "cov_diag_max_relative": 2.6516270582613862e-08,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2015",
+      "mass_MeV": 51,
+      "toy_id": 12,
+      "direct_seconds": 0.0050896250000000975,
+      "cached_cholesky_seconds": 0.001761124999999808,
+      "preconditioned_seconds": 2.3207999999996787e-05,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "guard_fallback",
+        "contraction_bound": 0.513115961833353,
+        "effective_seconds_with_cached_fallback": 0.0017843329999998048
+      }
+    },
+    {
+      "dataset": "2015",
+      "mass_MeV": 51,
+      "toy_id": 13,
+      "direct_seconds": 0.005722624999999981,
+      "cached_cholesky_seconds": 0.001993833999999861,
+      "preconditioned_seconds": 2.7334000000101e-05,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "guard_fallback",
+        "contraction_bound": 0.5276540229148764,
+        "effective_seconds_with_cached_fallback": 0.002021167999999962
+      }
+    },
+    {
+      "dataset": "2015",
+      "mass_MeV": 51,
+      "toy_id": 14,
+      "direct_seconds": 0.0055848329999999,
+      "cached_cholesky_seconds": 0.0018942500000000972,
+      "preconditioned_seconds": 3.2417000000117824e-05,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "guard_fallback",
+        "contraction_bound": 0.6584456582976715,
+        "effective_seconds_with_cached_fallback": 0.001926667000000215
+      }
+    },
+    {
+      "dataset": "2015",
+      "mass_MeV": 51,
+      "toy_id": 15,
+      "direct_seconds": 0.005746083000000013,
+      "cached_cholesky_seconds": 0.00190608400000003,
+      "preconditioned_seconds": 0.019774916999999892,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.40113493981857956,
+        "iterations": 29,
+        "relative_step": 1.9622914404493486e-12,
+        "effective_seconds_with_cached_fallback": 0.019774916999999892,
+        "mean_max_relative": 1.6009953754843525e-10,
+        "mean_max_over_poisson_sd": 5.009753874080059e-08,
+        "cov_max_abs_over_max_diag": 2.778969836216697e-08,
+        "cov_diag_max_relative": 2.9869497695586015e-08,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2015",
+      "mass_MeV": 51,
+      "toy_id": 16,
+      "direct_seconds": 0.004772709000000042,
+      "cached_cholesky_seconds": 0.0017428749999999216,
+      "preconditioned_seconds": 0.0183341250000002,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.35284834234609086,
+        "iterations": 26,
+        "relative_step": 8.463140924183737e-13,
+        "effective_seconds_with_cached_fallback": 0.0183341250000002,
+        "mean_max_relative": 1.1639756173416077e-10,
+        "mean_max_over_poisson_sd": 3.3737013785127055e-08,
+        "cov_max_abs_over_max_diag": 3.133734080767577e-08,
+        "cov_diag_max_relative": 2.6207765452961102e-08,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2015",
+      "mass_MeV": 51,
+      "toy_id": 17,
+      "direct_seconds": 0.004977291000000106,
+      "cached_cholesky_seconds": 0.001753208000000006,
+      "preconditioned_seconds": 0.02255445899999997,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.42973632622176294,
+        "iterations": 32,
+        "relative_step": 1.4832915909810328e-12,
+        "effective_seconds_with_cached_fallback": 0.02255445899999997,
+        "mean_max_relative": 9.45909943682137e-11,
+        "mean_max_over_poisson_sd": 1.846000392561254e-08,
+        "cov_max_abs_over_max_diag": 3.306673533794548e-08,
+        "cov_diag_max_relative": 3.0783887320569796e-08,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2015",
+      "mass_MeV": 51,
+      "toy_id": 18,
+      "direct_seconds": 0.0050612920000001616,
+      "cached_cholesky_seconds": 0.0017679580000000694,
+      "preconditioned_seconds": 2.2167000000017367e-05,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "guard_fallback",
+        "contraction_bound": 0.5169180341637688,
+        "effective_seconds_with_cached_fallback": 0.0017901250000000868
+      }
+    },
+    {
+      "dataset": "2015",
+      "mass_MeV": 51,
+      "toy_id": 19,
+      "direct_seconds": 0.0054269169999998645,
+      "cached_cholesky_seconds": 0.0019400829999998148,
+      "preconditioned_seconds": 2.9167000000107635e-05,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "guard_fallback",
+        "contraction_bound": 0.5628043559514927,
+        "effective_seconds_with_cached_fallback": 0.0019692499999999225
+      }
+    },
+    {
+      "dataset": "2015",
+      "mass_MeV": 51,
+      "toy_id": 20,
+      "direct_seconds": 0.005812375000000092,
+      "cached_cholesky_seconds": 0.0017783329999998543,
+      "preconditioned_seconds": 3.174999999999706e-05,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "guard_fallback",
+        "contraction_bound": 0.6443906216231811,
+        "effective_seconds_with_cached_fallback": 0.0018100829999998513
+      }
+    },
+    {
+      "dataset": "2015",
+      "mass_MeV": 51,
+      "toy_id": 21,
+      "direct_seconds": 0.005783042000000016,
+      "cached_cholesky_seconds": 0.0018522499999999997,
+      "preconditioned_seconds": 0.022858333000000064,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.41623234815688787,
+        "iterations": 31,
+        "relative_step": 1.2246931032485621e-12,
+        "effective_seconds_with_cached_fallback": 0.022858333000000064,
+        "mean_max_relative": 1.600656059899841e-10,
+        "mean_max_over_poisson_sd": 4.5833699424102976e-08,
+        "cov_max_abs_over_max_diag": 3.393979616606711e-08,
+        "cov_diag_max_relative": 8.081279261101705e-09,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2015",
+      "mass_MeV": 51,
+      "toy_id": 22,
+      "direct_seconds": 0.005738875000000032,
+      "cached_cholesky_seconds": 0.001982833999999878,
+      "preconditioned_seconds": 2.945799999998222e-05,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "guard_fallback",
+        "contraction_bound": 0.5562092037591359,
+        "effective_seconds_with_cached_fallback": 0.00201229199999986
+      }
+    },
+    {
+      "dataset": "2015",
+      "mass_MeV": 51,
+      "toy_id": 23,
+      "direct_seconds": 0.005336250000000042,
+      "cached_cholesky_seconds": 0.002014750000000065,
+      "preconditioned_seconds": 3.7292000000022085e-05,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "guard_fallback",
+        "contraction_bound": 0.6253165301895524,
+        "effective_seconds_with_cached_fallback": 0.002052042000000087
+      }
+    },
+    {
+      "dataset": "2015",
+      "mass_MeV": 51,
+      "toy_id": 24,
+      "direct_seconds": 0.006760458000000025,
+      "cached_cholesky_seconds": 0.00180112500000007,
+      "preconditioned_seconds": 0.01582112499999999,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.29099407162873936,
+        "iterations": 22,
+        "relative_step": 1.1024326716242007e-12,
+        "effective_seconds_with_cached_fallback": 0.01582112499999999,
+        "mean_max_relative": 1.0550324033116485e-10,
+        "mean_max_over_poisson_sd": 2.659159721210827e-08,
+        "cov_max_abs_over_max_diag": 3.315657718961885e-08,
+        "cov_diag_max_relative": 2.866025648786447e-08,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2015",
+      "mass_MeV": 51,
+      "toy_id": 25,
+      "direct_seconds": 0.005023,
+      "cached_cholesky_seconds": 0.0018713340000000578,
+      "preconditioned_seconds": 0.016668165999999873,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.2993995462009348,
+        "iterations": 22,
+        "relative_step": 1.4723855956905672e-12,
+        "effective_seconds_with_cached_fallback": 0.016668165999999873,
+        "mean_max_relative": 1.309689529167015e-10,
+        "mean_max_over_poisson_sd": 3.341593301653382e-08,
+        "cov_max_abs_over_max_diag": 2.719296470043107e-08,
+        "cov_diag_max_relative": 1.4801203998386629e-08,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2015",
+      "mass_MeV": 51,
+      "toy_id": 26,
+      "direct_seconds": 0.005417333999999885,
+      "cached_cholesky_seconds": 0.002072083000000058,
+      "preconditioned_seconds": 0.019654457999999986,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.3835718493776368,
+        "iterations": 28,
+        "relative_step": 8.355623398414193e-13,
+        "effective_seconds_with_cached_fallback": 0.019654457999999986,
+        "mean_max_relative": 1.3096723872699512e-10,
+        "mean_max_over_poisson_sd": 3.8366720145805484e-08,
+        "cov_max_abs_over_max_diag": 3.032978798413327e-08,
+        "cov_diag_max_relative": 1.9737713456641658e-08,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2015",
+      "mass_MeV": 51,
+      "toy_id": 27,
+      "direct_seconds": 0.005694124999999994,
+      "cached_cholesky_seconds": 0.0017484999999999307,
+      "preconditioned_seconds": 0.01813120800000001,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.33999317838399457,
+        "iterations": 24,
+        "relative_step": 1.516798303698345e-12,
+        "effective_seconds_with_cached_fallback": 0.01813120800000001,
+        "mean_max_relative": 1.6008354041708892e-10,
+        "mean_max_over_poisson_sd": 4.528850524252118e-08,
+        "cov_max_abs_over_max_diag": 3.6092033794647014e-08,
+        "cov_diag_max_relative": 3.2414509062859223e-08,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2015",
+      "mass_MeV": 51,
+      "toy_id": 28,
+      "direct_seconds": 0.005674791999999984,
+      "cached_cholesky_seconds": 0.001821625000000049,
+      "preconditioned_seconds": 0.02233420900000005,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.40996993583424574,
+        "iterations": 30,
+        "relative_step": 1.674459242033362e-12,
+        "effective_seconds_with_cached_fallback": 0.02233420900000005,
+        "mean_max_relative": 1.3097075053927096e-10,
+        "mean_max_over_poisson_sd": 3.7489071504944204e-08,
+        "cov_max_abs_over_max_diag": 4.5413068635235674e-08,
+        "cov_diag_max_relative": 1.28700638657974e-08,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2015",
+      "mass_MeV": 51,
+      "toy_id": 29,
+      "direct_seconds": 0.005404249999999777,
+      "cached_cholesky_seconds": 0.002054917000000156,
+      "preconditioned_seconds": 0.02357479199999979,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "convergence_fallback",
+        "contraction_bound": 0.4967365585926523,
+        "iterations": 32,
+        "relative_step": 3.6492036180128505e-11,
+        "effective_seconds_with_cached_fallback": 0.025629708999999945
+      }
+    },
+    {
+      "dataset": "2015",
+      "mass_MeV": 51,
+      "toy_id": 30,
+      "direct_seconds": 0.005095083000000056,
+      "cached_cholesky_seconds": 0.0018777089999999497,
+      "preconditioned_seconds": 0.020663541999999868,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.4050362502738276,
+        "iterations": 30,
+        "relative_step": 8.14965001569509e-13,
+        "effective_seconds_with_cached_fallback": 0.020663541999999868,
+        "mean_max_relative": 1.1642422508056724e-10,
+        "mean_max_over_poisson_sd": 3.414427917351693e-08,
+        "cov_max_abs_over_max_diag": 3.596848271845147e-08,
+        "cov_diag_max_relative": 2.5035219981709094e-08,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2015",
+      "mass_MeV": 51,
+      "toy_id": 31,
+      "direct_seconds": 0.005525834000000174,
+      "cached_cholesky_seconds": 0.001999749999999967,
+      "preconditioned_seconds": 0.01934979200000031,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.3078867797617211,
+        "iterations": 26,
+        "relative_step": 3.468488450040597e-13,
+        "effective_seconds_with_cached_fallback": 0.01934979200000031,
+        "mean_max_relative": 1.3097438178096386e-10,
+        "mean_max_over_poisson_sd": 3.420745935097446e-08,
+        "cov_max_abs_over_max_diag": 3.822486413397221e-08,
+        "cov_diag_max_relative": 1.5581834276794304e-08,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2016",
+      "mass_MeV": 88,
+      "toy_id": 0,
+      "direct_seconds": 0.013291708999999763,
+      "cached_cholesky_seconds": 0.0050932919999997495,
+      "preconditioned_seconds": 0.030461083000000055,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.08542089113173341,
+        "iterations": 16,
+        "relative_step": 9.69396188607017e-13,
+        "effective_seconds_with_cached_fallback": 0.030461083000000055,
+        "mean_max_relative": 9.895196060684277e-10,
+        "mean_max_over_poisson_sd": 4.441512007714057e-07,
+        "cov_max_abs_over_max_diag": 2.624753754284976e-06,
+        "cov_diag_max_relative": 1.351513288744798e-06,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2016",
+      "mass_MeV": 88,
+      "toy_id": 1,
+      "direct_seconds": 0.014575125000000355,
+      "cached_cholesky_seconds": 0.004819916000000202,
+      "preconditioned_seconds": 0.023862124999999956,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.08574389530649679,
+        "iterations": 12,
+        "relative_step": 1.9324541966625475e-12,
+        "effective_seconds_with_cached_fallback": 0.023862124999999956,
+        "mean_max_relative": 1.0477219078782387e-09,
+        "mean_max_over_poisson_sd": 4.6478336493082037e-07,
+        "cov_max_abs_over_max_diag": 2.464998729084411e-06,
+        "cov_diag_max_relative": 9.985764023898626e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2016",
+      "mass_MeV": 88,
+      "toy_id": 2,
+      "direct_seconds": 0.014129957999999831,
+      "cached_cholesky_seconds": 0.0051336250000000305,
+      "preconditioned_seconds": 0.02329691700000014,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.08880559163492488,
+        "iterations": 12,
+        "relative_step": 5.125497813647154e-13,
+        "effective_seconds_with_cached_fallback": 0.02329691700000014,
+        "mean_max_relative": 1.222350159252568e-09,
+        "mean_max_over_poisson_sd": 5.801459745516844e-07,
+        "cov_max_abs_over_max_diag": 2.699997755536898e-06,
+        "cov_diag_max_relative": 9.60463323697254e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2016",
+      "mass_MeV": 88,
+      "toy_id": 3,
+      "direct_seconds": 0.015258459000000002,
+      "cached_cholesky_seconds": 0.005080458000000121,
+      "preconditioned_seconds": 0.025207041999999902,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.07531940641127081,
+        "iterations": 13,
+        "relative_step": 1.775361901259087e-12,
+        "effective_seconds_with_cached_fallback": 0.025207041999999902,
+        "mean_max_relative": 6.984918345394131e-10,
+        "mean_max_over_poisson_sd": 3.4948741882350946e-07,
+        "cov_max_abs_over_max_diag": 2.5151035459005907e-06,
+        "cov_diag_max_relative": 1.243012500177925e-06,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2016",
+      "mass_MeV": 88,
+      "toy_id": 4,
+      "direct_seconds": 0.013581165999999811,
+      "cached_cholesky_seconds": 0.005159874999999925,
+      "preconditioned_seconds": 0.02835437499999971,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.10221903200249323,
+        "iterations": 15,
+        "relative_step": 1.8969918656131123e-12,
+        "effective_seconds_with_cached_fallback": 0.02835437499999971,
+        "mean_max_relative": 1.1932304475867818e-09,
+        "mean_max_over_poisson_sd": 5.317102710523231e-07,
+        "cov_max_abs_over_max_diag": 2.640732914781586e-06,
+        "cov_diag_max_relative": 8.318687760093611e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2016",
+      "mass_MeV": 88,
+      "toy_id": 5,
+      "direct_seconds": 0.014249125000000085,
+      "cached_cholesky_seconds": 0.005121458000000079,
+      "preconditioned_seconds": 0.030398332999999944,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.07178663414736942,
+        "iterations": 16,
+        "relative_step": 1.3781427867471473e-12,
+        "effective_seconds_with_cached_fallback": 0.030398332999999944,
+        "mean_max_relative": 6.402645712678713e-10,
+        "mean_max_over_poisson_sd": 2.5300662859927746e-07,
+        "cov_max_abs_over_max_diag": 2.488888705496595e-06,
+        "cov_diag_max_relative": 8.743232945202301e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2016",
+      "mass_MeV": 88,
+      "toy_id": 6,
+      "direct_seconds": 0.012673500000000004,
+      "cached_cholesky_seconds": 0.004990917000000206,
+      "preconditioned_seconds": 0.02276729200000016,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.07495059314653976,
+        "iterations": 12,
+        "relative_step": 1.6085100343837368e-12,
+        "effective_seconds_with_cached_fallback": 0.02276729200000016,
+        "mean_max_relative": 1.120504655047505e-09,
+        "mean_max_over_poisson_sd": 5.317442809894617e-07,
+        "cov_max_abs_over_max_diag": 2.694248114504665e-06,
+        "cov_diag_max_relative": 1.0869911737865063e-06,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2016",
+      "mass_MeV": 88,
+      "toy_id": 7,
+      "direct_seconds": 0.012865750000000009,
+      "cached_cholesky_seconds": 0.00502270799999982,
+      "preconditioned_seconds": 0.023678250000000123,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.10370279977763329,
+        "iterations": 12,
+        "relative_step": 1.1600897761268723e-12,
+        "effective_seconds_with_cached_fallback": 0.023678250000000123,
+        "mean_max_relative": 1.0478426283225467e-09,
+        "mean_max_over_poisson_sd": 4.866296190318988e-07,
+        "cov_max_abs_over_max_diag": 2.6085921277484254e-06,
+        "cov_diag_max_relative": 8.264390158128159e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2016",
+      "mass_MeV": 88,
+      "toy_id": 8,
+      "direct_seconds": 0.013146083999999725,
+      "cached_cholesky_seconds": 0.004786291999999914,
+      "preconditioned_seconds": 0.01987658300000028,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.0849907663076727,
+        "iterations": 11,
+        "relative_step": 1.8997026174361054e-12,
+        "effective_seconds_with_cached_fallback": 0.01987658300000028,
+        "mean_max_relative": 6.985416856695085e-10,
+        "mean_max_over_poisson_sd": 3.31311591815222e-07,
+        "cov_max_abs_over_max_diag": 2.3290889179707457e-06,
+        "cov_diag_max_relative": 1.0823575211089206e-06,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2016",
+      "mass_MeV": 88,
+      "toy_id": 9,
+      "direct_seconds": 0.01435645799999996,
+      "cached_cholesky_seconds": 0.005539333000000202,
+      "preconditioned_seconds": 0.02178170799999979,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.07794099287464708,
+        "iterations": 11,
+        "relative_step": 1.6387787063946925e-12,
+        "effective_seconds_with_cached_fallback": 0.02178170799999979,
+        "mean_max_relative": 1.3969163375647486e-09,
+        "mean_max_over_poisson_sd": 6.990113017563161e-07,
+        "cov_max_abs_over_max_diag": 3.1948520026103006e-06,
+        "cov_diag_max_relative": 8.59823792057091e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2016",
+      "mass_MeV": 88,
+      "toy_id": 10,
+      "direct_seconds": 0.014053125000000222,
+      "cached_cholesky_seconds": 0.0051924159999998665,
+      "preconditioned_seconds": 0.022083333999999955,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.09224402829831924,
+        "iterations": 12,
+        "relative_step": 6.243801202092387e-13,
+        "effective_seconds_with_cached_fallback": 0.022083333999999955,
+        "mean_max_relative": 1.6298304532322058e-09,
+        "mean_max_over_poisson_sd": 8.153623428310091e-07,
+        "cov_max_abs_over_max_diag": 2.3808722722484057e-06,
+        "cov_diag_max_relative": 1.2564746237800675e-06,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2016",
+      "mass_MeV": 88,
+      "toy_id": 11,
+      "direct_seconds": 0.013664000000000343,
+      "cached_cholesky_seconds": 0.0055458750000001444,
+      "preconditioned_seconds": 0.02243783300000013,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.09887528616448979,
+        "iterations": 12,
+        "relative_step": 1.4874312653795306e-12,
+        "effective_seconds_with_cached_fallback": 0.02243783300000013,
+        "mean_max_relative": 9.313740875010482e-10,
+        "mean_max_over_poisson_sd": 3.928666283500289e-07,
+        "cov_max_abs_over_max_diag": 2.3001763609068316e-06,
+        "cov_diag_max_relative": 1.1909680630104354e-06,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2016",
+      "mass_MeV": 88,
+      "toy_id": 12,
+      "direct_seconds": 0.014002416000000295,
+      "cached_cholesky_seconds": 0.005521959000000187,
+      "preconditioned_seconds": 0.02982808299999995,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.10185704685873666,
+        "iterations": 15,
+        "relative_step": 1.9652237800810637e-12,
+        "effective_seconds_with_cached_fallback": 0.02982808299999995,
+        "mean_max_relative": 1.28056860092097e-09,
+        "mean_max_over_poisson_sd": 5.778089695341006e-07,
+        "cov_max_abs_over_max_diag": 3.2330781732388204e-06,
+        "cov_diag_max_relative": 1.097045143832726e-06,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2016",
+      "mass_MeV": 88,
+      "toy_id": 13,
+      "direct_seconds": 0.014635708000000136,
+      "cached_cholesky_seconds": 0.005529542000000109,
+      "preconditioned_seconds": 0.03287370899999997,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.11179737286612416,
+        "iterations": 15,
+        "relative_step": 7.970513449174961e-13,
+        "effective_seconds_with_cached_fallback": 0.03287370899999997,
+        "mean_max_relative": 9.022382457136725e-10,
+        "mean_max_over_poisson_sd": 3.7104279460750515e-07,
+        "cov_max_abs_over_max_diag": 2.55471943931053e-06,
+        "cov_diag_max_relative": 1.1426457253752907e-06,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2016",
+      "mass_MeV": 88,
+      "toy_id": 14,
+      "direct_seconds": 0.012426416999999912,
+      "cached_cholesky_seconds": 0.004992458999999894,
+      "preconditioned_seconds": 0.021607166999999983,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.08110926154344585,
+        "iterations": 11,
+        "relative_step": 1.1978193525012816e-12,
+        "effective_seconds_with_cached_fallback": 0.021607166999999983,
+        "mean_max_relative": 8.731362775456422e-10,
+        "mean_max_over_poisson_sd": 3.982541651968338e-07,
+        "cov_max_abs_over_max_diag": 2.6706274083440713e-06,
+        "cov_diag_max_relative": 8.842674707037165e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2016",
+      "mass_MeV": 88,
+      "toy_id": 15,
+      "direct_seconds": 0.013551708000000051,
+      "cached_cholesky_seconds": 0.005662041999999978,
+      "preconditioned_seconds": 0.030167249999999868,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.11944749021668656,
+        "iterations": 15,
+        "relative_step": 9.85246576081348e-13,
+        "effective_seconds_with_cached_fallback": 0.030167249999999868,
+        "mean_max_relative": 1.1641213101898069e-09,
+        "mean_max_over_poisson_sd": 5.522113365956136e-07,
+        "cov_max_abs_over_max_diag": 2.665022789125915e-06,
+        "cov_diag_max_relative": 8.418943715476014e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2016",
+      "mass_MeV": 88,
+      "toy_id": 16,
+      "direct_seconds": 0.01391187500000024,
+      "cached_cholesky_seconds": 0.004998749999999941,
+      "preconditioned_seconds": 0.05546712499999984,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.09855886268704357,
+        "iterations": 29,
+        "relative_step": 1.361799562005217e-12,
+        "effective_seconds_with_cached_fallback": 0.05546712499999984,
+        "mean_max_relative": 8.731290706837342e-10,
+        "mean_max_over_poisson_sd": 4.001796007442848e-07,
+        "cov_max_abs_over_max_diag": 2.791502788237374e-06,
+        "cov_diag_max_relative": 9.64265686899045e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2016",
+      "mass_MeV": 88,
+      "toy_id": 17,
+      "direct_seconds": 0.014481707999999927,
+      "cached_cholesky_seconds": 0.005172083999999799,
+      "preconditioned_seconds": 0.02476195800000003,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.1117752144989769,
+        "iterations": 13,
+        "relative_step": 7.316933290559327e-13,
+        "effective_seconds_with_cached_fallback": 0.02476195800000003,
+        "mean_max_relative": 5.82167265406018e-10,
+        "mean_max_over_poisson_sd": 2.609342513657743e-07,
+        "cov_max_abs_over_max_diag": 2.7390057719254113e-06,
+        "cov_diag_max_relative": 1.0700219778031788e-06,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2016",
+      "mass_MeV": 88,
+      "toy_id": 18,
+      "direct_seconds": 0.012579833000000207,
+      "cached_cholesky_seconds": 0.005026084000000264,
+      "preconditioned_seconds": 0.059334999999999916,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "convergence_fallback",
+        "contraction_bound": 0.10817758596556894,
+        "iterations": 32,
+        "relative_step": 1.0804024341837248e-11,
+        "effective_seconds_with_cached_fallback": 0.06436108400000018
+      }
+    },
+    {
+      "dataset": "2016",
+      "mass_MeV": 88,
+      "toy_id": 19,
+      "direct_seconds": 0.013794916999999796,
+      "cached_cholesky_seconds": 0.00473391699999981,
+      "preconditioned_seconds": 0.022867708000000153,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.09753058876415406,
+        "iterations": 12,
+        "relative_step": 1.979286932430043e-12,
+        "effective_seconds_with_cached_fallback": 0.022867708000000153,
+        "mean_max_relative": 1.2224142325680955e-09,
+        "mean_max_over_poisson_sd": 5.897818633804804e-07,
+        "cov_max_abs_over_max_diag": 2.753229631523924e-06,
+        "cov_diag_max_relative": 8.766085514011012e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2016",
+      "mass_MeV": 88,
+      "toy_id": 20,
+      "direct_seconds": 0.012287374999999656,
+      "cached_cholesky_seconds": 0.005231167000000259,
+      "preconditioned_seconds": 0.06189595800000003,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "convergence_fallback",
+        "contraction_bound": 0.11089736644086791,
+        "iterations": 32,
+        "relative_step": 8.363396074886758e-12,
+        "effective_seconds_with_cached_fallback": 0.06712712500000029
+      }
+    },
+    {
+      "dataset": "2016",
+      "mass_MeV": 88,
+      "toy_id": 21,
+      "direct_seconds": 0.01371562500000012,
+      "cached_cholesky_seconds": 0.0052467910000002504,
+      "preconditioned_seconds": 0.026641791999999942,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.08221687523285753,
+        "iterations": 13,
+        "relative_step": 1.058588737108358e-12,
+        "effective_seconds_with_cached_fallback": 0.026641791999999942,
+        "mean_max_relative": 7.275620437399626e-10,
+        "mean_max_over_poisson_sd": 3.152657312388892e-07,
+        "cov_max_abs_over_max_diag": 2.881167711022008e-06,
+        "cov_diag_max_relative": 1.1806685490209725e-06,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2016",
+      "mass_MeV": 88,
+      "toy_id": 22,
+      "direct_seconds": 0.013210582999999776,
+      "cached_cholesky_seconds": 0.005064709000000001,
+      "preconditioned_seconds": 0.0260047499999998,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.1136233966919286,
+        "iterations": 13,
+        "relative_step": 5.24913446042774e-13,
+        "effective_seconds_with_cached_fallback": 0.0260047499999998,
+        "mean_max_relative": 7.275389179376631e-10,
+        "mean_max_over_poisson_sd": 3.6524909438975926e-07,
+        "cov_max_abs_over_max_diag": 2.549189557164939e-06,
+        "cov_diag_max_relative": 1.0350506540006213e-06,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2016",
+      "mass_MeV": 88,
+      "toy_id": 23,
+      "direct_seconds": 0.01381874999999999,
+      "cached_cholesky_seconds": 0.0054074170000002475,
+      "preconditioned_seconds": 0.02198174999999969,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.09745595076645808,
+        "iterations": 12,
+        "relative_step": 6.455268340599509e-13,
+        "effective_seconds_with_cached_fallback": 0.02198174999999969,
+        "mean_max_relative": 1.1059278297813788e-09,
+        "mean_max_over_poisson_sd": 5.403073108194347e-07,
+        "cov_max_abs_over_max_diag": 3.0800112058592667e-06,
+        "cov_diag_max_relative": 1.2299858729795977e-06,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2016",
+      "mass_MeV": 88,
+      "toy_id": 24,
+      "direct_seconds": 0.01328808299999995,
+      "cached_cholesky_seconds": 0.005061416999999846,
+      "preconditioned_seconds": 0.02400712500000024,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.0981347018652553,
+        "iterations": 12,
+        "relative_step": 1.0133005545753804e-12,
+        "effective_seconds_with_cached_fallback": 0.02400712500000024,
+        "mean_max_relative": 9.895515622995893e-10,
+        "mean_max_over_poisson_sd": 4.910657252520921e-07,
+        "cov_max_abs_over_max_diag": 2.54983907732954e-06,
+        "cov_diag_max_relative": 1.0153870249246627e-06,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2016",
+      "mass_MeV": 88,
+      "toy_id": 25,
+      "direct_seconds": 0.013247250000000044,
+      "cached_cholesky_seconds": 0.005561666999999826,
+      "preconditioned_seconds": 0.02468058300000031,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.07545591371530465,
+        "iterations": 13,
+        "relative_step": 1.6727577756768407e-12,
+        "effective_seconds_with_cached_fallback": 0.02468058300000031,
+        "mean_max_relative": 1.222396417231241e-09,
+        "mean_max_over_poisson_sd": 5.217568907672721e-07,
+        "cov_max_abs_over_max_diag": 2.7129709690955607e-06,
+        "cov_diag_max_relative": 7.643916338540543e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2016",
+      "mass_MeV": 88,
+      "toy_id": 26,
+      "direct_seconds": 0.014290667000000035,
+      "cached_cholesky_seconds": 0.005418042000000067,
+      "preconditioned_seconds": 0.025620083000000182,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.09669006911907209,
+        "iterations": 13,
+        "relative_step": 1.7667791030205047e-12,
+        "effective_seconds_with_cached_fallback": 0.025620083000000182,
+        "mean_max_relative": 8.148931170670351e-10,
+        "mean_max_over_poisson_sd": 3.666695130585657e-07,
+        "cov_max_abs_over_max_diag": 2.503659552705001e-06,
+        "cov_diag_max_relative": 9.73030985720437e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2016",
+      "mass_MeV": 88,
+      "toy_id": 27,
+      "direct_seconds": 0.01307470799999999,
+      "cached_cholesky_seconds": 0.004753165999999975,
+      "preconditioned_seconds": 0.024054957999999793,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.0899054810491262,
+        "iterations": 12,
+        "relative_step": 1.8056614360667174e-12,
+        "effective_seconds_with_cached_fallback": 0.024054957999999793,
+        "mean_max_relative": 9.022720275765802e-10,
+        "mean_max_over_poisson_sd": 3.566028628528144e-07,
+        "cov_max_abs_over_max_diag": 2.3429412735400883e-06,
+        "cov_diag_max_relative": 9.628470502453254e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2016",
+      "mass_MeV": 88,
+      "toy_id": 28,
+      "direct_seconds": 0.012996291999999965,
+      "cached_cholesky_seconds": 0.004814957999999869,
+      "preconditioned_seconds": 0.059596041999999905,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "convergence_fallback",
+        "contraction_bound": 0.07778821647082751,
+        "iterations": 32,
+        "relative_step": 7.460920770085977e-12,
+        "effective_seconds_with_cached_fallback": 0.06441099999999977
+      }
+    },
+    {
+      "dataset": "2016",
+      "mass_MeV": 88,
+      "toy_id": 29,
+      "direct_seconds": 0.013216082999999657,
+      "cached_cholesky_seconds": 0.005014709000000117,
+      "preconditioned_seconds": 0.024769542000000033,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.10594836524890303,
+        "iterations": 13,
+        "relative_step": 1.4260125724747274e-12,
+        "effective_seconds_with_cached_fallback": 0.024769542000000033,
+        "mean_max_relative": 9.896154632114907e-10,
+        "mean_max_over_poisson_sd": 4.694597631169222e-07,
+        "cov_max_abs_over_max_diag": 2.9481982927854072e-06,
+        "cov_diag_max_relative": 1.019186208740382e-06,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2016",
+      "mass_MeV": 88,
+      "toy_id": 30,
+      "direct_seconds": 0.013941624999999735,
+      "cached_cholesky_seconds": 0.005400208999999823,
+      "preconditioned_seconds": 0.02112299999999978,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.08377745637704541,
+        "iterations": 11,
+        "relative_step": 1.7146365244514586e-12,
+        "effective_seconds_with_cached_fallback": 0.02112299999999978,
+        "mean_max_relative": 1.2224177168612292e-09,
+        "mean_max_over_poisson_sd": 5.701197063482611e-07,
+        "cov_max_abs_over_max_diag": 3.0291679741493897e-06,
+        "cov_diag_max_relative": 1.3637714631674873e-06,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2016",
+      "mass_MeV": 88,
+      "toy_id": 31,
+      "direct_seconds": 0.013613207999999766,
+      "cached_cholesky_seconds": 0.005034624999999959,
+      "preconditioned_seconds": 0.027236707999999776,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.08501839445013105,
+        "iterations": 14,
+        "relative_step": 1.7861550276891701e-12,
+        "effective_seconds_with_cached_fallback": 0.027236707999999776,
+        "mean_max_relative": 9.60435282397418e-10,
+        "mean_max_over_poisson_sd": 4.2995691597041907e-07,
+        "cov_max_abs_over_max_diag": 2.80964061045393e-06,
+        "cov_diag_max_relative": 1.312891821192094e-06,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2021",
+      "mass_MeV": 71,
+      "toy_id": 0,
+      "direct_seconds": 0.004147083000000329,
+      "cached_cholesky_seconds": 0.00121608300000009,
+      "preconditioned_seconds": 0.0029924999999999535,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.033472994131128406,
+        "iterations": 9,
+        "relative_step": 8.333894025200211e-13,
+        "effective_seconds_with_cached_fallback": 0.0029924999999999535,
+        "mean_max_relative": 6.391811714898998e-10,
+        "mean_max_over_poisson_sd": 6.865732388005088e-07,
+        "cov_max_abs_over_max_diag": 4.029657937909717e-07,
+        "cov_diag_max_relative": 1.5988554695929912e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2021",
+      "mass_MeV": 71,
+      "toy_id": 1,
+      "direct_seconds": 0.0042603329999999495,
+      "cached_cholesky_seconds": 0.0013673339999997758,
+      "preconditioned_seconds": 0.0033634170000000907,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.03520039938732763,
+        "iterations": 9,
+        "relative_step": 4.916067553040193e-13,
+        "effective_seconds_with_cached_fallback": 0.0033634170000000907,
+        "mean_max_relative": 1.4778394284302685e-10,
+        "mean_max_over_poisson_sd": 1.561243049660561e-07,
+        "cov_max_abs_over_max_diag": 3.3046053729181905e-07,
+        "cov_diag_max_relative": 2.092410665936799e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2021",
+      "mass_MeV": 71,
+      "toy_id": 2,
+      "direct_seconds": 0.0038976250000000157,
+      "cached_cholesky_seconds": 0.0012992909999995916,
+      "preconditioned_seconds": 0.003338665999999879,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.029733855513660413,
+        "iterations": 10,
+        "relative_step": 5.03819208574896e-13,
+        "effective_seconds_with_cached_fallback": 0.003338665999999879,
+        "mean_max_relative": 2.2011725231460013e-10,
+        "mean_max_over_poisson_sd": 2.3431452845805567e-07,
+        "cov_max_abs_over_max_diag": 4.024916861052598e-07,
+        "cov_diag_max_relative": 1.7056573563243835e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2021",
+      "mass_MeV": 71,
+      "toy_id": 3,
+      "direct_seconds": 0.003789166999999871,
+      "cached_cholesky_seconds": 0.0011196250000002905,
+      "preconditioned_seconds": 0.003191833000000255,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.032256090194800247,
+        "iterations": 9,
+        "relative_step": 2.447210596631903e-13,
+        "effective_seconds_with_cached_fallback": 0.003191833000000255,
+        "mean_max_relative": 7.656276116767198e-10,
+        "mean_max_over_poisson_sd": 7.976398110272427e-07,
+        "cov_max_abs_over_max_diag": 2.671917487352741e-07,
+        "cov_diag_max_relative": 1.5854387917169867e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2021",
+      "mass_MeV": 71,
+      "toy_id": 4,
+      "direct_seconds": 0.004178416999999879,
+      "cached_cholesky_seconds": 0.001246207999999971,
+      "preconditioned_seconds": 0.0027735419999999067,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.03118029197590425,
+        "iterations": 8,
+        "relative_step": 1.5687451337953462e-12,
+        "effective_seconds_with_cached_fallback": 0.0027735419999999067,
+        "mean_max_relative": 2.3499415822171746e-10,
+        "mean_max_over_poisson_sd": 2.4747811079828325e-07,
+        "cov_max_abs_over_max_diag": 3.859179095353757e-07,
+        "cov_diag_max_relative": 1.2570697761063918e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2021",
+      "mass_MeV": 71,
+      "toy_id": 5,
+      "direct_seconds": 0.003823624999999886,
+      "cached_cholesky_seconds": 0.0012204169999998626,
+      "preconditioned_seconds": 0.002748207999999863,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.032804097959029,
+        "iterations": 9,
+        "relative_step": 2.6623148130511254e-13,
+        "effective_seconds_with_cached_fallback": 0.002748207999999863,
+        "mean_max_relative": 1.8541449859899874e-10,
+        "mean_max_over_poisson_sd": 1.995078397293949e-07,
+        "cov_max_abs_over_max_diag": 3.3470284329215213e-07,
+        "cov_diag_max_relative": 9.894462400987856e-08,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2021",
+      "mass_MeV": 71,
+      "toy_id": 6,
+      "direct_seconds": 0.004056792000000087,
+      "cached_cholesky_seconds": 0.001507332999999722,
+      "preconditioned_seconds": 0.002693290999999931,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.027529195171529984,
+        "iterations": 8,
+        "relative_step": 1.3845677514078452e-12,
+        "effective_seconds_with_cached_fallback": 0.002693290999999931,
+        "mean_max_relative": 3.9528557458997926e-10,
+        "mean_max_over_poisson_sd": 4.2092179098752545e-07,
+        "cov_max_abs_over_max_diag": 3.9460794138822475e-07,
+        "cov_diag_max_relative": 1.0860085435749112e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2021",
+      "mass_MeV": 71,
+      "toy_id": 7,
+      "direct_seconds": 0.0037947080000000355,
+      "cached_cholesky_seconds": 0.001419750000000164,
+      "preconditioned_seconds": 0.0029847499999999805,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.035724651613354544,
+        "iterations": 9,
+        "relative_step": 6.126210649881614e-13,
+        "effective_seconds_with_cached_fallback": 0.0029847499999999805,
+        "mean_max_relative": 4.39413820786981e-10,
+        "mean_max_over_poisson_sd": 4.712147887126135e-07,
+        "cov_max_abs_over_max_diag": 3.551213250347142e-07,
+        "cov_diag_max_relative": 1.7082557244179643e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2021",
+      "mass_MeV": 71,
+      "toy_id": 8,
+      "direct_seconds": 0.0036351249999997393,
+      "cached_cholesky_seconds": 0.0011051659999998797,
+      "preconditioned_seconds": 0.003361667000000068,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.032296147359143657,
+        "iterations": 9,
+        "relative_step": 3.4183372302304894e-13,
+        "effective_seconds_with_cached_fallback": 0.003361667000000068,
+        "mean_max_relative": 2.855832524358046e-10,
+        "mean_max_over_poisson_sd": 3.0666254746330293e-07,
+        "cov_max_abs_over_max_diag": 4.0561852107593675e-07,
+        "cov_diag_max_relative": 1.3612589594024982e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2021",
+      "mass_MeV": 71,
+      "toy_id": 9,
+      "direct_seconds": 0.0035858750000001827,
+      "cached_cholesky_seconds": 0.0011081250000000153,
+      "preconditioned_seconds": 0.002458083999999694,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.022530374737465355,
+        "iterations": 8,
+        "relative_step": 1.7863488466218769e-13,
+        "effective_seconds_with_cached_fallback": 0.002458083999999694,
+        "mean_max_relative": 3.760495700507246e-10,
+        "mean_max_over_poisson_sd": 3.917561845370466e-07,
+        "cov_max_abs_over_max_diag": 3.946222417669839e-07,
+        "cov_diag_max_relative": 1.2028231798990573e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2021",
+      "mass_MeV": 71,
+      "toy_id": 10,
+      "direct_seconds": 0.004508875000000412,
+      "cached_cholesky_seconds": 0.0011837080000001166,
+      "preconditioned_seconds": 0.003018332999999984,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.03169323003579816,
+        "iterations": 9,
+        "relative_step": 5.944428452926006e-13,
+        "effective_seconds_with_cached_fallback": 0.003018332999999984,
+        "mean_max_relative": 1.1910650842673427e-10,
+        "mean_max_over_poisson_sd": 1.2717762845086256e-07,
+        "cov_max_abs_over_max_diag": 3.756452508779489e-07,
+        "cov_diag_max_relative": 1.2643414878389115e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2021",
+      "mass_MeV": 71,
+      "toy_id": 11,
+      "direct_seconds": 0.004140040999999872,
+      "cached_cholesky_seconds": 0.0013205830000000418,
+      "preconditioned_seconds": 0.0024085409999998753,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.03208384648650579,
+        "iterations": 8,
+        "relative_step": 5.386156812884497e-13,
+        "effective_seconds_with_cached_fallback": 0.0024085409999998753,
+        "mean_max_relative": 3.2273572226000185e-10,
+        "mean_max_over_poisson_sd": 3.361708086014989e-07,
+        "cov_max_abs_over_max_diag": 3.22981017475063e-07,
+        "cov_diag_max_relative": 9.988480814537648e-08,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2021",
+      "mass_MeV": 71,
+      "toy_id": 12,
+      "direct_seconds": 0.0055914999999999715,
+      "cached_cholesky_seconds": 0.001254666999999987,
+      "preconditioned_seconds": 0.0030260829999999572,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.02137995657389295,
+        "iterations": 8,
+        "relative_step": 1.3369581624569064e-13,
+        "effective_seconds_with_cached_fallback": 0.0030260829999999572,
+        "mean_max_relative": 5.655990840792048e-10,
+        "mean_max_over_poisson_sd": 5.765858736689458e-07,
+        "cov_max_abs_over_max_diag": 4.4885443929014754e-07,
+        "cov_diag_max_relative": 1.844374997350976e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2021",
+      "mass_MeV": 71,
+      "toy_id": 13,
+      "direct_seconds": 0.0052336250000002416,
+      "cached_cholesky_seconds": 0.001621375000000036,
+      "preconditioned_seconds": 0.003395709000000302,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.034148401118345044,
+        "iterations": 8,
+        "relative_step": 1.7993336247326749e-12,
+        "effective_seconds_with_cached_fallback": 0.003395709000000302,
+        "mean_max_relative": 4.3796430747552503e-10,
+        "mean_max_over_poisson_sd": 4.6618484926580516e-07,
+        "cov_max_abs_over_max_diag": 3.5319968473466405e-07,
+        "cov_diag_max_relative": 1.8337609632810752e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2021",
+      "mass_MeV": 71,
+      "toy_id": 14,
+      "direct_seconds": 0.004845207999999879,
+      "cached_cholesky_seconds": 0.0016665419999997155,
+      "preconditioned_seconds": 0.0026732919999998828,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.02312501121580922,
+        "iterations": 9,
+        "relative_step": 1.737739278389039e-12,
+        "effective_seconds_with_cached_fallback": 0.0026732919999998828,
+        "mean_max_relative": 6.759944762191263e-10,
+        "mean_max_over_poisson_sd": 7.080740450659597e-07,
+        "cov_max_abs_over_max_diag": 3.256479307643688e-07,
+        "cov_diag_max_relative": 1.2630877487358205e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2021",
+      "mass_MeV": 71,
+      "toy_id": 15,
+      "direct_seconds": 0.005056708000000132,
+      "cached_cholesky_seconds": 0.0012771670000000235,
+      "preconditioned_seconds": 0.0028861660000001343,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.023761497236040437,
+        "iterations": 8,
+        "relative_step": 4.687361609967411e-13,
+        "effective_seconds_with_cached_fallback": 0.0028861660000001343,
+        "mean_max_relative": 1.0173553027530701e-10,
+        "mean_max_over_poisson_sd": 1.0459266474390326e-07,
+        "cov_max_abs_over_max_diag": 3.1232005666469394e-07,
+        "cov_diag_max_relative": 1.23709562987651e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2021",
+      "mass_MeV": 71,
+      "toy_id": 16,
+      "direct_seconds": 0.003952208999999929,
+      "cached_cholesky_seconds": 0.001177375000000147,
+      "preconditioned_seconds": 0.003189667000000007,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.05694410339927943,
+        "iterations": 11,
+        "relative_step": 2.988415534658518e-13,
+        "effective_seconds_with_cached_fallback": 0.003189667000000007,
+        "mean_max_relative": 2.328590596483223e-10,
+        "mean_max_over_poisson_sd": 2.3749609826293299e-07,
+        "cov_max_abs_over_max_diag": 3.3268291842048895e-07,
+        "cov_diag_max_relative": 1.3786720999782293e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2021",
+      "mass_MeV": 71,
+      "toy_id": 17,
+      "direct_seconds": 0.004531582999999895,
+      "cached_cholesky_seconds": 0.0016279590000003452,
+      "preconditioned_seconds": 0.003536125000000112,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.04741198038249848,
+        "iterations": 10,
+        "relative_step": 5.085445657267955e-13,
+        "effective_seconds_with_cached_fallback": 0.003536125000000112,
+        "mean_max_relative": 1.9703006130056385e-10,
+        "mean_max_over_poisson_sd": 2.0519162577780817e-07,
+        "cov_max_abs_over_max_diag": 5.746081754404665e-07,
+        "cov_diag_max_relative": 1.752401251946272e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2021",
+      "mass_MeV": 71,
+      "toy_id": 18,
+      "direct_seconds": 0.004601042,
+      "cached_cholesky_seconds": 0.0013857499999998524,
+      "preconditioned_seconds": 0.002363832999999982,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.03313773306417819,
+        "iterations": 9,
+        "relative_step": 1.8074430840897548e-12,
+        "effective_seconds_with_cached_fallback": 0.002363832999999982,
+        "mean_max_relative": 2.2684433620925709e-10,
+        "mean_max_over_poisson_sd": 2.3135031589790828e-07,
+        "cov_max_abs_over_max_diag": 3.259077648355906e-07,
+        "cov_diag_max_relative": 1.425273337843875e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2021",
+      "mass_MeV": 71,
+      "toy_id": 19,
+      "direct_seconds": 0.0048222080000002165,
+      "cached_cholesky_seconds": 0.001493875000000422,
+      "preconditioned_seconds": 0.0033313749999996922,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.03443841806261271,
+        "iterations": 9,
+        "relative_step": 6.496102519324219e-13,
+        "effective_seconds_with_cached_fallback": 0.0033313749999996922,
+        "mean_max_relative": 1.8978436245800457e-10,
+        "mean_max_over_poisson_sd": 2.026225713235109e-07,
+        "cov_max_abs_over_max_diag": 3.036872815392461e-07,
+        "cov_diag_max_relative": 1.2129805030022471e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2021",
+      "mass_MeV": 71,
+      "toy_id": 20,
+      "direct_seconds": 0.004051707999999987,
+      "cached_cholesky_seconds": 0.0011519170000000578,
+      "preconditioned_seconds": 0.0025020420000001486,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.027283603913933974,
+        "iterations": 8,
+        "relative_step": 1.1991518888976316e-12,
+        "effective_seconds_with_cached_fallback": 0.0025020420000001486,
+        "mean_max_relative": 1.615045122039447e-10,
+        "mean_max_over_poisson_sd": 1.7375765223952855e-07,
+        "cov_max_abs_over_max_diag": 3.3755785699754797e-07,
+        "cov_diag_max_relative": 1.9646862279536933e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2021",
+      "mass_MeV": 71,
+      "toy_id": 21,
+      "direct_seconds": 0.0043036669999998445,
+      "cached_cholesky_seconds": 0.001100874999999668,
+      "preconditioned_seconds": 0.002607832999999893,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.03214141953702311,
+        "iterations": 9,
+        "relative_step": 1.599143645271469e-12,
+        "effective_seconds_with_cached_fallback": 0.002607832999999893,
+        "mean_max_relative": 4.543137427592739e-10,
+        "mean_max_over_poisson_sd": 4.862214867261402e-07,
+        "cov_max_abs_over_max_diag": 3.5627740711892605e-07,
+        "cov_diag_max_relative": 1.5788204517189286e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2021",
+      "mass_MeV": 71,
+      "toy_id": 22,
+      "direct_seconds": 0.003982624999999906,
+      "cached_cholesky_seconds": 0.001389042000000007,
+      "preconditioned_seconds": 0.002630082999999672,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.02749322893340585,
+        "iterations": 8,
+        "relative_step": 2.410363430432217e-13,
+        "effective_seconds_with_cached_fallback": 0.002630082999999672,
+        "mean_max_relative": 2.017142002942399e-10,
+        "mean_max_over_poisson_sd": 2.1696591082904957e-07,
+        "cov_max_abs_over_max_diag": 3.9430528347355667e-07,
+        "cov_diag_max_relative": 2.561950782298725e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2021",
+      "mass_MeV": 71,
+      "toy_id": 23,
+      "direct_seconds": 0.004137958999999913,
+      "cached_cholesky_seconds": 0.0011539169999998933,
+      "preconditioned_seconds": 0.003089125000000248,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.03293725404343108,
+        "iterations": 9,
+        "relative_step": 1.841630323163714e-13,
+        "effective_seconds_with_cached_fallback": 0.003089125000000248,
+        "mean_max_relative": 1.2991753615401496e-10,
+        "mean_max_over_poisson_sd": 1.3609753902252038e-07,
+        "cov_max_abs_over_max_diag": 3.3781072408041467e-07,
+        "cov_diag_max_relative": 1.947357286726085e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2021",
+      "mass_MeV": 71,
+      "toy_id": 24,
+      "direct_seconds": 0.0039306250000001874,
+      "cached_cholesky_seconds": 0.0011229159999999183,
+      "preconditioned_seconds": 0.0027677499999998467,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.031171394985784386,
+        "iterations": 9,
+        "relative_step": 2.7465789338571056e-13,
+        "effective_seconds_with_cached_fallback": 0.0027677499999998467,
+        "mean_max_relative": 3.478337735700015e-10,
+        "mean_max_over_poisson_sd": 3.7045542293865974e-07,
+        "cov_max_abs_over_max_diag": 4.0978355456471394e-07,
+        "cov_diag_max_relative": 1.1813623190886699e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2021",
+      "mass_MeV": 71,
+      "toy_id": 25,
+      "direct_seconds": 0.004532250000000015,
+      "cached_cholesky_seconds": 0.0011618339999999172,
+      "preconditioned_seconds": 0.002376374999999875,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.03141538834782828,
+        "iterations": 8,
+        "relative_step": 1.8666410854729806e-12,
+        "effective_seconds_with_cached_fallback": 0.002376374999999875,
+        "mean_max_relative": 1.5119815837377902e-10,
+        "mean_max_over_poisson_sd": 1.565079736405331e-07,
+        "cov_max_abs_over_max_diag": 3.1958906920448194e-07,
+        "cov_diag_max_relative": 1.850351330893421e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2021",
+      "mass_MeV": 71,
+      "toy_id": 26,
+      "direct_seconds": 0.004506334000000223,
+      "cached_cholesky_seconds": 0.001407500000000006,
+      "preconditioned_seconds": 0.0034788749999998814,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.031295636097961314,
+        "iterations": 9,
+        "relative_step": 1.5059065106015623e-12,
+        "effective_seconds_with_cached_fallback": 0.0034788749999998814,
+        "mean_max_relative": 1.5176135809737903e-10,
+        "mean_max_over_poisson_sd": 1.5709277339031264e-07,
+        "cov_max_abs_over_max_diag": 4.0653938043306673e-07,
+        "cov_diag_max_relative": 1.4240179427028014e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2021",
+      "mass_MeV": 71,
+      "toy_id": 27,
+      "direct_seconds": 0.003977290999999994,
+      "cached_cholesky_seconds": 0.0015245409999993242,
+      "preconditioned_seconds": 0.0035503749999996614,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.03842198315537668,
+        "iterations": 11,
+        "relative_step": 1.9022396548903713e-12,
+        "effective_seconds_with_cached_fallback": 0.0035503749999996614,
+        "mean_max_relative": 4.478498664819186e-10,
+        "mean_max_over_poisson_sd": 4.808124479661911e-07,
+        "cov_max_abs_over_max_diag": 3.5035019509252906e-07,
+        "cov_diag_max_relative": 1.540105233165021e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2021",
+      "mass_MeV": 71,
+      "toy_id": 28,
+      "direct_seconds": 0.003717833999999698,
+      "cached_cholesky_seconds": 0.0011192500000003491,
+      "preconditioned_seconds": 0.003074250000000056,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.02513882609277973,
+        "iterations": 8,
+        "relative_step": 2.3725466036239595e-13,
+        "effective_seconds_with_cached_fallback": 0.003074250000000056,
+        "mean_max_relative": 9.706555158683597e-11,
+        "mean_max_over_poisson_sd": 1.0391450183876171e-07,
+        "cov_max_abs_over_max_diag": 4.873466640202378e-07,
+        "cov_diag_max_relative": 1.0870991069655577e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2021",
+      "mass_MeV": 71,
+      "toy_id": 29,
+      "direct_seconds": 0.0036761659999999807,
+      "cached_cholesky_seconds": 0.0011183749999998938,
+      "preconditioned_seconds": 0.0027806669999996814,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.034228744487133374,
+        "iterations": 9,
+        "relative_step": 3.863083651656587e-13,
+        "effective_seconds_with_cached_fallback": 0.0027806669999996814,
+        "mean_max_relative": 2.026769941297351e-10,
+        "mean_max_over_poisson_sd": 2.082882939156208e-07,
+        "cov_max_abs_over_max_diag": 3.5926948791838436e-07,
+        "cov_diag_max_relative": 1.7798196075107245e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2021",
+      "mass_MeV": 71,
+      "toy_id": 30,
+      "direct_seconds": 0.004438583000000662,
+      "cached_cholesky_seconds": 0.0011078749999997584,
+      "preconditioned_seconds": 0.0034083339999995133,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.033609059530560974,
+        "iterations": 9,
+        "relative_step": 5.373151562748535e-13,
+        "effective_seconds_with_cached_fallback": 0.0034083339999995133,
+        "mean_max_relative": 3.077644331571915e-10,
+        "mean_max_over_poisson_sd": 3.2776126134104473e-07,
+        "cov_max_abs_over_max_diag": 4.89150553210633e-07,
+        "cov_diag_max_relative": 1.6982992717392575e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    },
+    {
+      "dataset": "2021",
+      "mass_MeV": 71,
+      "toy_id": 31,
+      "direct_seconds": 0.004162209000000416,
+      "cached_cholesky_seconds": 0.0012888329999993786,
+      "preconditioned_seconds": 0.003247709000000043,
+      "cached_closure": {
+        "mean_max_relative": 0.0,
+        "mean_max_over_poisson_sd": 0.0,
+        "cov_max_abs_over_max_diag": 0.0,
+        "cov_diag_max_relative": 0.0,
+        "mean_bit_exact": true,
+        "cov_bit_exact": true
+      },
+      "preconditioned": {
+        "status": "converged",
+        "contraction_bound": 0.04412702189233406,
+        "iterations": 9,
+        "relative_step": 7.506264523221182e-13,
+        "effective_seconds_with_cached_fallback": 0.003247709000000043,
+        "mean_max_relative": 5.765450801891828e-10,
+        "mean_max_over_poisson_sd": 5.965480333764595e-07,
+        "cov_max_abs_over_max_diag": 4.4984655931108194e-07,
+        "cov_diag_max_relative": 1.2355198110795142e-07,
+        "mean_bit_exact": false,
+        "cov_bit_exact": false
+      }
+    }
+  ],
+  "scope": "Numerical refit/prediction timing only; no calibration or coverage study."
+}

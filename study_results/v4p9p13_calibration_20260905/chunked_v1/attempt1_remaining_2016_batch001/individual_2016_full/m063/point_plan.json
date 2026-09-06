@@ -1,0 +1,268 @@
+{
+  "attempt": 1,
+  "baseline_contract_sha256": "246e8411c4737b51c44271db3eb21cf3c4c767efa8c59faf0722f0162e272170",
+  "calibration_spectra": 52992,
+  "execution_layout": {
+    "blas_threads": 1,
+    "chunk_size": 128,
+    "max_memory_gib": 4.0,
+    "numerical_policy": "original_proposals_then_nuisance1e-7_replay_v1",
+    "runtime_reserve_bytes": 536870912,
+    "sampling_policy": "fisher075_fresh512_retry1024_centers96_v1",
+    "sampling_policy_unchanged": true,
+    "source_hashes": {
+      "study_results/v4p9p13_calibration_20260905/CHUNKED_REFINEMENT_PROTOCOL.md": "4e4dc3c392a122a343584f2268b1ecc9206574dceac0365a02fecf217d7e9591",
+      "study_results/v4p9p13_calibration_20260905/run_chunked_refinement.py": "07ddfe38d74fa8ac5c6d6643606cb64169c645e9cb4aaf1833cac9ba0ebc382a"
+    },
+    "statistical_identity": "Same likelihood and Poisson laws; floating-point/fallback paths need not be bit-identical",
+    "type": "chunked_sampling_execution",
+    "version": 1
+  },
+  "mass_MeV": 63,
+  "max_memory_gib": 4.0,
+  "memory_estimates": {
+    "eigenfeature_rtol_1e-15": {
+      "chunk_size": 128,
+      "chunk_workspace_bytes": 5492736,
+      "conservative_rank": 12,
+      "estimated_peak_bytes": 1264272000,
+      "estimated_peak_gib": 1.1774450540542603,
+      "full_bins": 720,
+      "generation_workspace_bytes": 2949120,
+      "interpretation": "Both banks, bounded q caches, chunk fit/density copies, retained validation models and 512 MiB runtime reserve; source-derived, not measured RSS",
+      "per_truth": {
+        "gp": {
+          "chunk_workspace_bytes": 5271552,
+          "persistent_bytes": 112324608,
+          "qcache_bound_bytes": 8650752,
+          "qcache_limit": 128,
+          "spectra": 8448
+        },
+        "stress": {
+          "chunk_workspace_bytes": 5492736,
+          "persistent_bytes": 592257024,
+          "qcache_bound_bytes": 45613056,
+          "qcache_limit": 128,
+          "spectra": 44544
+        }
+      },
+      "persistent_bytes": 704581632,
+      "proposal_bytes": 2073600,
+      "runtime_reserve_bytes": 536870912,
+      "validation_retained_bytes": 12304000,
+      "window_bins": 46
+    },
+    "exact_cached_cholesky": {
+      "chunk_size": 128,
+      "chunk_workspace_bytes": 28610560,
+      "conservative_rank": 46,
+      "estimated_peak_bytes": 2051052672,
+      "estimated_peak_gib": 1.9101916551589966,
+      "full_bins": 720,
+      "generation_workspace_bytes": 2949120,
+      "interpretation": "Both banks, bounded q caches, chunk fit/density copies, retained validation models and 512 MiB runtime reserve; source-derived, not measured RSS",
+      "per_truth": {
+        "gp": {
+          "chunk_workspace_bytes": 28389376,
+          "persistent_bytes": 231813120,
+          "qcache_bound_bytes": 8650752,
+          "qcache_limit": 128,
+          "spectra": 8448
+        },
+        "stress": {
+          "chunk_workspace_bytes": 28610560,
+          "persistent_bytes": 1222287360,
+          "qcache_bound_bytes": 45613056,
+          "qcache_limit": 128,
+          "spectra": 44544
+        }
+      },
+      "persistent_bytes": 1454100480,
+      "proposal_bytes": 2073600,
+      "runtime_reserve_bytes": 536870912,
+      "validation_retained_bytes": 26448000,
+      "window_bins": 46
+    }
+  },
+  "numerical_policy": "original_proposals_then_nuisance1e-7_replay_v1",
+  "policy": "fisher075_fresh512_retry1024_centers96_v1",
+  "scope_key": "individual_2016_full",
+  "selection_sha256": "5358140d25adb7f07f598f8d0e91410b5e78dc2c605b677fe9a3e7fcf0242b1f",
+  "sigma_reference": 6966.549827898956,
+  "signal_yield_per_eps2": 2572846814.164896,
+  "source_checkpoint_sha256": "86c4e1940828bf286016daaea379948d2a1639edde288216964c7f948d49852f",
+  "truths": {
+    "gp": {
+      "calibration_spectra": 8448,
+      "candidates": [],
+      "ceiling": 12.0,
+      "ntoys_per_proposal": 256,
+      "proposal_count": 33,
+      "proposal_nodes": [
+        0.0,
+        0.5,
+        1.0,
+        1.5,
+        2.0,
+        3.0,
+        4.0,
+        5.0,
+        6.0,
+        8.0,
+        12.0
+      ],
+      "refined": false,
+      "scan_nodes": [
+        0.0,
+        0.5,
+        1.0,
+        1.5,
+        2.0,
+        3.0,
+        4.0,
+        5.0,
+        6.0,
+        8.0,
+        12.0
+      ],
+      "windows": []
+    },
+    "stress": {
+      "calibration_spectra": 44544,
+      "candidates": [
+        {
+          "centers": [
+            0.306640625,
+            2.413564855344473
+          ],
+          "first_or_previous_endpoint": 0.306640625,
+          "influence_hint": 2.413564855344473,
+          "method": "fixed",
+          "propagated_sd_sigma": 1.2067824276722365,
+          "window": [
+            0.0,
+            4.827129710688946
+          ]
+        },
+        {
+          "centers": [
+            0.322265625,
+            1.9537366979142397
+          ],
+          "first_or_previous_endpoint": 0.322265625,
+          "influence_hint": 1.9537366979142397,
+          "method": "profiled",
+          "propagated_sd_sigma": 0.9768683489571198,
+          "window": [
+            0.0,
+            3.958722087408506
+          ]
+        }
+      ],
+      "ceiling": 12.0,
+      "ntoys_per_proposal": 512,
+      "proposal_count": 87,
+      "proposal_nodes": [
+        0.0,
+        0.306640625,
+        0.322265625,
+        0.37569929860409446,
+        0.5,
+        0.7514438902364035,
+        1.0,
+        1.1272337735845275,
+        1.5,
+        1.5030689473365442,
+        1.8789494101810076,
+        1.9537366979142397,
+        2.0,
+        2.254875160806948,
+        2.413564855344473,
+        2.6308461979038724,
+        3.0,
+        3.006862520161763,
+        3.382924126271078,
+        3.7590310149227513,
+        3.958722087408506,
+        4.0,
+        4.1351831848081915,
+        4.5113806346192815,
+        4.827129710688946,
+        5.0,
+        6.0,
+        8.0,
+        12.0
+      ],
+      "refined": true,
+      "scan_nodes": [
+        0.0,
+        0.306640625,
+        0.322265625,
+        0.5,
+        1.0,
+        1.5,
+        1.9537366979142397,
+        2.0,
+        2.413564855344473,
+        3.0,
+        3.958722087408506,
+        4.0,
+        4.827129710688946,
+        5.0,
+        6.0,
+        8.0,
+        12.0
+      ],
+      "windows": [
+        [
+          0.0,
+          4.827129710688946
+        ]
+      ]
+    }
+  },
+  "type": "independent_poisson_mixture_refinement",
+  "unchunked_memory_estimates": {
+    "eigenfeature_rtol_1e-15": {
+      "conservative_rank": 12,
+      "estimated_peak_bytes": 2401530880,
+      "estimated_peak_gib": 2.236599922180176,
+      "full_bins": 720,
+      "interpretation": "Explicit array bound with factor/padding copies, Hessian workspaces, mixture matrices and both retained banks; not measured host memory",
+      "per_truth": {
+        "gp": {
+          "persistent_bytes": 107999232,
+          "spectra": 8448,
+          "transient_bytes": 299261952
+        },
+        "stress": {
+          "persistent_bytes": 569450496,
+          "spectra": 44544,
+          "transient_bytes": 1654898688
+        }
+      },
+      "window_bins": 46
+    },
+    "exact_cached_cholesky": {
+      "conservative_rank": 46,
+      "estimated_peak_bytes": 11196052480,
+      "estimated_peak_gib": 10.427136421203613,
+      "full_bins": 720,
+      "interpretation": "Explicit array bound with factor/padding copies, Hessian workspaces, mixture matrices and both retained banks; not measured host memory",
+      "per_truth": {
+        "gp": {
+          "persistent_bytes": 227487744,
+          "spectra": 8448,
+          "transient_bytes": 1825038336
+        },
+        "stress": {
+          "persistent_bytes": 1199480832,
+          "spectra": 44544,
+          "transient_bytes": 9699901440
+        }
+      },
+      "window_bins": 46
+    }
+  },
+  "validation_spectra": 3000
+}

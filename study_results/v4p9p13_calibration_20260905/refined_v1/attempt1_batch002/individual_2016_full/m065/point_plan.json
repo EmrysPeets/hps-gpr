@@ -1,0 +1,207 @@
+{
+  "attempt": 1,
+  "baseline_contract_sha256": "246e8411c4737b51c44271db3eb21cf3c4c767efa8c59faf0722f0162e272170",
+  "calibration_spectra": 79872,
+  "mass_MeV": 65,
+  "max_memory_gib": 4.0,
+  "memory_estimates": {
+    "eigenfeature_rtol_1e-15": {
+      "conservative_rank": 12,
+      "estimated_peak_bytes": 2749080064,
+      "estimated_peak_gib": 2.5602803230285645,
+      "full_bins": 720,
+      "interpretation": "Explicit array bound with factor/padding copies, Hessian workspaces, mixture matrices and both retained banks; not measured host memory",
+      "per_truth": {
+        "gp": {
+          "persistent_bytes": 560824320,
+          "spectra": 43008,
+          "transient_bytes": 1637744640
+        },
+        "stress": {
+          "persistent_bytes": 480706560,
+          "spectra": 36864,
+          "transient_bytes": 1389625344
+        }
+      },
+      "window_bins": 48
+    },
+    "exact_cached_cholesky": {
+      "conservative_rank": 48,
+      "estimated_peak_bytes": 12513026560,
+      "estimated_peak_gib": 11.653664112091064,
+      "full_bins": 720,
+      "interpretation": "Explicit array bound with factor/padding copies, Hessian workspaces, mixture matrices and both retained banks; not measured host memory",
+      "per_truth": {
+        "gp": {
+          "persistent_bytes": 1229684736,
+          "spectra": 43008,
+          "transient_bytes": 10159521792
+        },
+        "stress": {
+          "persistent_bytes": 1054015488,
+          "spectra": 36864,
+          "transient_bytes": 8694005760
+        }
+      },
+      "window_bins": 48
+    }
+  },
+  "numerical_policy": "original_proposals_then_nuisance1e-7_replay_v1",
+  "policy": "fisher075_fresh512_retry1024_centers96_v1",
+  "scope_key": "individual_2016_full",
+  "selection_sha256": "14e71c7ea5868ddcc7b3ac9017f175b75b7093f74d5156815c761e3f9586213a",
+  "sigma_reference": 6685.219652855825,
+  "signal_yield_per_eps2": 2614912595.6684265,
+  "source_checkpoint_sha256": "9024b4b64e0f0c9d6c4c40983979a614487e8f57ae8e58b21183d2e69c324398",
+  "truths": {
+    "gp": {
+      "calibration_spectra": 43008,
+      "candidates": [
+        {
+          "centers": [
+            4.15625,
+            4.704539007160173
+          ],
+          "first_or_previous_endpoint": 4.15625,
+          "influence_hint": 4.704539007160173,
+          "method": "fixed",
+          "propagated_sd_sigma": 1.2016533132616296,
+          "window": [
+            1.7529433734767408,
+            7.107845633683432
+          ]
+        }
+      ],
+      "ceiling": 12.0,
+      "ntoys_per_proposal": 512,
+      "proposal_count": 84,
+      "proposal_nodes": [
+        0.0,
+        0.5,
+        1.0,
+        1.5,
+        1.7529433734767408,
+        2.0,
+        2.1475236652604743,
+        2.5421512622800426,
+        2.9368261631716535,
+        3.0,
+        3.3315483665720076,
+        3.726317871118298,
+        4.0,
+        4.121134675448209,
+        4.15625,
+        4.515998778199919,
+        4.704539007160173,
+        4.910910178012097,
+        5.0,
+        5.305868873523902,
+        5.700874863374987,
+        6.0,
+        6.095928146205494,
+        6.491028720656055,
+        6.886176585367794,
+        7.107845633683432,
+        8.0,
+        12.0
+      ],
+      "refined": true,
+      "scan_nodes": [
+        0.0,
+        0.5,
+        1.0,
+        1.5,
+        1.7529433734767408,
+        2.0,
+        3.0,
+        4.0,
+        4.15625,
+        4.704539007160173,
+        5.0,
+        6.0,
+        7.107845633683432,
+        8.0,
+        12.0
+      ],
+      "windows": [
+        [
+          1.7529433734767408,
+          7.107845633683432
+        ]
+      ]
+    },
+    "stress": {
+      "calibration_spectra": 36864,
+      "candidates": [
+        {
+          "centers": [
+            0.59765625,
+            1.9594350472264026
+          ],
+          "first_or_previous_endpoint": 0.59765625,
+          "influence_hint": 1.9594350472264026,
+          "method": "profiled",
+          "propagated_sd_sigma": 0.9797175236132013,
+          "window": [
+            0.0,
+            4.066704823813228
+          ]
+        }
+      ],
+      "ceiling": 12.0,
+      "ntoys_per_proposal": 512,
+      "proposal_count": 72,
+      "proposal_nodes": [
+        0.0,
+        0.3948784615181581,
+        0.5,
+        0.59765625,
+        0.7898042194600117,
+        1.0,
+        1.1847772724642704,
+        1.5,
+        1.5797976191701355,
+        1.9594350472264026,
+        1.9748652582172992,
+        2.0,
+        2.369980188245945,
+        2.7651424078967466,
+        3.0,
+        3.1603519158108684,
+        3.555608710629965,
+        3.9509127909961808,
+        4.0,
+        4.066704823813228,
+        5.0,
+        6.0,
+        8.0,
+        12.0
+      ],
+      "refined": true,
+      "scan_nodes": [
+        0.0,
+        0.5,
+        0.59765625,
+        1.0,
+        1.5,
+        1.9594350472264026,
+        2.0,
+        3.0,
+        4.0,
+        4.066704823813228,
+        5.0,
+        6.0,
+        8.0,
+        12.0
+      ],
+      "windows": [
+        [
+          0.0,
+          4.066704823813228
+        ]
+      ]
+    }
+  },
+  "type": "independent_poisson_mixture_refinement",
+  "validation_spectra": 3000
+}

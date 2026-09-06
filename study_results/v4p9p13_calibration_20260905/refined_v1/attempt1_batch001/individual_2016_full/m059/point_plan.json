@@ -1,0 +1,172 @@
+{
+  "attempt": 1,
+  "baseline_contract_sha256": "246e8411c4737b51c44271db3eb21cf3c4c767efa8c59faf0722f0162e272170",
+  "calibration_spectra": 52992,
+  "mass_MeV": 59,
+  "max_memory_gib": 4.0,
+  "memory_estimates": {
+    "eigenfeature_rtol_1e-15": {
+      "conservative_rank": 12,
+      "estimated_peak_bytes": 2342351872,
+      "estimated_peak_gib": 2.181485176086426,
+      "full_bins": 720,
+      "interpretation": "Explicit array bound with factor/padding copies, Hessian workspaces, mixture matrices and both retained banks; not measured host memory",
+      "per_truth": {
+        "gp": {
+          "persistent_bytes": 105836544,
+          "spectra": 8448,
+          "transient_bytes": 290611200
+        },
+        "stress": {
+          "persistent_bytes": 558047232,
+          "spectra": 44544,
+          "transient_bytes": 1609285632
+        }
+      },
+      "window_bins": 44
+    },
+    "exact_cached_cholesky": {
+      "conservative_rank": 44,
+      "estimated_peak_bytes": 10318738432,
+      "estimated_peak_gib": 9.610074043273926,
+      "full_bins": 720,
+      "interpretation": "Explicit array bound with factor/padding copies, Hessian workspaces, mixture matrices and both retained banks; not measured host memory",
+      "per_truth": {
+        "gp": {
+          "persistent_bytes": 213970944,
+          "spectra": 8448,
+          "transient_bytes": 1674731520
+        },
+        "stress": {
+          "persistent_bytes": 1128210432,
+          "spectra": 44544,
+          "transient_bytes": 8907374592
+        }
+      },
+      "window_bins": 44
+    }
+  },
+  "numerical_policy": "original_proposals_then_nuisance1e-7_replay_v1",
+  "policy": "fisher075_fresh512_retry1024_centers96_v1",
+  "scope_key": "individual_2016_full",
+  "selection_sha256": "0a99258a7803283e7c0bcfd36b48cddb4773ed40aba44efbf42f1e0c52d1d66a",
+  "sigma_reference": 6843.929436226842,
+  "signal_yield_per_eps2": 2442454414.0070076,
+  "source_checkpoint_sha256": "7d969aec54c0c46fa5333a66552057473e26d311d72d6c2fb4dcc4260669071d",
+  "truths": {
+    "gp": {
+      "calibration_spectra": 8448,
+      "candidates": [],
+      "ceiling": 12.0,
+      "ntoys_per_proposal": 256,
+      "proposal_count": 33,
+      "proposal_nodes": [
+        0.0,
+        0.5,
+        1.0,
+        1.5,
+        2.0,
+        3.0,
+        4.0,
+        5.0,
+        6.0,
+        8.0,
+        12.0
+      ],
+      "refined": false,
+      "scan_nodes": [
+        0.0,
+        0.5,
+        1.0,
+        1.5,
+        2.0,
+        3.0,
+        4.0,
+        5.0,
+        6.0,
+        8.0,
+        12.0
+      ],
+      "windows": []
+    },
+    "stress": {
+      "calibration_spectra": 44544,
+      "candidates": [
+        {
+          "centers": [
+            8.9375,
+            9.507397831158602
+          ],
+          "first_or_previous_endpoint": 8.9375,
+          "influence_hint": 9.507397831158602,
+          "method": "fixed",
+          "propagated_sd_sigma": 1.207985773636116,
+          "window": [
+            6.521528452727768,
+            11.923369378430834
+          ]
+        }
+      ],
+      "ceiling": 12.0,
+      "ntoys_per_proposal": 512,
+      "proposal_count": 87,
+      "proposal_nodes": [
+        0.0,
+        0.5,
+        1.0,
+        1.5,
+        2.0,
+        3.0,
+        4.0,
+        5.0,
+        6.0,
+        6.521528452727768,
+        6.8961076821266865,
+        7.270733086806821,
+        7.645404665405001,
+        8.0,
+        8.020122416558564,
+        8.394886338905353,
+        8.769696431083716,
+        8.9375,
+        9.144552691732505,
+        9.507397831158602,
+        9.519455119491083,
+        9.894403712999312,
+        10.269398470897562,
+        10.644439391826705,
+        11.01952647442812,
+        11.394659717343691,
+        11.769839119215801,
+        11.923369378430834,
+        12.0
+      ],
+      "refined": true,
+      "scan_nodes": [
+        0.0,
+        0.5,
+        1.0,
+        1.5,
+        2.0,
+        3.0,
+        4.0,
+        5.0,
+        6.0,
+        6.521528452727768,
+        8.0,
+        8.9375,
+        9.507397831158602,
+        11.923369378430834,
+        12.0
+      ],
+      "windows": [
+        [
+          6.521528452727768,
+          11.923369378430834
+        ]
+      ]
+    }
+  },
+  "type": "independent_poisson_mixture_refinement",
+  "validation_spectra": 3000
+}

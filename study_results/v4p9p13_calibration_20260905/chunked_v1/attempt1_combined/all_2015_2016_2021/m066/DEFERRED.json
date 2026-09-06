@@ -1,0 +1,70 @@
+{
+  "detail": "Chunked peak 4.850 GiB exceeds explicit 4.000 GiB guard",
+  "diagnostics": {
+    "chunk_size": 128,
+    "chunk_workspace_bytes": 33855488,
+    "conservative_rank": 36,
+    "estimated_peak_bytes": 5207995536,
+    "estimated_peak_gib": 4.850323811173439,
+    "full_bins": 1626,
+    "generation_workspace_bytes": 6660096,
+    "gp_backend": "eigenfeature_rtol_1e-15",
+    "interpretation": "Both banks, bounded q caches, chunk fit/density copies, retained validation models and 512 MiB runtime reserve; source-derived, not measured RSS",
+    "limit_gib": 4.0,
+    "passed": false,
+    "per_truth": {
+      "gp": {
+        "chunk_workspace_bytes": 33855488,
+        "persistent_bytes": 2327740416,
+        "qcache_bound_bytes": 42467328,
+        "qcache_limit": 128,
+        "spectra": 41472
+      },
+      "stress": {
+        "chunk_workspace_bytes": 33843200,
+        "persistent_bytes": 2241527808,
+        "qcache_bound_bytes": 40894464,
+        "qcache_limit": 128,
+        "spectra": 39936
+      }
+    },
+    "persistent_bytes": 4569268224,
+    "proposal_bytes": 6204816,
+    "runtime_reserve_bytes": 536870912,
+    "validation_retained_bytes": 55136000,
+    "window_bins": 126
+  },
+  "entry": {
+    "baseline_checkpoint_path": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v4p9p13_calibration_20260905/derived/all_2015_2016_2021/m066/result.json",
+    "baseline_checkpoint_sha256": "0d45b16f8fea07bf08d033772d4081e2d8ccfa4f113a817e2e9f60363d338a00",
+    "components": [
+      {
+        "failed_gates": [
+          "numerical_bracket"
+        ],
+        "method": "profiled",
+        "priority": 2,
+        "reason": "envelope_controlling",
+        "truth": "gp",
+        "worst_ess": 349.694294115885
+      },
+      {
+        "failed_gates": [
+          "tail_ess"
+        ],
+        "method": "profiled",
+        "priority": 5,
+        "reason": "noncontrolling_qualified_component",
+        "truth": "stress",
+        "worst_ess": 48.20339569408244
+      }
+    ],
+    "mass_MeV": 66,
+    "priority": 2,
+    "scope_key": "all_2015_2016_2021",
+    "source_checkpoint_path": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v4p9p13_calibration_20260905/derived/all_2015_2016_2021/m066/result.json",
+    "source_checkpoint_sha256": "0d45b16f8fea07bf08d033772d4081e2d8ccfa4f113a817e2e9f60363d338a00",
+    "worst_ess": 48.20339569408244
+  },
+  "reason": "declared_geometry_or_memory_cap"
+}

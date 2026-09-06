@@ -1,0 +1,33 @@
+\subsection{Auxiliary check of the known 71 MeV failure}\label{sec:reverse_truth_validation}
+
+The original reverse-truth five-reference-sigma injections excluded the true yield in 349/500 fixed-background fits and 145/500 Gaussian-profiled fits. These are the recorded uncalibrated asymptotic results. The reverse truth is absent from the two-truth calibration envelope, so the main validation does not establish that this failure has been corrected.
+
+This auxiliary result reconstructs the selected 71 MeV calibration proposal arrays and their hashes, then evaluates both calibration and validation statistics with dense GP refits and the full conditioned covariance. It uses the original 1,500 spectra (500 at each of zero, two and five reference sigmas), regenerated from the original seeds and checked against the saved fitted yields and signed likelihood roots. The two methods remain paired; these spectra are reused and are not pooled with the main validation.
+
+The bounded statistic is evaluated at the original physical injected yield, without a Wald reconstruction. Calibration still takes the larger tail result from the same two declared truths. The reverse truth is a known out-of-envelope diagnostic: this retrospective result does not establish truth-independent or global coverage.
+
+\begin{table}[H]\centering\small
+
+\begin{tabular}{llrrrr}\toprule
+
+Test & Method & Raw & Calibrated & Tail-ready & MC-resolved\\\midrule
+
+B-only local $5\%$ & Gaussian profile & 1 & 19 & 356 & 356\\
+
+B-only local $5\%$ & Fixed mean & 38 & 25 & 373 & 373\\
+
+$2\sigma_{\rm ref}$ exclusion & Gaussian profile & 100 & 0 & 440 & 440\\
+
+$2\sigma_{\rm ref}$ exclusion & Fixed mean & 315 & 0 & 416 & 416\\
+
+$5\sigma_{\rm ref}$ exclusion & Gaussian profile & 145 & 3 & 369 & 369\\
+
+$5\sigma_{\rm ref}$ exclusion & Fixed mean & 349 & 2 & 364 & 364\\
+
+\bottomrule\end{tabular}
+
+\caption{Counts out of 500 in each original reverse-truth ensemble. Positive injections test $CL_s<0.10$; B-only spectra test local $p_0<0.05$. The last two columns qualify the calibrated decision: tail-ready requires both truth-specific tail effective sample sizes of at least 100 and finite errors; MC-resolved additionally places the envelope of pointwise $\pm1.96$-SE tail estimates wholly on one side of the threshold. Point estimates retain every toy, including limited decisions. Exact binomial intervals in the CSV condition on the chosen calibration bank and do not include its finite Monte Carlo uncertainty. No counts are pooled across methods, strengths or studies.}
+
+\label{tab:reverse_truth_validation}\end{table}
+
+The five-reference-sigma exclusion point estimates fall to 3/500 for the Gaussian profile and 2/500 for the fixed mean. These values lie well below the nominal 10\% rate and indicate conservative behavior under this truth. However, 682 of the 3,000 method--toy decisions have limited Monte Carlo precision; this diagnostic does not resolve coverage to percent-level accuracy.

@@ -1,0 +1,18 @@
+{
+  "chunked_equivalence_passed": true,
+  "elapsed_seconds": 402.498705458,
+  "event": "point_completed",
+  "mass_MeV": 74,
+  "scope_key": "all_2015_2016_2021"
+}
+
+Traceback (most recent call last):
+  File "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v4p9p13_calibration_20260905/run_scalar_reference_recovery.py", line 126, in <module>
+    if __name__ == "__main__":main()
+  File "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v4p9p13_calibration_20260905/run_scalar_reference_recovery.py", line 91, in main
+    audit = recovery.recovery_audit(ctx)
+  File "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v4p9p13_calibration_20260905/scalar_reference_recovery.py", line 298, in recovery_audit
+    matches = [r for r in ctx.scalar_checks if (r["batch_id"], r["method"], r["toy_index"], r["counts_sha256"]) ==
+  File "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v4p9p13_calibration_20260905/scalar_reference_recovery.py", line 298, in <listcomp>
+    matches = [r for r in ctx.scalar_checks if (r["batch_id"], r["method"], r["toy_index"], r["counts_sha256"]) ==
+KeyError: 'batch_id'
