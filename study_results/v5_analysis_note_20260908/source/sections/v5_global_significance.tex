@@ -1,0 +1,126 @@
+% Definitions and frozen diagnostics from v4.9.14, v4.9.15 and v4.9.16.
+\subsection{A GP calculation of scan-global significance}
+\label{v5-sec:global-method}\label{sec:v5-global}
+A local probability describes a fluctuation at one fixed mass. A global
+probability asks how often a complete background experiment would produce
+an equally extreme result anywhere in the declared search. Nearby mass
+hypotheses reuse counts and sidebands, so their fluctuations are correlated.
+The significance-GP method of Ananiev and Read~\cite{AnanievRead2023}
+estimates those correlations from the analysis response, then generates
+many inexpensive correlated fields. It complements the look-elsewhere
+approach described above and can retain nonstationary correlations and
+changes in the contributing datasets.
+
+The GP used for this purpose is distinct from the GP used to estimate the
+mass background. Let $\psi$ denote the signal yield for an individual
+dataset or the shared coupling parameter $\epsilon^2$ for a combination.
+The auxiliary best fit $\widehat\psi$ is unconstrained in sign, so that
+deficits remain visible; the physical discovery test still tests a
+nonnegative signal. Let $r(n;m)$ denote the signed local significance mapping
+from the profile likelihood at mass $m$:
+\begin{equation}
+ r(n;m)=\operatorname{sgn}(\widehat\psi)
+ \sqrt{2[\ell(0,\widehat\theta_0)-\ell(\widehat\psi,\widehat\theta)]}.
+ \label{v5-eq:signed-local-mapping}
+\end{equation}
+It expresses the likelihood improvement on a significance-like scale.
+The conventional one-sided excess display uses $Z_{\rm local}=\max(0,r)$
+and the asymptotic mapping $p_0=1-\Phi(Z_{\rm local})$; a negative value of
+$r$ records a deficit rather than evidence for a positive signal.
+
+For one coherent expected background spectrum $B$, the calculation scans
+the unfluctuated spectrum and spectra with one support bin increased by
+its Poisson standard deviation. It records
+\begin{align}
+ a_m&=r(B;m), & D_{im}&=r(B+\sqrt{B_i}e_i;m)-a_m,\\
+ C_{mn}&=\sum_iD_{im}D_{in}, & s_m&=\sqrt{C_{mm}},
+ & K_{mn}&=C_{mn}/(s_ms_n).
+ \label{v5-eq:field-response}
+\end{align}
+A simulated significance field is then
+$r_m^*=a_m+s_mz_m^*$ with $z^*\sim N(0,K)$. The nonzero offset $a_m$ and
+nonunit width $s_m$ are explicit extensions of the ideally centered,
+unit-width construction. Subtracting $a_m$ in the response calculation
+centers the covariance estimate; it does not subtract events from data.
+
+The declared principal ordering first maps each mass to its conditional
+local probability,
+\begin{equation}
+ p_m(r)=\begin{cases}
+ 1,&r\leq0,\\
+ 1-\Phi[(r-a_m)/s_m],&r>0,
+ \end{cases}\qquad
+ T=\max_{m:r_m>0}\frac{r_m-a_m}{s_m}.
+ \label{v5-eq:global-ordering}
+\end{equation}
+If no raw fitted signal is positive, $T=-\infty$. The global tail is the
+fraction of complete simulated fields with $T^*\geq T_{\rm obs}$.
+A separate comparison orders the scan by $\max_m\max(0,r_m)$.
+These are different tests because the first accounts for a mass-dependent
+background offset before ranking positive fluctuations. Their probabilities
+must not be chosen after seeing which is more interesting. The empirical
+positive-signal gate gives $p=1$ for nonpositive $r$, whereas the older
+asymptotic display gives $p_0=0.5$; this convention explains some abrupt
+changes between plots.
+
+Each individual study began with ten complete Poisson scans, followed by
+1,000 independently generated complete scans and 200,000 GP fields.
+Every mass in one scan uses the same full spectrum. Sideband targets,
+count-dependent errors and posterior predictions are updated; the reviewed
+kernel coordinates remain fixed. Independently generated pointwise toy
+collections cannot be joined by their row numbers to reconstruct this
+correlation. The 2015, 2016 and 2021 grids contain 72, 142 and 201 integer
+mass hypotheses over 19--90, 39--180 and 50--250~MeV, respectively.
+
+The combined study evaluates the actual shared-coupling likelihood over
+232 integer masses from 19 to 250~MeV. The active datasets are 2015 at
+19--38~MeV, 2015+2016 at 39--49~MeV, all three at 50--90~MeV,
+2016+2021 at 91--180~MeV, and 2021 at 181--250~MeV. Independent
+constituent random streams are paired into 1,000 joint experiments, with
+each whole experiment preserved across the grid. The response basis uses
+1,626 support bins and 1,627 deterministic scans. Drawing one joint field
+preserves correlations across membership boundaries; combining separate
+p-values or treating segments as independent would define another test.
+
+\begin{table}[htbp]\centering\small
+\begin{tabular}{lrrrr}\toprule
+Profiled scan & Selected mass & GP exceedances & GP global $p$ & Direct exceedances\\
+ & [MeV] & out of 200,000 & & out of 1,000\\\midrule
+2015 & 51 & 3,797 & 0.018985 & 13\\
+2016 & 42 & 0 & $<1.498\times10^{-5}$ & 0\\
+2021 10\% & 92 & 5,038 & 0.02519 & 26\\
+Combined union & 76 & 0 & $<1.498\times10^{-5}$ & 0\\\bottomrule
+\end{tabular}
+\caption{Existing conditional significance-GP diagnostics under the
+archived coherent stress background, using the principal ordering in
+Eq.~\ref{v5-eq:global-ordering}. Zero GP exceedances give the displayed
+one-sided 95\% sampling bound; zero direct exceedances give only
+$p<0.002991$. These bounds condition on their respective simulation models.
+The table reports neither a validated rare particle tail nor a global
+calibration of the two-truth envelope in Appendix~\ref{v5-sec:calibration}.}
+\label{v5-tab:global-diagnostics}
+\end{table}
+
+The latest probability audit gives a particularly instructive combined
+example. At 76~MeV the observed $r=0.166$ corresponds to an asymptotic local
+$p_0=0.434$. The stress background predicts $a_m=-8.700$ with width 0.979,
+so its offset-adjusted score is 9.053. This large score measures a
+mismatch with that selected background reference. It cannot be reported
+as a $9\sigma$ particle signal. Under the alternative raw ordering, every
+simulated scan exceeds the observed maximum and the estimated global
+probability is one. Neither comparison is a general goodness-of-fit test.
+
+Direct scans check central distributions, widths, correlations and
+accessible maximum tails. In the 2016 profiled study one unadjusted
+bulk-distribution comparison has nominal $p=0.034$, reinforcing the need
+to inspect approximation discrepancies. Agreement elsewhere and the
+absence of adjusted marginal flags do not validate the unresolved rare
+tails. The 2016 stress shape also retains source-fit and numerical
+qualifications discussed in Appendix~\ref{v5-sec:calibration}.
+
+\paragraph{Result still to be supplied for final interpretation.}
+Final particle-global results require a justified background family and
+kernel policy, independent validation of local probabilities, and adequate
+simulation of the complete chosen mass and model search. Until those
+conditions are met, Table~\ref{v5-tab:global-diagnostics} retains the
+conditional diagnostics and leaves unresolved tails as bounds.
