@@ -1,0 +1,156 @@
+\documentclass[11pt]{article}
+
+\newif\ifwritingsample
+\writingsampletrue
+
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,mathtools,bm}
+\usepackage{booktabs,tabularx,array,makecell,longtable}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{siunitx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{xurl}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{placeins}
+\usepackage{microtype}
+\usepackage{textcomp}
+\usepackage{fancyhdr}
+\urlstyle{same}
+
+\hypersetup{
+  hidelinks,
+  pdfdisplaydoctitle=true,
+  pdftitle={HPS Gaussian-Process Resonance Search: Analysis Note v5.0.0},
+  pdfauthor={Emrys Peets},
+  pdfsubject={Draft for full-2021 unblinding review},
+  pdfkeywords={Heavy Photon Search, Gaussian processes, resonance search, statistical inference}
+}
+\pdfstringdefDisableCommands{%
+  \def\eps{epsilon}%
+  \def\CLs{CLs}%
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\setlength{\headheight}{14pt}
+\fancyhead[L]{\small HPS Gaussian-Process Resonance Search}
+\fancyhead[R]{\small v5.0.0 / Review Draft}
+\fancyfoot[C]{\thepage}
+\fancypagestyle{plain}{%
+  \fancyhf{}%
+  \fancyhead[L]{\small HPS Gaussian-Process Resonance Search}%
+  \fancyhead[R]{\small v5.0.0 / Review Draft}%
+  \fancyfoot[C]{\thepage}%
+}
+
+\setlist[itemize]{leftmargin=*}
+\setlist[enumerate]{leftmargin=*}
+\setlength{\tabcolsep}{5pt}
+\setlength{\emergencystretch}{2em}
+\renewcommand{\arraystretch}{1.12}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\CLs}{CL$_\mathrm{s}$}
+\newcommand{\Pre}{\textbf{Pre:}\ }
+\newcommand{\Pro}{\textbf{Prompt:}\ }
+\newcommand{\xspace}{}
+
+% The shared sections retain this historical command name.  In the writing
+% sample it is deliberately strict: a missing asset stops the build.
+\newcommand{\graphicorplaceholder}[2]{%
+  \includegraphics[width=#1]{#2}%
+}
+
+\input{sections/generated_v4p9_results}
+\input{sections/generated_v4p9p1_results}
+
+
+\usepackage{pdflscape}
+\newcommand{\fig}[4]{\begin{figure}[htbp]\centering
+\includegraphics[width=#1\linewidth,height=0.78\textheight,keepaspectratio]{#2}
+\caption{#3}\label{#4}\end{figure}}
+\newcommand{\widefig}[4]{\FloatBarrier\clearpage\begin{landscape}
+\begin{figure}[p]\centering
+\includegraphics[width=#1\linewidth,height=0.72\textheight,keepaspectratio]{#2}
+\caption{#3}\label{#4}\end{figure}
+\end{landscape}\clearpage}
+\makeatletter
+\newcommand{\startappendixcontents}{%
+\let\vfiveoriginaladdcontentsline\addcontentsline
+\renewcommand{\addcontentsline}[3]{%
+\vfiveoriginaladdcontentsline{##1}{##2}{##3}%
+\def\vfivefirst{##1}\def\vfivetoc{toc}%
+\ifx\vfivefirst\vfivetoc\vfiveoriginaladdcontentsline{apc}{##2}{##3}\fi}}
+\newcommand{\appendixcontents}{\section*{Appendix contents}{\setcounter{tocdepth}{2}\@starttoc{apc}}}
+\makeatother
+\title{HPS Gaussian-Process Resonance Search\\[0.5em]
+\large Analysis Note v5.0.0\\Draft for full-2021 unblinding review}
+\author{Emrys Peets\\Stanford University and SLAC National Accelerator Laboratory
+\and Matthew Gignac\\SLAC National Accelerator Laboratory
+\and Eden Hsu\\Stanford University and SLAC National Accelerator Laboratory}
+\date{8 September 2026}
+\begin{document}
+\maketitle
+\begin{abstract}
+This note consolidates the HPS Gaussian-process prompt-resonance analysis and
+its subsequent validation studies for review before full-2021 unblinding.
+The observed inputs are full 2015, full 2016 and the released 2021 10\% sample.
+A common coupling combines the active campaigns through a profiled Poisson
+likelihood with correlated Gaussian constraints on the interpolated background.
+The primary displayed limits are pointwise, bounded, asymptotic 90\% \CLs{}
+limits. Conditional expected-limit bands, empirical tail refinement,
+background-calibration comparisons, mass-resolution variations and candidate
+extractions are presented with their respective assumptions. The GP global
+study supplies a computationally efficient account of correlations across
+mass, but its strongest conditional tails expose sensitivity to the generating
+background. The inherited 2016 numerical exception and the remaining
+background-validation questions are therefore explicit review items.
+This is a working consolidation, not a completed authorization or a final
+scan-calibrated discovery result.
+\end{abstract}
+\clearpage{\small\tableofcontents}
+\clearpage
+\input{sections/01_introduction}
+\FloatBarrier\clearpage
+\input{sections/02_datasets}
+\FloatBarrier\clearpage
+\input{sections/03_event_selection}
+\FloatBarrier\clearpage
+\input{sections/04_methodology}
+\input{sections/v5_method_updates}
+\input{sections/v5_global_significance}
+\FloatBarrier\clearpage
+\input{sections/05_toys_validation}
+\FloatBarrier\clearpage
+\input{sections/06_selected_results}
+\input{sections/v5_results_updates}
+\FloatBarrier\clearpage
+\input{sections/v5_review_summary}
+\FloatBarrier\clearpage
+\appendix
+\addtocontents{toc}{\protect\setcounter{tocdepth}{1}}
+\startappendixcontents
+\input{sections/v5_history}
+\FloatBarrier\clearpage
+\appendixcontents
+\clearpage
+\input{sections/v5_calibration_appendix}
+\FloatBarrier\clearpage
+\input{sections/v5_traditional_appendix}
+\FloatBarrier\clearpage
+\input{sections/v5_deficit_appendix}
+\FloatBarrier\clearpage
+\input{sections/v5_historical_appendix}
+\FloatBarrier\clearpage
+\input{sections/v5_lowmass_appendix}
+\FloatBarrier\clearpage
+\let\addcontentsline\vfiveoriginaladdcontentsline
+\bibliographystyle{unsrt}
+\bibliography{hps_gpr_analysis_note}
+\end{document}

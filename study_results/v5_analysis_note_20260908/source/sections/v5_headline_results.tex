@@ -1,0 +1,38 @@
+\subsection{The complete observed search and conditional expected bands}
+\label{sec:v5-band-results}
+
+The full search runs from 19 to 250~MeV. At each mass it includes every campaign
+whose declared search interval covers that point: 2015 alone at 19--38~MeV,
+2015+2016 at 39--49~MeV, all three at 50--90~MeV, 2016+2021 at 91--180~MeV,
+and 2021 alone at 181--250~MeV. This membership rule is fixed by the search
+ranges; it never selects the dataset giving the smallest observed limit.
+Figure~\ref{fig:v5-union-bands} places the nominal local asymptotic $p_0$ directly
+below the corresponding observed limit and conditional expected bands.
+
+The bands retain 300 background-only draws per mass from the archived
+mass-local GP prediction. Each draw first samples a correlated latent
+background and then Poisson counts; constituent draws are shared among the
+combinations at that mass. The GP state is held fixed. Different masses do not
+form one coherent full-spectrum experiment. The resulting quantiles describe
+pointwise variation under that conditional model; they do not calibrate the
+\CLs{} sampling distributions or supply a global significance.
+
+\fig{0.98}{../figures/v5_total_limits_with_local_pvalues.pdf}{Complete 19--250~MeV
+observed search, with the preassigned active datasets shown above the curves.
+The upper panel shows 90\% \CLs{} limits and the median, central 68\% and central
+95\% ranges of the original 300 conditional background-only toys per mass.
+The lower panel adds the unchanged fixed-mass asymptotic $p_0$. The observed
+polyline connects every adjacent tested mass, including membership transitions;
+no numerical endpoint is changed by those connections. The physical
+visible-branching correction is applied once above the dimuon threshold.
+These are pointwise bands; 2016-inclusive values retain the numerical exception.}
+{fig:v5-union-bands}
+
+\fig{0.98}{../figures/v5_observed_coupling_overlay.pdf}{Observed coupling limits
+from the three individual released samples and the full maximal-available-dataset
+combination of Fig.~\ref{fig:v5-union-bands}. Only observed limits are shown.
+The combination is obtained from a shared-coupling likelihood with the fixed
+membership rule; it is not the envelope of the individual curves.}
+{fig:v5-observed-overlay}
+
+\FloatBarrier

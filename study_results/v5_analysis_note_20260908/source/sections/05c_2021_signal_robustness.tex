@@ -1,0 +1,120 @@
+\FloatBarrier
+\subsection{Robustness of the earlier 65~MeV local excess}
+\label{sec:v4p9p7-signal-robustness}
+
+The support study in Section~\ref{sec:v4p9p5-support} changes the background
+prescription used to interpret the observed 2021 spectrum.  We compare the v4.2
+result (40--300~MeV support) with v4.9.5 (36--300~MeV support).  This is a
+post-unblinding robustness audit, not an additional support-selection criterion.
+Both scans use the same observed ROOT histogram, mass resolution, signal
+normalization, signed extraction, and 201 integer-MeV hypotheses.
+
+In Figure~\ref{fig:v4p9p7-old-new-local-z}, the v4.2 maximum at 65~MeV changes from
+$Z_{\mathrm{local}}=4.25249$ to 2.40288; the new maximum is 2.81029 at 78~MeV.
+The response is not a uniform suppression: 64 values decrease, 60 are unchanged
+within $10^{-12}$, and 77 increase, with median change zero.  The feature did not
+disappear---the observed counts are unchanged.  Its attribution to a narrow signal
+is not robust to the GP-support prescription.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.88\linewidth]{v4p9p7_figs/old_new_2021_local_z_curves.pdf}
+  \caption{Complete 2021 native-10\% local-asymptotic $Z$ curves before and after
+  the GP-support optimization.  The v4.2 curve is copied without alteration from
+  the reviewed scan ledger; its 65~MeV value differs from the dedicated extraction
+  summary in Table~\ref{tab:v4p9p7-m65-exact} by less than $10^{-6}$ in $Z$.
+  Neither curve is corrected for the mass scan.}
+  \label{fig:v4p9p7-old-new-local-z}
+\end{figure}
+
+\paragraph{Exact 65~MeV comparison.}
+
+The integral density and $K=A/\eps^2$ agree exactly at stored precision, excluding
+normalization as the cause.  The fitted coefficient decreases by 39.0\%, its
+uncertainty increases by 8.0\%, local $p_0$ increases by a factor 769.5, and the
+observed 90\% \CLs{} limit on $\eps^2$ decreases by 28.1\%.
+
+\begin{table}[H]
+  \centering
+  \footnotesize
+  \caption{Accepted 2021 native-10\% quantities at 65~MeV.  The GP log marginal
+  likelihoods are recorded for provenance but are not compared across rows because
+  the two support geometries contain different training bins.}
+  \label{tab:v4p9p7-m65-exact}
+  \begin{tabular}{lrrr}
+    \toprule
+    Quantity & v4.2 (40--300) & v4.9.5 (36--300) & Change \\
+    \midrule
+    $\widehat A$ [events] & 28038.923 & 17100.854 & $-39.0\%$ \\
+    $\sigma_A$ [events] & 6609.530 & 7136.498 & $+8.0\%$ \\
+    $p_{0,\mathrm{local}}$ (asymptotic) & $1.05702\times10^{-5}$ & $8.13332\times10^{-3}$ & $\times769.5$ \\
+    $Z_{\mathrm{local}}$ (asymptotic) & 4.252493 & 2.402877 & $-1.849616$ \\
+    $A_{90}$ [events] & 36520.123 & 26243.502 & $-28.1\%$ \\
+    $\eps^2_{90}$ & $1.17184\times10^{-5}$ & $8.42089\times10^{-6}$ & $-28.1\%$ \\
+    density [counts/GeV] & $1.556935082\times10^9$ & $1.556935082\times10^9$ & 0 \\
+    $K$ [events/$\eps^2$] & $3.116477095\times10^9$ & $3.116477095\times10^9$ & 0 \\
+    GP constant & 66.347717 & 52.088109 & --- \\
+    GP length scale in $\log m$ & 0.319475 & 0.274866 & --- \\
+    GP log marginal likelihood & 1648.806087 & 1676.039393 & not compared \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\paragraph{Support-driven kernel migration.}
+
+We reconstruct four fixed-hyperparameter fits by applying each archived kernel state
+to each support geometry without reoptimization.  On the 40--300~MeV geometry, the
+new state lowers $Z$ from 4.252 to 2.854.  On the 36--300~MeV geometry, the old state
+would give $Z=4.740$, while the new state gives 2.403.  Within each geometry, the
+corresponding diagonal state has the larger GP marginal likelihood: 1648.8 versus
+1641.9 on the old geometry, and 1676.0 versus 1667.7 on the new one.  Thus the
+support change migrates the preferred GP correlation structure; the effect is not
+merely that of appending low-mass bins while holding the GP fixed.
+
+On the common grid in panel C, the new diagonal state predicts 1949 more events per
+0.625~MeV target bin at 65~MeV and 23484 more events over the common
+$\pm2.25\sigma_m$ window (0.1594\%).  Because the covariance and bin geometry also
+change, this is not a one-bin subtraction from $\widehat A$; it shows that the new GP
+accounts for more of the local structure and leaves a smaller narrow-signal fit.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.88\linewidth]{v4p9p7_figs/m65_support_kernel_mechanism.pdf}
+  \caption{Diagnostic decomposition at 65~MeV.  Panel A compares the fitted signal
+  coefficients and their profile uncertainties.  Panel B exchanges the archived
+  old and new GP hyperparameter states between the two support geometries; the
+  displayed marginal likelihoods are compared only within a row.  Panel C compares
+  the diagonal GP means on an identical grid.  These are background-prescription
+  diagnostics, not an alternative result selection or calibrated model test.}
+  \label{fig:v4p9p7-m65-mechanism}
+\end{figure}
+
+\paragraph{Rebin phase, optimizer lineage, and scope.}
+
+Five native 0.125~MeV bins make each 0.625~MeV coarse bin.  Shifting the support by
+4~MeV therefore moves the rebin phase by 0.25~MeV.  The old 65~MeV window spans
+60.000--70.000~MeV in 16 bins; the new window spans 60.375--69.750~MeV in 15.
+Support extent and rebin phase are consequently not isolated.  Separating them
+requires a fixed-anchor rebin study; the counterfactual is a support-geometry test.
+
+Branch repair is not the cause.  The raw and accepted old 65~MeV states differ by
+only 0.091 fitted event and $1.7\times10^{-5}$ in $Z$; v4.9.5 repairs 94, 152, and
+212~MeV, not 65~MeV.  The often-quoted old $Z=4.657$ is the 2015+2021 pair, not the
+all-three result ($Z=3.993$).  Controlled swaps of only the 2021 block reduce these
+to 2.881 and 2.561.  They identify the dataset carrying the change but are not
+official combined scans.  These single-mass block swaps do not substitute for a
+fully rebuilt v4.9.7 scan; Section~\ref{sec:v4p9p7-combined-gate} explains why that
+scan was not authorized.
+
+All quoted $p_0$ and $Z$ values are local and asymptotic.  The fixed-state and
+combined-block swaps have no look-elsewhere or model-selection calibration.  The
+support toys are conditional diagnostics, not coverage tests, and the 0.75 rule was
+a documented post-phase-1 practical amendment.  This audit does not establish that
+the feature is background, that signal is absent, or that an exclusion has gained
+calibration.  It establishes that the narrow-signal attribution of the unchanged
+feature is not robust to the selected GP-support prescription.
+
+The release bundle archives the source snapshots, counterfactual tables, figure
+metadata, and SHA-256 manifest for this audit.
+
+\FloatBarrier

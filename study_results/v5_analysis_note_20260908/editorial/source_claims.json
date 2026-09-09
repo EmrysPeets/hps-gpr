@@ -1,0 +1,182 @@
+{
+  "source_commit": "0c1d4692b",
+  "new_toys": 0,
+  "new_data_opened": false,
+  "claims": [
+    {
+      "id": "profile_and_injections",
+      "claim": "Fixed injections of 2 or 5 reference errors; 500 spectra per cell. At 71 MeV, mean pulls are -2.33 fixed and -0.81 profiled, with true-yield exclusion counts 349/500 and 145/500.",
+      "status": "conditional selected response",
+      "evidence": [
+        {
+          "path": "study_results/v4p9p13_calibration_20260905/note/analysis_note.tex",
+          "sha256": "6f036fbdfb9e75ca2af8a149115589198fed14407381a50ba1e76e4af26fa917"
+        },
+        {
+          "path": "study_results/v4p9p13_background_profiling_20260905/injections/derived/summary_table.tex",
+          "sha256": "c7e334b197effbe1e592583b37b58d4e973780645c289980bdf7d59368c3e5e8"
+        }
+      ]
+    },
+    {
+      "id": "calibration_completion",
+      "claim": "456 coordinates; 12,080,640 calibration spectra and 1,368,000 independent validation spectra. Profile/fixed resolved counts: 70/72 for 2015, 133/141 for 2016, 201/200 for 2021, and 41/41 combined.",
+      "status": "frozen conditional numerical release",
+      "evidence": [
+        {
+          "path": "study_results/v4p9p13_calibration_20260905/note/calibration_values.tex",
+          "sha256": "32a8966a68739b28b09cc3abfe1cad6ad988348a2b8460aea8f9751b34e001ed"
+        },
+        {
+          "path": "study_results/v4p9p13_calibration_20260905/note/calibration_table.tex",
+          "sha256": "f7fb7a15cb99da44daddc45ce74fbd3aeef742bca9de66a646d1b217e0167d29"
+        }
+      ]
+    },
+    {
+      "id": "validation",
+      "claim": "3,648 exclusion cells with 2,039 raw flags; 1,824 local-rejection cells with 952 raw flags. No adjusted calibrated flags in either family.",
+      "status": "finite multiple-testing screens",
+      "evidence": [
+        {
+          "path": "study_results/v4p9p13_calibration_20260905/note/validation_results.tex",
+          "sha256": "385286363c6ba9f984802d51e40fdab99a531417751202b3559c3acba4b7a432"
+        },
+        {
+          "path": "study_results/v4p9p14_interpretation_global_20260906/note/reader_report.tex",
+          "sha256": "3f5ea6ebb409e989b1d92439786ffada6142f7be39e07a4d07a2d2d17f2c3dc4"
+        }
+      ]
+    },
+    {
+      "id": "truths",
+      "claim": "2016 continuation retains a failed fit-convergence/status flag; 2021 tail deviance per degree of freedom is 6.220. Combined calibration uses two joint truth scenarios.",
+      "status": "source-conditioned background family",
+      "evidence": [
+        {
+          "path": "study_results/v4p9p13_calibration_20260905/history_review.md",
+          "sha256": "55a3be4ba6b9fef8f744710155451146a881e434ea5016fd7e7d0e70d906b51b"
+        },
+        {
+          "path": "study_results/v4p9p14_interpretation_global_20260906/note/reader_report.tex",
+          "sha256": "3f5ea6ebb409e989b1d92439786ffada6142f7be39e07a4d07a2d2d17f2c3dc4"
+        },
+        {
+          "path": "study_results/v4p9p15_global_2016_2021_20260906/note/reader_report.tex",
+          "sha256": "760eec64a1b2246d7d31a4e441c6e51ae07b276399fe2296f9a2ea7021fd6ea8"
+        }
+      ]
+    },
+    {
+      "id": "offsets",
+      "claim": "Profiled archived-stress median absolute offset and residual-projection discrepancy: 1.157 and 0.031 reference errors in 2016; 5.361 and 0.035 combined.",
+      "status": "deterministic approximation diagnosis",
+      "evidence": [
+        {
+          "path": "study_results/v4p9p13_calibration_20260905/note/bias_projection_table.tex",
+          "sha256": "fe4d55183ac3a70058a1164933be90e66e48895df1cbc445d03f0fba571bde3a"
+        }
+      ]
+    },
+    {
+      "id": "reverse71",
+      "claim": "Calibrated five-reference-error exclusion is 3/500 profiled and 2/500 fixed; 682 of 3,000 method-toy decisions have limited calibration Monte Carlo precision.",
+      "status": "retrospective out-of-envelope check",
+      "evidence": [
+        {
+          "path": "study_results/v4p9p13_calibration_20260905/note/reverse_truth_validation.tex",
+          "sha256": "f3e7ed7aecd41cd9e880c3ae46b0dffc5a7650719b0d0a4fe97caa102576b296"
+        }
+      ]
+    },
+    {
+      "id": "global2015",
+      "claim": "Profiled principal peak at 51 MeV: 3,797/200,000 GP exceedances, global p=0.018985; direct count 13/1,000.",
+      "status": "conditional coherent-stress pilot",
+      "evidence": [
+        {
+          "path": "study_results/v4p9p14_interpretation_global_20260906/global/2015/analysis/summary.json",
+          "sha256": "9de3dff1be517eec26a78bde03f695ce0f38aff79e7a0c4f33cafc391eff4837"
+        }
+      ]
+    },
+    {
+      "id": "global2016_2021",
+      "claim": "2016 profiled peak at 42 MeV has 0/200,000 GP and 0/1,000 direct exceedances. 2021 profiled peak at 92 MeV has 5,038/200,000 GP exceedances, p=0.02519; direct count 26/1,000.",
+      "status": "2016tail unresolved;2021conditional finite tail",
+      "evidence": [
+        {
+          "path": "study_results/v4p9p15_global_2016_2021_20260906/README.md",
+          "sha256": "353c750ae1adb5a5f1125827d85afcf97facc5a89b6834b180a9a09ede930246"
+        },
+        {
+          "path": "study_results/v4p9p15_global_2016_2021_20260906/review/HEP_EXTENSION_REVIEW.md",
+          "sha256": "5eb72d8181acbb94f026b943dfc26d884cec6ddf00b730911cc1292b3c0a1973"
+        }
+      ]
+    },
+    {
+      "id": "combined_global",
+      "claim": "The 232-mass union uses the shared-coupling likelihood. At 76 MeV, raw r=0.165569, stress offset=-8.700091, width=0.979354; no GP or direct exceedances resolve the principal tail.",
+      "status": "background-reference diagnostics, not particle significance",
+      "evidence": [
+        {
+          "path": "study_results/v4p9p16_combined_global_20260906/PROTOCOL.md",
+          "sha256": "4bb416a1f7b076c8b69825eb1d9b9d21d9cf2e6b3e1270efcc5bb4ab42590559"
+        },
+        {
+          "path": "study_results/v4p9p16_combined_global_20260906/README.md",
+          "sha256": "49d886275ad8820f3060071e2c7df5f0f71f865edd2f3f2d51c1431650d58adc"
+        },
+        {
+          "path": "study_results/v4p9p16_combined_global_20260906/review/HEP_COMBINED_REVIEW.md",
+          "sha256": "c41ad5ba8b38816c4a15f5cf5aefa229ca563324775d1d96ed7ef6e20ea361bf"
+        }
+      ]
+    },
+    {
+      "id": "history_candidate",
+      "claim": "Candidate interventions and traditional-background fits are conditional diagnostics; no new probability or limit calibration was supplied.",
+      "status": "historical diagnostic",
+      "evidence": [
+        {
+          "path": "study_results/v4p9p16_candidate_removal_20260906/README.md",
+          "sha256": "90487704e696c10c8c23dd866649ab399dc706e3c150732ebe76a7832edf6afc"
+        },
+        {
+          "path": "study_results/v4p9p16_probability_echo_review_20260906/README.md",
+          "sha256": "0240f79ad1bfc25061946e54209e5cf6b381ce345bb867e96f1db8e17d55269f"
+        }
+      ]
+    },
+    {
+      "id": "history_lowmass",
+      "claim": "The 15-20 MeV study is exploratory; accepted signal shape and resolution below 19 MeV remain unqualified.",
+      "status": "exploratory extension",
+      "evidence": [
+        {
+          "path": "study_results/v4p9p16_2015_lowmass_side_study_20260906/README.md",
+          "sha256": "fe4e8a559ae101910130c65783141515429ea1031784e9c19c99f19664ab1733"
+        }
+      ]
+    }
+  ],
+  "figure_sources": {
+    "v5_profile_background_comparison.pdf": "study_results/v4p9p13_background_profiling_20260905/comparison/figures/observed_limits_2021_comparison.pdf",
+    "v5_profile_injected_bias.pdf": "study_results/v4p9p13_background_profiling_20260905/injections/figures/injected_bias.pdf",
+    "v5_calibration_limits_2015.pdf": "study_results/v4p9p13_calibration_20260905/figures/limits_2015.pdf",
+    "v5_calibration_limits_2016.pdf": "study_results/v4p9p13_calibration_20260905/figures/limits_2016.pdf",
+    "v5_calibration_limits_2021.pdf": "study_results/v4p9p13_calibration_20260905/figures/limits_2021.pdf",
+    "v5_calibration_limits_combined.pdf": "study_results/v4p9p13_calibration_20260905/figures/limits_combined.pdf",
+    "v5_calibration_truth_dependence.pdf": "study_results/v4p9p13_calibration_20260905/figures/truth_dependence.pdf",
+    "v5_calibration_local_pvalues.pdf": "study_results/v4p9p13_calibration_20260905/figures/local_pvalues.pdf",
+    "v5_calibration_bias_by_truth.pdf": "study_results/v4p9p13_calibration_20260905/figures/bias_by_truth.pdf",
+    "v5_calibration_validation_exclusion.pdf": "study_results/v4p9p13_calibration_20260905/figures/validation_exclusion.pdf"
+  },
+  "current_section_hashes": {
+    "v5_method_updates.tex": "1b81c1ddbd68487eb5a146e32cb7fcb6959fa932b6928ebfd598e4d51a554a94",
+    "v5_global_significance.tex": "cc8bacc1800479df9de34a86828041d2f429004dd9aedcb43a2fc12a342209cf",
+    "v5_history.tex": "b77f2d4d8a9e6a9f5e6b1c9f1e7a4575cace4c1a5ac8f066d05ba2ed4897c9d7",
+    "v5_calibration_appendix.tex": "c23ab75bade9faebe403d24f4f6bb3839eef3a83099cf169ac2377c8d9f40044"
+  }
+}

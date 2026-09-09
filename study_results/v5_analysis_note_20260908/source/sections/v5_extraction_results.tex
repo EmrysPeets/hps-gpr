@@ -1,0 +1,183 @@
+\FloatBarrier\clearpage
+\subsection{Signal extraction from the observed data}
+\label{sec:extractions}\label{sec:v5-extractions}
+
+The extraction displays show the leading separated positive fluctuations in
+each campaign, the common-coupling fits at 66 and 92~MeV, and the largest
+negative fitted contributions. Selection uses the dense observed profiled
+local statistic; it does not use the stress-centered global ordering. The
+66~MeV common-coupling fit is the largest positive combined fluctuation,
+with nominal local significance about 2.76. The second leading positive
+feature of the full union is at 21~MeV and contains only 2015; 92~MeV is a
+second useful multi-campaign comparison, containing 2016 and 2021.
+
+The plotted local coordinate is
+\begin{equation}
+ r=\operatorname{sign}(\widehat A)
+ \sqrt{2[\mathrm{NLL}(0)-\mathrm{NLL}(\widehat A)]}.
+\end{equation}
+It agrees with the usual nominal local excess significance on the positive
+branch. Negative values describe an auxiliary deficit fit, with positive
+Poisson expectations maintained, and do not represent a physical negative
+coupling. The probability mappings and their different sign conventions
+are defined in Section~\ref{sec:v5-global}.
+
+\begin{table}[htbp]\centering\small
+\begin{tabular}{lrrr}\toprule
+Data & Leading excess & Next separated excess & Deepest deficit\\\midrule
+2015 full & 51 (+3.14) & 21 (+2.52) & 19 ($-3.21$)\\
+2016 full & 90 (+3.42) & 117 (+3.28) & 102 ($-4.50$)\\
+2021 10\% & 78 (+2.81) & 65 (+2.40) & 71 ($-4.02$)\\
+Combined union & 66 (+2.76) & 21 (+2.52) & 72 ($-3.49$)\\\bottomrule
+\end{tabular}
+\caption{Selected mass in MeV, followed by signed nominal local significance.
+The 19~MeV deficit is at the 2015 search endpoint. These values rank selected
+local fits and are not global significances. The additional combined
+92~MeV fit has nominal local significance 2.42.}
+\end{table}
+
+Displays retain native analysis bins and add sideband context. Residuals
+subtract the same unprofiled GP mean throughout. Inside the likelihood window,
+separate curves show the profiled-background displacement, total displacement
+and signal. Lines join saved bin predictions, shown as counts per MeV.
+Multi-campaign sums use exact shared whole-bin edges and have no independent fit.
+
+\widefig{0.98}{../figures/v5_extraction_combined_66.pdf}{Common-coupling extraction at
+66~MeV, with a shared fitted amplitude $\widehat\epsilon^2=4.55\times10^{-6}$
+and nominal local significance 2.76. Each campaign retains its own yield
+conversion and resolution. Bars show counting error only. Colored shading
+in the residuals is the zero-centered GP constraint width; it is neither
+fitted-background uncertainty nor total residual uncertainty.}
+{fig:v5-extraction-combined66}
+\widefig{0.98}{../figures/v5_extraction_combined_92.pdf}{The 92~MeV common-coupling fit
+uses 2016 and 2021 and gives $\widehat\epsilon^2=2.97\times10^{-6}$ with nominal
+local significance 2.42. The separate preferred rates differ, as shown at the
+end of this results section. Bars show counting error only; residual shading
+shows the zero-centered GP constraint width, not fitted-background or total
+residual uncertainty.}
+{fig:v5-extraction-combined92}
+\widefig{0.98}{../figures/v5_extraction_combined_72.pdf}{The deepest combined observed
+deficit at 72~MeV has signed local significance $-3.49$ and an auxiliary
+amplitude $\widehat\epsilon^2=-4.88\times10^{-6}$. The negative signal template
+describes missing counts relative to the fitted background. Bars show counting
+error only; residual shading shows the zero-centered GP constraint width,
+not fitted-background or total residual uncertainty.}
+{fig:v5-extraction-combined72}
+\fig{0.98}{../figures/v5_extraction_2015_peaks.pdf}{The two leading separated
+2015 excesses at 51 and 21~MeV. The 21~MeV feature lies close to the search
+endpoint and has strong background-model dependence in the traditional-fit
+cross-check. Bars show counting error only; residual shading shows the
+zero-centered GP constraint width, not fitted-background or total residual
+uncertainty.}
+{fig:v5-extraction-2015}
+\fig{0.98}{../figures/v5_extraction_2016_peaks.pdf}{The leading separated 2016
+excesses at 90 and 117~MeV. These fits retain the inherited 2016 numerical and
+background-source qualifications. Bars show counting error only; residual
+shading shows the zero-centered GP constraint width, not fitted-background
+or total residual uncertainty.}
+{fig:v5-extraction-2016}
+\fig{0.98}{../figures/v5_extraction_2021_peaks.pdf}{The leading separated
+excesses in the released 2021 10\% sample at 78 and 65~MeV. These masses
+are fixed by the existing observed scan and are distinct from the combined
+66~MeV coordinate. Bars show counting error only; residual shading shows
+the zero-centered GP constraint width, not fitted-background or total
+residual uncertainty.}
+{fig:v5-extraction-2021}
+\widefig{0.98}{../figures/v5_extraction_individual_deficits.pdf}{Individual deficit
+extractions at 19, 102 and 71~MeV in 2015, 2016 and 2021. The first is a search
+endpoint. Bars show counting error only; residual shading is the zero-centered
+GP constraint width, not fitted-background or total residual uncertainty.
+These are local background diagnostics. The joint deficit scan is retained
+in Appendix~\ref{sec:v5-deficit}.}
+{fig:v5-extraction-deficits}
+\FloatBarrier
+
+\subsection{Correlated fluctuations and signal-induced echoes}
+\label{sec:echo}\label{sec:v5-echo}
+
+A positive signal can affect a neighboring mass test because the exclusion
+window moves. Counts protected from background training at the signal mass
+can enter the sidebands of a nearby hypothesis. The GP prediction then
+changes, and the neighboring signal fit can prefer a deficit. A negative
+fitted contribution can therefore arise without removing any physical events
+from the generating spectrum.
+
+The deterministic 2021 replay demonstrates this mechanism with saved positive
+templates and the current dense solver. Relative to its own background-only
+reconstruction, a 66~MeV injection changes the fitted local coordinate at
+71 and 72~MeV by $-1.646$ and $-1.740$; a 78~MeV injection produces changes
+$-1.825$ and $-1.968$. These changes are expressed in units of the nominal
+local-significance coordinate. They are not separately calibrated
+significances of an echo. The selected generating strengths are 17,142 events
+at 66~MeV, 19,273 at 78~MeV and 36,373 for the 65+78~MeV pair; the comparison
+is not an equal-strength experiment or a fitted two-particle hypothesis.
+
+\fig{0.96}{../figures/v5_signal_echo_dense_replay.pdf}{Positive injected signals
+can induce nearby fitted oscillations through the moving-mask background
+regression. The injection-induced change is
+$\Delta r(m)=r_m(B+S)-r_m(B)$ for the same smooth reference spectrum. The
+65+78~MeV pair can induce a deep fitted deficit even though both generating
+signal components are nonnegative. These are conditional response
+illustrations; their agreement with one selected dip does not establish
+the identity of the observed parent peak.}
+{fig:v5-signal-echo}
+
+\fig{0.98}{../figures/v5_correlations_2015.pdf}{2015 correlation of nominal local
+fit fluctuations across mass under the archived coherent background.
+Correlation describes how fluctuations co-vary; it does not assign a
+significance to a particular observed oscillation. The matrix shows the significance-GP prediction; independent complete
+Poisson comparisons are retained in the archived validation study.}
+{fig:v5-correlations-2015}
+\fig{0.98}{../figures/v5_correlations_2016.pdf}{The corresponding 2016
+mass-correlation study. Its agreement with direct scans checks the response
+approximation conditional on the generating spectrum; it does not qualify
+that spectrum as a physical background.}
+{fig:v5-correlations-2016}
+\fig{0.98}{../figures/v5_correlations_2021.pdf}{The corresponding correlation
+study for the released 2021 10\% configuration. Alternating positive and
+negative correlations help explain why neighboring extrema need not be
+independent. Signal injection is a separate test of the response to a changed
+generating mean.}
+{fig:v5-correlations-2021}
+
+\fig{0.94}{../figures/v5_correlations_combined.pdf}{Correlation matrix of
+the combined local-significance field across the full 19--250~MeV search.
+The shared response basis preserves correlations across boundaries where
+campaign membership changes. Regions with no common data have zero response
+covariance in this conditional model. This is the combined-correlation
+figure from the v4.9.16 extraction report, with the statistic labelled by
+its nominal local-significance interpretation.}
+{fig:v5-correlations-combined}
+
+A correlation slice can be expressed in the same local-significance units.
+With $z_m=(r_m-a_m)/s_m$, conditioning a Gaussian field on $z_{m_0}=1$ gives
+$E[r_m-a_m\mid z_{m_0}=1]=s_m K_{m,m_0}$. The following curves use fixed
+anchors from the existing candidate catalogue. They illustrate the expected
+accompanying fluctuation under the background covariance; they are distinct
+from the positive-signal injection replay above.
+\fig{0.98}{../figures/v5_conditional_echo_response.pdf}{Conditional changes in
+the local-significance coordinate following a one-standard-deviation field
+fluctuation at 51~MeV in 2015, 90~MeV in 2016 and 78~MeV in 2021. The curves
+are $s_mK_{m,m_0}$, with each archived offset removed. Positive and negative
+lobes show the scale and sign of correlated fluctuations. These are Gaussian
+conditional means, not injected particles, probabilities of observed echoes,
+or independent significance gains.}
+{fig:v5-conditional-echo}
+
+The replacement study gives a complementary observed-data check. Replacing
+the selected 2021 candidate regions changes the fitted 71~MeV deficit from
+$-4.02$ to $-0.72$, yet the remote observed scan retains 92\% of its original
+standard deviation. The corresponding retained fractions in 2015 and 2016
+are 67\% and 78\%. Some neighboring structures are coupled to the replaced
+regions, while other variation remains. The replacements are conditional
+interventions and cannot identify a particle or create a new null ensemble.
+
+\fig{0.98}{../figures/v5_observed_candidate_removal.pdf}{Observed scans before and
+after conditional replacement of the two selected candidate regions in each
+year. The envelope spans ten conditional replacements and is not a confidence
+band. Changes demonstrate how the local fit responds to altered candidate
+bins; the untouched remote variation is quantified in
+Appendix~\ref{sec:candidate-removal}. All curves retain their existing tested
+masses and the same nominal local-significance mapping.}
+{fig:v5-removal}
+\FloatBarrier
