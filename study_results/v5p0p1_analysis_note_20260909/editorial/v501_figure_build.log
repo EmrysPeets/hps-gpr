@@ -1,0 +1,127 @@
+{
+  "figures": 8,
+  "checks": {
+    "correlation_panels": [
+      {
+        "panel": "2015 full",
+        "masses": 72,
+        "minimum_mass": 19.0,
+        "maximum_mass": 90.0,
+        "matrix_sha256": "f9ca9c082e34fdd913d5322c5bad8dd557a18cbafff4f86dfcd62534a537af8f"
+      },
+      {
+        "panel": "2016 full",
+        "masses": 142,
+        "minimum_mass": 39.0,
+        "maximum_mass": 180.0,
+        "matrix_sha256": "413e076013a1ed01acd503c5b112961762d06613836961bda07fe99546c946a3"
+      },
+      {
+        "panel": "2021 10%",
+        "masses": 201,
+        "minimum_mass": 50.0,
+        "maximum_mass": 250.0,
+        "matrix_sha256": "0ca30ff76109670d1db56813961a02bbb61dbb5311b6ef359aed59f51f2f687c"
+      },
+      {
+        "panel": "Combined search",
+        "masses": 232,
+        "minimum_mass": 19.0,
+        "maximum_mass": 250.0,
+        "matrix_sha256": "c00d6d699ed1203717cc88d91faca8bb1130d34b33d5197931323c8a8390a475"
+      }
+    ],
+    "lengthscale_bounds": {
+      "rows": 1050,
+      "dataset_stat_upper_floor_active_points": 0,
+      "exact_implementation": "compute_kernel_ls_bounds with frozen analysis card and pinned module snapshots",
+      "upper_floor_mode": "dataset_stat",
+      "upper_floor_factor": 0.8
+    },
+    "kernel_schematic": {
+      "source_synthetic_calculation_unchanged": true,
+      "removed_in_plot_text": [
+        "excluded from training",
+        "(a)",
+        "$\\Delta\\log L=-8$",
+        "$\\Delta\\log L=-8$",
+        "$\\Delta\\log L=-4.5$",
+        "$\\Delta\\log L=-2$",
+        "$\\Delta\\log L=-0.5$",
+        "$\\ell_{\\min}$",
+        "$\\ell_{\\max}$",
+        "bounded maximum",
+        "(b)",
+        "$m_0=72$ MeV, $\\sigma_m=1.25$ MeV",
+        "$m_0=96$ MeV, $\\sigma_m=1.55$ MeV",
+        "filled: training bin",
+        "open: excluded bin",
+        "(c)",
+        "domain is active;\nrange study required",
+        "not a measurement of a physical correlation length",
+        "configured domain",
+        "interior conditional optimum",
+        "upper-bound contact",
+        "(d)"
+      ],
+      "HPS_observations_used": false
+    },
+    "individual_scans": [
+      {
+        "dataset": "2015",
+        "n_points": 72,
+        "A90_full_template_unchanged": true,
+        "epsilon2_matches_v500": true,
+        "p0_unchanged": true,
+        "inherited_csv_conversion_max_relative_rounding": 1.1146639167236572e-13,
+        "minimum_local_p0": 0.0008462825153401037,
+        "minimum_local_p0_mass_MeV": 51,
+        "minimum_local_Z": 3.139465223457327
+      },
+      {
+        "dataset": "2016",
+        "n_points": 142,
+        "A90_full_template_unchanged": true,
+        "epsilon2_matches_v500": true,
+        "p0_unchanged": true,
+        "inherited_csv_conversion_max_relative_rounding": 2.220446049250313e-16,
+        "minimum_local_p0": 0.00030888909811282967,
+        "minimum_local_p0_mass_MeV": 90,
+        "minimum_local_Z": 3.4236866105162984
+      },
+      {
+        "dataset": "2021",
+        "n_points": 201,
+        "A90_full_template_unchanged": true,
+        "epsilon2_matches_v500": true,
+        "p0_unchanged": true,
+        "inherited_csv_conversion_max_relative_rounding": 2.220446049250313e-16,
+        "minimum_local_p0": 0.0024748462183818466,
+        "minimum_local_p0_mass_MeV": 78,
+        "minimum_local_Z": 2.8102897012100323
+      }
+    ],
+    "babar_projection": {
+      "points": 232,
+      "current_curve_exact_v500_match": true,
+      "only_2021_scaled": 10,
+      "normalization_window_nsigma": 1.64,
+      "proxy_formula": "eps2_current*sqrt(sum_d density_d/sum_d scale_d*density_d)",
+      "only_2021_scale_exact": 0.31622776601683794,
+      "no_2021_scale_exact": 1.0,
+      "current_minimum": {
+        "mass_MeV": 72,
+        "eps2": 8.004291009961892e-07
+      },
+      "proxy_minimum": {
+        "mass_MeV": 72,
+        "eps2": 3.189780153256571e-07
+      }
+    },
+    "kinematics": {
+      "groups": 5,
+      "native_pdf_panels": 20,
+      "all_assets_equal_archived_v497": true
+    }
+  }
+}

@@ -1,0 +1,351 @@
+"""Configuration management for HPS GPR analysis."""
+
+import os
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional, Tuple
+
+import yaml
+import sklearn.gaussian_process as skgp
+
+
+@dataclass
+class DatasetPaths:
+    """Paths to ROOT files for each dataset."""
+    path_2015: str = ""
+    path_2016: str = ""
+    path_2021: str = ""
+    path_2021_mc: str = ""
+
+
+@dataclass
+class HistogramNames:
+    """Histogram names within ROOT files."""
+    hist_2015: str = "invariant_mass"
+    hist_2016: str = "h_Minv_General_Final_1"
+    hist_2021: str = "preselection/h_invM_8000"
+
+
+@dataclass
+class AnalysisRanges:
+    """Analysis mass ranges (GeV) for each dataset."""
+    range_2015: Tuple[float, float] = (0.015, 0.140)
+    range_2016: Tuple[float, float] = (0.035, 0.190)
+    range_2021: Tuple[float, float] = (0.030, 0.250)
+
+
+@dataclass
+class Config:
+    """Complete configuration for HPS GPR analysis."""
+
+    # Dataset ROOT paths
+    path_2015: str = ""
+    path_2016: str = ""
+    path_2021: str = ""
+    path_2021_mc: str = ""
+    only_2021_mc: bool = False
+
+    # Histogram names
+    hist_2015: str = "invariant_mass"
+    hist_2016: str = "h_Minv_General_Final_1"
+    hist_2021: str = "preselection/h_invM_8000"
+
+    # Analysis ranges (GeV)
+    range_2015: Tuple[float, float] = (0.015, 0.140)
+    range_2016: Tuple[float, float] = (0.035, 0.190)
+    range_2021: Tuple[float, float] = (0.030, 0.250)
+    # Optional full histogram fit/training ranges (GeV).
+    # If None, model training uses full histogram extent.
+    data_range_2015: Optional[Tuple[float, float]] = None
+    data_range_2016: Optional[Tuple[float, float]] = None
+    data_range_2021: Optional[Tuple[float, float]] = None
+
+    # Mass resolution sigma(m) polynomial coefficients
+    # sigma(m) = sum_i coeffs[i] * m**i
+    sigma_coeffs_2015: List[float] = field(
+        default_factory=lambda: [-0.0000922283032152, 0.0532190838657]
+    )
+    sigma_coeffs_2016: List[float] = field(
+        default_factory=lambda: [0.00038, 0.041, -0.27, 3.49, -11.11]
+    )
+    # Optional linear tail for 2016 sigma(m):
+    # for m > sigma_tail_m0_2016, enforce sigma(m) = sigma(m0) + slope*(m-m0)
+    sigma_tail_m0_2016: Optional[float] = 0.18
+    sigma_tail_slope_floor_2016: float = 0.0
+    sigma_tail_slope_override_2016: Optional[float] = 0.0239
+    sigma_coeffs_2021: List[float] = field(
+        default_factory=lambda: [0.0014786, -0.0011, 0.0687]
+    )
+
+    # Radiative fraction f_rad(m) polynomial coefficients
+    frad_coeffs_2015: List[float] = field(default_factory=lambda: [0.085])
+    frad_coeffs_2016: List[float] = field(default_factory=lambda: [0.05])
+    frad_coeffs_2021: List[float] = field(
+        default_factory=lambda: [-0.211, 10.5, -161.8, 1189.0, -4165.0, 5565.0]
+    )
+    # Optional radiative-fraction sensitivity penalty.
+    # When enabled, conversions use f_rad^eff = f_rad * (1 - penalty_frac).
+    radiative_penalty_on: bool = False
+    radiative_penalty_frac_2015: float = 0.07
+    radiative_penalty_frac_2016: float = 0.07
+    radiative_penalty_frac_2021: float = 0.07
+
+    # Dataset enable switches
+    enable_2015: bool = True
+    enable_2016: bool = False
+    enable_2021: bool = False
+
+    # Kernel hyperparameters
+    kernel_constant_init: float = 1.0
+    kernel_constant_bounds: Tuple[float, float] = (1e-8, 1e18)
+    kernel_ls_init: float = 1.0
+    kernel_ls_bounds: Tuple[float, float] = (0.001, 10.0)
+
+    # Kernel length-scale policy
+    # "manual"                   — use kernel_ls_init and kernel_ls_bounds directly
+    # "resolution_scaled_local"  — bounds derived from σ(mass) at each scan point (default)
+    # "resolution_scaled_global" — bounds derived from dataset-wide σ statistic
+    kernel_ls_policy: str = "resolution_scaled_local"
+    kernel_ls_res_upper_factor: float = 8.0
+    kernel_ls_res_lower_factor: float = 0.5
+    kernel_ls_res_stat: str = "median"
+    kernel_ls_res_npts: int = 200
+    kernel_ls_local_hi_floor_mode: str = "none"   # "none" | "dataset_stat"
+    kernel_ls_local_hi_floor_factor: float = 1.0
+    # Legacy opt-in ceiling on the local-policy upper bound. Leave unset for
+    # pure sigma(mass)-scaled bounds, otherwise ls_hi can become mass-independent.
+    kernel_ls_local_hi_cap_xrange_frac: Optional[float] = None
+
+    # Per-dataset kernel overrides (empty dicts = use global factors)
+    kernel_ls_res_upper_factor_by_dataset: Dict[str, float] = field(
+        default_factory=lambda: {"2021": 9.0}
+    )
+    kernel_ls_res_lower_factor_by_dataset: Dict[str, float] = field(default_factory=dict)
+    kernel_ls_bounds_by_dataset: Dict[str, Any] = field(default_factory=dict)
+    kernel_ls_init_by_dataset: Dict[str, float] = field(default_factory=dict)
+
+    # Preprocessing knobs
+    pre_log: bool = True
+    pre_zero_alpha: float = 1.0
+    alpha_model: str = "1/y"
+    pre_alpha_first_n: int = 0
+    pre_alpha_first_factor: float = 0.1
+
+    # Scan settings
+    mass_step_gev: float = 0.001
+    blind_nsigma: float = 1.64
+    gp_train_exclude_nsigma: Optional[float] = None  # defaults to blind_nsigma when None
+    eps2_density_nsigma: Optional[float] = None  # defaults to blind_nsigma when None
+    neighborhood_rebin: int = 5
+    n_restarts: int = 12
+    # Scan parallelization
+    scan_parallel: bool = False
+    scan_n_workers: int = 1
+    scan_parallel_backend: str = "loky"
+    scan_threads_per_worker: int = 1
+    # Functional-form toy scans use lean closure-study defaults unless overridden.
+    toy_scan_parallel: bool = False
+    toy_scan_n_workers: int = 1
+    toy_scan_parallel_backend: str = "threading"
+    toy_scan_threads_per_worker: int = 1
+    toy_scan_save_plots: bool = False
+    toy_scan_save_fit_json: bool = False
+    toy_scan_save_per_mass_folders: bool = False
+    # Scan diagnostic plots. These knobs are currently inactive placeholders
+    # until the scan path writes a real diagnostic artifact from fit details.
+    scan_diagnostic_plot_every_n: Optional[int] = None
+    scan_diagnostic_zoom_half_sigma: float = 0.5
+
+    # CLs settings
+    cls_alpha: float = 0.05
+    cls_mode: str = "asymptotic"
+    cls_num_toys: int = 100
+    cls_seed_base: int = 12345
+    make_ul_bands: bool = True
+    ul_bands_toys: int = 100
+    # Optional CLs settings specifically for UL-band evaluation.
+    # When None, fall back to cls_mode / cls_num_toys.
+    ul_bands_cls_mode: Optional[str] = None
+    ul_bands_cls_num_toys: Optional[int] = None
+    # v15 UL bands extensions
+    ul_bands_seed: int = 12345
+    ul_bands_n_workers: int = 1
+    ul_bands_parallel_backend: str = "loky"
+    ul_bands_threads_per_worker: int = 1
+    ul_bands_refit_gp_on_toy: bool = False
+    ul_bands_refit_gp_restarts: int = 0
+    ul_bands_refit_gp_optimize: bool = True
+    ul_bands_train_exclude_nsigma: Optional[float] = None  # defaults to gp_train_exclude_nsigma
+    full_toy_bkg_mode: str = "poisson"  # "poisson" | "fixed_total_multinomial"
+    # Combined bands settings
+    do_combined_bands: bool = False
+    combined_bands_n_toys: int = 100
+    combined_bands_seed: int = 24680
+
+    # Scan edge guards and blinding policy
+    scan_require_two_sidebands: bool = False
+    scan_edge_guard_nsigma: Optional[float] = None  # defaults to gp_train_exclude_nsigma
+    data_visibility: Dict[str, str] = field(
+        default_factory=lambda: {"2015": "observed", "2016": "observed", "2021": "observed"}
+    )
+
+    # Injection + extraction settings
+    inject_signal: bool = False
+    inj_dataset_key: str = "2015"
+    inj_masses_gev: List[float] = field(default_factory=lambda: [0.030, 0.060, 0.090])
+    inj_strengths: List[int] = field(default_factory=lambda: [0, 100, 200, 500, 1000, 2000, 5000])
+    inj_mode: str = "poisson"
+    extract_background_mode: str = "profiled"  # "profiled" | "fixed"
+    extract_allow_negative: bool = True
+    # v15 injection extensions
+    inj_strength_mode: str = "absolute"   # "absolute" | "sigmaA"
+    inj_sigma_a_source: str = "asimov"    # "asimov" | "poisson"
+    inj_sigma_a_ref_mode: str = "prefit_asimov"  # "prefit_asimov" | "matched_refit_bonly"
+    inj_shape_mode: str = "full"          # "full" | "window"
+    inj_background_mode: str = "gp_resample"  # "gp_resample" | "fixed_hist"
+    inj_refit_gp_on_toy: bool = False
+    inj_refit_gp_restarts: int = 0
+    inj_refit_gp_optimize: bool = True
+    inj_refit_fail_on_error: bool = False
+    # Diagnostic-only refit stabilization knobs. The nominal path should remain
+    # a predeclared guard band unless these modes are separately validated.
+    inj_refit_kernel_lock_mode: str = "none"  # "none" | "initial_fit" | "ensemble_file"
+    inj_refit_kernel_lock_file: str = ""
+    inj_refit_signal_tail_alpha_scale: float = 0.0
+    inj_refit_signal_tail_alpha_threshold: float = 0.0
+    inj_train_exclude_nsigma: Optional[float] = None  # defaults to gp_train_exclude_nsigma
+    inj_sigma_multipliers: List[float] = field(
+        default_factory=lambda: [0.0, 1.0, 2.0, 3.0, 5.0]
+    )
+    inj_combined_mass_policy: str = "intersection"  # "intersection" | "union_min_n"
+    inj_combined_min_n_contrib: int = 2
+    inj_write_toy_csv: bool = True
+    inj_write_qmu: bool = False
+    # Streaming injection aggregation (default-on)
+    inj_stream_aggregate: bool = True
+    inj_aggregate_every: int = 100
+    inj_n_workers: int = 5
+    inj_parallel_backend: str = "loky"
+    inj_threads_per_worker: int = 1
+    # Signal template model. "default" is the nominal detector-resolution
+    # Gaussian line shape. "kernel" is an opt-in localized signal-kernel study
+    # template with width and correlation length tied to the mass resolution.
+    signal_model: str = "default"
+    signal_kernel_width_factor: float = 1.0
+    signal_kernel_length_scale_factor: float = 1.0
+    # Reviewer-facing extraction display plots (single representative pseudoexperiments)
+    extraction_display_dataset_key: str = ""
+    extraction_display_dataset_keys: List[str] = field(default_factory=lambda: ["2015", "2016"])
+    extraction_display_masses_gev: List[float] = field(default_factory=list)
+    extraction_display_sigma_multipliers: List[float] = field(default_factory=lambda: [3.0, 5.0, 7.0])
+    extraction_display_seed: int = 271828
+    extraction_display_inj_mode: str = "multinomial"
+    extraction_display_sigma_source: str = "asimov"
+    extraction_display_refit_gp_on_toy: bool = True
+    extraction_display_gp_restarts: int = 0
+    extraction_display_gp_optimize: bool = True
+    extraction_display_train_exclude_nsigma: Optional[float] = None
+    extraction_display_funcform_toy_index: int = 0
+    extraction_display_zoom_half_sigma: float = 0.5
+    extraction_display_blind_shade_alpha: float = 0.18
+    extraction_display_blind_shade_color: str = "0.88"
+    # Functional-form closure toy sources. These are intentionally separate
+    # from ordinary `inject`; use `funcform-inject` or `toy-scan` to consume them.
+    funcform_closure_enable: bool = False
+    funcform_closure_root_by_dataset: Dict[str, str] = field(default_factory=dict)
+    funcform_closure_container_by_dataset: Dict[str, str] = field(default_factory=dict)
+    funcform_closure_toy_pattern_by_dataset: Dict[str, str] = field(default_factory=dict)
+    # MVN non-negative sampling
+    mvn_trunc_method: str = "reject_then_clip"  # "clip" | "reject" | "reject_then_clip"
+    mvn_trunc_max_tries: int = 80
+
+    # Combined fit settings
+    do_combined: bool = False
+    # "epsilon2" scans the shared coupling directly. "count_scale" is an
+    # equivalent shared-coupling parameterization that scans a normalized
+    # count-scale signal amplitude internally, then converts back to epsilon^2.
+    combined_mode: str = "epsilon2"
+    eps2_lrt_scale: float = 1e10
+
+    # Limit-band dataset selector
+    run_limit_bands_on: str = "2015"
+    make_eps2_bands: bool = True
+
+    # Outputs
+    output_dir: str = "outputs/hps_gpr"
+
+    # Validation/debug controls
+    debug_print: bool = True
+    debug_max_errors: int = 10
+    fail_fast: bool = False
+    save_per_mass_folders: bool = True
+    save_plots: bool = True
+    save_fit_json: bool = True
+
+    def get_kernel(self):
+        """Build the sklearn kernel from config parameters."""
+        return (
+            skgp.kernels.ConstantKernel(
+                self.kernel_constant_init, self.kernel_constant_bounds
+            )
+            * skgp.kernels.RBF(
+                length_scale=self.kernel_ls_init,
+                length_scale_bounds=self.kernel_ls_bounds,
+            )
+        )
+
+    def ensure_output_dir(self):
+        """Create output directory if it doesn't exist."""
+        os.makedirs(self.output_dir, exist_ok=True)
+
+
+def load_config(path: str) -> Config:
+    """Load configuration from a YAML file."""
+    with open(path, "r") as f:
+        data = yaml.safe_load(f)
+
+    if data is None:
+        data = {}
+
+    # Handle tuple fields that come as lists from YAML
+    tuple_fields = [
+        "range_2015",
+        "range_2016",
+        "range_2021",
+        "data_range_2015",
+        "data_range_2016",
+        "data_range_2021",
+        "kernel_constant_bounds",
+        "kernel_ls_bounds",
+    ]
+    dict_fields = [
+        "kernel_ls_res_upper_factor_by_dataset",
+        "kernel_ls_res_lower_factor_by_dataset",
+        "kernel_ls_bounds_by_dataset",
+        "kernel_ls_init_by_dataset",
+        "data_visibility",
+        "funcform_closure_root_by_dataset",
+        "funcform_closure_container_by_dataset",
+        "funcform_closure_toy_pattern_by_dataset",
+    ]
+    for field_name in dict_fields:
+        if field_name in data and data[field_name] is None:
+            data[field_name] = {}
+    for field_name in tuple_fields:
+        if field_name in data and isinstance(data[field_name], list):
+            data[field_name] = tuple(data[field_name])
+
+    return Config(**data)
+
+
+def save_config(config: Config, path: str) -> None:
+    """Save configuration to a YAML file."""
+    data = {}
+    for field_name in config.__dataclass_fields__:
+        value = getattr(config, field_name)
+        # Convert tuples to lists for YAML
+        if isinstance(value, tuple):
+            value = list(value)
+        data[field_name] = value
+
+    with open(path, "w") as f:
+        yaml.dump(data, f, default_flow_style=False, sort_keys=False)

@@ -1,0 +1,388 @@
+\section{Version 4.2 Follow-up Studies}
+\label{app:v4p2-followups}
+
+This appendix records targeted checks requested after completion of the v4.2
+result.  They retain the v4.2 signal model, conversion, physical windows,
+statistical conventions, and interpretation boundaries without altering the
+accepted v4.2 result.  They are not used to replace the principal observed scan
+or its conditional fixed-state bands.
+
+\subsection{Common-binning and profiled 65 MeV extraction}
+\label{app:v4p2-common-binning}
+
+The native post-rebin widths in Figure~\ref{fig:results-v4p2-m065-extraction}
+are 0.25, 0.25, and 0.625~MeV for 2015, 2016, and 2021, respectively.  The
+underlying 2015 and 2016 histogram bins are 0.05~MeV wide, whereas the 2021
+source bins are 0.125~MeV wide.  Consequently, an exact common 0.625~MeV
+aggregation would require the noninteger factor 12.5 for 2015 and 2016.  The
+validated ROOT inputs contain histograms but no event-level tree from which a
+new edge-aligned spectrum can be filled.  Splitting, weighting, or rounding
+source-bin counts would introduce fractional or reassigned pseudo-counts into
+the integer-Poisson likelihood, so that construction is not used.
+
+The exact 0.5 and 0.75~MeV source-compatible choices are equally distant from
+0.625~MeV.  The study uses 0.5~MeV because it is the finer choice and the
+nearest one that retains the complete support of all three inputs, with integer
+aggregation factors 10, 10, and 4; 0.75~MeV would require endpoint trimming in
+2015 and 2021.  A second exact 1.25~MeV aggregation with factors 25, 25, and 10
+provides a coarser stress test.  Each alternative is a newly optimized
+sideband GP refit at 65~MeV using the v4.2 physical resolution, training
+exclusion, support, radiative conversion, and profile likelihood.  The count
+density entering the signal conversion remains calculated from the uncropped
+fine histogram in the physical $m\pm1.64\sigma_m$ window.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Fixed-mass 65~MeV common-binning check.  The quoted uncertainty is the
+local signed-estimator Wald curvature scale.  The 1.25~MeV 2015 support ends at
+134 rather than 135~MeV because the original support length is not divisible
+by 1.25~MeV.  No tolerance for ``unchanged'' significance was declared in
+advance, so the shifts are reported directly.}
+\label{tab:v4p2-common-binning-m065}
+\begin{tabular}{lcccccc}
+\toprule
+Binning & factors $(15,16,21)$ &
+$\widehat{\eps^2}$ & $\sigma_{\eps^2}$ & local $p_0$ & local $Z$ &
+$\Delta Z$ \\
+ & & \multicolumn{2}{c}{($\times10^{-6}$)} & & & \\
+\midrule
+Native v4.2 & $(5,5,5)$ & 6.4271 & 1.6101 &
+$3.2592\times10^{-5}$ & 3.9932 & 0 \\
+Common 0.5~MeV & $(10,10,4)$ & 6.2072 & 1.6110 &
+$5.8033\times10^{-5}$ & 3.8543 & $-0.1389$ \\
+Common 1.25~MeV & $(25,25,10)$ & 6.4049 & 1.6346 &
+$4.4447\times10^{-5}$ & 3.9191 & $-0.0742$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The exact 0.5~MeV result therefore produces a modest fixed-mass shift rather
+than numerical identity: the local excess remains near $4\sigma$, while
+$Z_{\mathrm{local}}$ decreases by 0.139 and the fitted coupling changes by
+$-0.220\times10^{-6}$.  The Wald scale changes by less than
+$0.001\times10^{-6}$.  Both independent optimizer-repeat sets select stable,
+non-boundary solutions.  The 1.25~MeV stress test gives the same qualitative
+conclusion, subject to its recorded one-MeV far-side support trim.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.99\linewidth}{final_limit_projection_figs/v4p2_followups_20260806/figure61_common_0p5MeV.pdf}
+\caption{Observed 65~MeV extraction after an exact, count-preserving common-bin
+refit.  All three histograms use 0.5~MeV bins.  The upper panels show data, the
+newly optimized sideband-trained GP mean and predictive uncertainty, and
+display extensions of the standalone and simultaneous shared-$\eps^2$ signal
+shapes.  The lower panels show data minus the pre-profile GP mean.  This is a
+local binning-robustness check, not a replacement for the accepted native v4.2
+scan.  Its lower-panel error bars use the prior-predictive scale
+$\sqrt{\mu_{\mathrm{GP}}+C_{ii}}$ and are not independent post-fit bin
+uncertainties.}
+\label{fig:appendix-v4p2-common-binning-m065}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.99\linewidth}{final_limit_projection_figs/v4p2_followups_20260806/figure61_common_0p5MeV_profiled.pdf}
+\caption{Profiled-background view of the exact common-0.5~MeV extraction,
+restricted to the actual $\pm2.25\sigma_m$ likelihood window.  Blue denotes
+the background-only profiled expectation, orange the standalone
+signal-plus-background profile, and red the simultaneous shared-$\eps^2$
+profile.  The lower panels show count residuals relative to each expectation.
+The curves are not extended into the sidebands because the v4.2 nuisance
+likelihood profiles the GP background only inside the extraction window.
+These correlated fit diagnostics are not standardized per-bin significances.}
+\label{fig:appendix-v4p2-common-binning-profiled}
+\end{figure}
+
+The negative 2016 endpoint in the original lower-right panel of
+Figure~\ref{fig:results-v4p2-m065-residuals} came from plotting the signed,
+unconstrained estimate
+$(1.51921\pm2.55749)\times10^{-6}$ with a symmetric Wald error.  Its lower
+endpoint is $-1.03828\times10^{-6}$ even though the event-to-$\eps^2$
+conversion factor is positive.  It is therefore not a sign or normalization
+error, but it is easy to misread as a physical interval.  The corrected
+display uses the physical domain $\eps^2\geq0$ and the nominal asymptotic
+profile-likelihood set defined by $\Delta(-2\ln L)=1$.  For native 2016 that
+set is $[0,4.08001]\times10^{-6}$; it is not asserted to be
+coverage-calibrated.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.92\linewidth}{final_limit_projection_figs/v4p2_followups_20260806/figure62_coefficients_physical68.pdf}
+\caption{Physical-domain 65~MeV signal-strength estimates for the native v4.2
+extraction and the exact common-0.5~MeV refit.  Horizontal bars are the nominal
+asymptotic $\eps^2\geq0$ profile sets satisfying
+$\Delta(-2\ln L)\leq1$.  The 2016 lower endpoints are zero.  These sets replace
+the ambiguous symmetric signed-Wald display; they are not
+coverage-calibrated confidence intervals.}
+\label{fig:appendix-v4p2-physical-profile-intervals}
+\end{figure}
+
+\subsection{Conditional 65 MeV central-window pseudo-observation study}
+\label{app:v4p2-pseudo65}
+
+This study replaces the 65~MeV central region of the 2021 10\% spectrum with
+two smooth-background pseudo-observations and then treats each replacement as
+an observed dataset.  The requested continuous interval is
+$65~\mathrm{MeV}\pm2.5\sigma_m=[59.6958,70.3042]$~MeV, using
+$\sigma_m(65~\mathrm{MeV})=2.121696875$~MeV.  On the production 0.625~MeV
+grid, the $\pm2.25\sigma_m$ and $\pm2.5\sigma_m$ center selections happen to
+select the same sixteen analysis bins, whose complete edges are
+$[60,70)$~MeV.  The ROOT construction therefore replaces the corresponding
+80 native 0.125~MeV bins.  All bins outside this interval are bitwise identical
+to the original observed spectrum.
+
+No nonzero signal strength was supplied, so both lanes use the fail-closed
+background-only interpretation $A_{\mathrm{inj}}=0$.  The first lane draws
+independent binwise Poisson counts from the exact accepted v4.2 fixed-GP mean
+at 65~MeV.  The second draws from a sideband-only
+\texttt{fGenGammaThresh} interpolation fitted with a binned Poisson
+likelihood over 50--85~MeV with $[60,70)$~MeV excluded.  Five deterministic
+starts were compared.  The selected functional fit has Poisson
+deviance/ndf 1.069, a deviance $p$-value of 0.243, and no selected parameter
+at its declared bound.  It is a smooth interpolation stress truth, not a
+physical event generator.  Independent PCG64 child streams of master seed
+20260806 generate the two draws.  The source copy, both pseudo-observed
+histograms, and both central expectations are written to one ROOT file with
+their construction and array hashes.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.99\linewidth}{final_limit_projection_figs/v4p2_followups_20260806/pseudo65_central_window_zoom.pdf}
+\caption{Construction of the two fixed-seed background-only replacements in
+the 65~MeV central window.  Gray shows the original 2021 10\% data, blue or
+orange the integer-valued conditional pseudo-observation, and the dashed black
+curve the corresponding replacement expectation.  The shaded interval has
+complete-bin edges $[60,70)$~MeV and the dotted line marks 65~MeV.  The two
+panels are single Poisson draws, not ensemble means; only the outside-window
+data and the bin geometry, not the replaced total count, are preserved.}
+\label{fig:appendix-v4p2-pseudo65-construction}
+\end{figure}
+
+Each pseudo-observation is passed through the full 2021-only v4.2
+observed/asymptotic scan from 50 to 250~MeV: 0.625~MeV analysis bins,
+$\pm2.25\sigma_m$ extraction and training geometry, $k_{\max}=15$, profiled
+correlated-background extraction, 90\% \CLs{}, and a local bounded
+asymptotic $p_0$.  Thus the wider requested interval controls the complete
+central bins replaced in the ROOT file but does not redefine the inference
+card.  No expected limit bands or toys are produced.
+
+Two unchanged-card full scans were compared for each lane.  Where they selected
+different optimizer branches, isolated mass points were rerun with the
+unchanged card and the reproducible maximum-log-marginal-likelihood state was
+selected; no point was interpolated.  The final ledgers contain all 201 masses
+per lane, have no pending or nonfinite results, and select no length-scale
+boundary states.  Multiple finite branches were recorded at 12 GP-mean masses
+and 11 functional-form masses rather than hidden.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Observed/asymptotic 2021-only results at 65~MeV.  The original v4.2
+row is included only as context.  Negative replacement estimates are allowed
+in the signed local fit; their bounded one-sided discovery statistic gives
+$p_0=0.5$, which is not a posterior probability that the background model is
+true.}
+\label{tab:v4p2-pseudo65-m065}
+\begin{tabular}{lrrrrr}
+\toprule
+Sample & $\widehat A$ & $\sigma_A$ &
+$\eps^2_{90}$ & local $p_0$ & local $Z$ \\
+ & \multicolumn{2}{c}{events} & $(\times10^{-6})$ & & \\
+\midrule
+Original 2021 10\% & 28038.9 & 6609.5 & 11.7184 &
+$1.0570\times10^{-5}$ & 4.2525 \\
+GP-mean replacement & $-5125.8$ & 6602.8 & 2.7736 &
+0.5 & 0 \\
+Functional-form replacement & $-2195.6$ & 6603.0 & 3.1242 &
+0.5 & 0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.99\linewidth}{final_limit_projection_figs/v4p2_followups_20260806/pseudo65_observed_limit_p0_aligned.pdf}
+\caption{Conditional 2021 10\% replacement scans.  The columns use the
+GP-mean and functional-form draws, respectively.  Within each column the
+pseudo-observed spectrum, observed 90\% \CLs{} upper limit on $\eps^2$, and
+local asymptotic $p_0$ are aligned in mass.  The original v4.2 observed curves
+are dashed context only; no expected bands are constructed.  At 65~MeV the
+replacement lanes give $\eps^2_{90}=2.77357\times10^{-6}$ and
+$3.12419\times10^{-6}$, respectively, with $p_0=0.5$ in both cases.  The
+tighter single-draw limits are fluctuation dependent and are not expected
+sensitivities.}
+\label{fig:appendix-v4p2-pseudo65-scans}
+\end{figure}
+
+At 65~MeV, the localized positive estimate in the original 2021 10\% spectrum
+is absent in both fixed replacement draws.  Across the full conditional scans,
+however, the smallest local values occur at the lower 50~MeV scan boundary:
+$p_0=1.51\times10^{-4}$ ($Z=3.61$) for the GP-mean lane and
+$p_0=9.81\times10^{-7}$ ($Z=4.76$) for the functional-form lane.  Replacing
+$[60,70)$~MeV can change the full-support sideband-trained GP used at other
+hypotheses, while the outside-window data remain observed.  The boundary
+minima are therefore reported as conditional fixed-mass diagnostics and are
+not scan calibrated or globalized.  The disappearance of the 65~MeV estimate
+is likewise a conditional counterfactual observation, not a probability
+statement about the source of the feature.  Because both lanes retain the
+same observed spectrum outside the replacement window and contain only one
+draw each, they are not independent global-null pseudoexperiments and do not
+establish expected sensitivity, coverage, or a global discovery probability.
+
+\subsubsection{Post-Figure~\ref{fig:appendix-v4p2-pseudo65-scans}
+functional-form shoulder check}
+
+The functional-form lane in
+Figure~\ref{fig:appendix-v4p2-pseudo65-scans} has a conspicuous local shoulder
+below 65~MeV.  Its fixed-seed draw gives
+$p_0=1.12297\times10^{-4}$ ($Z=3.6896$) at 62~MeV, with
+$\widehat A=23177.5$ and $\sigma_A=6288.4$ events.  To separate the smooth
+truth shape from this particular Poisson fluctuation, the central
+$[60,70)$~MeV bins were replaced by the stored fractional functional mean
+itself and the unchanged v4.2 analysis was repeated over 55--75~MeV.
+The corresponding fixed-GP-mean construction was analyzed in parallel.  These
+are deterministic central-mean diagnostics with the observed spectrum retained
+outside the replacement interval; they are not complete Asimov datasets.
+
+The functional mean alone produces a broad positive response: it peaks at
+$Z=2.268$ at 61~MeV and gives $Z=1.909$ at 62~MeV.  The fixed-GP mean gives
+$Z=0.951$ and 0.431 at the same masses.  At 62~MeV the end-to-end signed
+functional-mean response exceeds the fixed-GP-mean response by 9369.2 fitted
+events, about $1.47\sigma_A$.  The particular functional Poisson draw adds a
+further 11062.3 fitted events relative to its deterministic mean response,
+about $1.76\sigma_A$, and moves the local maximum from 61 to 62~MeV.  Thus the
+Figure~\ref{fig:appendix-v4p2-pseudo65-scans} shoulder contains both a coherent
+functional-truth/GP-analysis shape-mismatch component and an additional
+realized fluctuation; it should not be read as a feature of the observed 2021
+data.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.92\linewidth}{final_limit_projection_figs/v4p2_followups_20260806/functional_mean_shape_bias_Ahat_p0.pdf}
+\caption{Conditional central-mean shape diagnostic over 55--75~MeV.  Solid
+curves replace $[60,70)$~MeV by the stored fractional functional or fixed-GP
+expectation; dashed curves are the corresponding fixed-seed Poisson draws from
+Figure~\ref{fig:appendix-v4p2-pseudo65-construction}.  The upper panel shows
+the signed fitted signal yield and the lower panel the local asymptotic
+$p_0$.  The smooth functional mean already produces a 61--63~MeV shoulder,
+while the displayed Poisson draw amplifies it.  All 42 selected optimizer
+states were reproduced by unchanged-card repeats, with no selected
+length-scale boundary and no interpolation.  This is a conditional
+truth-model/analysis-model diagnostic, not a calibrated bias, expected
+sensitivity, or global-significance result.}
+\label{fig:appendix-v4p2-functional-mean-shape}
+\end{figure}
+
+The functional interpolation nevertheless passes its declared sideband
+goodness-of-fit checks: Poisson deviance/ndf is 1.069, the deviance
+$p$-value is 0.243, five starts reach the near-optimal solution, and no
+selected parameter lies on its bound.  Those tests assess the interpolation
+on its fitted sidebands; they do not guarantee zero signed signal response
+when a moving-mask GP analyzes that smooth truth.
+
+\subsubsection{GP-mean replacement-window ensembles}
+
+At 65~MeV the requested replacement half-widths have the following exact
+production-grid interpretation:
+
+\begin{table}[H]
+\centering
+\small
+\caption{Continuous replacement intervals and the complete 0.625~MeV
+analysis bins selected by their centers.  The 2.25- and 2.5-$\sigma_m$
+requests are exactly the same binned operation and therefore cannot define
+independent window-scope results.}
+\label{tab:v4p2-pseudo65-window-geometry}
+\begin{tabular}{lccc}
+\toprule
+Half-width & Continuous interval [MeV] & Complete-bin edges [MeV] &
+analysis bins \\
+\midrule
+$2.25\sigma_m$ & $[60.2262,69.7738]$ & $[60.00,70.00)$ & 16 \\
+$2.5\sigma_m$  & $[59.6958,70.3042]$ & $[60.00,70.00)$ & 16 \\
+$3.0\sigma_m$  & $[58.6349,71.3651]$ & $[58.75,71.25)$ & 20 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Ten independent background-only Poisson replacements were generated from the
+exact accepted fixed-GP mean for the shared 2.25/2.5-$\sigma_m$ geometry and
+ten for the 3-$\sigma_m$ geometry.  Matching draw indices use common random
+numbers: their counts are identical in the sixteen shared bins, while the
+wider construction adds four replaced edge bins.  The inference card itself
+remains the frozen v4.2 2.25-$\sigma_m$ card, so this comparison isolates
+replacement scope rather than simultaneously changing the likelihood
+geometry.  Each histogram retains the observed spectrum outside its declared
+replacement window.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.99\linewidth}{final_limit_projection_figs/v4p2_followups_20260806/gp_window_ensemble_central_spectra.pdf}
+\caption{The ten paired fixed-GP-mean pseudo-observations near 65~MeV.
+The left column uses the shared 2.25/2.5-$\sigma_m$ sixteen-bin replacement
+and the right column the 3-$\sigma_m$ twenty-bin replacement.  Upper panels
+show the individual integer draws, their arithmetic mean, the fixed
+generating mean, and the retained original data outside the replaced bins.
+Lower panels show each draw's Poisson residual relative to the generating
+mean.  Matching draw indices contain identical counts in the shared
+$[60,70)$~MeV interval.}
+\label{fig:appendix-v4p2-gp-window-spectra}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\small
+\caption{Pointwise 65~MeV summaries across ten conditional fixed-GP-mean
+draws.  The 16--84\% intervals are empirical descriptive spreads, not
+expected-limit bands.}
+\label{tab:v4p2-pseudo65-gp-ensemble-m065}
+\begin{tabular}{lccccc}
+\toprule
+Replacement geometry & median $\eps^2_{90}$ & mean $\eps^2_{90}$ &
+empirical 16--84\% & median $p_0$ & median $Z$ \\
+ & \multicolumn{3}{c}{$(\times10^{-6})$} & & \\
+\midrule
+$2.25\sigma_m=2.5\sigma_m$ & 3.69710 & 3.57686 &
+$[2.70526,4.14840]$ & 0.437686 & 0.1569 \\
+$3.0\sigma_m$ & 4.27450 & 4.19152 &
+$[3.06747,5.12518]$ & 0.284313 & 0.5702 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.99\linewidth}{final_limit_projection_figs/v4p2_followups_20260806/gp_window_ensemble_observed_limit_p0.pdf}
+\caption{Dedicated fixed-GP-mean replacement ensembles.  The columns compare
+the shared 2.25/2.5-$\sigma_m$ and 3-$\sigma_m$ replacement scopes.  The rows
+show the mass spectrum, observed 90\% \CLs{} upper limit, and local
+asymptotic $p_0$, aligned in mass.  Thin curves are the ten individual
+conditional draws; thick colored and dashed black curves are their pointwise
+median and arithmetic mean, and the translucent region is the empirical
+16--84\% spread.  The original observed v4.2 curves are gray dashed context.
+The empirical spread is not an expected-limit band, and the ensemble is not
+a scan-wide null calibration.}
+\label{fig:appendix-v4p2-gp-window-ensemble}
+\end{figure}
+
+At 65~MeV the paired median ratio
+$\eps^2_{90}(3\sigma_m)/\eps^2_{90}(2.25/2.5\sigma_m)$ is 1.17957, with
+empirical 16--84\% spread $[1.00971,1.27080]$.  The normalization density is
+identical for each paired draw because its physical
+$m\pm1.64\sigma_m$ window lies wholly inside the shared replaced bins; the
+difference comes from the four outer bins and the profiled GP/extraction
+response.  None of the twenty conditional draws reaches local $3\sigma$ in
+55--75~MeV.  The smallest values are $p_0=0.00692$ ($Z=2.462$) for the
+narrow geometry and $p_0=0.01118$ ($Z=2.284$) for the wide geometry, both at
+60~MeV in draw 04.
+
+All 420 rows in the predeclared 55--75~MeV review interval have a reproduced
+maximum-finite-log-marginal-likelihood selected state after unchanged-card
+repeats.  Seventeen rows retain documented multiple finite branches; none has
+an unresolved selected state, selected kernel bound, or interpolated result.
+Outside that interval the displayed full-range curves have one scan attempt
+with twelve within-fit restarts, so full-grid repeat stability is not claimed.
+These ten-draw summaries are a conditional recurrence and mechanism screen,
+not expected sensitivity, coverage, or a probability for a future full-data
+observation.

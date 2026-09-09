@@ -1,0 +1,191 @@
+\subsection{Exact-v16 selected-row morphology diagnostics}
+\label{app:v4p3-exact-v16-diagnostics}
+
+The preceding kinematic atlas used a v11 SIMP/TM production because the exact
+event-level source of the v4.2 observed-limit histogram was not then locally
+available.  A new v16 diagnostic production now supplies the unchanged
+prompt-target-constrained, $p_{\rm sum}>2.8$ baseline together with exhaustive
+topology and stored-trigger partitions and four mass-versus-control
+histograms.  This closes the earlier \emph{histogram-level} sample mismatch:
+the 2000-, 4000-, and 8000-bin invariant-mass histograms, including their
+axes, are bitwise identical to the frozen v4.2 2021 input and each contains
+141,590,915 selected rows.  Unique physical-event counting remains outside
+this histogram-level closure because the parser did not identify a stable
+run/event key.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Release-level continuity checks for the exact-v16 diagnostic
+product.  ``Exact'' refers to histogram arrays and axes, not to an
+independently frozen event-file list or unique-event identity.}
+\label{tab:v4p3-v16-provenance}
+\begin{tabularx}{0.96\linewidth}{P{0.31\linewidth} P{0.24\linewidth} Y}
+\toprule
+gate & result & qualification \\
+\midrule
+canonical baseline, 2000/4000/8000 bins & bitwise exact; 141,590,915 rows &
+matches the frozen v4.2 spectrum at all three binnings \\
+six topology categories & exact binwise partition closure &
+includes the 25.6\% \texttt{topology\_other} category \\
+four stored-trigger flag categories & exact binwise partition closure &
+the ``neither'' category is empty; categories are exclusive stored-flag combinations \\
+1-MeV mass-retention sidecar & 11 selections $\times$ 260 bins exact &
+all values reproduce aggregations of the 8000-bin ROOT histograms \\
+input-file provenance & 1189 unique paths; list hash recorded &
+status remains \texttt{list-hash-unfrozen} \\
+row semantics & selected candidate rows &
+unique-event mapping and inter-row correlations are unavailable \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The four controls are pair momentum sum, vertex-projection significance,
+the minimum-track $|y_0|$ proxy, and the stored electron-track 3D-hit count.
+The last quantity is not the N2D-hit variable used in earlier selection
+studies, and vertex-projection significance is not reconstructed vertex
+$z$.  No new vertex-$\chi^2$, momentum, opening-angle, or $y_0$ cut is made.
+The control-axis overflows are retained in the ledger; the displayed 2D
+domains omit 395 vertex-significance rows and 7368 $y_0$ rows, while the
+mass axis omits 82,471 rows below 40~MeV and 256,936 above 300~MeV.
+
+\subsubsection{Sideband-trained conditional-composition GPR}
+\label{app:v4p3-composition-gpr-method}
+
+The available histograms do not support an event-level two-dimensional
+signal likelihood.  In particular, there is no signal template in the second
+coordinate, no category-specific efficiency or mass-resolution model, and no
+validated factorization of selected rows into independent events.  The useful
+part of the true-muonium 2D-GPR construction is therefore adapted only as a
+background-morphology diagnostic: a target-masked smooth surface is fit to
+the mass dependence of the conditional control composition.
+
+For mass bin $i$ and one of $J$ mutually represented control groups, let
+$N_{ij}$ be the selected-row count and $N_i=\sum_jN_{ij}$.  The fitted
+coordinates are the Jeffreys-regularized centered log ratios
+\begin{equation}
+ p_{ij}=\frac{N_{ij}+1/2}{N_i+J/2},\qquad
+ y_{ij}=\log p_{ij}-\frac{1}{J}\sum_{k=1}^{J}\log p_{ik}.
+ \label{eq:v4p3-clr-gpr}
+\end{equation}
+Independent mass-axis RBF predictors for the $y_{ij}$ coordinates are
+coupled again by the inverse centered-log-ratio transform, so every predicted
+composition sums to one.  This conditions on the observed mass-bin total and
+tests morphology only; it neither estimates the total background under a
+candidate nor assigns a signal yield.
+
+The primary card uses 0.5-MeV mass bins over 40--160~MeV and eight contiguous
+control groups whose boundaries are frozen from candidate-masked sideband
+rows.  The eight stored 3D-hit bins, six exhaustive topology categories, and
+three nonempty trigger categories remain discrete.  The union of the fixed
+$65\pm2.5\sigma_m$ and $80\pm2.5\sigma_m$ stripes is excluded from both
+kernel choice and training to protect the interpolation against reciprocal
+model-mediated cross-response.  Such cross-response can arise through the
+common nonlocal GP/background profile and adjacent deficit/background
+structure.  It is assigned to the shared fitting procedure rather than to
+physical causation, shared events, or intrinsic dependence between the
+features.  For each surface the RBF length
+and
+standardized nugget are chosen from
+\begin{equation}
+ \ell_m\in\{2,4,8,12,20,35\}\ \mathrm{MeV},\qquad
+ \eta\in\{10^{-4},10^{-3},10^{-2},5\times10^{-2}\},
+\end{equation}
+using the median centered-log-ratio residual in five same-rule held-out fake
+gaps at 50, 100, 115, 130, and 145~MeV.  None of those scores is converted to
+a $p$-value or significance.  Deterministic checks repeat the procedure at
+0.125, 0.25, 0.5, and 1.0~MeV mass binning, with 6, 8, 10, and 12 continuous
+control groups, and with single-target rather than union masks.  No
+pseudoexperiment, expected band, or coverage claim is introduced in v4.3.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.98\linewidth}{final_limit_projection_figs/v4p3_2021_10pct_exact_v16_diagnostics_20260810/partition_composition_gpr.pdf}
+\caption{Exact-v16 topology and stored-trigger compositions aggregated over
+the 65 and 80~MeV target stripes.  Black bars are observed selected-row
+fractions and orange bars are the jointly masked, sideband-trained
+conditional-composition GPR predictions.  The exact partition closures are a
+data-integrity result.  The displayed interpolation is a correlated
+histogram-level morphology diagnostic, not a category signal fit.}
+\label{fig:v4p3-partition-composition}
+\end{figure}
+
+\subsubsection{Fixed-window controls and mass-surface residuals}
+\label{app:v4p3-control-results}
+
+The exact parser windows contain 16,361,818 rows at 65~MeV and 20,984,092 rows
+at 80~MeV.  Subtracting the combined adjacent sidebands after the prescribed
+$5/3$ width scaling gives $+1,039,881$ and $+557,880$ rows, respectively.
+Those large values are spectrum-curvature diagnostics: 65~MeV lies on the
+rising shoulder of a distribution whose broad maximum is near 77.5~MeV.
+They are not fitted candidate yields.  After normalizing the central and
+combined-sideband control distributions separately and applying the primary
+control grouping, the total-variation distances span only 0.12--1.02\% across
+the four saved variables.  Lower and
+upper sidebands move in opposite directions for several controls, confirming
+that a one-number sideband subtraction is mass sculpted.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.98\linewidth}{final_limit_projection_figs/v4p3_2021_10pct_exact_v16_diagnostics_20260810/central_sideband_controls.pdf}
+\caption{Normalized exact-v16 control distributions in each central stripe
+and its lower, upper, and combined adjacent sidebands.  Each curve is
+normalized independently to expose shape rather than the rapidly changing
+mass yield.  The visible lower-to-upper evolution motivates the
+mass-conditioned GPR; none of these differences is a fitted signal
+component.}
+\label{fig:v4p3-central-sideband-controls}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.98\linewidth}{final_limit_projection_figs/v4p3_2021_10pct_exact_v16_diagnostics_20260810/conditional_residual_atlas.pdf}
+\caption{Observed minus GPR-predicted conditional composition in the 65 and
+80~MeV target stripes for the four mass--control surfaces and the topology and
+trigger partitions.  Colors are percentage-point composition residuals, not
+Poisson pulls.  All panels reuse the same selected rows and must not be
+combined as independent tests.}
+\label{fig:v4p3-conditional-residual-atlas}
+\end{figure}
+
+The parent v4.2 deterministic inpainting supplies a useful scale for the
+dilution of any local component.  In its complete analysis-bin windows,
+$(N_{\rm data}-N_{\rm GP\ mean})/N_{\rm data}$ is 0.2605\% at 65~MeV and
+0.1460\% at 80~MeV.  These are conditional mean-fill differences, not signal
+purities.  The parent counterfactual changes each complete window total by
+less than 0.3\%, which illustrates the severe dilution scale but does not
+identify the remaining rows as background.  Sub-percent composition changes
+therefore cannot by themselves distinguish a dilute prompt signal from
+ordinary mass dependence or reconstruction effects.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.98\linewidth}{final_limit_projection_figs/v4p3_2021_10pct_exact_v16_diagnostics_20260810/effect_size_robustness_summary.pdf}
+\caption{Conditional-composition effect sizes and deterministic closure
+context at 65 and 80~MeV.  The upper panels show the primary maximum
+composition shift and its ratio to the median fake-gap CLR residual; the
+ratio is not a $p$-value.  In the lower panels, filled markers show the
+primary union-masked card and line segments span the mass-binning variants.
+The ranges are model-robustness envelopes, not confidence intervals.  Parent
+v4.2 mean-fill fractions are included only as dilution references.}
+\label{fig:v4p3-effect-size-summary}
+\end{figure}
+
+The 65~MeV stripe has modest, repeatable changes in some momentum-sum,
+topology, and high-$|y_0|$ fractions, while the trigger composition is nearly
+unchanged.  The detailed vertex-significance and 3D-hit-bin directions are
+less stable under reasonable binning and grouping choices.  At 80~MeV the
+effects are generally smaller and their leading bins or signs change more
+often across the deterministic variations.  Because each comparison reuses
+the same selected rows and conditions on the mass-bin total, differences
+across variables or regions are correlated descriptors rather than separate
+tests.  In particular, the joint mask does not convert shared-model
+cross-response into a statement about the physical relation between the
+65 and 80~MeV features.
+
+Thus the exact-v16 product removes the earlier histogram-level sample
+mismatch and provides a controlled view of saved-variable morphology.  The
+histograms alone do not furnish an event-level signal template, fitted yield,
+or calibrated local or global significance.  Event-identified run/time
+splits, category-specific signal simulation and response, and
+correlation-preserving inference would be required for those quantities.

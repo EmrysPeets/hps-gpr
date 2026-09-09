@@ -1,0 +1,84 @@
+\subsection{Local probabilities and the conditional GP global studies}
+\label{sec:v5-global-results}
+
+The following plots apply the method in Section~\ref{sec:v5-global} to each
+campaign's complete mass scan. They distinguish the raw local asymptotic
+reference, the local probability after accounting for the archived
+background response, and the scan-global probability under that same model.
+The global correction acts on a specified probability ordering; it does not
+rescale the observed upper limit.
+
+\fig{0.98}{../figures/v5_global_probabilities_2015.pdf}{Profiled 2015 local and
+conditional GP global probabilities. The study used ten complete pilot
+scans, 1,000 independent validation scans and 200,000 GP fields. The principal
+global probability at the selected 51~MeV threshold is 0.018985 in the GP
+approximation; 13 of 1,000 direct scans exceed that threshold. The precision
+of either ensemble and the generating-background assumptions remain explicit.}
+{fig:v5-global-2015}
+\fig{0.98}{../figures/v5_global_probabilities_2016.pdf}{Profiled 2016 conditional
+global study. The leading principal-ordering threshold at 42~MeV has no
+exceedance in either ensemble. The corresponding one-sided 95\% bounds are
+$1.498\times10^{-5}$ for 200,000 GP fields and 0.002991 for 1,000 direct scans.
+They are finite-sampling bounds under the specified models, not a resolved
+rare particle probability. A qualified final 2016 global result remains
+outstanding.}
+{fig:v5-global-2016}
+\fig{0.98}{../figures/v5_global_probabilities_2021.pdf}{Profiled global study for
+the released 2021 10\% sample. The principal ordering selects 92~MeV and gives
+GP global probability 0.02519, with 26 of 1,000 independent direct scans above
+the threshold. This selection differs from the largest raw positive fitted
+signal. Qualification of the generating background and the final analysis
+choices remains required for a final particle-global interpretation.}
+{fig:v5-global-2021}
+\FloatBarrier
+
+The combined study illustrates why the distinction matters. At 76~MeV the
+observed raw local coordinate is only 0.166, corresponding to asymptotic
+$p_0=0.434$. The archived stress spectrum has an offset of $-8.700$ and a
+response width of 0.979, giving an offset-adjusted score of about 9.05.
+This is a large disagreement with that reference response, not a $9\sigma$
+observed resonance. Under the separate raw-maximum ordering, every simulated
+scan exceeds the observed maximum. The two tests cannot be interchanged
+according to which yields the more striking probability.
+
+\fig{0.98}{../figures/v5_global_probabilities_combined.pdf}{Full combined
+search with the same profiled local and conditional global probability
+conventions. The upper panel shows the observed local coordinate and the
+stress-background offset so that an extreme centered tail can be traced to
+its reference. Open downward triangles are one-sided 95\% Monte Carlo upper bounds
+for zero counts; triangles at the local plotting floor mark analytic values
+below $10^{-8}$. The raw and centered orderings are separate tests.}
+{fig:v5-global-combined}
+\FloatBarrier
+
+\FloatBarrier\clearpage
+\begin{landscape}
+\subsection{Agreement of fitted rates across campaigns}
+\label{sec:v5-rate-consistency}
+
+A shared coupling requires the signal yields in different campaigns to agree
+after their different normalizations are applied. Figure~\ref{fig:v5-consistency}
+compares the separate fitted coupling estimates with the common fit. The
+quantity formerly labelled $\Delta D$ is the loss in twice the log likelihood
+when separate campaign amplitudes are replaced by one shared amplitude:
+\begin{equation}
+ \Delta D=2\left[\mathrm{NLL}_{\rm common}-
+                    \sum_d\mathrm{NLL}_{d,\rm independent}\right].
+\end{equation}
+A larger loss means the common rate describes the selected local spectra less
+well than separate rates. The number of freed amplitudes is one fewer than
+the number of active campaigns. Because the displayed masses were selected
+from the data, this descriptive comparison is not assigned an unadjusted
+compatibility probability.
+
+\methodfig{0.98}{../figures/v5_dataset_amplitude_consistency.pdf}{Separate campaign
+coupling estimates and local curvature errors compared with the common rate.
+The likelihood loss quantifies how much the local fit improves when each year
+can choose its own amplitude. The 66~MeV fit has positive contributions from
+all three years; the 92~MeV separate rates differ more visibly. These selected
+comparisons and local errors are not post-selection compatibility tests.}
+{fig:v5-consistency}
+\FloatBarrier
+
+\end{landscape}
+\clearpage

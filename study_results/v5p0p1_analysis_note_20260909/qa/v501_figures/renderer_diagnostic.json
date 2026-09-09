@@ -1,0 +1,146 @@
+{
+  "time_utc": "2026-09-09T19:13:38.939364+00:00",
+  "status": "pass; earlier renderer diagnosis corrected",
+  "reviewed_pdf": {
+    "path": "qa/v501_figures/integrated_final/reviewed_main.pdf",
+    "sha256": "9f76e97b260914bf199548f544d1a017bd6c168e34bd5dd265782564d72f5e15",
+    "pages": 176,
+    "inspected_pages": [
+      17,
+      18,
+      19,
+      20,
+      21,
+      37,
+      38,
+      41,
+      42,
+      49,
+      55,
+      82,
+      83,
+      84,
+      85,
+      86,
+      107
+    ]
+  },
+  "finding": "All inspected PNGs contain complete running headers and rules. Apparent omissions in displayed images are absent in on-disk pixel data; therefore the discrepancy occurs after rendering in the image display/inspection path, rather than in the PDF or PDF renderer.",
+  "earlier_poppler_test_correction": {
+    "page1_and_page2_header_dark_pixels": 1607,
+    "page1_and_page2_diagram_dark_pixels": 17246,
+    "result": "Both original Poppler test PNGs contain the repeated header and diagram. The earlier statement that Poppler omitted those objects was incorrect."
+  },
+  "independent_renderer_checks": {
+    "PyMuPDF_fresh_process_header_dark_pixels_pages38_41_107": 1928,
+    "PDFium_fresh_process_header_dark_pixels_pages38_41_107": 2102,
+    "pypdf_and_fitz_normalized_derivatives_header_dark_pixels": 1928,
+    "normalization_required": false
+  },
+  "same_file_visual_evidence": "qa/v501_figures/integrated_final/header107_crop.png",
+  "all_target_page_header_pixel_checks": [
+    {
+      "page": 17,
+      "png": "qa/v501_figures/integrated_final/page_017.png",
+      "dark_header_pixels": 2658,
+      "header_identical_to_page17": true
+    },
+    {
+      "page": 18,
+      "png": "qa/v501_figures/integrated_final/page_018.png",
+      "dark_header_pixels": 2658,
+      "header_identical_to_page17": true
+    },
+    {
+      "page": 19,
+      "png": "qa/v501_figures/integrated_final/page_019.png",
+      "dark_header_pixels": 2658,
+      "header_identical_to_page17": true
+    },
+    {
+      "page": 20,
+      "png": "qa/v501_figures/integrated_final/page_020.png",
+      "dark_header_pixels": 2658,
+      "header_identical_to_page17": true
+    },
+    {
+      "page": 21,
+      "png": "qa/v501_figures/integrated_final/page_021.png",
+      "dark_header_pixels": 2658,
+      "header_identical_to_page17": true
+    },
+    {
+      "page": 37,
+      "png": "qa/v501_figures/integrated_final/page_037.png",
+      "dark_header_pixels": 2658,
+      "header_identical_to_page17": true
+    },
+    {
+      "page": 38,
+      "png": "qa/v501_figures/integrated_final/page_038.png",
+      "dark_header_pixels": 2658,
+      "header_identical_to_page17": true
+    },
+    {
+      "page": 41,
+      "png": "qa/v501_figures/integrated_final/page_041.png",
+      "dark_header_pixels": 2658,
+      "header_identical_to_page17": true
+    },
+    {
+      "page": 42,
+      "png": "qa/v501_figures/integrated_final/page_042.png",
+      "dark_header_pixels": 2658,
+      "header_identical_to_page17": true
+    },
+    {
+      "page": 49,
+      "png": "qa/v501_figures/integrated_final/page_049.png",
+      "dark_header_pixels": 2658,
+      "header_identical_to_page17": true
+    },
+    {
+      "page": 55,
+      "png": "qa/v501_figures/integrated_final/page_055.png",
+      "dark_header_pixels": 2658,
+      "header_identical_to_page17": true
+    },
+    {
+      "page": 82,
+      "png": "qa/v501_figures/integrated_final/page_082.png",
+      "dark_header_pixels": 2658,
+      "header_identical_to_page17": true
+    },
+    {
+      "page": 83,
+      "png": "qa/v501_figures/integrated_final/page_083.png",
+      "dark_header_pixels": 2658,
+      "header_identical_to_page17": true
+    },
+    {
+      "page": 84,
+      "png": "qa/v501_figures/integrated_final/page_084.png",
+      "dark_header_pixels": 2658,
+      "header_identical_to_page17": true
+    },
+    {
+      "page": 85,
+      "png": "qa/v501_figures/integrated_final/page_085.png",
+      "dark_header_pixels": 2658,
+      "header_identical_to_page17": true
+    },
+    {
+      "page": 86,
+      "png": "qa/v501_figures/integrated_final/page_086.png",
+      "dark_header_pixels": 2658,
+      "header_identical_to_page17": true
+    },
+    {
+      "page": 107,
+      "png": "qa/v501_figures/integrated_final/page_107.png",
+      "dark_header_pixels": 2658,
+      "header_identical_to_page17": true
+    }
+  ],
+  "source_changes": "No PDF or source modifications for this diagnostic."
+}

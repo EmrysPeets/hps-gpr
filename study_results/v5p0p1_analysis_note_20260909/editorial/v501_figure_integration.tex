@@ -1,0 +1,101 @@
+% Integration fragments; root editor owns the corresponding manuscript sections.
+% 1. Replace the old Figure 21 filename with ../figures/v501_kernel_optimization_clean.pdf.
+% Its caption may be retained, but remove references to text now carried by legends.
+
+% 2. Insert after the production length-scale table in the methodology section.
+Figure~\ref{fig:v501-lengthscale-regions} displays the allowed GP length-scale
+regions in log-mass coordinates. The shaded region is a configured domain, not
+an error band on the fitted smoothness. The implementation retains the upper-bound
+floor $0.8\,k_{\max,d}\operatorname{median}_{m\in\mathcal M_d}\sigma_x(m)$,
+with the median evaluated on its configured 300-point search grid; that floor is
+nonbinding over the three plotted search ranges.
+\fig{0.99}{../figures/v501_lengthscale_allowed_regions.pdf}{Allowed RBF
+length scales in $x=\log m$ across the three search ranges. Shading lies between
+the lower and upper bounds evaluated from the frozen analysis card; the dotted
+curves show the local detector-resolution scale $\sigma_x(m)$. The lower/upper
+factors are $1.0/8$, $0.9/12$, and $1.1/15$ for 2015, 2016, and 2021,
+respectively. These are numerical domains for the sideband fit, not fitted
+length scales or detector-resolution uncertainties.}
+{fig:v501-lengthscale-regions}
+
+% 3. Replace the four correlation figures, retaining any old labels as aliases
+% beneath the new single figure if needed for inherited references.
+\fig{0.99}{../figures/v501_profiled_correlations_2x2.pdf}{Profiled-response
+correlation matrices under the archived generating backgrounds: 2015 full at
+top left, 2016 full at top right, 2021 10\% at bottom left, and the combined
+search at bottom right. All four panels use the same dimensionless color scale.
+Positive and negative entries describe same-direction and opposite-direction
+statistical fluctuations. Dotted lines in the combined panel mark changes in
+the active datasets. The matrices quantify dependence; they do not assign a
+probability to a selected observed echo or describe correlations of physical
+signal production.}
+{fig:v501-correlations}
+
+% 4. Add to independent-dataset results; figure limits are exact v5.0.0 curves.
+\subsection{Signal-yield and coupling limits for each dataset}
+\label{sec:v501-individual-scans}
+Figures~\ref{fig:v501-scan-2015}--\ref{fig:v501-scan-2021} separate the
+observed yield limit from its conversion to $\epsilon^2$. The upper panels
+use the full Gaussian-template yield, while the likelihood uses the portion
+inside the fitted window. The different mass dependence of the yield and
+coupling limits follows from the dataset's mass-dependent normalization.
+The nominal local minima occur at 51, 90, and 78~MeV in 2015, 2016, and
+2021, with $p_0=8.46\times10^{-4}$, $3.09\times10^{-4}$, and
+$2.47\times10^{-3}$, respectively. They are fixed-mass asymptotic quantities;
+the coherent global calculation in Section~\ref{v5-sec:global-method} uses
+a separately declared scan statistic and conditional background model.
+
+\fig{0.95}{../figures/v501_observed_scan_2015.pdf}{Observed 2015 full-sample
+scan on 19--90~MeV with 14--135~MeV GP support. From top to bottom: the
+90\% \CLs{} full-template signal-yield upper limit $A_{90}$, the corresponding
+$\epsilon^2$ upper limit, and nominal local asymptotic $p_0$. The same frozen
+released fits supply all panels. The dashed line marks $p_0=0.05$; no
+expected bands or look-elsewhere correction are included.}
+{fig:v501-scan-2015}
+\fig{0.95}{../figures/v501_observed_scan_2016.pdf}{Corresponding observed
+2016 full-sample scan on 39--180~MeV with 30--210~MeV GP support. The panels
+show the full-template $A_{90}$, $\epsilon^2$ limit, and nominal local
+asymptotic $p_0$. The existing 2016 numerical and generating-source
+qualifications remain applicable.}
+{fig:v501-scan-2016}
+\fig{0.95}{../figures/v501_observed_scan_2021.pdf}{Corresponding observed
+2021 10\% scan on 50--250~MeV with 36--300~MeV GP support. The panels
+show the full-template $A_{90}$, minimal-visible $\epsilon^2$ limit, and
+nominal local asymptotic $p_0$. Above the dimuon threshold the inherited
+branching correction enters the coupling conversion once; it does not change
+the visible electron-pair yield or local probability.}
+{fig:v501-scan-2021}
+
+% 5. Add after the current combined result, before interpretation/conclusions.
+\subsection{Conditional full-2021 response compared with BaBar}
+\label{sec:v501-babar-proxy}
+To show how the current result responds to a larger 2021 sample, we repeat
+the restricted density-response construction used in Figure~84 of v4.9.7.
+Let $\rho_d(m)$ be the observed prompt normalization density in the physical
+window $m\pm1.64\sigma_m$. Holding the full 2015 and 2016 samples fixed and
+increasing only the 2021 contribution by a factor of ten gives
+\begin{equation}
+ (\epsilon^2_{90})_{\rm proxy}(m)
+ = (\epsilon^2_{90})_{\rm current}(m)
+ \sqrt{\frac{\sum_{d\in\mathcal D(m)}\rho_d(m)}
+ {\sum_{d\in\mathcal D(m)}s_d\rho_d(m)}} ,
+ \qquad (s_{2015},s_{2016},s_{2021})=(1,1,10).
+ \label{eq:v501-density-proxy}
+\end{equation}
+Here $\mathcal D(m)$ is the active dataset set. The scale is unity below
+50~MeV, density weighted where samples overlap, and exactly $1/\sqrt{10}$
+where only 2021 contributes. The current and proxy minima are
+$8.0043\times10^{-7}$ and $3.1898\times10^{-7}$, both at 72~MeV.
+These are properties of the displayed curves, not expected future outcomes.
+
+\fig{0.98}{../figures/v501_current_projected_babar.pdf}{Current observed
+90\% upper limits and the conditional full-2021 density-response proxy
+compared with the published BaBar visible-dark-photon observed 90\% contour
+\cite{BaBarDarkPhoton2014}. The gray dashed curve is exactly the current
+maximal-available-dataset HPS result over 19--250~MeV. The blue curve applies
+Eq.~\eqref{eq:v501-density-proxy} to its current observed normalization
+densities. It retains present fluctuations and is neither expected
+sensitivity nor a future observed limit or a fit to full-2021 data.
+HPS and BaBar use different statistical constructions. The inherited
+dimuon correction and 2016 qualifications remain applicable.}
+{fig:v501-babar-proxy}

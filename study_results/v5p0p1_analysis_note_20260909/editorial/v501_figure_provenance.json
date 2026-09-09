@@ -1,0 +1,445 @@
+{
+  "version": "5.0.1",
+  "scope": "figure derivatives only",
+  "new_HPS_fits": false,
+  "new_HPS_data": false,
+  "new_toys": false,
+  "records": [
+    {
+      "name": "v501_profiled_correlations_2x2",
+      "caption": "Profiled-response correlation matrices under the archived generating backgrounds: 2015 full (top left), 2016 full (top right), 2021 10% (bottom left), and the combined search (bottom right). All panels share a dimensionless color scale. Positive and negative entries describe same-direction and opposite-direction statistical fluctuations, respectively. Dotted lines in the combined panel mark changes in the active datasets. The matrices quantify dependence; they do not assign a probability to an observed echo or describe correlations of physical signal production.",
+      "derivation": "The exact four saved profiled_K matrices are displayed unchanged on one common scale; this replaces v5.0.0 Figures 57--60.",
+      "inputs": [
+        {
+          "path": "provenance/figure_inputs/50354106be0e_covariance.npz",
+          "sha256": "50354106be0eb505c8fd4712163197a992c76387303b3e8365851db82a62d1ff"
+        },
+        {
+          "path": "provenance/figure_inputs/08d63e7cb3d1_covariance.npz",
+          "sha256": "08d63e7cb3d10bf4b0e260b4af9a4dfa81294ffb99177f5fac7b92927c93a4de"
+        },
+        {
+          "path": "provenance/figure_inputs/407e8b1ad318_covariance.npz",
+          "sha256": "407e8b1ad3186aff5ae0341801d37c06ad72d65994d5ff8085bbe50d6c893e5d"
+        },
+        {
+          "path": "provenance/figure_inputs/2eb5dcd4723a_covariance.npz",
+          "sha256": "2eb5dcd4723a74be096b18dddfa99e002619ec6209896549d1e6edb9ef9a4262"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "figures/v501_profiled_correlations_2x2.pdf",
+          "sha256": "4bd65e47d1af5fb0e2bf9b188d87f89700c6f420f959b594dab5b5e7c427d246"
+        },
+        {
+          "path": "figures/v501_profiled_correlations_2x2.png",
+          "sha256": "1056ab8b26204dbfaa0ca9a31a6d989b9902016f5ffa8cb347bfd01eaae08f6f"
+        }
+      ]
+    },
+    {
+      "name": "v501_lengthscale_allowed_regions",
+      "caption": "Allowed RBF length scales in the GP input coordinate x=log m, evaluated from the frozen analysis card across each search range. Shaded regions lie between the configured lower and upper bounds; dotted curves show the local detector-resolution scale sigma_x(m). The lower/upper factors are 1.0/8 for 2015, 0.9/12 for 2016, and 1.1/15 for 2021. The implementation also retains its configured upper-bound floor of 0.8 times the dataset-median sigma_x times k_max; it is nonbinding over the plotted search ranges. These are allowed numerical domains, not fitted length scales or detector-resolution uncertainties.",
+      "derivation": "Deterministic evaluation of the exact bound function and resolution parameterizations; no spectra or fits are used.",
+      "inputs": [
+        {
+          "path": "provenance/figure_inputs/4a3f33655847_analysis_card.yaml",
+          "sha256": "4a3f3365584743ac1f8b62515ec37c9ca1b908968cfa7497a22609dedbfb79df"
+        },
+        {
+          "path": "provenance/figure_inputs/c57c4cdc05cc_gpr.py",
+          "sha256": "c57c4cdc05cc9e5b923cf7ec303aab9b9c72a6027413a282699ad9dfa3a4ca76"
+        },
+        {
+          "path": "provenance/figure_inputs/ab704592994e_dataset.py",
+          "sha256": "ab704592994ee54bf0e3cb16524e5cfb85eb00635ab887dabd79f7a618bf1ff6"
+        },
+        {
+          "path": "provenance/figure_inputs/ec4f50345aeb_config.py",
+          "sha256": "ec4f50345aebbf5c062e8daaefaaeca9b0e96df12f12b2d726172979df61cf9d"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "figures/v501_lengthscale_allowed_regions.pdf",
+          "sha256": "e8641665f5a69920d589379661785d3ada7a06a0952238816dab52b99c713c9e"
+        },
+        {
+          "path": "figures/v501_lengthscale_allowed_regions.png",
+          "sha256": "b741684773c5afd3c8262919b1fb6bad5656c1104a67590641b53eeca2eba0e7"
+        }
+      ]
+    },
+    {
+      "name": "v501_kernel_optimization_clean",
+      "caption": "Deterministic illustration of per-mass GP hyperparameter selection. (a) One synthetic sideband sample is interpolated using short, interior-optimum, and long RBF length scales; the shaded central interval is excluded from training. (b) The joint log marginal likelihood selects the ConstantKernel value and RBF length scale within the bounded domain. (c) Moving the test mass changes the excluded bins and local resolution. (d) Interior optima and upper-bound contacts have different interpretations: contact means that the numerical domain is active and motivates a controlled range study. The curves and likelihood surface are unchanged from the earlier schematic; annotations have been moved into legends and the caption. No HPS data or measured fit results enter this figure.",
+      "derivation": "Reproduce the original deterministic synthetic illustration, remove all in-panel explanatory text and contour-label clutter, expand layout, and place keys below each panel.",
+      "inputs": [
+        {
+          "path": "provenance/figure_inputs/95d7af709012_make_gpr_hyperparameter_explainer.py",
+          "sha256": "95d7af709012a8a494611e7922bbd4b3372f28554b8688a6dcf495fbfe3e9dcf"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "figures/v501_kernel_optimization_clean.pdf",
+          "sha256": "f99c6787c9031e0a89063469e36aeeb5bdf9637659aa3f7cbd997f33352a64be"
+        },
+        {
+          "path": "figures/v501_kernel_optimization_clean.png",
+          "sha256": "7062a2cbc0b8d42361074bdaf644f8b4421b791e77b6a71d58055028a1997bad"
+        }
+      ]
+    },
+    {
+      "name": "v501_observed_scan_2015",
+      "caption": "2015 full observed scan with GP support 14--135 MeV. From top to bottom: the 90% CLs full-template signal-yield upper limit A90, the corresponding minimal-visible epsilon-squared upper limit, and the nominal local asymptotic p0. The same frozen released profile fits supply all panels. The epsilon-squared conversion includes the inherited dimuon branching correction once above threshold; the visible electron-pair yield is unchanged. The dashed line marks p0=0.05. No expected bands are shown, and the minimum p0 has no look-elsewhere correction.",
+      "derivation": "The v4.9.7 Figure 85 display is rebuilt separately for each current dataset from exact saved rows; no fits, new toys, or projected p-values.",
+      "inputs": [
+        {
+          "path": "provenance/figure_inputs/6f60467b8051_final_dataset_result_curves.csv",
+          "sha256": "6f60467b8051ac23d6b7d357d7f325d0fea6be0f6e184497a7c94769ae6e9adc"
+        },
+        {
+          "path": "provenance/figure_inputs/5caa6781433b_expected_band_summary_dimuon_300toys.csv",
+          "sha256": "5caa6781433bc4a85e9a0fab3bd62b53984422f761f0201c05482d77073a2195"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "figures/v501_observed_scan_2015.pdf",
+          "sha256": "694e6415816a8d1ccb9792a9ca8f0e63c47f2b1c1871615897fbf9a76a350a87"
+        },
+        {
+          "path": "figures/v501_observed_scan_2015.png",
+          "sha256": "a04d1cc4b1cca475ca259c021743c1fd3bfdc340317a6e5f4edf6ca556f72c17"
+        }
+      ]
+    },
+    {
+      "name": "v501_observed_scan_2016",
+      "caption": "2016 full observed scan with GP support 30--210 MeV. From top to bottom: the 90% CLs full-template signal-yield upper limit A90, the corresponding minimal-visible epsilon-squared upper limit, and the nominal local asymptotic p0. The same frozen released profile fits supply all panels. The epsilon-squared conversion includes the inherited dimuon branching correction once above threshold; the visible electron-pair yield is unchanged. The dashed line marks p0=0.05. No expected bands are shown, and the minimum p0 has no look-elsewhere correction. The 2016 numerical and generating-source qualifications remain applicable.",
+      "derivation": "The v4.9.7 Figure 85 display is rebuilt separately for each current dataset from exact saved rows; no fits, new toys, or projected p-values.",
+      "inputs": [
+        {
+          "path": "provenance/figure_inputs/6f60467b8051_final_dataset_result_curves.csv",
+          "sha256": "6f60467b8051ac23d6b7d357d7f325d0fea6be0f6e184497a7c94769ae6e9adc"
+        },
+        {
+          "path": "provenance/figure_inputs/5caa6781433b_expected_band_summary_dimuon_300toys.csv",
+          "sha256": "5caa6781433bc4a85e9a0fab3bd62b53984422f761f0201c05482d77073a2195"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "figures/v501_observed_scan_2016.pdf",
+          "sha256": "d23af4898ddd824d3c865a0bc206c69356afc1f99a7448ad66ae54e0ef33e34d"
+        },
+        {
+          "path": "figures/v501_observed_scan_2016.png",
+          "sha256": "7454a8447251e3750c1a97a280914b34351cfd6302f48896d34b24f2af8d8e37"
+        }
+      ]
+    },
+    {
+      "name": "v501_observed_scan_2021",
+      "caption": "2021 10% observed scan with GP support 36--300 MeV. From top to bottom: the 90% CLs full-template signal-yield upper limit A90, the corresponding minimal-visible epsilon-squared upper limit, and the nominal local asymptotic p0. The same frozen released profile fits supply all panels. The epsilon-squared conversion includes the inherited dimuon branching correction once above threshold; the visible electron-pair yield is unchanged. The dashed line marks p0=0.05. No expected bands are shown, and the minimum p0 has no look-elsewhere correction.",
+      "derivation": "The v4.9.7 Figure 85 display is rebuilt separately for each current dataset from exact saved rows; no fits, new toys, or projected p-values.",
+      "inputs": [
+        {
+          "path": "provenance/figure_inputs/6f60467b8051_final_dataset_result_curves.csv",
+          "sha256": "6f60467b8051ac23d6b7d357d7f325d0fea6be0f6e184497a7c94769ae6e9adc"
+        },
+        {
+          "path": "provenance/figure_inputs/5caa6781433b_expected_band_summary_dimuon_300toys.csv",
+          "sha256": "5caa6781433bc4a85e9a0fab3bd62b53984422f761f0201c05482d77073a2195"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "figures/v501_observed_scan_2021.pdf",
+          "sha256": "a89ee7c006c6694824867134743d3a61aff631d9873424bcd0554d07063dc14a"
+        },
+        {
+          "path": "figures/v501_observed_scan_2021.png",
+          "sha256": "af8413320efe6618167ac0b9e0d31a05c78ce1eed52ff385980fdf3c65b7b6ca"
+        }
+      ]
+    },
+    {
+      "name": "v501_current_projected_babar",
+      "caption": "Current observed 90% upper limits and the conditional full-2021 density-response proxy compared with the published BaBar visible-dark-photon observed 90% contour. The current HPS curve is exactly the v5.0.0 maximal-available-dataset result over 19--250 MeV. The blue proxy holds the full 2015 and 2016 contributions fixed, multiplies only the 2021 observed normalization density in m plus or minus 1.64 sigma_m by ten, and scales epsilon-squared by sqrt(current summed density / changed summed density). This is density weighted in overlap regions and equals 1/sqrt(10) when only 2021 is active. The curve retains current fluctuations; it is neither expected sensitivity nor a future observed limit or refit. The dimuon correction is inherited once. HPS and BaBar use different statistical constructions. The 2016 qualification remains applicable.",
+      "derivation": "Apply the exact restricted prescription of v4.9.7 Figure 84 to current saved HPS limits and current saved normalization densities. Display native BaBar contour points; no new inference or p-values.",
+      "inputs": [
+        {
+          "path": "provenance/figure_inputs/3fbecde0e595_final_total_search_window_dimuon_300toys.csv",
+          "sha256": "3fbecde0e595e416e489734adcf3fefba44c8ff47b1e2fc802974ce6837724c4"
+        },
+        {
+          "path": "provenance/figure_inputs/ccfef5338eda_prediction_state_ledger.csv",
+          "sha256": "ccfef5338edabc70c2f8dd30f864a5960bc4dfaac9ac4276f37c2b1c712e4ee3"
+        },
+        {
+          "path": "provenance/figure_inputs/52ad806b14bc_babar_Lees2014xha_eps2_90.csv",
+          "sha256": "52ad806b14bc8acfab34998727f8431f19ae8c73cd4eb73417fbf7daea137ad8"
+        },
+        {
+          "path": "provenance/figure_inputs/a341f660c124_06_results.tex",
+          "sha256": "a341f660c1244f9084b1434761b619dac678cedbcd5f7e1c7c4cd93c7e170699"
+        },
+        {
+          "path": "provenance/figure_inputs/4a3f33655847_analysis_card.yaml",
+          "sha256": "4a3f3365584743ac1f8b62515ec37c9ca1b908968cfa7497a22609dedbfb79df"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "figures/v501_current_projected_babar.pdf",
+          "sha256": "1a449b93f7c3060b425ea36dacdf1481a52feeebfa891c1c8c5a8b9955fac033"
+        },
+        {
+          "path": "figures/v501_current_projected_babar.png",
+          "sha256": "0f13a921202878eb59d3df55c5e11d883acaf63f59e993ad43cb880edea7cda9"
+        }
+      ]
+    },
+    {
+      "name": "restored_v497_kinematic_figures_8_to_12",
+      "derivation": "Original 20 PDF panels and five main captions retained byte-for-byte; added summary subsection and restored visibility.",
+      "inputs": [
+        {
+          "path": "provenance/figure_inputs/93ee843803ed_03_event_selection.tex",
+          "sha256": "93ee843803ed07b9316a33dca83348f177876cf0b0192a142522f26860ad00f1"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "source/preselection_plots/signal_overlay_loose_loose_vtx_mass.pdf",
+          "sha256": "31367d5bde9c908c31df650b64c1c8426514cd261be6e958276d924e25ff92ae",
+          "original": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-v5-analysis-note-20260908/study_results/v4p9p7_2016_support_combined_100toy_20260902/note/source/preselection_plots/signal_overlay_loose_loose_vtx_mass.pdf"
+        },
+        {
+          "path": "source/preselection_plots/signal_overlay_loose_loose_vtx_chi2.pdf",
+          "sha256": "42ec7ce1071e441007f9d46650eb17e200580ce9228dca3acdfabe4ee1d5504c",
+          "original": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-v5-analysis-note-20260908/study_results/v4p9p7_2016_support_combined_100toy_20260902/note/source/preselection_plots/signal_overlay_loose_loose_vtx_chi2.pdf"
+        },
+        {
+          "path": "source/preselection_plots/signal_overlay_loose_loose_ele_p.pdf",
+          "sha256": "c3d16632a2c7fc27e53c35fb62ce4e0143080c7c806e8f6ec82117ef35d953e5",
+          "original": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-v5-analysis-note-20260908/study_results/v4p9p7_2016_support_combined_100toy_20260902/note/source/preselection_plots/signal_overlay_loose_loose_ele_p.pdf"
+        },
+        {
+          "path": "source/preselection_plots/signal_overlay_loose_loose_ele_pz.pdf",
+          "sha256": "a5e091218d3fa8934f78e7452c089c8923bf532a1a015ba6bcb59cbf1d7566d3",
+          "original": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-v5-analysis-note-20260908/study_results/v4p9p7_2016_support_combined_100toy_20260902/note/source/preselection_plots/signal_overlay_loose_loose_ele_pz.pdf"
+        },
+        {
+          "path": "source/preselection_plots/signal_overlay_loose_loose_ele_d0.pdf",
+          "sha256": "e53d056480e4e8ee5c48cf1208547c49ae6e9be6bbfb184ec387219ec196ba64",
+          "original": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-v5-analysis-note-20260908/study_results/v4p9p7_2016_support_combined_100toy_20260902/note/source/preselection_plots/signal_overlay_loose_loose_ele_d0.pdf"
+        },
+        {
+          "path": "source/preselection_plots/signal_overlay_loose_loose_ele_z0.pdf",
+          "sha256": "c180312b09055dd711e6e959825c831bd10bdbc1c07060b452851eb0d0543c4d",
+          "original": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-v5-analysis-note-20260908/study_results/v4p9p7_2016_support_combined_100toy_20260902/note/source/preselection_plots/signal_overlay_loose_loose_ele_z0.pdf"
+        },
+        {
+          "path": "source/preselection_plots/signal_overlay_loose_loose_pos_p.pdf",
+          "sha256": "e74a06c1775753309a5051c689689fd127b1b4723e2818d33f59fc12cc1c90af",
+          "original": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-v5-analysis-note-20260908/study_results/v4p9p7_2016_support_combined_100toy_20260902/note/source/preselection_plots/signal_overlay_loose_loose_pos_p.pdf"
+        },
+        {
+          "path": "source/preselection_plots/signal_overlay_loose_loose_pos_pz.pdf",
+          "sha256": "c8df6fe6668719ba41d957ea8a67302c10508603b29b319df4d1b72ea85b3a8f",
+          "original": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-v5-analysis-note-20260908/study_results/v4p9p7_2016_support_combined_100toy_20260902/note/source/preselection_plots/signal_overlay_loose_loose_pos_pz.pdf"
+        },
+        {
+          "path": "source/preselection_plots/signal_overlay_loose_loose_pos_d0.pdf",
+          "sha256": "bb027686b969613d295bc34d166fc9db472eedb683f1bbce66799c2f4a9a2bdb",
+          "original": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-v5-analysis-note-20260908/study_results/v4p9p7_2016_support_combined_100toy_20260902/note/source/preselection_plots/signal_overlay_loose_loose_pos_d0.pdf"
+        },
+        {
+          "path": "source/preselection_plots/signal_overlay_loose_loose_pos_z0.pdf",
+          "sha256": "06e8f12a7ffe89c0f9f2008dc53b667c1d51c511d3930140e716cea1a1f217bd",
+          "original": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-v5-analysis-note-20260908/study_results/v4p9p7_2016_support_combined_100toy_20260902/note/source/preselection_plots/signal_overlay_loose_loose_pos_z0.pdf"
+        },
+        {
+          "path": "source/preselection_plots/xy_scatter_xy_mass_vs_ele_p_data_loose.pdf",
+          "sha256": "0ed65c0521f71b5e894e63308c31af47638b941820f11036603e7ba756371c48",
+          "original": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-v5-analysis-note-20260908/study_results/v4p9p7_2016_support_combined_100toy_20260902/note/source/preselection_plots/xy_scatter_xy_mass_vs_ele_p_data_loose.pdf"
+        },
+        {
+          "path": "source/preselection_plots/xy_scatter_xy_mass_vs_ele_p_signal_loose.pdf",
+          "sha256": "40af03df0612cc19124e31cd2fa81ed9bebb3ff83e5b3508c722b74d7ad03ee2",
+          "original": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-v5-analysis-note-20260908/study_results/v4p9p7_2016_support_combined_100toy_20260902/note/source/preselection_plots/xy_scatter_xy_mass_vs_ele_p_signal_loose.pdf"
+        },
+        {
+          "path": "source/preselection_plots/xy_scatter_xy_mass_vs_pos_p_data_loose.pdf",
+          "sha256": "5fabbeabce7b4853b4a53116c9df1f41da66a44db4659f2230551c6fec22001a",
+          "original": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-v5-analysis-note-20260908/study_results/v4p9p7_2016_support_combined_100toy_20260902/note/source/preselection_plots/xy_scatter_xy_mass_vs_pos_p_data_loose.pdf"
+        },
+        {
+          "path": "source/preselection_plots/xy_scatter_xy_mass_vs_pos_p_signal_loose.pdf",
+          "sha256": "4f4824991ff345f2df1e538c7546a79a16b8664e5ed7a3504875725cec4e97a2",
+          "original": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-v5-analysis-note-20260908/study_results/v4p9p7_2016_support_combined_100toy_20260902/note/source/preselection_plots/xy_scatter_xy_mass_vs_pos_p_signal_loose.pdf"
+        },
+        {
+          "path": "source/preselection_plots/xy_scatter_xy_mass_vs_ele_chi2_data_loose.pdf",
+          "sha256": "d872dedf784672c03bc18fb08b84434ff82a08c5571cd80798abe6696928f609",
+          "original": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-v5-analysis-note-20260908/study_results/v4p9p7_2016_support_combined_100toy_20260902/note/source/preselection_plots/xy_scatter_xy_mass_vs_ele_chi2_data_loose.pdf"
+        },
+        {
+          "path": "source/preselection_plots/xy_scatter_xy_mass_vs_ele_chi2_signal_loose.pdf",
+          "sha256": "029c4da8707fe35a4d846d8de07dec47f91495eb52b604fa02fa5f21c3c0d1eb",
+          "original": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-v5-analysis-note-20260908/study_results/v4p9p7_2016_support_combined_100toy_20260902/note/source/preselection_plots/xy_scatter_xy_mass_vs_ele_chi2_signal_loose.pdf"
+        },
+        {
+          "path": "source/preselection_plots/xy_scatter_xy_mass_vs_pos_chi2_data_loose.pdf",
+          "sha256": "ededf0c45c91468adfc0b4bfa0dbc48036e96ef098244837690383e76e71b6ec",
+          "original": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-v5-analysis-note-20260908/study_results/v4p9p7_2016_support_combined_100toy_20260902/note/source/preselection_plots/xy_scatter_xy_mass_vs_pos_chi2_data_loose.pdf"
+        },
+        {
+          "path": "source/preselection_plots/xy_scatter_xy_mass_vs_pos_chi2_signal_loose.pdf",
+          "sha256": "57b8ff92db8e952a4aee3a6a4849b2784d7043123560a8250df5c70432db1005",
+          "original": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-v5-analysis-note-20260908/study_results/v4p9p7_2016_support_combined_100toy_20260902/note/source/preselection_plots/xy_scatter_xy_mass_vs_pos_chi2_signal_loose.pdf"
+        },
+        {
+          "path": "source/preselection_plots/xy_scatter_xy_mass_vs_vtx_chi2_data_loose.pdf",
+          "sha256": "1e96ba2108b8517634a221adbcd09007b34f19aecd04755923d40b4ba7bdf9db",
+          "original": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-v5-analysis-note-20260908/study_results/v4p9p7_2016_support_combined_100toy_20260902/note/source/preselection_plots/xy_scatter_xy_mass_vs_vtx_chi2_data_loose.pdf"
+        },
+        {
+          "path": "source/preselection_plots/xy_scatter_xy_mass_vs_vtx_chi2_signal_loose.pdf",
+          "sha256": "5401e01f1a023fc64f27d26a473bc11551f1b291ae692370851d41fd8e56d344",
+          "original": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-v5-analysis-note-20260908/study_results/v4p9p7_2016_support_combined_100toy_20260902/note/source/preselection_plots/xy_scatter_xy_mass_vs_vtx_chi2_signal_loose.pdf"
+        }
+      ]
+    }
+  ],
+  "checks": {
+    "correlation_panels": [
+      {
+        "panel": "2015 full",
+        "masses": 72,
+        "minimum_mass": 19.0,
+        "maximum_mass": 90.0,
+        "matrix_sha256": "f9ca9c082e34fdd913d5322c5bad8dd557a18cbafff4f86dfcd62534a537af8f"
+      },
+      {
+        "panel": "2016 full",
+        "masses": 142,
+        "minimum_mass": 39.0,
+        "maximum_mass": 180.0,
+        "matrix_sha256": "413e076013a1ed01acd503c5b112961762d06613836961bda07fe99546c946a3"
+      },
+      {
+        "panel": "2021 10%",
+        "masses": 201,
+        "minimum_mass": 50.0,
+        "maximum_mass": 250.0,
+        "matrix_sha256": "0ca30ff76109670d1db56813961a02bbb61dbb5311b6ef359aed59f51f2f687c"
+      },
+      {
+        "panel": "Combined search",
+        "masses": 232,
+        "minimum_mass": 19.0,
+        "maximum_mass": 250.0,
+        "matrix_sha256": "c00d6d699ed1203717cc88d91faca8bb1130d34b33d5197931323c8a8390a475"
+      }
+    ],
+    "lengthscale_bounds": {
+      "rows": 1050,
+      "dataset_stat_upper_floor_active_points": 0,
+      "exact_implementation": "compute_kernel_ls_bounds with frozen analysis card and pinned module snapshots",
+      "upper_floor_mode": "dataset_stat",
+      "upper_floor_factor": 0.8
+    },
+    "kernel_schematic": {
+      "source_synthetic_calculation_unchanged": true,
+      "removed_in_plot_text": [
+        "excluded from training",
+        "(a)",
+        "$\\Delta\\log L=-8$",
+        "$\\Delta\\log L=-8$",
+        "$\\Delta\\log L=-4.5$",
+        "$\\Delta\\log L=-2$",
+        "$\\Delta\\log L=-0.5$",
+        "$\\ell_{\\min}$",
+        "$\\ell_{\\max}$",
+        "bounded maximum",
+        "(b)",
+        "$m_0=72$ MeV, $\\sigma_m=1.25$ MeV",
+        "$m_0=96$ MeV, $\\sigma_m=1.55$ MeV",
+        "filled: training bin",
+        "open: excluded bin",
+        "(c)",
+        "domain is active;\nrange study required",
+        "not a measurement of a physical correlation length",
+        "configured domain",
+        "interior conditional optimum",
+        "upper-bound contact",
+        "(d)"
+      ],
+      "HPS_observations_used": false,
+      "likelihood_mesh_rasterized_dpi": 300
+    },
+    "individual_scans": [
+      {
+        "dataset": "2015",
+        "n_points": 72,
+        "A90_full_template_unchanged": true,
+        "epsilon2_matches_v500": true,
+        "p0_unchanged": true,
+        "inherited_csv_conversion_max_relative_rounding": 1.1146639167236572e-13,
+        "minimum_local_p0": 0.0008462825153401037,
+        "minimum_local_p0_mass_MeV": 51,
+        "minimum_local_Z": 3.139465223457327
+      },
+      {
+        "dataset": "2016",
+        "n_points": 142,
+        "A90_full_template_unchanged": true,
+        "epsilon2_matches_v500": true,
+        "p0_unchanged": true,
+        "inherited_csv_conversion_max_relative_rounding": 2.220446049250313e-16,
+        "minimum_local_p0": 0.00030888909811282967,
+        "minimum_local_p0_mass_MeV": 90,
+        "minimum_local_Z": 3.4236866105162984
+      },
+      {
+        "dataset": "2021",
+        "n_points": 201,
+        "A90_full_template_unchanged": true,
+        "epsilon2_matches_v500": true,
+        "p0_unchanged": true,
+        "inherited_csv_conversion_max_relative_rounding": 2.220446049250313e-16,
+        "minimum_local_p0": 0.0024748462183818466,
+        "minimum_local_p0_mass_MeV": 78,
+        "minimum_local_Z": 2.8102897012100323
+      }
+    ],
+    "babar_projection": {
+      "points": 232,
+      "current_curve_exact_v500_match": true,
+      "only_2021_scaled": 10,
+      "normalization_window_nsigma": 1.64,
+      "proxy_formula": "eps2_current*sqrt(sum_d density_d/sum_d scale_d*density_d)",
+      "only_2021_scale_exact": 0.31622776601683794,
+      "no_2021_scale_exact": 1.0,
+      "current_minimum": {
+        "mass_MeV": 72,
+        "eps2": 8.004291009961892e-07
+      },
+      "proxy_minimum": {
+        "mass_MeV": 72,
+        "eps2": 3.189780153256571e-07
+      }
+    },
+    "kinematics": {
+      "groups": 5,
+      "native_pdf_panels": 20,
+      "all_assets_equal_archived_v497": true
+    }
+  }
+}

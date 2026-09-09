@@ -1,0 +1,177 @@
+\subsection{Kinematic distributions after the 2021 preselection}
+\label{sec:preselection-kinematics}
+The five groups in Figures~\ref{fig:presel_vertex}--\ref{fig:scatter_chi2}
+show the reconstructed quantities used to inspect the 2021 loose preselection.
+Figure~\ref{fig:presel_vertex} displays the mass spectrum and vertex-fit quality;
+Figures~\ref{fig:presel_ele_kin} and~\ref{fig:presel_pos_kin} show the electron
+and positron momenta and impact parameters. The two-dimensional displays in
+Figures~\ref{fig:scatter_mom} and~\ref{fig:scatter_chi2} make their mass dependence
+visible and distinguish broad kinematic structure from the narrow simulated
+mass hypotheses. The signal samples are scaled for display, so these figures
+compare reconstruction shapes rather than absolute yields or efficiencies.
+The vertex-fit $\chi^2$ remains a diagnostic: no additional vertex-fit $\chi^2$
+requirement is applied to the regenerated 2021 GPR input. These archived plots
+document the preselection context and do not constitute a new event selection
+or a validation of the final likelihood.
+
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/signal_overlay_loose_loose_vtx_mass.pdf}
+    \caption{Vertex invariant mass.}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/signal_overlay_loose_loose_vtx_chi2.pdf}
+    \caption{Vertex-fit $\chi^2$.}
+  \end{subfigure}
+  \caption{Reconstructed-vertex distributions after the loose preselection,
+    comparing data (points) with the signal MC (filled histogram). The vertex-fit
+    $\chi^2$ is shown as a diagnostic; no vertex-fit $\chi^2$ requirement is applied to
+    the regenerated 2021 GPR input.}
+  \label{fig:presel_vertex}
+\end{figure}
+
+% ------------------------------------------------------------
+%  1. Electron track kinematics
+% ------------------------------------------------------------
+% The following figures compare the loose-preselected data (points) with the
+% signal Monte Carlo (histogram), normalised to unit area, for the kinematic
+% variables entering the preselection. Figure~\ref{fig:presel_ele_kin} shows the
+% electron-track quantities: the total and longitudinal momentum together with
+% the transverse and longitudinal impact parameters. Good agreement between the
+% shapes of the reconstructed distributions is expected in the bulk of phase
+% space, while the signal is characterised by its harder momentum spectrum and
+% displaced-vertex tails.
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/signal_overlay_loose_loose_ele_p.pdf}
+    \caption{Electron momentum $p$.}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/signal_overlay_loose_loose_ele_pz.pdf}
+    \caption{Electron longitudinal momentum $p_z$.}
+  \end{subfigure}
+
+  \vspace{0.5em}
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/signal_overlay_loose_loose_ele_d0.pdf}
+    \caption{Electron transverse impact parameter $d_0$.}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/signal_overlay_loose_loose_ele_z0.pdf}
+    \caption{Electron longitudinal impact parameter $z_0$.}
+  \end{subfigure}
+  \caption{Electron-track kinematic distributions after the loose preselection,
+    comparing data (points) with the signal MC (filled histogram).}
+  \label{fig:presel_ele_kin}
+\end{figure}
+
+% ------------------------------------------------------------
+%  2. Positron track kinematics
+% ------------------------------------------------------------
+% Figure~\ref{fig:presel_pos_kin} shows the corresponding positron-track
+% quantities. As for the electron, the momentum and impact-parameter
+% distributions are used to validate the modelling of the reconstructed final
+% state prior to any signal-region selection.
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/signal_overlay_loose_loose_pos_p.pdf}
+    \caption{Positron momentum $p$.}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/signal_overlay_loose_loose_pos_pz.pdf}
+    \caption{Positron longitudinal momentum $p_z$.}
+  \end{subfigure}
+
+  \vspace{0.5em}
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/signal_overlay_loose_loose_pos_d0.pdf}
+    \caption{Positron transverse impact parameter $d_0$.}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/signal_overlay_loose_loose_pos_z0.pdf}
+    \caption{Positron longitudinal impact parameter $z_0$.}
+  \end{subfigure}
+  \caption{Positron-track kinematic distributions after the loose preselection,
+    comparing data (points) with the signal MC (filled histogram).}
+  \label{fig:presel_pos_kin}
+\end{figure}
+
+
+
+% ------------------------------------------------------------
+%  5. Two-dimensional mass correlations
+% ------------------------------------------------------------
+% The two-dimensional distributions of the reconstructed invariant mass versus
+% the preselection variables are shown for data (left column) and signal MC
+% (right column) in the following figures. These correlations are used to check
+% that the mass reconstruction is unbiased across the relevant phase space and
+% that no artificial structure is introduced by the selection.
+% Figure~\ref{fig:scatter_mom} shows the mass-versus-momentum correlations.
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/xy_scatter_xy_mass_vs_ele_p_data_loose.pdf}
+    \caption{Mass vs.\ electron $p$ (data).}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/xy_scatter_xy_mass_vs_ele_p_signal_loose.pdf}
+    \caption{Mass vs.\ electron $p$ (signal).}
+  \end{subfigure}
+
+  \vspace{0.5em}
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/xy_scatter_xy_mass_vs_pos_p_data_loose.pdf}
+    \caption{Mass vs.\ positron $p$ (data).}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/xy_scatter_xy_mass_vs_pos_p_signal_loose.pdf}
+    \caption{Mass vs.\ positron $p$ (signal).}
+  \end{subfigure}
+
+  \caption{Reconstructed invariant mass versus momentum observables, for data
+    (left) and signal MC (right), after the loose preselection.}
+  \label{fig:scatter_mom}
+\end{figure}
+
+% Figure~\ref{fig:scatter_chi2} shows the mass-versus-track/vertex-quality
+% correlations.
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/xy_scatter_xy_mass_vs_ele_chi2_data_loose.pdf}
+    \caption{Mass vs.\ electron $\chi^2$ (data).}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/xy_scatter_xy_mass_vs_ele_chi2_signal_loose.pdf}
+    \caption{Mass vs.\ electron $\chi^2$ (signal).}
+  \end{subfigure}
+
+  \vspace{0.5em}
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/xy_scatter_xy_mass_vs_pos_chi2_data_loose.pdf}
+    \caption{Mass vs.\ positron $\chi^2$ (data).}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/xy_scatter_xy_mass_vs_pos_chi2_signal_loose.pdf}
+    \caption{Mass vs.\ positron $\chi^2$ (signal).}
+  \end{subfigure}
+
+  \vspace{0.5em}
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/xy_scatter_xy_mass_vs_vtx_chi2_data_loose.pdf}
+    \caption{Mass vs.\ vertex $\chi^2$ (data).}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{preselection_plots/xy_scatter_xy_mass_vs_vtx_chi2_signal_loose.pdf}
+    \caption{Mass vs.\ vertex $\chi^2$ (signal).}
+  \end{subfigure}
+  \caption{Reconstructed invariant mass versus track- and vertex-fit quality,
+    for data (left) and signal MC (right), after the loose preselection.}
+  \label{fig:scatter_chi2}
+\end{figure}
+
+
+\FloatBarrier
