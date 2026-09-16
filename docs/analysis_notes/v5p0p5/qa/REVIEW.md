@@ -6,6 +6,8 @@ Figure 1 retains the original published vector curves. Figure 2 uses the
 archived numerical inputs with revised layout and colors. The requested language revision was checked in the compiled PDF. Dataset
 terminology, the Results heading, the LCDD explanation, and removal of the
 quoted passages were verified. Detailed toy counts are now in Appendix B.
+The abstract lists the search range and largest local excess for each dataset.
+Pages 2 through 252 match the preceding PDF in both text and rendered pixels.
 All 486 numerical-result and figure files are unchanged by the editorial pass.
 The tail figure was fitted below its shortened introduction to avoid a nearly
 empty page.

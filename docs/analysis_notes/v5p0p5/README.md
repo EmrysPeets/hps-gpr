@@ -4,7 +4,7 @@
 
 ## Language revision within v5.0.5
 
-The requested editorial pass removes the process-heavy wording, uses dataset for experimental samples, expands LCDD at first use, and shortens the Results introduction. Detailed toy counts and the 2016 fit-reproducibility checks are kept in the appendices. The version remains 5.0.5. Numerical results, figures and fit settings are unchanged by this pass.
+The requested editorial pass removes the process-heavy wording, uses dataset for experimental samples, expands LCDD at first use, and shortens the Results introduction. Detailed toy counts and the 2016 fit-reproducibility checks are kept in the appendices. The version remains 5.0.5. Numerical results, figures and fit settings are unchanged by this pass. The abstract now states the individual search ranges and the mass and local significance of the largest excess in each dataset, replacing the version-change summary.
 
 ## Changes
 
