@@ -1,0 +1,136 @@
+{
+  "contours": [
+    {
+      "file": "babar.csv",
+      "role": "upper-limit boundary",
+      "mass_unit": "gev",
+      "y_kind": "eps",
+      "display_95_to_90": true
+    },
+    {
+      "file": "kloe.csv",
+      "role": "upper-limit boundary",
+      "mass_unit": "mev",
+      "y_kind": "eps2",
+      "display_95_to_90": false
+    },
+    {
+      "file": "2014_kloe.csv",
+      "role": "upper-limit boundary",
+      "mass_unit": "mev",
+      "y_kind": "eps2",
+      "display_95_to_90": false
+    },
+    {
+      "file": "2014_mainz.csv",
+      "role": "upper-limit boundary",
+      "mass_unit": "gev",
+      "y_kind": "eps2",
+      "display_95_to_90": false
+    },
+    {
+      "file": "apex_test_run.csv",
+      "role": "upper-limit boundary",
+      "mass_unit": "mev",
+      "y_kind": "eps2",
+      "display_95_to_90": false
+    },
+    {
+      "file": "2015_na482_rescaled_to_95cl.csv",
+      "role": "upper-limit boundary",
+      "mass_unit": "gev",
+      "y_kind": "eps",
+      "display_95_to_90": true
+    },
+    {
+      "file": "hades.csv",
+      "role": "upper-limit boundary",
+      "mass_unit": "gev",
+      "y_kind": "eps2",
+      "display_95_to_90": false
+    },
+    {
+      "file": "2014_phenix.csv",
+      "role": "upper-limit boundary",
+      "mass_unit": "mev",
+      "y_kind": "eps2",
+      "display_95_to_90": false
+    },
+    {
+      "file": "lhcb_2019_results_prompt_data.csv",
+      "role": "upper-limit boundary",
+      "mass_unit": "gev",
+      "y_kind": "eps2",
+      "display_95_to_90": false
+    },
+    {
+      "file": "e137_andreas_log.csv",
+      "role": "closed exclusion polygon",
+      "mass_unit": "loggev",
+      "y_kind": "logeps",
+      "swap_columns": false
+    },
+    {
+      "file": "e141_andreas_log.csv",
+      "role": "closed exclusion polygon",
+      "mass_unit": "loggev",
+      "y_kind": "logeps",
+      "swap_columns": false
+    },
+    {
+      "file": "e774_andreas_log.csv",
+      "role": "closed exclusion polygon",
+      "mass_unit": "loggev",
+      "y_kind": "logeps",
+      "swap_columns": false
+    },
+    {
+      "file": "orsay_andreas_95pct.dat",
+      "role": "closed exclusion polygon",
+      "mass_unit": "loggev",
+      "y_kind": "logeps",
+      "swap_columns": false
+    },
+    {
+      "file": "kek.csv",
+      "role": "closed exclusion polygon",
+      "mass_unit": "gev",
+      "y_kind": "eps",
+      "swap_columns": false
+    },
+    {
+      "file": "u70_serpuhov.csv",
+      "role": "closed exclusion polygon",
+      "mass_unit": "gev",
+      "y_kind": "eps",
+      "swap_columns": true
+    },
+    {
+      "file": "na64_2018.csv",
+      "role": "closed exclusion polygon",
+      "mass_unit": "gev",
+      "y_kind": "eps",
+      "swap_columns": false
+    },
+    {
+      "file": "na64_2019.csv",
+      "role": "closed exclusion polygon",
+      "mass_unit": "gev",
+      "y_kind": "eps",
+      "swap_columns": false
+    }
+  ],
+  "excluded_inputs": {
+    "apex_2019_physics_run.csv": "The source notebook explicitly identifies this as a projection, not a published exclusion.",
+    "dark_light.csv": "Prospective reach."
+  },
+  "geometry": "Exact union of source polygons in log mass and log epsilon squared. Source vertex order and invalid-row breaks retained; no numerical smoothing of limits.",
+  "g2": {
+    "formula": "Delta a_l = alpha epsilon^2 F_V(m/m_l)/(2 pi), F_V=integral_0^1 2x(1-x)^2/((1-x)^2+(m/m_l)^2*x) dx",
+    "muon_delta_a": 3.8e-10,
+    "muon_source": "Aliberti et al., arXiv:2505.21476v3, WP25: 38(63)e-11. The central curve does not imply a nonzero favored band.",
+    "electron_delta_a": 3.4e-13,
+    "electron_source": "Rounded positive central residual for Fan et al. 2023 with Morel et al. 2020 rubidium alpha. Independent Cs alpha gives a negative residual and is not mapped into a positive-vector favored line.",
+    "bands": "Only central-value loci, not confidence regions or posterior medians."
+  }
+}

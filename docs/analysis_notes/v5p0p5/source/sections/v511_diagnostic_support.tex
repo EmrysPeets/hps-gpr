@@ -1,0 +1,121 @@
+\clearpage
+\paragraph{Covariance and injection follow-up (v5.1.1).}
+The new study tests two links in the approximation: whether the response
+matrix describes the dependence between fitted masses, and whether a known
+signal produces the expected local recovery and neighboring response.
+The observed spectra, released limits and probabilities above are unchanged.
+These are conditional diagnostics of the fixed analysis and generating
+spectra, not a new global calibration.
+
+For the extended-grid covariance check, the same first 256 archived
+background-only Poisson spectra are evaluated at every coordinate and
+centered by their empirical means. Their covariance
+and correlation are compared with $D^\top D$ and $R$ from
+Eqs.~\ref{v5-eq:field-response}--\ref{eq:v501-field-correlation}.
+Bootstrap resampling keeps each whole scan together, preserving the
+correlations among masses. The resulting uncertainties quantify Monte Carlo
+precision; they do not include uncertainty in the stress-background model.
+The eigenmodes describe correlated patterns in the scan. An effective
+mode count is a covariance summary, not a calibrated number of search trials.
+The RMS difference between empirical and response-predicted correlations
+is 0.0556 for 2015, 0.0626 for 2016 and 0.0594 for 2021. The denser
+2016 grid resolves the shape of the stress response, whose signed root
+still spans $-17.86$ to $+13.71$; grid refinement does not repair that
+background offset.
+
+The 2015 pilot covers 19--100~MeV at integer masses. Above 90~MeV the
+kernel coordinates are held at their 90~MeV values; each added mass still
+has its own recomputed fit and source-bin response. The 2016 grid retains
+39--180~MeV and adds half-MeV points from 70.5 to 80.5~MeV, with log-linear
+interpolation of the saved kernel coordinates. The released 2021 sample
+retains 50--250~MeV at integer masses. The grids therefore contain
+82, 153 and 201 points. Re-evaluating the same 256 complete spectra at
+all coordinates provides the new covariance blocks; unrelated local toys
+are not joined. The earlier 1,000-scan native-grid benchmark is retained
+separately. A timing-based amendment fixed this reduced covariance sample
+and grid before inspecting their results. The extension remains a pilot
+and does not enlarge the released observed search.
+
+\fig{0.99}{../figures/v511_covariance_comparison.pdf}{Response-predicted
+correlations and their empirical comparison using the same 256 complete
+background-only Poisson spectra at all coordinates. Each row uses its
+actual mass grid; difference panels have separate color scales. The
+original 1,000-scan native-grid result is retained separately and is not
+spliced into these extended matrices. This checks central dependence
+under the specified stress reference, not the rare global tail.}
+{fig:v511-covariance}
+\FloatBarrier
+
+\paragraph{Fixed-mass recovery and full-scan signal responses.}
+The injection masses are inherited diagnostic anchors: 51, 78 and 95~MeV
+for 2015; 42, 66, 76 and 92~MeV for 2016; and 71 and 92~MeV for 2021.
+They cover the earlier 2016 stress excursions, the neighboring structures
+illustrated by the 2021 65/71/78~MeV examples, representative peaks, and
+the proposed 2015 extension. They were chosen to investigate those known
+features, so they do not constitute an independent discovery selection.
+Each mass is tested against both the archived coherent stress spectrum
+and a full-support local GP control fitted to the observed sidebands
+with that signal window excluded. The control depends on the injection
+mass, so these local controls do not form a single global null. The same frozen reference
+error defines the physical yields $A/\sigma_{\rm ref}=0,2,5$ for both
+truths. Within a mass and truth, 64 Poisson background spectra are paired
+across strengths; independent Poisson signal increments of two and three
+reference errors build the size-two and size-five samples. Thus the
+three strengths are correlated experiments, not independent ensembles.
+Figure~\ref{fig:v511-injections} shows three representative anchors.
+At 2016 76~MeV, the size-five injection gives mean signed root $-9.80$
+under the stress truth and $+4.52$ under the local GP control; every
+stress fit remains negative. At 2021 71~MeV the corresponding means are
+$+3.14$ and $+4.37$. Adding a signal moves the distributions, but it does
+not remove the background-dependent offset. With 64 experiments per
+curve, these are small conditional recovery samples.
+
+A deterministic injected spectrum is also scanned over every tested mass.
+For a count perturbation $\delta n_i$ from the signal, the first-order
+prediction from the background response is
+\begin{equation}
+ \Delta r_m^{\rm lin}=\sum_{i:B_i>0}D_{im}
+                         \frac{\delta n_i}{\sqrt{B_i}}.
+ \label{eq:v511-injection-projection}
+\end{equation}
+For the 2016 76~MeV size-five injection, the exact change is $+4.843$
+at the injected mass and reaches $-3.589$ at 85~MeV. The largest difference
+from the linear projection is 0.00924 in signed root over the scan.
+Comparison with the exact difference of the injected and background-only
+scans tests linearity and reveals neighboring peaks or deficits induced by
+the shared interpolation. An off-mass dip can therefore accompany a
+positive injection. This diagnostic does not establish the origin of a
+feature in the observed spectrum. A covariance-matrix column describes
+shared noise; it is not the signal-template projection in
+Eq.~\ref{eq:v511-injection-projection}.
+\fig{0.99}{../figures/v511_signed_injection_echoes.pdf}{Deterministic signal
+injections into the coherent stress spectrum. Left: signed roots before
+and after injection. Right: the size-five change with full retraining,
+its first-order template projection, and a control holding the
+background-only GP prediction and covariance fixed. The likelihood's
+background nuisance parameters remain profiled in the last control.
+Vertical lines mark the injected mass. Neighboring negative responses
+are retained. These full scans contain no Poisson fluctuation.}
+{fig:v511-echo}
+\FloatBarrier
+
+\fig{0.99}{../figures/v511_injection_distributions.pdf}{Fixed-mass Poisson
+injection examples under local GP controls (top) and the archived stress
+truth (bottom). Each curve uses 64 experiments, paired across the three
+strengths within a mass and truth. Dotted lines show fits to unfluctuated
+expectations. The horizontal axis is the signed fitted root; the labels
+$A/\sigma_{\rm ref}=0,2,5$ specify injected yields, not achieved
+significances. The same reference uncertainty is used for both truths
+at a fixed mass. Persistent stress offsets are especially clear at
+2016 76~MeV. No global discovery efficiency is assigned.}
+{fig:v511-injections}
+\FloatBarrier
+
+The fixed-mass Poisson experiments measure conditional signal recovery
+at their declared anchors. They do not scan each fluctuated injection
+across the full mass range, and no new global false-positive threshold or
+discovery power is inferred. The significance GP remains useful for
+propagating a specified background response across the mass scan;
+background qualification and global-tail validation remain separate
+requirements.
+\FloatBarrier

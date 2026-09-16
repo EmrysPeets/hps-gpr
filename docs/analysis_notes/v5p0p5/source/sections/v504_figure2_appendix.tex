@@ -1,0 +1,97 @@
+
+\section{Construction of the Figure 2 projections}
+\label{app:figure2-projections}
+
+Figure~\ref{fig:hps-engineering-phase-space} uses the v5.0.4 spectra,
+training supports, archived kernel parameters and 2015 extension through
+100~MeV. The 2019 input is the measured nominal 1\% spectrum selected with
+$p_{e^-}+p_{e^+}>3.64$~GeV. Its declared search range is 75--250~MeV and its
+training support is 50--300~MeV. The archived factor-15 response scan supplies
+its kernel coordinates; the mass resolution, radiative fraction and conversion
+are borrowed from 2021. Every retained 2019 kernel remains at the upper
+length-scale bound. This limitation is part of the projection, not a native
+2019 response qualification.
+
+At each mass the constituent spectra enter as separate Poisson factors with
+a common nonnegative $\epsilon^2$ and independent Gaussian background
+constraints, including the correlations among bins within each campaign.
+The background is profiled and the bounded asymptotic 90\% \CLs{} endpoint
+is solved numerically. The three- and four-campaign projection inputs use
+the same implementation. No inverse-limit or significance combination is used.
+This figure-specific replay changes the three-campaign numerical endpoints
+by at most 2.51\% relative to the frozen note ledger; the earlier observed
+limits and their figures in Section~6 are retained. The 2019 saved limits
+are not substituted for the newly profiled joint likelihood.
+
+For the full-exposure-equivalent display, let $d_y(m)$ be the observed native-bin
+count density in the $\pm1.64\sigma_m$ window, with fractional edge-bin overlaps,
+and let $f_y$ be the ratio of full exposure to the input exposure. The plotted
+coordinate is
+\begin{equation}
+ u_{\mathrm{full\,eq}}(m)=u_{\mathrm{current}}(m)
+ \sqrt{\frac{\sum_{y\in\mathcal A(m)}d_y(m)}
+ {\sum_{y\in\mathcal A(m)} f_y d_y(m)}},
+ \qquad (f_{2015},f_{2016},f_{2019},f_{2021})=(1,1,100,10).
+\end{equation}
+Here $\mathcal A(m)$ contains every declared active campaign. The two curves
+therefore coincide below 75~MeV. The minimal-visible branching correction is
+applied once above the dimuon threshold. This density rescaling is a
+statistics-only approximation: it retains fluctuations and background
+structure from the observed samples, assumes exposure-independent selections
+and response, and does not generate or analyze future full-data spectra.
+There are no new toys, expected-limit bands, global probabilities or coverage
+claims in this figure calculation. In particular, the curves are not medians
+of a future-data ensemble.
+
+The world-data layer uses the union of the archived exclusion polygons in
+$(\log m,\log\epsilon^2)$ coordinates. It preserves source nodes, closed-contour
+ordering and missing-interval breaks; no smoothing changes the fitted limits.
+The source notebook identifies the archived APEX 2019 physics-run curve as
+a projection, so that curve is omitted from the published-exclusion shading.
+The world-data layer is a historical context snapshot, not a claim of a
+complete September 2026 exclusion compilation.
+
+
+The archived prompt exclusions include BaBar, KLOE/KLOE-2, A1/MAMI, APEX,
+NA48/2, HADES, PHENIX and LHCb
+\cite{BaBarDarkPhoton2014,KLOE2013,KLOE22015,A1MAMI2014,APEX2011,
+NA48DarkPhoton2015,HADESDarkPhoton2014,PHENIXDarkPhoton2015,LHCbDarkPhoton2020}.
+The lower-coupling context includes NA64 and the earlier E137, E141, E774,
+Orsay, KEK and U70 contours
+\cite{NA64DarkPhoton2018,NA64X17Visible2021,E137BeamDump1988,
+E141BeamDump1987,E774BeamDump1991,OrsayBeamDump1989,KEKBeamDump1986,
+U70DarkPhoton2014}. The thermal target is an inherited benchmark
+\cite{EssigEtAl2011}. BaBar and NA48/2 retain the source notebook's
+approximate $95\%\to90\%$ display rescaling of $\eps^2$ by $1.64/1.96$;
+this is not a recomputation of their confidence limits. The HPS curves
+instead retain their published 95\% level in this revision.
+
+For the lepton references the positive-vector one-loop relation is
+\begin{equation}
+ \Delta a_\ell=\frac{\alpha\epsilon^2}{2\pi}
+ \int_0^1\!dx\,\frac{2x(1-x)^2}{(1-x)^2+(m_{A^\prime}/m_\ell)^2x}.
+\end{equation}
+The muon input is the WP25 residual $38(63)\times10^{-11}$
+\cite{MuonWP2025}. The electron curve uses the rounded positive residual
+$\Delta a_e\simeq0.34\times10^{-12}$ obtained with the Fan23 measurement and
+Rb20 fine-structure constant \cite{ElectronFan2023,AlphaMorel2020}.
+The published rounded inverse fine-structure constants are
+137.035999166(15) from the electron moment and 137.035999206(11) from Rb recoil;
+their difference implies this positive residual through the QED derivative.
+These lines are central-value loci, not posterior medians or confidence
+regions. The muon interval includes zero, and the separate Cs determination
+of $\alpha$ gives a negative electron residual that cannot be represented by
+a positive contribution from this vector model. No common preferred region
+is inferred from the two lines.
+
+\subsection{Display update in v5.0.5}
+The top panel now uses the September poster's contour sources and its
+simulated displaced full-luminosity outline. The HPS 2015 and 2016 contours
+retain their published 95\% confidence level; the legacy $1.64/1.96$ display
+rescaling is no longer applied to those two curves. The historical BaBar
+and NA48/2 display convention remains as documented above. Both lower
+panels use the same original published HPS contours and the unchanged
+three- and four-campaign projection arrays. The displaced outline is
+recovered from the poster's archived vector source; it is contextual and
+is not recalculated by the prompt fit. Colors distinguish the three-campaign
+(teal) and four-campaign (dark red) projections.

@@ -1,0 +1,95 @@
+\subsection{Conditional expected bands for the individual and overlapping scopes}
+The following panels resolve the combined overview into the all-three,
+pairwise and standalone searches. They use the same archived 300-toy
+pointwise quantiles described above.
+
+\fig{0.92}{../figures/v5_all_three_expected_bands.pdf}{The all-three
+shared-coupling result on its common 50--100~MeV interval. Green and yellow show
+central 68\% and 95\% pointwise ranges, and the dashed curve is the median of
+300 conditional background-only toys at each mass. The observed curve uses the
+same bounded asymptotic construction as the standalone fits.}
+{fig:v5-all-three-bands}
+\fig{0.98}{../figures/v5_combination_expected_bands.pdf}{Pairwise and all-three
+results with the same conditional 300-toy pointwise bands. Comparisons at a
+given mass use paired constituent draws. Correlation between these panels does
+not supply correlation between separate mass hypotheses.}
+{fig:v5-combination-bands}
+\fig{0.98}{../figures/v5_individual_expected_bands.pdf}{Standalone results for full
+2015, full 2016 and the released 2021 10\% sample, with the same 300-toy
+pointwise quantiles. The 2021 curve uses the frozen 36--300~MeV GP support.}
+{fig:v5-individual-bands}
+\FloatBarrier
+
+\subsection{Empirical limit-tail diagnostics and unresolved tails}
+\label{sec:v5-tail-results}
+
+A second set of probabilities locates an observed \emph{upper limit} within its
+conditional background-only distribution. A low-limit tail describes an
+unusually strong observed constraint; a high-limit tail describes an unusually
+weak constraint. Neither is the local probability of a narrow positive signal.
+The two-sided diagnostic doubles the smaller tail, capped at one.
+
+The targeted refinement added independent batches of 3,000 or 10,000 draws at
+108 sparse scope--mass coordinates, for 660,000 additional scope evaluations.
+It retained the original 300-toy bands. Nine zero-count cells remained after
+the refinement. Zero exceedances therefore appear as one-sided 95\% Monte Carlo
+upper bounds, not as zero probabilities. The requested further continuation
+is outstanding: v5.0.4 adds 300-toy ensembles only for the ten new 2015 masses in each
+applicable scope. The earlier sparse-tail continuation remains outstanding.
+New empty cells retain their own 300-toy bounds, as described in
+Appendix~\ref{app:v504-extension}.
+
+\fig{0.98}{../figures/v5_individual_tail_probabilities.pdf}{Empirical limit-tail
+diagnostics for each dataset. Unrefined points use 300 toys; selected coordinates
+use the saved independent 3,000- or 10,000-toy batches.
+The newly added 2015 masses use 300 toys and the same bound convention. Open downward triangles show
+one-sided 95\% Monte Carlo upper bounds when no tail event is observed; for the
+two-sided diagnostic the bound is doubled and capped at one. These probabilities
+refer to the upper-limit statistic and are distinct from local asymptotic $p_0$.}
+{fig:v5-individual-tails}
+\fig{0.98}{../figures/v5_combination_tail_probabilities.pdf}{The same empirical
+limit-tail diagnostics for the pairwise and all-three combinations. Finite
+estimates and zero-count bounds remain visually distinct. Additional sampling
+can improve the precision of these conditional diagnostics, but cannot
+establish physical background validity or a discovery probability.}
+{fig:v5-combination-tails}
+\FloatBarrier
+
+\subsection{Varying the mass resolution in the signal template}
+\label{sec:v5-resolution-results}
+
+The nominal resolutions were introduced with the detector inputs in
+Section~\ref{sec:event-selection}. The saved width study repeats the 2021
+extraction for templates with widths 0.8, 0.9, 1.0, 1.1 and 1.2 times nominal
+at all 201 tested masses. It holds the GP mean and covariance, training
+exclusion, fit bins and full-template yield-to-coupling conversion fixed.
+Thus the background is still profiled in the local likelihood, but the GP
+training is not repeated for a changed exclusion width.
+
+All 1,005 saved mass--width limits pass their recorded numerical checks. The
+nominal calculation reproduces the production limits within a relative
+$1.28\times10^{-6}$. Across the grid, the median limit ratios at 0.8 and 1.2
+times nominal are 0.799 and 1.202; at 78~MeV they are 0.687 and 1.329.
+The final result retains the nominal template. These variations describe
+sensitivity to the assumed shape; their envelope is not a systematic-error
+band or a likelihood profile of detector-resolution uncertainty.
+
+\fig{0.98}{../figures/v5_resolution_width_limits.pdf}{2021 observed 90\% \CLs{}
+limits for the five signal-template widths, with ratios to the nominal limit
+below. Every curve uses the same archived GP prediction and yield conversion.
+The visible-branching correction is common to all curves and cancels in the
+ratios. The plots retain all 1,005 saved limits.}
+{fig:v5-resolution-limits}
+\fig{0.98}{../figures/v5_resolution_width_significance.pdf}{Local significance
+under the same template-width variations. The plotted signed local coordinate is
+$r=\operatorname{sign}(\widehat A)\sqrt{2[\mathrm{NLL}(0)-\mathrm{NLL}(\widehat A)]}$;
+its negative branch describes deficits. The 1.2-width template changes the
+78~MeV value from 2.810 to 3.216 and the 71~MeV value from $-4.019$ to $-4.239$.
+The 66~MeV reference changes from 2.366 to 2.478 for the 0.8-width template.}
+{fig:v5-resolution-response}
+Selecting a preferred mass or width after examining these curves does not add
+independent evidence for a resonance or measure a resolution miscalibration.
+\FloatBarrier
+
+\input{sections/v5_extraction_results}
+\input{sections/v5_global_results}

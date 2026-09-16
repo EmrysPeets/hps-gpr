@@ -1,0 +1,380 @@
+\section{Conditional global probabilities: implementation and diagnostics}
+\label{app:v504-global-study}
+This appendix collects the detailed checks supporting the method in
+Section~\ref{sec:v5-global} and its results in
+Section~\ref{sec:v5-global-results}. The source and injection diagnostics
+were computed before the 2015 extension; their original reference states
+and sample sizes are retained. The new full-range probability curves are
+Figures~\ref{fig:v5-global-2015} and \ref{fig:v5-global-combined}.
+\subsection{Comparison with the paper and sigcorr}
+\paragraph{Check against the paper and sigcorr.}
+The official implementation~\cite{SigcorrPinned2023}, pinned at commit
+\texttt{a66c08771a81}, reproduces our 2016 and combined correlation matrices
+for both fit methods: the largest absolute difference is
+$3.34\times10^{-16}$, and its Gaussian sampling factors reconstruct those
+matrices within $4.89\times10^{-15}$. This verifies the covariance
+normalization and sampling algebra. There is a substantive difference in
+interpretation, however. The paper~\cite{AnanievRead2023} assumes a signed
+likelihood-root field with null mean zero and unit variance. We supply
+centered response directions $D$, retain a nonzero stress offset $a_m$ and
+width $s_m$, and require a positive raw fit. These are explicit extensions,
+not features that the reference package validates for HPS. Feeding the raw
+biased stress scans into its zero-mean covariance formula instead changes
+the profiled correlations by an RMS of 0.945 for 2016 and 0.953 for the
+combination. Simply removing the centering would therefore be incorrect.
+The calculations below are conditional stress-reference probabilities;
+their normal quantiles are not calibrated particle-discovery significances.
+
+\subsection{Large stress-reference offsets}
+\paragraph{The large 2016 response and the 76 MeV comparison.}
+The 2016 observed $r$ ranges from $-4.50$ to $3.42$, whereas its stress
+response ranges from $-17.60$ to $13.71$. The large gold excursions therefore
+describe the reference construction, not giant observed local signals.
+The reference blends a low-mass fit and a broad continuation over
+75--85~MeV; the latter retains a failed convergence flag and the construction
+has development-sample overlap. The independent 1,000-scan sample reproduces
+its bulk response: standardized means have magnitude below 0.099 and widths
+range from 0.947 to 1.047, with no Holm-adjusted marginal-normality flags.
+However, the nominal full-maximum comparison has $p=0.034$ and its rare tails
+remain unvalidated. This is evidence that the approximation describes much
+of this particular stress ensemble, not that the 2016 physical background
+has been adequately qualified. A replacement reference would need independent
+background controls and renewed validation, rather than selection because
+it gives a more favorable observed significance.
+
+At combined 76~MeV, $r=0.166$ gives nominal local $p_0=0.434$.
+The stress response is $a=-8.700$ with width $s=0.979$, so
+$(r-a)/s=9.053$. That number measures disagreement with a reference that
+usually produces a large fitted deficit; it is not a $9\sigma$ resonance.
+For 2016 alone at the same mass, $r=-2.460$ and $a=-14.653$. Although the
+centered coordinate is 12.437, the negative fitted signal fails the declared
+positive-fit gate and its conditional discovery probability is one.
+The combined fit is slightly positive and passes that gate. This explains
+both the apparent contrast between the plots and the sharp probability
+jumps at sign changes. Under the separate raw-maximum ordering, every
+archived combined simulated scan exceeds the observed maximum; the two orderings
+cannot be exchanged after seeing their results.
+
+\subsection{Resolving empty Gaussian tails}
+\paragraph{Resolving the empty Gaussian tails.}
+The original local plotting floor and ordinary Monte Carlo resolution were
+separate issues. Removing the floor reveals all finite local tails.
+The 2,000,000-field continuation still gives zero counts at six 2016 masses
+(42--44, 55--56 and 71~MeV) and combined 76--77~MeV. Those ordinary-sampling
+bounds remain in the ledger. This revision evaluates the same Gaussian
+probabilities by conditional-mixture importance sampling
+\cite{OwenMaximovChertkov2019}; it does not extrapolate a fitted tail or
+change the reference to obtain smaller probabilities.
+
+For an observed threshold $u$, the positive-fit gate makes the event
+\begin{equation}
+ \{T^*\geq u\}=\bigcup_i\{z_i^*\geq b_i\},\qquad
+ b_i=\max(u,-a_i/s_i),\qquad Q=\sum_i[1-\Phi(b_i)].
+ \label{eq:v502-tail-union}
+\end{equation}
+Choose a coordinate with probability $[1-\Phi(b_i)]/Q$ and draw a complete
+correlated Gaussian field conditional on that coordinate exceeding its
+threshold. If the draw exceeds $c$ coordinate thresholds, its weight is
+$Q/c$. The mean weight is an unbiased estimator of the union probability.
+The full covariance and scan grid are retained, including dataset-membership
+boundaries. This additional integration method is separate from
+\texttt{sigcorr}'s ordinary sampling and smooth-field upcrossing routines.
+The latter cannot be applied unchanged to this varying gate threshold.
+
+The fixed budget is two independent samples of 20,000 fields at each
+positive-fit coordinate with standardized threshold at least 3.5:
+23 coordinates in total, including every formerly empty Gaussian tail.
+Checks cover independent and singular correlated fields with known
+probabilities, plus eight overlap thresholds against the existing
+2,000,000-field samples. The largest overlap discrepancy is 1.71 combined
+standard errors; independent targeted replicates differ by at most 2.11.
+The complete targeted run, including the overlap and basic analytic tests,
+took 3.1 seconds with one worker, one linear-algebra thread and 207~MiB
+peak resident memory. Relative Monte Carlo standard errors are below
+0.33\%. Table~\ref{tab:v502-continuation} shows the newly resolved points.
+The plotted intervals are pointwise approximate 95\% Monte Carlo intervals,
+not simultaneous intervals or uncertainty in the Gaussian/background model.
+The direct Poisson rare tails remain unresolved. A precisely integrated
+biased Gaussian reference is still not a validated discovery probability.
+
+\begin{table}[htbp]\centering\small
+\input{../derived/v502_resolved_tail_table}
+\caption{Previously zero-count Gaussian tails resolved by conditional-mixture
+sampling of the unchanged finite-grid stress model. Each estimate uses
+40,000 weighted fields. The last column gives the relative Monte Carlo
+standard error. The $Z$ column is a normal-quantile representation of the
+conditional probability, not a particle significance. Ordinary Gaussian
+sampling gives 0/2,000,000 at every listed point; the independent direct
+Poisson study remains limited to 1,000 experiments.}
+\label{tab:v502-continuation}
+\end{table}
+
+\fig{0.99}{../figures/v502_stress_reference_distributions.pdf}{Representative
+background-only distributions from the saved 1,000 complete Poisson scans.
+Green histograms show the signed fitted coordinate, gold curves the
+unfluctuated-response Gaussian approximation, and black lines the observed
+fit. These panels show why the apparently large centered scores at 2016
+42~MeV and combined 76~MeV can coexist with nearly zero raw observed fits.
+At 2016 76~MeV the observed fit is negative and is excluded by the
+positive-fit gate. Agreement of the histograms with the gold curves tests
+the approximation under that reference, not the physical correctness of
+the reference spectrum.}
+{fig:v502-stress-distributions}
+
+\subsection{Fixed-mass injection recovery at 76 MeV}
+\paragraph{Injected signals: what is already tested.}
+Signal injection is built into the separate fixed-mass validation study in
+Appendix~\ref{v5-sec:calibration}. Figure~\ref{fig:v502-injection-recovery}
+replots its saved 76~MeV distributions for both 2016 and the combined fit,
+using 500 independent Poisson toys per curve. The injected yield is fixed at
+$A/\sigma_{\rm ref}=0,2,5$, where $\sigma_{\rm ref}$ is the frozen reference
+uncertainty; these labels are injection sizes, not achieved significances.
+For the combined local-GP control, the calibrated local $p<0.05$ criterion
+is met in 23/500, 321/500 and 499/500 experiments, respectively. The
+corresponding 2016 counts are 18/500, 311/500 and 500/500. Thus the fit
+responds to an injected signal under that control, with residual offsets
+visible in the distributions.
+
+The stress-background panels are equally important. Their zero-injection
+mean fitted yields are $-14.72\sigma_{\rm ref}$ for 2016 and
+$-8.68\sigma_{\rm ref}$ for the combination. Adding signal moves the
+fitted distribution to the right, but even the size-five injection leaves
+it negative; all three strengths have 0/500 calibrated local rejections
+under this stress construction. Calibration alone therefore does not repair
+signal recovery under an unsuitable reference. These are local tests of
+the two-truth calibration envelope, not a demonstration of full-scan
+discovery power for the significance GP.
+
+The practical gain of the significance GP is to approximate many correlated
+background scans cheaply once the response has been evaluated
+\cite{AnanievRead2023}. Compared with reading a nominal normal-tail p-value,
+this exposes the effects of reference offsets, correlations and the search
+range. It does not improve the fitted signal automatically or establish
+superiority to a traditional background fit. A discovery-power comparison
+would inject the same physical signal into coherent full spectra and apply
+each complete search at the same validated global false-positive rate.
+The present results support that next test while also identifying the
+2016 reference problem that must be addressed first.
+
+\fig{0.98}{../figures/v502_injection_recovery_76.pdf}{Saved 76~MeV signal-injection
+experiments, with identical axes for the local-GP controls (top) and archived
+stress backgrounds (bottom). Each curve has 500 independent Poisson spectra;
+dotted vertical guides mark the true injected yields $0,2,5$ in units of
+that scope's fixed $\sigma_{\rm ref}$. The distributions move with injection,
+but the stress-background bias persists. These fitted-yield distributions
+show recovery and its failure mode explicitly; injection size five does
+not mean a measured $5\sigma$ signal. No new injection toys were generated
+for this display.}
+{fig:v502-injection-recovery}
+\FloatBarrier
+
+\subsection{Can the 2016 reference be improved?}
+\paragraph{Can the 2016 reference be improved by repairing the blend?}
+Figure~\ref{fig:v502-stress-source-controls} compares three predetermined
+background constructions over all 142 frozen hypotheses: the archived
+reference, its broad component alone with the same total normalization,
+and a version integrating the blend weights inside each source bin.
+No observed p-value enters either construction. The low-mass component is
+a degree-five logistic--Chebyshev fit over 26--80~MeV; the 75--85~MeV
+transition therefore uses some extrapolation. The broad component has a
+failed source-fit convergence flag and threshold zeros. These are diagnostic
+controls, not qualified candidate nulls.
+
+Removing the low-mass component changes the 76~MeV response from
+$-14.653$ to $-5.926$, and the 66~MeV response from $12.469$ to $-0.124$.
+But at 42~MeV it worsens from $-9.215$ to $-23.524$; the full-grid RMS
+increases from 4.967 to 9.430. More accurate integration changes the
+response by at most 0.001135, ruling out midpoint blend weighting as the
+cause of the large excursions in this paired comparison. The original
+source is reproduced to floating-point precision, and exact scalar/batch
+fits agree within $4.0\times10^{-12}$ in signed root. The final exact
+replay takes 36 seconds and 364~MiB with one worker and no new Poisson
+toys. Thus the source mixture matters, but neither tested modification
+repairs 2016 across its search range. The existing response is retained;
+qualifying a replacement needs background controls and signal-recovery
+validation, not a cosmetically smoother curve.
+
+\fig{0.98}{../figures/v502_stress_source_controls.pdf}{Controlled 2016
+background-source comparison. Top: expected source spectra with identical
+total normalization; gold is the archived blend and blue its broad component
+alone. Middle: their exact unfluctuated signed responses, using the same
+frozen kernels. Bottom: the difference in deterministic signed response,
+$r_{\rm integrated}-r_{\rm midpoint}$, when the blend weights are integrated
+inside each source bin. This is neither an observed mass residual nor a
+fitted signal: both curves come from smooth, signal-free expected spectra.
+The maximum absolute change is only 0.001135 in $r$. A localized smooth
+shape on this very small vertical scale therefore does not show extraction
+of a perfect signal. Gray shading marks 75--85~MeV. The broad-only
+control improves some masses but makes the full-grid response worse; it
+retains a failed source-fit flag and is not adopted as a replacement null.
+No new Poisson or injected-signal toys are used here.}
+{fig:v502-stress-source-controls}
+\FloatBarrier
+
+\subsection{Covariance and scan-grid checks}
+
+\paragraph{Covariance and injection follow-up (v5.1.1).}
+The new study tests two links in the approximation: whether the response
+matrix describes the dependence between fitted masses, and whether a known
+signal produces the expected local recovery and neighboring response.
+The observed spectra and original study products were unchanged by that support study.
+These are conditional diagnostics of the fixed analysis and generating
+spectra, not a new global calibration.
+
+For the extended-grid covariance check, the same first 256 archived
+background-only Poisson spectra are evaluated at every coordinate and
+centered by their empirical means. Their covariance
+and correlation are compared with $D^\top D$ and $R$ from
+Eqs.~\ref{v5-eq:field-response}--\ref{eq:v501-field-correlation}.
+Bootstrap resampling keeps each whole scan together, preserving the
+correlations among masses. The resulting uncertainties quantify Monte Carlo
+precision; they do not include uncertainty in the stress-background model.
+The eigenmodes describe correlated patterns in the scan. An effective
+mode count is a covariance summary, not a calibrated number of search trials.
+The RMS difference between empirical and response-predicted correlations
+is 0.0556 for 2015, 0.0626 for 2016 and 0.0594 for 2021. The denser
+2016 grid resolves the shape of the stress response, whose signed root
+still spans $-17.86$ to $+13.71$; grid refinement does not repair that
+background offset.
+
+The 2015 pilot covers 19--100~MeV at integer masses. Above 90~MeV the
+kernel coordinates are held at their 90~MeV values; each added mass still
+has its own recomputed fit and source-bin response. The 2016 grid retains
+39--180~MeV and adds half-MeV points from 70.5 to 80.5~MeV, with log-linear
+interpolation of the saved kernel coordinates. The released 2021 sample
+retains 50--250~MeV at integer masses. The grids therefore contain
+82, 153 and 201 points. Re-evaluating the same 256 complete spectra at
+all coordinates provides the new covariance blocks; unrelated local toys
+are not joined. The earlier 1,000-scan native-grid benchmark is retained
+separately. A timing-based amendment fixed this reduced covariance sample
+and grid before inspecting their results. That study alone did not enlarge the released observed search. Version 5.0.4
+now uses its endpoint prescription and response matrix, together with the
+new conditional limits in Appendix~\ref{app:v504-extension}.
+
+\fig{0.99}{../figures/v511_covariance_comparison.pdf}{Response-predicted
+correlations and their empirical comparison using the same 256 complete
+background-only Poisson spectra at all coordinates. Each row uses its
+actual mass grid; difference panels have separate color scales. The
+original 1,000-scan native-grid result is retained separately and is not
+spliced into these extended matrices. This checks central dependence
+under the specified stress reference, not the rare global tail.}
+{fig:v511-covariance}
+\FloatBarrier
+
+\subsection{Paired Poisson injection distributions}
+\fig{0.99}{../figures/v511_injection_distributions.pdf}{Fixed-mass Poisson
+injection examples under local GP controls (top) and the archived stress
+truth (bottom). Each curve uses 64 experiments, paired across the three
+strengths within a mass and truth. Dotted lines show fits to unfluctuated
+expectations. The horizontal axis is the signed fitted root; the labels
+$A/\sigma_{\rm ref}=0,2,5$ specify injected yields, not achieved
+significances. The same reference uncertainty is used for both truths
+at a fixed mass. Persistent stress offsets are especially clear at
+2016 76~MeV. No global discovery efficiency is assigned.}
+{fig:v511-injections}
+\FloatBarrier
+
+The fixed-mass Poisson experiments measure conditional signal recovery
+at their declared anchors. They do not scan each fluctuated injection
+across the full mass range, and no new global false-positive threshold or
+discovery power is inferred. The significance GP remains useful for
+propagating a specified background response across the mass scan;
+background qualification and global-tail validation remain separate
+requirements.
+\FloatBarrier
+
+\subsection{Why the 76 MeV probability spike is not a narrow mass peak}
+\label{app:v504-width-review}
+The statistical review first distinguishes the dataset and the statistic.
+At 76~MeV the 2016 fit has $r=-2.4599$, stress expectation
+$a=-14.6532$, and response width $s=0.9804$. Its positive-fit gate is
+closed. The combined fit has $r=0.1656$, $a=-8.7001$ and $s=0.9794$,
+giving $(r-a)/s=9.0526$ with the gate open. At 75~MeV the combined
+raw fit is $r=-0.6659$ and the gate is closed. This change in the gate,
+followed by a rapid change in the reference offset, creates the sharp
+feature in the plotted probability. The 2015 extension changes the global
+maximum distribution but leaves these fixed-mass fits below 90~MeV intact.
+
+The adopted 2016 detector width is $\sigma_m=3.0979$~MeV at 76~MeV,
+or FWHM $=7.2949$~MeV for a Gaussian. Interpolating the old plotted global
+$Z$ nodes gives an apparent half-height width of about 1.90~MeV. That is
+a property of a transformed, gated scan, not a fitted invariant-mass width.
+Even a known resolution-shaped injection has a different scan response:
+the five-reference-error injection gives a positive $\Delta r$ lobe about
+5.74~MeV wide. The training mask moves and the GP is retrained at each
+hypothesis, so the scan acts as a filter and can develop negative neighbors.
+Equation~\eqref{eq:v511-injection-projection} is the appropriate first-order
+description of that response; the detector line shape is a different object.
+
+All twelve saved fixed-width and GP-treatment variants examined at 76~MeV
+retain negative 2016 fits and zero bounded signal. The saved resolution-nuisance
+fit also gives zero positive signal. Its width coordinate at zero amplitude
+cannot be read as a measured narrow width. The 2016 90--92~MeV region does
+have positive raw fits, about $r=3.1$--$3.4$, which makes a mass-residual
+inspection meaningful. This is a reason to investigate its shape and rate
+agreement, not to assign it a physical origin. A width inference would require
+a fixed-bin signal-plus-background model and an independently supported
+resolution constraint, together with the effect of selecting the region.
+The review adds no such width measurement or calibrated discovery claim.
+
+\fig{1.0}{../figures/v510_histogram_binning.pdf}{Archived v5.1.0 histogram-binning
+comparison using exact pointwise fits at the saved kernel settings. Histogram
+width changes both the GP prediction and the signal fit. These individual
+campaign scans are not a rebinned calibration of the combined positive-fit gate.}
+{fig:v505-binning}
+
+\subsection{Joint binning check around the 76 MeV gate crossing}
+\label{app:v505-joint-binning}
+The archived v5.1.0 scans above describe the individual campaigns. For this
+revision, a short joint scan tests the effect on the combined signed fit
+itself. Five binning choices are fixed before the refits: the nominal widths,
+twice and four times those widths, and one additional origin for each coarse
+choice shifted by half its bin width. The tested masses are the integers
+from 72 through 80 MeV. The choice of this region follows the question about
+the displayed spike; no new discovery test is assigned to the comparison.
+
+The original analysis widths are 0.25 MeV for 2015 and 2016 and 0.625 MeV
+for 2021. Counts are summed in adjacent original bins, with exact conservation
+inside each included group. An incomplete group at the far upper training
+edge is omitted, as in the original rebin operation; shifting the origin
+also removes leading support bins. The effective endpoints are saved for
+every campaign and choice. Thus this check includes the small change in
+sideband sampling that accompanies the selected bin boundaries; it does not
+isolate bin origin from support-edge effects.
+
+Each tested mass retains its archived kernel amplitude and length scale.
+The log-count GP is conditioned again on the rebinned sidebands, excluding
+bin centers within $\pm2.25\sigma_m$. The count covariance and
+bin-integrated Gaussian template are reconstructed, and the joint Poisson
+likelihood is fitted with a common signed coupling and independent GP
+background constraints. The native-bin prompt density, detector resolution
+and radiative conversion are held fixed. The nominal 76 MeV fit reproduces
+the reported $r=0.166$ to the quoted precision, and its individual roots
+agree with the archived values. Every fitted expectation is positive and
+all 180 fitted mass/scope/binning coordinates converge.
+
+\begin{table}[htbp]\centering\small
+\begin{tabular}{lrrr}\toprule
+Widths relative to nominal & Origin shift & $r_{\rm comb}(76)$ & First $r>0$ [MeV]\\\midrule
+$1\times$ & 0 & $+0.166$ & 76\\
+$2\times$ & 0 & $-0.216$ & 77\\
+$2\times$ & half a coarse bin & $+0.530$ & 76\\
+$4\times$ & 0 & $-0.137$ & 77\\
+$4\times$ & half a coarse bin & $-0.695$ & 77\\
+\bottomrule\end{tabular}
+\caption{Signed joint-profile response in the bounded v5.0.5 diagnostic.
+``First'' refers only to the tested 72--80 MeV grid. The shifted origins
+are applied separately using each campaign's bin width.}
+\label{tab:v505-joint-binning}\end{table}
+
+\fig{1.0}{../figures/v505_76_joint_binning.pdf}{Observed signed fit scans
+under the five declared bin choices. The horizontal zero line is the
+positive-fit gate boundary. At 76 MeV, the combined fit can lie on either
+side of it while the 2016 component remains negative. Curves connect tested
+integer masses; no sub-MeV zero-crossing precision is implied.}
+{fig:v505-joint-binning}
+The saved CSV and protocol record the bin widths, origin shifts, effective
+supports and convergence diagnostics. This small comparison draws no toys,
+reoptimizes no kernels and computes no global probabilities. A full binning
+choice for unblinding still requires the corresponding closure and
+calibration checks.

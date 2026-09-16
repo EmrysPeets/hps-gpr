@@ -1,0 +1,232 @@
+\section{Change log and study history}
+\label{v5-sec:history}\label{sec:v5-history}
+
+\subsection{Version 5.0.5: projections and detector-study integration}
+The 16 September revision replaces Figure 1 with vector reproductions of
+the published HPS limits and updates Figure 2 from the poster sources while
+retaining both projection panels. It adds the v5.6.1 10\%-based conditional
+expectations after the observed results, with historical 1\% examples in
+an appendix; integrates v5.7.1 geometry and transport; adds a bounded joint binning check near 76 MeV using the saved spectra; and summarizes v5.5.4 rate studies at the end
+of the appendix. The observed result ledgers and nominal binning are unchanged.
+The distinction between exposure-scaling targets and empirical toy medians
+is explicit. The standalone version archive records source hashes and the
+changes between successive studies.
+
+This appendix begins with the history of the studies used to prepare the
+version 5.0.0 unblinding-request draft. The main text is a curated account
+of the current proposed procedure, while this chronology explains how the
+support choices, background treatment and interpretation changed.
+A later report does not automatically supersede every earlier result:
+the underlying data fraction, fit policy, numerical qualification and
+probability definition determine which comparison is valid.
+
+\subsection{Historical validation and the full-note foundation}
+The v4 analysis established the sideband GP interpolation, signal
+extraction and bounded asymptotic $CL_s$ workflow. Subsequent v4.6--v4.8
+studies examined trigger categories, injected-signal response, guard bands,
+residual structure and smooth alternative backgrounds. Their plots remain
+useful historical controls. They are not measurements of observed-data
+bias or global significance, and tests with different truth constructions
+or injected-yield definitions are not combined into a single ensemble.
+
+The August 2026 v4.9 and v4.9.1 threshold studies established that 2021
+signal recovery depends on the lower training edge and on the generating
+shape. The v4.9.5 support study, recorded on 20 August, compared six
+lower edges. No choice passed its original uniform mean-pull criterion.
+A documented amendment selected the 36~MeV edge under a practical
+criterion and confirmed it with independent backgrounds. The remaining
+55~MeV offsets are retained in Appendix~\ref{v5-sec:calibration}.
+The older 40--300~MeV 2021 support is historical context; the current
+2021 card uses the documented 36--300~MeV support.
+
+The v4.9.7 study of 2 September attempted the 2016 support qualification
+needed for subsequent combined extraction. Its initial support scan failed
+the declared gate and stopped; its planned continuation and combined
+validation were not run. A later, separate observed-state replay retained
+an explicit 2016 numerical exception: 87 of 142 states were resolved,
+with 55 unresolved. These later qualifications take precedence over any
+historical statement that the validation alone established readiness for
+full-data unblinding. Version 5 retains the technical description of the
+detector inputs, signal normalization and fitting procedure from that
+full-note lineage, while stating the remaining review conditions explicitly.
+
+The Harvard final-combinations writing sample, also prepared on
+2 September, supplied the compact presentation of the available observed
+results and polished explanatory prose. Its inputs were full 2015,
+full 2016 and the released 2021 10\% sample. This draft expands those
+sections with the subsequent statistical studies and separates the
+proposal to unblind from a claim that all calibration gates have passed.
+It does not open additional 2021 events.
+
+\subsection{Observed combinations, tails and resolution: v4.9.12}
+The 4--5 September v4.9.12 sequence consolidated observed combinations,
+expected-limit reference products, targeted statistical-tail sampling,
+and mass-resolution variations. Version 5 uses its observed individual
+and combined coupling limits, supplements the principal figure with
+asymptotic local probabilities, and retains the requested resolution
+comparisons as response studies. Figures from different releases are
+identified by their numerical source rather than assumed to be equivalent
+because their appearance is similar.
+
+The targeted-tail study refined finite-simulation probabilities where
+possible. A zero exceedance count supplies a sampling bound and does
+not measure a zero probability; an unresolved endpoint remains
+explicitly unresolved. Resolution variations and selected candidate
+extractions assess how the result responds to a changed template.
+They do not independently measure a resolution error or supply an
+additional significance gain.
+
+The related 2021 peak--dip and reverse-injection studies showed how a
+positive localized feature can enter neighboring sidebands and induce
+negative or positive fitted responses as the mask moves. These studies
+motivate the correlation and extraction displays in the results section.
+Their generating smooth shapes and selected masses make them conditional
+response diagnostics.
+
+\subsection{Background profiling and empirical calibration: v4.9.13}
+The 5 September background-profiling study compared the nominal
+correlated Gaussian profile, a positive log-GP profile and a fixed GP
+mean. Known-background controls separated implementation behavior from
+uncertainty propagation; injections with fluctuating background and
+retrained sidebands demonstrated the limitations of the fixed approach
+and the remaining 71~MeV failure of the profile.
+Version 5 brings the controlled limit comparison and injected-bias figure
+into the methodology discussion, including the physical meaning of the
+two- and five-reference-error injections.
+
+The accompanying calibration release evaluated 456 dataset/mass
+coordinates and independently checked exclusion and local-rejection
+rates. Its finite-set background envelope removed the adjusted failures
+within the declared validation family, while exposing large sensitivity
+to the 2016 stress construction. Appendix~\ref{v5-sec:calibration}
+reorganizes the full calibration discussion around a flowchart,
+background definitions, observed changes, interpolation offsets and
+validation. Its conclusion supports profiling but does not certify
+uncorrected asymptotic probabilities across every tested background.
+
+\subsection{Understanding calibration and extending global tests: v4.9.14--v4.9.15}
+The 6 September v4.9.14 interpretation report explained why calibration
+can turn an unusually tight limit into a broad feature, and why a large
+background-dependent offset differs from a wider statistical error.
+It also introduced the 2015 significance-GP pilot, using ten complete
+initial scans, 1,000 independent validation scans and 200,000 correlated
+fields. Version 5 adopts its distinction between the background GP and
+the GP describing correlations across the significance scan.
+
+The v4.9.15 extension repeated this calculation for full 2016 and
+released 2021 10\% data. It documented the coherent background
+construction, central-distribution checks and unresolved rare tails.
+These results motivate the method in Sec.~\ref{v5-sec:global-method},
+while the source-fit and convergence limitations of the 2016 stress spectrum prevent
+its very small formal local probabilities from becoming particle claims.
+The 2015 and 2021 finite global-tail estimates remain conditional
+method-development results.
+
+\subsection{Union scan, probability audit and candidate studies: v4.9.16}
+The 6 September combined-global study extended the actual shared-coupling
+likelihood across the complete 19--250~MeV union. Dataset membership changes
+with mass, and the new coherent calculation preserves correlations across
+those boundaries. It supplies 232 observed mass points and separates
+raw-local ordering from stress-offset-adjusted ordering. Its union limits
+remain pointwise asymptotic limits; the 41-point earlier calibration
+cannot be silently promoted to a calibration of the entire union.
+
+The probability-audit and echo report checked the displayed extraction
+likelihoods against the saved scan. It showed that the apparently extreme
+76~MeV stress-reference result accompanies a small observed positive
+local fit. Version 5 uses that distinction to label local significance
+and conditional background-reference probabilities consistently. Its
+deterministic signal-injection replay also demonstrates that a real
+injected feature can induce nearby oscillations through the fitting
+procedure, without establishing that the observed features are particles.
+
+The extraction-presentation report provided the candidate count and
+residual displays used in the results section. The deficit extension
+reused the same coherent experiments and Gaussian fields in the negative
+direction. It is retained as a background diagnostic, with its scan plot
+shown beside the extraction discussion and its detailed interpretation
+in the appendix. It adds no independent toy ensemble or direction-selection
+correction.
+
+The candidate-removal and traditional-search report replaced selected
+regions with conditional expectations and compared fits to the original
+counts with conventional local backgrounds. These interventions changed
+the peak--dip pattern but did not eliminate all remote oscillation.
+The conventional fits were strongly dependent on window and polynomial
+choice. Version 5 keeps their extraction displays as model comparisons
+and their detailed study in the appendix. They are not independent
+confirmation of candidates selected from the same data.
+
+Finally, the 2015 low-mass side study searched 15--20~MeV with local
+12--28~MeV GP support and nearby support and polynomial controls.
+It checked the 17.25~MeV fluctuation and kernel-ceiling dependence,
+using small conditional toy ensembles. The study is placed at the end
+of the appendix, outside the qualified production range: the accepted
+signal shape and resolution below 19~MeV still require validation.
+
+\subsection{What version 5 changes, and the remaining review decision}
+The new note assembles these studies into one account: detector and
+statistical method, observed individual and combined results, candidate
+and resolution diagnostics, then organized technical appendices.
+The proposed primary fit profiles correlated background uncertainty;
+the calibration and significance-GP work remain separately identified
+alternatives and validation studies. Historical readiness language is
+replaced by the concrete conditions in Sec.~\ref{sec:v5-review}.
+The statistical-tail gaps and background qualifications remain visible.
+
+The 8 September editing pass curates existing results and improves their
+presentation. It does not supply new pseudoexperiments, a new global
+particle significance, or an authorization to inspect the remaining
+2021 data. The appendix contents that follow provide a guide to the
+supporting studies, while the accompanying source ledger records the
+release directories and artifacts used for this draft.
+
+\subsection{The 5.0.1 presentation and historical restoration}
+Version 5.0.1 restores the preselection distributions, blind-window diagnostics,
+source/exposure studies, and published-search comparisons requested for review.
+It adds explicit profile-likelihood equations and diagrams, separate plots of
+each dataset's yield and coupling limits, and a compact comparison of the
+mass-correlation matrices. The full-range observed polyline and all fitted
+results are inherited unchanged from 5.0.0. A conditional full-2021 density
+projection illustrates an exposure response; it is not an expected limit.
+The restored historical comparisons retain their original fit settings and
+confidence levels. These editorial and display changes do not close the
+remaining statistical-tail or background-validation requirements.
+
+\subsection{Significance displays and stress-response review: v5.0.2}
+The 9 September v5.0.2 revision builds on the v5.0.1 document from the same
+day. It adds aligned local and global normal-quantile panels, scan-specific
+Sidak conversion tables, and representative saved signal-injection and
+background-response distributions. A fixed continuation adds 1.8 million
+profiled Gaussian fields each for 2016 and the combined full search, keeping
+the reference shapes, covariance matrices, grids and ordering unchanged.
+No observed result or direct Poisson-fit ensemble is changed. Sparse tails
+remain marked by their sampling uncertainty, and the 2016 stress-background
+qualification remains open.
+
+The subsequent repository audit verifies covariance normalization and field
+sampling against pinned \texttt{sigcorr} code, and makes the distinction
+between its centered null model and our stress-reference extension explicit.
+Targeted Gaussian importance sampling resolves the remaining zero-count
+surrogate tails. A paired deterministic 2016 source test isolates the effect
+of the background blend without selecting a replacement from observed
+probabilities. These updates do not qualify a particle-global tail.
+
+
+The 10 September support revision adds the v5.1.1 covariance and
+signal-injection diagnostics to Section~\ref{sec:v5-global-results}.
+The covariance comparison retains complete background experiments;
+deterministic signal scans expose neighboring responses, and paired
+fixed-mass Poisson tests measure conditional recovery. The finer grid and
+2015 range extension remain pilots. This dated derivative preserves the
+frozen observed analysis and does not establish a new global calibration.
+
+\subsection{The 2015 endpoint extension and reorganized global study: v5.0.4}
+The full note now includes 2015 through 100~MeV in every applicable observed
+and combined search. It reuses the saved endpoint-kernel observed fits,
+adds 300 conditional toys at each new mass, and updates the corresponding
+combined field. Detailed sigcorr, tail, stress-source, covariance and
+fixed-mass injection checks move to Appendix~\ref{app:v504-global-study};
+the signal-response equation and injection-intensity figure remain in the
+main results. The separate-rate interpretation is expanded, and the earlier
+displays are preserved in Appendix~\ref{app:v504-historical-displays}.

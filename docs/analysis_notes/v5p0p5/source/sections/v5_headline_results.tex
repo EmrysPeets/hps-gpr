@@ -1,0 +1,84 @@
+\subsection{The complete observed search and conditional expected bands}
+\label{sec:v5-band-results}
+
+The full search runs from 19 to 250~MeV. At each mass it includes every campaign
+whose declared search interval covers that point: 2015 alone at 19--38~MeV,
+2015+2016 at 39--49~MeV, all three at 50--100~MeV, 2016+2021 at 101--180~MeV,
+and 2021 alone at 181--250~MeV. This membership rule is fixed by the search
+ranges; it never selects the dataset giving the smallest observed limit.
+Figure~\ref{fig:v5-union-bands} places the nominal local asymptotic $p_0$ directly
+below the corresponding observed limit and conditional expected bands, followed
+by an aligned significance panel. Black gives the local reference and red its
+Sidak correction for this complete search.
+
+The bands use 300 background-only draws per mass from the
+mass-local GP prediction. Each draw first samples a correlated latent
+background and then Poisson counts; constituent draws are shared among the
+combinations at that mass. The GP state is held fixed. Different masses do not
+form one coherent full-spectrum experiment. The resulting quantiles describe
+pointwise variation under that conditional model; they do not calibrate the
+\CLs{} sampling distributions or supply a global significance.
+
+\fig{0.98}{../figures/v5_total_limits_with_local_pvalues.pdf}{Complete 19--250~MeV
+observed search, with the preassigned active datasets shown above the curves.
+The upper panel shows 90\% \CLs{} limits and the median, central 68\% and central
+95\% ranges of the 300 conditional background-only toys per mass, with newly computed
+bands at the added 2015 coordinates.
+The next two panels show the fixed-mass asymptotic $p_0$ and
+its normal-quantile significance, with the local reference in black and the
+Sidak reference in red. The latter uses $N_{\rm eff}=35.381$ for the
+complete search; its value at 66~MeV is $Z_{\rm Sidak}=1.305$,
+compared with local $Z=2.765$. The observed
+polyline connects every adjacent tested mass, including membership transitions;
+no numerical endpoint is changed by those connections. The physical
+visible-branching correction is applied once above the dimuon threshold.
+These are pointwise bands; 2016-inclusive values retain the numerical exception.}
+{fig:v5-union-bands}
+
+\paragraph{Reading the significance panels.}
+We use the one-sided normal convention $Z=\Phi^{-1}(1-p)$ and display
+$Z^+=\max(0,Z)$, with integer guides on the vertical axis. Thus a probability
+of at least one half appears at zero; this convention avoids interpreting a
+negative normal quantile as positive discovery evidence. It does not change
+the probability. The signed fit coordinate $r$, which can describe a deficit,
+is shown separately in Section~\ref{sec:v5-global-results}.
+
+The Sidak curves apply Eq.~\eqref{eq:sidak-global} to each local threshold
+using one fixed $N_{\rm eff}$ for the entire corresponding search.
+The inherited resolution-spacing prescription sums
+$\Delta m/(2.25\,\bar\sigma_m)$ between adjacent mass hypotheses, uses the
+narrowest active campaign resolution, and caps the result between one and
+the number of tested masses. It gives 14.521, 16.062 and 26.402 for the
+individual 2015, 2016 and 2021 searches. This is an analytic reference for
+the look-elsewhere penalty, not a calibration from complete simulated scans.
+Table~\ref{tab:v502-sidak-lookup} shows how the same local significance maps
+to different corrections as the search range and resolution change.
+
+\begin{table}[htbp]\centering\small
+\input{../derived/v502_sidak_lookup_table}
+\caption{Local-to-Sidak significance conversion for the declared individual
+and complete searches. These are illustrative thresholds passed through the
+fixed analytic formula, not additional observed peaks. The final four columns
+use the $Z^+$ display convention; signed quantiles and probabilities are
+retained in the accompanying numerical tables.}
+\label{tab:v502-sidak-lookup}
+\end{table}
+
+\fig{0.98}{../figures/v5_observed_coupling_overlay.pdf}{Observed coupling limits
+from the three individual released samples and the full maximal-available-dataset
+combination of Fig.~\ref{fig:v5-union-bands}. Only observed limits are shown.
+The combination is obtained from a shared-coupling likelihood with the fixed
+membership rule; it is not the envelope of the individual curves.}
+{fig:v5-observed-overlay}
+
+\FloatBarrier
+
+\paragraph{The 2015 90--100 MeV extension.}
+All 2015-containing curves now include the ten added integer hypotheses.
+The 14--135~MeV training support is retained and the 90~MeV kernel parameters
+are held fixed above that endpoint. The template width follows the existing
+linear response, rising from 4.70 to 5.23~MeV across the added interval.
+The shaded range has new observed limits, 300 conditional toys per mass and
+scope, and the saved 95~MeV recovery check. Appendix~\ref{app:v504-extension}
+records the calculation and its validation limits. Historical displays are
+retained in Appendix~\ref{app:v504-historical-displays}.

@@ -1,0 +1,82 @@
+\section{The 2015 extension from 90 to 100 MeV}
+\label{app:v504-extension}
+The extension introduced in v5.0.4 and retained in v5.0.5 includes 2015 at every integer hypothesis from 19 to 100~MeV.
+The 2015+2016 overlap is 39--100~MeV; 2015+2021 and all three span
+50--100~MeV. The complete 19--250~MeV search therefore uses all three
+campaigns at 50--100~MeV and 2016+2021 at 101--180~MeV. Dataset membership
+follows these intervals, without selecting the more favorable observed curve.
+
+The spectrum, binning, 14--135~MeV GP support, normalization prescription
+and original mass-resolution model are retained. Above 90~MeV the two
+kernel parameters are held at their archived 90~MeV values. Each actual
+mass has its own moving $\pm2.25\sigma_m$ mask, template, density conversion,
+background prediction, likelihood and upper limit. This is the endpoint
+prescription already used by the v5.1.1 covariance pilot and v5.2.1 fine scan;
+the independently refitted width-nuisance studies are not substituted for it.
+The archived 85~MeV kernel remains a separate endpoint control, rather than a
+choice made from favorable observed limits.
+
+The inherited linear resolution gives $\sigma_m(90)=4.6975$~MeV and
+$\sigma_m(100)=5.2297$~MeV, an increase of 11.3\%, not a constant width.
+At 100~MeV the training exclusion is approximately 88.23--111.77~MeV,
+well inside the existing support, and the density window is also contained.
+This supports a modest continuation of the same analysis geometry. It does
+not independently measure the extrapolated resolution or establish coverage.
+The main figures shade 90--100~MeV to make this extension identifiable.
+
+\subsection{Targeted conditional calculations}
+The observed integer-mass limits at 91--100~MeV reuse the saved v5.2.1
+fixed-endpoint fits. An exact numerical replay of every added mass and scope
+checks those inputs before the bands are computed. There are 300 new
+background-only experiments at each of the ten masses, separately for each
+campaign. A correlated Gaussian draw around the frozen local GP prediction
+is followed by Poisson counts. Constituent counts are shared among the four
+2015-containing scopes at a mass. These 9,000 constituent draws yield
+12,000 fitted limits, with maximum $|CL_s-0.1|=1.05\times10^{-8}$.
+The likelihood profiles the background; the GP prediction is held fixed.
+No latent draw was clipped. Quantiles and counts are saved by mass, scope
+and toy identifier. These mass-local ensembles provide expected-limit bands
+and upper-limit tail diagnostics; they are not coherent scan experiments.
+The pre-extension 300-toy bands and targeted tail batches remain unchanged.
+New empty 300-toy tails retain the one-sided bound $p<0.00994$ at 95\%
+Monte Carlo confidence. No empty empirical cell is set to a finite discovery
+probability by extrapolation.
+
+The saved 95~MeV injection pilot provides a distinct recovery check: 64
+paired spectra per truth and injection strength $0,2,5$ reference errors,
+under both a local GP control and the coherent stress spectrum. It also
+tests deterministic signal response over the enlarged grid. These checks
+support the stated conditional continuation; they do not turn the extension
+into an independently calibrated coverage result.
+
+For the updated combined field, all ten changed mass coordinates are
+recomputed using the actual shared-coupling likelihood. The input-bin
+response has 1,626 directions. The 90~MeV bridge reproduces the archived
+deterministic roots to $1.88\times10^{-6}$, and exact direct refits check
+the rank-one GP updates used for single-bin perturbations. The same first
+256 archived joint Poisson spectra are retained across all 232 hypotheses,
+including the changed membership. The 2015 field uses all 82 masses and
+its same 256 coherent spectra. Each updated field is integrated with
+200,000 Gaussian draws; positive observed fits with standardized score
+at least 3.5 receive 40,000 conditional-mixture draws. This predetermined
+rule improves Monte Carlo precision under the given Gaussian model. Its
+small tail intervals do not include error in the stress background or in
+the Gaussian approximation. A zero direct count in 256 experiments gives
+only $p<0.01163$ at 95\% Monte Carlo confidence.
+
+\subsection{Trials factors and what changes in the result}
+The resolution-spacing Sidak estimate for 2015 increases from 13.624 to
+14.521. The 2015+2016 value becomes 10.011; 2015+2021 and all three each
+give 9.948. The complete-search value stays at 35.381 because the rule
+uses the narrowest active detector resolution, already supplied by the
+other campaigns in the added interval. Thus extending dataset membership
+does not necessarily enlarge this particular approximation to the trials
+factor. It still has no correction for selecting among overlapping scopes.
+
+The complete search's strongest nominal local excess remains at 66~MeV,
+with $Z=2.765$ and Sidak reference $p=0.0959$. At 92~MeV the new
+three-campaign result is $Z=2.520$ with $p_0=0.00586$; the separate-rate
+comparison in Section~\ref{sec:v5-rate-consistency} is needed to interpret
+what the common fit describes. The extension is made after the original
+data have been examined, and its conditional studies do not supply a
+selection-adjusted discovery significance or new unblinding authorization.

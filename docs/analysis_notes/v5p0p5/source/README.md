@@ -1,0 +1,1 @@
+This directory contains the complete LaTeX source for Analysis Note v5.0.5. Compile main.tex using ../scripts/build_note.sh; the bundled ../figures and ../derived directories are required. See ../README.md for changes, numerical scope and reproduction details. Historical section filenames identify their source lineage.

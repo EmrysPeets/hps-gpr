@@ -1,0 +1,1900 @@
+\section{Archived Validation Batteries Through Version 4.8}
+\label{app:v4p8-validation-archive}
+
+\begin{center}
+\fbox{%
+\begin{minipage}{0.94\linewidth}
+\textbf{Findings first.}  The v4.6 full-100 study confirmed that the
+$1\%\times10$ 65~MeV offset persists beyond its ten-toy pilot.  The v4.7
+threshold-specific truth reduced that offset but did not give uniform closure in
+$1\%\times10$ and native 10\%.  The v4.8 residual-structured means failed their
+source and signal-influence qualification gates; their completed extractions remain
+conditional stress tests only.  These studies motivate v4.9 but do not contribute
+rows to its 25-background ensemble and do not change the accepted v4.2 result.
+\end{minipage}}
+\end{center}
+
+The detailed historical record follows so numerical provenance and negative results
+remain reviewable.  It is intentionally outside the main decision path.  Repeated
+method definitions should be read in light of the current definitions in
+Section~\ref{sec:methodology}.
+
+\subsection{Historical 2021 pilot definitions}
+
+The source/exposure studies used independently fitted native 1\% and native 10\%
+means, $\lambda_i^{(1)}$ and $\lambda_i^{(10)}$.  Their declared intensities were
+\begin{align}
+\Lambda_i^{\mathrm{native}\,1\%}&=\lambda_i^{(1)}, &
+\Lambda_i^{1\%\times10}&=10\lambda_i^{(1)}, &
+\Lambda_i^{1\%\times100}&=100\lambda_i^{(1)},\nonumber\\
+\Lambda_i^{\mathrm{native}\,10\%}&=\lambda_i^{(10)}, &
+\Lambda_i^{10\%\times10}&=10\lambda_i^{(10)}.
+\label{eq:v4p1-ls-pilot-scenarios}
+\end{align}
+Within a source family the marginally Poisson samples were nested,
+\begin{align}
+N_i^{1\%}&\sim\operatorname{Pois}(\lambda_i^{(1)}), &
+N_i^{1\%\times10}&=N_i^{1\%}+\operatorname{Pois}(9\lambda_i^{(1)}),\nonumber\\
+N_i^{1\%\times100}&=N_i^{1\%\times10}+\operatorname{Pois}(90\lambda_i^{(1)}),
+\nonumber\\
+N_i^{10\%}&\sim\operatorname{Pois}(\lambda_i^{(10)}), &
+N_i^{10\%\times10}&=N_i^{10\%}+\operatorname{Pois}(9\lambda_i^{(10)}).
+\label{eq:v4p1-ls-pilot-increments}
+\end{align}
+The historical fixed-amplitude screen used
+\begin{equation}
+A_{\mathrm{inj}}(z)=z\,\sigma_{A,\mathrm{ref}}^{(15)},
+\qquad z\in\{0,1,3,5\}.
+\label{eq:v4p1-fixed-amplitude-anchor}
+\end{equation}
+These equations are retained here because the v4.5 archival subsection references
+them.  They do not define the v4.9 source truth or pair the two native source families.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.98\linewidth}{guard_band_figs/hps_gpr_bump_hunt_flowchart.png}
+\caption{HPS GPR bump-hunt analysis and closure-validation flow. The shared
+per-mass setup defines the spectrum, signal template, blind/extraction window,
+sideband-training region, GP refit, and amplitude extraction. The nominal-data path
+converts the profiled yield upper limit to $\eps^2_{\mathrm{UL}}$, while the
+functional-form path injects known signals into smooth-background toys and tests signal
+recovery, pull calibration, $Z$ calibration, uncertainty consistency, and leakage into
+the sideband-training region.}
+\label{fig:hps-gpr-flowchart-section5}
+\end{figure}
+
+\subsection{Validation of the Statistical Framework}
+
+The closure tests in this section validate the local extraction and are not themselves
+confidence-level statements. Some historical reach proxies use the one-sided 95\%
+Gaussian coefficient, while the current physics-facing result in
+Section~\ref{sec:results} is a 90\% CL upper limit obtained with the \CLs{} construction.
+The staged suites shown here are the historical validation basis inherited from v3:
+the fully unblinded 2015 sample, the 2016 10\% development sample, and the regenerated
+2021 1\% validation sample. Their headline functional-form figures use full GP refits
+and, for 2021, the corrected matched-reference widened-window convention. They do not
+constitute support-matched closure for the v4 full-2016 and 2021-10\% state; that
+remaining gate is stated with the v4 result. Superseded and duplicated closure
+displays are collected in Appendix~\ref{app:prior-validation-results}.
+
+The validation material is organized around four checks of analysis robustness:
+
+\begin{itemize}
+    \item First, how far from the signal peak should the GP sideband training data begin?
+
+    \item  Second, after that training exclusion is fixed, should the $1.64$--$2.25\,\sigma_m$ signal tails be omitted as a guard band or included in the extraction likelihood through a wider blind window?
+
+    \item Third, do the reference-matched full-refit toys close for the 2015, 2016, and 2021 datasets?
+
+    \item   Finally, do the combined pseudoexperiments accumulate sensitivity as expected when statistically independent datasets share one coupling parameter?
+
+\end{itemize}
+
+
+
+\subsubsection*{Terms used in the validation plots}
+
+\begin{description}
+\item[train-$k$ or $k_{train}$] The GP sideband fit excludes bins with
+$|m-m_0|<k\,\sigma_m$ around the tested mass. The selected production value is
+train-$2.25$, matched to the $2.25\,\sigma_m$ blind/extraction window.
+\item[refmatched] The injected amplitude is defined with the same
+background-only refit reference scale, blind geometry, kernel policy, and refit
+prescription used in the extraction study:
+$A_{\mathrm{inj}}=Z_{\mathrm{inj}}\sigma_{A,\mathrm{ref}}$.
+\item[$Z_{\mathrm{inj}}$] The nominal injected signal strength in units of
+$\sigma_{A,\mathrm{ref}}$.
+\item[$\hat Z$] The extracted signal significance, usually summarized as
+$\hat A/\sigma_A$ for toy-closure plots.
+\item[pull mean] The ensemble mean of
+$(\hat A-A_{\mathrm{inj}})/\sigma_A$. A value near zero indicates little bias.
+\item[pull width] The ensemble standard deviation of the pull. A value near one
+indicates that the fitted $\sigma_A$ is correctly calibrated.
+\item[$\Delta Z$] The significance residual $\hat Z-Z_{\mathrm{inj}}$.
+\item[Gaussian-equivalent expected reach proxy] The background-only proxy
+$1.64\,\sigma_{A,\mathrm{ref}}/A_{\eps^2=1}$ used to compare window choices. It is a
+compact expected-95\% scale, not the final \CLs{} limit.
+\end{description}
+
+Throughout this section, the zero-injection row has a special interpretation. At
+$Z_{\mathrm{inj}}=0$ no signal is added, so the pull mean, pull width, and
+$\Delta Z=\hat Z-Z_{\mathrm{inj}}$ form a spurious-signal test. Centered pulls and
+near-zero $\Delta Z$ mean that the GP-plus-template extraction is not manufacturing a
+signal in a smooth background-only spectrum. Nonzero injected rows then test whether a
+real signal is recovered after the same sideband-refit prescription has been applied.
+
+\subsection{Training exclusion and blind-window width}
+\label{subsec:guard-band-construction}
+
+The first decision is the training exclusion: how far from the test mass the sideband bins used by the GP should begin. Figure~\ref{fig:blind225-cartoon} illustrates the adopted wide-blind geometry. For a large injected signal, Gaussian tails remain visible outside the central peak. The training-exclusion studies below show why training directly next to a narrow $1.64\,\sigma_m$ extraction window is unattractive: those tails can be
+offered to the GP as ordinary smooth-background information and then be partly absorbed
+by the refitted background.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.90\linewidth}{guard_band_figs/guard_band_5sigma_fake_data_gp_band_no_guard_2p25_extended2sigma.png}
+\caption{Illustration of the selected $2.25\,\sigma_m$ blind-window construction for a
+large injected signal. The GP is trained only outside the widened blinded region, so the
+near tails of a Gaussian resonance are not included in the sideband-training data. The
+same blinded region is then used by the local signal-extraction likelihood.}
+\label{fig:blind225-cartoon}
+\end{figure}
+
+The training-exclusion scan starts from the older $1.64\,\sigma_m$ blind window and
+varies the outer boundary of the bins excluded from GP training. In this notation,
+train-$k$ means that bins with $|m-m_0|<k\,\sigma_m$ are withheld from the GP sideband
+fit. The train-$2.25$ choice is not the point with the strongest raw background-only
+reach proxy; it is selected from the combined leakage, recovery, and calibration
+evidence below.
+
+
+In the comparison of different blind windows shown in Figure~\ref{fig:guard-band-reach-uncertainty}, train-$1.96$ gives the lowest median Gaussian-equivalent $\eps^2_{95}$ proxy, but it also leaves a much larger fraction of the injected signal template in the GP training region, leading to higher leakage rate and lower signal sensitivity. The train-$2.25$ exclusion is the balanced candidate: it sharply reduces train-region leakage, is more sensitive to injected signal than $1.96$, and retains better expected reach than the wider $2.58$ and $3.0$ exclusions. The compact evidence is summarized in Table~\ref{tab:guard-band-choice-summary}; for the train-$2.25$ choice, the mean signal recovery is about $0.961$ at $Z_{\mathrm{inj}}=3$ and $0.943$ at $Z_{\mathrm{inj}}=5$, with a maximum injected training fraction of about $0.0258$.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{ccccc}
+\toprule
+$k_{\mathrm{train}}$ & median expected $\eps^2_{95}$ &
+$\langle\hat A/A_{\mathrm{inj}}\rangle_{Z=3}$ &
+$\langle\hat A/A_{\mathrm{inj}}\rangle_{Z=5}$ &
+max $f_{\mathrm{train}}$ \\
+\midrule
+1.96 & \num{7.92e-5} & 0.730 & 0.715 & 0.0530 \\
+2.25 & \num{9.53e-5} & 0.961 & 0.943 & 0.0258 \\
+2.58 & \num{1.08e-4} & 1.052 & 1.036 & 0.0106 \\
+3.00 & \num{1.19e-4} & 1.049 & 1.037 & 0.00288 \\
+\bottomrule
+\end{tabular}
+\caption{Training-exclusion comparison summary from the refmatched 2015 closure toys using the older $1.64\,\sigma_m$ blind window. The expected reach column is the background-only Gaussian-equivalent proxy $1.64\,\sigma_{A,\mathrm{ref}}/A_{\eps^2=1}$ defined in the terms list, not the final $CL_s$ limit. The train-$2.25$ point trades a modest reach cost relative to $1.96$ for much smaller training leakage and substantially improved injected-signal recovery.} \label{tab:guard-band-choice-summary}
+\end{table}
+
+The figures in this subsection are meant to be read sequentially because each one removes a different ambiguity in the guard-band choice. Figure~\ref{fig:blind225-cartoon} first defines the selected widened blind region and shows the practical reason for the choice: a large Gaussian resonance still has non-negligible tails outside a narrow $1.64\,\sigma_m$ extraction window, so training directly beside that window can feed signal-like counts to the GP sideband fit. Table~\ref{tab:guard-band-choice-summary} then gives the compact numerical trade-off between expected reach, recovered injected signal, and the maximum signal-template fraction left in the training region.
+
+The remaining guard-band figures separate the ingredients behind that table. Figure~\ref{fig:guard-band-reach-uncertainty} shows the cost side of widening the training exclusion: as nearby sideband bins are removed, $\sigma_{A,\mathrm{ref}}$ grows and the Gaussian-equivalent expected reach softens. Figure~\ref{fig:guard-band-leakage-reference} shows the protection side: train-$2.25$ greatly reduces the signal fraction available to the GP training set while preserving the matched reference scale used to define the injected amplitudes. Figure~\ref{fig:guard-band-closure-diagnostics} checks that this protection does not create a new calibration problem by comparing recovery, $\Delta Z$, pull means, and pull widths over the mass and injection grid. Figure~\ref{fig:guard-band-recovery-boxes} then shows the same recovery behavior at the toy-distribution level, making the narrow-guard under-recovery visible beyond the ensemble mean curves. Finally, Figures~\ref{fig:refmatched-blind-geometry-reach}--\ref{fig:refmatched-blind-geometry-deltaz} compare the two blind-window geometries after train-$2.25$ is fixed: expected reach favors including the $1.64$--$2.25\,\sigma_m$ tails in the likelihood, while the background-only, pull-summary, amplitude-recovery, and $\Delta Z$ panels show that the widened blind window keeps the same closure behavior as the explicit guard-band construction.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[t]{0.82\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{guard_band_figs/expected95_reach_z0.png}
+  \caption{Background-only expected $\eps^2_{95}$ proxy.}
+\end{subfigure}
+
+\vspace{0.8em}
+
+\begin{subfigure}[t]{0.82\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{guard_band_figs/uncertainty_vs_reach_z0.png}
+  \caption{Reference uncertainty and reach relative to train-$1.96$.}
+\end{subfigure}
+\caption{Expected-reach cost of widening the guard band. The upper panel shows the
+background-only expected $\eps^2$ reach by mass and guard width. The lower panel makes
+the mechanism explicit: wider guards remove nearby sideband information, increase
+$\sigma_{A,\mathrm{ref}}$, and therefore soften the Gaussian-equivalent expected
+reach.}
+\label{fig:guard-band-reach-uncertainty}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[t]{0.78\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{guard_band_figs/f_train_frac_vs_mass.png}
+  \caption{Template fraction inside the training region.}
+\end{subfigure}
+
+\vspace{0.8em}
+
+\begin{subfigure}[t]{0.78\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{guard_band_figs/reference_components_z0.png}
+  \caption{Matched-reference and extraction-uncertainty components.}
+\end{subfigure}
+\caption{Leakage and reference-scale diagnostics used in the guard-band choice. The training-fraction panel shows the direct contamination pressure that disfavors too narrow a guard, while the reference-component panel checks that the matched background-only reference scale is consistent with the refit prescription used for the closure toys.}
+\label{fig:guard-band-leakage-reference}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[t]{0.49\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{guard_band_figs/eps2_recovery_vs_mass.png}
+  \caption{Recovered over injected $\eps^2$.}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.49\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{guard_band_figs/delta_z_vs_mass.png}
+  \caption{$Z$-calibration residuals.}
+\end{subfigure}
+
+\vspace{0.6em}
+
+\begin{subfigure}[t]{0.49\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{guard_band_figs/pull_mean_vs_mass.png}
+  \caption{Pull means.}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.49\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{guard_band_figs/pull_width_vs_mass.png}
+  \caption{Pull widths.}
+\end{subfigure}
+\caption{Closure diagnostics entering the train-$2.25$ guard choice. Recovery and $Z$-calibration test the response to injected signals, while the pull panels diagnose amplitude bias and uncertainty calibration across the same mass and injected-strength grid. Curves show the toy-ensemble central values exported by the comparison suite; the uncertainty bands, where shown, are the toy-to-toy central spread for the same mass-strength slice rather than the uncertainty from one individual extraction. The train-$2.25$ configuration is well motivated because it suppresses training-region signal leakage while keeping the pull means near zero and the pull widths close to unity across the tested injections.}
+\label{fig:guard-band-closure-diagnostics}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[t]{0.98\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{guard_band_figs/eps2_recovery_box_z2.png}
+  \caption{$Z_{\mathrm{inj}}=2$.}
+\end{subfigure}
+
+\vspace{0.8em}
+
+\begin{subfigure}[t]{0.98\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{guard_band_figs/eps2_recovery_box_z5.png}
+  \caption{$Z_{\mathrm{inj}}=5$.}
+\end{subfigure}
+\caption{Toy-level $\eps^2$ recovery distributions for all selected injected masses
+(\SIlist{30;45;60;75;90;105;120}{MeV}). For each mass and training guard, the colored
+box shows the central 50\% (interquartile) range of toy recoveries, the whisker bars
+show the wider non-outlier toy range, and the black horizontal line inside the box
+marks the toy median. The gray dashed horizontal reference lines mark 0.9, 1.0, and
+1.1 recovery. The boxes show how the
+narrow guard under-recovers injected signals, while train-$2.25$ restores the median
+recovery much closer to unity before the wider-guard sensitivity cost becomes
+dominant.}
+\label{fig:guard-band-recovery-boxes}
+\end{figure}
+
+Once the training exclusion is fixed at $2.25\,\sigma_m$, there are two clean
+blind-window geometries to compare. The older construction keeps the extraction likelihood at $1.64\,\sigma_m$ and treats the $1.64$--$2.25\,\sigma_m$ interval as a guard band. The newer construction uses a $2.25\,\sigma_m$ blind/extraction window, so the same bins are still excluded from training but are retained in the signal likelihood. The refmatched comparison holds the background-only reference convention fixed in both cases, so the remaining difference is the blind-window geometry itself. Figure~\ref{fig:refmatched-blind-geometry-reach} is the central reach comparison: it shows that the separate guard band is possible but unnecessary for the selected refmatched 2015 ensemble, because the widened blind window gives similar closure while recovering the signal tails that the guard-band construction discards. The older guard-band construction is kept as an appendix reference in Appendix~\ref{app:guard-band-construction}.
+
+\begin{figure}[h!]
+\centering
+\graphicorplaceholder{0.82\linewidth}{guard_band_figs/refmatched_blind_geometries_eps2_95_reach.png}
+\caption{Refmatched 2015 blind-geometry reach comparison. Both geometries exclude GP training data out to $2.25\,\sigma_m$ and define the injected strength with the matched background-only refit convention. The $2.25\,\sigma_m$ blind window has similar closure behavior but a lower expected $\eps^2_{95}$ proxy because the $1.64$--$2.25\,\sigma_m$ signal tails are included in the extraction likelihood instead of being discarded as a guard band.}
+\label{fig:refmatched-blind-geometry-reach}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\graphicorplaceholder{0.66\linewidth}{guard_band_figs/refmatched_blind_geometries_background_only_closure.png}
+\caption{Background-only spurious-signal closure for the two refmatched blind
+geometries. Both the guard-band construction and the $2.25\,\sigma_m$ blind/extraction window remain centered near zero pull in the tested 2015 functional-form ensemble.}
+\label{fig:refmatched-blind-geometry-background}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\graphicorplaceholder{0.82\linewidth}{guard_band_figs/refmatched_blind_geometry_pull_summary_z0135.png}
+\caption{Compact pull-summary comparison for $Z_{\mathrm{inj}}=0,1,3,5$. The
+$2.25\,\sigma_m$ blind window preserves the same signal-recovery behavior as the guard-band construction within the tested 2015 functional-form ensemble.}
+\label{fig:refmatched-blind-geometry-pulls}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\graphicorplaceholder{0.66\linewidth}{guard_band_figs/refmatched_blind_geometries_injected_amplitude_recovery.png}
+\caption{Injected-amplitude recovery for the two refmatched blind geometries. The recovered amplitudes follow the injected reference scale similarly for the guard-band and widened-blind constructions.}
+\label{fig:refmatched-blind-geometry-recovery}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\graphicorplaceholder{0.66\linewidth}{guard_band_figs/refmatched_blind_geometries_z_calibration_residual.png}
+\caption{$Z$-calibration residual comparison for the two refmatched blind geometries. In this 2015 ensemble the $2.25\,\sigma_m$ blind window and the $1.64\,\sigma_m$ blind plus $2.25\,\sigma_m$ guard construction have very similar closure behavior. The widened blind window is therefore selected because it keeps the same training protection while recovering the signal tails in the extraction likelihood and improving the expected reach.}
+\label{fig:refmatched-blind-geometry-deltaz}
+\end{figure}
+
+\FloatBarrier
+
+\subsection{Three toy-generation modes}
+
+The validation program uses three complementary pseudoexperiment constructions.
+Analytic functional-form pseudoexperiments provide the required smooth-background closure test because the true toy spectrum is independent of the GP model later used in the extraction.
+Conditional blind-window GP toys are not used as a standalone closure requirement; they are a fast diagnostic of the local extraction likelihood when the sideband-trained GP prediction is held fixed.
+Full procedural GP-mean/refit pseudoexperiments are the required closure stress test for signal absorption, because each toy is generated over the full mass range and then passed back through the same sideband-refit and extraction chain as the data.
+
+\subsubsection{Analytic functional-form pseudoexperiments}
+
+The first class of toys starts from an analytic fit to the smooth $e^+e^-$
+invariant-mass spectrum and fluctuates pseudo-data around that closed-form background model. These studies isolate the question of gross spectral smoothness from the later question of GP conditioning. They are therefore useful as the first closure test before the full inference chain is exercised.
+
+The primary analytic seeds are written explicitly here because their role is to define smooth positive toy means, not to claim a unique physical parameterization of the trident continuum. With $S(m;m_t,w)=[1+\exp\{-(m-m_t)/w\}]^{-1}$ and $u_d=(m-m_{\mathrm{mid},d})/m_{\mathrm{scale},d}$, the three selected dataset seeds are
+\begin{align}
+B_{2015}(m) &=
+N_{15}\,S(m;m_{t,15},w_{15})\,(m-m_{0,15})^{a_{15}}
+\nonumber\\[-0.3ex]
+&\quad{}\times
+\exp\!\left[-\frac{m-m_{0,15}}{\theta_{15}}\right]
+\exp\!\left(c_{1,15}u_{15}+c_{2,15}u_{15}^2\right),
+\label{eq:funcform-seed-2015}\\
+B_{2016}(m) &=
+N_{16}\,S(m;m_{t,16},w_{16})\,(m-m_{0,16})^{a_{16}}
+\nonumber\\[-0.3ex]
+&\quad{}\times
+\exp\!\left[-\frac{m-m_{0,16}}{\theta_{16}}\right]
+\exp\!\left(c_{1,16}u_{16}+c_{2,16}u_{16}^2\right),
+\label{eq:funcform-seed-2016}\\
+B_{2021}(m) &=
+N_{21}\,S(m;m_{t,21},w_{21})\,m^{a_{21}}
+\nonumber\\[-0.3ex]
+&\quad{}\times
+\exp\!\left[-\frac{m}{\theta_{21}}\right]
+\exp\!\left(c_{1,21}m+c_{2,21}m^2\right).
+\label{eq:funcform-seed-2021}
+\end{align}
+The 2015 and 2016 functions are independent fits of the same shifted sigmoid-power-exponential family with a normalized quadratic tail factor; they are set to zero below the fitted turn-on offset $m_{0,d}$ and are useful when the low-mass turn-on is better described by a shifted variable. The 2021 seed uses the unshifted sigmoid-power-exponential form with an exponential quadratic modifier, which was preferred for the 2021 1\% spectrum because the wider support and smoother low-mass turn-on did not require the shifted threshold parameter.
+
+The fit selection algorithm is implemented in a deliberately conservative ROOT macro. For each dataset the macro builds a small list of positive candidate families, scans the configured lower edge of the fit interval, and for each candidate tries several seeded minimizations covering early turn-on, broad-tail, and late-turn-on shapes. Each trial is fit to the input histogram over the dataset-specific fit range with bin-integrated expectations, then evaluated with Pearson and Neyman goodness-of-fit on the selected support and with normalization checks on the full support range, scan range, and low/high sideband fractions. The primary seed is the first preferred candidate that has finite parameters, passes the support and sideband-fraction checks, and satisfies the configured Pearson target; if no preferred candidate passes, the best validated candidate is used. Here, support check means enough sideband bins after mass-dependent exclusion; sideband-fraction check means the retained sideband fraction; and Pearson target means the toy-validation $\chi^2$-like residual threshold. The selected function is then frozen, normalized to the observed number of events on the full toy-support range, and used to generate Poisson pseudo-data bin by bin from the normalized bin integrals.
+
+The candidate families were chosen to span the few smooth structures that can mimic the observed spectra without introducing narrow features: a sigmoid threshold factor for turn-on behavior, a power-law rise, an exponential falloff for the high-mass tail, optional threshold shifts for datasets whose support begins near a sharp turn-on, and low-order exponential curvature for residual broad-shape freedom. The generalized-gamma and simpler sigmoid-power variants in the candidate overlay provide cross-checks that the chosen seed is not an artifact of one algebraic form. They are not used to inject additional model uncertainty in these closure plots; once the primary seed is selected, the closure question is whether the GP extraction recovers known signals from that fixed smooth truth.
+
+Figure~\ref{fig:functional-form-seed-overview} shows the outcome of this construction
+rather than an internal parameter dump. In each row, the left panel overlays the input
+histogram with all enabled candidate families, while the right panel compares the
+selected seed with the pseudoexperiment-ensemble mean. The 2015 shifted-tail family
+follows both the turn-on and falling spectrum without introducing a narrow feature. The
+2016 row shows the same family on the 10\% sample. The 2021 row selects the unshifted
+\texttt{fSigPowExpQ} family, whose broad curvature follows the 1\% spectrum without
+requiring a shifted threshold. Most importantly, each right-hand panel demonstrates
+that the Poisson toy mean reproduces the selected analytic expectation and that the toy
+normalization is set on the stated support rather than fixed inside the search window.
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.99\linewidth}{toy_generation_figs/funcform_publication_overview.png}
+\caption{Functional-form seeds used to construct the analytic-background
+pseudoexperiments. Each dataset row pairs the candidate-family comparison (left) with
+the selected seed and the mean of the generated toy ensemble (right). The titles give
+the family, the scan interval used for that generation campaign, and the full-support
+normalization target. The 2015 row uses the shifted
+sigmoid--power--exponential form with an additional smooth tail; the 2016 10\% row uses
+an independently fitted member of the same family; and the 2021 1\% row uses the
+unshifted \texttt{fSigPowExpQ} form. Shaded regions contribute to the normalization but
+lie outside the displayed campaign's search interval. The 2016 42--210~MeV label is
+retained to document the seed-generation study; the v3 result itself is restricted to
+39--180~MeV. The corrected 2021 lower-bound study likewise uses 30--250~MeV model
+support and searches 50--250~MeV, as documented below.}
+\label{fig:functional-form-seed-overview}
+\end{figure}
+
+\paragraph{Injected-signal lower-bound scans.}
+The lower-bound choice was made with signal-injection studies, not from the observed
+limit curve. For every mass and $k_{\min}$ setting, the analytic background was
+Poisson fluctuated, a full-range Gaussian signal was injected, the GP was refit to the
+toy sidebands, and the blinded-window extraction was repeated. The 2015 and 2016 grids
+used $Z_{\mathrm{inj}}=0,1,2,3,5$ at masses
+\SIlist{45;60;75;90;105}{MeV} and \SIlist{60;90;105;120;150}{MeV}, respectively.
+The corrected 2021 grid used $Z_{\mathrm{inj}}=0,1,3,5$ at
+\SIlist{50;60;90;120;180;210}{MeV}. There are 100 toys per 2015 mass--strength cell
+and 25 toys per 2016 and 2021 cell. The zero-injection cells test for a fitted false
+signal; the nonzero cells test recovery, fitted uncertainty, and significance
+calibration across the injected-strength range.
+
+Table~\ref{tab:lslb-injection-pull-summary} makes the mean-pull information explicit.
+The signed $Z_{\mathrm{inj}}=0$ entry is the equal-weight mean of the background-only
+cell means over the tested masses. The signed $Z_{\mathrm{inj}}>0$ entry is the
+equal-weight mean over all nonzero mass--strength cells. The RMS column is the root
+mean square of those nonzero cell means and is sensitive to biases that change sign
+across the grid; the last column is the median nonzero-injection pull width. No
+uncertainty is assigned to the aggregate rows because the plots retain the
+cell-by-cell toy-derived uncertainties used to judge whether a pattern is coherent.
+
+\begin{table}[H]
+\centering
+\scriptsize
+\begin{tabular}{lrrrrrr}
+\toprule
+Dataset & $k_{\min}$ & \makecell{Toys\\per cell} &
+\makecell{Signed mean pull\\$Z_{\mathrm{inj}}=0$} &
+\makecell{Signed mean pull\\$Z_{\mathrm{inj}}>0$} &
+\makecell{RMS cell-mean pull\\$Z_{\mathrm{inj}}>0$} &
+\makecell{Median pull width\\$Z_{\mathrm{inj}}>0$} \\
+\midrule
+2015 & 0.50 & 100 & $+0.235$ & $-1.449$ & 1.897 & 1.110 \\
+     & 0.75 & 100 & $+0.146$ & $-0.508$ & 0.732 & 0.895 \\
+     & 0.90 & 100 & $+0.090$ & $-0.259$ & 0.363 & 0.884 \\
+     & $\mathbf{1.00}^{\ast}$ & 100 & $\mathbf{+0.029}$ & $\mathbf{-0.223}$ & $\mathbf{0.285}$ & $\mathbf{0.887}$ \\
+     & 1.10 & 100 & $+0.037$ & $-0.161$ & 0.217 & 0.890 \\
+\addlinespace
+2016 10\% & $\mathbf{0.90}^{\ast}$ & 25 & $\mathbf{-0.016}$ & $\mathbf{-0.262}$ & $\mathbf{0.321}$ & $\mathbf{0.948}$ \\
+     & 1.00 & 25 & $+0.178$ & $+0.036$ & 0.377 & 0.924 \\
+     & 1.10 & 25 & $+0.222$ & $+0.120$ & 0.403 & 0.889 \\
+\addlinespace
+2021 1\% & 0.90 & 25 & $+0.061$ & $+0.041$ & 0.213 & 0.838 \\
+     & 1.00 & 25 & $+0.016$ & $+0.004$ & 0.230 & 0.860 \\
+     & $\mathbf{1.10}^{\ast}$ & 25 & $\mathbf{-0.005}$ & $\mathbf{-0.034}$ & $\mathbf{0.276}$ & $\mathbf{0.908}$ \\
+\bottomrule
+\end{tabular}
+\caption{Aggregate pull diagnostics from the functional-form signal-injection scans.
+An asterisk marks the lower-bound factor frozen for v3. Signed means and RMS values
+refer to cell-level mean pulls, while $w_{\mathrm{pull}}$ is the fitted width of the
+toy pull distribution in a mass--strength cell. The table should be read together with
+the mass-resolved panels in Figures~\ref{fig:v3-lslb-closure-2015}--%
+\ref{fig:v3-lslb-closure-2021}; a small aggregate mean alone can hide compensating
+mass-dependent biases.}
+\label{tab:lslb-injection-pull-summary}
+\end{table}
+
+Figures~\ref{fig:v3-lslb-closure-2015}--\ref{fig:v3-lslb-closure-2021} are the
+physics-facing closure summaries for v3. Each panel uses analytic functional-form toys,
+per-toy GP refitting, profiled background covariance, and toy-derived error bars. The
+mean pull tests amplitude bias, the pull width tests the fitted uncertainty, the
+$\hat Z-Z_{\mathrm{inj}}$ panel tests significance calibration when the reference scale
+is matched, and the amplitude-bias panel tests signal recovery directly. These are
+extraction-closure tests. Their reach panels and rankings are diagnostic proxies rather
+than direct \CLs{} coverage measurements.
+
+For 2015, the 100-toy study strongly rejects the overly flexible
+$k_{\min}=0.5$ row. The 1.0 and 1.1 rows are close in pull-width calibration; the frozen
+1.0 row has a background-only mean pull of $+0.029$, a signed nonzero-injection mean of
+$-0.223$, and an RMS cell-mean pull of 0.285. It is retained as a conservative
+production compromise even though the aggregate score slightly favors 1.1. For 2016,
+the 25-toy scan selects $k_{\min}=0.9$ among 0.9, 1.0, and 1.1. In particular, the
+background-only mean pull changes from $+0.222$ at 1.1 to $-0.016$ at 0.9, removing
+the positive false-signal offset that motivated the follow-up. Across the injected
+cells, 0.9 also reduces the RMS cell-mean pull from 0.403 to 0.321 and moves the median
+pull width from 0.889 to 0.948. Its signed nonzero-injection mean is $-0.262$, so the
+selection should be understood as the best joint calibration of the scanned rows, not
+as exact zero bias in every injected cell.
+
+The 2021 figure is not the older full-support study. It uses the regenerated
+\path{final_1pct_invM.root} sample, an \texttt{fSigPowExpQ} truth model with
+\SIrange{30}{250}{MeV} toy/data support, the \SIrange{50}{250}{MeV} search range, a
+$2.25\,\sigma_m$ exclusion, $k_{\max}=9$, and a matched background-only refit reference.
+All 1,800 requested toy rows have finite key fit quantities and successful refit and
+$q_\mu$ statuses. The aggregate scores are nearly degenerate; $k_{\min}=1.1$ is frozen
+because it gives the pull-width median closest to unity and the strongest extraction
+proxy. Its background-only and nonzero-injection signed mean pulls are $-0.005$ and
+$-0.034$, respectively; the larger 0.276 RMS reflects mass-to-mass variation that is
+visible in Figure~\ref{fig:v3-lslb-closure-2021}. Pull widths below unity imply
+conservative fitted uncertainties only if the toy ensemble faithfully represents the
+production procedure. Direct coverage with the frozen upper-limit configuration
+remains the final calibration requirement.
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.98\linewidth}{toy_generation_figs/v3_20260709_lslb_closure/fig40_style_2015_lslb_closure_suite_100toy.png}
+\caption{2015 injected-signal closure as the RBF lower bound is varied. At each mass,
+the plotted central value is the median of the nonzero
+$Z_{\mathrm{inj}}=1,2,3,5$ cell summaries; each cell contains 100 full-refit
+functional-form toys, and the error bars are derived from those toy ensembles. The
+$k_{\min}=0.5$ behavior is incompatible with reliable signal recovery. The 1.0 and 1.1
+curves form the stable neighborhood, and 1.0 is retained as the conservative v3
+choice rather than as the minimum of the aggregate ranking score.}
+\label{fig:v3-lslb-closure-2015}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.98\linewidth}{toy_generation_figs/v3_20260709_lslb_closure/fig40_style_2016_lslb_closure_suite_25toy.png}
+\caption{2016 10\% injected-signal closure for
+$k_{\min}=0.9,1.0,1.1$. Each point summarizes the nonzero
+$Z_{\mathrm{inj}}=1,2,3,5$ cells at that mass, with 25 full-refit functional-form toys
+per cell. The companion background-only cells have mean pulls $-0.016$, $+0.178$, and
+$+0.222$ for 0.9, 1.0, and 1.1, respectively. Together with the smaller RMS
+nonzero-injection mean pull and the pull width closer to unity, removal of the positive
+background-only offset is the reason $k_{\min}=0.9$ is used for 2016 in v3.}
+\label{fig:v3-lslb-closure-2016}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.98\linewidth}{toy_generation_figs/v3_20260709_lslb_closure/fig40_style_2021_search50_project30_refmatched_lslb_closure_suite_25toy.png}
+\caption{Corrected 2021 1\% injected-signal closure for the
+\texttt{fSigPowExpQ} toy truth. Each mass point summarizes the nonzero
+$Z_{\mathrm{inj}}=1,3,5$ cells, with 25 toys per cell, \SIrange{30}{250}{MeV} model
+support, and a \SIrange{50}{250}{MeV} search range. Defining the injected amplitude
+with the matched background-only refit uncertainty removes the mixed-denominator
+$\Delta Z$ offset seen in the superseded study. The 1.1 choice has the pull-width
+median closest to unity and the strongest extraction-reach proxy; its signed mean pull
+over the nonzero cells is $-0.034$. It is a calibration--reach choice, not the winner of
+every scalar diagnostic.}
+\label{fig:v3-lslb-closure-2021}
+\end{figure}
+
+\FloatBarrier
+
+\subsubsection{Conditional blind-window GP toys}
+
+The fastest toy mode keeps the sideband-trained GP fixed at a given test mass. The GP
+fit is performed once on the sidebands, the blind-window mean vector and covariance are
+constructed from that fit, a background realization is drawn, signal is added, and the
+result is Poisson-sampled. This construction is ideal for high-statistics expected-band
+studies and for testing the response of the extraction fit under the posterior
+background model preferred by the real data.
+
+\subsubsection{Full procedural GP-mean/refit pseudoexperiments}
+
+The most realistic toy mode generates a full pseudoexperiment from the GP-derived
+background expectation, injects signal with the full Gaussian template, and then reruns
+the GP sideband-to-blind prediction on the toy before signal extraction. Here ``GP
+mean'' means the full-range propagated count-space mean obtained from the sideband-fit
+GP model of the observed spectrum. That propagated mean is used as the toy-truth
+background source over the full histogram support; the toy is then fluctuated, signal
+is added, and the ordinary mass-scan workflow refits the GP on the toy sidebands at
+each scanned mass. This is the appropriate mode for diagnosing signal absorption,
+because it directly tests how much of the injected signal may be absorbed by the
+refitted background model or by the profiled nuisance treatment. The phrase
+``refit-on-toy'' is therefore literal: the search stage does not reuse the original
+data-conditioned blind-window prediction.
+
+\subsubsection{Fixed-total GP-propagated toy-scan study}
+
+The GP-propagated fixed-total toy mode remains a useful internal cross-check of the
+scan machinery, but it is not the main closure evidence in this note. The main text
+therefore emphasizes the clean year-matched functional-form scan suites above and the
+refmatched full-refit closure studies below.
+
+% The v4.1 and v4.5 ten-toy material is retained verbatim for the archival
+% appendix.  Defining it here keeps the historical labels and figure paths
+% unchanged while removing the pilot from the main validation narrative.
+\long\gdef\vfourpfivepilotappendix{%
+\subsection{Ten-toy 2021 source-and-exposure length-scale pilot}
+\label{sec:v4p1-ls-exposure-pilot}
+
+The pilot implements Eqs.~\eqref{eq:v4p1-ls-pilot-scenarios} and
+\eqref{eq:v4p1-ls-pilot-increments} for the native 1\%, $1\%\times10$,
+$1\%\times100$, native 10\%, and $10\%\times10$ scenarios. Ten background
+pseudoexperiments are generated for each analytic truth and scenario. Within a source
+family, the same toy index identifies a nested Poisson realization, and the optimizer
+seed is held common across upper-bound factors at fixed truth, scenario, toy, and mass.
+This pairing reduces comparison noise; it does not make the independently derived
+native-1\% and native-10\% source functions identical.
+
+The common-family primary lane uses \texttt{fGenGammaThresh} for both native sources so
+that the $1\%\times10$ versus native-10\% comparison probes the source spectrum and
+selection rather than a change of analytic family. The \texttt{fSigPowExpQ} lane is
+kept separate as an alternate-truth stress test. Both are smooth stress truths with
+their source-fit diagnostics retained in the provenance ledger; neither is promoted as
+a physical background generator.
+
+\paragraph{Recovered 2016 10\% observed-input provenance.}
+The original remote 2016 10\% ROOT input is not present in the local checkout. The
+observed histogram used here was recovered from five retained functional-form products.
+All five archived copies have bitwise-identical bin values and edges, with the joint
+values-and-edges SHA-256
+\path{db85ff94c74855549c45b173116b36a70a4183ac86db8f374d5b3202c1410656}.
+The source paths, per-file hashes, underflow/overflow accounting, recovered-file hash,
+and the statement of this limitation are recorded in
+\path{study_results/v4p1_2021_ls_exposure_ensembles_20260804/derived/2016_10pct_recovery_manifest.json}.
+The recovery changes no bin content and is used only to place the 10\% and full samples
+on the same factor-12 wide-support card.
+
+On the matched observed grids, increasing the data fraction did not move the optimized
+length scale upward. For 2016, the median
+$\ell_{\mathrm{opt}}/\sigma_x$ changes from 10.782 in the recovered 10\% sample to
+9.716 in the full sample on the common factor-12 card; the median pointwise change is
+$-1.080$. For 2021, it changes from 13.061 at 1\% to 12.060 at 10\% on the common
+factor-15 card, with a median pointwise change of $-0.850$ and a negative change at
+every matched mass. These observed comparisons show that higher statistics do not by
+themselves require a longer correlation scale. They are diagnostics of these spectra,
+not an exposure-scaling law.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.92\linewidth}{toy_generation_figs/v4p1_ls_exposure_pilot/fig_v4p1_ls_observed_dataset_comparison.pdf}
+\caption{Observed optimized-length-scale comparison used to motivate the 2021 pilot.
+The ordinate is $\ell_{\mathrm{opt}}/\sigma_x$ at each mass. The 2016 panel compares
+the reviewed 10\% and full samples on the common factor-12 wide-support card, while the
+2021 panel compares the reviewed native 1\% and 10\% samples on the common factor-15
+wide-support card. The respective medians are 10.782 and 9.716 for 2016, and
+13.061 and 12.060 for 2021. These are exact observed fit-space diagnostics with no
+interpolated rows; they are not ensemble expectations, limit bands, or evidence for
+a universal monotonic luminosity dependence.}
+\label{fig:v4p1-ls-observed-dataset-comparison}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.94\linewidth}{toy_generation_figs/v4p1_ls_exposure_pilot/fig_v4p1_ensemble_ls_all_toys_gengamma_f20.pdf}
+\caption{Individual optimized-length-scale curves at the provisional factor-20
+ceiling in the ten-toy 2021 source-and-exposure pilot primary lane. The one-page
+raw-trajectory display shows native 1\%,
+$1\%\times10$, $1\%\times100$, native 10\%, and $10\%\times10$. They are
+projections of a fit-space hyperparameter diagnostic under the declared smooth truth,
+not projected limits, expected-limit bands, or a prediction of the eventual full-2021
+observed spectrum. Because the native-10\% support total is 11.296 times the
+native-1\% total, the $1\%\times10$ versus native-10\% comparison also probes
+source/selection shape and native normalization.}
+\label{fig:v4p1-ls-toy-ensemble-curves}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.92\linewidth}{toy_generation_figs/v4p1_ls_exposure_pilot/fig_v4p1_factor20_native10_vs_1pct_x10_toy_medians.pdf}
+\caption{Focused, unpaired factor-20 comparison of the toy-level median
+$\ell_{\mathrm{opt}}/\sigma_x$ for the native-10\% and
+$1\%\times10$ source scenarios in the primary and alternate truth lanes. Each point
+is one toy median over the 11 predeclared masses. The two source families are generated
+independently and are not paired by toy index; moreover, the native-10\% effective
+target is 1.129647 times the $1\%\times10$ source target. The separation is therefore
+a source/selection-shape and normalization diagnostic, not a pure exposure-scaling
+effect or a paired significance test. No expected-limit quantity is shown.}
+\label{fig:v4p1-ls-factor20-native10-vs-1pct-x10}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.92\linewidth}{toy_generation_figs/v4p1_ls_exposure_pilot/fig_v4p1_ensemble_bound_lml_diagnostics_gengamma.pdf}
+\caption{Upper-bound occupancy and likelihood diagnostic in the same ten-toy pilot for
+$k_{\max}=6,9,12,15,20,$ and 25. The panels summarize row- and toy-level boundary
+occupancy and the median and worst adjacent-factor log-marginal-likelihood changes
+on the predeclared mass grid after unchanged-card optimizer review. A bound is not
+selected because it gives a favorable limit or local $p_0$. With only ten toys per
+scenario, even zero observed boundary hits is a screening diagnostic rather than a
+production qualification. Factor 15 truncates at least one mass-toy row in each
+projected-100\% lane and truth family; factors 20 and 25 are nonbinding and form the
+reviewed likelihood plateau for those projection lanes.}
+\label{fig:v4p1-ls-bound-sensitivity}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.94\linewidth}{toy_generation_figs/v4p1_ls_exposure_pilot/fig_v4p1_ensemble_fixed_amplitude_response_gengamma.pdf}
+\caption{Fixed-amplitude signal-response screen for the primary truth lane. At each
+truth, scenario, toy, and injection mass, the absolute injected amplitudes are
+calibrated once from the factor-15 background-only Asimov reference according to
+Eq.~\eqref{eq:v4p1-fixed-amplitude-anchor} and then reused unchanged at every upper
+factor. The panels compare extraction uncertainty, signed residual, paired recovery,
+pull width, and injection-refit boundary occupancy. An increased $\sigma_A$ is the
+defined indicator of reduced local extraction sensitivity; a nonzero residual or
+response away from unity is the corresponding bias or absorption diagnostic. With
+ten toys, the figure is an implementation screen and neither a sensitivity
+qualification, a coverage result, nor an expected-limit band. The $q_\mu$ fields
+retained in the raw fit output are not used in this display.}
+\label{fig:v4p1-ls-fixed-amplitude-response}
+\end{figure}
+
+\paragraph{Reviewed background-only pilot result.}
+All 600 predeclared scan tasks and 6600 mass rows pass the final optimizer audit.
+The reviewed table uses actual fits only: 167 rows select a higher-likelihood targeted
+repair, no row is interpolated, no initialization lock remains, and every adjacent
+factor comparison is either an allowed-domain likelihood gain or a consistent
+plateau.
+
+Factor 15 still has boundary contact in both projected-100\% scenarios and both truth
+lanes under the predeclared 0.999 occupancy criterion. At factors 20 and 25, both
+projected scenarios have zero boundary and near-boundary rows in both truth lanes, and
+their optimized-length-scale medians and log marginal likelihoods form the reviewed
+plateau. Factor 20 is therefore the first tested nonbinding value and the provisional
+ceiling for a 2021 100\%-statistics projection. It is not a production-card freeze.
+
+The lower-statistics native-1\% scenario still binds at factor 20 in both truth lanes.
+If one numerical ceiling must cover all five pilot exposures rather than only the
+projected-100\% use case, factor 25 is the first tested value with zero boundary and
+near-boundary rows for every scenario and truth. This universal-card option is a
+conservative pilot choice, not evidence that the physical correlation length grows
+with luminosity.
+
+\paragraph{Fixed-amplitude sensitivity and bias.}
+For the projected native-1\%$\times100$ and native-10\%$\times10$ lanes, respectively,
+the median fitted-uncertainty ratios
+$\sigma_A(k_{\max}=20)/\sigma_A(k_{\max}=15)$ are 0.999993 and 1.00001 in the
+primary truth lane, and 1.00000 and 0.985677 in the alternate lane. Thus no local
+extraction-sensitivity loss is seen when lifting the ceiling from factor 15 to factor
+20. The alternate native-10\%$\times10$ lane instead has a 1.43\% smaller fitted
+uncertainty. Together with the nonbinding factor-20/factor-25 likelihood plateau, this
+supports factor 20 as the provisional projected-100\% ceiling.
+
+At factor 20, the paired response medians
+$(\hat A_z-\hat A_0)/A_{\mathrm{inj}}$ span 0.971921--0.979603 across the four
+projected truth/scenario groups and are essentially unchanged at factors 15 and 25.
+The common 2--3\% under-response is therefore not introduced by lifting the
+length-scale ceiling. At factor 20, the absolute anchor-normalized median residual is
+at most 0.214502 and the median pull widths span 1.01892--1.21408. With only ten
+independent background toys per scenario, these offsets and widths are an unresolved
+closure diagnostic rather than evidence for a calibrated bias.
+
+The response study uses the fixed absolute amplitudes of
+Eq.~\eqref{eq:v4p1-fixed-amplitude-anchor}; it constructs no expected-limit band and
+does not establish coverage. The raw $q_\mu$ fields are neither relabeled nor used by
+the postprocessor and are explicitly non-promotable, as are the immutable-path
+$\eps^2$ values. None of these pilot quantities supplies an exclusion, global
+discovery probability, or production-card qualification.
+
+\subsubsection{Frozen-v4.2 refmatched injection--extraction continuation}
+\label{sec:v4p5-exposure-refmatched-continuation}
+
+The preceding scan asked how a prefit fixed-amplitude response changed as the
+length-scale ceiling was moved.  The v4.5 continuation asks a different,
+production-matched question while keeping the requested candidate ceiling fixed at
+$k_{\max}=15$.  It reuses only the reviewed Section~5.4 background histograms for
+toy indices 0--9.  It does \emph{not} reuse the earlier injection rows, whose masses
+were 60, 120, and 220~MeV and whose absolute amplitudes were anchored to a
+factor-15 prefit Asimov reference.  Every result in this continuation is a new
+full-refit extraction under the declared v4.2 2021 state.
+
+The card uses the 40--300~MeV GP support and 50--250~MeV search range,
+$k_{\min}=1.1$, $k_{\max}=15$, the $2.25\sigma_m$ blind and training exclusion,
+the two-sideband requirement, five-bin local rebinning, and 12 optimizer restarts.
+The four headline ensembles are $1\%\times10$, native 10\%, $1\%\times100$,
+and $10\%\times10$.  For all four we use the common
+\texttt{fGenGammaThresh} analytic family, fitted independently to the native 1\%
+and native 10\% source spectra.  This keeps the functional family common across
+the requested comparisons; the fits are smooth stress truths and not physical
+background generators.
+
+For scenario $s$, background toy $t$, and mass $m$, a matched background-only GP
+refit first supplies $\sigma^{\mathrm{ref}}_{A,stm}$.  The four injected means are
+then
+\begin{equation}
+ A^{\mathrm{inj}}_{stmz}=z\,\sigma^{\mathrm{ref}}_{A,stm},
+ \qquad z\in\{0,1,3,5\}.
+ \label{eq:v4p5-refmatched-injection}
+\end{equation}
+Independent binwise Poisson signal counts with mean
+$A^{\mathrm{inj}}_{stmz}w_i(m)$ are added to the fixed background histogram, after
+which the complete sideband GP and profiled signed-amplitude extraction are rerun.
+The primary pull is
+\begin{equation}
+ p_{stmz}=
+ \frac{\widehat A_{stmz}-A^{\mathrm{inj}}_{stmz}}
+      {\widehat\sigma_{A,stmz}}.
+ \label{eq:v4p5-pull}
+\end{equation}
+Thus the matched background-only uncertainty defines the injection scale, whereas
+the denominator is the post-fit uncertainty of the injected pseudoexperiment.  The
+two quantities are not substituted for one another.
+
+The coupling-coordinate conversion is also toy-local.  The exact v4.2 density
+construction, including its $\pm1.64\sigma_m$ fractional-bin integral, gives
+$K_{stm}=A(\eps^2=1)$ separately for every scenario, toy, and mass.  It is frozen
+only across the four strengths of that pseudo-spectrum, so that
+\begin{equation}
+ \eps^2_{\mathrm{inj},stmz}=A^{\mathrm{inj}}_{stmz}/K_{stm},
+ \qquad
+ \widehat{\eps^2}_{stmz}=\widehat A_{stmz}/K_{stm}.
+ \label{eq:v4p5-eps2-coordinate}
+\end{equation}
+Negative fitted values are retained as signed extraction coordinates.  These panels
+are not upper limits or physical negative couplings.  The $1.64\sigma_m$ conversion
+integral is distinct from the $2.25\sigma_m$ extraction blind.
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.99\linewidth}{toy_generation_figs/v4p5_2021_exposure_refmatched_20260811/functional_form_exposure_mass_distributions.pdf}
+\caption{Invariant-mass construction for the four headline source/exposure
+ensembles, following the functional-form display of
+Fig.~\ref{fig:functional-form-seed-overview}.
+The left panels overlay the native source spectrum and its independently fitted
+\texttt{fGenGammaThresh} mean; their Pearson $\chi^2/\mathrm{ndf}$ values are 1.108
+for the 1\% source and 2.781 for the 10\% source.  The middle panels show the ten
+analyzed pseudoexperiments, analytic expectation, toy mean, and toy median after the
+declared scaling.  The right panels show the toy-mean residual normalized by the
+expected standard error.  Grey vertical bands are the support-only regions outside
+the 50--250~MeV search.  The visibly poorer native-10\% analytic description remains
+part of the stress test rather than being tuned away.}
+\label{fig:v4p5-functional-form-exposure-distributions}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.99\linewidth}{toy_generation_figs/v4p5_2021_exposure_refmatched_20260811/spurious_signal_zero_sigma.pdf}
+\caption{Standalone zero-signal, or spurious-signal, result.  Each row is one
+source/exposure ensemble; the columns show the ten raw signed
+$\widehat{\eps^2}$ coordinates at each mass, the arithmetic pull mean, and the
+$n-1$ sample pull width.  The $\eps^2$ ordinates use symmetric-log scaling so that
+signed extremes remain visible; no point is clipped.  The $10\%\times10$ cell at
+65~MeV has pull mean $-1.077$ and width 3.187 because toy 1 has pull $-9.867$.
+That pseudoexperiment is retained as the principal spurious-signal stability
+warning.  Error bars on pull means are sample-standard-error estimates and those on
+widths use the finite-Gaussian approximation; with ten toys they are guides, not
+coverage intervals.}
+\label{fig:v4p5-zero-signal-spurious}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.99\linewidth}{toy_generation_figs/v4p5_2021_exposure_refmatched_20260811/refmatched_closure_2021_1pct_x10.pdf}
+\caption{Refmatched full-refit closure for the $1\%\times10$ ensemble.  The
+Fig.~\ref{fig:v3-lslb-closure-2021}-style panels show pull mean, sample pull width,
+mean residual significance $\widehat Z-z$, and median amplitude recovery.  All raw
+cell sizes are ten.  The common positive 65~MeV pull means, reaching 0.950 at
+$z=1$, are therefore a finite-ensemble diagnostic rather than a calibrated bias.
+Mean-pull bars are $s/\sqrt{10}$, pull-width bars use the approximate
+$s/\sqrt{18}$ scale, and recovery bars are empirical 16--84\% intervals.
+Joining lines are visual guides between the five predeclared masses, not
+interpolated scan behavior.}
+\label{fig:v4p5-closure-1pct-x10}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.99\linewidth}{toy_generation_figs/v4p5_2021_exposure_refmatched_20260811/refmatched_closure_2021_10pct.pdf}
+\caption{As in Fig.~\ref{fig:v4p5-closure-1pct-x10}, for the native-10\% ensemble.
+The 210~MeV cells have negative pull means from $-0.600$ at zero signal to $-0.770$
+at $z=5$, while the 120~MeV sample widths are approximately 1.64 across strengths.
+The correlated pattern across strengths reflects reuse of a background toy and is
+not four independent ensemble observations.}
+\label{fig:v4p5-closure-10pct}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.99\linewidth}{toy_generation_figs/v4p5_2021_exposure_refmatched_20260811/refmatched_closure_2021_1pct_x100.pdf}
+\caption{As in Fig.~\ref{fig:v4p5-closure-1pct-x10}, for the
+$1\%\times100$ ensemble.  Twenty-five of this ensemble's 200 extraction rows touch
+the fixed factor-15 length-scale ceiling, clustered in three background toys at
+120--210~MeV.  The boundary contacts are reported rather than repaired by changing
+the candidate card.}
+\label{fig:v4p5-closure-1pct-x100}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.99\linewidth}{toy_generation_figs/v4p5_2021_exposure_refmatched_20260811/refmatched_closure_2021_10pct_x10.pdf}
+\caption{As in Fig.~\ref{fig:v4p5-closure-1pct-x10}, for the
+$10\%\times10$ ensemble.  A separate toy at 180~MeV selects
+$\sigma_A^{\mathrm{ref}}=268459$ events, compared with a 9240-event prefit reference,
+and reaches pull $-4.138$ at the nominal 5-$\sigma_A$ injection.  The cell mean is
+less extreme because the instability is localized, so the raw ledger is required
+alongside the summary.  Relative to the injected-fit uncertainties, the nominal
+1-, 3-, and 5-$\sigma_A$ amplitudes are instead 28.90, 74.42, and 141.42 standard
+deviations; their mean residual significances are 3.01, 7.17, and 13.48.}
+\label{fig:v4p5-closure-10pct-x10}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.99\linewidth}{toy_generation_figs/v4p5_2021_exposure_refmatched_20260811/eps2_coordinate_distributions_nonzero.pdf}
+\caption{Raw and median signed $\eps^2$ extraction coordinates for the 1-, 3-, and
+5-$\sigma_A$ injections.  Each panel contains ten fitted points, the empirical
+16--84\% interval around their median, and the corresponding toy-local injected
+coordinates.  Symmetric-log ordinates retain negative estimates and rare large
+fit branches without clipping.  Because $K_{stm}$ and
+$\sigma^{\mathrm{ref}}_{A,stm}$ vary among background toys, the injected points are
+themselves distributions rather than one universal horizontal value.  These are
+extraction-coordinate diagnostics, not $\eps^2$ limits or expected bands.
+Each panel selects its own symmetric-log range, so apparent vertical spreads
+should not be compared without the numerical ledger.}
+\label{fig:v4p5-eps2-distributions}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.99\linewidth}{toy_generation_figs/v4p5_2021_exposure_refmatched_20260811/direct_pairwise_eps2_comparisons.pdf}
+\caption{Direct unpaired comparisons requested between native 10\% and
+$1\%\times10$ (top), and between $10\%\times10$ and $1\%\times100$ (bottom).
+Solid curves and bands are fitted medians and empirical 16--84\% intervals; dashed
+curves are injected medians.  The 1\%- and 10\%-source functions are independently
+fitted and their ensembles are independently generated.  Moreover, the expected
+native-10\%/$1\%\times10$ normalization ratio is 1.1296466, with the same ratio for
+the scaled pair.  The differences therefore combine source/selection shape and
+normalization and are neither pure exposure effects nor paired tests.  The shaded
+regions are pointwise descriptive quantiles of ten values, not expected bands, and
+can suppress isolated extremes; Fig.~\ref{fig:v4p5-eps2-distributions} retains all
+raw signed values.}
+\label{fig:v4p5-direct-eps2-comparisons}
+\end{figure}
+
+\begin{table}[p]
+\centering
+\small
+\caption{Ten-toy closure ranges over the five requested masses.  The zero-signal
+columns summarize five cells per ensemble; the nonzero columns summarize 15 cells.
+Recovery is the cell median of $\widehat A/A_{\mathrm{inj}}$.  Extrema are
+descriptive screening values and are not simultaneous confidence intervals.}
+\label{tab:v4p5-refmatched-summary}
+\begin{tabular}{lccccc}
+\toprule
+Ensemble & max $|\bar p|$, $z=0$ & width range, $z=0$ &
+max $|\bar p|$, $z>0$ & width range, $z>0$ & recovery range \\
+\midrule
+$1\%\times10$  & 0.981 & 1.123--1.240 & 0.950 & 1.010--1.326 & 0.824--1.439 \\
+native 10\%     & 0.600 & 0.671--1.642 & 0.770 & 0.653--1.652 & 0.312--1.430 \\
+$1\%\times100$ & 0.535 & 0.892--1.387 & 0.332 & 0.872--1.444 & 0.692--1.561 \\
+$10\%\times10$ & 1.077 & 0.567--3.187 & 0.305 & 0.521--1.615 & 0.759--1.531 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+All 800 extraction rows and all 200 unique matched reference fits complete with
+finite quantities and no reference fallback.  The reference uncertainty and exact
+$K_{stm}$ have zero spread across the four strengths at fixed scenario, toy, and
+mass, and the recorded pull exactly follows Eq.~\eqref{eq:v4p5-pull}.  Across the
+60 nonzero cells, pull widths span 0.521--1.652 and maximum $|\bar p|$ is 0.950.
+The broad 0.312--1.561 recovery range is driven by the intrinsically noisy 1-$\sigma$
+ratio; restricting to 3- and 5-$\sigma$ cells narrows it to 0.756--1.210.  These
+numbers do not establish coverage: a width estimated from ten Gaussian pulls has only
+nine degrees of freedom, and repeated masses and strengths from one background toy
+are correlated.
+
+Twenty extraction rows, spanning 17 distinct scenario--toy--mass states, have
+$\widehat\sigma_A/\sigma_A^{\mathrm{ref}}$ outside $[0.5,2]$, with range
+0.0344--40.61.  Eleven of them retain the optimizer-start signature while still
+reporting a finite success flag.  The latter flag therefore establishes only that
+the code returned a finite result without fallback; it is not a likelihood-optimum
+or repeat-stability test.
+
+The independent physics/statistics review classifies this as a completed
+\emph{screening-level conditional closure study}, not a production qualification.
+Artifact and provenance QA passes, but statistical-closure and optimizer-stability
+acceptance are held.
+The retained 65~MeV spurious-signal outlier, the 180~MeV matched-reference branch,
+the native-10\% truth misdescription, and the clustered factor-15 contacts motivate
+repeat-stability and larger-ensemble checks.  No post-hoc row removal, interpolation,
+or enlargement of the candidate length-scale bound is applied.
+
+Finally, a separate atomic ROOT product extends the deterministic Section~5.4
+nested-Poisson streams through indices 10--99 for both predeclared truth lanes and all
+five source/exposure scenarios.  All 100 original index-0--9 histograms reproduce
+bit-for-bit.  The 90 new toys per truth/scenario are generated but are not used in any
+v4.5 number or figure, and their extraction is not authorized by the present
+statistical review.  Before continuation, a deterministic matched-reference and
+repeat-stability gate must be predeclared, including archived seeds and a fixed
+likelihood-selection criterion.  Pooling them later requires the present card,
+summary schema, and outlier policy to remain frozen; a scientific protocol change
+instead requires a new versioned study.
+
+\FloatBarrier
+}
+
+\subsection{Full-100 2021 source-and-exposure refmatched closure}
+\label{sec:v4p6-exposure-refmatched-full100}
+
+\paragraph{Finding summary.}
+The complete ensemble confirms a local conditional 65~MeV offset in the
+$1\%\times10$ lane, with a smaller native-10\% response, after a pull-blind
+optimizer treatment.  It does not establish observed-data bias or direct coverage.
+
+The ten-toy hyperparameter pilot and its first refmatched continuation are now
+archived in Appendix~\ref{app:v4p5-ten-toy-source-exposure}.  This section uses the
+complete 100-toy ensembles.  It was frozen before the reserve toys were inspected:
+toys 0--9 are the pilot sample and toys 10--99 are an independent confirmation
+sample for the pilot-selected $1\%\times10$, 65~MeV zero-signal offset.  All 100
+background pseudo-histograms are refitted uniformly under the new estimator and
+restart policy; the v4.5 extraction rows are not pooled with the new rows.
+
+The analysis card remains the declared v4.2 2021 state: a 40--300~MeV GP support,
+50--250~MeV search range, $k_{\min}=1.1$, $k_{\max}=15$, a
+$2.25\sigma_m$ blind and training exclusion, two required sidebands, five-bin local
+rebinning, and 12 randomized optimizer restarts in addition to the nominal start.
+The four headline ensembles are $1\%\times10$, native 10\%, $1\%\times100$, and
+$10\%\times10$.  The common \texttt{fGenGammaThresh} family is fitted independently
+to the native 1\% and native 10\% spectra.  These functions are smooth stress truths,
+not physical background generators.  In particular, the native-10\% fit has Pearson
+$\chi^2/\mathrm{ndf}=2.781$ and is deliberately not retuned after inspecting closure.
+
+For each scenario $s$, background toy $t$, and mass $m$, an independently optimized
+matched background-only fit defines $\sigma^{\mathrm{ref}}_{A,stm}$.  The injected
+amplitude and reported pull are
+\begin{equation}
+ A^{\mathrm{inj}}_{stmz}=z\,\sigma^{\mathrm{ref}}_{A,stm},
+ \qquad
+ p_{stmz}=\frac{\widehat A_{stmz}-A^{\mathrm{inj}}_{stmz}}
+ {\widehat\sigma_{A,stmz}},
+ \qquad z\in\{0,1,3,5\}.
+ \label{eq:v4p6-refmatched-pull}
+\end{equation}
+The injection scale is therefore toy-local, while the denominator is always the
+post-fit uncertainty of the injected pseudoexperiment.  The exact v4.2 conversion
+$K_{stm}=A(\eps^2=1)$ is also recomputed from each native pseudo-spectrum, including
+the $\pm1.64\sigma_m$ fractional-bin density integral, so that
+\begin{equation}
+ \eps^2_{\mathrm{inj},stmz}=A^{\mathrm{inj}}_{stmz}/K_{stm},
+ \qquad
+ \widehat{\eps^2}_{stmz}=\widehat A_{stmz}/K_{stm}.
+ \label{eq:v4p6-eps2-coordinate}
+\end{equation}
+Negative fitted coordinates are retained.  They are estimator fluctuations, not
+physical negative couplings, and none of these distributions is an upper limit or an
+expected-limit band.
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.99\linewidth}{toy_generation_figs/v4p6_2021_exposure_refmatched_100toy_20260812/functional_form_exposure_mass_distributions_full100.pdf}
+\caption{Invariant-mass construction of the full-100 ensembles, following the
+functional-form display of Fig.~\ref{fig:functional-form-seed-overview}.  Each row
+shows the native source and independently fitted stress truth (left), the scaled
+analytic expectation with the mean, median, and central 68\% range of 100 background
+pseudoexperiments (middle), and the toy-mean residual divided by its expected standard
+error (right).  Grey bands are support-only regions outside the 50--250~MeV search.
+The common analytic family isolates source/selection and normalization differences
+without claiming that either smooth function is a physical background generator.}
+\label{fig:v4p6-functional-form-exposure-distributions}
+\end{figure}
+
+\subsubsection{Predeclared optimizer-repeat and exclusion gate}
+
+Each optimizer attempt refits exactly the same cached background and signal counts;
+the pseudoexperiment seed and optimizer-start seed occupy separate deterministic
+namespaces.  An attempt uses the nominal kernel start plus 12 randomized starts and
+archives its seed, warnings, log marginal likelihood (LML), length scale, constant,
+extraction uncertainty, and covariance diagnostics.  Three independently seeded,
+identically configured background-only/zero-signal optimizer attempts use the same
+data and masks.  The highest-LML branch
+must occur at least twice under the predeclared agreement criteria
+\begin{equation}
+ \frac{|\Delta\mathrm{LML}|}{N_{\mathrm{train}}}\leq10^{-3},\quad
+ |\Delta\ln\ell|\leq0.01,\quad
+ |\Delta\ln C|\leq0.05,\quad
+ |\Delta\ln\sigma_A|\leq0.02.
+ \label{eq:v4p6-branch-replication}
+\end{equation}
+If it does not, two additional independent attempts are made.  A nonzero-injection
+fit begins with one attempt and receives two, then at most five, attempts if it has an
+invalid or nonfinite fit/covariance state, retains the exact optimizer-start signature, lies
+within 2\% of a length-scale bound, or has
+$\widehat\sigma_A/\sigma_A^{\mathrm{ref}}\notin[0.5,2]$.  Branch selection uses only
+maximum GP LML and reproducibility---never $\widehat A$, pull sign or size,
+$\widehat\eps^2$, or agreement with the injected amplitude.
+Optimizer warnings are archived for audit, but are not by themselves a repeat or
+exclusion trigger; only the pull- and amplitude-blind numerical diagnostics listed above
+activate the adaptive attempts.
+
+An irreproducible reference state excludes all four strengths at that
+scenario--toy--mass key; an irreproducible injected refit excludes only that strength.
+Statistical extremes that pass this pull-blind technical gate remain accepted;
+repeat-triggered boundary solutions are retained when replicated.  A closure cell
+was predeclared reportable only if at least 95 of its 100 generated rows survived.
+This fit-state policy avoids both post-hoc pull clipping and the scientifically
+incorrect removal of a complete pseudoexperiment because it fluctuates unfavorably.
+
+The production run contains 400 scenario--toy tasks, 8000 predeclared extraction-state
+keys, 7996 finite raw amplitude fits, and 12,845 archived optimizer-attempt records.
+Of the 7994 accepted states,
+5593 required one attempt, 2384 required three, and 17 required five.  Six states are
+excluded: the $1\%\times100$ toy-83, 90~MeV, $z=3$ refit; the $10\%\times10$
+toy-28, 180~MeV, $z=5$ refit; and all four strengths of the $10\%\times10$ toy-66,
+90~MeV reference state.  The first two fail injected-fit reproducibility and the last
+fails reference-branch reproducibility after five attempts.  No entire background-toy
+index is removed, every one of the 80 closure cells retains 99 or 100 rows, and all pass the
+predeclared minimum-size gate.
+
+The count-space covariance produced by the frozen lognormal-moment mapping is
+classified as numerically repairable, not necessarily positive semidefinite, when it
+is finite and symmetric and satisfies
+$\lambda_{\min}/\max_i|C_{ii}|\geq-0.01$.  The extraction likelihood then follows its
+frozen numerical path: progressively larger diagonal jitter through
+$10^{-3}\max_i|C_{ii}|$, followed, when needed, by an eigenvalue-clipped square root.
+Among the 7994 accepted states, 498 archived raw matrices have the eigenvalue ratio
+below $-10^{-3}$ and 22 lie below $-0.005$; the latter are confined to 90~MeV in the
+two high-exposure ensembles.  A pull-blind influence check that omits those 22 rows
+changes any closure-cell mean by at most 0.031 and any width by at most 0.014, but
+would reduce one cell below the predeclared 95-row reporting threshold.  The rows
+therefore remain in the headline moments.  An all-state deterministic reconstruction
+replays the actual repair path and compares it with the minimally sufficient isotropic
+diagonal loading.  The replay agrees with the archived pull to within 0.0031 and with
+its uncertainty to within $3.2\times10^{-4}$ relatively; changing to minimal diagonal
+loading moves any pull by at most 0.0029 and any uncertainty by at most
+$6.94\times10^{-4}$ relatively; the largest changes in a cell mean and width are
+$5.0\times10^{-5}$ and $1.1\times10^{-4}$, respectively.  The archived ratios, rather than reconstructed
+threshold counts, define the 498 and 22 figures above.  This tolerance and repair audit is a
+numerical qualification of the estimator, not evidence that the unrepaired matrices
+are positive semidefinite.
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.99\linewidth}{toy_generation_figs/v4p6_2021_exposure_refmatched_100toy_20260812/optimizer_gate_diagnostics_full100.pdf}
+\caption{Optimizer-repeat gate and exclusion audit.  The upper-left panel compares
+zero-signal means from the raw first attempts with the accepted LML-selected states;
+the visibly repaired $1\%\times100$, 65~MeV point is numerical rather than a pull-based
+deletion.  The upper-right panel reports accepted factor-15 contacts.  The lower-left
+panel gives the adaptive attempt workload, and the lower-right panel lists all six
+excluded states.  Statistical extremes that pass the pull-blind technical gate remain
+in the headline summaries; repeat-triggered boundary solutions are retained when
+replicated.}
+\label{fig:v4p6-optimizer-gate}
+\end{figure}
+
+\subsubsection{Spurious-signal bias and independent confirmation}
+
+Figure~\ref{fig:v4p6-zero-signal-spurious} isolates the $z=0$ tests.  The apparent
+$1\%\times10$, 65~MeV pilot offset does not disappear with more toys.  In the
+predeclared independent reserve (toys 10--99), the mean pull is
+$0.768$ with sample width $0.944$ and 95\% Student-$t$ interval
+$[0.570,0.965]$; the two-sided test of zero mean gives
+$p=1.64\times10^{-11}$.  This exceeds the predeclared materiality threshold
+$|\bar p|\geq0.2$.  The full-100 precision estimate is
+$0.789$ with width $0.962$, median $0.784$, and 95\% interval
+$[0.598,0.980]$.
+
+The deterministic analytic-mean stress spectrum gives a stable zero-signal pull of
+$0.837$ at the same mass.  The agreement with the 100-toy mean and the near-normal
+reserve quantiles in Fig.~\ref{fig:v4p6-bias-confirmation} identify a local
+functional-form/GP underprediction, not an optimizer failure or a few statistical
+outliers.  The four injection strengths share each background toy and are highly
+correlated; their similar offsets are recovery diagnostics, not four independent
+confirmations.
+
+The remaining zero-signal cells were treated as exploratory with Holm correction over
+all 20 scenario--mass checks.  Two additional material offsets survive that correction:
+native 10\% at 65~MeV has mean $0.716$ (analytic-mean value $0.723$), and
+$10\%\times10$ at 180~MeV has mean $0.338$ (analytic-mean value $0.194$).
+These are closure properties conditional on the deliberately imperfect smooth stress
+truth and the frozen card.  They do not measure a bias of the observed data result and
+do not calibrate frequentist coverage.
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.99\linewidth}{toy_generation_figs/v4p6_2021_exposure_refmatched_100toy_20260812/spurious_signal_zero_sigma_full100.pdf}
+\caption{Full-100 spurious-signal study.  Each row corresponds to one ensemble.  The
+left panels show every accepted zero-signal pull and its median; the middle panels show
+raw first-attempt means, accepted means with 95\% Student-$t$ intervals, and the
+deterministic analytic-mean closure; the right panels show accepted sample widths with
+95\% normal-theory intervals.  Red crosses mark excluded raw fit states where present.
+No accepted pull is clipped.  The common mass dependence between analytic-mean and
+ensemble results diagnoses stress-truth/model closure rather than a statistical
+outlier.}
+\label{fig:v4p6-zero-signal-spurious}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.96\linewidth}{toy_generation_figs/v4p6_2021_exposure_refmatched_100toy_20260812/onepct_x10_65mev_bias_confirmation.pdf}
+\caption{Investigation of the $1\%\times10$, 65~MeV closure offset.  The top-left
+panel separates the pilot and independent reserve distributions; the top-right tracks
+the running mean and its 95\% Student-$t$ interval, with the pilot/reserve boundary
+fixed at toy 10.  The lower-left normal Q--Q diagnostic shows no isolated tail capable
+of explaining the mean, and the lower-right panel shows the correlated response across
+injection strengths.  The analytic-mean pull of 0.837 was obtained from the exact
+stress-truth mean with independent optimizer seeds.}
+\label{fig:v4p6-bias-confirmation}
+\end{figure}
+
+\subsubsection{Injection recovery, pull widths, and signed coupling coordinates}
+
+Figures~\ref{fig:v4p6-closure-1pct-x10}--\ref{fig:v4p6-closure-10pct-x10}
+use the four-panel convention of Figs.~\ref{fig:v3-lslb-closure-2015}--
+\ref{fig:v3-lslb-closure-2021}.  The pull-mean error bars are 95\% Student-$t$
+intervals and the width bars are exact normal-theory intervals based on the accepted
+sample size.  The lower panels show residual fitted significance and median amplitude
+recovery with empirical central 68\% spreads.  Joining lines connect only the five
+predeclared mass points.
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.97\linewidth}{toy_generation_figs/v4p6_2021_exposure_refmatched_100toy_20260812/refmatched_closure_full100_2021_1pct_x10.pdf}
+\caption{Full-100 refmatched closure for $1\%\times10$.  Every cell retains 100
+accepted toys.  The persistent positive 65~MeV pull means and the corresponding
+analytic-mean result are local stress-truth/model offsets; the other masses have
+near-unit widths and substantially smaller means.  Crosses in the mean panel show raw
+first-attempt moments before the predeclared LML/reproducibility selection.}
+\label{fig:v4p6-closure-1pct-x10}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.97\linewidth}{toy_generation_figs/v4p6_2021_exposure_refmatched_100toy_20260812/refmatched_closure_full100_2021_10pct.pdf}
+\caption{As in Fig.~\ref{fig:v4p6-closure-1pct-x10}, for the native-10\% ensemble.
+All cells retain 100 toys.  The largest mean offset is at 65~MeV.  The only accepted
+width outside 0.8--1.2 in the complete study is 1.237 for the 65~MeV, $z=5$ cell; its
+normal-theory 95\% interval is $[1.086,1.437]$.}
+\label{fig:v4p6-closure-10pct}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.97\linewidth}{toy_generation_figs/v4p6_2021_exposure_refmatched_100toy_20260812/refmatched_closure_full100_2021_1pct_x100.pdf}
+\caption{As in Fig.~\ref{fig:v4p6-closure-1pct-x10}, for $1\%\times100$.  The
+90~MeV, $z=3$ cell retains 99 toys after one irreproducible injected refit is excluded;
+all other cells retain 100.  Eighty-five of 1999 accepted fits contact the factor-15
+upper length-scale bound.  Stable contacts are reported rather than removed or used to
+change the frozen card.}
+\label{fig:v4p6-closure-1pct-x100}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.97\linewidth}{toy_generation_figs/v4p6_2021_exposure_refmatched_100toy_20260812/refmatched_closure_full100_2021_10pct_x10.pdf}
+\caption{As in Fig.~\ref{fig:v4p6-closure-1pct-x10}, for $10\%\times10$.  The four
+90~MeV cells and the 180~MeV, $z=5$ cell retain 99 toys; all others retain 100.  The
+repeat gate repairs the dramatic 65 and 180~MeV optimizer branches seen in the v4.5
+pilot without discarding those background pseudoexperiments.  Among 1995 accepted
+fits, 134 stably contact the factor-15 upper bound.}
+\label{fig:v4p6-closure-10pct-x10}
+\end{figure}
+
+\clearpage
+\begin{table}[H]
+\centering
+\small
+\caption{Full-100 accepted closure summary over the five requested masses.  The
+maximum mean entries give the mass, and for nonzero injections also $z$, at which the
+maximum absolute mean occurs.  Width ranges span five zero-signal or 15 nonzero cells.
+Boundary contacts are accepted, stable fit states, not exclusions.}
+\label{tab:v4p6-refmatched-summary}
+\begin{tabular}{lccccc}
+\toprule
+Ensemble & minimum $n$ & max $|\bar p|$, $z=0$ & width range, $z=0$ &
+max $|\bar p|$, $z>0$ & width range, $z>0$ \\
+\midrule
+$1\%\times10$  & 100 & 0.789 (65)  & 0.962--1.138 & 0.760 (65, 1)  & 0.964--1.142 \\
+native 10\%     & 100 & 0.716 (65)  & 0.923--1.142 & 0.689 (65, 1)  & 0.921--1.237 \\
+$1\%\times100$ &  99 & 0.280 (120) & 0.884--1.088 & 0.378 (120, 5) & 0.879--1.131 \\
+$10\%\times10$ &  99 & 0.338 (180) & 0.893--1.060 & 0.359 (120, 5) & 0.890--1.177 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The accepted upper-bound occupancies are 0/2000 for $1\%\times10$, 0/2000 for
+native 10\%, 85/1999 (4.25\%) for $1\%\times100$, and 134/1995 (6.72\%) for
+$10\%\times10$.  The last two totals correspond to 23 and 37 unique
+scenario--toy--mass states (14 and 18 unique toy indices), respectively, because
+strengths sharing one background toy are correlated.  Factor 15 is therefore still a frozen candidate-card choice with
+non-negligible high-exposure boundary contact, not a universally nonbinding bound.
+The closure ensemble does not by itself authorize a change of card: such a change
+would require a separately frozen same-input upper-bound study and renewed observed
+and coverage validation.
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.99\linewidth}{toy_generation_figs/v4p6_2021_exposure_refmatched_100toy_20260812/eps2_coordinate_distributions_full100.pdf}
+\caption{Signed $\eps^2$ extraction-coordinate distributions for the 1-, 3-, and
+5-$\sigma_A$ injections.  Points are all accepted fits; solid summaries are medians
+and empirical 16--84\% intervals, while dashed summaries describe the toy-local
+injected coordinates.  Panel-wise symmetric-log axes retain negative fitted values
+and broad 1-$\sigma$ fluctuations.  Because both $K_{stm}$ and
+$\sigma^{\mathrm{ref}}_{A,stm}$ are toy-local, the injected coordinates are
+distributions.  These are extraction diagnostics, not limits, physical negative
+couplings, or expected bands.}
+\label{fig:v4p6-eps2-distributions}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.99\linewidth}{toy_generation_figs/v4p6_2021_exposure_refmatched_100toy_20260812/direct_pairwise_eps2_comparisons_full100.pdf}
+\caption{Direct full-100 comparisons between native 10\% and $1\%\times10$ (top)
+and between $10\%\times10$ and $1\%\times100$ (bottom).  Solid curves and bands are
+fitted medians and empirical 16--84\% spreads; dashed curves are injected medians.
+The source functions are fitted independently and the cross-source ensembles are
+unpaired.  Their expected-normalization ratio is 1.1296466 in both comparisons, so
+differences combine source/selection shape and normalization and are not pure exposure
+effects or paired tests.  The ribbons are descriptive coordinate spreads, not
+expected-limit bands.}
+\label{fig:v4p6-direct-eps2-comparisons}
+\end{figure}
+
+\clearpage
+The full ensemble resolves the principal v4.5 ambiguity.  The two spectacular pilot
+branches were numerical and are repaired by reproducible maximum-LML selection, while
+the $1\%\times10$, 65~MeV offset is a stable local closure failure of the declared
+smooth stress truth under the frozen GP analysis.  Only irreproducible numerical fit
+states are excluded; statistical extremes that pass the pull-blind gate remain in every
+arithmetic moment.
+The result is a full-100 conditional injection--extraction closure study, but it is
+not direct \CLs{} coverage, a scan-wise global-significance calibration, or evidence
+that the observed 65~MeV feature is signal or background.  The accepted v4.2 observed
+result and its conditional limit bands remain unchanged.
+
+\FloatBarrier
+
+\subsection{Validation of near-threshold background modeling}
+\label{sec:v4p7-near-threshold-background-modeling}
+
+\paragraph{Finding summary.}
+A source-dedicated turn-on truth improves the 65~MeV response for
+$1\%\times10$ but leaves nonuniform offsets in both targeted lanes and neighboring
+masses.  Better threshold modeling is relevant, but this 20-background study does
+not freeze a support or generator choice.
+
+Version 4.6 established that the positive 65~MeV closure response was not
+explained by a few pseudoexperiments or by the two conspicuous optimizer
+branches in the v4.5 pilot.  Its common \texttt{fGenGammaThresh} stress truth
+gave full-100 background-only mean pulls of 0.789 for $1\%\times10$ and 0.716
+for native 10\%, with deterministic analytic-mean pulls of 0.837 and 0.723.
+The present study tests the more specific hypothesis that this behavior is
+caused by inadequate modeling of the 2021 turn-on.  It replaces the generating
+truth, but holds fixed the v4.2 search card and the v4.5 matched-reference
+injection semantics.  In particular, it does not tune the 40~MeV GP-support
+edge, the $2.25\sigma_m$ blind/training exclusion, or the 2021 lower
+length-scale factor using the resulting pull direction.
+
+\subsubsection{Dedicated turn-on truth and fixed model selection}
+
+The native 2021 1\% and 10\% source histograms are fitted independently over
+35--80~MeV.  For source $d$ and Chebyshev degree $p$, the candidate intensity
+in expected counts per GeV is
+\begin{equation}
+ \lambda_{d,p}(m)=
+ \exp\!\left[\sum_{k=0}^{p}c_{dk}T_k\!\left(
+ \frac{m-0.0575}{0.0225}\right)\right]
+ \left[1+\exp\!\left(-\frac{m-m_{t,d}}{w_d}\right)\right]^{-1} .
+ \label{eq:v4p7-near-threshold-truth}
+\end{equation}
+Every expected native-bin count is the integral of
+Eq.~\eqref{eq:v4p7-near-threshold-truth} over the bin, evaluated with fixed
+order-16 Gauss--Legendre quadrature.  Doubling the order changes any expected
+bin count by at most $1.1\times10^{-13}$ relatively.  Twelve deterministic
+multistart fits are made for degrees 3, 4, and 5.  A candidate passes only if
+its native-bin Poisson deviance/ndf is at most 1.5, its five-bin
+deviance/ndf is at most 2.0, its largest absolute five-bin Pearson pull is at
+most 5, and no fitted parameter contacts its declared bound.  These criteria
+use no GP extraction or injected-signal result.
+
+\begin{table}[htbp]
+\centering
+\caption{Near-threshold functional-form selection.  Degree five is the lowest
+degree that passes the fixed gates in both native sources.  All listed selected
+fits report successful numerical termination; the pass/fail decision itself is
+based on the four fixed criteria stated in the text.}
+\label{tab:v4p7-near-threshold-model-selection}
+\small
+\begin{tabular}{llrrrrl}
+\toprule
+Source & Degree & Native dev./ndf & Five-bin dev./ndf & Max. $|r_5|$ & Bound & Gate \\
+\midrule
+2021 1\%  & 3 & 1.420 & 3.126 & 4.057 & no & fail \\
+          & 4 & 1.068 & 1.269 & 2.620 & no & pass \\
+          & 5 & 0.994 & 0.850 & 2.724 & no & pass, selected \\
+2021 10\% & 3 & 5.506 & 24.535 & 12.200 & no & fail \\
+          & 4 & 2.020 & 6.036 & 4.953 & no & fail \\
+          & 5 & 1.188 & 1.589 & 3.311 & no & pass, selected \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The selected local intensity is used directly from 40 to 75~MeV.  Between
+75 and 80~MeV it is joined to the archived \texttt{fGenGammaThresh} tail with
+the $C^2$ weight
+\begin{equation}
+ q(u)=u^3(10-15u+6u^2),\qquad
+ u=\frac{m-0.075}{0.005},
+\end{equation}
+clipped to zero below 75~MeV and one above 80~MeV.  The local and tail
+intensities, including this weight, are integrated jointly in every bin.  A
+single tail scale preserves the observed native 40--300~MeV total before the
+1\% source is multiplied by ten.  The solved coefficients multiplying the
+archived tail are 0.9997674467 and 0.9998089682 for the 1\% and 10\%
+sources.  Because the local-to-tail blend also contributes to the total, the
+resulting new-to-archived bin ratios above 80~MeV are 0.987024 and 0.987130.
+Consequently this is not a strictly local replacement: all bins above 80~MeV
+inherit an approximately 1.3\% tail rescaling.  Moreover, the 80--300~MeV
+tail deviance/ndf is 1.122 for the 1\% source and 2.861 for the 10\% source.
+The latter is a known global-splice limitation outside the range used to
+select the dedicated turn-on form.
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.99\linewidth}{toy_generation_figs/v4p7_2021_near_threshold_background_modeling_20260812/near_threshold_old_new_fit_residuals.pdf}
+\caption{Native-source turn-on fits.  The upper panels compare the observed
+0.125-MeV bins with the selected local model and the archived
+\texttt{fGenGammaThresh} form.  The gray band is the fitted 35--40~MeV region
+below the GP support.  The blue curve displays the fitted local form through
+35--80~MeV, whereas the toy truth is set to zero below 40~MeV, uses the local
+fit from 40 to 75~MeV, and blends to the rescaled tail from 75 to 80~MeV.
+The lower panels use a symmetric-log scale so the very large old-model
+residuals remain visible rather than being clipped.}
+\label{fig:v4p7-near-threshold-source-fits}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\graphicorplaceholder{0.96\linewidth}{toy_generation_figs/v4p7_2021_near_threshold_background_modeling_20260812/near_threshold_degree_selection.pdf}
+\caption{Native-bin and five-bin Poisson deviances for the three declared
+Chebyshev degrees.  Dashed lines are the fixed gates and the vertical dotted
+line marks the lowest common passing degree.  The selection is made before
+any pseudoexperiment or signal extraction.}
+\label{fig:v4p7-near-threshold-degree-selection}
+\end{figure}
+
+As a diagnostic that cannot change the selected model, each
+$\pm2.25\sigma_m$ signal interval is omitted in turn and the degree-five form
+is refitted.  The largest change of the predicted 35--80~MeV spectrum is
+0.905\% for the 1\% source and 0.862\% for the 10\% source.  This test probes
+fit stability only.  It is not normalized to the signal template or to
+$\sigma_A$ and therefore does not prove that a flexible background cannot
+absorb a narrow signal.
+
+\begin{figure}[htbp]
+\centering
+\graphicorplaceholder{0.88\linewidth}{toy_generation_figs/v4p7_2021_near_threshold_background_modeling_20260812/near_threshold_leave_window_out.pdf}
+\caption{Maximum fractional prediction change after omitting one complete
+$\pm2.25\sigma_m$ interval from the native-source fit.  These points are
+model-stability diagnostics, not signal-injection results or a bound on signal
+absorption.}
+\label{fig:v4p7-near-threshold-leave-window-out}
+\end{figure}
+
+\subsubsection{Frozen analysis path, ensemble, and numerical gate}
+
+Exactly 20 independent Poisson background histograms are generated from each
+source-derived mean: $10\lambda^{(1\%)}$ and the native 10\% mean.  Thus there
+are 40 independent background spectra, not 640 independent spectra.  Each
+background is reused at the four masses and four injection strengths, so
+mass cells are correlated and the four strength cells at fixed mass have pull
+correlations between 0.994 and 1.000.  The two source families are fitted and
+generated independently; their comparison is unpaired and includes both
+source-shape and normalization differences.
+
+The card retains the 50--250~MeV search range, 40--300~MeV GP support,
+rebin-five geometry, factor-1.1/factor-15 resolution-scaled 2021 length-scale
+bounds, and $2.25\sigma_m$ blind and training exclusions.  Log preprocessing
+is applied to both the mass coordinate and every positive training count,
+with fixed log-space noise variance $\alpha_i=1/y_i$.  Every accepted fit has
+strictly positive training counts: the minimum is 3876 in the
+$1\%\times10$ lane and 4486 in native 10\%.  Table~\ref{tab:v4p7-training-geometry}
+records the exact asymmetric geometry close to the lower support edge.
+
+\begin{table}[htbp]
+\centering
+\caption{Near-threshold fit geometry after rebinning to 0.625-MeV bins.  The
+training counts are identical for the two scenarios; only their bin contents
+differ.  ``Low'' and ``high'' count training bins below and above the excluded
+interval.}
+\label{tab:v4p7-training-geometry}
+\small
+\begin{tabular}{rrrrrr}
+\toprule
+$m$ [MeV] & $\sigma_m$ [MeV] & $2.25\sigma_m$ [MeV] & Blind bins & Low train & High train \\
+\midrule
+55 & 2.032 & 4.573 & 14 & 17 & 385 \\
+60 & 2.075 & 4.669 & 14 & 25 & 377 \\
+65 & 2.122 & 4.774 & 16 & 32 & 368 \\
+70 & 2.173 & 4.889 & 16 & 40 & 360 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+At each scenario--toy--mass key, a reproducible multistart background-only GP
+defines $\sigma_A^{\mathrm{ref}}$.  Full-range Gaussian signal counts are then
+drawn independently with mean
+$z\sigma_A^{\mathrm{ref}}w_i$ for $z=1,3,5$, added to the fixed background
+histogram, and the GP is refitted after excluding the same training window.
+The Gaussian tails are not truncated at that window: 1.53--3.97\% of each
+realized signal, with median 2.53\%, lies in retained training bins.  This is
+the inherited v4.5 full-template convention and is disclosed because the
+refitted GP can respond to that tail.
+
+The initial complete v4.7 extraction used the v4.6 adaptive repeat gate.  A
+pull- and amplitude-blind review of its optimizer ledger found three
+additional single-attempt injected fits whose GP likelihood and kernel
+coordinates were far from their replicated background-only references.  The
+gate was therefore amended before the v4.7 scientific result was accepted.
+Every nonzero fit is repeated when
+\begin{equation}
+ \frac{|\mathrm{LML}-\mathrm{LML}_{\mathrm{ref}}|}{n_{\mathrm{train}}}>0.02,
+ \quad
+ \left|\log\frac{\ell}{\ell_{\mathrm{ref}}}\right|>0.05,
+ \quad\text{or}\quad
+ \left|\log\frac{C}{C_{\mathrm{ref}}}\right|>0.10 .
+ \label{eq:v4p7-optimizer-repeat-amendment}
+\end{equation}
+The pre-existing invalid-state, exact-start, length-bound, and
+$\sigma_A/\sigma_A^{\mathrm{ref}}$ triggers remain active.  In the original
+raw first-attempt ledger the new criteria flag 14 states: 11 already repeated
+by the old gate and three additional states exposed by this audit.  Thresholds
+were chosen after that numerical audit, not prospectively before the first
+run, and are labeled v4.7.1 for that reason.  All 40 task products were then
+superseded and rerun uniformly with the same cached background and signal
+streams.  The final ledger contains 640 unique accepted states, zero
+exclusions, and 988 optimizer attempts.  Fourteen injected states repeat to a
+reproducible top-LML branch; no accepted length or constant is at a declared
+bound.  Selection uses no pull, fitted amplitude, or injected-value agreement.
+
+\begin{figure}[htbp]
+\centering
+\graphicorplaceholder{0.93\linewidth}{toy_generation_figs/v4p7_2021_near_threshold_background_modeling_20260812/near_threshold_optimizer_gate_repair.pdf}
+\caption{Audit of the three injected states newly exposed by the v4.7.1
+reference-relative repeat conditions.  Magenta bars are the branches that the
+inherited gate had accepted after one attempt; green bars are the uniformly
+rerun, replicated maximum-LML branches.  The 70~MeV example demonstrates that
+the decision is pull-blind: its ordinary-looking first-attempt pull is replaced
+because the GP numerical coordinates fail Eq.~\eqref{eq:v4p7-optimizer-repeat-amendment},
+not because of its fitted amplitude.}
+\label{fig:v4p7-near-threshold-optimizer-repair}
+\end{figure}
+
+\subsubsection{Deterministic and twenty-toy closure results}
+
+Table~\ref{tab:v4p7-zero-signal-results} compares the deterministic response
+to the embedded old and new analytic means with the new 20-toy zero-signal
+ensembles.  The intervals on the means are 95\% Student-$t$ intervals; widths
+are sample standard deviations.  The old analytic rows are exact same-support
+diagnostics, but their truth shapes differ from the new generator.  The only
+old Poisson ensemble quoted here is the archived v4.6 100-toy 65~MeV context;
+it is unpaired with the new toys and cannot by itself establish a causal
+``before/after'' correction.
+
+\begin{table}[p]
+\centering
+\caption{Background-only near-threshold closure.  ``Old analytic'' uses the
+embedded \texttt{fGenGammaThresh} mean, ``new analytic'' uses the dedicated
+turn-on mean, and the final columns use the 20 new Poisson backgrounds.  The
+eight zero-signal tests and any $|\bar p|=0.2$ reference are exploratory rather
+than a prospectively declared hypothesis test.}
+\label{tab:v4p7-zero-signal-results}
+\small
+\begin{tabular}{llrrrr}
+\toprule
+Scenario & $m$ [MeV] & Old analytic & New analytic & 20-toy mean [95\% CI] & Width \\
+\midrule
+$1\%\times10$ & 55 &  1.947 & $-0.822$ & $-0.985\;[-1.443,-0.528]$ & 0.978 \\
+                & 60 & $-1.534$ &  0.030 & $ 0.101\;[-0.389, 0.590]$ & 1.046 \\
+                & 65 &  0.837 &  0.252 & $ 0.300\;[-0.219, 0.819]$ & 1.109 \\
+                & 70 &  0.546 &  0.854 & $ 0.625\;[ 0.319, 0.931]$ & 0.654 \\
+Native 10\%     & 55 &  1.840 & $-0.984$ & $-0.824\;[-1.125,-0.523]$ & 0.644 \\
+                & 60 & $-1.447$ &  0.052 & $ 0.045\;[-0.319, 0.409]$ & 0.777 \\
+                & 65 &  0.723 &  0.563 & $ 0.641\;[ 0.082, 1.199]$ & 1.194 \\
+                & 70 &  0.655 &  0.304 & $ 0.152\;[-0.372, 0.675]$ & 1.119 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+At 65~MeV in the 1\%-source-times-ten lane, the new mean is 0.300.  This is
+smaller than the archived v4.6 mean 0.789, whose interval is
+$[0.598,0.980]$, while the analytic response falls from 0.837 to 0.252.  This
+is evidence of partial mitigation conditional on the two declared truths.
+Native 10\%, however, changes only from the unpaired v4.6
+mean $0.716\;[0.512,0.920]$ to $0.641\;[0.082,1.199]$, while its analytic
+response changes from 0.723 to 0.563.  In addition, both new-truth scenarios
+have negative 55~MeV means and $1\%\times10$ has a positive 70~MeV mean.
+The sign reversals of the old and new analytic responses at 55 and 60~MeV
+show that the inferred spurious signal is strongly truth-shape dependent.
+The dedicated turn-on form therefore does not provide uniform near-threshold
+closure or a unique explanation of the observed spectrum.
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.99\linewidth}{toy_generation_figs/v4p7_2021_near_threshold_background_modeling_20260812/near_threshold_zero_signal_closure.pdf}
+\caption{Zero-signal closure for the dedicated turn-on truth.  Solid points
+are 20-toy means with 95\% Student-$t$ intervals; diamonds and crosses are the
+new and old deterministic analytic means.  Open squares at 65~MeV are the
+archived v4.6 100-toy means and intervals, shown only as unpaired old-truth
+context.  The gray $|\bar p|<0.2$ band is an exploratory reference, not a
+coverage or acceptance criterion.}
+\label{fig:v4p7-near-threshold-zero-signal}
+\end{figure}
+
+The nonzero injections preserve the same mass pattern.  Table~\ref{tab:v4p7-injection-means}
+gives all four accepted mean pulls and the width range over injection
+strengths.  The full cell-wise 95\% intervals are displayed in
+Fig.~\ref{fig:v4p7-near-threshold-injection-closure}.  Widths range from 0.644
+to 1.196, but with only 20 backgrounds their normal-theory intervals are
+broad; the study neither establishes calibrated unit width nor direct
+coverage.  Because each row reuses one background stream, the similar
+strength dependence is one correlated recovery diagnostic rather than four
+independent confirmations.
+
+\begin{table}[htbp]
+\centering
+\caption{Accepted mean pull at $z=0,1,3,5$ and the corresponding range of
+sample pull widths.  Each entry contains 20 accepted fits.}
+\label{tab:v4p7-injection-means}
+\small
+\begin{tabular}{llrrrrr}
+\toprule
+Scenario & $m$ [MeV] & $z=0$ & $z=1$ & $z=3$ & $z=5$ & Width range \\
+\midrule
+$1\%\times10$ & 55 & $-0.985$ & $-1.037$ & $-1.154$ & $-1.279$ & 0.978--0.991 \\
+                & 60 &  0.101 &  0.027 & $-0.096$ & $-0.216$ & 1.020--1.047 \\
+                & 65 &  0.300 &  0.264 &  0.191 &  0.143 & 1.100--1.109 \\
+                & 70 &  0.625 &  0.595 &  0.531 &  0.479 & 0.652--0.669 \\
+Native 10\%     & 55 & $-0.824$ & $-0.881$ & $-1.006$ & $-1.111$ & 0.644--0.655 \\
+                & 60 &  0.045 & $-0.021$ & $-0.147$ & $-0.280$ & 0.777--0.791 \\
+                & 65 &  0.641 &  0.616 &  0.531 &  0.467 & 1.193--1.196 \\
+                & 70 &  0.152 &  0.120 &  0.059 &  0.007 & 1.109--1.124 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.99\linewidth}{toy_generation_figs/v4p7_2021_near_threshold_background_modeling_20260812/near_threshold_injection_pull_summary.pdf}
+\caption{Twenty-toy injection--extraction closure.  The upper panels give
+mean pulls with 95\% Student-$t$ intervals; the lower panels give sample widths
+with 95\% normal-theory chi-square intervals.  Strengths at fixed
+scenario--toy--mass reuse the same background and are almost perfectly
+correlated.  The gray band is an exploratory $|\bar p|<0.2$ reference.}
+\label{fig:v4p7-near-threshold-injection-closure}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\graphicorplaceholder{0.96\linewidth}{toy_generation_figs/v4p7_2021_near_threshold_background_modeling_20260812/near_threshold_amplitude_recovery.pdf}
+\caption{Median fitted-to-injected amplitude ratios with empirical 16--84\%
+intervals.  The 1-$\sigma_A$ ratios are intrinsically broad because the fitted
+amplitude can cross zero while the denominator is small.  These correlated
+conditional summaries supplement the pull endpoint; they are not an expected
+signal strength or a sensitivity projection.}
+\label{fig:v4p7-near-threshold-amplitude-recovery}
+\end{figure}
+
+The accepted raw count-space covariances are finite and symmetric under the
+frozen repairability criterion.  Their smallest recorded eigenvalue ratio is
+$-1.09\times10^{-6}$, well above the $-0.01$ rejection threshold, and no
+accepted state contacts a kernel bound or has a zero training count.  A
+reconstruction of all 640 selected cells changes at most
+$|\Delta\widehat A|/\sigma_A=1.60\times10^{-8}$ and
+$|\Delta\sigma_A|/\sigma_A=1.17\times10^{-6}$ under explicit eigenvalue
+clipping, or $3.48\times10^{-7}$ and $1.04\times10^{-6}$, respectively,
+under the minimum diagonal shift to the same positive floor.  This is a
+read-only numerical influence diagnostic, not an alternate estimator or a
+coverage study.  Internal
+L-BFGS warnings from one or more of the 12 optimizer restarts are retained in
+142 accepted rows (155 warnings total); they do not by themselves identify the
+selected top-LML branch as invalid.  Their occupancy, the 14 repeat-triggered
+states, and the three newly exposed repairs remain explicit numerical QA
+rather than statistical row selection.
+
+\subsubsection{Interpretation and next validation steps}
+
+The study answers the narrow functional-form question but does not establish
+a uniform fix.  Modeling the turn-on directly reduces the $1\%\times10$
+65~MeV response, while native 10\% remains positive and other masses expose
+responses of comparable or larger magnitude.  Because the dedicated truth is
+fitted to the same source spectra, this is conditional model stress testing,
+not an unbiased measurement of the estimator bias on future data.  The
+unpaired old and new ensembles also prevent a causal attribution to the truth
+replacement alone.
+
+The observed geometry suggests several separately frozen follow-ups.  At
+55~MeV only 17 rebinned training bins lie below the mask and 385 lie above it,
+so a modestly raised lower support can be tested by cropping the cached toys.
+A lower-support extension cannot reuse zeros that were imposed below 40~MeV:
+it requires newly generated sub-40-MeV bins from a validated expanded truth,
+while holding every bin at or above 40~MeV identical to the reference toys.
+A one-at-a-time scan of the 65~MeV blind/training half-width, followed if
+needed by the previously proposed $k_{\min,2021}=1.0$ lower length-scale test,
+should use identical background and signal streams and the v4.7.1 pull-blind
+repeat gate.  Since nominally small width changes can leave the discrete bin
+masks unchanged, the first tested alternatives should be the discretely
+effective 2.20 and 2.51$\sigma_m$ half-widths, with the extraction and training
+masks recorded separately.  None should be selected by whichever setting
+moves the 65~MeV mean closest to zero; fake-gap and signal-injection performance
+across the complete 55--70~MeV grid must be reported together.
+
+More structural alternatives are also justified.  A nonzero parametric
+turn-on mean followed by a GP residual fit would separate the known boundary
+trend from residual smooth variation, while a nonstationary or input-warped
+covariance could allow the correlation scale to change through the turn-on.
+These are standard GP modeling choices rather than interpretations of the
+present residuals \cite{RasmussenWilliams2006,FrateGP2017,BarrLiu2025}.
+If several defensible analytic turn-on families survive those gates, their
+choice can instead be carried as a discrete-profiled nuisance, conditional on
+validating the family set and penalty prescription
+\cite{Dauncey2015DiscreteProfiling}.
+Whichever family is considered should pass source-independent or held-out
+fake-gap tests and a predeclared spurious-signal requirement before observed
+inference; analogous resonance searches explicitly use spurious-signal tests
+to qualify background parameterizations \cite{ATLASSpuriousSignal2024}.
+The present 20-toy diagnostic is too small and too correlated to supply that
+qualification.  It changes no accepted v4.2 card, observed limit, conditional
+band, local $p_0$, or interpretation of the observed 65~MeV feature.
+
+\FloatBarrier
+
+\input{sections/subsection_v4p8p3_residual_truths}
+
+\FloatBarrier
+
+\subsection{Asimov calibration and background-only pseudoexperiments}
+
+When toy strengths are specified in units of $\sigma_A$, the package first constructs a
+reference extraction uncertainty $\sigma_{A,\mathrm{ref}}(m)$ by fitting the local
+signal-strength model to a background-only reference spectrum,
+\begin{equation}
+\left(\hat A_{\mathrm{ref}},\sigma_{A,\mathrm{ref}}\right)
+=
+\mathcal{F}\!\left[\bm{n}_{\mathrm{ref}};\,\bm{b}(m),\bm{C}(m),\bm{w}(m)\right],
+\end{equation}
+where $\bm{b}(m)$ and $\bm{C}(m)$ are the GP-predicted blind-window mean and covariance,
+and $\bm{w}(m)$ is the full-range Gaussian signal template restricted to the blinded
+bins. The injected strength axis is then defined by
+\begin{equation}
+A_{\mathrm{inj}}(m) = Z_{\mathrm{inj}}\,\sigma_{A,\mathrm{ref}}(m).
+\end{equation}
+
+It is useful to state explicitly what $\sigma_{A,\mathrm{ref}}$ is \emph{not}. It is
+not the uncertainty extracted from an individual toy after signal injection. Rather, it
+is a calibration quantity computed once from a background-only reference problem at each
+mass hypothesis. In the code this is exactly the object returned by evaluating the local
+fit on the reference spectrum and reading off its fitted $\sigma_A$
+\cite{Cowan1998,Cowan2011}. Its role is to define what is meant by an injected
+``$1\sigma$,'' ``$2\sigma$,'' or ``$5\sigma$'' signal through
+$A_{\mathrm{inj}}=Z_{\mathrm{inj}}\sigma_{A,\mathrm{ref}}$ before any toy-by-toy
+fluctuations are generated.
+
+In \textbf{Asimov mode}, the reference spectrum is deterministic,
+\begin{equation}
+n_{\mathrm{ref},i} = b_i,
+\end{equation}
+so $\sigma_{A,\mathrm{ref}}$ measures the nominal local sensitivity implied by the
+fitted background model. In \textbf{Poisson mode}, the reference spectrum is first
+fluctuated,
+\begin{equation}
+n_{\mathrm{ref},i} \sim \mathrm{Pois}\!\left(b_i\right),
+\end{equation}
+and the extracted $\sigma_{A,\mathrm{ref}}$ then inherits an extra layer of
+background-only sampling noise. In both cases, the v3 headline closure studies use the
+reference spectrum only to seed a background-only \emph{refit}. The reference
+uncertainty is evaluated after imposing the same mass support, exclusion mask, kernel
+bounds, and refit prescription used for the corresponding toy ensemble. This matched
+background-only refit is the calibration reference used in the updated 2021 study and
+in the year-specific lower-bound comparisons. Earlier studies that evaluated
+$\sigma_{A,\mathrm{ref}}$ directly from a prefit Asimov spectrum are retained in
+Appendix~\ref{app:prior-validation-results}; they do not define the v3 calibration.
+
+This distinction matters for the later profile-likelihood interpretation. The Asimov
+construction defines the expected sensitivity scale, while the background-only
+pseudoexperiments are what test coverage, bias, and finite-sample departures from the
+asymptotic approximation. Put differently: the Asimov dataset calibrates the injection
+axis, but the pseudoexperiments remain the mechanism that profiles the background model
+and measures how realistic background-only fluctuations propagate through the
+extraction chain.
+
+The later toy summaries therefore involve two related uncertainty scales. The reference
+quantity $\sigma_{A,\mathrm{ref}}$ fixes the horizontal injection axis and the nominal
+target significance $Z_{\mathrm{inj}}$. The toy-level $\sigma_A$ is returned by the fit
+\emph{for that specific toy} after the background and signal fluctuations have been
+realized. Pulls use the toy-level $\sigma_A$, whereas $Z_{\mathrm{inj}}$ is defined from
+$\sigma_{A,\mathrm{ref}}$. Once the reference and toy fits are matched, the ensemble
+pull and residual-significance calibrations should consequently be mutually
+consistent, up to finite-sample and fit fluctuations. A large coherent separation is
+a diagnostic of a reference-denominator or refit mismatch; it is not accepted as
+normal behavior of an otherwise calibrated study.
+
+\subsection{Poisson versus multinomial signal injection}
+
+Signal injection is distinct from the choice of $\sigma_A$ reference. In
+\textbf{Poisson-total injection}, each bin receives a Poisson draw with mean
+$A_{\mathrm{inj}}w_i$, so the realized total signal fluctuates from toy to toy. In
+\textbf{multinomial fixed-total injection}, the total number of injected events is
+fixed and only the bin-to-bin allocation fluctuates. Since the present signal template
+is normalized on the full histogram range, $A_{\mathrm{inj}}$ denotes the total local
+signal yield and only the fraction $f_{\mathrm{blind}}A_{\mathrm{inj}}$ is expected to
+appear inside the blinded bins for the selected $2.25\,\sigma_m$ window.
+
+This distinction matters when interpreting uncertainty bars on validation plots. Only
+Poisson-total injection produces a genuine horizontal spread in the realized injected
+strength. Under fixed-total multinomial injection the horizontal coordinate is exact.
+
+\subsection{Refit versus no-refit extraction displays}
+
+The note now distinguishes two pseudoexperiment tests because they are answering
+different questions. In the \textbf{no-refit} display, the GP sideband model
+is fitted once on the real data and then held fixed while a background realization is
+drawn in the blind window. This is the cleanest closure test of whether the extraction
+fit can recover an injected signal when the background prediction is treated as the
+correct local model. In the \textbf{full-refit} display, the toy is generated over the
+full mass range and the GP is refit on the toy sidebands before the blind-window
+extraction is repeated. That second test is slower and more aggressive, but it is also
+the direct diagnostic for signal absorption by the refitted background model.
+
+These tests should therefore not be judged by the same visual criterion. Agreement
+between the no-refit pseudoexperiment display and the observed-data display is expected
+and desirable because both are using the same sideband-conditioned background
+description. The full-refit display is instead meant to stress the nuisance-model
+freedom. When it visibly degrades the extracted signal, the correct interpretation is
+not that the no-refit test was ``too easy,'' but that the full procedural toy is
+probing how much the sideband refit can absorb signal-like structure.
+
+\subsection{Representative single-mass extraction displays}
+
+Representative extraction displays make the statistical procedure concrete at the level
+of an individual mass hypothesis. The 2015 \SI{30}{MeV} display and the 2016 10\%
+\SI{58}{MeV} display are retained because they show, in real data, how the profiled
+background deformation competes with the narrow signal template. The 2016 example is
+particularly useful because the best-fit amplitude is negative.
+Figure~\ref{fig:data-fit-examples} is included to make those competing fit components
+visible before moving to ensemble summaries.
+
+\begin{figure}[h!]
+\centering
+\begin{subfigure}[t]{0.88\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{fit_example_figs/2015/m030MeV_blind_fit.png}
+  \caption{2015 data at \SI{30}{MeV}.}
+\end{subfigure}
+
+\vspace{1.0em}
+
+\begin{subfigure}[t]{0.88\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{fit_example_figs/2016/m058MeV_blind_fit.png}
+  \caption{2016 10\% data at \SI{58}{MeV}, including a negative $\hat A$.}
+\end{subfigure}
+\caption{Representative blind-window fits using data. These displays show the fit
+components directly and serve as concrete examples of the local extraction machinery
+before one moves to ensemble diagnostics.}
+\label{fig:data-fit-examples}
+\end{figure}
+
+\subsection{Pull, coverage, and significance-calibration diagnostics}
+
+The central ensemble-level validation quantities are the pull,
+\begin{equation}
+\mathrm{pull} = \frac{\hat A - A_{\mathrm{inj}}}{\sigma_A},
+\end{equation}
+its mean and width as a function of mass and injected strength, and the empirical
+coverage of the nominal one- and two-standard-deviation intervals. These are standard
+closure diagnostics in HEP statistical analyses because they test, respectively,
+whether the estimator is biased, whether the quoted uncertainty is correctly calibrated,
+and whether the reported intervals achieve the claimed frequentist coverage
+\cite{Cowan1998,Cowan2011}.
+
+The main closure evidence in this section comes from the functional-form
+pseudoexperiments, where
+the smooth-spectrum truth is an analytic toy seed rather than a GP-generated background
+ensemble. Earlier GP-generated pull, coverage, and $\Delta Z$ displays remain useful
+internal checks of the extraction layer, but they are not shown as headline validation
+figures because the refmatched functional-form pull and calibration plots are the more
+direct closure tests.
+
+\subsubsection{Representative pull distributions}
+
+The year-specific v3 figures above summarize closure across mass and injected strength.
+Figure~\ref{fig:refmatched-train225-pulls-2015} complements those summaries by showing
+the toy-level pull distributions at one representative 2015 mass. It uses the
+reference-matched definition given above: the zero-injection panel tests for a spurious
+signal, while the nonzero panels test recovery after the same sideband-refit procedure
+has been applied to the toys.
+
+\begin{figure}[p]
+\centering
+\begin{subfigure}[t]{0.60\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{injection_extraction_figs/refmatched_train2p25_pull_hists_2015/pull_hist_2015_m075MeV_Z0.png}
+  \caption{$Z_{\mathrm{inj}}=0$.}
+\end{subfigure}
+\par\vspace{0.25em}
+\begin{subfigure}[t]{0.60\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{injection_extraction_figs/refmatched_train2p25_pull_hists_2015/pull_hist_2015_m075MeV_Z2.png}
+  \caption{$Z_{\mathrm{inj}}=2$.}
+\end{subfigure}
+\par\vspace{0.25em}
+\begin{subfigure}[t]{0.60\linewidth}
+  \centering
+  \graphicorplaceholder{\linewidth}{injection_extraction_figs/refmatched_train2p25_pull_hists_2015/pull_hist_2015_m075MeV_Z5.png}
+  \caption{$Z_{\mathrm{inj}}=5$.}
+\end{subfigure}
+\caption{Representative 2015 train-$2.25$ refmatched pull distributions at
+\SI{75}{MeV}. The zero-injection panel is the direct spurious-signal test, while the
+$Z_{\mathrm{inj}}=2$ and $Z_{\mathrm{inj}}=5$ panels show the injected-signal pull
+response under the same full-refit widened-blind prescription.}
+\label{fig:refmatched-train225-pulls-2015}
+\end{figure}
+
+The earlier two-panel dataset summaries are superseded by
+Figures~\ref{fig:v3-lslb-closure-2015}--\ref{fig:v3-lslb-closure-2021}. They are retained
+in Appendix~\ref{app:prior-validation-results} because they document the development of
+the matched-reference procedure, but they do not use the selected three-dataset lower-bound
+choices and should not be read as the v3 headline closure evidence.
+
+\FloatBarrier
+
+The earlier fixed-background/no-refit functional-form plots remain useful as internal
+diagnostics because they isolate the local likelihood once the sideband-conditioned GP
+prediction is held fixed. They are not the main closure evidence in this note and are
+therefore not shown as headline figures here. The full-refit panels above are the
+appropriate studies for assessing signal absorption by the sideband refit.
+
+\subsection{Auxiliary combined-study displays}
+
+The earlier combined-search-power scans and illustrative no-refit/full-refit extraction
+displays have been moved to Appendix~\ref{app:prior-validation-results}. They remain
+useful demonstrations of how a common $\eps^2$ maps into dataset-dependent signal
+yields, but their provisional injections are not direct coverage or closure evidence
+for the v4.2 result. The current physics-facing simultaneous limit is presented
+in Section~\ref{sec:results-v4-combined-limit}. The older observed-equivalent
+full-sample projection remains in
+Figure~\ref{fig:app-legacy-projections} as a planning study rather than a v4.2 result.

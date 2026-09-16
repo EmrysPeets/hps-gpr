@@ -1,0 +1,255 @@
+\subsection{Local probabilities and the conditional GP global studies}
+\label{sec:v5-global-results}
+
+The following plots apply the method in Section~\ref{sec:v5-global} to each
+campaign's complete mass scan, including 2015 through 100~MeV. Their top panels show the observed signed fit
+$r$, the unfluctuated stress response $a_m$, and the mean of complete Poisson scans. The updated 2015 and combined
+displays use the same 256 coherent experiments at every mass; the unchanged
+2016 and 2021 displays retain their 1,000-scan benchmark. The lower panels put probabilities and their one-sided normal
+quantiles on the same mass axis. Black denotes the conditional local result
+and red the conditional GP global result; gray retains the nominal local
+asymptotic comparison. The global probability comes from the maximum of a
+correlated field with the declared positive-fit gate. It is different from
+the Sidak reference accompanying the asymptotic plots.
+
+
+The implementation comparison, stress-reference construction, and treatment of
+rare Gaussian tails are documented in Appendix~\ref{app:v504-global-study}.
+Figures~\ref{fig:v502-stress-distributions} and
+\ref{fig:v502-injection-recovery} there show why large reference offsets can
+coexist with ordinary observed fits and why injected signals do not remove
+those offsets. The extended 2015 and combined fields are recomputed with the
+same search membership as the observed limits, rather than assigning the old
+global penalty to the enlarged search.
+
+\paragraph{The apparent 76 MeV spike and the detector resolution.}
+The sharp excursion belongs to the \emph{combined, stress-centered} display.
+The 2016 raw fit at 76~MeV is negative ($r=-2.46$), while the combined raw
+response is only $r=0.166$. On the saved 1 MeV test-mass grid, the combined signed fit changes sign
+between 75 and 76~MeV, opening the positive-fit gate while the stress mean is strongly
+negative. The resulting spike in probability or $Z$ is therefore not a
+measured resonance width. The adopted 2016 resolution at 76~MeV is
+$\sigma_m=3.10$~MeV (Gaussian FWHM 7.29~MeV). The positive raw response near
+90--92~MeV warrants examination of the mass residual and its background
+dependence; neither its visual plausibility nor its stress-centered ranking
+establishes a physical signal. Appendix~\ref{app:v504-width-review} gives
+the signed-root decomposition and the saved width and injection controls.
+
+\paragraph{Dependence on binning.}
+The zero crossing refers to a scan of fitted amplitudes, not to a zero in
+the measured histogram. Changing histogram bins changes the GP training
+counts, the excluded-bin membership and the integrated signal template;
+changing the test-mass grid only changes where that response is sampled.
+The v5.1.0 fixed-kernel rebinning study gives 2016 signed roots at 76 MeV of
+$-2.460$, $-2.545$ and $-2.432$ for 0.25, 0.5 and 1 MeV bins. Its stress
+responses are $-14.653$, $-14.620$ and $-14.488$. Thus coarsening those bins
+does not remove the 2016 deficit or the large stress offset. The corresponding
+2021 roots are $1.808$, $1.429$ and $1.517$ for 0.625, 1.25 and 2.5 MeV bins.
+
+A bounded joint check in v5.0.5 repeats the signed shared-coupling fit at
+72--80 MeV using the same spectra, detector widths, native-density conversion
+and frozen kernel coordinates. With the bin origins unchanged, doubling
+and quadrupling the histogram widths changes the combined root at 76 MeV
+from $+0.166$ to $-0.216$ and $-0.137$. Shifting each coarse origin by half
+its new bin width gives $+0.530$ and $-0.695$, respectively. The first
+positive tested point is consequently 76 or 77 MeV in these alternatives.
+The zero crossing is sensitive to binning at the one-step level.
+
+Figure~\ref{fig:v505-joint-binning} and
+Appendix~\ref{app:v505-joint-binning} give the full comparison, including
+the small accompanying changes in sampled support endpoints. These checks
+recompute the observed pointwise fits; they do not recompute the stress
+field or its global tail. The spike's position and height therefore cannot
+be interpreted as a detector-resolved resonance feature. Binning should be
+chosen from resolution and closure controls, before inspecting which choice
+makes the observed probability more striking.
+
+\paragraph{What the stress response means.}
+The gold curve is the signed fit obtained by analyzing a smooth expected
+background with no injected signal and no Poisson fluctuation. It measures
+how that particular background shape is represented by the moving GP
+interpolation and signal fit. It is not an observed significance and is not
+assumed to equal the exact Poisson mean; the green curve checks the latter.
+A response near zero is desirable for an unbiased signal search. A large
+response can occur when the chosen background leaves a signal-shaped excess
+or deficit relative to the interpolation. More simulations can measure that
+response more precisely, but cannot make the generating shape appropriate
+for the data.
+
+\fig{0.98}{../figures/v5_global_probabilities_2015.pdf}{Profiled 2015 conditional local and global probabilities on 19--100~MeV.
+The full field uses 82 integer hypotheses and the endpoint kernel prescription
+in Appendix~\ref{app:v504-extension}. Its response matrix and the first 256
+coherent Poisson scans are reused from the extended covariance study;
+200,000 Gaussian fields integrate the enlarged search. Open symbols retain
+one-sided 95\% bounds for empty direct tails. Probability and $Z^+$ panels
+refer to the declared stress model. The interpretation, sigcorr check and
+sampling method are in Appendix~\ref{app:v504-global-study}.}
+{fig:v5-global-2015}
+\fig{0.98}{../figures/v5_global_probabilities_2016.pdf}{Profiled 2016 conditional
+global study with the same black-local/red-global convention and integer
+$Z^+$ guides. Ordinary sampling uses 2,000,000 fields; targeted importance
+sampling resolves the previously empty Gaussian tails without altering the
+field model or ordering. At 42~MeV the conditional Gaussian global
+probability is $6.096\times10^{-20}$ ($Z=9.067$), with 0.16\% relative Monte
+Carlo standard error. This extreme value reflects the biased stress
+reference, not a particle discovery. The direct Poisson check remains
+0/1,000, giving only $p<0.002991$ ($Z>2.749$); its open triangles retain
+those bounds. Red shading gives sampling intervals, not background-model
+uncertainty. This global calculation is different from the Sidak reference. The implementation and stress-reference diagnostics are in Appendix~\ref{app:v504-global-study}.}
+{fig:v5-global-2016}
+\fig{0.98}{../figures/v5_global_probabilities_2021.pdf}{Profiled study for the
+released 2021 10\% sample. The principal ordering selects 92~MeV and gives
+GP global probability 0.02519 ($Z=1.957$), with 26/1,000 direct exceedances.
+The GP ensemble retains 200,000 fields. Black is the conditional local
+probability and red the global probability, with the corresponding $Z^+$
+below. This global calculation uses the correlated field rather than the
+Sidak correction used for the asymptotic references. Qualification of the
+generating background remains required for a particle-global interpretation. The implementation and stress-reference diagnostics are in Appendix~\ref{app:v504-global-study}.}
+{fig:v5-global-2021}
+\FloatBarrier
+
+\fig{0.98}{../figures/v5_global_probabilities_combined.pdf}{Combined conditional field over the complete 19--250~MeV search,
+with all three campaigns active through 100~MeV. The ten changed coordinates
+use new joint-likelihood responses to the same 1,626 input-bin directions;
+all 256 direct experiments remain coherent over the entire grid. Gaussian
+tails use 200,000 ordinary fields and 40,000 conditional-mixture draws at
+every positive-fit threshold with standardized score at least 3.5. At
+76~MeV the conditional global probability is $1.351\times10^{-17}$, but the
+raw fit is only $r=0.166$: this is a stress-reference mismatch. Empty direct
+tails give only $p<0.01163$. Appendix~\ref{app:v504-global-study} explains
+the estimator, and Appendix~\ref{app:v504-width-review} explains the narrow
+display feature. Historical values for the former membership are retained
+in Appendix~\ref{app:v504-historical-displays}.}
+{fig:v5-global-combined}
+\FloatBarrier
+
+For comparison with the conditional tests in Appendix~\ref{app:v504-global-study},
+Figure~\ref{fig:v502-combination-discovery} completes the nominal discovery
+reference plots for every pair and the all-three overlap. It keeps each
+scope's local fit and its own Sidak search penalty together.
+
+\fig{0.99}{../figures/v502_combination_discovery.pdf}{Discovery probabilities
+and aligned $Z^+$ values for all four overlapping combinations. Local
+asymptotic curves are black and Sidak global references are red. Each pair
+of panels shares its mass axis and uses one fixed $N_{\rm eff}$ over that
+scope's full overlap, now through 100~MeV whenever 2015 participates.
+The 90--100~MeV extension is shaded. These are analytic Sidak references, distinct from the stress-centered
+correlated-field global probabilities above; no additional correction for
+selecting among overlapping scopes is included.}
+{fig:v502-combination-discovery}
+\FloatBarrier
+
+\paragraph{Fixed-mass recovery and full-scan signal responses.}
+The injection masses are inherited diagnostic anchors: 51, 78 and 95~MeV
+for 2015; 42, 66, 76 and 92~MeV for 2016; and 71 and 92~MeV for 2021.
+They cover the earlier 2016 stress excursions, the neighboring structures
+illustrated by the 2021 65/71/78~MeV examples, representative peaks, and
+the 2015 extension. They were chosen to investigate those known
+features, so they do not constitute an independent discovery selection.
+Each mass is tested against both the archived coherent stress spectrum
+and a full-support local GP control fitted to the observed sidebands
+with that signal window excluded. The control depends on the injection
+mass, so these local controls do not form a single global null. The same frozen reference
+error defines the physical yields $A/\sigma_{\rm ref}=0,2,5$ for both
+truths. Within a mass and truth, 64 Poisson background spectra are paired
+across strengths; independent Poisson signal increments of two and three
+reference errors build the size-two and size-five samples. Thus the
+three strengths are correlated experiments, not independent ensembles.
+Figure~\ref{fig:v511-injections} in Appendix~\ref{app:v504-global-study}
+shows three representative anchors, including the 2015 95~MeV extension check.
+At 2016 76~MeV, the size-five injection gives mean signed root $-9.80$
+under the stress truth and $+4.52$ under the local GP control; every
+stress fit remains negative. At 2021 71~MeV the corresponding means are
+$+3.14$ and $+4.37$. Adding a signal moves the distributions, but it does
+not remove the background-dependent offset. With 64 experiments per
+curve, these are small conditional recovery samples.
+
+A deterministic injected spectrum is also scanned over every tested mass.
+For a count perturbation $\delta n_i$ from the signal, the first-order
+prediction from the background response is
+\begin{equation}
+ \Delta r_m^{\rm lin}=\sum_{i:B_i>0}D_{im}
+                         \frac{\delta n_i}{\sqrt{B_i}}.
+ \label{eq:v511-injection-projection}
+\end{equation}
+For the 2016 76~MeV size-five injection, the exact change is $+4.843$
+at the injected mass and reaches $-3.589$ at 85~MeV. The largest difference
+from the linear projection is 0.00924 in signed root over the scan.
+Comparison with the exact difference of the injected and background-only
+scans tests linearity and reveals neighboring peaks or deficits induced by
+the shared interpolation. An off-mass dip can therefore accompany a
+positive injection. This diagnostic does not establish the origin of a
+feature in the observed spectrum. A covariance-matrix column describes
+shared noise; it is not the signal-template projection in
+Eq.~\ref{eq:v511-injection-projection}.
+\fig{0.99}{../figures/v511_signed_injection_echoes.pdf}{Deterministic signal
+injections into the coherent stress spectrum. Left: signed roots before
+and after injection. Right: the size-five change with full retraining,
+its first-order template projection, and a control holding the
+background-only GP prediction and covariance fixed. The likelihood's
+background nuisance parameters remain profiled in the last control.
+Vertical lines mark the injected mass. Neighboring negative responses
+are retained. These full scans contain no Poisson fluctuation.}
+{fig:v511-echo}
+\FloatBarrier
+
+
+
+\FloatBarrier\clearpage
+
+\subsection{Agreement of fitted rates across campaigns}
+\label{sec:v5-rate-consistency}
+
+A shared coupling requires the signal yields in different campaigns to agree
+after their different normalizations are applied. Figure~\ref{fig:v5-consistency}
+compares the separate fitted coupling estimates with the common fit. The
+quantity formerly labelled $\Delta D$ is the loss in twice the log likelihood
+when separate campaign amplitudes are replaced by one shared amplitude:
+\begin{equation}
+ \Delta D=2\left[\mathrm{NLL}_{\rm common}-
+                    \sum_d\mathrm{NLL}_{d,\rm independent}\right].
+\end{equation}
+A larger loss means the common rate describes the selected local spectra less
+well than separate rates. The number of freed amplitudes is one fewer than
+the number of active campaigns. Because the displayed masses were selected
+from the data, this descriptive comparison is not assigned an unadjusted
+compatibility probability.
+
+\widefig{0.98}{../figures/v5_dataset_amplitude_consistency.pdf}{Separate campaign coupling estimates with local curvature errors and the
+common fitted rate at 66, 92, 72 and 76~MeV. All three campaigns now
+enter every comparison. At 92~MeV the common fit gives
+$\widehat\epsilon^2=3.096\times10^{-6}$; freeing the three rates lowers
+twice the negative log likelihood by 11.552, compared with 2.845 at 66~MeV.
+The shaded band is the common fit's local curvature interval. These selected
+comparisons are descriptive; the errors are not post-selection intervals and
+no unadjusted compatibility probability is assigned.}
+{fig:v5-consistency}
+\FloatBarrier
+
+
+The extension makes the 92~MeV comparison especially informative. In units
+of $10^{-6}$, the separate fitted rates and local curvature errors are
+$77.48\pm29.96$ for 2015, $9.13\pm2.93$ for 2016, and
+$1.65\pm1.35$ for 2021. The 2015 rate is weakly constrained, but its central
+value is much larger than the common estimate $3.096\pm1.229$.
+The shared fit therefore does not extract each campaign's preferred peak
+height independently. Its nominal local $Z=2.520$ and 90\% \CLs{} upper
+limit $4.675\times10^{-6}$ summarize a common-rate model, with its
+normalizations and background constraints, rather than three separately
+confirmed excesses. The likelihood loss is 11.552 for two additional free
+amplitudes; at 66~MeV the analogous loss is 2.845. This comparison identifies
+rate agreement as a useful diagnostic without assigning a probability to
+masses chosen from the same scans.
+
+The 2015 template width rises from 4.70~MeV at 90~MeV to 5.23~MeV at
+100~MeV under the inherited linear response. Broader resolution makes nearby
+hypotheses strongly dependent, but it does not explain away a rate mismatch
+or establish that a visible structure is physical. A credible common signal
+would need stable rates after independently supported background and resolution
+variations, a signal shape consistent with the detector response, and a
+predeclared global treatment of the selected masses and model choices.
+The conditional GP probabilities, nominal asymptotic $p_0$, upper-limit tail
+diagnostics, and common-rate comparison answer different questions; none
+provides a probability that the 90--92~MeV feature is a new particle.
+
+\clearpage
