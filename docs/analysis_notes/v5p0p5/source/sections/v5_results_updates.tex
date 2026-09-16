@@ -20,7 +20,7 @@ pointwise quantiles. The 2021 curve uses the frozen 36--300~MeV GP support.}
 {fig:v5-individual-bands}
 \FloatBarrier
 
-\subsection{Empirical limit-tail diagnostics and unresolved tails}
+\subsection{Empirical limit-tail probabilities}
 \label{sec:v5-tail-results}
 
 A second set of probabilities locates an observed \emph{upper limit} within its
@@ -29,24 +29,19 @@ unusually strong observed constraint; a high-limit tail describes an unusually
 weak constraint. Neither is the local probability of a narrow positive signal.
 The two-sided diagnostic doubles the smaller tail, capped at one.
 
-The targeted refinement added independent batches of 3,000 or 10,000 draws at
-108 sparse scope--mass coordinates, for 660,000 additional scope evaluations.
-It retained the original 300-toy bands. Nine zero-count cells remained after
-the refinement. Zero exceedances therefore appear as one-sided 95\% Monte Carlo
-upper bounds, not as zero probabilities. The requested further continuation
-is outstanding: v5.0.4 adds 300-toy ensembles only for the ten new 2015 masses in each
-applicable scope. The earlier sparse-tail continuation remains outstanding.
-New empty cells retain their own 300-toy bounds, as described in
-Appendix~\ref{app:v504-extension}.
+Additional toys were generated in regions where the original samples gave
+few or no tail events. The toy counts and treatment of empty tails are
+described in Appendix~\ref{app:v505-tail-sampling}.
 
-\fig{0.98}{../figures/v5_individual_tail_probabilities.pdf}{Empirical limit-tail
-diagnostics for each dataset. Unrefined points use 300 toys; selected coordinates
-use the saved independent 3,000- or 10,000-toy batches.
-The newly added 2015 masses use 300 toys and the same bound convention. Open downward triangles show
+\begin{figure}[!htbp]\centering
+\includegraphics[width=0.90\linewidth,height=0.68\textheight,keepaspectratio]{../figures/v5_individual_tail_probabilities.pdf}
+\caption{Empirical limit-tail
+probabilities for each dataset. Most points use 300 toys, with larger samples
+in selected regions as described in Appendix~\ref{app:v505-tail-sampling}. Open downward triangles show
 one-sided 95\% Monte Carlo upper bounds when no tail event is observed; for the
 two-sided diagnostic the bound is doubled and capped at one. These probabilities
 refer to the upper-limit statistic and are distinct from local asymptotic $p_0$.}
-{fig:v5-individual-tails}
+\label{fig:v5-individual-tails}\end{figure}
 \fig{0.98}{../figures/v5_combination_tail_probabilities.pdf}{The same empirical
 limit-tail diagnostics for the pairwise and all-three combinations. Finite
 estimates and zero-count bounds remain visually distinct. Additional sampling
@@ -58,7 +53,7 @@ establish physical background validity or a discovery probability.}
 \subsection{Varying the mass resolution in the signal template}
 \label{sec:v5-resolution-results}
 
-The nominal resolutions were introduced with the detector inputs in
+The nominal resolutions were introduced in
 Section~\ref{sec:event-selection}. The saved width study repeats the 2021
 extraction for templates with widths 0.8, 0.9, 1.0, 1.1 and 1.2 times nominal
 at all 201 tested masses. It holds the GP mean and covariance, training

@@ -59,11 +59,11 @@ this two-truth calibration.}
 \label{v5-sec:calibration-truths}
 The local-GP control extends the mass-local observed GP mean over the
 complete support. It tests repeated analysis of a shape close to the
-assumed interpolation. The archived stress input is a second smooth
+assumed interpolation. The alternative stress background is a second smooth
 expected-count spectrum inherited from earlier source-fit studies. The
 word ``stress'' identifies its purpose: to expose sensitivity to a plausible
-construction or a known limitation. It does not certify that construction
-as a physical truth.
+construction or a known limitation. The resulting shape still needs to be
+tested against data.
 
 For 2015 the alternative is the saved \texttt{fShiftSigPowTail}
 expected-count spectrum. The 2016 alternative blends a low-mass fit to a
@@ -141,7 +141,7 @@ $CL_s=0.10$; the larger endpoint is the reported finite-set envelope.
 This procedure cannot be reproduced by multiplying all significances by
 one scale factor.
 
-To sample rare tails efficiently, the release generated equal strata
+To sample rare tails efficiently, the study generated equal strata
 from several full-spectrum Poisson proposal means, including strengths
 near the observed crossing. Every generated spectrum was fitted and
 weighted with its exact full-spectrum Poisson density divided by the
@@ -174,11 +174,10 @@ Scope & Completed & Profile resolved & Fixed resolved & Raw ratio & Calibrated r
 2021 10\% & 201/201 & 201 & 200 & 0.607 & 1.199\\
 All three & 41/41 & 41 & 41 & 0.595 & 1.346\\\bottomrule
 \end{tabular}
-\caption{Completion and declared Monte Carlo precision of the frozen
-calibration release. The final columns are median fixed/profiled
-observed-limit ratios on matched completed coordinates. Resolution of
-the numerical endpoint does not qualify the background family or resolve
-the inherited 2016 numerical exception.}
+\caption{Completed fits and Monte Carlo precision in the calibration study.
+The final columns are median fixed/profiled observed-limit ratios at
+matched masses. The precision listed here concerns the finite toy samples;
+it does not measure the accuracy of the background model.}
 \label{v5-tab:calibration-summary}
 \end{table}
 
@@ -204,9 +203,9 @@ finite Monte Carlo accuracy; they are not expected-limit bands.}
 \begin{figure}[htbp]\centering
 \includegraphics[width=0.96\linewidth]{../figures/v5_calibration_limits_2016.pdf}
 \caption{The same comparison for full 2016. The pronounced change is
-localized and depends on the archived stress construction. A resolved
-calibration endpoint does not remove the source-convergence qualifications
-or inherited numerical exception.}
+localized and depends on the stress background. That background includes a
+component from a fit that did not converge, which limits the interpretation
+of this comparison.}
 \label{v5-fig:cal-limits-2016}
 \end{figure}
 \begin{figure}[htbp]\centering
@@ -232,7 +231,7 @@ Values above one indicate that the stress background controls the larger
 endpoint; values below one indicate that the local-GP control does.
 Open circles mark limited precision in at least one component, and gaps
 retain unavailable or censored ratios. This comparison diagnoses the
-chosen background family rather than certifying either member.}
+chosen background family; it does not establish which model describes the data.}
 \label{v5-fig:cal-truth-dependence}
 \end{figure}
 
@@ -253,7 +252,7 @@ tail from the two calibration truths. The empirical bounded-statistic
 convention gives one when the discovery statistic is zero; the earlier
 asymptotic display gives 0.5. Triangles retain asymptotic values below the
 plotting floor. Open circles flag limited Monte Carlo precision or a
-noisy estimate displayed at one; numerical ledgers retain unclipped values.
+noisy estimate displayed at one; the saved numerical results retain unclipped values.
 No curve in this figure includes a global trials correction.}
 \label{v5-fig:cal-local-probabilities}
 \end{figure}
@@ -346,7 +345,7 @@ have limited power. With 500 spectra per cell, the first Holm exclusion
 step requires at least 81/500 exclusions, or 16.2\%, to reject the 10\%
 null in this family. The analogous local-rejection step begins at
 48/500, or 9.6\%, against a 5\% null. No flags therefore does not
-certify percent-level accuracy at every mass.
+establish percent-level accuracy at every mass.
 
 The same background disagreement can reduce detection power. At combined
 66~MeV a five-reference-error signal generated on the local-GP truth
@@ -376,6 +375,6 @@ source fits, sidebands and independent or explicitly held-out predictive
 controls, and then validate the complete selected analysis policy. A
 poorly qualified stress model need not become a mandatory physical
 possibility, but its effect cannot be dismissed solely because it weakens
-a result. The inherited 2016 numerical exception must be resolved
-separately. These requirements define the scope of the present unblinding
-review and remain visible alongside the proposed asymptotic primary results.
+a result. The discrepancies in the independent 2016 parameter fits,
+described in Appendix~\ref{sec:v5-historical-validation}, require a separate
+numerical investigation.

@@ -9,7 +9,7 @@ GP on a fixed, dataset-specific mass range and exclude a small region around the
 mass from training. The GP interpolates across the excluded region, and those same bins
 are then used in the signal-plus-background likelihood. Earlier HPS studies redefined
 the sidebands in separate piecewise windows. The fixed-support construction gives
-smoother behavior across the scan and allows the three data sets to enter a joint
+smoother behavior across the scan and allows the three datasets to enter a joint
 likelihood with a shared coupling.
 
 \subsection{Search interval and GP fit support}
@@ -35,9 +35,8 @@ Data & Search [MeV] & GP support [MeV] & Upper length factor \\
 2021 10\% & 50--250 & 36--300 & 15 \\
 \bottomrule
 \end{tabular}
-\caption{Frozen settings of the current v4.9.12 input release inherited by v5.
-The 2016-inclusive results remain conditional on the recorded state-replay
-exception. The 2021 lower edge follows the conditional support study;
+\caption{Search ranges and GP settings used for the individual and combined fits.
+The 2021 lower edge follows the support study;
 its earlier 40~MeV value is retained only in historical comparisons.}
 \label{tab:v4p9-card-lineage}
 \end{table}
@@ -52,7 +51,7 @@ Section~\ref{sec:v4p9p5-support}; its post-selection practical rule and remainin
 
 \subsection{Observable, scan grid, and blinding}
 
-The input observable is the reconstructed $e^+e^-$ invariant-mass histogram for each
+The observable is the reconstructed $e^+e^-$ invariant-mass histogram for each
 dataset. Throughout this section, $d$ labels the dataset, $m$ denotes the reconstructed
 $e^+e^-$ invariant mass, $m_0$ is the test-mass hypothesis, and $\sigma_d(m)$ is the
 dataset-specific mass resolution introduced in
@@ -284,7 +283,7 @@ k_{\mathrm{RBF}}(x,x') =
 =e^{-1/2}\simeq0.61 .
 \label{eq:rbf-lengthscale-interpretation}
 \end{equation}
-Thus $\ell$ is a covariance-decay scale in the GP input coordinate: larger values
+Thus $\ell$ is a covariance-decay scale in invariant mass: larger values
 favor smoother background functions, while smaller values admit more rapid
 variation \cite{RasmussenWilliams2006,FrateGP2017}. The ratio
 $\ell/\sigma_x(m)$ expresses that nuisance-model smoothness relative to the width of
@@ -356,7 +355,7 @@ If the allowed range forces $\ell$ too low, the GP retains unnecessary
 signal-scale flexibility and can absorb part of a localized excess; if the fitted
 background is forced too smooth, broad mismodeling can instead leave a biased local
 residual. Raising only the upper bound permits, but does not require, a smoother
-solution. A larger data set also need not prefer a larger $\ell$: additional
+solution. A larger dataset also need not prefer a larger $\ell$: additional
 statistics can resolve background structure and move the optimum downward. The
 upper range is therefore selected from boundary occupancy, likelihood ordering,
 optimizer stability, and fixed-amplitude signal-recovery diagnostics, never from a
@@ -452,7 +451,7 @@ language used by the implemented likelihood. The sideband bins set the log-count
 training sample and its heteroscedastic bin-noise assignment, the kernel hyperparameters
 are optimized only on those sidebands, and the trained GP is then conditioned to predict
 the mean and covariance in the blinded mass window. That predicted count-space mean and
-covariance are the background inputs passed to the local profiled signal extraction.
+covariance are the background model used in the local profiled signal extraction.
 
 \begin{figure}[H]
 \centering
@@ -834,7 +833,7 @@ not change the pointwise $CL_s$ upper-limit definition.
 The local-significance mapping introduced above is treated asymptotically throughout
 the scan. For upper limits, the same bounded statistic
 $\tilde q_{A_d}$ is calibrated in one of two ways. In asymptotic mode, the
-background-only Asimov data set is used to evaluate the positive reference quantity
+background-only Asimov dataset is used to evaluate the positive reference quantity
 $q_A\equiv\tilde q_{A_d,A}>0$ for the tested nonzero amplitude. Writing
 $q_{\mathrm{obs}}\equiv\tilde q_{A_d}^{\mathrm{obs}}$, the normal deviates entering
 the two tail areas are

@@ -231,11 +231,10 @@ the 15 mrad gap alone provides no upper mass cutoff.
 \label{v571:geometry}
 The beam energies are 1.056, 2.30 and 3.74 GeV for 2015, 2016 and 2021,
 respectively~\cite{v571:HPS2022,v571:HPS2015,v571:HPS2016}.
-The detector input is the committed LCDD geometry in
-\texttt{JeffersonLab/hps-java}, fixed to revision
-\texttt{473c732d}~\cite{v571:geometry-source}; the complete identifier is saved
-in the source manifest.
-LCDD contains the active sensor solids and their complete placement hierarchy.
+The sensor geometry is read from the Linear Collider Detector Description
+(LCDD) files in \texttt{JeffersonLab/hps-java}, revision
+\texttt{473c732d}~\cite{v571:geometry-source}. These XML files specify the
+active sensor shapes, positions and rotations within the detector.
 The corresponding compact XML and Java geometry definitions are retained as
 supporting sources; a fresh rebuild of those definitions is not assumed to
 reproduce the committed alignment exactly.
@@ -285,7 +284,7 @@ view. The hole and slot sensors within one view remain alternatives.
 \centering\small
 \begin{tabular}{@{}l>{\raggedright\arraybackslash}p{3.0cm}>{\raggedright\arraybackslash}p{3.0cm}>{\raggedright\arraybackslash}p{4.0cm}@{}}
 \toprule
-Run & Positron & Electron & Selection provenance\\
+Run & Positron & Electron & Selection reference\\
 \midrule
 2015 & $N_{\rm 3D}\geq5$ of 6; paired hits in L1 and L2
      & $N_{\rm 3D}\geq5$ of 6
@@ -324,8 +323,7 @@ all six stations for 2015/2016 or all seven for 2021.
 \subsubsection{Field maps and numerical propagation}
 \label{v571:field-model}
 The field tables are taken from \texttt{JeffersonLab/hps-fieldmaps} at
-revision \texttt{feadfcbd}, with the full identifiers and file hashes saved
-in the input manifest~\cite{v571:fieldmaps}. The 2015 calculation adopts
+revision \texttt{feadfcbd}~\cite{v571:fieldmaps}. The 2015 calculation adopts
 the corrected-unfolding v3 map with scale 0.7992. Its compact detector
 definition has the same non-field geometry content as the original
 configuration, but no separately generated v3 LCDD is provided; the original
@@ -442,7 +440,7 @@ prove zero support between or beyond sampled points.
 The bottom row of Figure~\ref{v571:spectra} retains the original selected-pair spectra in 1 MeV bins:
 2015 full, 2016 full and 2021 10\%. Their displayed integrals are 21,442,838,
 73,218,251 and 141,305,897 pairs. The display starts at 15, 30 and 36 MeV,
-respectively, and ends at 300 MeV. The 2015 input ends at 150 MeV; its grey
+respectively, and ends at 300 MeV. The 2015 histogram ends at 150 MeV; its grey
 region denotes unavailable bins. The samples have no exposure or luminosity
 rescaling, and their selections differ. Their shapes therefore provide
 observational context, not a validation of the signal geometry fractions or

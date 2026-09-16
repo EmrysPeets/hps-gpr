@@ -1,8 +1,8 @@
 \section{Event selection, mass resolution, and radiative fraction}
 \label{sec:event-selection}
 
-Each HPS input is an invariant-mass spectrum formed after a run-specific event
-selection. That selection determines the composition of the prompt $e^+e^-$ sample;
+Each HPS dataset is represented by an invariant-mass spectrum formed after a
+run-specific event selection. That selection determines the composition of the prompt $e^+e^-$ sample;
 the detector response sets the width of a possible resonance, and the radiative
 fraction sets its normalization. Together, these ingredients connect the recorded
 events to the signal model used in the search.
@@ -36,15 +36,14 @@ The 2021 preselection entries follow the full analysis note
 The native 10\% spectrum comes from the prompt-TC sample. The GPR fit adds no
 event-level cuts.
 \else
-The complete-note build reads the native 10\% mass spectrum preselection/h\_invM\_8000 from a
-hash-bound ROOT input whose recorded SHA-256 matches final\_10pct\_invM.root. The GPR
-fit adds no event-level cuts.
+The 10\% mass spectrum is the prompt-TC histogram
+\texttt{preselection/h\_invM\_8000}. The GPR fit adds no event-level cuts.
 \fi
 Each campaign enters the analysis through its selected invariant-mass histogram and
-the detector-response and normalization inputs for the same event category.
+the detector response and signal normalization for the same event category.
 
 The engineering-run notes use \emph{preselection} for the broad reconstruction sample
-and \emph{prompt selection} for the tighter resonance-search sample. The 2021 input is
+and \emph{prompt selection} for the tighter resonance-search sample. The 2021 dataset is
 closer to the latter because the prompt-TC sample retains the high-$p_{\mathrm{sum}}$
 side. Table~\ref{tab:event-selection} keeps that distinction without adding an
 unrecorded two-dimensional hit requirement.
@@ -64,7 +63,7 @@ visible and distinguish broad kinematic structure from the narrow simulated
 mass hypotheses. The signal samples are scaled for display, so these figures
 compare reconstruction shapes rather than absolute yields or efficiencies.
 The vertex-fit $\chi^2$ remains a diagnostic: no additional vertex-fit $\chi^2$
-requirement is applied to the regenerated 2021 GPR input. These archived plots
+requirement is applied to the 2021 dataset used in the GPR fit. These archived plots
 document the preselection context and do not constitute a new event selection
 or a validation of the final likelihood.
 
@@ -81,7 +80,7 @@ or a validation of the final likelihood.
   \caption{Reconstructed-vertex distributions after the loose preselection,
     comparing data (points) with the signal MC (filled histogram). The vertex-fit
     $\chi^2$ is shown as a diagnostic; no vertex-fit $\chi^2$ requirement is applied to
-    the regenerated 2021 GPR input.}
+    the 2021 dataset used in the GPR fit.}
   \label{fig:presel_vertex}
 \end{figure}
 
@@ -233,8 +232,8 @@ or a validation of the final likelihood.
 
 \begin{figure}[htbp]\centering
 \includegraphics[width=0.94\linewidth]{../figures/v5_nominal_mass_resolutions.pdf}
-\caption{Frozen nominal mass-resolution parameterizations over the current
-search intervals. These inputs set the signal-template widths, moving fit
+\caption{Nominal mass-resolution parameterizations over the
+search intervals. These functions set the signal-template widths, moving fit
 windows and resolution-scaled kernel constraints. Their signal-width
 variations are examined in Section~\ref{sec:v5-resolution-results}.}
 \label{fig:v5-nominal-resolution}
@@ -404,7 +403,7 @@ A_d = K_d(m)\,\eps^2,
 \label{eq:kd-radfrac}
 \end{equation}
 where $\rho_d(m)$ is the selected prompt-spectrum density in dataset $d$. The
-engineering-run inputs follow the corresponding prompt searches, while the 2021
+engineering-run normalizations follow the corresponding prompt searches, while the 2021
 normalization remains provisional for the native 10\% sample.
 
 \subsubsection{2015 radiative fraction}
@@ -423,7 +422,7 @@ the published 2015 analysis.
 \begin{figure}[H]
 \centering
 \graphicorplaceholder{0.96\linewidth}{normalization_figs/hps2015_radiative_fraction_review.png}
-\caption{Dedicated 2015 radiative-fraction inputs. The left panel shows the selected
+\caption{Determination of the 2015 radiative fraction. The left panel shows the selected
 cross-section composition, while the right panel shows the radiative fraction used for
 normalization. The red horizontal line denotes the 8.5\% constant adopted as the
 conservative fit across the 2015 prompt-search dataset. This quantity converts the
@@ -437,7 +436,7 @@ final $\eps^2$ interpretation rather than the local spectral fit itself.}
 The 2016 prompt search used a fifth-order polynomial derived from radiative, trident,
 and converted-WAB MC after the full prompt selection. Those components determine the
 mass-dependent conversion from fitted signal yield to $\eps^2$ over the 2016 search
-range. For the 2016 input, we instead use the constant approximation
+range. For the 2016 dataset, we instead use the constant approximation
 \begin{equation}
 f_{\mathrm{rad},2016}(m) = 0.05,
 \end{equation}
@@ -516,7 +515,7 @@ do not enter the GP interpolation and are not profiled as nuisance parameters.
 
 The 7\% engineering-run penalties reflect the several-percent uncertainty in the 2015
 radiative and total $e^+e^-$ composition and the corresponding 2016 uncertainty from
-the selected radiative, trident, and converted-WAB inputs
+the selected radiative, trident, and converted-WAB simulated samples
 \cite{HPS2015InternalNote,HPS2016PromptLong}. We retain 7\% as a conservative
 first-order treatment for both engineering runs. The 2021 term uses the
 upgraded-detector estimate below.
@@ -543,7 +542,7 @@ The 2015 and 2016 penalties remain at 7\%.
 \graphicorplaceholder{0.88\linewidth}{normalization_figs/hps2021_radiative_xsec_note_fig16.png}
 \caption{Generated cross-section distributions for the 2021 tritrig, radiative, and
 WAB background MC samples \cite{HPS2021FullAnalysisNote}. These distributions set the
-cross-section normalization inputs for the 2021 radiative-fraction calculation.}
+cross-section normalization for the 2021 radiative-fraction calculation.}
 \label{fig:2021-radfrac-xsec-note}
 \end{figure}
 
@@ -552,7 +551,7 @@ cross-section normalization inputs for the 2021 radiative-fraction calculation.}
 \graphicorplaceholder{0.76\linewidth}{normalization_figs/hps2021_radiative_xsec_uncertainty_note_fig161.png}
 \caption{RAD and WAB cross-section distributions used in the 2021 note's
 radiative-fraction cross-section uncertainty propagation \cite{HPS2021FullAnalysisNote}.
-Together with the relative normalization $R=0.244$, these inputs lead to the 3.5\%
+Together with the relative normalization $R=0.244$, these quantities give the 3.5\%
 MC cross-section contribution.}
 \label{fig:2021-radfrac-xsec-syst-note}
 \end{figure}
@@ -560,7 +559,7 @@ MC cross-section contribution.}
 The 4.6\% term covers only the radiative-fraction normalization. The broader 2021
 displaced-search uncertainty model in Fig.~\ref{fig:2021-syst-table-note} also includes
 mass resolution, target position, and tight-selection effects that must be revisited
-before applying it to the full data set \cite[Sec.~9,
+before applying it to the full dataset \cite[Sec.~9,
 Table~58]{HPS2021FullAnalysisNote}. Those signal-yield and acceptance uncertainties are
 not included in Eq.~\eqref{eq:frad-penalty}.
 

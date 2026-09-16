@@ -26,8 +26,8 @@ The main figures shade 90--100~MeV to make this extension identifiable.
 
 \subsection{Targeted conditional calculations}
 The observed integer-mass limits at 91--100~MeV reuse the saved v5.2.1
-fixed-endpoint fits. An exact numerical replay of every added mass and scope
-checks those inputs before the bands are computed. There are 300 new
+fixed-endpoint fits. The calculation is repeated at every added mass for
+each dataset combination before the bands are computed. There are 300 new
 background-only experiments at each of the ten masses, separately for each
 campaign. A correlated Gaussian draw around the frozen local GP prediction
 is followed by Poisson counts. Constituent counts are shared among the four
@@ -50,7 +50,7 @@ support the stated conditional continuation; they do not turn the extension
 into an independently calibrated coverage result.
 
 For the updated combined field, all ten changed mass coordinates are
-recomputed using the actual shared-coupling likelihood. The input-bin
+recomputed using the actual shared-coupling likelihood. The histogram-bin
 response has 1,626 directions. The 90~MeV bridge reproduces the archived
 deterministic roots to $1.88\times10^{-6}$, and exact direct refits check
 the rank-one GP updates used for single-bin perturbations. The same first
@@ -63,6 +63,31 @@ rule improves Monte Carlo precision under the given Gaussian model. Its
 small tail intervals do not include error in the stress background or in
 the Gaussian approximation. A zero direct count in 256 experiments gives
 only $p<0.01163$ at 95\% Monte Carlo confidence.
+
+\subsection{Additional toys for upper-limit tails}
+\label{app:v505-tail-sampling}
+The original expected-limit bands use 300 background-only toys at each mass.
+To improve the upper-limit-tail estimates where few toys exceeded the observed
+value, 108 combinations of dataset and mass received independent batches of
+3,000 or 10,000 toys. These batches added 660,000 fitted limits. They refine
+the tail probabilities but do not change the original 300-toy bands.
+
+Nine tail estimates still had no exceedances after this refinement. For
+zero events in $N$ independent trials, the one-sided 95\% binomial upper
+bound is
+\begin{equation}
+ p_{\mathrm{up}}=1-0.05^{1/N}.
+\end{equation}
+The plots show these bounds with downward triangles. For the two-sided
+diagnostic, the bound is doubled and capped at one. An empty tail therefore
+limits the probability rather than measuring it to be zero.
+
+The extension introduced in v5.0.4 adds 300 toys at each of the ten new 2015
+masses, for each applicable dataset combination. It does not add further
+toys to the earlier sparse tails. An empty tail in this extension gives
+$p<0.00994$ at 95\% Monte Carlo confidence. More sampling is needed to
+resolve the remaining bounds; the counts used here are the completed
+ensembles described above.
 
 \subsection{Trials factors and what changes in the result}
 The resolution-spacing Sidak estimate for 2015 increases from 13.624 to
@@ -79,4 +104,4 @@ three-campaign result is $Z=2.520$ with $p_0=0.00586$; the separate-rate
 comparison in Section~\ref{sec:v5-rate-consistency} is needed to interpret
 what the common fit describes. The extension is made after the original
 data have been examined, and its conditional studies do not supply a
-selection-adjusted discovery significance or new unblinding authorization.
+selection-adjusted discovery significance.

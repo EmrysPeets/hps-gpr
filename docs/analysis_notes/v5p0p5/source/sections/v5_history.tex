@@ -7,14 +7,17 @@ the published HPS limits and updates Figure 2 from the poster sources while
 retaining both projection panels. It adds the v5.6.1 10\%-based conditional
 expectations after the observed results, with historical 1\% examples in
 an appendix; integrates v5.7.1 geometry and transport; adds a bounded joint binning check near 76 MeV using the saved spectra; and summarizes v5.5.4 rate studies at the end
-of the appendix. The observed result ledgers and nominal binning are unchanged.
+of the appendix. The nominal observed results and binning are unchanged.
 The distinction between exposure-scaling targets and empirical toy medians
-is explicit. The standalone version archive records source hashes and the
-changes between successive studies.
+is explicit. The standalone reports and their version history are included in the
+accompanying archive. This v5.0.5 revision also simplifies the wording,
+uses ``dataset'' for experimental samples, explains the detector geometry
+files, and moves the detailed toy counts from the Results section to
+Appendix~\ref{app:v505-tail-sampling}.
 
 This appendix begins with the history of the studies used to prepare the
-version 5.0.0 unblinding-request draft. The main text is a curated account
-of the current proposed procedure, while this chronology explains how the
+version 5.0.0 unblinding-request draft. The main text describes
+the current procedure, while this chronology explains how the
 support choices, background treatment and interpretation changed.
 A later report does not automatically supersede every earlier result:
 the underlying data fraction, fit policy, numerical qualification and
@@ -42,17 +45,17 @@ The older 40--300~MeV 2021 support is historical context; the current
 The v4.9.7 study of 2 September attempted the 2016 support qualification
 needed for subsequent combined extraction. Its initial support scan failed
 the declared gate and stopped; its planned continuation and combined
-validation were not run. A later, separate observed-state replay retained
-an explicit 2016 numerical exception: 87 of 142 states were resolved,
-with 55 unresolved. These later qualifications take precedence over any
+validation were not run. In a later calculation run in a separate process, the fitted parameters
+were reproduced within the specified tolerance at 87 of 142 masses,
+leaving 55 discrepancies. These later qualifications take precedence over any
 historical statement that the validation alone established readiness for
 full-data unblinding. Version 5 retains the technical description of the
-detector inputs, signal normalization and fitting procedure from that
+detector description, signal normalization and fitting procedure from that
 full-note lineage, while stating the remaining review conditions explicitly.
 
 The Harvard final-combinations writing sample, also prepared on
 2 September, supplied the compact presentation of the available observed
-results and polished explanatory prose. Its inputs were full 2015,
+results and polished explanatory prose. Its datasets were full 2015,
 full 2016 and the released 2021 10\% sample. This draft expands those
 sections with the subsequent statistical studies and separates the
 proposal to unblind from a claim that all calibration gates have passed.
@@ -94,14 +97,14 @@ Version 5 brings the controlled limit comparison and injected-bias figure
 into the methodology discussion, including the physical meaning of the
 two- and five-reference-error injections.
 
-The accompanying calibration release evaluated 456 dataset/mass
+The accompanying calibration study evaluated 456 dataset/mass
 coordinates and independently checked exclusion and local-rejection
 rates. Its finite-set background envelope removed the adjusted failures
 within the declared validation family, while exposing large sensitivity
 to the 2016 stress construction. Appendix~\ref{v5-sec:calibration}
 reorganizes the full calibration discussion around a flowchart,
 background definitions, observed changes, interpolation offsets and
-validation. Its conclusion supports profiling but does not certify
+validation. Its conclusion supports profiling but does not establish
 uncorrected asymptotic probabilities across every tested background.
 
 \subsection{Understanding calibration and extending global tests: v4.9.14--v4.9.15}
@@ -174,12 +177,9 @@ alternatives and validation studies. Historical readiness language is
 replaced by the concrete conditions in Sec.~\ref{sec:v5-review}.
 The statistical-tail gaps and background qualifications remain visible.
 
-The 8 September editing pass curates existing results and improves their
-presentation. It does not supply new pseudoexperiments, a new global
-particle significance, or an authorization to inspect the remaining
-2021 data. The appendix contents that follow provide a guide to the
-supporting studies, while the accompanying source ledger records the
-release directories and artifacts used for this draft.
+The 8 September revision reorganized the existing results without adding
+new pseudoexperiments. The appendix contents that follow provide a guide
+to the supporting studies.
 
 \subsection{The 5.0.1 presentation and historical restoration}
 Version 5.0.1 restores the preselection distributions, blind-window diagnostics,

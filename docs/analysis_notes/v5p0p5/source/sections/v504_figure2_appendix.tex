@@ -4,7 +4,7 @@
 
 Figure~\ref{fig:hps-engineering-phase-space} uses the v5.0.4 spectra,
 training supports, archived kernel parameters and 2015 extension through
-100~MeV. The 2019 input is the measured nominal 1\% spectrum selected with
+100~MeV. The 2019 dataset is the measured nominal 1\% spectrum selected with
 $p_{e^-}+p_{e^+}>3.64$~GeV. Its declared search range is 75--250~MeV and its
 training support is 50--300~MeV. The archived factor-15 response scan supplies
 its kernel coordinates; the mass resolution, radiative fraction and conversion
@@ -16,16 +16,16 @@ At each mass the constituent spectra enter as separate Poisson factors with
 a common nonnegative $\epsilon^2$ and independent Gaussian background
 constraints, including the correlations among bins within each campaign.
 The background is profiled and the bounded asymptotic 90\% \CLs{} endpoint
-is solved numerically. The three- and four-campaign projection inputs use
+is solved numerically. The three- and four-campaign projections use
 the same implementation. No inverse-limit or significance combination is used.
-This figure-specific replay changes the three-campaign numerical endpoints
-by at most 2.51\% relative to the frozen note ledger; the earlier observed
+This calculation for Figure 2 changes the three-campaign numerical endpoints
+by at most 2.51\% relative to the nominal results in the note; the earlier observed
 limits and their figures in Section~6 are retained. The 2019 saved limits
 are not substituted for the newly profiled joint likelihood.
 
 For the full-exposure-equivalent display, let $d_y(m)$ be the observed native-bin
 count density in the $\pm1.64\sigma_m$ window, with fractional edge-bin overlaps,
-and let $f_y$ be the ratio of full exposure to the input exposure. The plotted
+and let $f_y$ be the ratio of full exposure to the analyzed exposure. The plotted
 coordinate is
 \begin{equation}
  u_{\mathrm{full\,eq}}(m)=u_{\mathrm{current}}(m)
@@ -71,7 +71,7 @@ For the lepton references the positive-vector one-loop relation is
  \Delta a_\ell=\frac{\alpha\epsilon^2}{2\pi}
  \int_0^1\!dx\,\frac{2x(1-x)^2}{(1-x)^2+(m_{A^\prime}/m_\ell)^2x}.
 \end{equation}
-The muon input is the WP25 residual $38(63)\times10^{-11}$
+The muon curve uses the WP25 residual $38(63)\times10^{-11}$
 \cite{MuonWP2025}. The electron curve uses the rounded positive residual
 $\Delta a_e\simeq0.34\times10^{-12}$ obtained with the Fan23 measurement and
 Rb20 fine-structure constant \cite{ElectronFan2023,AlphaMorel2020}.

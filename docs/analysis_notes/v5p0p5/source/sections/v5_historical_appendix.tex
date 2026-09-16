@@ -2,7 +2,6 @@
 \label{sec:v5-historical-validation}
 
 This record groups the earlier development studies by the question they answer.
-Their sources remain at the commit recorded in the v5 provenance.
 Section~\ref{sec:toys} retains the full-refit validation and support studies;
 Section~\ref{sec:selected-observed-results} gives the current observed limits.
 
@@ -35,22 +34,24 @@ rule. The surviving under-recovery at 55~MeV is part of the result, not an
 exception removed from the figure. That sequence explains both the adopted
 support and the limits of its validation.
 
-\subsection{The 2016 support and numerical-state sequence: September 2026}
+\subsection{The 2016 support and fit-reproducibility checks: September 2026}
 The v4.9.7 study tested lower support edges 28--34~MeV at 44, 49, 54 and
 59~MeV using 25 paired backgrounds and matched 0-, 2- and 5-reference-sigma
 injections. Every edge violated the predeclared gross-bias guard. The rule
 returned no provisional edge, so the proposed 75-background continuation and
 new combination did not follow from that study. Its broad-tail generating
 component carried a failed source-fit flag and was retained only as an
-explicitly conditional stress input.
+alternative background for the stress test.
 
-Later v4.9.9--v4.9.11 investigations examined predictive controls and
-reproducibility of the archived 30--210~MeV state. An independent process
-reproduced the selected state to the required $10^{-6}$ tolerance at 87 of
-142 masses. Subsequent optimizer-off predictions and numerical checks permit
-a conditional downstream release, documented by the numerical exception
-retained in v4.9.12. They do not convert the failed support-selection result
-into a passed physical-background qualification.
+Later v4.9.9--v4.9.11 studies checked whether a calculation run in a
+separate process reproduced the fitted GP parameters for the 30--210~MeV
+support. Agreement within the required $10^{-6}$ tolerance was obtained at
+87 of 142 masses; 55 did not meet that tolerance. Recalculating the
+background predictions from the saved parameters, without rerunning the
+optimizer, passed the subsequent numerical checks. The v4.9.12 results
+therefore use those saved parameters. The discrepancies in the independent
+parameter fits remain unresolved and are separate from the failed
+background-validation tests described above.
 
 Full-refit closure, frozen-GP expected limits, empirical \CLs{} calibration
 and coherent global scans test different parts of the procedure. More draws

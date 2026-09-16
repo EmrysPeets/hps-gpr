@@ -1,14 +1,19 @@
 # v5.0.5 delivery checks
 
-The final note has 253 pages. All pages were rendered, and the revised text,
+The final note has 252 pages. All pages were rendered, and the revised text,
 tables, figures and appendix pages were inspected at higher resolution.
 Figure 1 retains the original published vector curves. Figure 2 uses the
-archived numerical inputs with revised layout and colors. The small toy
-catalogues were enlarged to full portrait pages after the first layout check.
+archived numerical inputs with revised layout and colors. The requested language revision was checked in the compiled PDF. Dataset
+terminology, the Results heading, the LCDD explanation, and removal of the
+quoted passages were verified. Detailed toy counts are now in Appendix B.
+All 486 numerical-result and figure files are unchanged by the editorial pass.
+The tail figure was fitted below its shortened introduction to avoid a nearly
+empty page.
 
 No unresolved references, undefined labels, duplicated labels or overfull
 boxes remain. The 242 inherited result files are byte-identical to the parent.
-All 180 new binning-fit coordinates converged with positive expectations.
+The earlier binning study retains 180 converged coordinates with positive
+expectations; no numerical fits were rerun for this language revision.
 The nominal 76 MeV combined signed root is 0.165569, reproducing the archived
 0.166 after rounding.
 

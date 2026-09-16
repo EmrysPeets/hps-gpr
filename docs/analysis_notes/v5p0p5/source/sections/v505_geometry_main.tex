@@ -10,8 +10,11 @@ the movement of the low-mass turn-on with beam energy. They do not set a
 hard mass threshold: azimuth, momentum sharing, magnetic bending and missed
 planes all affect whether a pair crosses enough active silicon.
 
-The v5.7.1 study follows prompt $A'\to e^+e^-$ decays through representative
-LCDD sensor geometries and the campaign field maps. The daughter momenta
+The v5.7.1 study follows prompt $A'\to e^+e^-$ decays through the sensor
+geometries and field maps used for each campaign. The sensor shapes and
+positions are read from Linear Collider Detector Description (LCDD) files,
+the XML geometry files used by the detector simulation~\cite{McCormickLCDD2005}.
+The daughter momenta
 are generated from exact two-body kinematics, rotated into the detector
 frame and propagated numerically. A sensor is hit only when the trajectory
 crosses its finite active face. Axial and stereo views are counted separately
@@ -24,10 +27,7 @@ charge-dependent bending visible.
 The 2015 and 2016 curves require at least five paired stations per track;
 the 2015 positron also requires paired L1 and L2 hits. The 2021 study instead
 uses at least ten individual strip-plane hits for the positron and eight for
-the electron. This is the explicit v5.7.1 geometry-study specification.
-The archived prompt-TC histogram does not establish equivalence to this
-hit-count convention, so the geometric curves do not alter the event
-selection recorded above.
+the electron.
 
 \begin{figure}[htbp]\centering
 \includegraphics[width=\linewidth]{../figures/HPS_v5p7p1_geometry_illustration.pdf}

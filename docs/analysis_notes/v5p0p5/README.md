@@ -2,6 +2,10 @@
 
 16 September 2026. This is the complete revised analysis note, based on the supplied v5.0.4 Figure 2 revision. It preserves the original delivery and all 242 inherited files in `derived/` byte for byte. The new joint binning diagnostic is saved separately; it does not replace the nominal observed result.
 
+## Language revision within v5.0.5
+
+The requested editorial pass removes the process-heavy wording, uses dataset for experimental samples, expands LCDD at first use, and shortens the Results introduction. Detailed toy counts and the 2016 fit-reproducibility checks are kept in the appendices. The version remains 5.0.5. Numerical results, figures and fit settings are unchanged by this pass.
+
 ## Changes
 
 - Section 1.1 now describes the two published engineering-run searches directly. Figure 1 reproduces their published limits as vector crops, retaining the original 95% confidence constructions.
@@ -29,6 +33,6 @@ The editorial scripts in `provenance/` record construction from the local parent
 
 ## Checks and scope
 
-The QA record accompanies the final delivery. It includes resolved cross-references, data-table comparisons, a nominal 76 MeV replay, convergence and positive expectations for all 180 new pointwise coordinates, inherited-ledger identity, rendered-page inspection, and a separate source build. The historical studies retain their original validation limits. The note remains a review draft; these additions do not resolve the documented full-2016 state-replay exception or the incomplete combined global extension.
+The QA record accompanies the final delivery. It includes resolved cross-references, data-table comparisons, a nominal 76 MeV replay, convergence and positive expectations for all 180 new pointwise coordinates, inherited-ledger identity, rendered-page inspection, and a separate source build. The historical studies retain their original validation limits. The note remains a review draft; these additions do not resolve the documented differences in the independent 2016 parameter fits or the incomplete combined global extension.
 
 The GitHub study archive preserves 35 distinct delivered PDFs, including earlier note versions and separately delivered figure PDFs. Its version index explains the changes within the 5.1, 5.2, 5.3, 5.5, 5.6 and 5.7 study families. Identical PDF copies are stored once with source aliases and SHA-256 identities.

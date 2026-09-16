@@ -1,10 +1,9 @@
-\section{Results for the released data}
+\section{Results}
 \label{sec:selected-observed-results}
 \input{../derived/generated_selected_results}
 
-This is a snapshot of a partially unblinded analysis. It includes the fully unblinded
-2015 and 2016 samples and the 10\% sample currently available from 2021. The remaining 2021 data are outside the reviewed sample. The curves below
-describe the observed result in hand and do not project the full-2021 reach.
+The results use the full 2015 and 2016 datasets and the available 10\%
+sample from 2021.
 
 Each mass point uses the corrected, bounded, piecewise-asymptotic \CLs{}
 construction with the common signal-strength coordinate constrained to
@@ -15,19 +14,15 @@ the asymptotic approximation. For 2016, the frozen GP support is
 \FinalSixteenSupportLowMeV--\FinalSixteenSupportHighMeV~MeV and the upper
 resolution-scaled length-scale factor is \FinalSixteenLengthScaleUpperFactor. The
 2015 and 2021 configurations retain their separately qualified supports.
-One numerical caveat applies to 2016. An independent cross-process replay passed the
-specified $10^{-6}$ state-reproduction check at 87 of 142 masses. A downstream replay
-with the optimizer disabled, together with the other release checks, passes; even so,
-every 2016-inclusive curve remains preliminary and conditional on this exception.
 
-The three current inputs can be analyzed in seven distinct combinations: each data set
+The three datasets can be analyzed in seven distinct combinations: each dataset
 alone, each of the three pairs, and all three together.
 
 \begin{center}
 \small
 \begin{tabularx}{\linewidth}{@{}P{0.15\linewidth}Y P{0.28\linewidth}@{}}
 \toprule
-Scope & Active data sets & Statistical coordinate \\
+Scope & Active datasets & Statistical coordinate \\
 \midrule
 Standalone & full 2015 & campaign-specific $\eps^2$ \\
 Standalone & full 2016 & campaign-specific $\eps^2$ \\
@@ -40,8 +35,8 @@ All three & full 2015 + full 2016 + 2021 10\% & one shared $\eps^2$ \\
 \end{tabularx}
 \end{center}
 
-This subsection reproduces the observed-only release. The pointwise expected
-bands and empirical limit-tail study are added in the next subsection. The background-only $p_0$ values are fixed-mass, one-sided asymptotic
+The observed limits are shown first, followed by the pointwise expected
+bands and empirical limit-tail probabilities. The background-only $p_0$ values are fixed-mass, one-sided asymptotic
 quantities. The added Sidak curves give a separate analytic look-elsewhere
 reference. Neither reference constitutes a direct coverage calibration of the
 upper-limit construction.
@@ -63,7 +58,7 @@ increasing only the 2021 contribution by a factor of ten gives
  \qquad (s_{2015},s_{2016},s_{2021})=(1,1,10).
  \label{eq:v501-density-proxy}
 \end{equation}
-Here $\mathcal D(m)$ is the active dataset set. The scale is unity below
+Here $\mathcal D(m)$ is the set of contributing datasets. The scale is unity below
 50~MeV, density weighted where samples overlap, and exactly $1/\sqrt{10}$
 where only 2021 contributes. The current and proxy minima are
 $8.0043\times10^{-7}$ and $3.1898\times10^{-7}$, both at 72~MeV.
@@ -77,8 +72,7 @@ maximal-available-dataset HPS result over 19--250~MeV. The blue curve applies
 Eq.~\eqref{eq:v501-density-proxy} to its current observed normalization
 densities. It retains present fluctuations and is neither expected
 sensitivity nor a future observed limit or a fit to full-2021 data.
-HPS and BaBar use different statistical constructions. The inherited
-dimuon correction and 2016 qualifications remain applicable.}
+HPS and BaBar use different statistical constructions. The coupling conversion includes the dimuon branching correction.}
 {fig:v501-babar-proxy}
 \FloatBarrier
 
@@ -111,8 +105,7 @@ in Section~\ref{sec:v5-global-results}.}
 show the full-template $A_{90}$, $\epsilon^2$ limit, discovery probabilities,
 and aligned $Z^+$ values. Black is local and red is the Sidak reference
 with $N_{\rm eff}=16.062$; their values at 90~MeV are 3.424 and 2.579.
-The existing 2016 numerical and generating-source
-qualifications remain applicable.}
+}
 {fig:v501-scan-2016}
 \fig{0.95}{../figures/v501_observed_scan_2021.pdf}{Corresponding observed
 2021 10\% scan on 50--250~MeV with 36--300~MeV GP support. The panels
@@ -131,22 +124,22 @@ the corresponding Sidak reference. Each row uses its own fixed search range
 and effective trials count. The complete search uses the preassigned
 maximal-available-dataset rule. Selecting the most favorable row would add
 another search and is not included in these corrections. These values use
-the frozen asymptotic result tables, rather than the separately evaluated
+the nominal asymptotic results, rather than the separately evaluated
 stress-centered scores.}
 \label{tab:v502-sidak-peaks}
 \end{table}
 
 \FloatBarrier
-\subsection{Combining data sets through a shared coupling}
+\subsection{Combining datasets through a shared coupling}
 \label{sec:selected-combined-results}
 
 Figure~\ref{fig:combined-final-results} contains all three pairwise combinations and
 the all-three result. At any given mass, the simultaneous likelihood profiles one
 nonnegative $\eps^2$ shared by the active campaigns. Each campaign nevertheless
 retains its own signal normalization, GP prediction, covariance, and observed
-spectrum. Combining the data sets is thus a new likelihood calculation, not an
+spectrum. Combining the datasets is thus a new likelihood calculation, not an
 envelope, average, or choice among the standalone limits. Each curve is evaluated only
-on the mass interval common to all of its active inputs.
+on the mass interval common to all contributing datasets.
 
 \begin{figure}[H]
   \centering
@@ -183,7 +176,7 @@ with their peak conversions in Table~\ref{tab:v502-sidak-peaks}.
   \centering
   \includegraphics[width=0.98\linewidth]{../figures/final_asymptotic_pvalues.pdf}
   \caption{Local one-sided asymptotic background-only $p_0$ for the three
-  standalone inputs, the three pairs, and the all-three combination. The values are
+  individual datasets, the three pairs, and the all-three combination. The values are
   conditional on the frozen GP supports and states. No look-elsewhere correction,
   global significance, or toy calibration is supplied by these curves.
 The 2015-containing scopes include 91--100~MeV.}
