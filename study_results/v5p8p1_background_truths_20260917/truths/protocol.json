@@ -1,0 +1,87 @@
+{
+  "declared_utc": "2026-09-17T20:37:37.129621+00:00",
+  "truth_names": [
+    "archived_stress",
+    "gp_full_nominal",
+    "gp_full_half_ls",
+    "gp_blocked",
+    "regional_rise_fall"
+  ],
+  "scope": "One fixed positive full-support expectation per candidate shared by all scan coordinates; no root-dependent selection.",
+  "GP_kernel": {
+    "frozen_anchor_MeV": 76,
+    "const": 108.58562729610972,
+    "ls_log_mass": 0.4131724631444206,
+    "half_ls_factor": 0.5,
+    "hyperparameter_optimization": false
+  },
+  "blocked_GP": {
+    "centers_MeV": [
+      30.0,
+      35.0,
+      40.0,
+      45.0,
+      50.0,
+      55.0,
+      60.0,
+      65.0,
+      70.0,
+      75.0,
+      80.0,
+      85.0,
+      90.0,
+      95.0,
+      100.0,
+      105.0,
+      110.0,
+      115.0,
+      120.0,
+      125.0,
+      130.0,
+      135.0,
+      140.0,
+      145.0,
+      150.0,
+      155.0,
+      160.0,
+      165.0,
+      170.0,
+      175.0,
+      180.0,
+      185.0,
+      190.0,
+      195.0,
+      200.0,
+      205.0,
+      210.0
+    ],
+    "blend_radius_MeV": 5.0,
+    "weight": "compact C2 Wendland (1-u)^4 (1+4u), u=abs(m-center)/5, then partition normalization",
+    "excluded_halfwidth_MeV": "max(15,5+2.25*sigma(min(center+5,210)))",
+    "minimum_signal_window_exclusion": "Each positively weighted query lies inside an excluded interval at least2.25sigma(query) from its edges over39\u2013180 MeV.",
+    "boundary_behavior": "Same exclusion rule; GP extrapolation near support edges, no data overwrite."
+  },
+  "regional": {
+    "rising_fit_domain_MeV": [
+      30,
+      75
+    ],
+    "falling_fit_domain_MeV": [
+      50,
+      210
+    ],
+    "rising_basis": "cubic in (m-60)/30",
+    "falling_basis": "cubic in log(m/60)",
+    "objective": "Poisson log likelihood, four coefficients each",
+    "join_MeV": [
+      50,
+      75
+    ],
+    "join": "quintic smoothstep of log expected counts; C2 at endpoints",
+    "turnover_context": "10MeV binned observed count maximum is60\u201370MeV; no local roots used.",
+    "monotonic_constraints": false
+  },
+  "normalization": "No postfit rescaling; native predicted expected-count total recorded. In particular blocked GP does not leak excluded counts through a total-count normalization.",
+  "controls": "Full-data GP candidates are self-fit controls and may absorb actual signal; blocked stitching reduces but does not eliminate source dependence.",
+  "archived_stress_qualification": "Conditional hybrid stress histogram; broad component retains failed source-fit flag"
+}

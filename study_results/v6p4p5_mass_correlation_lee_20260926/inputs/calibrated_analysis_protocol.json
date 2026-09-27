@@ -1,0 +1,24 @@
+{
+  "version": "6.4.4",
+  "calibration_size": 1024,
+  "validation_size": 1024,
+  "local_map": "p_A(q)=(1+number of A q>=q)/(1025); upper-tail inclusive ties",
+  "statistic": "min_m p_A(q_m); smaller is more extreme; ties included in B tail; lower mass chosen for display ties",
+  "independence": "Only A defines maps and Sidak fit; B does not update maps; same frozen map applied to observations and B",
+  "sidak": "Two references: actual grid-size independence N=136/181, and fixed effectiveN learned from A only",
+  "sidak_fit": "A leave-one-out ranks count(q_A>=q_i)/1024 including self; min across mass; least squares through origin of log(1-G_A(alpha)) on log(1-alpha)",
+  "fit_alphas": [
+    0.005,
+    0.01,
+    0.02,
+    0.03,
+    0.05
+  ],
+  "fit_weighting": "equal weights in log-survival space; omit saturated G_A=1; require at least2 points",
+  "sidak_limits": "A LOO minima are dependent and differ from B conditional on the full frozen map; no binomial CI for A fit; fit is an approximation tested on B",
+  "raw_comparison": "Keep raw-maximum global tails for A,B,and A+B2048 separately; no B reuse in local calibration",
+  "uncertainties": "Clopper-Pearson95 for B conditional on fixed A maps and fixed null source; calibration-map/source uncertainty not included",
+  "combined": "Exactly one common psi at same mass, same null and alternative, independent GP nuisance blocks; no maximization over dataset selections",
+  "validation_protocol_sha256": "8ef55902b00b2e861fc50148f18c2635d696ef19e51455d59fa5d054e2f1b379",
+  "script_sha256": "f4c20d571b7d30304d4a3e13d8f6307c12cfe021f5b8f3ca4b1817d9abd6f320"
+}

@@ -1,0 +1,2897 @@
+HPS Gaussian-Process Resonance Search
+v6.1 / MC signal templates
+HPS Gaussian-Process Resonance Search
+Selected Reconstructed-MC Templates
+Standalone Study v6.1
+Emrys Peets
+Stanford University and SLAC National Accelerator Laboratory
+23 September 2026
+Abstract
+The 2021 Gaussian signal model is compared with normalized reconstructed target-
+constrained selected-candidate mass distributions from twelve A-prime MC masses between 40
+and 260 MeV. The baseline retains the original ±2.25σm ﬁt and training mask, observed 10%
+spectrum, GP kernel states and coupling normalization. Additional common mask half-widths
+of 2.4, 2.5 and 2.6 nominal sigma are compared separately.
+Direct-template observed 90%
+CLs limits and local p0 values at the generated masses are compared with Gaussian ﬁts
+to the same data.
+A dense morphing scan is reported separately as exploratory.
+The MC
+production is v13 and the observed sample is v16; their target constraint and momentum-sum
+labels agree, but timing selections diﬀer and full production equivalence is not established.
+Stored reconstructed masses receive no added smearing or recentering. The inherited coupling
+coordinate is a conditional comparison, not a validated A-prime exclusion: an unmatched or
+accidental continuum need not scale with the signal coupling. A further comparison centers the
+primary ﬁt and training window on an MC-only estimate of the reconstructed core, retaining
+the nominal width and unchanged MC shape.
+1
+Observed comparison and scope
+The opening comparison retains the original pole-centered prescription.
+The MC core-centered
+update appears in Section 12. At the 10 shared generated masses, the median MC-to-Gaussian
+limit ratio is 0.9876; the range is 0.5332–3.7590.
+The median absolute relative limit change is
+22.05%. The largest absolute relative limit change occurs at 60 MeV (+275.90%). The smallest
+direct-MC local probability among these tested points occurs at 80 MeV, with p0 = 2.477 × 10−2
+and Z0 = 1.964. This is a sparse-grid local comparison, not a scan-global probability.
+The direct comparison uses generated masses from 60 through 240 MeV in 20 MeV steps, inside
+the original 2021 search. The 40 and 260 MeV samples provide shape and interpolation information
+outside those direct test points. Full 2015 and full 2016 Gaussian references are retained in the
+package, but no matching reconstructed MC for those campaigns was supplied. The 2021 response
+is therefore not substituted into their ﬁts.
+The result is conditional on the supplied selected-MC shapes and their ﬁnite statistics.
+It
+is neither a newly qualiﬁed detector-response model nor a coverage calibration.
+The supplied
+candidate distributions have broad components and substantial displacement from the generated
+pole at several masses; they are not established as pure reconstructed resonance responses. An
+observed diﬀerence between the two curves can reﬂect mass bias, core width, non-Gaussian tails,
+selection diﬀerences and ﬁnite-MC ﬂuctuations together.
+1
+
+HPS Gaussian-Process Resonance Search
+v6.1 / MC signal templates
+2
+Reconstructed mass distributions
+The source histograms retain selected target-constrained masses within 0–400 MeV and record out-
+of-range counts separately. The pole mass sets the hypothesis; the reconstructed mean is allowed
+to diﬀer. The comparison does not shift the MC peak onto the pole mass or force its width to the
+Gaussian parameterization.
+0
+50
+100
+150
+200
+250
+300
+350
+400
+10−6
+10−5
+10−4
+10−3
+10−2
+10−1
+Density (MeV−1)
+40 MeV; Neff=92,201
+Stored reconstructed MC
+Nominal Gaussian
+0
+50
+100
+150
+200
+250
+300
+350
+400
+10−6
+10−5
+10−4
+10−3
+10−2
+10−1
+60 MeV; Neff=243,668
+0
+50
+100
+150
+200
+250
+300
+350
+400
+10−6
+10−5
+10−4
+10−3
+10−2
+10−1
+80 MeV; Neff=770,358
+0
+50
+100
+150
+200
+250
+300
+350
+400
+10−6
+10−5
+10−4
+10−3
+10−2
+10−1
+Density (MeV−1)
+100 MeV; Neff=1,309,730
+0
+50
+100
+150
+200
+250
+300
+350
+400
+10−6
+10−5
+10−4
+10−3
+10−2
+10−1
+120 MeV; Neff=3,448,406
+0
+50
+100
+150
+200
+250
+300
+350
+400
+10−6
+10−5
+10−4
+10−3
+10−2
+10−1
+140 MeV; Neff=1,966,199
+0
+50
+100
+150
+200
+250
+300
+350
+400
+10−6
+10−5
+10−4
+10−3
+10−2
+10−1
+Density (MeV−1)
+160 MeV; Neff=2,035,063
+0
+50
+100
+150
+200
+250
+300
+350
+400
+10−6
+10−5
+10−4
+10−3
+10−2
+10−1
+180 MeV; Neff=1,998,339
+0
+50
+100
+150
+200
+250
+300
+350
+400
+10−6
+10−5
+10−4
+10−3
+10−2
+10−1
+200 MeV; Neff=1,837,830
+0
+50
+100
+150
+200
+250
+300
+350
+400
+Reconstructed mee (MeV)
+10−6
+10−5
+10−4
+10−3
+10−2
+10−1
+Density (MeV−1)
+220 MeV; Neff=1,619,560
+0
+50
+100
+150
+200
+250
+300
+350
+400
+Reconstructed mee (MeV)
+10−6
+10−5
+10−4
+10−3
+10−2
+10−1
+240 MeV; Neff=1,388,655
+0
+50
+100
+150
+200
+250
+300
+350
+400
+Reconstructed mee (MeV)
+10−6
+10−5
+10−4
+10−3
+10−2
+10−1
+260 MeV; Neff=1,157,665
+Figure 1: Unit-normalized stored reconstructed MC mass densities and the nominal Gaussian at
+each generated mass. Densities span the full stored range on a logarithmic axis so broad or displaced
+populations remain visible. Dotted lines mark the original ±2.25σm boundaries, calculated from
+the nominal Gaussian resolution. Displayed densities are normalized over their stored histogram
+range; ﬁtted templates retain their separately declared support normalization. No extra smearing
+or recentering is applied.
+2
+
+HPS Gaussian-Process Resonance Search
+v6.1 / MC signal templates
+3
+Selected MC statistics and shape properties
+The source histograms store the weighted bin contents and squared-weight sums. The eﬀective
+number of weighted entries is
+Neﬀ= (∑
+j wj)2
+∑
+j w2
+j
+.
+(1)
+It describes MC sampling, not data exposure or signal eﬃciency. Selected rows need not be unique
+physical events unless the production candidate policy establishes that identity. The source ﬁles,
+latest ROOT tree cycles, branches, weights and extraction counts are recorded in the histogram
+metadata and manifest.
+The stored 0–400 MeV range contains 99.9848–99.9978% of the selected weight across samples;
+overﬂow counts are shown separately. All extracted weights are unit weights, so Neﬀequals the
+selected count. The raw particle-vector momentum diagnostic falls below 2.8 GeV for 1.35–8.28%
+of rows. A bounded read ﬁnds that stored psum and psum_scalar satisfy the cut in every inspected
+row; the raw-vector discrepancy therefore reﬂects an incompatible convention, not an established
+selection failure.
+m0 (MeV) Selected rows Overﬂow Median bias
+σ68 (MeV) Core (%)
+40
+92,201
+2
++61.907
+40.172
+0.53
+60
+243,668
+6
++7.500
+40.204
+39.18
+80
+770,358
+18
+-1.597
+7.116
+66.92
+100
+1,309,730
+35
+-2.411
+3.724
+72.61
+120
+3,448,406
+123
+-2.983
+3.898
+74.81
+140
+1,966,199
+82
+-3.510
+4.441
+75.64
+160
+2,035,063
+109
+-3.966
+5.240
+75.95
+180
+1,998,339
+129
+-4.382
+6.311
+75.86
+200
+1,837,830
+141
+-4.785
+7.784
+75.17
+220
+1,619,560
+206
+-5.250
+9.868
+73.84
+240
+1,388,655
+180
+-5.790
+12.854
+71.96
+260
+1,157,665
+176
+-6.581
+17.255
+69.90
+Table 1: Selected reconstructed MC entries and saved shape summaries. Bias is the reconstructed
+median displacement, in MeV, from the generated pole. Median and quantile half-width σ68 are
+conditional on the stored 0–400 MeV range; the core probability uses the full selected weight. Over-
+ﬂow denotes selected rows above that range; it remains included in full-selected-yield bookkeeping.
+The original 2021 resolution is held ﬁxed when deﬁning every mask:
+σm(m) = 0.00184825 −0.001375m + 0.085875m2,
+m, σm in GeV.
+(2)
+Thus a narrower or shifted MC core changes the fraction of a unit signal inside the existing ﬁtted
+bins. It does not silently redeﬁne those bins or the sideband training set. The MC mass range and
+normalization support are recorded separately so losses at either boundary remain visible.
+The word smeared in the production directory is not suﬃcient to reconstruct the upstream
+smearing chain. The stored smear-ratio branches and cutﬂows are audited, while the template itself
+uses the stored target-constrained mass exactly once. No second factor of 1.25 or undocumented
+mass transformation is introduced.
+3
+
+HPS Gaussian-Process Resonance Search
+v6.1 / MC signal templates
+4
+Observed 2021 limits and local probabilities
+The direct MC points use the same observed counts and correlated GP constraint as their Gaussian
+partners at each mass. The dense morph curve is displayed with a separate line style because its
+additional mass hypotheses require an interpolation assumption.
+10−6
+10−5
+10−4
+Observed 90% CLs limit on ε2
+Gaussian
+MC morph: exploratory
+Direct MC at generated masses
+10−2
+10−1
+Local p0
+50
+75
+100
+125
+150
+175
+200
+225
+250
+Test mass (MeV)
+0.2
+0.4
+0.6
+0.8
+1.0
+Signal fraction in fitted bins
+Figure 2: Observed 2021 10% limits, ﬁxed-mass local probabilities and signal fractions in the
+original ﬁtted bins. Points use the direct reconstructed templates at generated masses. The dashed
+curve, when present, uses exploratory MC morphing. The coupling limit includes the inherited
+minimal-visible branching correction once above the dimuon threshold.
+4
+
+HPS Gaussian-Process Resonance Search
+v6.1 / MC signal templates
+5
+Paired comparison at generated masses
+The direct result is paired with the Gaussian at the same mass.
+The limit ratio is R(m) =
+ε2
+90,MC/ε2
+90,G, and the signed-root change is ∆r = rMC −rG.
+Points at diﬀerent masses share
+observations and GP training bins.
+m0
+ε2
+90,G
+ε2
+90,MC
+Ratio
+p0,G
+p0,MC
+∆r
+60
+3.747 × 10−6
+1.408 × 10−5
+3.7590
+5.000 × 10−1
+4.950 × 10−1
++0.825
+80
+5.221 × 10−6
+6.362 × 10−6
+1.2184
+1.628 × 10−2
+2.477 × 10−2
+-0.174
+100
+2.599 × 10−6
+2.089 × 10−6
+0.8039
+3.173 × 10−1
+5.000 × 10−1
+-0.969
+120
+2.905 × 10−6
+2.258 × 10−6
+0.7773
+2.500 × 10−1
+5.000 × 10−1
+-0.969
+140
+1.968 × 10−6
+1.964 × 10−6
+0.9975
+5.000 × 10−1
+5.000 × 10−1
+-0.356
+160
+5.376 × 10−6
+4.787 × 10−6
+0.8904
+6.817 × 10−2
+2.188 × 10−1
+-0.713
+180
+5.946 × 10−6
+3.170 × 10−6
+0.5332
+1.371 × 10−1
+5.000 × 10−1
+-2.194
+200
+5.577 × 10−6
+5.453 × 10−6
+0.9777
+4.128 × 10−1
+5.000 × 10−1
+-0.684
+220
+6.114 × 10−6
+1.230 × 10−5
+2.0113
+5.000 × 10−1
+5.000 × 10−1
++1.117
+240
+1.558 × 10−5
+2.472 × 10−5
+1.5865
+4.865 × 10−1
+4.436 × 10−1
++0.108
+Table 2: Direct-template comparison at generated masses. All probabilities are pointwise and use
+their stated signal template.
+0
+100
+200
+Observed limit change (%)
+75
+100
+125
+150
+175
+200
+225
+Generated/test mass (MeV)
+−2
+−1
+0
+1
+Change in signed r
+Figure 3: Observed fractional limit changes and signed-root diﬀerences for direct MC templates.
+These are paired descriptions of the same observed spectra. They are not independent residuals
+with a chi-squared sampling law.
+5
+
+HPS Gaussian-Process Resonance Search
+v6.1 / MC signal templates
+6
+Agreement summaries and interpolation boundary
+Descriptive quantity
+Direct MC versus Gaussian
+Common generated masses
+10
+Median ratio
+0.98760
+16th–84th percentile ratio
+0.78900–1.82440
+Minimum / maximum ratio
+0.53322 / 3.75896
+Median absolute relative change
+22.055%
+RMS log ratio
+0.54902
+Within 1 / 5 / 10%
+10.0% / 20.0% / 20.0%
+Maximum |∆r|
+2.19398
+Table 3: Descriptive agreement on the common direct-MC grid. Quantile ranges and percentages
+of agreeing masses are summaries of the curves, not conﬁdence intervals or agreement probabilities.
+A statistical probability for disagreement would require a speciﬁed joint sampling calculation that
+preserves the common data, overlapping sidebands and template estimation. An independent-point
+chi-squared test would omit those dependencies. The present comparison therefore reports sizes
+and locations of diﬀerences without assigning such a probability.
+The reconstructed MC is available at discrete generated masses.
+A dense scan necessarily
+interpolates shape information. Holding out an interior generated mass and predicting its shape
+from its neighbors tests that interpolation against an available simulation sample. It does not test
+the underlying detector simulation against data, and it cannot establish sampling coverage of an
+upper limit.
+The declared morph linearly mixes the neighboring CDFs in standardized residual z = (mrec −
+m0)/σnominal(m0), evaluating each input distribution at its own pole and nominal resolution. It
+uses no extrapolation beyond the supplied 40–260 MeV grid. Its dense observed scan covers the
+original 50–250 MeV search at 1 MeV spacing.
+8 of 10 held-out shape checks pass the declared DCDF ≤0.03 and |∆Fcore| ≤0.02 criteria. The
+largest conditional-support CDF distance is 0.1395. The held-out limit ratios to direct MC range
+from 0.9142 to 1.3029. The dense curve remains exploratory regardless of this outcome.
+The direct generated-mass results remain the primary comparison. Any minimum found on the
+denser exploratory grid depends on both the morphing prescription and the enlarged mass scan.
+Neither its local probability nor the smallest value selected across models is a global discovery
+probability.
+6
+
+HPS Gaussian-Process Resonance Search
+v6.1 / MC signal templates
+6.1
+Held-out shapes and ﬁnite-MC precision
+m0
+DCDF
+∆Fcore
+UL ratio
+∆r
+Shape check
+60 0.1168 -0.0545
+0.9142
++0.3724
+fail
+80 0.1395 -0.1090
+1.3029
++0.0490
+fail
+100 0.0271 -0.0166
+1.0540
++0.0364
+pass
+120 0.0118 -0.0062
+1.0230
++0.0116
+pass
+140 0.0091 -0.0025
+1.0117
++0.0037
+pass
+160 0.0057 -0.0016
+1.0143
++0.0103
+pass
+180 0.0037 -0.0028
+1.0165
++0.0124
+pass
+200 0.0033 -0.0030
+1.0056
+-0.0154
+pass
+220 0.0027 -0.0026
+1.0177
++0.0289
+pass
+240 0.0052 -0.0006
+1.0024
++0.0168
+pass
+Table 4: Leave-one-mass-out checks. CDF distances and core fractions use the conditional analysis-
+support distributions. Limit ratios and signed-root changes compare the held-out morph with direct
+MC at the same hypothesis. The shape thresholds are diagnostic criteria.
+For each direct mass, 32 independent Poisson resamples of the stored unit-weight MC histogram
+bins are ﬁtted against the ﬁxed Gaussian reference. This conditional calculation quantiﬁes template
+sampling precision under that bin-count model. It does not include detector systematics, selection
+diﬀerences, correlations between candidates or uncertainty in the observed-data background. No
+new observed-data experiments are generated.
+m0
+Resamples
+R16
+R50
+R84
+UL spread (%)
+60
+32
+3.7284 3.7609
+3.7925
+1.063
+80
+32
+1.2141 1.2173
+1.2213
+0.349
+100
+32
+0.8016 0.8037
+0.8061
+0.302
+120
+32
+0.7767 0.7772
+0.7780
+0.096
+140
+32
+0.9960 0.9978
+0.9987
+0.125
+160
+32
+0.8887 0.8908
+0.8920
+0.212
+180
+32
+0.5320 0.5332
+0.5350
+0.243
+200
+32
+0.9750 0.9773
+0.9798
+0.268
+220
+32
+2.0067 2.0148
+2.0185
+0.312
+240
+32
+1.5794 1.5852
+1.5907
+0.326
+Table 5: Conditional ﬁnite-MC precision. R16, R50, R84 are quantiles of the MC-to-Gaussian upper-
+limit ratio across 32 MC-bin resamples. The last column is the relative standard deviation of the
+resampled limit around its central direct-template scale, in percent.
+Thirty-two resamples resolve only a modest estimate of the central spread. The intervals are
+neither an observed-limit conﬁdence band nor a signiﬁcance for the discrepancy between templates.
+7
+
+HPS Gaussian-Process Resonance Search
+v6.1 / MC signal templates
+7
+Likelihood and normalization
+The baseline uses the original primary window. The GP trains only on bins outside ±2.25σm, using
+archived kernel coordinates. The window diagnostics replace 2.25 by 2.4, 2.5 or 2.6 for both the
+ﬁt and training mask, recomputing the prediction with the same kernel states. Within a mass
+hypothesis, both signal models share its predicted count mean b, covariance C and observed counts
+n. With LLT = C,
+a =
+ε2
+10−8 ,
+Ti = K(m) 10−8wi,
+(3)
+λi = bi + (Lθ)i + aTi,
+(4)
+ℓ(a, θ) =
+∑
+i
+[
+λi −ni + ni log ni
+λi
+]
++ 1
+2θT θ.
+(5)
+The zero-count contribution is λi. The correlated background deformation is proﬁled at every tested
+amplitude. The bin probabilities wi are normalized over the declared full support before selecting
+ﬁtted bins; their restriction to the primary window is not renormalized.
+For MC the full ﬁtting support is 36–299.75 MeV. Its retained fraction fsupport is recorded
+separately.
+The ledger’s full_yield_90 is the support-normalized yield;
+the additional
+full_selected_yield_90 divides it by fsupport. That bookkeeping conversion does not establish
+a calibrated coupling normalization outside the analysis support.
+Here K(m) is the unchanged prompt-density conversion. The solver’s A90 column is a90, while
+the support-normalized event yield is N90 = a90K(m)10−8 = K(m)ε2
+90. Above 2mµ, the inherited
+minimal-visible conversion multiplies the electron-only coupling limit by 1 + √1 −4rµ(1 + 2rµ),
+with rµ = (mµ/m)2. This correction does not change the visible yield or local probability. Density
+continues to use the nominal m ± 1.64σm native-bin interval.
+The observed limit solves the bounded, piecewise-asymptotic CLs(a90) = 0.10, using explicitly
+proﬁled observed and background-Asimov likelihood ratios [2]. The free diagnostic amplitude may
+be negative while physical Poisson expectations are maintained. Writing its signed likelihood root
+as r,
+Z0 = max(r, 0),
+p0 = Φ(−Z0).
+(6)
+Deﬁcits therefore have the inherited reference value p0 = 0.5. This is a local asymptotic reference,
+not the probability of the most signiﬁcant result anywhere in a scan.
+The Gaussian and MC comparisons use the same converged solver. The historical v5.9 audit
+found a stopping discrepancy in an older optimizer; the present paired comparison does not mix
+that older table with newly computed MC ﬁts. Numerical convergence and ﬁnite-MC statistical
+qualiﬁcation are separate questions.
+8
+
+HPS Gaussian-Process Resonance Search
+v6.1 / MC signal templates
+8
+Selection provenance and interpretation
+The supplied MC directory is /sdf/data/hps/physics2021/preselection/v13/ap_signal_p
+rompt_smeared. The observed input derives from /sdf/data/hps/physics2021/preselection
+/v16/data_10pc_prompt_TC_psum2p8. The MC uses the stored vertex./vertex.invM_ branch
+and the target-constrained vertex category. Production labels agree on the target constraint and
+psum > 2.8 GeV, but the inspected MC timing windows include 5.7 and 9.2 ns where the observed
+sample uses 5.1 and 7.8 ns. Full production equivalence is not established. No new selection is
+silently imposed to make the two samples appear matched.
+A bounded inspection ﬁnds both stored daughter truth-link ﬂags false for every inspected row.
+Those ﬂags cannot identify matched signal daughters, and their values alone do not prove that the
+reconstructed candidates lack signal daughters. No additional truth selection is defensible from
+them. The ﬁt therefore substitutes the supplied all-selected candidate distribution conditionally.
+The stored track hit counters are three-dimensional; cutﬂow labels refer to two-dimensional-hit
+requirements. Those labels are not a license to apply their thresholds directly to the stored hit
+counters. The local and remote selection audits preserve the evidence and the unresolved production
+details. ROOT ﬁles can contain older tree cycles; only the latest preselection cycle contributes
+to extraction.
+Input ﬁles and conﬁgurations are identiﬁed by saved paths, sizes and SHA-256 hashes. Extrac-
+tion uses bounded chunks and retains bin sums of weights and squared weights. All results, scripts,
+reconstructed-mass histograms and report sources are mirrored to /sdf/home/e/epeets/src/hps
+_gpr_v6p1_mc_signal_templates_20260922. The original observed result and source ROOT ﬁles
+are preserved.
+This study measures how the selected reconstructed 2021 MC changes the conditional observed
+inference under the archived background model and the explicitly declared ﬁt and training mask.
+It does not isolate a pure tail uncertainty or establish that either signal template is the correct
+detector response. Selection diﬀerences, ﬁnite MC and interpolation remain explicit qualiﬁcations.
+No MC-template claim is made for the 2015 or 2016 detector conﬁgurations.
+Approximately 24–61% of the direct-mass selected signal distributions lie outside the primary
+blind window.
+Signal in those training bins can be absorbed by a background-only GP. This
+observed template replacement keeps the sideband prediction ﬁxed; it does not model signal-
+contamination feedback, extraction recovery or coverage for these broad distributions.
+References
+[1] E. Peets, M. Gignac and E. Hsu, HPS Gaussian-Process Resonance Search: Analysis Note
+v5.0.5, 16 September 2026, internal review draft and archived source package.
+[2] G. Cowan, K. Cranmer, E. Gross and O. Vitells, “Asymptotic formulae for likelihood-based
+tests of new physics,” Eur. Phys. J. C 71, 1554 (2011), arXiv:1007.1727.
+9
+
+HPS Gaussian-Process Resonance Search
+v6.1 / MC signal templates
+9
+Common ﬁt and training windows of 2.4, 2.5 and 2.6 sigma
+The original ±2.25σm prescription remains the baseline. Three additional calculations use common
+ﬁt and training-mask half-widths h = 2.4σm, 2.5σm and 2.6σm. There is no separate outer guard
+window: the same half-width determines the ﬁtted bins and the excluded GP training bins. Each
+changed mask recomputes the GP prediction and correlated covariance from its own observed
+sidebands, with the archived kernel coordinates held ﬁxed.
+Gaussian and MC templates at a given width share those counts and GP constraints. A compar-
+ison between widths therefore changes both the observed ﬁt region and the background prediction;
+it cannot isolate signal-tail acceptance alone. The nominal resolution, coupling conversion and full-
+support template normalization are retained. Masks select bins by their native-bin centers. Nearby
+half-widths can therefore select exactly the same ﬁt and training bins at a particular mass and yield
+coincident results; the width response is not continuous. No width is selected for its observed limit
+or local probability.
+h/σm
+Median ratio
+Ratio range
+Med. |R −1| (%)
+Max. |∆r|
+LOO pass
+MC spread (%)
+2.25
+0.9876
+0.5332–3.7590
+22.05
+2.194
+8/10
+1.06
+2.4
+1.0038
+0.5413–3.7386
+22.92
+2.164
+8/10
+1.11
+2.5
+1.0127
+0.5480–3.9413
+28.90
+2.151
+8/10
+1.13
+2.6
+1.0127
+0.5491–3.9413
+29.53
+2.170
+8/10
+1.13
+Table 6: Direct-MC versus Gaussian comparisons at ten generated masses, reported separately for
+each common half-width. The LOO column counts held-out shape checks satisfying the declared
+criteria. MC spread is the largest relative upper-limit standard deviation among the ten masses
+under 32 independent-bin Poisson resamples. These descriptions are correlated across both mass
+and window.
+The median absolute MC-to-Gaussian limit change is 22.92%, 28.90% and 29.53% for half-
+widths 2.4, 2.5 and 2.6 sigma, compared with 22.05% at baseline. The smallest direct-template
+local probability remains at 80 MeV: p0 = 0.02477 for baseline and 2.4 sigma, and p0 = 0.009903
+for 2.5 and 2.6 sigma. These are conditional local results, not a basis for choosing the width.
+The following pages keep the three new prescriptions separate. Their upper panels show the
+full observed curves; the lower panels and tables compare direct templates only at their generated
+masses. Dashed curves use the same exploratory CDF morph as the baseline, including its low-mass
+qualiﬁcation. Local probabilities retain p0 = 0.5 for deﬁcits and are not adjusted for inspecting
+multiple masses, models or window widths.
+The ﬁnite-MC and leave-one-out diagnostics are recomputed for each width and retained in
+the portable ledgers. Wider masks do not resolve the unveriﬁed candidate association, production-
+selection mismatch or signal leakage into the sidebands.
+The inherited coupling values remain
+conditional template comparisons rather than validated A-prime exclusions.
+10
+
+HPS Gaussian-Process Resonance Search
+v6.1 / MC signal templates
+9.1
+Half-width 2.4σm
+50
+75
+100
+125
+150
+175
+200
+225
+250
+10−6
+10−5
+10−4
+Observed ε2
+90
+Gaussian
+MC morph: exploratory
+Direct MC
+50
+75
+100
+125
+150
+175
+200
+225
+250
+10−2
+10−1
+Local p0
+50
+75
+100
+125
+150
+175
+200
+225
+250
+0.2
+0.4
+0.6
+0.8
+1.0
+Fraction in fitted bins
+50
+75
+100
+125
+150
+175
+200
+225
+250
+Test mass (MeV)
+1
+2
+3
+Direct MC / Gaussian limit
+50
+75
+100
+125
+150
+175
+200
+225
+250
+Test mass (MeV)
+−2
+−1
+0
+1
+Direct Δr
+Figure 4: 2021 10% observed results with common ﬁt and GP training-mask half-width 2.4σm. The
+Gaussian and MC predictions share the background constraint within this page. The lower panels
+show direct-MC/Gaussian limit ratios and signed-root changes at generated masses; dashed dense
+curves are exploratory.
+m0
+ε2
+90,G
+ε2
+90,MC
+Ratio
+p0,G
+p0,MC
+∆r
+60
+3.73 × 10−6
+1.39 × 10−5
+3.739
+0.5000
+0.5000
++0.616
+80
+5.22 × 10−6
+6.36 × 10−6
+1.218
+0.0163
+0.0248
+-0.174
+100
+2.60 × 10−6
+2.09 × 10−6
+0.804
+0.3173
+0.5000
+-0.969
+120
+2.95 × 10−6
+2.24 × 10−6
+0.760
+0.2465
+0.5000
+-1.053
+140
+1.94 × 10−6
+1.95 × 10−6
+1.007
+0.5000
+0.5000
+-0.318
+160
+5.38 × 10−6
+4.56 × 10−6
+0.848
+0.0716
+0.2724
+-0.858
+180
+6.23 × 10−6
+3.37 × 10−6
+0.541
+0.1148
+0.5000
+-2.164
+200
+5.62 × 10−6
+5.62 × 10−6
+1.001
+0.4175
+0.5000
+-0.635
+220
+6.25 × 10−6
+1.34 × 10−5
+2.141
+0.5000
+0.4879
++1.256
+240
+1.58 × 10−5
+2.48 × 10−5
+1.569
+0.4771
+0.4595
++0.044
+Table 7: Direct-template comparison for half-width 2.4σm. Coupling limits and local probabilities
+retain the same conventions as the baseline table.
+11
+
+HPS Gaussian-Process Resonance Search
+v6.1 / MC signal templates
+9.2
+Half-width 2.5σm
+50
+75
+100
+125
+150
+175
+200
+225
+250
+10−6
+10−5
+10−4
+Observed ε2
+90
+Gaussian
+MC morph: exploratory
+Direct MC
+50
+75
+100
+125
+150
+175
+200
+225
+250
+10−2
+10−1
+Local p0
+50
+75
+100
+125
+150
+175
+200
+225
+250
+0.2
+0.4
+0.6
+0.8
+1.0
+Fraction in fitted bins
+50
+75
+100
+125
+150
+175
+200
+225
+250
+Test mass (MeV)
+1
+2
+3
+4
+Direct MC / Gaussian limit
+50
+75
+100
+125
+150
+175
+200
+225
+250
+Test mass (MeV)
+−2
+−1
+0
+1
+Direct Δr
+Figure 5: 2021 10% observed results with common ﬁt and GP training-mask half-width 2.5σm. The
+Gaussian and MC predictions share the background constraint within this page. The lower panels
+show direct-MC/Gaussian limit ratios and signed-root changes at generated masses; dashed dense
+curves are exploratory.
+m0
+ε2
+90,G
+ε2
+90,MC
+Ratio
+p0,G
+p0,MC
+∆r
+60
+3.80 × 10−6
+1.50 × 10−5
+3.941
+0.5000
+0.5000
++0.727
+80
+5.47 × 10−6
+7.31 × 10−6
+1.338
+0.0121
+0.0099
++0.078
+100
+2.65 × 10−6
+2.20 × 10−6
+0.831
+0.3101
+0.5000
+-0.915
+120
+2.95 × 10−6
+2.24 × 10−6
+0.760
+0.2465
+0.5000
+-1.053
+140
+1.94 × 10−6
+2.03 × 10−6
+1.047
+0.5000
+0.5000
+-0.225
+160
+5.44 × 10−6
+4.62 × 10−6
+0.849
+0.0698
+0.2743
+-0.878
+180
+6.24 × 10−6
+3.42 × 10−6
+0.548
+0.1170
+0.5000
+-2.151
+200
+5.60 × 10−6
+5.47 × 10−6
+0.978
+0.4234
+0.5000
+-0.725
+220
+6.18 × 10−6
+1.29 × 10−5
+2.084
+0.5000
+0.5000
++1.163
+240
+1.62 × 10−5
+2.74 × 10−5
+1.686
+0.4545
+0.3763
++0.201
+Table 8: Direct-template comparison for half-width 2.5σm. Coupling limits and local probabilities
+retain the same conventions as the baseline table.
+12
+
+HPS Gaussian-Process Resonance Search
+v6.1 / MC signal templates
+9.3
+Half-width 2.6σm
+50
+75
+100
+125
+150
+175
+200
+225
+250
+10−6
+10−5
+10−4
+Observed ε2
+90
+Gaussian
+MC morph: exploratory
+Direct MC
+50
+75
+100
+125
+150
+175
+200
+225
+250
+10−2
+10−1
+Local p0
+50
+75
+100
+125
+150
+175
+200
+225
+250
+0.2
+0.4
+0.6
+0.8
+1.0
+Fraction in fitted bins
+50
+75
+100
+125
+150
+175
+200
+225
+250
+Test mass (MeV)
+1
+2
+3
+4
+Direct MC / Gaussian limit
+50
+75
+100
+125
+150
+175
+200
+225
+250
+Test mass (MeV)
+−2
+−1
+0
+1
+Direct Δr
+Figure 6: 2021 10% observed results with common ﬁt and GP training-mask half-width 2.6σm. The
+Gaussian and MC predictions share the background constraint within this page. The lower panels
+show direct-MC/Gaussian limit ratios and signed-root changes at generated masses; dashed dense
+curves are exploratory.
+m0
+ε2
+90,G
+ε2
+90,MC
+Ratio
+p0,G
+p0,MC
+∆r
+60
+3.80 × 10−6
+1.50 × 10−5
+3.941
+0.5000
+0.5000
++0.727
+80
+5.47 × 10−6
+7.31 × 10−6
+1.338
+0.0121
+0.0099
++0.078
+100
+2.65 × 10−6
+2.20 × 10−6
+0.831
+0.3101
+0.5000
+-0.915
+120
+2.97 × 10−6
+2.22 × 10−6
+0.747
+0.2454
+0.5000
+-1.131
+140
+1.94 × 10−6
+2.03 × 10−6
+1.047
+0.5000
+0.5000
+-0.225
+160
+5.47 × 10−6
+4.78 × 10−6
+0.873
+0.0684
+0.2549
+-0.829
+180
+6.20 × 10−6
+3.40 × 10−6
+0.549
+0.1234
+0.5000
+-2.170
+200
+5.65 × 10−6
+5.52 × 10−6
+0.978
+0.4173
+0.5000
+-0.723
+220
+6.16 × 10−6
+1.29 × 10−5
+2.090
+0.5000
+0.5000
++1.146
+240
+1.62 × 10−5
+2.71 × 10−5
+1.670
+0.4606
+0.4053
++0.141
+Table 9: Direct-template comparison for half-width 2.6σm. Coupling limits and local probabilities
+retain the same conventions as the baseline table.
+13
+
+HPS Gaussian-Process Resonance Search
+v6.1 / MC signal templates
+10
+Morphed midpoint templates: full reconstructed range
+The eleven midpoint hypotheses use equal CDF mixtures of their two neighboring generated samples,
+transported through the nominal-resolution standardized coordinate. The plots use saved numerical
+morphs, not a ﬁt to observed data. The bracketing curves show the transported inputs at the
+midpoint hypothesis.
+Each displayed curve is normalized over 0–400 MeV; ﬁtted probabilities
+retain the separately recorded analysis support normalization.
+0
+50
+100
+150
+200
+250
+300
+350
+400
+10−6
+10−5
+10−4
+10−3
+10−2
+10−1
+Density (MeV−1)
+50 MeV: 40/60 MeV inputs *
+Lower mass transported
+Upper mass transported
+Midpoint CDF mixture
+0
+50
+100
+150
+200
+250
+300
+350
+400
+10−6
+10−5
+10−4
+10−3
+10−2
+10−1
+70 MeV: 60/80 MeV inputs *
+0
+50
+100
+150
+200
+250
+300
+350
+400
+10−6
+10−5
+10−4
+10−3
+10−2
+10−1
+90 MeV: 80/100 MeV inputs *
+0
+50
+100
+150
+200
+250
+300
+350
+400
+10−6
+10−5
+10−4
+10−3
+10−2
+10−1
+Density (MeV−1)
+110 MeV: 100/120 MeV inputs
+0
+50
+100
+150
+200
+250
+300
+350
+400
+10−6
+10−5
+10−4
+10−3
+10−2
+10−1
+130 MeV: 120/140 MeV inputs
+0
+50
+100
+150
+200
+250
+300
+350
+400
+10−6
+10−5
+10−4
+10−3
+10−2
+10−1
+150 MeV: 140/160 MeV inputs
+0
+50
+100
+150
+200
+250
+300
+350
+400
+10−6
+10−5
+10−4
+10−3
+10−2
+10−1
+Density (MeV−1)
+170 MeV: 160/180 MeV inputs
+0
+50
+100
+150
+200
+250
+300
+350
+400
+10−6
+10−5
+10−4
+10−3
+10−2
+10−1
+190 MeV: 180/200 MeV inputs
+0
+50
+100
+150
+200
+250
+300
+350
+400
+10−6
+10−5
+10−4
+10−3
+10−2
+10−1
+210 MeV: 200/220 MeV inputs
+0
+50
+100
+150
+200
+250
+300
+350
+400
+Reconstructed mee (MeV)
+10−6
+10−5
+10−4
+10−3
+10−2
+10−1
+Density (MeV−1)
+230 MeV: 220/240 MeV inputs
+0
+50
+100
+150
+200
+250
+300
+350
+400
+Reconstructed mee (MeV)
+10−6
+10−5
+10−4
+10−3
+10−2
+10−1
+250 MeV: 240/260 MeV inputs
+MC-only shape interpolation
+* 50/70/90 MeV touch the
+low-mass region with failed
+held-out shape checks.
+No new simulated sample.
+No truth-response certification.
+Figure 7: Full-range reconstructed mass densities for midpoint morphs at 50, 70, . . ., 250 MeV,
+with transported neighboring MC shapes.
+The logarithmic scale exposes broad and displaced
+populations. Dotted lines mark the baseline ±2.25σm interval for reference; the morph itself is
+independent of the ﬁt-window width. Asterisks ﬂag the 50/70/90 MeV hypotheses that touch the
+low-mass region with failed held-out shape checks.
+14
+
+HPS Gaussian-Process Resonance Search
+v6.1 / MC signal templates
+11
+Morphed midpoint templates: core detail
+The same saved distributions are displayed within seven nominal sigma of each midpoint, on a
+linear density scale. Zooming the horizontal axis does not renormalize the curves or remove their
+broad components from the ﬁtted signal model. The interpolation supplies no additional truth
+matching, production-equivalence validation or detector-response certiﬁcation.
+40
+45
+50
+55
+60
+0.00
+0.01
+0.02
+0.03
+0.04
+0.05
+0.06
+0.07
+Density (MeV−1)
+50 MeV: 40/60 MeV inputs *
+Lower mass transported
+Upper mass transported
+Midpoint CDF mixture
+55
+60
+65
+70
+75
+80
+85
+0.00
+0.02
+0.04
+0.06
+0.08
+0.10
+0.12
+0.14
+70 MeV: 60/80 MeV inputs *
+75
+80
+85
+90
+95
+100
+105
+0.00
+0.02
+0.04
+0.06
+0.08
+0.10
+0.12
+0.14
+90 MeV: 80/100 MeV inputs *
+95
+100
+105
+110
+115
+120
+125
+0.00
+0.02
+0.04
+0.06
+0.08
+0.10
+0.12
+0.14
+Density (MeV−1)
+110 MeV: 100/120 MeV inputs
+110
+120
+130
+140
+150
+0.00
+0.02
+0.04
+0.06
+0.08
+0.10
+0.12
+130 MeV: 120/140 MeV inputs
+130
+140
+150
+160
+170
+0.00
+0.02
+0.04
+0.06
+0.08
+0.10
+150 MeV: 140/160 MeV inputs
+150
+160
+170
+180
+190
+0.00
+0.02
+0.04
+0.06
+0.08
+Density (MeV−1)
+170 MeV: 160/180 MeV inputs
+160
+170
+180
+190
+200
+210
+220
+0.00
+0.02
+0.04
+0.06
+0.08
+190 MeV: 180/200 MeV inputs
+180
+190
+200
+210
+220
+230
+240
+0.00
+0.01
+0.02
+0.03
+0.04
+0.05
+0.06
+210 MeV: 200/220 MeV inputs
+200
+220
+240
+260
+Reconstructed mee (MeV)
+0.00
+0.01
+0.02
+0.03
+0.04
+0.05
+Density (MeV−1)
+230 MeV: 220/240 MeV inputs
+220
+240
+260
+280
+Reconstructed mee (MeV)
+0.00
+0.01
+0.02
+0.03
+0.04
+250 MeV: 240/260 MeV inputs
+MC-only shape interpolation
+* 50/70/90 MeV touch the
+low-mass region with failed
+held-out shape checks.
+No new simulated sample.
+No truth-response certification.
+Figure 8: Core detail of the same midpoint morphs and transported neighboring shapes. The plot
+scale is set independently in each panel. Dotted boundaries retain the original baseline half-width.
+These MC-only interpolations remain exploratory, particularly the marked low-mass hypotheses;
+they are not new simulated samples.
+15
+
+HPS Gaussian-Process Resonance Search
+v6.1 / MC signal templates
+12
+MC core centers and shifted primary windows
+This update, dated 23 September 2026, centers the observed ﬁt and the excluded GP training
+interval on the reconstructed MC core, rather than the generated pole. The reconstructed template
+itself is unchanged. For a generated hypothesis m0 and an MC-only core location c(m0),
+I(m0) = [c(m0) −2.25σnominal(m0), c(m0) + 2.25σnominal(m0)].
+(7)
+The half-width retains the original nominal resolution. The ﬁtted core width below does not replace
+it. No additional guard is used.
+The center is determined without observed counts. A Gaussian smoothing of width 0.2σnominal
+locates the largest MC peak within m0 ± 3σnominal. A bin-integrated Gaussian plus a nonnegative
+aﬃne pedestal is then ﬁtted by Poisson deviance to the unsmoothed template within ±1.5σnominal
+of that mode. The Gaussian mean deﬁnes c; the pedestal limits the inﬂuence of a local broad
+component. The mean may vary by one nominal sigma around the mode, and the ﬁtted width
+by 0.25–2.5 nominal sigma. All 201 ﬁts converge without these bounds being active. This is an
+operational core deﬁnition, not proof of a pure resonance response.
+m0
+c(m0)
+c −m0
+σcore
+MC spread
+Max. |∆c|
+Max. UL change (%)
+60
+58.792
+-1.208
+1.550
+0.034
+0.049
+0.00
+80
+78.103
+-1.897
+1.637
+0.007
+0.003
+0.00
+100
+97.688
+-2.312
+1.853
+0.006
+0.027
+0.00
+120
+117.319
+-2.681
+2.112
+0.003
+0.039
+0.00
+140
+136.956
+-3.044
+2.392
+0.006
+0.052
+0.29
+160
+156.658
+-3.342
+2.713
+0.007
+0.081
+0.00
+180
+176.393
+-3.607
+3.120
+0.008
+0.096
+0.00
+200
+196.182
+-3.818
+3.577
+0.011
+0.130
+0.00
+220
+215.941
+-4.059
+4.233
+0.012
+0.162
+4.01
+240
+235.617
+-4.383
+4.981
+0.022
+0.132
+3.75
+Table 10: Native-MC core centers and stability. All mass quantities are in MeV. MC spread is the
+standard deviation of the estimated center under 32 independent-bin Poisson resamples. The last
+two columns vary the core-ﬁt half-width from its default 1.5 nominal sigma to 1.25 and 2.0, and
+reﬁt the observed MC limit using each alternative center.
+The maximum center-deﬁnition displacement is 0.162 MeV and the largest corresponding limit
+change is 4.01%. Native-bin masks are discrete; many smaller shifts select exactly the same bins.
+Bin resampling quantiﬁes conditional center precision only; it does not establish candidate inde-
+pendence or cover production systematics.
+The direct-template centers shift by 1.21–4.38 MeV below their generated poles. The median
+absolute MC/Gaussian limit diﬀerence in the matched centered windows is 17.83%, compared with
+22.05% for the original paired prescription. The native new/old MC limit ratios span 0.822–1.201.
+The smallest native MC local probability is at m0 = 80 MeV, c = 78.103 MeV: p0 = 0.00787
+(Z0 = 2.415), compared with p0 = 0.02477 before shifting the window.
+16
+
+HPS Gaussian-Process Resonance Search
+v6.1 / MC signal templates
+12.1
+Observed scans after centering
+The GP mean and covariance are recomputed from sidebands outside each shifted interval. Archived
+kernel coordinates remain anchored at m0. The inherited density conversion, nominal resolution
+and branching conversion also retain m0, isolating the center change from a change of coupling
+convention. Both the MC and its new Gaussian benchmark use the same shifted window and GP
+constraint. The benchmark Gaussian is centered at c(m0) with width σnominal(m0); it is not the
+historical Gaussian ﬁt evaluated at mass c with new kernel or density settings. All curves are
+plotted against generated hypothesis m0, not reconstructed center c.
+10−6
+10−5
+10−4
+Observed ε2
+90
+Original Gaussian
+Original MC window
+Gaussian at MC center
+MC-centered window
+10−2
+10−1
+Local p0
+1.0
+1.5
+2.0
+2.5
+Native limit ratios
+MC: new / original window
+MC / Gaussian at MC center
+50
+75
+100
+125
+150
+175
+200
+225
+250
+Generated mass hypothesis (MeV)
+−0.75
+−0.50
+−0.25
+0.00
+0.25
+0.50
+MC change in signed r
+Figure 9: Original and MC-centered observed inference for the 2021 10% sample.
+Native MC
+points are marked; continuous MC curves include exploratory morphs. The bottom panels compare
+only the ten generated masses. The matched Gaussian comparison separates the remaining shape
+diﬀerence from placing a Gaussian peak at the wrong reconstructed position.
+17
+
+HPS Gaussian-Process Resonance Search
+v6.1 / MC signal templates
+12.2
+Native-mass limits and local probabilities
+m0
+Old MC limit
+New MC limit
+New/old
+Old MC p0
+New MC p0
+New G p0
+60
+1.41 × 10−5
+1.16 × 10−5
+0.822
+0.49502
+0.50000
+0.50000
+80
+6.36 × 10−6
+7.64 × 10−6
+1.201
+0.02477
+0.00787
+0.00348
+100
+2.09 × 10−6
+2.30 × 10−6
+1.103
+0.50000
+0.50000
+0.50000
+120
+2.26 × 10−6
+2.30 × 10−6
+1.021
+0.50000
+0.50000
+0.50000
+140
+1.96 × 10−6
+2.09 × 10−6
+1.067
+0.50000
+0.50000
+0.50000
+160
+4.79 × 10−6
+5.04 × 10−6
+1.053
+0.21877
+0.21609
+0.17038
+180
+3.17 × 10−6
+3.26 × 10−6
+1.028
+0.50000
+0.50000
+0.50000
+200
+5.45 × 10−6
+5.22 × 10−6
+0.957
+0.50000
+0.50000
+0.50000
+220
+1.23 × 10−5
+1.21 × 10−5
+0.981
+0.50000
+0.50000
+0.50000
+240
+2.47 × 10−5
+2.32 × 10−5
+0.940
+0.44359
+0.50000
+0.50000
+Table 11: Original and shifted-window MC results. Limits use the inherited coupling coordinate.
+The last column is the Gaussian benchmark centered at the same MC core. All probabilities are
+local asymptotic references.
+m0
+Gaussian at c limit MC/G at c
+rMC −rG
+Old MC ﬁt (%)
+New MC ﬁt (%)
+60
+4.54 × 10−6
+2.548
+-0.520
+39.26
+39.65
+80
+6.20 × 10−6
+1.232
+-0.284
+67.56
+70.95
+100
+2.19 × 10−6
+1.052
+-0.292
+73.19
+78.21
+120
+2.12 × 10−6
+1.088
+-0.076
+74.60
+80.37
+140
+1.84 × 10−6
+1.136
++0.068
+76.52
+81.30
+160
+4.76 × 10−6
+1.059
+-0.167
+75.22
+81.75
+180
+3.27 × 10−6
+0.997
+-0.434
+75.27
+80.46
+200
+4.27 × 10−6
+1.221
+-0.002
+75.71
+79.37
+220
+8.91 × 10−6
+1.355
++0.073
+73.86
+77.30
+240
+1.63 × 10−5
+1.427
+-0.048
+72.38
+74.97
+Table 12: Matched centered-window comparison and retained MC probability in the ﬁtted bins.
+Support normalization remains unchanged; shifting the mask does not renormalize its retained
+template fraction to one.
+At the native 80 MeV hypothesis, the reconstructed center is 78.10 MeV. The shifted MC upper limit
+is 7.639×10−6, compared with 6.362×10−6 before shifting, a 20.08% increase. The local probability
+decreases from 0.02477 to 0.007875; an increased upper limit and a smaller local probability are
+compatible because they answer diﬀerent likelihood questions.
+On the dense exploratory MC grid the smallest local probability moves to 50 MeV (p0 =
+0.003798).
+That template uses the previously failing low-mass interpolation region.
+It is not
+promoted to a validated search result; the native comparison above remains the primary result.
+The unchanged selected-candidate association and v13/v16 production qualiﬁcations still apply.
+No global probability, coverage calibration or physically validated A-prime exclusion follows from
+this recentering.
+18
+
+HPS Gaussian-Process Resonance Search
+v6.1 / MC signal templates
+12.3
+Reconstructed cores and window placement
+50.0
+52.5
+55.0
+57.5
+60.0
+62.5
+65.0
+67.5
+0.00
+0.02
+0.04
+0.06
+0.08
+Density (MeV−1)
+60 MeV; center 58.79
+Reconstructed MC
+Local core + pedestal fit
+70
+75
+80
+85
+0.00
+0.02
+0.04
+0.06
+0.08
+0.10
+0.12
+0.14
+80 MeV; center 78.10
+90
+95
+100
+105
+110
+0.00
+0.02
+0.04
+0.06
+0.08
+0.10
+0.12
+0.14
+100 MeV; center 97.69
+110
+115
+120
+125
+130
+0.00
+0.02
+0.04
+0.06
+0.08
+0.10
+0.12
+Density (MeV−1)
+120 MeV; center 117.32
+125
+130
+135
+140
+145
+150
+0.00
+0.02
+0.04
+0.06
+0.08
+0.10
+0.12
+140 MeV; center 136.96
+145
+150
+155
+160
+165
+170
+175
+0.00
+0.02
+0.04
+0.06
+0.08
+0.10
+160 MeV; center 156.66
+160
+165
+170
+175
+180
+185
+190
+195
+0.00
+0.02
+0.04
+0.06
+0.08
+Density (MeV−1)
+180 MeV; center 176.39
+180
+190
+200
+210
+220
+0.00
+0.01
+0.02
+0.03
+0.04
+0.05
+0.06
+0.07
+200 MeV; center 196.18
+200
+210
+220
+230
+240
+0.00
+0.01
+0.02
+0.03
+0.04
+0.05
+0.06
+220 MeV; center 215.94
+210
+220
+230
+240
+250
+260
+Reconstructed mee (MeV)
+0.00
+0.01
+0.02
+0.03
+0.04
+0.05
+Density (MeV−1)
+240 MeV; center 235.62
+Dashed gray: original window
+Dotted blue: shifted window
+Solid red: MC core center
+Same nominal sigma and
+unchanged reconstructed MC.
+Figure 10: Native selected-MC cores and the original versus shifted ±2.25σnominal windows. Blue
+curves are unchanged empirical templates.
+The local Gaussian plus aﬃne-pedestal ﬁt (red) es-
+timates the center only and is never used to replace the full MC signal shape in the observed
+likelihood. The red vertical line marks the ﬁtted core center.
+19
+
+HPS Gaussian-Process Resonance Search
+v6.1 / MC signal templates
+13
+An analytic description of the MC core shift
+The ten native cores within the 60–240 MeV study range support a compact empirical location law.
+Four simple forms are ﬁtted with equal weight per mass: a proportional shift, an aﬃne function, a
+quadratic and a logarithm. Each mass is also omitted in turn and predicted from the other nine.
+No observed spectrum enters this comparison. The best leave-one-mass-out (LOO) RMS among
+these candidates is the logarithmic model,
+c(m) −m = −3.22433 −2.21399 ln
+( m
+150
+)
+MeV,
+60 ≤m ≤240 MeV.
+(8)
+The argument uses m in MeV. The law is an empirical approximation, not a detector mechanism
+or an extrapolation outside the ﬁtted range. Its ﬁtted RMS is 0.0497 MeV, LOO RMS 0.0652 MeV
+and largest held-out error 0.1604 MeV. These errors describe cross-mass prediction, not a calibrated
+conﬁdence band. Model selection and evaluation use the same ten masses; the LOO summary is a
+diagnostic, not independent validation.
+−4.5
+−4.0
+−3.5
+−3.0
+−2.5
+−2.0
+−1.5
+−1.0
+Core shift c −m0 (MeV)
+proportional
+affine
+quadratic
+logarithmic
+MC cores; bin-resample spread
+75
+100
+125
+150
+175
+200
+225
+Generated mass (MeV)
+−0.4
+−0.2
+0.0
+0.2
+Held-out prediction error (MeV)
+Figure 11: Measured core shifts, analytic models and their held-out residuals. Small error bars
+show conditional MC-bin resampling spread; the equal-mass ﬁts do not treat that spread as the
+complete response uncertainty.
+Model
+Parameters Fit RMS (MeV) LOO RMS (MeV) Max. LOO (MeV)
+proportional
+1
+0.2552
+0.2885
+0.4602
+aﬃne
+2
+0.1555
+0.2154
+0.5287
+quadratic
+3
+0.0679
+0.1399
+0.3015
+logarithmic
+2
+0.0497
+0.0652
+0.1604
+Table 13: Analytic model comparison. Aﬃne and quadratic forms use x = (m −150)/100; coeﬃ-
+cients and all held-out predictions are saved.
+20
+
+HPS Gaussian-Process Resonance Search
+v6.1 / MC signal templates
+14
+Can one normalized core describe all masses?
+The ten distributions are ﬁrst recentered without rescaling their physical widths. They are then
+expressed in u = (mee −c)/σcore using the measured local Gaussian width. The density transfor-
+mation includes the Jacobian: qm(u) = σcorepm(c + σcoreu). Each full source histogram has unit
+area over its recorded 0–400 MeV range. Display cropping never renormalizes the full distributions.
+The separately labeled core view conditions on |u| < 2 and therefore discards information about
+the fraction of all candidates in that core.
+−20
+−15
+−10
+−5
+0
+5
+10
+15
+20
+mee −c (MeV)
+0.00
+0.02
+0.04
+0.06
+0.08
+0.10
+0.12
+0.14
+Full-normalized density (MeV−1)
+Centered, unit area; physical widths retained
+60 MeV
+80 MeV
+100 MeV
+120 MeV
+140 MeV
+160 MeV
+180 MeV
+200 MeV
+220 MeV
+240 MeV
+−8
+−6
+−4
+−2
+0
+2
+4
+6
+8
+u = (mee −c)/σcore
+0.00
+0.05
+0.10
+0.15
+0.20
+0.25
+Full-normalized density
+Centered and width-scaled
+Equal-mass common shape
+−2.0
+−1.5
+−1.0
+−0.5
+0.0
+0.5
+1.0
+1.5
+2.0
+u
+0.00
+0.05
+0.10
+0.15
+0.20
+0.25
+0.30
+0.35
+0.40
+Conditional core density
+Core only: unit area on |u| < 2
+−20
+0
+20
+40
+60
+u
+10−6
+10−5
+10−4
+10−3
+10−2
+10−1
+Full-normalized density
+Tails retain their original weights
+Figure 12: All ten normalized native MC histograms superimposed; colored curves are empirical
+histograms, not Gaussian ﬁts or morphed samples.
+Top left: centered physical-mass densities.
+Top right: full-normalized densities after width scaling. Bottom left: unit-area conditional cores.
+Bottom right: full-normalized tails on a log scale. The black dashed curve is the equal-mass mean
+standardized distribution; sample event counts do not determine its weights.
+Direct MC-point
+overlays and the rebinning deﬁnition appear in Section 16.
+The conditional cores are much closer than the full shapes. A shared central shape is therefore a
+useful possibility, but its unit-area overlay cannot establish a common core fraction or common tails.
+The full candidate distributions include the same unresolved response and candidate-association
+contributions as the earlier sections.
+21
+
+HPS Gaussian-Process Resonance Search
+v6.1 / MC signal templates
+14.1
+Held-out tests of a common shape
+For each generated mass, the common standardized CDF is averaged from the other nine histograms.
+The primary shape-only test supplies the held-out sample’s known center and width. A second test
+predicts its center from the selected analytic law ﬁtted to the other nine and predicts its width
+from a quadratic in ln(σcore/MeV) versus x = (m −150)/100, also ﬁtted without that sample. All
+likelihood comparisons use the same measured-center evaluation window and GP constraint as the
+direct MC. The second test predicts the complete template but does not also move its evaluation
+mask. Existing neighboring-mass morphs are evaluated in that same window as a comparison.
+m0
+Core (%)
+Dcore
+Dfull
+Shared UL ratio
+Morph UL ratio
+Predictive UL ratio
+60
+32.4
+0.045
+0.461
+0.443
+1.047
+0.419
+80
+60.7
+0.009
+0.075
+0.944
+1.324
+0.991
+100
+68.1
+0.008
+0.023
+1.140
+1.050
+1.155
+120
+71.0
+0.010
+0.061
+1.191
+1.025
+1.172
+140
+71.5
+0.010
+0.072
+1.135
+1.009
+1.124
+160
+70.7
+0.009
+0.067
+1.135
+1.016
+1.127
+180
+69.6
+0.007
+0.052
+1.085
+1.017
+1.076
+200
+67.5
+0.007
+0.033
+1.002
+1.003
+1.003
+220
+65.8
+0.009
+0.037
+0.936
+1.018
+0.936
+240
+63.6
+0.014
+0.049
+0.864
+1.005
+0.860
+Table 14: Held-out CDF distances and observed upper-limit ratios relative to direct MC. Core
+probability is conditional on the stored histogram range; Dcore conditions on |u| < 2. Full distances
+use the declared analysis support. “Predictive” estimates center and width as well as shape without
+the held-out histogram.
+0.0
+0.1
+0.2
+0.3
+0.4
+Held-out full-support CDF distanc
+Common standardized shape
+Neighboring-mass morph
+75
+100
+125
+150
+175
+200
+225
+Generated mass (MeV)
+0.4
+0.6
+0.8
+1.0
+1.2
+Held-out / direct-MC upper limit
+Common shape; known center/width
+Common shape; predicted center/width
+Neighboring morph
+Figure 13: Common-shape and neighbor-morph prediction errors, with matched likelihood condi-
+tions.
+Core-conditioned CDF distances span 0.0067–0.0450, while full-support distances span 0.0229–
+0.4611. The common-shape limit ratios span 0.443–1.191 even when location and width are supplied.
+Thus a single full standardized shape is not supported as a drop-in replacement. A shared core
+with mass-dependent core fraction and tails is better motivated by these diagnostics. For inspection,
+181 exploratory common-shape templates are saved at 1 MeV spacing over 60–240 MeV using the
+analytic center and width laws; they are not adopted as the nominal signal model.
+22
+
+HPS Gaussian-Process Resonance Search
+v6.1 / MC signal templates
+15
+Left and right signal probability and asymmetric blinding
+Asymmetry is measured around the ﬁtted core, retaining the full stored-histogram normalization.
+The upper panel measures probability beyond ±2.25σnominal; the lower panel compares the two
+halves inside that interval.
+Source overﬂow is below 0.016% and is excluded by the explicitly
+declared 0–400 MeV normalization here.
+0.1
+0.2
+0.3
+0.4
+0.5
+Selected MC probability
+Left of centered -2.25 nominal sigma
+Right of centered +2.25 nominal sigma
+75
+100
+125
+150
+175
+200
+225
+Generated mass (MeV)
+0.20
+0.25
+0.30
+0.35
+0.40
+Selected MC probability
+Left half inside window
+Right half inside window
+Figure 14: Mass dependence of the left and right selected-MC contributions around the core.
+The left external tail is larger at 120–240 MeV, whereas the right external tail is larger at
+60–100 MeV. The direction is therefore not universal across the accepted samples.
+Five windows are declared around the same measured core before ﬁtting the observed data:
+[−2.25, +2.25], [−2.5, +2.0], [−2.0, +2.5], [−2.75, +2.25] and [−2.25, +2.75], all in nominal sigma.
+The redistributed pair keeps total width 4.5 sigma; each is also exactly a shift of the window
+midpoint by ∓0.25 sigma, so it cannot isolate tail asymmetry from center placement. The expanded
+pair adds half a sigma on either side as matched controls.
+Each window deﬁnes both the ﬁtted bins and excluded GP training bins. The GP prediction and
+covariance are recomputed; archived kernel, resolution and coupling conventions remain anchored
+at the generated mass. Gaussian and direct-MC templates share the same mask and background.
+Actual bin counts are saved because equal continuous widths need not select the same number of
+discrete observed bins.
+23
+
+HPS Gaussian-Process Resonance Search
+v6.1 / MC signal templates
+15.1
+Observed asymmetric-window comparisons
+Window in nominal sigma
+MC UL / symmetric
+Med. |MC/G −1| (%)
+Min. mass
+Min. local p0
+[−2.25, +2.25]
+1.000–1.000
+17.8
+80
+0.00787
+[−2.5, +2]
+0.942–1.038
+19.4
+80
+0.00671
+[−2, +2.5]
+0.964–1.119
+18.6
+80
+0.00854
+[−2.75, +2.25]
+0.983–1.129
+20.5
+80
+0.00761
+[−2.25, +2.75]
+0.997–1.133
+18.5
+80
+0.00868
+Table 15: Prespeciﬁed native-mass window comparisons. The minimum local probability is descrip-
+tive and is not corrected for testing several windows. No prescription is chosen from the observed
+result.
+0.95
+1.00
+1.05
+1.10
+MC UL / symmetric UL
+[-2.25, +2.25]
+[-2.5, +2]
+[-2, +2.5]
+[-2.75, +2.25]
+[-2.25, +2.75]
+−0.1
+0.0
+0.1
+0.2
+0.3
+MC change in signed r
+10−2
+10−1
+Local MC p0
+75
+100
+125
+150
+175
+200
+225
+Generated mass (MeV)
+0.4
+0.5
+0.6
+0.7
+0.8
+MC probability in fitted bins
+Figure 15: Native MC limit ratios, signed-root changes, local probabilities and ﬁtted signal fractions
+for all ﬁve windows. Full MC/Gaussian limits and probabilities are retained in the accompanying
+100-row ﬁt ledger. Changes include altered data bins and altered background interpolation, as well
+as signal acceptance.
+These are conditional observed diagnostics. A preferred production window would require signal-
+recovery and coverage checks, including signal leakage into the training sidebands, rather than
+selection by the largest observed local signiﬁcance or tightest upper limit.
+24
+
+HPS Gaussian-Process Resonance Search
+v6.1 / MC signal templates
+16
+What the Figure 12 curves represent
+The colored curves are the ten native reconstructed-MC histograms, normalized and plotted as
+connected bin densities. The local Gaussian plus aﬃne-pedestal ﬁt supplies only c and σcore; it does
+not supply their line shapes. In the standardized panels, a piecewise-linear CDF through the native
+0.1 MeV histogram edges is integrated into bins of width ∆u = 0.02. This is empirical rebinning,
+with uniform density within each original bin, rather than an analytic signal parameterization. The
+dashed black curve is a separate candidate: the equal-mass mean of these standardized shapes.
+0
+50
+100
+150
+200
+250
+300
+Reconstructed mee (MeV)
+10−5
+10−4
+10−3
+10−2
+10−1
+Density (MeV−1)
+60 MeV sample: full normalization
+Native empirical MC curve
+MC bin counts (2 MeV)
+0
+50
+100
+150
+200
+250
+300
+Reconstructed mee (MeV)
+10−5
+10−4
+10−3
+10−2
+10−1
+Density (MeV−1)
+160 MeV sample: full normalization
+Native empirical MC curve
+MC bin counts (2 MeV)
+−2.0
+−1.5
+−1.0
+−0.5
+0.0
+0.5
+1.0
+1.5
+2.0
+u = (mee −c)/σcore
+0.0
+0.1
+0.2
+0.3
+0.4
+0.5
+Conditional core density
+Unit area on |u| < 2
+Figure 12 native MC curve
+Equal-mass common shape
+MC bin counts (0.2 MeV)
+−2.0
+−1.5
+−1.0
+−0.5
+0.0
+0.5
+1.0
+1.5
+2.0
+u = (mee −c)/σcore
+0.0
+0.1
+0.2
+0.3
+0.4
+0.5
+Conditional core density
+Unit area on |u| < 2
+Figure 12 native MC curve
+Equal-mass common shape
+MC bin counts (0.2 MeV)
+Figure 16: Direct MC-point overlays for the outlying 60 MeV sample and a representative 160 MeV
+sample. Top: full-normalized native empirical curves and counts summed into 2 MeV bins. Bottom:
+exactly the standardized empirical curves of Figure 12 and direct sums into 0.2 MeV bins, both
+conditioned on |u| < 2.
+Horizontal bars show bin widths; vertical bars show
+√∑w2 with the
+display normalization held ﬁxed. The dashed common shape is shown separately. Points are bin
+averages; the curve must be integrated over the same bins for an exact comparison.
+The native curves agree with the MC points by construction: the largest diﬀerence between
+a direct bin sum and the corresponding CDF integral is below 10−9 candidates. This veriﬁes the
+plotted representation, not an independent goodness of ﬁt; no ﬁt probability is assigned to that
+identity. The common-shape candidate need not agree with each sample, and the held-out tests
+above assess that separate question. The plot and all underlying counts are saved.
+25
+
+HPS Gaussian-Process Resonance Search
+v6.1 / MC signal templates
+17
+The 60 MeV outlier and the meaning of a window in u
+At 60 MeV, 32.4% of the selected histogram is inside |u| < 2, compared with 60.7–71.5% at the
+other nine masses. Around the current centered ±2.25σnominal window, 5.4% is on the left, 55.1%
+on the right and 39.5% inside. Thus the full-normalized core is small because much of this selected-
+candidate distribution lies elsewhere. The core-conditioned panel removes that fraction information
+and still shows some shape variation.
+The 60 MeV ﬁles contain 243,668 selected rows. Their event cutﬂows record 1,542,086 readout
+events and the same 243,668 events at the ﬁnal selection stage, a conditional retention of 15.8%.
+Other masses give 34.5–61.6% (Table 16). This supports lower retention from the recorded readout
+stage, but neither that stage nor the unit-normalized Figure 12 establishes generated-signal accep-
+tance. A certiﬁed generated-event denominator and signal-daughter association are still needed;
+the selected candidate distribution is not certiﬁed as a pure signal response. “Within the study
+range” does not mean high detector acceptance.
+The existing core-centered window and a proposed ﬁxed-u window are diﬀerent because u uses
+the ﬁtted core width:
+|mee −c| < 2.25σnominal
+⇐⇒
+|u| < 2.25σnominal
+σcore
+= 2.920–3.174.
+(9)
+Consequently |u| < 2.25 would narrow the physical window by 23.0–29.1%.
+At 60 MeV, c =
+58.792 MeV, σcore = 1.550 MeV and σnominal = 2.075 MeV: the half-width changes from 4.669 to
+3.488 MeV and the retained selected-MC fraction falls from 39.5% to 34.5%.
+m0
+σcore
+σnom
+Old half-width (u)
+Old MC (%)
+±2.25u MC (%)
+Selected/readout (%)
+60
+1.550
+2.075
+3.012
+39.5
+34.5
+15.8
+80
+1.637
+2.288
+3.145
+70.4
+63.6
+34.5
+100
+1.853
+2.570
+3.120
+77.6
+71.1
+47.5
+120
+2.112
+2.920
+3.111
+80.5
+74.0
+55.3
+140
+2.392
+3.339
+3.140
+81.5
+74.6
+59.5
+160
+2.713
+3.827
+3.174
+81.3
+73.9
+61.3
+180
+3.120
+4.383
+3.161
+80.7
+72.9
+61.6
+200
+3.577
+5.008
+3.150
+79.2
+71.0
+60.0
+220
+4.233
+5.702
+3.031
+77.1
+69.4
+57.0
+240
+4.981
+6.465
+2.920
+74.5
+67.3
+52.8
+Table 16: Widths in MeV and continuous-window probabilities from the stored 0–400 MeV MC
+histograms. “Old” means the existing core-centered ±2.25σnominal window. The last column is
+conditional readout-stage retention, not detector acceptance. Actual observed-bin masks use bin
+centers and can diﬀer slightly from these continuous fractions.
+A ﬁxed-u prescription is a coherent MC-based candidate, but the coeﬃcient must be declared
+as a new choice. It is not a change of units that preserves the old blind region. Nor does a non-
+Gaussian empirical shape inherit a Gaussian containment fraction from its ﬁtted core width. This
+clariﬁcation does not change the primary mask or recompute observed limits and local probabilities.
+Testing a new mask would require the matching GP training exclusion and signal-recovery checks,
+as for the preceding width diagnostics.
+26

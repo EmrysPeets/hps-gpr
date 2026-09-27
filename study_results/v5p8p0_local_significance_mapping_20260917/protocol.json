@@ -1,0 +1,48 @@
+{
+  "version": "5.8.0",
+  "start_utc": "2026-09-17T17:16:59Z",
+  "hard_deadline_utc": "2026-09-17T17:56:00Z",
+  "fit_deadline_utc": "2026-09-17T17:43:00Z",
+  "scope": "Standalone retrospective diagnostic; frozen released scans remain unchanged",
+  "mass_spacing": "Compare nested 1 and 0.5 MeV tested-mass grids; 0.25 MeV stress-region control if within budget. Histogram bins, fit windows and search endpoints are separate choices.",
+  "local_anchors": {
+    "2015": [
+      51,
+      78
+    ],
+    "2016": [
+      42,
+      66,
+      76,
+      90,
+      92,
+      117
+    ],
+    "2021": [
+      71,
+      78,
+      92
+    ]
+  },
+  "anchor_selection": "Inherited stress examples and released local-peak masses; selected retrospectively before new simulations, not independent discovery targets",
+  "new_null_experiments_per_anchor_truth": 1024,
+  "truths": [
+    "archived_stress",
+    "local_GP_control"
+  ],
+  "seed": "SeedSequence([58020260917, year, mass_MeV, truth_index])",
+  "local_ordering": "q0=max(0,r)^2; for positive observed r count r_toy>=r_obs; at nonpositive r observed tail is exactly 1. Nominal asymptotic display convention remains p0=0.5 for nonpositive r.",
+  "local_probability": "Report k/N, add-one (k+1)/(N+1), two-sided 95% Clopper-Pearson intervals, one-sided95 upper bounds at zero; maximum over two specified truths is only a finite-family conditional diagnostic",
+  "kernel_policy": "Reuse fixed reviewed states and update sideband targets/count-dependent errors for each complete spectrum. Half-integer states use declared positive log-linear interpolation.",
+  "resource_policy": "One BLAS thread per process, checkpointed computations; no large bootstrap or rare-tail campaign",
+  "historical_10pct": "Actual saved histogram, parent fitting policy. Selection, luminosity and overlap equivalence remain unverified; scaled stress is a matched-shape diagnostic only.",
+  "claim_boundary": "No validated new particle significance, coverage, or production scan release from a plug-in truth or finer grid alone",
+  "amendments": [
+    {
+      "reason": "Add released 2021 nominal-maximum mass78 for comparison with main upper-limit scan; before new mass78 simulations",
+      "additional_scenarios": 2,
+      "additional_experiments": 2048
+    }
+  ],
+  "holdout_normality": "Split-half standardized KS p values descriptive only, not formal calibration because training moments are estimated."
+}

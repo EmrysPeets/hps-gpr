@@ -1,0 +1,483 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,mathtools,bm}
+\usepackage{booktabs,tabularx,array,longtable}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{placeins}
+\usepackage{microtype}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage{xurl}
+\hypersetup{hidelinks,pdfdisplaydoctitle=true,
+ pdftitle={HPS Gaussian-Process Resonance Search: Signal-Tail Study v5.9},
+ pdfauthor={Emrys Peets},
+ pdfsubject={Observed signal-tail scenarios for full 2015, full 2016 and 2021 10 percent}}
+\urlstyle{same}
+\pagestyle{fancy}
+\fancyhf{}
+\setlength{\headheight}{14pt}
+\fancyhead[L]{\small HPS Gaussian-Process Resonance Search}
+\fancyhead[R]{\small v5.9 / Signal-tail study}
+\fancyfoot[C]{\thepage}
+\fancypagestyle{plain}{\fancyhf{}
+ \fancyhead[L]{\small HPS Gaussian-Process Resonance Search}
+ \fancyhead[R]{\small v5.9 / Signal-tail study}
+ \fancyfoot[C]{\thepage}}
+\setlength{\tabcolsep}{5pt}
+\setlength{\emergencystretch}{2em}
+\renewcommand{\arraystretch}{1.12}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\CLs}{CL$_{\mathrm{s}}$}
+\newcommand{\sig}{\sigma_m}
+\newcommand{\studfig}[4]{\begin{figure}[H]\centering
+ \includegraphics[width=#1\linewidth,height=#2\textheight,keepaspectratio]{#3}
+ \caption{#4}\end{figure}}
+\newcommand{\studtable}[2]{\begin{table}[H]\centering\small
+ \input{#1}\caption{#2}\end{table}}
+\title{HPS Gaussian-Process Resonance Search\\[0.5em]
+ \large Signal-tail study v5.9\\
+ Gaussian cores with broader tails}
+\author{Emrys Peets\\Stanford University and SLAC National Accelerator Laboratory}
+\date{21 September 2026\\\normalsize Standalone study following Analysis Note v5.0.5}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+This study tests symmetric signal shapes with a Gaussian core inside the
+primary $\pm2.25\sig$ blind window and broader tails outside it. The tail
+scale is increased by 10, 20 and 30\% in two specified shape families.
+Observed 90\% \CLs{} limits and fixed-mass, one-sided asymptotic
+background-only probabilities are evaluated for full 2015 over 19--100~MeV,
+full 2016 over 39--180~MeV, and the released 2021 10\% sample over
+50--250~MeV. Each family is compared with a Gaussian under the same
+background and window prescription. The primary calculation retains the
+v5.0.5 window; a separate $\pm4.5\sig$ calculation tests the information
+carried by the outer structure. Detector resolution, prompt-density
+normalization and archived kernel coordinates are held fixed. The results
+retain primary-window maxima at 51, 90 and 78~MeV, respectively. The
+smooth-dilation alternatives increase the median primary limits by
+approximately 0.168, 0.345 and 0.529\%, with nearly unchanged local
+probabilities. These are declared signal-shape scenarios, conditional on the stated choices.
+They do not provide coverage calibration or a new global discovery probability.
+\end{abstract}
+
+\section{Observed comparisons and scope}
+The requested tail changes are implemented outside a fixed Gaussian core.
+They are changes in a tail-scale parameter, rather than a 10--30\% increase
+in the detector resolution or in the total number of signal events. Each
+template is normalized to unit yield over the inherited support, and the
+fitted amplitude denotes that full-template yield.
+
+There are seven shapes in each window: one Gaussian, three smooth tail
+dilations and three tail-curvature variations. The three datasets are
+analyzed separately. No dataset combination or choice among scenarios is
+used to strengthen an observed limit or significance. The complete
+mass-by-mass results accompany the note; the peak tables identify the
+smallest local probability within each stated scan, without assigning a
+probability to the selection of that minimum.
+
+\clearpage
+\subsection{The primary-window results}
+Table~\ref{tab:primary-peaks} records the strongest local excess for every
+primary-window scenario. The Gaussian row is freshly computed with the
+same portable fitting machinery used for all alternatives. For each
+alternative, the coupling and yield limits refer to its
+own full-template normalization, while the local probability tests whether
+a positive signal component improves the fit at that mass.
+
+\input{../derived/results_summary.tex}
+
+\begin{table}[H]\centering\small
+\input{../derived/peak_table.tex}
+\caption{Primary-window scan minima and corresponding observed limits.
+Every probability is local, with the mass and shape fixed. A scan minimum
+does not include a mass or scenario trials correction.}
+\label{tab:primary-peaks}
+\end{table}
+
+\clearpage
+\section{Signal shapes and normalization}
+Let $z=|m-m_0|/\sig$, $a=2.25$ and $t=z-a$. The nominal resolution
+$\sig=\sig(m_0)$ is inherited from v5.0.5. All shapes have the
+unnormalized core
+\begin{equation}
+ f(z)=\exp(-z^2/2),\qquad 0\leq z\leq a.
+\end{equation}
+For $z>a$, the primary family stretches the tail coordinate smoothly:
+\begin{align}
+ u_k(z)&=a+\frac{t}{1+(k-1)[1-\exp(-t/h)]},\qquad h=0.5,\\
+ f_{\mathrm{dil},k}(z)&=\exp[-u_k(z)^2/2],
+ \qquad k\in\{1.1,1.2,1.3\}.
+ \label{eq:dilation}
+\end{align}
+The coordinate and first derivative match the Gaussian at $z=a$;
+far into the tail, the distance from the boundary is stretched by $k$.
+The secondary family instead changes the tail curvature:
+\begin{equation}
+ f_{\mathrm{curv},k}(z)=
+ \exp\!\left[-\frac{a^2}{2}-at-\frac{t^2}{2k^2}\right],
+ \qquad z>a.
+ \label{eq:curvature}
+\end{equation}
+It also matches the core value and slope at the boundary. The two
+families test different continuations of the same core; their common $k$
+does not imply equal tail fractions or equal root-mean-square widths.
+Both reduce exactly to the Gaussian at $k=1$.
+
+\studfig{0.98}{0.34}{../figures/shapes_note.pdf}{Smooth-dilation signal
+shapes and the 30\% curvature control in units of the nominal mass
+resolution. The left panel shows full-line-normalized densities and the
+right shows their ratios to the Gaussian. Changes to the unnormalized
+shape begin at the primary blind-window boundary.}
+
+Core-only bins differ solely by normalization, leaving their unrestricted
+likelihood ratio and $p_0$ invariant. The actual center-selected bins can
+straddle $\pm2.25\sig$; their integrated tails break this proportionality
+and can produce small primary-probability changes. The guard calculation
+explicitly tests outer bins.
+
+\clearpage
+\subsection{Bin integration and the full-template yield}
+For support $\mathcal D_d$ and analysis bin $B_i$ in dataset $d$, the
+template probability is
+\begin{equation}
+ T_{di}^{(s)}(m_0)=
+ \frac{\displaystyle\int_{B_i}f_s(|m-m_0|/\sig)\,dm}
+ {\displaystyle\int_{\mathcal D_d}f_s(|m-m_0|/\sig)\,dm},
+ \qquad \sum_{i\in\mathcal D_d}T_{di}^{(s)}=1.
+ \label{eq:bin-template}
+\end{equation}
+The integrated bin probabilities are retained when a fit window is
+selected. They are never renormalized inside that window. If
+$F_{d,s,W}=\sum_{i\in W}T_{di}^{(s)}$, the fitted-window yield at the
+upper limit is $A_{90}F_{d,s,W}$, while $A_{90}$ itself denotes the
+full-template yield. The normalization in Eq.~\eqref{eq:bin-template}
+also accounts for the finite support near its endpoints.
+
+\studtable{../derived/shape_table.tex}{Numerical shape properties for
+the declared tail prescriptions, evaluated on the full line. The core
+upper-limit ratio is the ideal proportional-core normalization ratio.
+Actual fitted templates use the finite support in
+Eq.~\eqref{eq:bin-template}.}
+
+The prompt-density normalization uses the same nominal resolution for
+every shape:
+\begin{equation}
+ \rho_d(m_0)=\frac{1}{3.28\sig}
+ \int_{m_0-1.64\sig}^{m_0+1.64\sig}\frac{dN_d}{dm}\,dm,
+ \qquad
+ K_d(m_0)=\frac{3\pi m_0 f_{\mathrm{rad},d}^{\mathrm{eff}}}
+ {2\alpha}\,\rho_d(m_0).
+ \label{eq:conversion}
+\end{equation}
+The integral uses fractional overlaps with the native histogram bins.
+The electron-channel coupling coordinate satisfies $A=K_d\eps^2$.
+Holding $K_d$ fixed isolates the specified shape change; this study does
+not infer a new efficiency or acceptance from the broader tails.
+
+Above the dimuon threshold, the inherited minimal-visible coupling
+correction is applied once:
+\begin{equation}
+ (\eps^2_{90})_{\mathrm{minimal}}=\frac{A_{90}}{K_d}\,c_\mu(m_0),
+ \quad c_\mu(m_0)=
+ \begin{cases}
+ 1,&m_0\leq2m_\mu,\\
+ 1+\sqrt{1-4r_\mu}(1+2r_\mu),&m_0>2m_\mu,
+ \end{cases}
+ \quad r_\mu=(m_\mu/m_0)^2.
+\end{equation}
+This conversion changes neither the visible signal-yield limit nor $p_0$.
+In the numerical ledger, \texttt{A90} is the solver coordinate
+$\eps^2/(10^{-8})$, whereas \texttt{full\_yield\_90} is the event yield
+denoted $A_{90}$ in this note; \texttt{derived/COLUMN\_GUIDE.md} defines
+the columns and conversions.
+
+\clearpage
+\section{Primary-window observed scans}
+\subsection{Full 2015: 19--100 MeV}
+The 2015 scan retains the 14--135~MeV support and 0.25~MeV analysis bins.
+The 91--100~MeV extension follows the v5.0.5 endpoint prescription:
+kernel coordinates are fixed at their archived 90~MeV values, while the
+resolution, mask, template and density are evaluated at the actual mass.
+The extrapolated interval keeps its conditional status.
+
+\studfig{0.98}{0.69}{../figures/primary_2015.pdf}{Observed 2015
+primary-window Gaussian and smooth-dilation scenarios. The coupling
+conversion refers to the complete normalized template; the likelihood uses the selected
+$\pm2.25\sig$ bins. Limits are pointwise asymptotic 90\% \CLs{} limits
+and probabilities are fixed-mass local references.}
+
+\clearpage
+\subsection{Full 2016: 39--180 MeV}
+The 2016 scan uses the frozen 30--210~MeV support and 0.25~MeV analysis
+bins. Every shape at a mass uses the same archived kernel coordinates
+and the same background constraint for this window. Thus the
+within-window comparison changes the signal template without selecting
+a new background fit from the resulting limit or probability.
+
+The v5.0.5 note documents differences in independent 2016
+hyperparameter fits. Reusing its archived states makes this calculation
+reproducible under that prescription; it does not settle the separate
+fit-provenance or background-calibration questions.
+
+\studfig{0.98}{0.65}{../figures/primary_2016.pdf}{Observed 2016
+primary-window Gaussian and smooth-dilation results. The same frozen-state qualification applies to
+the Gaussian and every tail alternative. Probability differences should
+be interpreted together with the small boundary-bin contributions and
+the explicitly broader calculation below.}
+
+\clearpage
+\subsection{Released 2021 10\%: 50--250 MeV}
+The 2021 scan uses the native 10\% sample with the inherited
+36--300~MeV support prescription. Rebinning leaves the final complete
+analysis-bin edge at 299.75~MeV; the analysis-bin width is 0.625~MeV.
+The larger bin width makes the distinction between a continuous mask
+boundary and a full selected bin particularly relevant to the core-only
+comparison.
+
+\studfig{0.98}{0.69}{../figures/primary_2021.pdf}{Observed 2021 10\%
+primary-window Gaussian and smooth-dilation results. Above $2m_\mu$, the plotted coupling includes the
+inherited branching correction once. Neither the visible yield nor the
+local probability receives this correction.}
+
+\clearpage
+\section{Outer structure in a wider fit region}
+The guard calculation expands both the fitted region and the training
+exclusion to $\pm4.5\sig$. Its GP is conditioned only on bins outside
+that wider mask, using the same archived kernel coordinates. The
+prediction and covariance are recomputed for the widened region. Every
+observed bin in that region enters the likelihood once.
+
+The primary scans contain all 425 requested dataset--mass coordinates.
+The guard scan contains 420: the five 2016 hypotheses at 176--180~MeV
+do not retain the required external sidebands under the wider mask and
+are excluded by the geometric rule. Its 2016 domain is consequently
+39--175~MeV. The 2015 and 2021 guard domains retain their full primary
+ranges. Across seven shapes and both windows, 5,915 observed fits are
+reported; omitted guard endpoints are not interpolated or filled from the
+primary calculation.
+
+This is a separate background-interpolation and extraction prescription.
+The meaningful shape comparison is therefore the tail scenario divided
+by, or compared with, the Gaussian \emph{in the same guard window}.
+Comparing a guard tail fit directly with a primary Gaussian would mix
+the tail change with the window and background change. The wider window
+has not undergone an independent support or coverage qualification.
+
+\begin{table}[H]\centering\small
+\input{../derived/guard_peak_table.tex}
+\caption{Guard-window scan minima and their corresponding observed
+limits. These rows are separate fixed-shape local calculations, with a
+Gaussian guard-window reference.}
+\label{tab:guard-peaks}
+\end{table}
+
+\clearpage
+\subsection{Guard-window 2015 comparison}
+Widening the excluded region removes sideband information and adds
+explicit tail-sensitive bins to the likelihood. Both effects are included
+in the Gaussian guard reference. Near a support edge, the available
+external sidebands need not be symmetric; the fixed support and actual
+bin selection remain part of the definition.
+
+\studfig{0.98}{0.72}{../figures/guard_2015.pdf}{Observed 2015
+$\pm4.5\sig$ fits with external GP training. The 91--100~MeV endpoint
+prescription is retained. Tail effects are assessed relative to the
+Gaussian fitted with this same wider mask.}
+
+\clearpage
+\subsection{Guard-window 2016 comparison}
+Broader fitted structure can overlap background directions permitted by
+the correlated GP constraint. The profiled likelihood accounts for that
+overlap through its nuisance parameters. An observed change in $p_0$ or
+the upper limit consequently measures the response of the complete
+specified fit, rather than a direct measurement of the detector's signal
+tail.
+
+\studfig{0.98}{0.72}{../figures/guard_2016.pdf}{Observed 2016
+$\pm4.5\sig$ fits over 39--175~MeV. The final five primary-scan masses
+fail the external-sideband geometric requirement for this wider mask.
+The GP mean and covariance are held fixed across
+signal hypotheses within each mass and window; nuisance shifts are
+profiled at every tested amplitude. The archived 2016 state qualification
+remains in force.}
+
+\clearpage
+\subsection{Guard-window 2021 comparison}
+The 2021 guard scan retains the original 10\% exposure and normalization.
+It is not an exposure projection. Its broader likelihood region tests
+whether the declared outer template changes the pointwise inference
+when those bins are used explicitly.
+
+\studfig{0.98}{0.72}{../figures/guard_2021.pdf}{Observed 2021 10\%
+$\pm4.5\sig$ fits. Each alternative is compared with the Gaussian under
+the same support, external training set and fit window.}
+
+\clearpage
+\section{Size and location of the response}
+The ratios below compare each alternative with the Gaussian from the
+same dataset, mass and window. They quantify changes in the reported
+observed limit, not expected sensitivity. The collection of scenarios
+is not a confidence band or a nuisance-profiled uncertainty interval.
+
+\begin{table}[H]\centering\footnotesize
+\renewcommand{\arraystretch}{0.98}
+\input{../derived/ratio_table.tex}
+\caption{Observed percent limit changes relative to the Gaussian in the
+same window. Positive values denote larger upper limits.}
+\end{table}
+
+\studfig{0.98}{0.34}{../figures/structure_response.pdf}{Response of the
+observed inference at the largest declared tail change, $k=1.3$:
+percent changes in the limit and changes in the signed likelihood root
+are compared with the Gaussian at each mass. Both tail families are
+shown, and primary and guard results retain their separate Gaussian
+references. Features in a mass scan reuse sideband information and
+should not be counted as independent evidence.}
+
+\clearpage
+\section{Signal in the GP training region}
+Signal tails can enter bins used for background-only GP training.
+Changing the local signal template does not correct that contamination.
+A wider mask can reduce the training contribution, while also removing
+background information.
+
+The diagnostic uses anchors 51 and 92~MeV in 2015, 90 and 92~MeV in
+2016, and 78 and 92~MeV in 2021. At each anchor the full injected yield
+is fixed to the Gaussian primary observed $A_{90}$, retaining the nominal
+conversion. Each window has its own smooth source $n_0$, the full-support
+GP prediction from the observed external bins. Reconditioning on the
+external bins of $n_0$ gives $b_0,C_0$. The deterministic fitted-bin
+expectation is then $n=b_0+A_{\rm true}T_{\rm truth}$.
+
+The clean-training branch fits this expectation with $b_0,C_0$. The
+contaminated-training branch adds the same full signal to $n_0$ before
+reconditioning, obtains $b_1,C_1$, and fits exactly the same fitted-bin
+expectation. Both branches are evaluated with the matching signal
+template and with a Gaussian extraction template. Comparing
+$\widehat A/A_{\rm true}$ isolates the declared training response and
+template mismatch. Clean matched recovery equals one by construction:
+centering on $b_0$ makes this a numerical identity, not an independent
+background or injection-closure test. Primary and guard sources are
+constructed separately, so their difference also changes the reference
+continuum; it is not a comparison of windows under one common truth.
+
+\studfig{0.98}{0.42}{../figures/leakage.pdf}{Deterministic signal-leakage
+diagnostic: recovered yield divided by injected yield for contaminated
+training with matched Gaussian or smooth-dilation extraction. The
+horizontal line marks unit recovery. Clean-training, Gaussian-mismatch
+and curvature controls are retained in the numerical ledger. The
+injected yield is the Gaussian primary observed $A_{90}$ at each anchor.}
+
+No random sampling or coverage test is performed. These conditional
+responses do not establish that an observed structure arose from signal
+leakage or that an alternative template is the true detector response.
+
+\clearpage
+\section{Likelihood and probability construction}
+For one dataset, mass, window and shape, the observed expectation is
+\begin{equation}
+ \lambda_i=b_i+(L\bm\theta)_i+A T_i,\qquad LL^T=C,
+\end{equation}
+with profiled negative log likelihood, up to a data-only constant,
+\begin{equation}
+ \ell(A,\bm\theta)=
+ \sum_i\left[\lambda_i-n_i+n_i\log\frac{n_i}{\lambda_i}\right]
+ +\frac12\bm\theta^T\bm\theta.
+ \label{eq:nll}
+\end{equation}
+The zero-count contribution is $\lambda_i$. The GP count mean $b$ and
+covariance $C$ are determined by the external sidebands. Poisson
+expectations are constrained to remain physical. The same $b,C,T$ enter
+the null, unrestricted and tested-amplitude fits at a fixed coordinate.
+The unrestricted amplitude may be negative, enabling a signed diagnostic;
+the physical signal strength for limits is nonnegative.
+
+Writing $\widehat A$ for the unrestricted best fit, define
+\begin{align}
+ r&=\operatorname{sign}(\widehat A)
+ \sqrt{2[\ell(0,\widehat{\bm\theta}_0)
+               -\ell(\widehat A,\widehat{\bm\theta})]},\\
+ Z_0&=\max(r,0),\qquad p_0=\Phi(-Z_0).
+\end{align}
+Thus a deficit has $Z_0=0$ and $p_0=0.5$ by the inherited one-sided
+reference convention. This is distinct from the signed diagnostic
+$p_{\mathrm{signed}}=\Phi(-r)$.
+
+For a tested $A\geq0$, the bounded upper-limit statistic is zero if
+$A<\widehat A$. Otherwise its denominator uses the unrestricted fit
+when $\widehat A\geq0$ and the null fit when $\widehat A<0$.
+Let $q$ be that observed statistic and $q_{\mathrm A}$ the explicitly
+profiled background-Asimov statistic at the same tested amplitude.
+With $a_{\mathrm A}=\sqrt{q_{\mathrm A}}$, the asymptotic tails are
+\begin{equation}
+ (z_{s+b},z_b)=
+ \begin{cases}
+ (\sqrt q,\sqrt q-a_{\mathrm A}),&q\leq q_{\mathrm A},\\[2pt]
+ \left(\dfrac{q+q_{\mathrm A}}{2a_{\mathrm A}},
+       \dfrac{q-q_{\mathrm A}}{2a_{\mathrm A}}\right),&q>q_{\mathrm A},
+ \end{cases}
+ \qquad
+ CL_s(A)=\frac{\Phi(-z_{s+b})}{\Phi(-z_b)}.
+\end{equation}
+The $q=0$ inclusive-tail convention gives $CL_s=1$. The observed
+upper limit solves $CL_s(A_{90})=0.10$. Both likelihood ratios are
+profiled explicitly; their sampling tails use the asymptotic
+approximation~\cite{Cowan2011}. No Gaussian error-bar substitution is
+used for the observed upper limit.
+
+\clearpage
+\section{Input provenance, checks and interpretation}
+The portable spectra and fitting machinery come from Analysis Note
+v5.0.5~\cite{HPSv505}. Native counts, bin edges, resolution, normalization
+and archived GP states are preserved, with original ROOT identities in
+the export provenance and exact copied-file hashes in the study manifest.
+
+The Gaussian comparison is recomputed rather than copied from the
+historical results table. Its primary peak significances are 3.139237,
+3.424752 and 2.808645 for 2015, 2016 and 2021, compared with the
+published-note values 3.139465, 3.423687 and 2.810290. Across the full
+primary scans the largest difference from the inherited table is
+$|\Delta Z|=0.12366$, at 83~MeV in 2016; the largest relative limit
+difference is about 1.14\%. At 2016/83~MeV the legacy L-BFGS null fit
+stopped on relative objective change with maximum gradient about 0.116;
+its $Z_0=0.24369$ becomes 0.12003 in the converged fit. Holding the
+background, covariance and template fixed reproduces this difference;
+the covariance-factor choice changes the converged limit by less than
+$6\times10^{-12}$ relative. This numerical issue is distinct from the
+2016 kernel-fit caveat. All tail comparisons use the newly converged
+Gaussian with identical settings.
+
+The RBF kernel acts in log mass with the inherited log-count noise
+prescription. Its coordinates remain fixed across shapes. Effective
+radiative fractions are 0.07905, 0.04650 and 0.04770 for the three
+datasets, including the inherited penalties. No setting is selected by
+an observed limit or probability.
+
+\studtable{../derived/qa_table.tex}{Recorded numerical and artifact
+checks. Passing these checks establishes the stated numerical
+calculation; it does not establish frequentist coverage or the physical
+correctness of a chosen tail model.}
+
+Choosing a preferred shape requires an independent detector-response
+model or a calibrated selection procedure. These scenario comparisons
+supply no new expected bands, coherent scan calibration, look-elsewhere
+correction or global probability.
+
+\begin{thebibliography}{9}
+\bibitem{HPSv505}
+E.~Peets, M.~Gignac and E.~Hsu,
+\emph{HPS Gaussian-Process Resonance Search: Analysis Note v5.0.5},
+16 September 2026, internal review draft and archived source package.
+\bibitem{Cowan2011}
+G.~Cowan, K.~Cranmer, E.~Gross and O.~Vitells,
+``Asymptotic formulae for likelihood-based tests of new physics,''
+Eur. Phys. J. C \textbf{71}, 1554 (2011),
+\href{https://arxiv.org/abs/1007.1727}{arXiv:1007.1727}.
+\end{thebibliography}
+\end{document}

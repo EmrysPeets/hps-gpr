@@ -1,0 +1,465 @@
+HPS Gaussian-Process Resonance Search v5.8.5 / Review Draft
+HPS Gaussian-Process Resonance Search
+Common-mass likelihood and mass-coherence study
+Analysis Note v5.8.5
+Emrys Peets
+Stanford University and SLAC National Accelerator Laboratory
+19 September 2026
+Abstract
+We examine the structure near 92 MeV in the HPS 2015, 2016, and 2021 (10%) samples
+using a common-mass resonance likelihood with independent nonnegative signal amplitudes.
+The scan covers 19–250 MeV in 1 MeV steps, with each dataset included within its declared
+support. For the nominal blind half-width of 2. 25σm, the combined maximum occurs at 92
+MeV. The conditional Gaussian-response calibration gives local and full-domain signiﬁcances of
+3. 583 and 2. 060, respectively. Seven of 256 direct Poisson scans exceed the observed maximum,
+giving a 95% probability interval of [0. 0111, 0. 0555]. Across four blind widths, the combined
+maximum remains at 91–92 MeV. Individual peak stability is less uniform: the 2021 diagnostic
+maximum switches from 93 MeV to a competing excursion at 80 MeV. A toy-calibrated mass-
+coherence statistic gives p = 0. 763, showing no unusual clustering under the speciﬁed null. These
+probabilities condition on the pinned GP background source and exclude corrections for choices
+made after inspecting the data.
+1 Introduction
+This continuation tests a resonance at one common mass with independent nonnegative signal am-
+plitudes in the 2015, 2016 and 2021 (10%) samples. It reuses the pinned v5.8.4 spectra, likelihoods,
+background sources, response derivatives and 256 complete Poisson scans. The full search remains
+the integer grid 19–250 MeV, with each dataset included only on its inherited support.
+Method Peak [MeV] Local Z Global p Global Z Direct k/N
+Shared coupling 66 2.83 0.2085 0.81 41/256
+Fisher 92 3.72 0.0113 2.28 4/256
+signed Stouﬀer 92 3.93 0.0049 2.58 1/256
+Free amplitudes 92 3.58 0.0197 2.06 7/256
+Table 1: Full-domain peaks at ±2. 25σm. Local and global Z use the conditional Gaussian-response model.
+Direct counts use the same 256 full Poisson realizations. Old methods are unchanged v5.8.4 results; the new
+test has its own calibrated null distribution.
+1
+
+HPS Gaussian-Process Resonance Search v5.8.5 / Review Draft
+0.0
+0.5
+1.0
+1.5
+2.0
+2.5
+3.0
+3.5
+4.0Local Z
+Free amplitudes
+Shared coupling
+Fisher
+Signed Stouffer
+50 100 150 200 250
+T ested mass [MeV]
+10−3
+10−2
+10−1
+100
+Full-domain p
+Figure 1: Baseline ±2. 25σm comparison: local signiﬁcance and probability for an equally strong score
+anywhere on the full 19–250 MeV grid. Curves use conditional Gaussian-response calibration; Table 1 retains
+the direct Poisson count for the new test. Shading marks the post-hoc 80–105 MeV diagnostic interval. Each
+method uses its own declared ordering and null maxima.
+2 Local and domain-global probabilities
+At a mass ﬁxed independently of the data, the local probability is
+ploc(m) = Pr
+0
+{T (m) ≥ Tobs(m)}, Z loc(m) = Φ − 1[1 − ploc(m)], (1)
+where larger T is more signal-like and the probability includes equality. This inclusive convention
+matters when a nonnegative ﬁtted amplitude gives a point mass at T = 0: its inclusive tail is one.
+A displayed nonnegative Z is a plotting convention; the probability remains the primary quantity.
+The common-mass alternative has one amplitude for each active dataset, so √ qR is not generally
+its local signiﬁcance. Its null distribution must be calibrated with the appropriate boundary and
+active dataset count.
+For a declared mass grid G and a declared local ordering S(m), the scan statistic and its
+domain-global probability are
+M = max
+m∈G
+S(m), p G = Pr
+0
+{M ≥ Mobs}. (2)
+2
+
+HPS Gaussian-Process Resonance Search v5.8.5 / Review Draft
+For example, S = − log ploc compares locally calibrated evidence across masses; S = qR deﬁnes
+a diﬀerent valid scan test. The observed maximum and every null maximum must use the same
+ordering. A full-spectrum toy supplies the entire correlated curve, rather than independent random
+ﬂuctuations at each mass. This accounts for the look-elsewhere eﬀect within that grid. See Gross
+and Vitells for scan inference and Ananiev and Read for correlated Gaussian signiﬁcance-ﬁeld
+approximations.
+Here the inherited full combined grid is 19, 20, . . . , 250 MeV. The active supports are 19–100
+MeV (2015), 39–180 MeV (2016), and 50–250 MeV (2021, 10%); only 50–100 MeV contains all
+three datasets. “Common mass” ties the mass of the active components and does not extend an
+experiment’s support. Adding sites to a domain cannot reduce its null exceedance probability at
+a ﬁxed threshold . Comparisons of observed maxima can also change the threshold. The number
+of grid points is not the number of independent trials: nearby masses share events, background
+ﬁts, and signal templates. Finer sampling resolves maxima until grid convergence; a 1-MeV-grid
+calibration is not, by itself, a continuous-mass calibration.
+The 80–105 MeV interval was chosen after inspection and is used only to describe the reported
+structure. Its 2015 interval ends at 100 MeV. Calibrating a statistic restricted to this interval an-
+swers a conditional diagnostic question; it does not replace the full-domain discovery test or correct
+the choice of this interval. Likewise, four width-speciﬁc global probabilities are four conditional
+results, not a selection-corrected claim based on the most favorable width. Such a claim would
+require repeating the entire width/method/domain selection in joint null realizations. Reusing the
+same ﬂuctuations across widths preserves their strong dependence.
+All probabilities here condition on the pinned observed-data-derived GP source, its kernel policy,
+and the stated likelihood construction. Direct Poisson scans repeat the local ﬁts; Gaussian response
+ﬁelds approximate their ﬂuctuations. Neither propagates uncertainty in choosing or estimating
+the source itself. Exact likelihood factorization therefore does not imply unconditional physical-
+discovery calibration. Boundary asymptotics are reviewed by Cowan et al. ; sparse toy tails here
+are reported with exceedance counts and binomial bounds.
+3 Common-mass likelihood
+For independent datasets, at ﬁxed mass and width,
+L(µ, θ; m, w ) =
+∏
+d∈A(m)
+Ld(µd, θ d; m, w ), µ d ≥ 0.
+Each local likelihood is the archived Poisson model with correlated Gaussian GP-background con-
+straint. Its expected bin counts have the form λd = bd + Ldθd + AdSd and penalty θT
+d θd/ 2. The
+engine uses the original template normalization Ad, with ﬁtted-window yield µd = Ad
+∑
+i Sdi. This
+is a one-to-one amplitude reparameterization. Here Ld in the count equation is the covariance
+factor, distinct from the likelihood symbol. The local background prediction and covariance are
+conditioned on the sidebands of each observed or toy spectrum. The full generating source is ﬁxed.
+qR(m; w) = 2
+[∑
+d
+NLLd(0, ˆθd,0) −
+∑
+d
+NLLd(ˆµ+
+d , ˆθd)
+]
+=
+∑
+d∈A(m)
+[max(rd(m; w), 0)]2.
+The archived signed root rd uses the unconstrained single-amplitude ﬁt and the zero-amplitude pro-
+ﬁle. Convexity and factorization make the clipped-root identity exact for this likelihood, including
+boundary ﬁts. This is a direct likelihood construction; Fisher or Stouﬀer p-values do not enter qR.
+3
+
+HPS Gaussian-Process Resonance Search v5.8.5 / Review Draft
+Independent amplitudes impose no common coupling or calibrated relative yield. They also allow
+one or two amplitudes to vanish, so rejection of the all-zero null does not establish a signal in every
+dataset.
+The exact likelihood statistic must be distinguished from its sampling calibration. For the
+conditional response approximation,
+r∗
+d(m, w ) = ad(m, w ) + DT
+d,m,wξd, ξ d ∼ N (0, I ), s 2
+d = DT
+d,m,wDd,m,w.
+Diﬀerent datasets ﬂuctuate independently. Within each dataset the same latent ﬂuctuation drives
+the entire mass scan. The probability of qR = 0 is ∏
+d∈A(m) Φ[ −ad(m, w )/s d(m, w )]; its inclusive
+tail is one. The local tail of the sum of clipped squared normals is integrated over all nonempty
+positive-amplitude subsets with deterministic polar quadrature. At ad = 0 , s d = 1 it reduces to
+the independent-boundary mixture 2− k ∑ k
+j=1
+( k
+j
+)
+Pr(χ2
+j ≥ q) for q > 0, not a single χ2
+k tail. Actual
+mass-dependent ad, s d are retained. Monotone lookup tables accelerate the scans. The declared
+ordering is SR(m) = − log pR(m).
+The 256 stored Poisson realizations give an additional direct local and global calibration of this
+ordering, using the exact proﬁle roots at every mass. At 92 MeV none exceeds the observed local
+statistic for any width; the one-sided 95% upper bound is p < 0. 01163, which cannot resolve the
+response-model estimate near 3. 6σ. Zero counts are never presented as zero probability. Point
+estimates elsewhere use (k + 1)/ (N + 1); two-sided 95% intervals are Clopper–Pearson. A separate
+100,000-draw response ensemble preserves mass and width correlations through the joint derivative
+covariance.
+50 100 150 200 250
+T ested mass [MeV]
+0.0
+2.5
+5.0
+7.5
+10.0
+12.5
+15.0
+17.5
+20.0Exact profiled qR
+±2.25σm
+±2.4σm
+±2.5σm
+±2.6σm
+80 85 90 95 100 105
+T ested mass [MeV]
+0.0
+2.5
+5.0
+7.5
+10.0
+12.5
+15.0
+17.5
+20.0
+Figure 2: The exact observed proﬁle statistic qR for all four widths. Left: full domain, including changes in
+active datasets. Right: diagnostic interval. The global ordering uses calibrated − log pR, whose maximum
+can diﬀer from the maximum of raw qR. Neither ordinate is replaced by √ qR as a signiﬁcance.
+4 Results of the combined search
+At 92 MeV, qR = 17 . 307–18.077, local Z = 3 . 510–3.610, and full-domain Gaussian-response
+Z = 1 . 949–2.104. At each width’s selected peak, the direct global plus-one probabilities are
+0.0311, 0.0350, 0.0272, 0.0272, corresponding to Z values 1.864, 1.812, 1.923, 1.923. Their in-
+tervals are much wider than the 100,000-ﬁeld Monte Carlo errors. The new test is less signiﬁcant
+than signed Stouﬀer: it tests a broader alternative with separately nonnegative amplitudes, and its
+4
+
+HPS Gaussian-Process Resonance Search v5.8.5 / Review Draft
+w Peak [MeV] Local Z Z (92) Global Z k/ 256 Direct global p: 95% CI
+2.25 92 3.583 3.583 2.060 7 [0.0111, 0.0555]
+2.4 91 3.518 3.510 1.960 8 [0.0136, 0.0606]
+2.5 92 3.551 3.551 2.017 6 [0.0086, 0.0503]
+2.6 92 3.610 3.610 2.104 6 [0.0086, 0.0503]
+Table 2: Free-amplitude peaks selected by maximum − log pR on the full grid. The direct count column
+gives k out of 256. Signiﬁcance columns are Gaussian-response estimates. Raw qR instead has its maximum
+at 91 MeV for all four widths.
+0.0
+0.5
+1.0
+1.5
+2.0
+2.5
+3.0
+3.5Free-amplitude local Z
+±2.25σm ±2.4σm ±2.5σm ±2.6σm
+80 85 90 95 100 105
+T ested mass [MeV]
+10−1
+100
+Full-domain p
+Figure 3: Free-amplitude local signiﬁcance and full-domain probability, shown near the inspected structure.
+Every global probability in this zoom still uses the complete 19–250 MeV scan. Gaussian-response estimates
+are accompanied by direct Poisson counts and intervals in Table 2 and the numerical ledger. The four curves
+reuse the same observations and are not four independent conﬁrmations.
+own boundary-aware local calibration. The same width controls both the bins excluded from GP
+conditioning and the ﬁtted likelihood window. Signal templates retain their original normalization.
+These are ﬁxed-kernel window comparisons; no width has been adopted by choosing its largest
+observed signiﬁcance. The displayed mass-global probabilities do not correct the post-observation
+comparison of widths or methods.
+5
+
+HPS Gaussian-Process Resonance Search v5.8.5 / Review Draft
+−2
+−1
+0
+1
+2
+Signed reference Z
+ Outside
+support
+2015
+±2.25σm ±2.4σm ±2.5σm ±2.6σm
+−2
+0
+2
+Signed reference Z
+2016
+80 85 90 95 100 105
+T ested mass [MeV]
+−2
+−1
+0
+1
+Signed reference Z
+2021 (10% sample)
+Figure 4: All twelve signed reference-score curves Zd,w(m) = ( rd,w− ad,w)/s d,w in the post-hoc diagnostic
+interval. Dots mark the 1 MeV grid; the dotted vertical line is 92 MeV. Gray space beyond 100 MeV in the
+2015 panel is outside its support. Signed scores retain deﬁcits, unlike nonnegative signiﬁcance displays.
+Dataset 2. 25 2 . 4 2 . 5 2 . 6 σ(92) ∆ m R
+2015 92 93 93 93 4.804 1 0.208
+2016 91 91 91 91 3.788 0 0.000
+2021 93 93 80 80 2.449 13 5.309
+Table 3: Diagnostic-region signed-score argmax masses [MeV] at each half-width; resolution and range are
+also in MeV. ∆ m = max w ˆm − minw ˆm and R = ∆ m/σ (92). The region is 80–105 MeV, clipped to 80–100
+for 2015. All selected observed peaks also pass the positive-raw-ﬁt gate used by the coherence test.
+6
+
+HPS Gaussian-Process Resonance Search v5.8.5 / Review Draft
+5 Mass stability across blind widths
+The 2015 and 2016 maxima remain within one grid bin across width. In 2021 the ﬁrst two widths
+have almost tied excursions at 80 and 93 MeV: at w = 2 . 25, their signed scores are 1.6216 and
+1.6228. At w = 2. 5 they are 1.7332 and 1.6194. Thus the 13 MeV range is an argmax rank switch
+involving the lower diagnostic boundary, not evidence that a tracked resonance shifts by 13 MeV.
+The response at 92 MeV remains positive but modest.
+5.1 Individual amplitudes at 92 MeV
+80 82 84 86 88 90 92 94 96 98 100 102 104
+T ested mass [MeV]
+2015  |  2.25σm
+2015  |  2.4σm
+2015  |  2.5σm
+2015  |  2.6σm
+2016  |  2.25σm
+2016  |  2.4σm
+2016  |  2.5σm
+2016  |  2.6σm
+2021  |  2.25σm
+2021  |  2.4σm
+2021  |  2.5σm
+2021  |  2.6σm
+ −3
+−2
+−1
+0
+1
+2
+3
+Signed reference Z
+Figure 5: Signed-score stability matrix: rows are dataset and half-width, columns are tested masses. The
+gray cells are unavailable 2015 masses. This is a post-hoc diagnostic display, with one common color scale;
+it is not a reduced discovery search.
+Here ˆµ+
+d is the independent nonnegative signal amplitude expressed as ﬁtted signal events in
+that width’s likelihood window. These are conditional ﬁtted yields; they are not eﬃciency-corrected
+rates. The full-template yield and the original amplitude parameter Ad are also saved in the ledger.
+In that parameterization Ad = ϵ2
+d/ 10− 8, used here simply as an independent template normalization
+for each dataset. All twelve 92 MeV ﬁtted amplitudes are positive. Their local reference Z values
+alone do not demonstrate equal peak locations or a common physical coupling.
+7
+
+HPS Gaussian-Process Resonance Search v5.8.5 / Review Draft
+Dataset w Signed Z(92) Local p(92) ˆµ+
+d [events] ˆAd
+2015 2.25 2.594 0.0047 1 147 7748.35
+2015 2.4 2.594 0.0047 1 173 7857.10
+2015 2.5 2.596 0.0047 1 188 7922.75
+2015 2.6 2.691 0.0036 1 233 8196.43
+2016 2.25 2.796 0.0026 16 252 913.25
+2016 2.4 2.726 0.0032 16 182 902.53
+2016 2.5 2.778 0.0027 16 662 924.29
+2016 2.6 2.770 0.0028 16 703 924.58
+2021 2.25 1.423 0.0774 7 585 165.47
+2021 2.4 1.363 0.0864 7 436 159.77
+2021 2.5 1.363 0.0864 7 436 159.77
+2021 2.6 1.378 0.0841 7 650 163.06
+Table 4: Conditional single-dataset local responses and ﬁtted amplitudes at the inspected mass 92 MeV.
+Local tails use the source-standardized response model. The event yield is integrated over the actual ﬁtted
+window; changing the window changes its contained fraction.
+6 Null distribution of the coherence statistic
+For comparison on identical support, the coherence statistic uses the post-hoc common interval
+80–100 MeV. In each dataset and width, select the maximum signed reference score among sites
+with a positive raw ﬁt. Exact ties choose the lower mass. If any dataset–width has no positive site,
+its complete diagnostic is assigned T = W = +∞ and cannot count as coherent.
+¯m =
+∑
+d,w ˆmd,w/σ 2
+d(92)
+∑
+d,w1/σ 2
+d(92) , T = 1
+12
+∑
+d,w
+[ˆmd,w− ¯m
+σd(92)
+]2
+, W = 1
+3
+∑
+d
+R2
+d.
+Small T describes peaks clustered at one mass across both datasets and widths. W separately
+describes stability across width. The detector resolutions supply a dimensionless comparison scale;
+they are not claimed to be peak-estimator standard errors. These deﬁnitions were ﬁxed in the
+continuation before extracting its observed peak table, but the region and scientiﬁc question arose
+after inspection. Their lower-tail probabilities are exploratory null diagnostics, not discovery signif-
+icances, and are not multiplied together. Under the pinned null, 195 of 256 exact scans are at least
+Statistic Observed Direct k/N Direct p Direct 95% interval Gaussian p
+T 2.9793 195/256 0.7626 [0.7047, 0.8126] 0.7387
+W 9.4102 253/256 0.9883 [0.9661, 0.9976] 0.9858
+Table 5: Inclusive lower-tail probabilities. T is the primary coherence diagnostic; W is a separate width-
+stability diagnostic. The region and statistics have not received a selection correction.
+as tightly clustered as the observed twelve peaks. This is not unusually coherent. Likewise, 253 of
+256 have width ranges at least as small. The Gaussian estimates agree within the direct intervals;
+increasing Gaussian statistics cannot remove source-model uncertainty. The paired Gaussian en-
+semble contains 63 ineligible scans, all retained in the denominator as noncoherent. No diagnostic
+tail is used to select a new mass region or nominal width.
+8
+
+HPS Gaussian-Process Resonance Search v5.8.5 / Review Draft
+0 1 2 3 4 5 6
+Peak scatter T
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0Null cumulative probability
+256 exact Poisson scans
+100,000 Gaussian scans
+Observed
+0 2 4 6 8 10
+Width instability W
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+Figure 6: Inclusive lower-tail distributions from the 256 paired exact Poisson scans and 100,000 supplemental
+Gaussian-response scans. Each toy repeats the peak selection on the same grid and the same widths. Dashed
+lines mark observed values; smaller values indicate tighter coherence or greater stability. Ineligible toys
+remain in the denominator.
+7 Validation
+The numerical package contains 928 free-amplitude mass–width rows and 12 independent 92 MeV
+amplitude checks. The joint constrained likelihood was replayed at 20 representative mass–width
+conﬁgurations, including single-, two- and three-dataset regions, and checked against the factorized
+statistic and nested shared-coupling ﬁt. All source Poisson spectra regenerate exactly from their
+recorded seeds, and all twelve observed 92 MeV signed roots reproduce the parent values exactly
+in the matching SciPy/NumPy environment.
+The central independent-boundary mixture and the positive/zero-atom limits pass. Increasing
+quadrature order changes the checked tails by at most 1.6e-14 relatively; lookup interpolation
+changes observed log p by at most 2.4e-07. Joint covariance reconstruction diﬀers by at most 7.6e-
+12. Direct scalar evaluation reproduces the coherence metric to 4.4e-16. Numerical checks establish
+implementation consistency, not physical source validity.
+At each width’s Gaussian 95th-percentile global threshold, the direct Poisson exceedance counts
+are 16, 17, 20 and 17 out of 256. These are above the nominal mean 12.8; all corresponding 95%
+binomial intervals still contain 0.05. This limited ensemble cannot rule out a modest response-tail
+mismatch. At the observed peaks, all Gaussian global estimates lie inside the direct intervals.
+8 Discussion
+The free-amplitude likelihood identiﬁes a combined excess at 91–92 MeV throughout the four width
+choices. At the nominal width, the individual local reference signiﬁcances at 92 MeV are 2. 59, 2. 80,
+and 1. 42 for 2015, 2016, and 2021, respectively. The combined local signiﬁcance is 3. 583; scanning
+the full declared domain reduces it to 2. 060 in the Gaussian-response approximation. Direct Poisson
+scans give a broader assessment of this tail, with seven exceedances among 256 scans.
+The stable combined maximum does not extend to every individual regional maximum. In
+particular, a competing 2021 excursion overtakes the 93 MeV peak at the larger widths. The
+mass-coherence probability of 0. 763 therefore provides no additional evidence for unusually aligned
+peaks. Both conclusions remain conditional on the ﬁtted background source and the diagnostic
+9
+
+HPS Gaussian-Process Resonance Search v5.8.5 / Review Draft
+choices prompted by the observed spectra. The background source was ﬁtted to the observed
+data and then frozen. Neither ensemble propagates source-estimation uncertainty, possible signal
+absorption during source construction, background-model selection, or unspeciﬁed correlated sys-
+tematic uncertainties. The direct toys do reﬁt the local GP predictions and proﬁle the likelihood
+on each complete generated spectrum. The response ﬁelds approximate those operations by their
+stored derivatives. Agreement with 256 toys is a limited check, especially in sparse tails, not proof
+of precise Gaussian-tail calibration.
+The 2015 support extension through 100 MeV, 2021 sample fraction, resolution functions, kernel
+states and signal templates remain inherited assumptions. No continuous-mass convergence claim
+is made: these results describe the 1 MeV grid. The parent study separately examined 0.5 versus
+1 MeV spacing. The current extension does not choose a ﬁner grid or smaller search domain after
+seeing a preferable result.
+8.1 Reproducibility
+The source bundle includes all pinned inputs needed by this continuation, copied likelihood code,
+analysis and plotting scripts, the protocol, numerical ledgers, saved null maxima and coherence
+statistics, validation records, and SHA-256 manifests. The released v5.8.4 study and output package
+were hashed before and after the continuation. Rebuild commands are in README.md; the original
+report is included unchanged and precedes this extension in the combined PDF.
+References
+[1] G. Cowan, K. Cranmer, E. Gross and O. Vitells, Asymptotic formulae for likelihood-based tests
+of new physics , arXiv:1007.1727.
+[2] E. Gross and O. Vitells, Trial factors for the look elsewhere eﬀect in high energy physics ,
+arXiv:1005.1891.
+[3] V. Ananiev and A. L. Read, Gaussian Process-based calculation of look-elsewhere trials factor ,
+arXiv:2206.12328.
+[4] HPS-GPR v5.8.4, Independent combinations, mass spacing and blind-window comparisons ,
+pinned report and inputs, 18 September 2026.
+10

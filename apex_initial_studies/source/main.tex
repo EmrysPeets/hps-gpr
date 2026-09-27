@@ -1,0 +1,290 @@
+\documentclass[10pt,letterpaper]{article}
+\usepackage[margin=0.75in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,microtype,amsmath,amssymb,graphicx,booktabs,array,caption,xcolor,fancyhdr}
+\usepackage[colorlinks=true,linkcolor=blue!45!black,urlcolor=blue!50!black]{hyperref}
+\graphicspath{{../figures/}}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{1.5em}
+\setlength{\headheight}{14pt}
+\captionsetup{font=small,labelfont=bf}
+\pagestyle{fancy}\fancyhf{}\lhead{APEX initial studies}\rhead{16 September 2026}\cfoot{\thepage}
+\input{numbers}
+\newcommand{\eps}{\epsilon^2}
+\newcommand{\img}[3]{\begin{center}\includegraphics[width=#2\linewidth]{#1}\captionof{figure}{#3}\end{center}}
+\begin{document}
+\thispagestyle{empty}
+{\LARGE\bfseries APEX and HPS: an initial comparison}\par
+{\large Digitized observed contours, local probabilities, and full-2021 projections}\par
+16 September 2026 \hfill Standalone exploratory study
+
+\section*{What the comparison shows}
+The supplied APEX contour and the latest saved HPS results overlap over
+\textbf{155--250 MeV}. There is no compelling same-mass excess in both experiments:
+none of the 96 common integer-mass hypotheses has both local probabilities below
+0.1. The strongest digitized APEX feature is at about \ApexMinMass\ MeV,
+with $p_{\rm A}\simeq\ApexMinP$ ($\ApexMinZ\sigma$ on a one-sided Gaussian scale).
+HPS has $p_{\rm H}\simeq0.50$ there.
+
+The APEX coupling contour is lower than the present HPS contour at every common
+integer mass. The median HPS/APEX ratio is \MedianCurrentRatio.
+A statistics-only rescaling of the native 2021 sample from 10\% to 100\% gives
+limited contour crossings around \textbf{155--175 MeV}. They are possible places
+to improve a limit, rather than evidence for a shared resonance.
+The crossings at 158, 166 and 170 MeV persist throughout the adopted pixel
+envelope, although their confidence-level interpretation remains unresolved.
+Over the full overlap the median projected HPS/APEX ratio is
+\MedianProjectionRatio.
+
+The conditional full-2021 injections deserve a separate interpretation. The saved
+160 and 208 MeV native-sample hypotheses correspond to couplings about
+\textbf{2.4 and 19 times} the digitized APEX contour. If the two analyses use the
+same minimal visible-vector coupling, these hypotheses face an external
+consistency problem. Large projected local significances from such injections
+should not be read as plausible future discoveries without resolving that problem.
+
+\section*{Inputs and the limits of the comparison}
+The two supplied screenshots are the APEX numerical source. The designation
+``70\%'' comes from the user. The original slide, the contour's confidence level,
+and the resolution-axis units have not been verified. The coupling comparison
+assumes the left ordinate is $\eps=\alpha'/\alpha$. This assumption does not
+affect the mass or local-$p$ digitization.
+
+The HPS sources are the v5.0.4 released total-search-window ledger, the
+13 September Figure 2 revision, and the v5.6.1 2021 projection ledgers. The latest
+v5.5.4 rate-model comparison is confined to lower masses and supplies no
+additional APEX-overlap scan. In the APEX overlap, the released contour contains
+2016+2021 through 180 MeV and \textbf{2021 alone above 180 MeV}. There is no
+three-campaign coincidence at 208 or 229 MeV.
+
+Public APEX presentations \cite{jevons2023,jevons2024} provide methodological
+context, but their plotted mass ranges and curves differ from these screenshots.
+Their confidence level and resolution convention are therefore not silently
+assigned to the supplied image. HPS uses nominal 90\% asymptotic CL$_s$ limits;
+the plotted ratios compare numerical ordinates, not harmonized confidence limits.
+No 95\%-to-90\% rescaling or APEX/HPS likelihood combination is made.
+
+This derivative retains the HPS inputs' preliminary/conditional calibration status.
+It introduces no new event sample, GPR fit, toy ensemble, global discovery claim,
+or calibrated combined exclusion.
+
+\newpage
+\section*{1. Recovering the screenshot curves}
+The left panel contributes 740 mass columns, and the local-probability panel
+contributes 620. A linear mass transformation is fitted to the labelled ticks;
+the vertical transformation is linear in $\log_{10}U$ or $\log_{10}p$.
+Within each plot crop, the centre estimate is the median row of dark pixels
+(greyscale below 150/255), with bottom-axis tick marks explicitly masked.
+Every column is retained, without smoothing the
+mass dependence. Vertical strokes make some columns intrinsically ambiguous.
+
+The upper and lower dark-pixel rows, expanded by two pixels, define a
+\emph{digitization envelope}; this is not a statistical uncertainty. Two-pixel
+horizontal allowances are 0.31 MeV for the contour and 0.37 MeV for the
+probabilities. Thresholds of 120 and 180 provide an extraction check. These
+pixel choices do not cover systematic errors in the original experiment or a
+possible mismatch of source versions. The typical vertical half-span is about
+13\% for the limit and 10\% for the probability.
+
+\img{digitization_overlay.png}{1}{The extracted traces drawn over the supplied images. Orange and turquoise follow the contour and local probability; the lower overlay identifies only the black-square total-resolution series. Source crops are preserved without alterations in the input folder.}
+
+The contour covers approximately 154.8--270.1 MeV and the probability trace
+154.8--270.0 MeV. The common comparison uses 155--250 MeV, with no extrapolation
+of HPS. All 12 total-resolution points between 140 and 250 MeV are saved in
+native ordinate units. The report displays both an MeV and a fractional-percent
+interpretation where widths enter the discussion.
+
+\newpage
+\section*{2. Where the upper contours overlap}
+\img{limit_comparison.pdf}{1}{The supplied APEX curve, released HPS contour, and two conditional full-exposure displays. Shading around APEX is the pixel envelope. The shaded mass region beyond 250 MeV lacks a saved HPS counterpart. Curves connect available nodes for display; the confidence levels are not harmonized.}
+
+For a background-dominated yield search with $s\propto L\eps$ and
+$\delta b\propto\sqrt L$, a statistical upper contour scales as
+\begin{equation}
+ U_{100}^{\rm obs.eq.}(m)=U_{10}^{\rm obs}(m)/\sqrt{10}.
+\end{equation}
+Here the transformation retains the observed pattern of the 10\% contour.
+It is neither a future observation nor an ensemble-median sensitivity.
+The saved full-equivalent combination uses the factor
+$\sqrt{\sum_y d_y/\sum_y f_y d_y}$. Here $d_y$ is the source density,
+with exposure factors $f_{2015}=f_{2016}=1$ and $f_{2021}=10$.
+
+\begin{center}\small
+\input{table_competitive}
+\captionof{table}{Every integer mass where the 2021 observed-equivalent contour is below the central APEX trace. Both contour columns are in units of $10^{-6}$. These are sampled nodes, not continuous interval endpoints.}
+\end{center}
+
+\newpage
+\section*{3. What the local probabilities add}
+\img{pvalue_comparison.pdf}{1}{Mass-aligned local probabilities. APEX values above 0.5 are retained. HPS uses the released bounded discovery convention, with $p_0=0.5$ when the fitted positive signal is absent. The lower curve requires both experiments to have a small local probability.}
+
+A weaker upper limit can result from a positive fluctuation, changing sensitivity,
+or background-fit response. It does not by itself establish an excess. The local
+probability is therefore the primary evidence diagnostic; the contour is the
+separate constraint on signal strength.
+
+At a fixed mass define $C(m)=\max[p_{\rm A}(m),p_{\rm H}(m)]$. If each input
+is a valid one-sided local $p$-value for an excess, this is a conservative
+intersection-union test of evidence in \emph{both} experiments: under the null
+that at least one has no signal, $\Pr(C\leq\alpha)\leq\alpha$.
+It does not require independence. It is not a common-coupling likelihood test
+or a test of fitted-amplitude compatibility.
+
+The smallest integer-grid value is $C=\BestConcordance$ at 210 MeV.
+The corresponding minimum over the APEX image columns, with log-linear
+interpolation of HPS probabilities, is \DenseConcordance.
+Neither representation has both probabilities below 0.1. The 96-point
+Bonferroni bound $\min(1,96\min C)$ is 1. This is only a finite-grid bound
+conditional on valid input probabilities; no calibrated continuous-mass global
+$p$-value is inferred. Image columns and neighbouring mass hypotheses are not
+independent trials. No product of neighbouring probabilities is used.
+
+\newpage
+\section*{4. Candidate regions and mass resolution}
+\begin{center}\small
+\input{table_apex_minima}
+\captionof{table}{The eight lowest resolved APEX minima. $Z_{\rm equiv}=\Phi^{-1}(1-p_{\rm A})$ is a one-sided display conversion. The pixel envelope is an extraction range, not a confidence interval. Interpolated HPS values are descriptive between its 1 MeV nodes.}
+\end{center}
+Minima are catalogued with at least eight image columns (1.49 MeV) of separation
+and prominence 0.25 in $-\ln p$; this is a fixed descriptive rule, not a count of
+independent tests. The deepest feature remains below $2\sigma$ even using the
+lower pixel edge ($p\simeq0.031$). The 214 and 218 MeV features have weak or
+absent HPS counterparts. The 252 and 263 MeV minima fall outside saved HPS support.
+
+\begin{center}\small
+\input{table_hps_peaks}
+\captionof{table}{The released HPS local maxima with $p_{\rm H}<0.25$ in the overlap. The last column is the minimum APEX probability within one HPS 2021 width on either side; choosing that minimum is post-selection, not independent evidence.}
+\end{center}
+\img{resolution_comparison.pdf}{1}{The digitized total curve and the HPS widths. Because the APEX vertical label is missing, both $\sigma_m$ in MeV and $100\sigma_m/m$ interpretations are shown. No APEX width is extrapolated beyond 250 MeV.}
+If the supplied ordinate is an MeV width, HPS 2021 is about 3.8--9.6 times
+broader in this range; if it is a percentage, the ratio is about 2.4--3.8.
+Either way, one HPS feature spans several APEX resolution elements. A nearby
+APEX dip need not be the same resonance. Detector width is not the uncertainty
+on a fitted resonance mass; a physical alignment test also needs mass-scale
+calibration and fitted centroid errors.
+
+At the upper HPS boundary, $p_{\rm H}(250)=0.090$ and $p_{\rm A}(250)=0.477$.
+The nearby APEX minimum at 251.9 MeV ($p=0.071$) is outside the HPS scan.
+This is a possible follow-up near the boundary, conditional on qualifying an
+extended HPS search range; no same-mass coincidence can be assigned to it here.
+
+\newpage
+\section*{5. Interpreting the 100\% 2021 hypotheses}
+Two different operations must be kept distinct. Section 2 rescales an upper-limit
+curve. The v5.6.1 studies instead posit a signal and generate a full-exposure mean
+spectrum. If the fitted small-sample excess is held as the true signal rate,
+the ideal local significance scales as
+\begin{equation}
+ Z_{100}=\sqrt{10}\,Z_{10},\qquad Z_{100}=10\,Z_1.
+\end{equation}
+This follows from $s/\sqrt b$ scaling with $\sqrt L$ at fixed rate and background
+shape. It is conditional on the observed excess being signal. It does not supply
+the probability that this interpretation is correct or that a future search will
+discover it. A signal-conditioned upper limit approaches the nonzero signal
+strength as exposure grows; dividing an existing observed limit by $\sqrt{10}$
+does not implement that same hypothesis.
+
+The archived target-matched models tune the injected yield to reach the prescribed
+local $Z$ after fitting. The yield-scaled models simply multiply the fitted source
+yield by the exposure factor. Both use deterministic Asimov spectra
+$n_i=b_i+s_i$. These are mean \emph{input} spectra, not average nonlinear
+toy-limit curves. This study reuses their saved results and adds no toys.
+
+\begin{center}\small
+\input{table_injections}
+\captionof{table}{Four saved hypotheses in the APEX overlap. Injected $\eps$ is in units of $10^{-6}$, reconstructed as $A_{\rm inj}B_{\rm vis}^{-1}/K$ using the saved background-density conversion. The displayed injection/APEX comparison assumes identical visible-vector coupling definitions.}
+\end{center}
+
+The comparison at 160 MeV is already informative: APEX has $p\simeq0.40$ at the
+mass selected in HPS, and the target-matched signal is above the supplied contour.
+At 208 MeV, APEX again has $p\simeq0.41$, while the injected coupling is almost
+twenty times its contour. Ordinary yield scaling gives ratios about 2.3 and 18,
+so the concern does not arise only from target tuning.
+
+The historical 1\% source gives a 203 MeV hypothesis about 64 times the APEX
+contour, and a 244 MeV hypothesis about 356 times the contour. At exactly
+244 MeV, APEX has $p\simeq0.96$, despite a nearby minimum around 241.9 MeV.
+The 1\% sample's selection equivalence, membership and exact exposure ratio to
+the native 10\% sample remain unverified. These results are kept separate and
+are not combined as independent HPS evidence.
+
+The HPS conversion includes the inherited smooth electron/dimuon factor once,
+with threshold $2m_\mu\simeq211.3$ MeV. The screenshot does not establish the
+APEX branching convention. Consequently these are conditional compatibility
+ratios, not a new exclusion statement. The 160 and 208 MeV comparisons lie
+below this threshold and avoid that particular branching ambiguity.
+
+\textbf{Useful follow-up:} first establish the APEX source and conventions;
+then compare tabulated APEX limits with the HPS fitted signal amplitudes and
+their uncertainty. A combined likelihood would require signal response,
+background constraints, systematic correlations and the original statistical
+model. Upper-limit and $p$-value curves alone do not contain that information.
+
+\newpage
+\section*{6. The saved conditional contours}
+\img{conditional_projection_comparison.pdf}{1}{Saved v5.6.1 full-exposure mean-spectrum limits and the supplied APEX contour. Upper panels use the native 10\% source; lower panels use the historical 1\% source. Stars mark the injected coupling. The vertical ranges differ by row to retain the high historical 244 MeV injection. These panels are separate hypothetical spectra, not measurements of the full 2021 sample.}
+
+The broad peaks follow the assumed HPS signal templates, whereas the APEX
+structure varies on a substantially finer mass scale. The flanking depressions
+in an injected-model HPS limit are inherited GP fit responses. A coincident
+APEX fluctuation at such a flank does not constitute confirmation of the
+injected mass. In particular, the historical 244 MeV injection must be compared
+with APEX at 244 MeV; selecting the lower $p$ near 242 MeV changes the hypothesis.
+
+The 155--175 MeV band is the useful region for a more precise limit-comparison
+study because the projected ordinates are comparable there. The 160, 182 and
+208 MeV HPS regions are useful controls for cross-experiment consistency:
+their same-mass APEX probabilities are unremarkable. The 214, 218 and 229 MeV
+APEX minima can be retained as a descriptive catalogue, but the supplied
+information gives no reason to promote them into resonance candidates.
+
+All twelve total-resolution values are tabulated in
+\texttt{derived/apex\_total\_resolution.csv}. The nominal two-pixel vertical
+allowance is 0.0034 in the original ordinate units; it is not a detector uncertainty.
+
+\newpage
+\section*{7. The newest Figure 2 extension and reproducibility}
+\img{added_2019_comparison.pdf}{0.94}{The latest Figure 2 revision also adds the nominal 2019 1\% sample. Its current and full-equivalent contours are shown separately. There is no saved four-campaign $p$-value scan in this input ledger, so no probability is inferred from these limits.}
+
+The added-2019 current curve also remains above APEX at every common integer
+mass. The full-equivalent four-campaign display has more crossings below about
+176 MeV, but none above that region. It retains the source's 2021 response proxy
+for 2019, nominal $\times100$ exposure factor and active kernel length-scale
+ceiling. It does not change the same-mass probability conclusion from the
+released HPS ledger. Figure-specific refits differ from frozen limits by up to
+about 2.5\%; their probabilities are not substituted into the frozen release.
+
+\textbf{Reproduction.} The complete numerical comparison is in
+\texttt{derived/common\_mass\_scan.csv}; separate ledgers retain every extracted
+column, each experiment's extrema, conditional injection ratios, and extraction
+sensitivity. \texttt{provenance/} contains pixel calibration, source paths,
+SHA-256 hashes, source-search notes and the checkout state. All plots and tables
+are regenerated from bundled snapshots; no external HPS checkout or network
+access is needed. From this folder, run \texttt{bash scripts/build.sh}.
+For a document-only rebuild, run \texttt{tectonic main.tex} in \texttt{source/}.
+
+The comparison checks mass support, manually read landmarks, snapshot identity,
+the exposure transformation, injected-coupling conversion and the reported
+numerical conclusions. The compiled PDF is also checked through text extraction
+and rendered-page inspection. Pixel envelopes and numerical checks do not
+validate the original APEX inference or repair the inherited HPS calibration
+limitations.
+
+\begin{thebibliography}{9}\small
+\bibitem{screens} User-supplied screenshots, 16 September 2026, 10:47:36 and
+10:48:42. Primary numerical source for the APEX contour, local probabilities,
+and total-resolution values; original document metadata unresolved.
+\bibitem{hps} HPS-GPR local result snapshots: v5.0.4 total-search-window release;
+Figure 2 revision of 13 September 2026; v5.6.1 upper-limit echoes of 13 September
+2026. File identities and original paths are in the bundled input manifest.
+\bibitem{jevons2023} O.~T.~Jevons, \emph{The APEX Experiment; a dark matter search
+at Jefferson Lab Hall A}, 26 January 2023, slides 13--15 and backup slides 7--8.
+\href{https://indico.jlab.org/event/602/contributions/11893/attachments/8838/12776/APEX_HallAWinter23Update.pdf}{Official Hall A presentation}.
+Used for context only; not identified as the screenshot source.
+\bibitem{jevons2024} O.~T.~Jevons, \emph{The APEX Experiment; a dark matter search
+at Jefferson Lab Hall A}, 10 April 2024, slides 16--17 and backup slides 10--11.
+\href{https://indico.cern.ch/event/1388874/contributions/5878795/attachments/2833948/4951963/IoP24_APEX.pdf}{IoP 2024 presentation}.
+Its full-data plots differ from the supplied images.
+\end{thebibliography}
+\end{document}

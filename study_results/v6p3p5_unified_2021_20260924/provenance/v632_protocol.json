@@ -1,0 +1,116 @@
+{
+  "version": "6.3.2",
+  "dataset": "2016 controlled 0.1 and 1.0 exposure",
+  "master_seed": 63420160924,
+  "masses_MeV": [
+    42,
+    44,
+    60,
+    66,
+    76,
+    90,
+    92,
+    117,
+    160,
+    178
+  ],
+  "exposures": [
+    0.1,
+    1.0
+  ],
+  "sources": [
+    "nominal",
+    "stress"
+  ],
+  "signal": "nominal2016 integrated Gaussian",
+  "pilot_backgrounds_per_exposure": 100,
+  "calibration_backgrounds_per_source_exposure": 100,
+  "evaluation_backgrounds_per_source_exposure": 100,
+  "calibration_levels": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "evaluation_levels": [
+    0,
+    1,
+    3,
+    5
+  ],
+  "seed_namespaces": {
+    "pilot_background": 1,
+    "calibration_background": 2,
+    "evaluation_background": 3,
+    "bootstrap": 4,
+    "calibration_signal": 20,
+    "evaluation_signal": 30,
+    "smoke_signal": 90,
+    "smoke_background": 91
+  },
+  "background_seed_key": "[master,cohort_namespace,source_id,toy,increment_id]; source nominal0 stress1; increment low0 high1",
+  "signal_seed_key": "[master,cohort_namespace,source_id,mass_MeV,toy,z,increment_id]",
+  "background_truth": "nominal: pinned v5.8.2 full2016 all-data GP arithmetic mean; stress: archived source sensitivity control that failed broad-source-fit qualification",
+  "nominal_truth_sha256": "995bb3e22eac968c280e6ed2adb268c08af188fa7c07c3dff78fd9c7f85a6378",
+  "exposures_pairing": "low ~ Poisson(0.1*b), independent increment ~ Poisson(0.9*b), full=low+increment; no multiplication of realized counts",
+  "cohorts": "Independent pilot, calibration, evaluation RNG namespaces. Backgrounds shared across masses/levels within each cohort/source/exposure; nominal and stress sources independent.",
+  "pilot_rule": "Nominal source only. Freeze arithmetic mean of100 valid Gaussian returned observed-profile-Hessian errors independently at each mass/exposure before calibration.",
+  "expected_yields": "A=z*s0(m,exposure), same nominal-pilot mean for both truth sources. Exposure signal pairs use Poisson(A_low*p) plus independent Poisson((A_full-A_low)*p).",
+  "calibration_rule": "Freeze all100 calibration fits per source/exposure/mass/level and hashes before any evaluation fits; grid fixed by independent pilot, not calibration/evaluation outcomes.",
+  "signal_units": "Full-selected Gaussian yield. CDF bin integrals plus below/above30-210MeV support; no support/window renormalization.",
+  "fit_window": "Pole +/-2.25sigma_nominal2016; bin-center mask; complement training with>=3 exterior bins on each side.",
+  "GP": "Same archived full2016 mass-specific kernel at both exposures. Recompute log target/noise alpha, conditional mean and count covariance from every spectrum; no kernel reoptimization.",
+  "preprocessing": "Positive bins log(n), alpha=1/n; zero bins target0, alpha1. Arithmetic lognormal mean exp(mu+diag(cov)/2).",
+  "covariance": "Inherited first Cholesky-success loading1e-10..1e-5 times max(maxdiag,1), Poisson-whitened mode cutoff1e-8.",
+  "likelihood": "Poisson means b_GP+L*theta+A*p with Gaussian theta penalty; signed Ahat, positive means; fixed-truth nuisance profile at the same GP state.",
+  "uncertainty": "Returned observed-profile-Hessian yield error recomputed independently; unavailable curvature or Fisher substitution rejected.",
+  "acceptance": {
+    "score_lt": 3e-05,
+    "min_lambda_gt": 0,
+    "sigma_finite_positive": true,
+    "q_true_min": -2e-06
+  },
+  "retries": "At most3 deterministic attempts on identical counts: origin tolerance2e-7; origin2e-9; A/scale=.5 at2e-9. Use available truth-profile start when nesting needs repair. Select valid minimum objective. Never regenerate or select by outcome.",
+  "offset_response": "delta=mean calibration null Ahat; R=mean paired(Ahat_z3-Ahat_0)/(3*s0); k0=sample SD((Ahat_0-delta)/sigma_0). Keep offset, response, and pull width separate.",
+  "scaling_tests": [
+    "delta_full-10*delta_low",
+    "mean_pull_full-sqrt(10)*mean_pull_low",
+    "mean_sigma_full/(sqrt(10)*mean_sigma_low)"
+  ],
+  "scaling_uncertainty": "Resample whole calibration toy IDs, preserving exposure/mass/level pairing, independently for each source; bootstrap seed namespace4.",
+  "point_estimators": "Held-out raw; subtract10*delta_low; subtract delta_full; affine(Ahat-delta_full)/R_full. Calibration variance/covariance propagated for affine pull diagnostic, not a production interval.",
+  "native_limits": "Inherited profiled asymptotic CLs90 at full exposure only; numerical failures reported separately. No observed-data limit changed.",
+  "toy_limits": "Fixed grid lower-tail plus-one p_A=(1+#calibration Ahat<=evaluation Ahat)/101. Reject if p_A<=.1. Report finite-grid Neyman accepted sets, maximum accepted node, holes, right censoring; no interpolation or continuous endpoint claim.",
+  "toy_cls": "Estimator-ordering finite-MC CLs=min(1,p_A/p_0); separate from native profiled CLs. With100 calibration toys, granularity can prevent any rejection for small p_0.",
+  "calibration_models": "Matched source to held-out same source, and nominal calibration transferred to stress evaluation. These are conditional source/model checks.",
+  "rank_boundary": "Rank size<=10/101 is marginal over calibration and new experiment at fixed source/yield; frozen-table rejection rate is random, Beta(10,91) under continuous distributions, and assessed with independent100-toy evaluation plus exact binomial intervals.",
+  "resources": {
+    "local_workers": 4,
+    "numerical_threads_per_worker": 1,
+    "wall_timeout_seconds": 1800,
+    "checkpoint_toys_per_mass": 10,
+    "remote_compute": false
+  },
+  "exclusions": [
+    "historical10% selection/exposure equivalence claim",
+    "2021MC as2016 template",
+    "full mass scan",
+    "global significance",
+    "kernel optimization",
+    "production corrections or observed upper limits"
+  ],
+  "limitations": [
+    "Controlled thinning of a fixed full-data source is not a validated historical10%-to-full transfer.",
+    "Conditional on fixed sources and archived kernel prescription; source/selection/systematic uncertainty unpropagated.",
+    "Archived stress source is a sensitivity control, not a qualified physical alternative.",
+    "Historical2016 support/optimizer qualification exception remains; successful conditional toys do not repair it.",
+    "100 calibration/evaluation toys per cell give coarse tails; masses and exposures are correlated.",
+    "No unconditional coverage, physical discovery or exclusion claim."
+  ],
+  "user_extension": "2026-09-24: investigate2016 mean-offset exposure transfer and proper implications for signal extraction/upper limits; append to existing2021 report."
+}

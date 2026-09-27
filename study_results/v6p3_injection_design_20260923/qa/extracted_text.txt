@@ -1,0 +1,333 @@
+PAGE 1
+HPS Gaussian-Process Resonance Search v6.3 / Injection design
+HPS Gaussian-Process Resonance Search
+Reference Matching and Fixed-Yield Injections
+A short statistical study, v6.3
+Emrys Peets
+23 September 2026
+1 Answer and the two questions being tested
+Per-toy reference matching is statistically legitimate as a declared, adaptive injection–
+recovery diagnostic. It does not, by itself, test coverage or detection power at one ﬁxed physical
+signal yield. For that purpose, use one common expected yield per mass and dataset , preferably
+chosen from an independent background-only pilot sample and then frozen. The existing matched
+study remains useful for understanding response and signal absorption; changing the design does not
+automatically cure bias.
+Let Bt be background-only pseudoexperiment t, and deﬁne
+st = σA, ref,t = s(Bt), u t = ˆAt(0), e t(A) = ˆσA,t (A). (1)
+Here st is the ﬁtted uncertainty on the signal yield before adding signal, ut is the signed zero-signal
+ﬁtted yield, and et(A) is the uncertainty returned after injection. These are not a mass resolution or
+an uncertainty on the ensemble mean. For z ∈ {1, 3, 5}, compare
+AM
+t = z st (per-toy matched) , AF = z s0 (common expected yield) . (2)
+In the proposed alternative, s0 estimates the mean reference uncertainty within a speciﬁed cell. A
+denotes the expected signal count; a Poisson realization need not contain exactly A signal candidates.
+In plain words. Matching gives a noisier toy a larger injected signal. A common yield
+gives every toy the same expected number of signal candidates, allowing the diﬃculty of
+extracting it to ﬂuctuate naturally.
+Input z Matched: st = 10 Matched: st = 20 Common: s0 = 15
+1 10 20 15
+3 30 60 45
+5 50 100 75
+Table 1: Illustrative yields in candidates, with the two reference errors equally likely. Both designs
+have the same average yield, but diﬀerent experiments.
+“Matched” also means using the same binning, template, mask, ﬁt procedure and error convention
+for the reference and extraction. Keep that procedural consistency in both designs. It does not require
+A to vary by toy.
+1
+
+PAGE 2
+HPS Gaussian-Process Resonance Search v6.3 / Injection design
+2 Why equal average yield does not make equal ensembles
+For this comparison, ﬁrst take the ideal common scale s0 = E[st]. The mean injected yield agrees, but
+its variation does not:
+E[AM
+t ] = AF = zs0, Var(AM
+t ) = z2 Var(st), Var(AF) = 0 , (3)
+SD(AM
+t )
+E[AM
+t ] = CV(st), AM
+t
+st
+= z, AF
+st
+= z s0
+st
+. (4)
+The last two ratios are nominal input strengths. Neither is automatically the ﬁtted signiﬁcance, a
+discovery signiﬁcance or a global signiﬁcance. An injected signal can alter the error and the ﬁtted
+background.
+Let P0 generate the background and KA generate added signal counts at expected yield A. The
+actual sampling laws are
+PM(dB, dS ) = P0(dB) Kzs(B)(dS), (5)
+PF(dB, dS ) = P0(dB) Kzs0(dS). (6)
+In the matched design, the signal expectation is a function of the same background ﬂuctuation that
+will be ﬁtted. It is generally not an ordinary mixture of ﬁxed- A experiments: selecting a particular
+s(B) also selects background realizations. If st were constant, the two laws would coincide. A small
+spread makes their input yields close, but does not prove that nonlinear ﬁt response or tail probabilities
+are equivalent.
+Coverage and power have a ﬁxed-parameter meaning
+For a conﬁdence interval I(Y ) and a rejection rule ϕ(Y ), the usual quantities at ﬁxed background
+nuisance parameters ν are
+C(A, ν ) = Pr
+A,ν
+{A ∈ I(Y )}, π (A, ν ) = Pr
+A,ν
+{ϕ(Y ) = 1 }. (7)
+The standard frequentist construction repeats the experiment at ﬁxed parameter values, generating
+the relevant auxiliary measurements as well as the main data when they are part of the procedure [ 1].
+Matched-toy containment instead estimates
+CM = Pr
+M
+{zs(B) ∈ I(B + S)}. (8)
+This is a well-deﬁned performance measure for the adaptive experiment. It is not a measurement of
+C(zs0, ν ).
+In plain words. For a coverage claim, the truth must stay put while the experiment
+ﬂuctuates. If the truth moves with each toy, a containment fraction answers a diﬀerent
+question.
+This distinction does not imply that matched pulls must fail. In an ideal location model ˆA =
+A + stEt with Et ∼ N (0, 1) independent of st and a correctly returned error st, the pull is Et for either
+design. Matching neither forces a biased estimator to close nor proves ﬁxed-yield performance when
+closure is observed.
+2
+
+PAGE 3
+HPS Gaussian-Process Resonance Search v6.3 / Injection design
+3 Separate background oﬀset, signal response and error calibration
+To expose the mechanism, write the local conditional-mean response as
+E[ ˆAt(A) |Bt] = ut + gtA + O(A2). (9)
+The signal draw is averaged on the left. ut is the background-dependent oﬀset; gt = 1 means unit
+incremental response and gt < 1 means a loss of injected yield in this approximation. Ignoring the
+displayed nonlinear term, the ensemble mean biases are
+bM = E[ut] + zE[(gt − 1)st], (10)
+bF = E[ut] + zs0(E[gt] − 1), (11)
+bM − bF = z Cov(gt, s t) (s0 = E[st]). (12)
+Thus a correlation between sensitivity and absorption changes the average bias even when the mean
+injected yield agrees. The coeﬃcient of variation of st alone cannot determine that correlation.
+Three quantities that should be reported together
+For At > 0, deﬁne the raw recovery, paired response and pull as
+Qt =
+ˆAt(At)
+At
+, R t =
+ˆAt(At) − ˆAt(0)
+At
+, p t =
+ˆAt(At) − At
+et(At) . (13)
+Raw recovery includes the background oﬀset. The paired response subtracts that oﬀset to isolate the
+response to adding signal. In the linear model, E[Rt |Bt] = gt in either design; an individual Poisson
+signal draw makes Rt noisy. A raw average of Qt additionally contains E[ut/s t]/z under matching, or
+E[ut]/ (zs0) at common yield. Even E[ut] = 0 does not imply E[ut/s t] = 0 .
+Do not interchange the average of per-toy ratios and the ratio of averages. For matched injections
+in this linear model,
+E[Rt] = E[gt], E[ ˆAt(At) − ˆAt(0)]
+E[At] = E[gtst]
+E[st] = E[gt] + Cov(gt, s t)
+E[st] . (14)
+Design Mean A Mean bias Mean Qt Mean Rt
+Per-toy matched 45 − 6. 30 0.923 0.890
+Common yield 45 − 4. 95 0.890 0.890
+Table 2: Exact illustrative example at z = 3 : equally likely states have s = (10 , 20), u = (4 , − 4) and
+g = (0 . 98, 0. 80). Bias is in candidates. The diﬀerence is 3 Cov(g, s ) = − 1. 35. These are not HPS
+measurements.
+Always use each injected ﬁt’s returned error in the pull; replacing it by the pilot mean would test
+a diﬀerent error prescription. Pull moments are diagnostics, not substitutes for interval coverage. For
+physical inference, retain the raw ﬁtted yield; paired subtraction is a response diagnostic.
+At z = 0 both designs inject zero. With the same background draws and ﬁtting procedure,
+their null distributions are identical. Changing injection scaling cannot remove a null oﬀset. Also
+distinguish a signed local estimator from a positive, one-sided scan maximum; v5.9.5 addresses these
+separately [ 4].
+3
+
+PAGE 4
+HPS Gaussian-Process Resonance Search v6.3 / Injection design
+4 What the archived HPS implementation actually did
+The v5.0.5 methodology deﬁnes a zero-signal reference ﬁt for each source, toy and mass, followed
+by At = zσA, ref,t and a reﬁt of the injected spectrum [ 3]. The audit for this report follows the
+preserved v4.6 full-100 baseline used in the note’s consolidated validation displays. It covers four
+2021 exposure/source constructions and ﬁve masses (65, 90, 120, 180, 210 MeV), with 7,994 accepted
+extraction rows. It does not pool the later targeted threshold replacements.
+The saved rows and generating code establish the following:
+• The actual injection scale is the selected background-only ﬁt’s returned sigma_A, saved as
+sigmaA_ref. The reference ﬁt uses that toy’s ﬂuctuated counts, including its held-out extraction
+region. It is not a universal Asimov scale.
+• All 5,995 accepted positive-injection rows satisfy At = zst, to an absolute numerical residual
+below 3 × 10−11 candidates. Their saved reference error equals the corresponding zero-injection
+returned error exactly.
+• Added signal counts are Poisson ﬂuctuated . Across the accepted rows, (Nsig − At)/ √ At has
+descriptive sample standard deviation 1.005. The code, rather than this pooled check alone,
+establishes the sampling mode.
+Mass [MeV] Mean st SD(st) CV [%] Corr(st, u t)
+65 7,327.5 206.2 2.814 +0.162
+90 6,494.3 154.4 2.377 -0.344
+120 5,055.3 90.7 1.794 -0.065
+180 2,853.6 53.9 1.890 +0.079
+210 2,144.0 43.5 2.027 +0.180
+Table 3: Historical 2021 10% baseline, 100 reference toys per mass. Errors and their standard devia-
+tions are in signal candidates. CV is SD(st)/ s. The last column is the descriptive sample correlation
+with the signed zero-injection yield. It is not a signiﬁcance test.
+Across all 20 historical cells, the CV ranges from 1.17% to 3.00%. Consequently, the matched
+expected yields vary by that relative amount; this excludes the additional Poisson variation of actual
+signal counts. At 65 MeV in the 2021 10% row, a common scale equal to the saved mean would
+give approximately 7,327, 21,982 and 36,637 expected candidates at z = 1, 3, 5. These are illustrative
+translations of an existing ensemble, not new ﬁxed-yield ﬁt results.
+In plain words. In this archived baseline the two injection choices are numerically quite
+close in yield. The audit does not show that reference matching caused the observed bias,
+and it cannot reconstruct how new ﬁxed-yield ﬁts would behave.
+There are two naming traps. On zero-injection rows, sigmaA_reference is a separate Asimov
+diagnostic; using that column would audit the wrong quantity. Also, the older v4.6 plotting code
+labels ˆA/A inj as recovery, whereas the v5.0.5 methodology deﬁnes the paired response in Eq. ( 13).
+The audit preserves and computes both deﬁnitions without relabeling historical plots.
+4
+
+PAGE 5
+HPS Gaussian-Process Resonance Search v6.3 / Injection design
+5 How to choose the common reference uncertainty
+For a ﬁxed dataset, mass, template and ﬁt prescription, use an independent pilot ensemble of M
+background-only ﬁts:
+s0 = spilot = 1
+M
+M∑
+j=1
+spilot
+j , A ∈ {0, s 0, 3s0, 5s0}. (15)
+Freeze that value before generating the evaluation toys. Conditional on the frozen pilot result, every
+evaluation toy then has the same expected signal yield. Pilot precision is approximately
+SE(spilot)
+E[s] ≃ CV(s)√
+M
+. (16)
+This quantiﬁes precision of the chosen injection coordinate; it does not include uncertainty in the
+physical background truth.
+A mean over the same evaluation backgrounds is usable as an exploratory common-yield check, but
+retains a weak dependence on those backgrounds. For independent, identically distributed background
+toys and a baseline statistic ut = u(Bt),
+Cov(zsT , u t) = z
+T Cov(st, u t). (17)
+It shrinks with ensemble size, unlike the per-toy dependence Cov(zst, u t) = z Cov(st, u t). The inde-
+pendent pilot removes this particular dependence; it is the cleaner design for a ﬁxed-yield test.
+2 3 4 5 6
+Expected yield / common scale, A/s0
+0.0
+0.2
+0.4
+0.6
+0.8Density of the varying quantity
+Expected signal yield varies under matching
+Matched per toy
+Common yield: always 3
+2 3 4 5 6
+Expected yield / toy reference error, A/st
+0.0
+0.2
+0.4
+0.6
+0.8Density of the varying quantity
+Nominal strength varies for a common yield
+Common yield
+Matched per toy: always 3
+Figure 1: Analytic illustration at z = 3, with a positive lognormal reference error having mean s0 and
+CV 20%. The broad spread is chosen for visibility and is not the measured HPS spread. Curves are
+densities of the varying quantity; dashed lines mark a constant value, not a density height. Matching
+ﬁxes A/s t and varies A; a common yield ﬁxes A and varies A/s t.
+An Asimov background-only ﬁt also supplies a common scale; its curvature error need not equal
+the mean error of ﬂuctuated ﬁts [ 2]. For a target median local signiﬁcance, tune a ﬁxed A with the
+Asimov approximation and verify it with toys. A/s 0 alone need not equal that signiﬁcance.
+The mean error diﬀers from both
+√
+E[s2
+t ] and SD( ˆAt(0)). The last measures estimator variation;
+averaging errors does not establish their calibration. Do not pool masses, datasets or incompatible
+yield normalizations. To compare extraction methods, use one nominal scale and the same injected
+spectra.
+5
+
+PAGE 6
+HPS Gaussian-Process Resonance Search v6.3 / Injection design
+6 A separate choice: ﬂuctuate the number of signal candidates
+Choosing a common A does not require adding exactly A candidates to every toy. Let wi be full-
+template signal probabilities and include out-of-support categories so that ∑
+i wi = 1 . Let Bi ∼
+Poisson(bi) independently. Three useful designs have diﬀerent sampling variances:
+Signal construction Mean and covariance Question it addresses
+Deterministic template Si = Awi, Cov(S) = 0 Mean-response and absorption control;
+omits signal counting noise.
+Exactly N candidates S ∼ Multinomial(N, w); E[S] = N w,
+Cov(S) = N [diag(w) − wwT ]
+Recovery of a speciﬁed injected sample
+size; the total count is ﬁxed.
+Poisson signal yield Si ∼ Poisson(Awi) independently;
+Cov(S) = A diag(w)
+Repeated counting experiments at a
+ﬁxed expected signal rate A.
+Table 4: The background counting covariance adds to these covariances when the ﬁxed-yield signal
+draw is independent of the background. For matched injections these signal formulas apply conditional
+on B; marginally the adaptive dependence must also be retained.
+Drawing Nsig ∼ Poisson(A) and then placing those candidates multinomially is equivalent to
+independent binwise Poisson draws. In the ﬁxed-yield rate experiment,
+Bi + Si ∼ Poisson(bi + Awi). (18)
+By contrast, an exactly- N signal has negative cross-bin covariances and no ﬂuctuation in its total.
+Deterministic addition has no signal counting variance at all. A Poisson extraction likelihood applied
+to these other ensembles need not produce unit pull widths or nominal interval coverage, even with
+the correct background mean.
+In plain words. “Inject the same signal” should usually mean the same expected rate.
+Real counting experiments ﬂuctuate around that rate. Adding exactly the same number
+of candidates is a useful controlled experiment, but it removes one source of ﬂuctuation.
+For Poisson signal under per-toy matching, total signal variance satisﬁes
+Var(Nsig) = E[At] + Var(At) = zE[st] + z2 Var(st). (19)
+At a common expected yield it is just A. The extra term is variation of the chosen truth between toys;
+it is not an additional detector uncertainty. Pulls must subtract each toy’s own expected At, not an
+ensemble average or that toy’s realized Nsig, when assessing a Poisson-rate estimator.
+Relation to v6.2
+The current v6.2 MC study already uses common sample sizes N = 1, 000, 5, 000, 10, 000, 30, 000 at each
+mass, with exactly- N multinomial signal and Poisson background [ 5]. It is a ﬁxed-count recovery
+study, rather than a new per-toy reference-matched scan. Its GP conditional mean and covariance
+are recomputed, while archived kernel hyperparameters remain ﬁxed. For a Poisson-rate coverage
+follow-up, keep a common expected A and also ﬂuctuate the total signal count. In either case, repeat
+whichever ﬁt procedure the claimed result actually uses.
+6
+
+PAGE 7
+HPS Gaussian-Process Resonance Search v6.3 / Injection design
+7 Recommended next test and what this report establishes
+1. Deﬁne the cell and yield. Fix dataset, mass, full signal template, generating background and
+extraction prescription. Preserve the production ± 2. 25σm exclusion window. State whether A
+is a full selected yield or a yield restricted to a speciﬁed region.
+2. F reeze a common scale. Use an independent background-only pilot mean, or a declared
+Asimov scale, then take A = 0 , s 0, 3s0, 5s0. Use the same absolute yields when comparing
+methods or testing robustness to alternative generating backgrounds; give any separate equal-
+diﬃculty comparison its own label.
+3. Generate evaluation toys. For rate inference draw independent Poisson background and
+signal counts. Sharing each background across injection levels provides useful paired controls. Fit
+identical spectra with competing methods; account for the pairing when estimating diﬀerences.
+4. Keep the three diagnostics. Report signed raw bias, per-ﬁt-error pulls, and paired incremen-
+tal response. Report failed ﬁts and their selection rule. Do not discard statistical outliers or
+tune a bias correction on the evaluation sample.
+5. Measure coverage or power separately . At each ﬁxed A, evaluate the actual interval con-
+struction or test, with binomial uncertainty on the resulting fraction. Repeating a ﬁtted, frozen
+background source gives a source-conditional result; it does not establish uniform performance
+over unknown physical backgrounds. Keep the matched design as a secondary response check.
+Decision. The proposed average-error injection is a sensible primary design for a common-yield
+validation, with an independent pilot as the clean implementation. There is no basis here to discard
+the older matched study as statistically invalid. It asks a diﬀerent question, and the archived baseline
+has only a few percent variation in its matched expected yields. Neither design alone validates the
+physical background or ﬁxes null bias.
+Scope, audit trail and reproduction
+This study derives the comparison and audits archived rows; it runs no new HPS ﬁts and estimates
+no new coverage or discovery probability. The package includes LaTeX, the analytic ﬁgure, minimal
+archived rows, scripts, CSVs and SHA-256 provenance. Run bash reproduce.sh ; see README.md for
+tool paths. The original row source has SHA-256 preﬁx b23f31975b50; audit/ contains full hashes
+and line evidence. Later threshold replacements are outside this quantitative audit.
+References
+[1] G. Cowan and L. Lista, “Statistics,” Review of Particle Physics (2026), especially Secs. 40.2.6.1 and 40.4.2.
+PDG Statistics review .
+[2] G. Cowan, K. Cranmer, E. Gross and O. Vitells, “Asymptotic formulae for likelihood-based tests of new
+physics,” Eur. Phys. J. C 71, 1554 (2011), Secs. 3.2 and 4.1. arXiv:1007.1727.
+[3] HPS-GPR analysis note v5.0.5 (16 September 2026), “Matched-reference injection–extraction diagnostics”
+and “Matched reﬁts and ﬁt-quality checks. ” Preserved v4.6 full-100 baseline code and accepted rows are
+identiﬁed in the accompanying audit.
+[4] HPS-GPR v5.9.5, Apparent null bias (22 September 2026), local study package.
+[5] HPS-GPR v6.2, Reconstructed-MC injection and signal recovery (23 September 2026), local study package,
+40-toy release.
+7

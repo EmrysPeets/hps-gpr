@@ -1,0 +1,11 @@
+# Numerical ledger columns
+
+`scans.csv` contains one row per dataset, integer test mass, window and shape. `scope` is the dataset year; 2021 means native 10%. `family` is gaussian, dilation, or curvature. `kappa` is the asymptotic tail-width factor (1.0 is Gaussian). Primary and guard have half-widths 2.25 and 4.5 times nominal resolution; GP training uses only the bins outside that respective mask.
+
+The implementation amplitude `A90`, `Ahat` and `sigma_A` is the electron-only coupling in units of 1e-8. This scaled coordinate keeps numerical conditioning stable. It is not an event yield. `epsilon2_90 = A90 * 1e-8`; `display_epsilon2_90` includes the inherited dimuon branching factor once. `full_yield_90` and `window_yield_90` give event counts, and correspond to the physical amplitude A90 in the report equations. `signal_counts_per_amplitude` converts one implementation amplitude unit to full-support signal counts.
+
+`p0_fixed_mass` and `Z0` are the local, fixed-shape, one-sided asymptotic background-only reference; deficit convention p0=0.5 and Z0=0. `signed_r` and `p_signed` retain the deficit direction. `cls` is the CLs endpoint at the observed upper limit, not the discovery p-value. `q_obs` and `q_asimov` are explicitly profiled test statistics at that endpoint. `max_score`, `min_lambda`, covariance loading, and iteration fields are numerical diagnostics.
+
+`pvalue_minima.csv` selects the minimum local p within each separate scan. It is not a global p-value. `limit_ratios.csv` compares scenarios to the freshly computed Gaussian in the identical window. `excluded.csv` records unsupported guard coordinates. `shape_metrics.csv` reports full-line integrals, tail fractions and RMS; the actual fit uses the finite support normalization separately retained in scans.csv.
+
+`leakage_response.csv` is deterministic. `injected_A` and `recovered_A` use the same 1e-8 coupling coordinate; the recovery ratio equals the full-yield ratio. `injected_full_counts` and `injected_training_counts` are event counts. Clean and contaminated refer to adding signal to external GP training; matched and gaussian identify the extraction template. No Poisson random draws or coverage claims accompany these rows.

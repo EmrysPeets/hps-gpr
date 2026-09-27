@@ -1,0 +1,68 @@
+[
+  {
+    "command": [
+      "/opt/homebrew/bin/python3",
+      "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v5p8p5_mass_coherence_20260919/qa/portable-8i_6rh9r/scripts/free_amplitude.py"
+    ],
+    "returncode": 0,
+    "output": "local calibration complete 1.5\nexact likelihood replay checks complete 2.1\nGaussian paired scans 1024 / 100000\nGaussian paired scans 21504 / 100000\nGaussian paired scans 41984 / 100000\nGaussian paired scans 62464 / 100000\nGaussian paired scans 82944 / 100000\ncomplete 13.8\n"
+  },
+  {
+    "command": [
+      "/opt/homebrew/bin/python3",
+      "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v5p8p5_mass_coherence_20260919/qa/portable-8i_6rh9r/scripts/stability.py"
+    ],
+    "returncode": 0,
+    "output": "879153,\n    \"hi95\": 0.8125563865011852,\n    \"upper95\": 0.8050321912513942,\n    \"status\": \"finite_MC\",\n    \"eligible_null\": 256\n  },\n  \"direct_W\": {\n    \"k\": 253,\n    \"N\": 256,\n    \"p\": 0.9883268482490273,\n    \"raw_p\": 0.98828125,\n    \"lo95\": 0.9661367173637085,\n    \"hi95\": 0.9975767612461274,\n    \"upper95\": 0.996798482895824,\n    \"status\": \"finite_MC\",\n    \"eligible_null\": 256\n  },\n  \"gaussian_T\": {\n    \"k\": 73873,\n    \"N\": 100000,\n    \"p\": 0.7387326126738732,\n    \"raw_p\": 0.73873,\n    \"lo95\": 0.7359951762544468,\n    \"hi95\": 0.7414509711449694,\n    \"upper95\": 0.7410150174267371,\n    \"status\": \"finite_MC\",\n    \"eligible_null\": 99937\n  },\n  \"gaussian_W\": {\n    \"k\": 98583,\n    \"N\": 100000,\n    \"p\": 0.985830141698583,\n    \"raw_p\": 0.98583,\n    \"lo95\": 0.9850781960531693,\n    \"hi95\": 0.9865534277485075,\n    \"upper95\": 0.986439330361052,\n    \"status\": \"finite_MC\",\n    \"eligible_null\": 99937\n  },\n  \"gaussian_seed\": 58520260919,\n  \"gaussian_stream\": [\n    2015,\n    2016,\n    2021\n  ],\n  \"posthoc_selection_corrected\": false,\n  \"discovery_p_value\": false,\n  \"competing_peak_note\": \"For 2021, the region maximum changes from 93 to the 80 MeV diagnostic boundary at widths 2.5 and 2.6. This is a competing-excursion rank switch, not evidence of a resonance moving 13 MeV. No narrower optimized diagnostic region is introduced.\"\n}\ndataset  sigma92_MeV  region_lo_MeV  region_hi_MeV  delta_m_MeV        R  common_delta_m_MeV  common_R\n   2015     4.803927           80.0          100.0          1.0 0.208163                 1.0  0.208163\n   2016     3.788429           80.0          105.0          0.0 0.000000                 0.0  0.000000\n   2021     2.448596           80.0          105.0         13.0 5.309165                13.0  5.309165\ndataset  width_sigma  signed_Z  signal_events_nonnegative\n   2015         2.25  2.594369                1176.623918\n   2015         2.40  2.593739                1193.138410\n   2015         2.50  2.595695                1203.107403\n   2015         2.60  2.691247                1244.666705\n   2016         2.25  2.796104               16665.712277\n   2016         2.40  2.726187               16470.236769\n   2016         2.50  2.778059               16867.296272\n   2016         2.60  2.770211               16872.526568\n   2021         2.25  1.422854                7820.584326\n   2021         2.40  1.363364                7551.588465\n   2021         2.50  1.363364                7551.588465\n   2021         2.60  1.378326                7706.851165\n"
+  },
+  {
+    "command": [
+      "/opt/homebrew/bin/python3",
+      "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v5p8p5_mass_coherence_20260919/qa/portable-8i_6rh9r/scripts/make_figures.py"
+    ],
+    "returncode": 0,
+    "output": "Saved six publication figure pairs\nSaved coherence and method-width figure pairs\n"
+  },
+  {
+    "command": [
+      "/opt/homebrew/bin/python3",
+      "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v5p8p5_mass_coherence_20260919/qa/portable-8i_6rh9r/scripts/make_tables.py"
+    ],
+    "returncode": 0,
+    "output": "direct check columns width_sigma,mass_MeV,datasets,q_factorized,q_joint_constrained,q_pinned,absolute_joint_delta,absolute_replay_delta,q_shared,KKT_projected_gradient,joint_optimizer_success,min_lambda\nWrote numerical tables and report text\n"
+  },
+  {
+    "command": [
+      "tectonic",
+      "-X",
+      "compile",
+      "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v5p8p5_mass_coherence_20260919/qa/portable-8i_6rh9r/source/report.tex"
+    ],
+    "returncode": 0,
+    "output": "note: \"version 2\" Tectonic command-line interface activated\nnote: Running TeX ...\nnote: Rerunning TeX because \"report.out\" changed ...\nnote: Running xdvipdfmx ...\nnote: Writing `/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v5p8p5_mass_coherence_20260919/qa/portable-8i_6rh9r/source/report.pdf` (209.22 KiB)\nnote: Skipped writing 2 intermediate files (use --keep-intermediates to keep them)\n"
+  },
+  {
+    "command": [
+      "pdftoppm",
+      "-r",
+      "90",
+      "-png",
+      "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v5p8p5_mass_coherence_20260919/source/report.pdf",
+      "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v5p8p5_mass_coherence_20260919/qa/portable-8i_6rh9r/original"
+    ],
+    "returncode": 0,
+    "output": ""
+  },
+  {
+    "command": [
+      "pdftoppm",
+      "-r",
+      "90",
+      "-png",
+      "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v5p8p5_mass_coherence_20260919/qa/portable-8i_6rh9r/source/report.pdf",
+      "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v5p8p5_mass_coherence_20260919/qa/portable-8i_6rh9r/rebuilt"
+    ],
+    "returncode": 0,
+    "output": ""
+  }
+]

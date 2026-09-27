@@ -1,0 +1,80 @@
+{
+  "version": "5.8.5",
+  "source_kernel_anchor_MeV": 76,
+  "source_definition": "Unchanged pinned v5.8.2 nominal GP means and paired full-spectrum Poisson samples",
+  "analysis_policy": "Reviewed mass-dependent kernels and supports retained; integer-MeV grid; held-out and likelihood windows both vary over the four specified widths",
+  "datasets": {
+    "2015": [
+      19,
+      100
+    ],
+    "2016": [
+      39,
+      180
+    ],
+    "2021": [
+      50,
+      250
+    ]
+  },
+  "combined_domain_MeV": [
+    19,
+    250
+  ],
+  "common_overlap_MeV": [
+    50,
+    100
+  ],
+  "combined_definition": "Common mass with independent nonnegative amplitudes in each active dataset. Shared coupling, Fisher and signed Stouffer are frozen v5.8.4 comparisons.",
+  "scan_step_MeV": 1.0,
+  "validation_Poisson_scans": 256,
+  "gaussian_fields": 100000,
+  "seed_base": 58220260917,
+  "response_method": "Differential signed-profile-likelihood root propagation including GP count-dependent mean and covariance, checked against direct full-bin one-standard-deviation perturbations",
+  "validation": "Complete independent Poisson spectra per dataset reused at every mass; same drawindex used in combination; retain explicit MonteCarlo intervals and approximation diagnostics",
+  "source_fit_uncertainty_propagated": false,
+  "physical_discovery_calibrated": false,
+  "scope_selection_on_significance": false,
+  "blind_halfwidth_sigma": [
+    2.25,
+    2.4,
+    2.5,
+    2.6
+  ],
+  "combination_methods": [
+    "free_nonnegative_amplitudes",
+    "shared_coupling_parent",
+    "atom_calibrated_Fisher_parent",
+    "signed_Stouffer_parent"
+  ],
+  "reach_definition": "Observed and local model-background Asimov 90% CLs coupling upper endpoints; no one-dimensional Fisher reach without a signal-yield model",
+  "method_or_width_selection_corrected": false,
+  "reused_source_toy_seed_base": 58220260917,
+  "mixture_check_seed_base": 58420260918,
+  "blind_width_interpretation": "The same mask defines GP exclusion and fitted likelihood window, as in the original engine",
+  "new_width_response_checks": 264,
+  "baseline_response_reused": true,
+  "signal_template_renormalized_to_window": false,
+  "model_Asimov_definition": "Counts equal the observed-sideband-trained local predictive background; covariance fixed; exact profiled CLs endpoint, not a validated ensemble median",
+  "fisher_global_statistic": "Maximum -log(atom-mixture local p) across the declared domain",
+  "stouffer_global_statistic": "Maximum sum of continuous reference signed scores divided by sqrt(active dataset count) across the declared domain",
+  "parent": "v5.8.4",
+  "study": "Common mass, free amplitudes, and post-hoc mass stability",
+  "diagnostic_region_MeV": [
+    80,
+    105
+  ],
+  "diagnostic_common_region_MeV": [
+    80,
+    100
+  ],
+  "new_likelihood": "Independent nonnegative dataset amplitudes; exact q_R=sum(max(r_d,0)^2)",
+  "reused_Poisson_scans": 256,
+  "calibration_note": "Direct exact profile Poisson scans and separately labeled conditional Gaussian response approximation",
+  "primary_local_ordering": "Exact q_R=sum_d max(r_d,0)^2; inclusive source-conditioned tail at fixed mass",
+  "primary_global_ordering": "Maximum -log p_R(m) over every integer mass 19 through250 inclusive with active support changes repeated in null scans",
+  "coherence_statistic": "Mean squared resolution-normalized scatter of 12 positive-fit peak masses about one inverse-resolution-variance weighted mass; inf if any peak absent",
+  "coherence_domain": "Post-hoc 80-100 MeV common intersection; displayed stability80-105 clipped to dataset support",
+  "coherence_tail": "Inclusive lower tail; descriptive null diagnostic, uncorrected for selection of region/statistic",
+  "parent_untouched": true
+}

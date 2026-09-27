@@ -1,0 +1,101 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=0.76in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,microtype,graphicx,booktabs,amsmath,amssymb,xcolor,array,hyperref,fancyhdr}
+\hypersetup{pdftitle={HPS-GPR v5.8.2: Nominal GP reference significance scans},colorlinks=true,urlcolor=blue!50!black}
+\definecolor{navy}{RGB}{29,54,78}
+\pagestyle{fancy}\fancyhf{}\lhead{\small HPS-GPR: nominal GP reference significance}\rhead{\small v5.8.2}\cfoot{\thepage}
+\setlength{\headheight}{14pt}\setlength{\parindent}{0pt}\setlength{\parskip}{6pt}
+\newcommand{\heading}[1]{\section*{\color{navy}#1}}
+\newcommand{\fig}[2]{\begin{center}\includegraphics[width=\linewidth]{#1}\end{center}{\small #2}\par}
+\begin{document}
+{\LARGE\bfseries\color{navy} Local and global significance\\with nominal GP background references}\par
+{\large Standalone study v5.8.2}\hfill 17 September 2026
+
+\heading{Scope and main result}
+This study applies the nominal GP source construction of v5.8.1 to full 2015, full 2016 and native 2021 10\%, and to their exact shared-coupling combination. The observed likelihood fits are retained. The new probabilities ask how unusual those fits are under one fixed smoothed GP count spectrum per dataset.
+
+Each source mean uses its dataset's reviewed kernel at 76 MeV, the source anchor already used in v5.8.1 and inside all three search ranges. No source kernel is selected from the new significance curves. The analysis itself retains the reviewed mass-dependent kernels, support, resolution, signal windows and signal-to-coupling conversion.
+
+\input{peak_table.tex}
+\input{result_prose.tex}
+
+The scans use 0.5 MeV spacing. Individual ranges are 19--100, 39--180 and 50--250 MeV. The combined curve spans 19--250 MeV and uses all datasets whose declared ranges contain the tested mass. It is a three-dataset fit over 50--100 MeV; outside that overlap it uses the applicable pair or single dataset. Its global correction includes the entire connected range and these changes of composition.
+
+\heading{What the plotted significance means}
+Let $r(m)$ be the signed unconstrained profile-likelihood root, $a(m)=r(B;m)$ its value for the fixed GP mean $B$, and $s(m)$ the predicted standard deviation of its response to Poisson fluctuations. For a positive observed signal fit,
+\[
+z_{\rm ref}(m)=\frac{r_{\rm obs}(m)-a(m)}{s(m)},\qquad
+p_{\rm local}(m)=1-\Phi\!\left(z_{\rm ref}(m)\right).
+\]
+A nonpositive fit has the exact inclusive excess tail $p=1$. The displayed significance is $Z=\max[0,\Phi^{-1}(1-p)]$. The dashed gray curve instead shows the conventional unshifted local root $\max(0,r)$, allowing direct comparison with the released asymptotic display.
+
+These are GP-reference conditional significances. The source spectra are estimated from the observed data and held fixed during the simulations. The plots do not include source-estimation uncertainty or establish a replacement physical discovery calibration. The distinction matters because v5.8.1 demonstrated signal absorption during source construction even when the subsequent extraction recovered injected signal.
+
+\clearpage
+\heading{Local and scan-global significance}
+\fig{../figures/local_global_Z_overview.pdf}{\textbf{Figure 1.} Local (black) and global (red) significance conditional on the nominal GP references. Gray dashed: unshifted asymptotic local root. Every global curve accounts for its scope's complete declared search domain. Dotted vertical lines in the combined panel mark changes of participating datasets, not additional independent searches.}
+
+At each mass the red curve is obtained by comparing its observed reference score with the distribution of the largest positive-fit-gated score anywhere in the same search. A local upward fluctuation can therefore have a much smaller global significance. The comparison uses correlations across mass; it is not a Bonferroni count of plotted points or a combination of p-values.
+
+The combined likelihood constrains one coupling to predict all contributing signal yields. Independent dataset count fluctuations are propagated through that fit. Its covariance therefore includes shared fluctuations across masses, including masses where the dataset composition changes. It is not constructed by averaging the three displayed significance curves.
+
+The separate common-overlap plot uses all three datasets at every mass from 50 to 100 MeV. Its global probability at 66 MeV is 0.0714 ($Z=1.47$); this is a different, predeclared search domain and does not replace the full-range result.
+
+Each individual figure is also supplied separately, with aligned $Z$ and probability panels. All numeric curves and exact mass coordinates are available in \texttt{results/significance\_curves.csv}.
+
+\clearpage
+\heading{Local and scan-global probabilities}
+\fig{../figures/local_global_p_overview.pdf}{\textbf{Figure 2.} Conditional tail probabilities for the same scans. Red shading is the two-sided 95\% binomial sampling interval from 200,000 Gaussian fields per scope; it measures finite-simulation uncertainty only. The local black curve is the normal tail of the response-standardized root. At nonpositive observed fits its inclusive excess probability is one, whereas the gray conventional local display is one half.}
+
+A global probability concerns the full search even when shown as a function of a particular tested mass. The most significant point in each scope is summarized on page 1. The four scope results are reported separately; the correction does not include subsequently choosing whichever scope gives the smallest p-value.
+
+Monte Carlo estimates use the add-one convention $(k+1)/(N+1)$ and retain the raw count $k$, exact interval and one-sided upper bound in the ledger. A zero-exceedance result, if present, is shown using its one-sided 95\% probability upper bound rather than an infinite significance. Analytic local tails do not acquire additional precision from the number of Gaussian draws.
+
+The main results use the full half-MeV grid. At a fixed reference-score threshold of three, halving the step increases the Gaussian maximum tail from 0.0597 to 0.0701 for 2015, and from 0.1341 to 0.1482 for the combination. Finer-grid convergence is not established here. The same Gaussian fields are also sampled at the nested integer masses, separating scan-spacing effects from model changes. A predeclared 50--100 MeV common-overlap result is recorded as a secondary diagnostic; it does not replace the complete combined search penalty.
+
+\clearpage
+\heading{Background response and local validation}
+\fig{../figures/response_validation.pdf}{\textbf{Figure 3.} Deterministic reference offsets and moments of 256 complete Poisson scans. The null mean need not be exactly zero in the unchanged likelihood. Centering and scaling make the significance-field approximation explicit instead of assuming the unshifted roots have standard-normal marginals. The curves are conditional checks, not uncertainty bands.}
+\input{validation_table.tex}
+
+The same complete Poisson spectrum is reused at every mass within a dataset. Dataset draws are independent, and matching draw indices form the combined scan. There are 256 independent scan realizations per scope, with shared input realizations across scopes; increasing the mass grid does not increase the number of independent experiments.
+
+Source agreement is also distinct from these fluctuation checks. The nominal means reproduce their source spectra closely, but they are fitted through those spectra. Their usefulness here is to define a coherent alternative reference, not to supply an independent background measurement.
+
+\clearpage
+\heading{Global-field validation}
+\fig{../figures/global_validation.pdf}{\textbf{Figure 4.} Distribution of the largest gated reference score in each scope. Colored curves: 200,000 response-GP fields. Black steps: 256 complete Poisson scans using the same source means and the exact fitting procedure. The finite direct ensemble probes the bulk and moderate tails; it does not measure arbitrarily rare probabilities.}
+\input{global_validation_table.tex}
+\input{global_check_prose.tex}
+
+The global ordering is identical in the observed, Gaussian and direct-simulation calculations. For a Gaussian draw $W\sim N(0,R)$, form $r^*=a+sW$ and
+\[
+M^*=\max_{m:\,r^*(m)>0} W(m).
+\]
+The global tail at an observed positive fit is $P(M^*\ge z_{\rm ref,obs}(m))$. A draw with no positive fit has maximum $-\infty$; a nonpositive observed fit has global tail one. This preserves the excess-only interpretation while retaining mass correlations and the reference-dependent offsets.
+
+\clearpage
+\heading{Method, checks and reproducibility}
+The signal yield or common coupling is unconstrained when forming $r$; the positive-fit gate is applied only to the discovery ordering. Each fit profiles the existing Gaussian background covariance and Poisson count likelihood. The source means change the generating reference, not the observed fit or its parameterization.
+
+For efficient propagation, compute the differential response to each native count bin,
+\[
+D_{jm}=\sqrt{B_j}\,\frac{\partial r(m)}{\partial n_j},\qquad
+\Gamma=D^TD,\qquad s_m^2=\Gamma_{mm},\qquad
+R_{mn}=\frac{\Gamma_{mn}}{s_ms_n}.
+\]
+For the combined scope, $j$ runs over the concatenated independent dataset bins. The derivative includes the count dependence of both the GP predictive mean and covariance. It follows the envelope derivative of the profiled likelihood; the near-zero-root limit uses the efficient linear score. This is a differential implementation of the significance-GP response approximation, not an assertion that the exact nonlinear scan is Gaussian.
+
+The derivative was checked at 216 bin/scope/anchor combinations against directly recomputed fits. Four complete response banks, including the combination, contain 3,252 one-standard-deviation perturbations: the largest relative response-width difference is 0.137\%, and the smallest directional cosine is 0.999989. Exact Gaussian-process rank-one updates used for these checks are independently compared with direct Cholesky predictions.
+
+The main grid contains 163, 283, 401 and 463 coordinates for 2015, 2016, 2021 and the combined scope. All 1,310 displayed scope/mass coordinates carry 256 coherent validation roots. The dataset source spectra contain 484, 720 and 422 native fitted bins. Scalar-versus-batch checks, positive expectations, finite responses, covariance definiteness, frozen-source provenance, nested-grid monotonicity and local/global ordering are recorded in \texttt{qa/}. The source mean is not refitted separately for each toy.
+
+\textbf{Reproduce.} The package includes the pinned spectra, fitting engine, scripts, seeds, per-mass checkpoints, response matrices, Gaussian maxima and plot ledgers. From its root, \texttt{python3 scripts/make\_figures.py} regenerates figures and tables; \texttt{tectonic source/report.tex} rebuilds the note. NumPy, SciPy, pandas, Matplotlib and Tectonic are required. The README gives the full simulation commands. No previous release is modified.
+
+\heading{References}
+\begin{enumerate}
+\item V. Ananiev and A. L. Read, \textit{Gaussian Process-based calculation of look-elsewhere trials factor}, \href{https://arxiv.org/pdf/2206.12328}{arXiv:2206.12328}. The response-field approach motivates the covariance propagation; the choice of generating background remains a separate modeling assumption.
+\item HPS-GPR v5.0.5, Sections 4.20 and 6.11; v5.8.0, local-significance mapping and scan spacing; v5.8.1, alternative coherent references and source-signal contamination (17 September 2026). This study extends the nominal reference with unchanged observed inference.
+\end{enumerate}
+\end{document}

@@ -1,0 +1,38 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=.83in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,microtype,graphicx,booktabs,amsmath,amssymb,array,hyperref,fancyhdr,caption}
+\hypersetup{hidelinks,pdftitle={An outside statistician's fixed-background significance assessment}}
+\pagestyle{fancy}\fancyhf{}\setlength{\headheight}{14pt}
+\fancyhead[L]{\small HPS-GPR: an outside statistician's assessment}\fancyhead[R]{\small 21 September 2026}\fancyfoot[C]{\thepage}
+\setlength{\emergencystretch}{2em}\captionsetup{font=small}
+\begin{document}
+\begin{center}{\LARGE\bfseries Fixed backgrounds and\\the combined evidence}\par\vspace{7pt}
+{\large A numerical extension of the outside statistician's review}
+\end{center}
+\noindent\textit{Perspective: I approach these records as a statistician concerned with background modeling at high event counts. I take the supplied detector response, selections and signal-rate conversions as analysis assumptions. Here I evaluate the requested alternative directly: hold the estimated background fixed in each signal likelihood, and show both its nominal p-values and the outcome of repeating that procedure on complete null spectra.}
+\input{fixed_background.tex}
+\clearpage
+\section*{What I would ask of more 2021 data}
+My interest is in a reproducible mass, shape and rate. Removing background nuisance parameters changes the apparent ranking of the existing data, but supplies no new events. I would use the earlier profiled studies and the new fixed-background check together to design a replication, with the background policy chosen before inspecting that replication.
+
+The earlier profiled studies made 90--93 MeV worth following for rate consistency, and 65--67 MeV worth following under a common coupling. At 92 MeV their individual fitted $\epsilon^2$, in units of $10^{-6}$, were
+\[
+77.48\pm29.96\;(2015),\qquad9.13\pm2.93\;(2016),\qquad1.65\pm1.35\;(2021).
+\]
+Those are conditional fit errors, not complete detector or normalization uncertainties. The profiled 2021 sample supplied about 82\% of the local null information there while preferring the smallest amplitude. That explains why a flexible combination can look stronger than the physically restricted one. A common location does not by itself establish a common physical rate.
+
+\textbf{Use genuinely new events for the first replication test.} If the later total contains the examined 10\%, analyze the additional events separately before showing the pooled result. Freeze the mass hypotheses, signal widths, rate conversion, background treatment, test statistic and $\pm2.25\sigma_m$ mask. Searching intervals around nominated candidates still carries a trials correction, as does choosing among several candidates.
+
+\textbf{At 90--93 MeV, compare the rate as well as the mass.} New 2021 events could support a resolution-shaped excess at the rate predicted by a qualified common-coupling model, or make the differences among campaigns clearer. At 65--67 MeV they test the earlier shared-coupling preference. The new fixed-background preference near 51 MeV must also be judged through its dataset composition and calibration, rather than treated as an independent confirmation of the earlier studies. Around 76--80 MeV, examine the neighboring residual pattern as a background-model control.
+
+\textbf{More counts alone cannot distinguish signal from persistent model error.} A fractional background error has a residual proportional to exposure, just as a persistent signal fraction does. In a counting approximation,
+\[
+ Z_{\rm mismatch}(k)\simeq\frac{k\,\delta b}{\sqrt{k\,b}}
+ =\sqrt{k}\,\frac{\delta b}{\sqrt b}.
+\]
+A growing nominal score can therefore reveal a modeling error more precisely. Check fractional residuals, peak width, sidebands and justified control selections, including possible signal absorption when constructing the generating source. The v5.0.5 full-exposure projections assume persistence of selected partial-sample excesses; they are scenarios, not forecasts of unseen data.
+
+\vfill
+\noindent{\footnotesize\textbf{Evidence and scope.} This extension uses the portable v5.8.2 spectra, frozen nominal generating means, complete toy bank and raw profiled fields; the original review used v5.0.5 Sections 4.20/6.11, its calibration and projection material, and v5.8.4/v5.8.5 combination studies. The source archive includes numerical curves, toy fields, hashes, the statistician's assessment and independent likelihood checks. All empirical probabilities here remain conditional on the frozen source and inherited analysis choices. The original reports remain unchanged.}
+\end{document}

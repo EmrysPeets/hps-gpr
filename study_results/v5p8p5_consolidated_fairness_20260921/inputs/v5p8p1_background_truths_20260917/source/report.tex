@@ -1,0 +1,118 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=0.77in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,microtype,graphicx,booktabs,amsmath,amssymb,xcolor,array,hyperref,fancyhdr}
+\hypersetup{pdftitle={HPS-GPR v5.8.1: Alternative coherent background references},colorlinks=true,urlcolor=blue!50!black}
+\definecolor{navy}{RGB}{29,54,78}
+\pagestyle{fancy}\fancyhf{}\lhead{\small HPS-GPR: alternative background references}\rhead{\small v5.8.1}\cfoot{\thepage}
+\setlength{\headheight}{14pt}\setlength{\parindent}{0pt}\setlength{\parskip}{6pt}
+\newcommand{\heading}[1]{\section*{\color{navy}#1}}
+\newcommand{\fig}[2]{\begin{center}\includegraphics[width=\linewidth]{#1}\end{center}{\small #2}\par}
+\begin{document}
+{\LARGE\bfseries\color{navy} Alternative coherent backgrounds\\for the 2016 stress response}\par
+{\large Standalone follow-up v5.8.1}\hfill 17 September 2026
+
+\heading{A GP-derived reference changes the diagnosis}
+The large response in v5.8.0 was conditional on an archived generating spectrum: a low-mass functional form joined to a broad high-mass fit. It was not a statement about every plausible 2016 continuum. A fixed smoothed GP mean is a legitimate alternative generating reference, as is a positive regional construction. The essential requirement is to use \emph{one coherent spectrum} throughout the mass scan.
+
+The new comparison keeps the full-2016 analysis likelihood, reviewed mass-dependent kernels, signal resolution and moving signal windows unchanged. Across the 142 integer masses from 39 to 180 MeV, the RMS deterministic signed root changes from \textbf{4.967 for the archived stress spectrum to 0.609 for a full-data nominal GP mean}. A mean constructed with half the source GP length scale gives RMS 1.700. The substantial difference shows that the old stress offset is strongly reference dependent.
+
+This improvement has a serious qualification. When a known signal is added to the \emph{source data} and the generating mean is rebuilt, the nominal GP absorbs about 88\% of the extra counts inside the signal window at 76 and 90 MeV. The half-length-scale GP absorbs about 104\%. A small stress offset under a mean fitted through the same data is therefore an internal consistency result, not an independent demonstration of an unbiased physical null.
+
+The first blocked GP and regional cubic proposals are unsuccessful: they generate large source residuals and large stress roots. A second blocked construction, using local kernels and an explicit edge fallback, also remains inadequate. These examples identify construction problems; they do not rule out a better regional or held-out GP model.
+
+\heading{The six references}
+\begin{center}\small
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.29\linewidth}>{\raggedright\arraybackslash}p{0.62\linewidth}}\toprule
+Reference & Frozen construction\\\midrule
+Archived stress & Original hybrid reference, retained with its source-fit qualifications.\\
+Full GP, nominal & Entire observed spectrum smoothed using the reviewed 76 MeV kernel.\\
+Full GP, half length & Same source fit and amplitude, with half that length scale.\\
+Blocked GP & Predictions excluding broad fixed blocks, smoothly combined using the 76 MeV kernel.\\
+Regional rise/fall & Separate positive log-cubic branch fits with a smooth fixed overlap.\\
+Blocked, local kernels & Block-center reviewed kernels; self-fit fallback where two-sided interpolation is unavailable.\\\bottomrule
+\end{tabular}\end{center}
+
+All candidates are reported. None is selected from its observed significance or favorable stress response. The sixth construction is an explicit amendment motivated by the initial source-fit and boundary diagnosis; the first five arrays are preserved unchanged.
+
+\clearpage
+\heading{Source construction and agreement}
+\fig{../figures/backgrounds.pdf}{\textbf{Figure 1.} Fixed full-support means and observed counts. The lower panel shows the archived and full-data GP residuals. These residuals reuse the source data; they are descriptive, not independent goodness-of-fit probabilities. Native count normalization is retained without postfit rescaling.}
+
+The support is approximately 30--210 MeV with 0.25 MeV bins. Source GP parameters are fixed at $k=108.586$, $\ell=0.41317$ in log mass; the shorter-scale source uses $\ell/2$. These are generating-model choices. The analysis still uses its original reviewed parameters at each tested mass.
+
+For the blocked constructions, centers are spaced by 5 MeV. Each contributing prediction excludes at least the local $\pm2.25\sigma_m$ signal window, with an exclusion half-width of at least 15 MeV. Compact, positive $C^2$ weights assemble a single spectrum. Broad interpolation gaps and joins nevertheless distort the shape. The local-kernel variant uses the full-data nominal GP only for blocks lacking external sidebands; those edge predictions are explicitly not held out.
+
+The regional model fits four log-count coefficients in each branch, over 30--75 and 50--210 MeV, and joins their log means with a quintic smoothstep over 50--75 MeV. The overlap follows the broad observed turnover, with no local roots used. The branch labels describe their domains; monotonicity is not imposed.
+
+The descriptive Pearson sum divided by the number of bins is 2.90 for the archive, 1.085 and 1.067 for the two all-data GPs, 5029 for the original blocked construction, 349 for the regional cubic, and 113 for the local-kernel blocked variant. These are not reduced-$\chi^2$ values with calibrated degrees of freedom. The latter three source disagreements are too large to regard these particular curves as adequate smooth continuum estimates.
+
+\clearpage
+\heading{Response of the unchanged analysis}
+For a frozen expected-count spectrum $B$, define $a(m)=r(B;m)$, where $r$ is the signed unconstrained profile-likelihood root. This is a deterministic stress response, not an observed particle significance. The observed root is unchanged by changing the generating reference.
+
+\fig{../figures/response_scan.pdf}{\textbf{Figure 2.} Full integer-grid response under all six references. The two panels use different vertical scales so the unsuccessful proposals do not obscure the GP controls. The large blocked responses arise from the constructed source shapes; they are not observed excesses.}
+\input{summary_table.tex}
+
+A more flexible source fit is not automatically a better control for a fixed extraction procedure. The half-length-scale source describes the observed bins slightly more closely but produces a larger stress RMS than the nominal source. Conversely, a smooth join guarantees neither accurate interpolation nor harmless signal-scale curvature.
+
+\clearpage
+\heading{Conditional local experiments}
+At six inherited anchors, generate complete Poisson spectra independently from each fixed mean and retrain the analysis GP on each experiment's sidebands. The intended size is 512 experiments per reference and anchor. For a positive observed root, count $r^*\ge r_{\rm obs}$. When $r_{\rm obs}\le0$, the inclusive tail of $q_0=\max(0,r)^2=0$ is exactly one.
+
+\input{tail_table.tex}
+
+\fig{../figures/local_distributions.pdf}{\textbf{Figure 3.} Conditional root distributions for the archived and full-data GP references. The observed data and their fitted root are identical across references. Other completed distributions and numerical failures are recorded in the result ledger.}
+
+The nominal full-GP reference still gives 101/512 raw nominal 5\% rejections at 90 MeV and 97/512 at 117 MeV (about 20\% and 19\%). Thus its smaller overall offset does not establish standard-normal local calibration.
+
+A zero count out of 512 gives only the one-sided 95\% bound $p<0.005834$ under that particular fixed mean. The add-one value $1/513$ is a finite-simulation reporting convention, not a resolved tail. The CSV also reports two-sided exact binomial intervals. No new local discovery significance or global probability is certified.
+
+\input{local_status.tex}
+
+No all-reference envelope is reported. The completed GP probabilities still condition on a mean estimated from these same data and omit source-construction uncertainty.
+
+\clearpage
+\heading{Two different signal-injection questions}
+\textbf{Extraction with a frozen source.} Add the same physical signal yield to each fixed reference and then run the unchanged analysis. Strengths are two and five original observed-design Fisher errors at 42, 66, 76, 90, 92 and 117 MeV. The recovery column on page 3 measures the fitted-amplitude increment divided by that injected amplitude. It shows whether the analysis extracts added signal when the generating background remains fixed.
+
+\textbf{Contamination of the estimated source.} Add a five-reference-error signal to the observed source at 76 or 90 MeV, rebuild the background construction, and compare the resulting mean with its uninjected counterpart. This asks whether the proposed generating background itself incorporates a possible signal. It is a separate test from ordinary signal recovery.
+
+\input{source_leakage_table.tex}
+
+The nominal full-data GP takes about 88\% of the added window counts into its rebuilt mean and about 72\% of the signal-shaped component. The shorter-scale source takes about 104\% of the window counts and 94\% of that component. A fraction above one is possible because the source change also redistributes counts and produces neighboring deviations. These are deterministic transfer diagnostics, not probabilities.
+
+Blocked predictions strongly reduce contamination \emph{at the injected location}, but the constructions tested here produce large nonlocal changes. For the local-kernel version the full-support change divided by injected yield is about $+5.79$ at 76 MeV and $-6.13$ at 90 MeV. Small local leakage alone does not validate those backgrounds. The regional branches absorb roughly 49\% and 41\% of added window counts and already have poor source agreement.
+
+\heading{Practical conclusion}
+The proposed smoothed GP reference is useful and materially reduces the old stress response. Treat it first as a coherent internal control. A convincing replacement reference should combine adequate source description, interpolation tests with stable boundaries and joins, and a source-injection test that limits signal absorption. A regional construction remains worth developing, but the two simple cubics tested here are insufficient for this high-count spectrum.
+
+Use one frozen full-support mean for a scan, not a different mass-specific truth at each coordinate. If background uncertainty is later sampled from a GP posterior, it induces additional bin correlations and must be propagated through complete scans. Fixed-mean Poisson tests do not include that uncertainty.
+
+\clearpage
+\heading{Validation, provenance and reproducibility}
+This study is a bounded follow-up to v5.8.0 and the v5.0.5 background/significance discussion. It changes neither the released 2016 likelihood nor the stored observed results. The prior archive is retained as a traceable stress example; its failed broad-source fit and unverified source equivalence are not reclassified as a qualified physical null.
+
+The six generating arrays have identical support and finite positive means. The deterministic scan contains 852 mass/reference configurations and 72 added-signal configurations. All use positive profiled expectations. One extreme blocked-reference scan fit at 45 MeV has score residual $5.43\times10^{-7}$, above this study's stricter $2\times10^{-7}$ check, though below the underlying solver's outer acceptance bound. Its failed study flag is preserved; that construction already fails source agreement. This exception is not described as a passed numerical gate.
+
+\input{qa_status.tex}
+
+The exact GP predictors recompute count-dependent training noise for each Poisson spectrum, with fixed kernel coordinates. Batched local fits are checked against scalar fits. Complete candidate/anchor scenarios that fail the numerical check have no reported tail probability. Repeated deterministic-seed attempts during failure handling are not counted as additional independent calibration experiments.
+
+The source injection table contains ten deterministic reconstructions: five fitted-source constructions at two signal masses. Kernel choices, polynomial coefficients, exclusion masks, blend weights, source hashes, seeds, failed-scenario records and all saved root samples accompany the report. Independent method and statistical reviews distinguish execution completeness, numerical checks and physical qualification.
+
+\textbf{Rebuild the displayed artifacts.} From the study directory, run
+\begin{quote}\ttfamily\small
+python3 scripts/make\_artifacts.py\\
+cd source\\
+tectonic report.tex
+\end{quote}
+This saved-result rebuild requires NumPy, pandas, Matplotlib and Tectonic. Repeating the original fits also requires the frozen HPS runtime paths recorded in the manifests; the full legacy environment is not bundled. The delivery record gives elapsed time against the requested 20-minute cap. No toy maximum or look-elsewhere correction is computed here.
+
+\heading{References and result locations}
+\begin{enumerate}
+\item V. Ananiev and A. L. Read, \textit{Gaussian Process-based calculation of look-elsewhere trials factor}, \href{https://arxiv.org/pdf/2206.12328}{arXiv:2206.12328}. A fixed GP-derived mean can supply the bin expectations; the paper does not qualify that mean as the physical continuum.
+\item HPS-GPR v5.0.5, Sections 4.20 and 6.11, and standalone v5.8.0 (17 September 2026). The same full-2016 count snapshot and reviewed fitting policy are used here.
+\item \texttt{truths/}: frozen means, construction definitions, source agreement and source-injection transfer. \texttt{results/}: deterministic scans, extraction injections and local Poisson roots. \texttt{reviews/} and \texttt{qa/}: independent checks, explicit failures and PDF review.
+\end{enumerate}
+\end{document}

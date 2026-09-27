@@ -1,0 +1,91 @@
+\clearpage
+\section{Common fit and training windows of 2.4, 2.5 and 2.6 sigma}
+The original $\pm2.25\sigma_m$ prescription remains the baseline. Three
+additional calculations use common fit and training-mask half-widths
+$h=2.4\sigma_m$, $2.5\sigma_m$ and $2.6\sigma_m$. There is no separate
+outer guard window: the same half-width determines the fitted bins and
+the excluded GP training bins. Each changed mask recomputes the GP
+prediction and correlated covariance from its own observed sidebands,
+with the archived kernel coordinates held fixed.
+
+Gaussian and MC templates at a given width share those counts and GP
+constraints. A comparison between widths therefore changes both the
+observed fit region and the background prediction; it cannot isolate
+signal-tail acceptance alone. The nominal resolution, coupling conversion
+and full-support template normalization are retained. Masks select bins by their native-bin centers. Nearby half-widths
+can therefore select exactly the same fit and training bins at a particular
+mass and yield coincident results; the width response is not continuous. No width is selected for
+its observed limit or local probability.
+
+\begin{table}[H]\centering\scriptsize
+\input{../derived/report_window_summary.tex}
+\caption{Direct-MC versus Gaussian comparisons at ten generated masses,
+reported separately for each common half-width. The LOO column counts
+held-out shape checks satisfying the declared criteria. MC spread is
+the largest relative upper-limit standard deviation among the ten
+masses under 32 independent-bin Poisson resamples. These descriptions
+are correlated across both mass and window.}
+\end{table}
+
+The median absolute MC-to-Gaussian limit change is 22.92\%, 28.90\%
+and 29.53\% for half-widths 2.4, 2.5 and 2.6 sigma, compared with
+22.05\% at baseline. The smallest direct-template local probability
+remains at 80~MeV: $p_0=0.02477$ for baseline and 2.4 sigma, and
+$p_0=0.009903$ for 2.5 and 2.6 sigma. These are conditional local
+results, not a basis for choosing the width.
+
+The following pages keep the three new prescriptions separate. Their
+upper panels show the full observed curves; the lower panels and tables
+compare direct templates only at their generated masses. Dashed curves
+use the same exploratory CDF morph as the baseline, including its
+low-mass qualification. Local probabilities retain $p_0=0.5$ for
+deficits and are not adjusted for inspecting multiple masses, models
+or window widths.
+
+The finite-MC and leave-one-out diagnostics are recomputed for each
+width and retained in the portable ledgers. Wider masks do not resolve
+the unverified candidate association, production-selection mismatch or
+signal leakage into the sidebands. The inherited coupling values remain
+conditional template comparisons rather than validated A-prime exclusions.
+
+\clearpage
+\subsection{Half-width $2.4\sigma_m$}
+\fig{.55}{../figures/window_2p4.pdf}{2021 10\% observed results with
+common fit and GP training-mask half-width $2.4\sigma_m$. The Gaussian
+and MC predictions share the background constraint within this page.
+The lower panels show direct-MC/Gaussian limit ratios and signed-root
+changes at generated masses; dashed dense curves are exploratory.}
+\begin{table}[H]\centering\scriptsize
+\input{../derived/report_window_2p4.tex}
+\caption{Direct-template comparison for half-width $2.4\sigma_m$.
+Coupling limits and local probabilities retain the same conventions
+as the baseline table.}
+\end{table}
+
+\clearpage
+\subsection{Half-width $2.5\sigma_m$}
+\fig{.55}{../figures/window_2p5.pdf}{2021 10\% observed results with
+common fit and GP training-mask half-width $2.5\sigma_m$. The Gaussian
+and MC predictions share the background constraint within this page.
+The lower panels show direct-MC/Gaussian limit ratios and signed-root
+changes at generated masses; dashed dense curves are exploratory.}
+\begin{table}[H]\centering\scriptsize
+\input{../derived/report_window_2p5.tex}
+\caption{Direct-template comparison for half-width $2.5\sigma_m$.
+Coupling limits and local probabilities retain the same conventions
+as the baseline table.}
+\end{table}
+
+\clearpage
+\subsection{Half-width $2.6\sigma_m$}
+\fig{.55}{../figures/window_2p6.pdf}{2021 10\% observed results with
+common fit and GP training-mask half-width $2.6\sigma_m$. The Gaussian
+and MC predictions share the background constraint within this page.
+The lower panels show direct-MC/Gaussian limit ratios and signed-root
+changes at generated masses; dashed dense curves are exploratory.}
+\begin{table}[H]\centering\scriptsize
+\input{../derived/report_window_2p6.tex}
+\caption{Direct-template comparison for half-width $2.6\sigma_m$.
+Coupling limits and local probabilities retain the same conventions
+as the baseline table.}
+\end{table}

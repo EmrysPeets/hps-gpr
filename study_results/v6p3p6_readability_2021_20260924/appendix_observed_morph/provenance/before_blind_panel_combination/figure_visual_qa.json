@@ -1,0 +1,75 @@
+{
+  "passed": true,
+  "figures": [
+    "v638_observed_scan",
+    "v638_peak_1",
+    "v638_peak_2",
+    "v638_peak_3",
+    "v638_deficit"
+  ],
+  "render_scale_pixels": 1200,
+  "all_figures_rendered_and_visually_inspected": true,
+  "caption_and_metadata_checks": true,
+  "issues": [],
+  "component_checks": [
+    {
+      "region": "peak_1",
+      "mass_MeV": 67.0,
+      "fit_bins": 18,
+      "passed": true
+    },
+    {
+      "region": "peak_2",
+      "mass_MeV": 79.0,
+      "fit_bins": 19,
+      "passed": true
+    },
+    {
+      "region": "peak_3",
+      "mass_MeV": 185.0,
+      "fit_bins": 36,
+      "passed": true
+    },
+    {
+      "region": "deficit",
+      "mass_MeV": 226.0,
+      "fit_bins": 50,
+      "passed": true
+    }
+  ],
+  "input_sha256": {
+    "results/observed_scan.csv": "8a543b1e918da31ef1bdee98e56a0259f7d88ebc260d4ceb9a0fdf55d91b358e",
+    "results/selected_regions.json": "691e078381a85c8c9a1c39e176097e34204026ae119a3b6e0592c0ca361bda28",
+    "results/selected_local_calibration.csv": "2cf9def5f438e93db7dec47f3de9862ad3970831b02c42b0ad30f10b133e18c8",
+    "results/selected_fits/excess_1_m067_morph_starter.npz": "bc1d7494bfdd64433bd7df9481649ac2dfb84fcc6e75ed149d50dca80a7b82f4",
+    "results/selected_fits/excess_2_m079_morph_starter.npz": "a79725558f1f01a59867ae76590c0067e9f86e4fc24c19fe660c34f79b634e68",
+    "results/selected_fits/excess_3_m185_morph_starter.npz": "872017ec40bcfd5b28ac307e902ba68d7bb16f8f127fb4a8aee6d4f9741ac157",
+    "results/selected_fits/deficit_m226_morph_starter.npz": "6c8e57daf5bd079b058ce9db618e853746b707a98c8a41ec9da965e99de02f2e"
+  },
+  "script_sha256": "cb651291000e9866db4f97f2076fff71413b29d05dbac96c57f505d7726213f6",
+  "figure_sha256": {
+    "figures/v638_observed_scan.pdf": "8ad11b524c847ab57276bf1b7ef2e80448b696f224f2a7586c039eb9555bf139",
+    "figures/v638_observed_scan.png": "e62ef17cfa925d1c005ea12db397ee9ab4ad6c84200d116bdf93b5416f02824a",
+    "figures/v638_peak_1.pdf": "0c6d695f76988ef54510b0efc4dae501bf7a1a7d27d6b582906c077090c62eb6",
+    "figures/v638_peak_1.png": "5377a5f61a6eb8eaf42b4ffe09775e2becc5d38c43bacba43dacc56390457521",
+    "figures/v638_peak_2.pdf": "0aed965a50d187c1037abb138b48193cbdd0b3a8fb3e9b5f02269b3ec46ddfa0",
+    "figures/v638_peak_2.png": "57ea0ece0ed2d7a72af1cd22c410c3dccc9cebb5f2f0cb60638843905eadd936",
+    "figures/v638_peak_3.pdf": "5564b06f80bce3d5b75dceb437283eeb01c8d51118c1c9f012aa55ea25abd650",
+    "figures/v638_peak_3.png": "0e9688d5f5522e95f10400a95a9b4999b2645281f4fece500c29431fbcc77c1c",
+    "figures/v638_deficit.pdf": "c9dad5bfc4e99a284d4b1a7a010043a432a27f22a2d398601ea0b9b6e6593e25",
+    "figures/v638_deficit.png": "fb583161fea837133239f9f7b17047b3179598f05a2b4372c9fe08d89d9d11ea"
+  },
+  "scope": "Visual QA and saved-array display consistency. Numerical inference is audited separately.",
+  "clarity_checks": {
+    "positive_Z_and_local_p_labeled": true,
+    "deficit_signed_root_and_zero_excess_statistic_labeled": true,
+    "lower_tail_toy_probability_separate": true,
+    "acceptance_transition_67_and_79_flagged": true,
+    "GP_constraint_band_not_postfit_band": true,
+    "count_errors_sqrtN_only": true,
+    "curves_restricted_to_fit_bins": true,
+    "full_yield_model_difference_explained": true,
+    "empty_calibrated_sets_not_plotted_as_zero": true,
+    "legends_and_annotations_outside_data": true
+  }
+}

@@ -1,0 +1,142 @@
+\documentclass[11pt]{article}
+
+\newif\ifwritingsample
+\writingsampletrue
+
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,mathtools,bm}
+\usepackage{booktabs,tabularx,array,makecell,longtable}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{siunitx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{xurl}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{placeins}
+\usepackage{microtype}
+\usepackage{textcomp}
+\usepackage{fancyhdr}
+\urlstyle{same}
+
+\hypersetup{
+  hidelinks,
+  pdfdisplaydoctitle=true,
+  pdftitle={HPS Gaussian-Process Resonance Search: Selected Sections 2--6},
+  pdfauthor={Emrys Peets},
+  pdfsubject={Harvard fellowship writing sample; edited excerpt from a collaborative HPS analysis note},
+  pdfkeywords={Heavy Photon Search, Gaussian processes, resonance search, statistical inference}
+}
+\pdfstringdefDisableCommands{%
+  \def\eps{epsilon}%
+  \def\CLs{CLs}%
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\setlength{\headheight}{14pt}
+\fancyhead[L]{\small HPS Gaussian-Process Resonance Search}
+\fancyhead[R]{\small Writing Sample}
+\fancyfoot[C]{\thepage}
+\fancypagestyle{plain}{%
+  \fancyhf{}%
+  \fancyhead[L]{\small HPS Gaussian-Process Resonance Search}%
+  \fancyhead[R]{\small Writing Sample}%
+  \fancyfoot[C]{\thepage}%
+}
+
+\setlist[itemize]{leftmargin=*}
+\setlist[enumerate]{leftmargin=*}
+\setlength{\tabcolsep}{5pt}
+\setlength{\emergencystretch}{2em}
+\renewcommand{\arraystretch}{1.12}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\CLs}{CL$_\mathrm{s}$}
+\newcommand{\Pre}{\textbf{Pre:}\ }
+\newcommand{\Pro}{\textbf{Prompt:}\ }
+\newcommand{\xspace}{}
+
+% The shared sections retain this historical command name.  In the writing
+% sample it is deliberately strict: a missing asset stops the build.
+\newcommand{\graphicorplaceholder}[2]{%
+  \includegraphics[width=#1]{#2}%
+}
+
+\input{sections/generated_v4p9_results}
+\input{sections/generated_v4p9p1_results}
+
+\title{\vspace{1.3in}HPS Gaussian-Process Resonance Search\\[0.5em]
+\large Selected Sections: Data, Statistical Method, Validation, and Results}
+\author{
+Emrys Peets\\Stanford University and SLAC National Accelerator Laboratory
+}
+\date{September 2, 2026}
+
+\begin{document}
+
+\hypersetup{pageanchor=false}
+\begin{titlepage}
+\maketitle
+\vfill
+\begin{center}
+\begin{minipage}{0.84\textwidth}
+\small
+\textbf{Note:} Global significances are not reported in this selection of HPS
+internal documentation. Every quoted $p_0$ or $Z$ is a local, fixed-mass asymptotic
+diagnostic.
+
+\medskip
+\textbf{Abstract.} This excerpt follows the HPS search for a
+dark photon, $A^\prime$, from the detector and $e^+e^-$ spectra through a
+Gaussian-process description of the smooth background and the validation of a narrow
+resonance search. Four pseudoexperiment ensembles probe the extraction at different
+statistical scales, with matched zero-, one-, three-, and five-reference-sigma signal
+tests. Each scenario passes the documented validation checks, and the injected-signal
+response remains stable at 96.6--96.9\%. That agreement across sample sizes is the
+basis for saying that the analysis is ready for the planned full-data unblinding. The
+current observed results use full 2015, full 2016, and the available 2021 10\% sample
+in three standalone and four shared-coupling fits. The smallest all-three local value
+occurs at 66~MeV, with $p_0=2.845\times10^{-3}$ and $Z=2.765$; it is a local
+fluctuation, not a discovery claim.
+\end{minipage}
+\end{center}
+\vfill
+\thispagestyle{empty}
+\end{titlepage}
+
+\hypersetup{pageanchor=true}
+\setcounter{page}{1}
+\setcounter{section}{1}
+\setcounter{tocdepth}{2}
+\tableofcontents
+\clearpage
+
+\input{sections/02_datasets}
+\FloatBarrier
+\clearpage
+
+\input{sections/03_event_selection}
+\FloatBarrier
+\clearpage
+
+\input{sections/04_methodology}
+\FloatBarrier
+\clearpage
+
+\input{sections/05_toys_validation}
+\FloatBarrier
+
+\clearpage
+\input{sections/06_selected_results}
+\FloatBarrier
+
+\clearpage
+\bibliographystyle{unsrt}
+\bibliography{hps_gpr_analysis_note}
+
+\end{document}

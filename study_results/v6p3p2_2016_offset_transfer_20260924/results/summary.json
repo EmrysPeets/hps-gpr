@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "master_seed": 63420160924,
+  "bootstrap_replicates": 2000,
+  "pilot_rows": 2000,
+  "calibration_rows": 36000,
+  "evaluation_rows": 16000,
+  "pilot_valid": 2000,
+  "calibration_valid": 36000,
+  "evaluation_valid": 16000,
+  "all_toy_ids_accounted": true,
+  "calibration_parameter_cells": 40,
+  "valid_calibration_parameter_cells": 40,
+  "failure_rows": 0,
+  "evaluation_profile_valid": 16000,
+  "native_cls90_attempted": 8000,
+  "native_cls90_valid": 8000,
+  "source_hashes": {
+    "results/pilot_rows.csv": "029188e34e7bcb8abba2e71953b9355e4db6958182b478b6bf0458049dc03fec",
+    "results/calibration_rows.csv": "41bd4f1cd075c46329ead59619d6998f38f907db564b65cec98a88cae164c457",
+    "results/evaluation_rows.csv": "f7ac7b12193792497426452725beac5d77a93711b5c6d2b399d838b569336f1a",
+    "pilot_reference.json": "eb63ddb0cd885a9f4414a3e2617bc61b4fa1cc09833efd1a7d98c78358926cda",
+    "calibration_freeze.json": "231d853a1826132e805e92813c7d7b0e2e9b79d856f34a2f1741284796c071f8",
+    "protocol.json": "a72ec6d6f1433175da828bb43848e7c97325a2f499153dbb59cf2dd9ff4edc00",
+    "scripts/analyze.py": "8bb8a97417cb75d187187a7ed54fc207413e005d0badfa5d82e2565cc3c0f1ba",
+    "results/asimov_rows.csv": "0bd08029512516d999a7021b04d999d33497842d446d4c2b23da2bcb43eb9fc4"
+  },
+  "definitions": {
+    "offset": "delta=mean cal Ahat(0)",
+    "response": "R=mean paired cal[Ahat(3*s0)-Ahat(0)]/(3*s0)",
+    "width": "k0=sample SD[(cal Ahat(0)-delta)/sigmahat]",
+    "rank": "p_A=(1+#100 calibration Ahat<=evaluation Ahat)/101; reject if p_A<=0.10",
+    "CLs_diagnostic": "min(1,p_A/p_0), estimator ordering; not native profile CLs",
+    "bootstrap": "2000 whole toy-ID replicates within source, separate source streams, paired exposures/masses/levels; pilot reference fixed",
+    "rank_bound": "test size <=10/101 marginal over random calibration and evaluation at fixed source and independent pilot reference",
+    "frozen_table": "heldout acceptance and upper-envelope coverage reported separately, with 95% Clopper-Pearson intervals",
+    "grid": "z=0..8, no interpolation; empty sets, holes and z8 right-censoring preserved",
+    "calibration_beta": "Beta(10,91) continuous order-statistic reference for lower-tail probability of the10th calibration statistic; inclusive rank ties conservative"
+  },
+  "limitations": "Conditional fixed-source validation. Scaling is tested, not assumed. No production bias correction or calibrated continuous/global/physical-exclusion claim."
+}

@@ -1,0 +1,29 @@
+\section{What to adopt, and what still needs validation}
+Retain the reviewed likelihood, the raw observed scan and the fixed $\pm2.25\sigma_m$ blind window. Retain the significance-field GP as an efficient way to simulate the null response of that procedure once a defensible source policy is specified. Do not adopt a mass-dependent reference subtraction solely because it removes the large stress offset, and do not replace the full scan by a count of nominally decorrelated points.
+
+The deterministic offset remains a valuable diagnostic. It makes a source--extractor mismatch visible. The appropriate response is to investigate the source and its uncertainty, and to test the resulting analysis on independent simulated experiments and signal injections. Subtracting the offset defines a different test; it does not demonstrate that the original mismatch has been understood. Conversely, declining to subtract it does not establish that the raw roots have standard-normal null tails.
+
+\subsection{A concrete next calibration}
+A useful next study would change the source qualification while holding the extraction window fixed:
+\begin{enumerate}
+\item Establish the event selections, normalization and overlap for a control sample from the same campaign as the search. If the nominal 1\% sample is contained in the 10\% search, using it as an independent control requires a disjoint search sample and its correct exposure. The available 2021 high-$p_{\rm sum}$ histogram cannot determine a 2016 offset without a separate transfer model.
+\item Specify one coherent generative experiment for each full scan. A control-to-search transfer may require a mass-dependent factor $t_j$, not the number ten: $B_{\rm search,j}=t_j B_{\rm control,j}$. Qualify uncertainty in the control fit and in this transfer. Estimating nuisance parameters from observed data is allowed; freezing their fitted values only answers a conditional question.
+\item Validate the complete proposed procedure under several plausible background truths. When source construction or calibration uses the search data, repeat those steps in each outer pseudoexperiment and evaluate the resulting reported p-values. Use separate validation draws from those used to construct the response or calibrate tails. If the control is independent, simulate the control and search jointly when evaluating unconditional behavior.
+\item Inject signals before source estimation as well as after it. The first test measures what the source-building policy can learn; the second measures the extractor with a frozen source. Check size, signal recovery and uncertainty across mass before selecting a source or ordering. Then test mass-grid convergence and tails at the precision required by the scientific claim.
+\end{enumerate}
+This specifies a testable program rather than a reason to choose whichever reference produces the highest observed significance. Choosing among source models, combination methods or mass domains after inspecting their p-values creates an additional selection question beyond a mass-only trials correction.
+
+\subsection{Discovery reach and exclusion reach are different quantities}
+A lower global discovery significance does not automatically weaken the existing fixed-mass 90\% CL$_s$ exclusion limit. Discovery and exclusion use different tail events\cite{Cowan}. Pointwise exclusion curves are not obtained by applying a discovery trials factor to each endpoint. A simultaneous confidence statement across mass would require its own construction.
+
+For discovery reach, fix a false-positive level $\alpha$, calibrate the threshold $c_\alpha$ of the declared full-search statistic $T$, and evaluate
+\[
+ P_{B+S(\mu,m_0)}\!\left(T\geq c_\alpha\right),
+ \qquad P_B(T\geq c_\alpha)\leq\alpha.
+\]
+The signal-plus-background experiments must follow the same source-building policy. No global p-value ratio alone determines a coupling reach. The present report therefore establishes neither a new exclusion curve nor an improved discovery reach.
+
+\subsection{Combined searches: the useful result is model dependence}
+The common-coupling fit, Fisher combination, signed Stouffer combination and independent-amplitude common-mass likelihood ask different questions. Their different preferred masses are understandable without attributing extra independent evidence to a single spectrum. The v5.8.5 free-amplitude result at 92 MeV remains a conditional moderate excess; the same release found that the inspected clustering of peaks was not unusually coherent under its chosen null. The comparison is useful for understanding the data, but does not authorize selecting the largest of those significances as the discovery result.
+\fig[.96]{archive_methods_full_domain}{Baseline comparison from the earlier v5.8.5 report. All curves use the $\pm2.25\sigma_m$ mask and the 1 MeV mass grid; the global probabilities refer to the full 19--250 MeV domain. The shaded interval is a post-observation diagnostic zoom. The shared-coupling and independent-amplitude likelihoods impose different physical restrictions, while Fisher combines gated local probabilities and signed Stouffer combines continuous signed reference scores. These curves are strongly related uses of the same events.}
+\fig[.85]{archive_coherence_null}{The earlier v5.8.5 coherence check on 80--100 MeV. The lower tail, not the upper tail, measures unusually close peak locations. The observed clustering gives 195/256 direct lower-tail counts, or add-one probability 0.76265, and is not unusual under the fixed-source null. The four historical widths enter this archived sensitivity diagnostic; this review makes no new width choice.}

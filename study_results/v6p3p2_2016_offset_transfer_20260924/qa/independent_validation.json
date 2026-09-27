@@ -1,0 +1,183 @@
+{
+  "status": "passed",
+  "inputs_only": false,
+  "checked_utc": "2026-09-24T17:38:41.808212+00:00",
+  "validator_sha256": "5209c7e0e59a4dd90a3d187d2c98a94fbfcd6e05db23406c7212fa072d183e54",
+  "checks": [
+    {
+      "name": "immutable_inputs_and2016_provenance",
+      "passed": true,
+      "details": {
+        "pinned_files": 33,
+        "source_original_checked": true,
+        "bins": 720,
+        "support_GeV": [
+          0.03,
+          0.21
+        ],
+        "nominal_full_total": 73143935.4092819,
+        "stress_full_total": 73143052.25760624,
+        "historical10_selection_fraction_overlap_unverified": true,
+        "reviewed_kernel_state": "v4p9p11p1_uniform_optimizer_remediation",
+        "scope": "Fixed archived full2016 states; a conditional exposure scaling study, not verified historical10 transfer."
+      }
+    },
+    {
+      "name": "rank_test_finite_calibration_algebra",
+      "passed": true,
+      "details": {
+        "calibration_n": 100,
+        "nominal_rejection_probability": 0.09900990099009901,
+        "frozen_table_rejection_probability_beta": [
+          10,
+          91
+        ],
+        "frozen_table_rejection_probability_ci95": [
+          0.04900468922148596,
+          0.1639822550296352
+        ],
+        "frozen_table_coverage_ci95": [
+          0.8360177449703647,
+          0.9509953107785141
+        ],
+        "distinction": "Rank guarantee is marginal over calibration and evaluation, not a fixed-table guarantee."
+      }
+    },
+    {
+      "name": "independent_cohorts_templates_and_paired_exposures",
+      "passed": true,
+      "details": {
+        "background_spectra": 1000,
+        "independent_Poisson_components": 1000,
+        "exact_seed_replay": true,
+        "exposure_pairing": "B10~Pois(.1B); B100=B10+Pois(.9B)",
+        "gaussian_templates": 10
+      }
+    },
+    {
+      "name": "complete_rows_and_numerical_diagnostics",
+      "passed": true,
+      "details": {
+        "pilot": {
+          "attempted": 2000,
+          "fit_valid": 2000,
+          "profile_valid": 0,
+          "nativeCLs90_valid": 0
+        },
+        "calibration": {
+          "attempted": 36000,
+          "fit_valid": 36000,
+          "profile_valid": 0,
+          "nativeCLs90_valid": 0
+        },
+        "evaluation": {
+          "attempted": 16000,
+          "fit_valid": 16000,
+          "profile_valid": 16000,
+          "nativeCLs90_valid": 8000
+        }
+      }
+    },
+    {
+      "name": "every_signal_count_and_row_hash_replay",
+      "passed": true,
+      "details": {
+        "replayed_rows": 54000,
+        "positive_signal_vectors": 44000,
+        "paired_exposure_signal_increments": true,
+        "equal_expected_yields_across_sources": true,
+        "background_reuse_across_mass_and_levels": true
+      }
+    },
+    {
+      "name": "pilot_calibration_freezes_and_checkpoint_signatures",
+      "passed": true,
+      "details": {
+        "checkpoints": 500,
+        "signature": "dcdbc223ff1ccd12a6fa8eb8495ec7eafd322f1a364d892514a7d3511c1baeac",
+        "pilot_frozen_utc": "2026-09-24T17:35:22.895402+00:00",
+        "first_calibration_started_utc": "2026-09-24T17:35:23.921587+00:00",
+        "calibration_frozen_utc": "2026-09-24T17:36:29.678989+00:00",
+        "first_evaluation_started_utc": "2026-09-24T17:36:30.494201+00:00",
+        "all_checkpoint_cache_eligibility_recomputed": true
+      }
+    },
+    {
+      "name": "independent_GP_and_representative_optimizers",
+      "passed": true,
+      "details": [
+        {
+          "source": "stress",
+          "exposure": 0.1,
+          "mass_MeV": 42,
+          "z": 5,
+          "toy": 0,
+          "Ahat_difference": -1.8751607058220543e-06,
+          "sigma_difference": -6.591562851099297e-10,
+          "q_difference": -3.552713678800501e-14,
+          "optimizer": "independent SciPy BFGS/likelihood/GP"
+        },
+        {
+          "source": "stress",
+          "exposure": 1.0,
+          "mass_MeV": 76,
+          "z": 3,
+          "toy": 0,
+          "Ahat_difference": -0.0003011115622939542,
+          "sigma_difference": 3.4775439416989684e-08,
+          "q_difference": -6.536993168992922e-13,
+          "optimizer": "independent SciPy BFGS/likelihood/GP",
+          "native_cls90_difference": 0.0
+        },
+        {
+          "source": "nominal",
+          "exposure": 1.0,
+          "mass_MeV": 92,
+          "z": 5,
+          "toy": 0,
+          "Ahat_difference": -1.7600345017854124e-05,
+          "sigma_difference": -5.820766091346741e-09,
+          "q_difference": -4.618527782440651e-13,
+          "optimizer": "independent SciPy BFGS/likelihood/GP",
+          "native_cls90_difference": 0.0
+        },
+        {
+          "source": "nominal",
+          "exposure": 0.1,
+          "mass_MeV": 178,
+          "z": 0,
+          "toy": 0,
+          "Ahat_difference": 6.616005521209445e-09,
+          "sigma_difference": 1.3449152902467176e-10,
+          "q_difference": 0.0,
+          "optimizer": "independent SciPy BFGS/likelihood/GP"
+        }
+      ]
+    },
+    {
+      "name": "calibration_scaling_bootstrap_and_Beta_uncertainty",
+      "passed": true,
+      "details": {
+        "calibration_parameter_cells": 40,
+        "quantile_cells": 360,
+        "exposure_comparisons": 20,
+        "bootstrap_replicates": 2000,
+        "calibration_uncertainty_and_frozen_table_uncertainty_distinguished": true
+      }
+    },
+    {
+      "name": "rank_Neyman_MC_CLs_and_grid_coverage",
+      "passed": true,
+      "details": {
+        "rank_grid_rows": 20000,
+        "limit_rows": 48000,
+        "summary_cells": 480,
+        "empty_rank_sets": 2233,
+        "holey_rank_sets": 0,
+        "right_censored_rank_sets": 3416,
+        "accepted_true_hypothesis_and_upper_envelope_checked_separately": true
+      }
+    }
+  ],
+  "scope": "Numerical/source/replay/statistical-computation audit. Bias and undercoverage are measured outcomes."
+}

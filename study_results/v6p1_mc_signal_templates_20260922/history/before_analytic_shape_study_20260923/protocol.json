@@ -1,0 +1,136 @@
+{
+  "version": "6.1",
+  "status": "complete_conditional_selected_MC_study",
+  "created_utc": "2026-09-22T20:32:35.961766+00:00",
+  "requested_mc_root": "/sdf/data/hps/physics2021/preselection/v13/ap_signal_prompt_smeared",
+  "host_sequence": [
+    "epeets@s3dfdtn.slac.stanford.edu",
+    "iana"
+  ],
+  "primary_halfwidth_sigma": 2.25,
+  "guard": false,
+  "background_policy": "Baseline2.25 and diagnostics2.4/2.5/2.6 use matching fit and GP-training masks; predictions/covariances recomputed, archived kernel coordinates unchanged; no separate guard.",
+  "sample_policy": "Conditional supplied 2021 selected-candidate shapes; v13/v16 selection and signal daughter association not fully certified.",
+  "initial_scan": "validated generated MC masses only",
+  "interpolation": "requires explicit method and held-out checks before dense scan",
+  "agreement_metrics": [
+    "UL_MC/UL_Gaussian",
+    "delta signed r",
+    "delta local p0",
+    "median and extrema",
+    "fractions of coordinates within 1%,5%,10%"
+  ],
+  "claim_scope": "conditional pointwise asymptotic CLs and local p0; descriptive paired scan agreement",
+  "usage": {
+    "start_used_percent": 44,
+    "user_cap": "20% usage",
+    "conservative_interpretation": "20% of initially remaining 56% = 11.2 percentage points",
+    "soft_stop_used_percent": 54,
+    "shared_account": true
+  },
+  "remote_study_directory": "/sdf/home/e/epeets/src/hps_gpr_v6p1_mc_signal_templates_20260922",
+  "MC_campaign": "2021",
+  "MC_generated_mass_MeV": [
+    40,
+    60,
+    80,
+    100,
+    120,
+    140,
+    160,
+    180,
+    200,
+    220,
+    240,
+    260
+  ],
+  "primary_MC_scan_mass_MeV": [
+    60,
+    80,
+    100,
+    120,
+    140,
+    160,
+    180,
+    200,
+    220,
+    240
+  ],
+  "MC_mass_branch": "vertex./vertex.invM_",
+  "MC_unit": "GeV",
+  "additional_smearing": false,
+  "additional_cuts": false,
+  "recentering": false,
+  "finite_MC_precision": {
+    "method": "independent Poisson resampling of unit-weight histogram bins",
+    "replicas_per_native_mass": 32,
+    "seed": 61120260922
+  },
+  "morph": {
+    "method": "linear mixture of neighbouring CDFs in standardized residual z=(mrec-mpole)/sigma_nominal(mpole)",
+    "domain_MeV": [
+      50,
+      250
+    ],
+    "step_MeV": 1,
+    "claim": "exploratory",
+    "leave_one_out_CDF_threshold": 0.03,
+    "leave_one_out_core_fraction_threshold": 0.02,
+    "saved_nonnative_templates": 191,
+    "gallery_midpoints_MeV": [
+      50,
+      70,
+      90,
+      110,
+      130,
+      150,
+      170,
+      190,
+      210,
+      230,
+      250
+    ],
+    "data_training": "MC histograms only; no observed-data shape fitting"
+  },
+  "selection_match": "stored MC vertex type TargetConstrained and psum>2.8 cutflow; v13/v16 timing labels differ and full matching is unverified",
+  "signal_association": "No truth-match selection; generated event pole does not establish candidate daughter identity.",
+  "histogram_support": {
+    "range_MeV": [
+      0,
+      400
+    ],
+    "bin_width_MeV": 0.1,
+    "overflow": "Counted in metadata and all-selected support fractions; excluded from conditional-range quantiles.",
+    "analysis_support_MeV": [
+      36,
+      299.75
+    ]
+  },
+  "numerical_checks_passed": 82,
+  "production_signal_response_validated": false,
+  "older_campaign_MC_status": "Not supplied; Gaussian reference only",
+  "candidate_flags": "Both flags false in every row of bounded 100000-row-per-file diagnostic; no inferred ancestry result.",
+  "revision": "MC-core-centered fit and training windows, 23 September 2026",
+  "diagnostic_halfwidths_sigma": [
+    2.4,
+    2.5,
+    2.6
+  ],
+  "core_window_centering": {
+    "MC_only": true,
+    "translate_template": false,
+    "halfwidth": "2.25 sigma_nominal at generated pole",
+    "core_location": "Local integrated Gaussian plus nonnegative affine pedestal",
+    "mode_smoothing_sigma_nominal": 0.2,
+    "mode_search_halfwidth_sigma_nominal": 3,
+    "core_fit_halfwidth_sigma_nominal": 1.5,
+    "diagnostic_core_fit_halfwidths": [
+      1.25,
+      2.0
+    ],
+    "Gaussian_control": "centered at same MC core, same nominal width, same GP and conversion at pole",
+    "kernel_and_density_anchor": "generated mass",
+    "finite_MC_center_replicas": 32,
+    "observed_fits": 402
+  }
+}

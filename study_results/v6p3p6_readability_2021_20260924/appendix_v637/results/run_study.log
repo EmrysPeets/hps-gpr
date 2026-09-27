@@ -1,0 +1,47 @@
+tuning gp_mean 100 complete
+tuning gp_mean 160 complete
+tuning gp_mean 220 complete
+FROZEN WINNER common_starter
+calibration gp_mean 100 complete
+calibration gp_mean 160 complete
+calibration gp_mean 220 complete
+calibration functional 100 complete
+calibration functional 160 complete
+calibration functional 220 complete
+evaluation gp_mean 100 complete
+evaluation gp_mean 160 complete
+evaluation gp_mean 220 complete
+evaluation functional 100 complete
+evaluation functional 160 complete
+evaluation functional 220 complete
+{
+  "passed": true,
+  "all_fits_valid": true,
+  "tuning_rows": 6600,
+  "calibration_rows": 36000,
+  "evaluation_rows": 9000,
+  "backgrounds_paired": true,
+  "signals_paired": true,
+  "fit_and_training_disjoint": true,
+  "selected_policy": "common_starter",
+  "evaluation_policies": [
+    "gaussian_baseline",
+    "common_starter",
+    "gaussian_starter",
+    "morph_starter",
+    "direct_starter"
+  ],
+  "sources": [
+    "gp_mean",
+    "functional"
+  ],
+  "all_asimov_limits_valid": true,
+  "bootstrap_resamples": 2000,
+  "seed": 637250925,
+  "runtime_seconds": 103.22317650000001,
+  "protocol_sha256": "5d7e235958561ea8d3056e9b0a4ae29fc9b4adff11d3594e4b337d36aaa688af",
+  "inference_empty": 205,
+  "inference_holes": 0,
+  "inference_upper_censored": 0,
+  "caution": "Conditional finite-grid local study. No observed-data fit, global discovery significance, physical exclusion, or continuous confidence-interval coverage claim."
+}

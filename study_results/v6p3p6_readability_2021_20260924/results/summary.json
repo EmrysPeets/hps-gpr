@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "pilot_rows": 2000,
+  "calibration_rows": 52000,
+  "evaluation_rows": 22000,
+  "pilot_valid": 2000,
+  "calibration_valid": 52000,
+  "evaluation_valid": 22000,
+  "evaluation_profile_valid": 22000,
+  "native_cls90_attempted": 16000,
+  "native_cls90_valid": 16000,
+  "failure_rows": 0,
+  "observed_pointwise_rows": 40,
+  "bootstrap_replicates": 2000,
+  "master_seed": 63520260924,
+  "all_planned_ids_present": true,
+  "source_hashes": {
+    "results/pilot_rows.csv": "5aa40426bcc25898763c487da2032d409bdf1a7a37b500cea8a290b8b542810a",
+    "results/calibration_rows.csv": "e44ef96d12c8e2aeb1e5af530889f1a477725177aca5a815be3ddc7390f5efef",
+    "results/evaluation_rows.csv": "4cd0eacf9c32b8be9f4d44c58f1d5ec985ec396c686a2345e9088e8a193d2314",
+    "pilot_reference.json": "a49125a6af2878d6474ff0f4e8f6850cc4aadb94fa691e0fa685a12a20dc19ac",
+    "calibration_freeze.json": "0f47e849b4a4114c3dcd0cff68e7fca20825240620816d6d1ac562a1ef080ccc",
+    "scripts/analyze.py": "a4ff87f03a9fe1f71a76f1c312e67309908dc402d999cba111d709adbaae25b1",
+    "results/observed_dense.csv": "fcc0a89bea00692d9fc9cf75e8581c87ceceb62e676d188ed91cf206955805ff",
+    "scripts/observed.py": "da3c041a42e0d2b121a6c9c343f6024ce31961ccb72f8e890462d7032d86abc4",
+    "results/combined_observed_rank.csv": "777a4fc9ad33e5b82059b0625cc48ee25c164831f9f084e17611b15413d48376"
+  },
+  "definitions": {
+    "signal": "Native full-selected MC generated; Gaussian full-template fitted. Gaussian-log controls separate.",
+    "logshift": "Fit and training-exclusion mask share log-displaced center; nominal resolution retained.",
+    "mu0": "Calibration mean null Wald pull Ahat/sigma; mean-pull centering is diagnostic and differs from fixed yield offset.",
+    "delta": "Calibration mean null fitted yield in full-selected candidate units.",
+    "R": "Calibration paired MC response at z3; not tail acceptance or detector efficiency.",
+    "rank": "Raw Ahat lower-tail p=(1+k)/101; reject<=0.10; grid endpoints only, right-censor at24s0.",
+    "p0": "Raw Ahat upper-tail add-onep, with separate k/100 binomial95%CP interval; pointwise fixed source.",
+    "bootstrap": "Whole IDs across masses/policies/levels; independent source streams; frozen pilot scale.",
+    "coverage": "Rank size<=10/101 marginal over calibration and independent evaluation at fixed generator; frozen tables checked separately."
+  },
+  "limitations": "Conditional fixed-source and fixed-empirical-template diagnostics, not global calibration or physical exclusion."
+}

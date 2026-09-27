@@ -1,0 +1,49 @@
+{
+  "version": "5.6.0",
+  "seed": 56020210912,
+  "toys_per_scenario": 20,
+  "workers": 1,
+  "linear_algebra_threads": 1,
+  "regions": [
+    [
+      "65",
+      60,
+      70
+    ],
+    [
+      "75",
+      71,
+      83
+    ],
+    [
+      "92",
+      86,
+      99
+    ],
+    [
+      "120",
+      111,
+      132
+    ],
+    [
+      "160",
+      148,
+      177
+    ],
+    [
+      "210",
+      198,
+      223
+    ]
+  ],
+  "extra_one_percent": "top six interior local maxima, adding any not already selected; nearby maxima retained and not independent",
+  "injection": "Gaussian count template; numerical target Z=source Z sqrt(k)",
+  "yield_scaling_comparison": "k max(Ahat,0) Asimov comparison, reported separately from target-Z matched toys",
+  "generator": "Independent Poisson counts on scaled source GP continuum plus matched Gaussian signal over all 36-300 MeV support",
+  "inference": "Recondition GP on each toy sidebands with fixed source-specific reviewed kernels; profile count signal and Gaussian GP nuisance; 1% support40-300,10% support36-300 MeV",
+  "regional_scan": "1 MeV grid within +/-2 sigma of injected mass, bounded to 50-250 MeV; injected mass always included",
+  "selection": "post-observation conditional catalogue",
+  "gp_numerics": "PSD eigenspace of RBF Gram matrix at relative eigenvalue cutoff1e-14; SVD ridge conditioning avoids subtractive posterior covariance",
+  "full_observed_2021_used": false,
+  "statistical_claim": "nominal fixed-mass asymptotic diagnostics; no global calibration, confidence bounds or guaranteed discovery probability"
+}

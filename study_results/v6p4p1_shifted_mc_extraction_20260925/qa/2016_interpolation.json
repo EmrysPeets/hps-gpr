@@ -1,0 +1,84 @@
+{
+  "passed": true,
+  "method": "Linear center and linear fitted-core width; neighboring full aligned empirical CDFs.",
+  "previous_method": "Linear center and log-linear fitted-core width; same anchors and CDF mixture.",
+  "cdf_metric": "Maximum absolute CDF difference on the held-out histogram native edges; descriptive, not a p-value.",
+  "claim_boundary": "This checks interpolation and geometry, not yield recovery, coverage or detector/data selection equivalence.",
+  "native_anchors": 27,
+  "held_out_interior_anchors": 25,
+  "primary_domain_MeV": [
+    40,
+    175
+  ],
+  "missing_native_mass_MeV": 150,
+  "native_identity_max_absolute_error": 0.0,
+  "full_category_normalization_max_absolute_error": 2.220446049250313e-16,
+  "previous_holdout_metric_max_absolute_difference": 9.393870230300916e-13,
+  "holdout": {
+    "linear_full_cdf_distance_median": 0.0029785004324429654,
+    "log_full_cdf_distance_median": 0.002404972684197093,
+    "linear_full_cdf_distance_max": {
+      "mass_MeV": 45,
+      "value": 0.008961218084754363
+    },
+    "log_full_cdf_distance_max": {
+      "mass_MeV": 45,
+      "value": 0.007552635286534826
+    },
+    "full_cdf_change_max": {
+      "mass_MeV": 50,
+      "value": 0.002548238817405485
+    },
+    "width_change_max_MeV": {
+      "mass_MeV": 145,
+      "value": 0.030669427407638672
+    },
+    "center_error_max_MeV": {
+      "mass_MeV": 160,
+      "value": 0.26028471300000433
+    },
+    "linear_width_relative_error_max": 0.10515540067881668
+  },
+  "production_grid": {
+    "mass_step_MeV": 1,
+    "masses": 136,
+    "full_cdf_change_max": {
+      "mass_MeV": 47,
+      "value": 0.0010138893901090185
+    },
+    "width_change_max_MeV": {
+      "mass_MeV": 143,
+      "value": 0.01094644007708645
+    },
+    "width_relative_change_max": {
+      "mass_MeV": 47,
+      "value": 0.003991956123738705
+    },
+    "cdf_metric_grid": "Archived 2016 observed-spectrum bin edges"
+  },
+  "geometry": {
+    "definition": "u=(reconstructed mass-interpolated fitted-core center)/interpolated fitted-core width; fit and GP exclusion both [-3.5,3.5]; bin centers select whole bins.",
+    "minimum_left_training_bins": 18,
+    "minimum_left_at_masses_MeV": [
+      40
+    ],
+    "minimum_right_training_bins": 44,
+    "minimum_right_at_masses_MeV": [
+      175
+    ],
+    "minimum_fit_bins": 43,
+    "maximum_fit_bins": 198,
+    "unusable_points": [],
+    "spectrum_bins": 720,
+    "spectrum_edge_support_MeV": [
+      30.0,
+      210.0
+    ]
+  },
+  "hashes": {
+    "script_sha256": "3adb0d7159ac7a21a47581ab53f5286bac0febb0c38e8c5af78daf1dec36051c",
+    "result_sha256": "fa406db8448a30ecd8bdf5e550d4a71e2d3ad6ce97ea73adc16228635122bee9",
+    "centers_sha256": "f6b96a54218579c6125a5927e765b1b48a602145d69f5786640e2796a95fb27b",
+    "spectrum_sha256": "11bc1b24af6a0aaa2345fe87e83fce60ee8fb45c77d6b1d4e80adc37fa7af176"
+  }
+}

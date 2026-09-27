@@ -1,0 +1,41 @@
+{
+  "version": "5.8.2",
+  "start_utc": "2026-09-17T20:51:15Z",
+  "source_kernel_anchor_MeV": 76,
+  "source_definition": "Full-support observed-count GP mean with each dataset reviewed source kernel at76MeV, no mass-dependent generating truth and no retuning",
+  "analysis_policy": "Unchanged reviewed mass-dependent states, same supports, 0.5MeV scan grid; source used only for null calibration",
+  "datasets": {
+    "2015": [
+      19,
+      100
+    ],
+    "2016": [
+      39,
+      180
+    ],
+    "2021": [
+      50,
+      250
+    ]
+  },
+  "combined_domain_MeV": [
+    19,
+    250
+  ],
+  "common_overlap_MeV": [
+    50,
+    100
+  ],
+  "combined_definition": "One common coupling among all active datasets at each mass, original frozen signal conversion; independent dataset count fluctuations with coherent full-spectrum draws",
+  "scan_step_MeV": 0.5,
+  "validation_Poisson_scans": 256,
+  "gaussian_fields": 200000,
+  "seed_base": 58220260917,
+  "primary_local_ordering": "z=(r-a)/s for raw positive signal fit; otherwise inclusive excess tail1",
+  "primary_global_ordering": "Max z over sites with r_star=a+s*z>0 across declared full scope grid",
+  "response_method": "Differential signed-profile-likelihood root propagation including GP count-dependent mean and covariance, checked against direct full-bin one-standard-deviation perturbations",
+  "validation": "Complete independent Poisson spectra per dataset reused at every mass; same drawindex used in combination; retain explicit MonteCarlo intervals and approximation diagnostics",
+  "source_fit_uncertainty_propagated": false,
+  "physical_discovery_calibrated": false,
+  "scope_selection_on_significance": false
+}

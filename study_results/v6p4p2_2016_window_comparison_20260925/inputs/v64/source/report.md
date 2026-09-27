@@ -1,0 +1,216 @@
+# Where does the 2016 signal reconstruct?
+
+Core locations, mass resolution and full-shape comparisons
+
+The result. The supplied smeared and scaled 2016 prompt target-constrained signal histograms have a small downward core displacement over 40-175 MeV. The fitted shifts range from -0.08 to -1.02 MeV. The sign agrees with the earlier 2021 study, but the displacement and non-Gaussian tail contribution are substantially smaller in these 2016 inputs.
+
+What this suggests for the analysis. Use the native 2016 histograms as the starting signal templates. Between simulated masses, interpolation of nearby 2016 shapes performs better in the checks here than either one common shape or a Gaussian. A shifted Gaussian remains a useful description of the core, provided its fitted yield is not assumed to be the full selected signal yield.
+
+![centers_and_2021](../figures/centers_and_2021.png)
+
+Figure 1. How to read the figure. Left: fitted core, median and binned mean need not coincide because the distributions have tails. Right: the same local core definition is applied to 2016 and compared with the saved 2021 results. Bars are MC bin-resampling standard deviations (64 replicas in 2016; 32 in 2021), not detector calibration uncertainties. Reconstruction and selection equivalence between years has not been established.
+
+| Generated mass | 2016 core center | Core shift | MC SD of center |
+| --- | --- | --- | --- |
+| 60 MeV | 59.812 MeV | -0.188 MeV | 0.028 MeV |
+| 100 MeV | 99.691 MeV | -0.309 MeV | 0.034 MeV |
+| 160 MeV | 158.983 MeV | -1.017 MeV | 0.181 MeV |
+
+Inputs and scope. There are 29 ROOT files, containing 3,770,135 selected entries in total, at 30-175 MeV in nominal 5 MeV steps; 150 MeV is missing. All results use h_MinvScSm_GeneralLargeBins_Final_1. Its FEE momentum scaling and smearing are already applied according to the supplied sample description. No extra smearing is applied here. The 30 and 35 MeV samples are shown separately; no observed-data or GP extraction is performed.
+
+# 1. What do we mean by the central location?
+
+The central location is not unique for an asymmetric distribution. A Gaussian fit near the peak answers where the core lies. The median divides the selected probability in half. The mean includes the entire tail. This report shows all three, with the fitted core as its primary location so that the comparison follows the v6.3 series.
+
+![core_fit_examples](../figures/core_fit_examples.png)
+
+Figure 2. Points are native 0.625 MeV bins with square-root-count bars. Blue curves are local Gaussian-plus-pedestal fits, drawn only over their fitted bins. Green curves show the Gaussian component of that local fit. The vertical red line is the generated mass, and the blue dashed line marks the fitted core. The pedestal represents broad signal shoulders locally; these are signal-MC histograms, so it is not a fitted collision-background component.
+
+The local fit. The smoothed mode is located within three reference analysis widths of the generated mass. The unsmoothed bin counts within 1.5 reference widths of that mode are then fitted with a bin-integrated Gaussian plus a nonnegative affine pedestal. The Gaussian area, center and width, and the two pedestal endpoints, are free. This is the location convention inherited from v6.1 and used in v6.3.6.
+
+For each included bin [ai, bi], the expected count is A[Phi((bi-c)/s) - Phi((ai-c)/s)] plus the affine pedestal. The fit minimizes Poisson deviance. Integrating across each bin matters because a bin is 0.625 MeV wide; locating a peak only by its tallest bin would quantize the answer.
+
+What the error bars mean. Sixty-four independent Poisson resamplings of the histogram bins are refitted, including the mode search. The reported center error is the standard deviation of the valid replica centers. All 1,728 replicas in the primary 40-175 MeV domain are valid. This measures finite-MC variation under the independent-bin assumption, conditional on the chosen fit. It does not include calibration, detector or selection uncertainty.
+
+How much the definition matters. The fit is repeated with half-widths 1.25 and 2.0 reference widths, and without a pedestal at 1.5 and 2.0 widths. The largest absolute change in center is retained as a definition spread, not added in quadrature to the MC error. At 60, 100 and 160 MeV the spreads are 0.044, 0.084 and 0.396 MeV. The 160 MeV center is therefore more definition-dependent than its statistical bar alone suggests.
+
+# 2. How wide is the reconstructed signal?
+
+The supplied histograms already describe smeared, scaled reconstruction. Their fitted core widths increase from 1.56 MeV at 40 MeV to 7.06 MeV at 175 MeV. A width extracted from the core and a width describing the entire distribution answer different questions; they should not be substituted for one another without stating the change.
+
+![widths_and_tails](../figures/widths_and_tails.png)
+
+Figure 3. Left: the fitted Gaussian core width, the existing 2016 analysis-resolution curve and half the 16%-84% quantile interval. Right: probability on each side outside two fitted core widths. The Gaussian reference is 2.28% per side. The curves use full selected normalization, and the fitted-core-width bars are the MC resampling standard deviations.
+
+Over 40-175 MeV the fitted core width is 0.84-0.99 times the existing reference analysis width. The central 68% interval is generally wider than the fitted core width because it includes the shoulders. Neither result is an unsmeared resolution: the unsmeared histogram is only inventoried for presence and is not fitted in this study.
+
+| Quantity | What it measures | How it is used here |
+| --- | --- | --- |
+| Fitted core width s | Width of the local Gaussian component | Aligns cores and defines the standardized coordinate u |
+| Reference width s_ref | Existing 2016 analysis prescription | Defines the local-fit range and reference window comparisons |
+| (q84 - q16)/2 | Half the central 68% probability interval | Describes the selected distribution without a Gaussian model |
+
+Between 89.2% and 93.7% of the selected probability lies within two fitted core widths; a Gaussian would put 95.45% there. Thus the 2016 samples have relatively compact cores but still have excess tail probability. From 50 MeV upward the lower-mass tail is larger than the upper-mass tail in this definition. At 40 MeV the upper tail is larger, so one universal asymmetric tail would hide a low-mass change.
+
+The reference resolution is copied from the archived 2016 spectrum configuration. In GeV, with m also in GeV, it is 0.000380 + 0.0410 m - 0.270 m2 + 3.490 m3 - 11.11 m4. It is a comparison curve in this study; the analysis configuration is not modified.
+
+# 3. Overlaying the histograms without hiding their tails
+
+![pole_aligned_overlays](../figures/pole_aligned_overlays.png)
+
+Figure 4. Each colored curve is a native 2016 histogram, divided by its own full selected count. Left: subtracting only the generated mass leaves the mass-dependent widths visible. Right: dividing that coordinate by the existing analysis width brings the distributions closer together. The dotted Gaussian is centered at the generated mass. The logarithmic vertical axis exposes tail differences.
+
+![core_aligned_overlays](../figures/core_aligned_overlays.png)
+
+Figure 5. The coordinate is u = (reconstructed mass - fitted core center) / fitted core width. Left: each curve is normalized within |u| < 2 to compare the central shapes. Right: each curve retains its original full selected probability. The dashed black curve is an equal-mass average of the 27 aligned empirical distributions, not an analytic fit. The dotted curve is a standard Gaussian.
+
+Answer. Alignment produces similar central shapes, but it does not make the full distributions identical. The left panel deliberately removes differences in core probability; the right panel restores them. That is why an attractive overlay of normalized peaks is not, by itself, evidence that one common template describes the full selected signal.
+
+# 4. Is this the same shift and shape as in 2021?
+
+There is a qualitatively similar downward core shift, but a direct transfer of the 2021 correction would be too large for these 2016 samples. At 60, 100 and 160 MeV the 2021 shifts are -1.208, -2.312 and -3.342 MeV, compared with -0.188, -0.309 and -1.017 MeV here. The distinction is present in both the locations and the full shapes.
+
+![cross_year_shapes](../figures/cross_year_shapes.png)
+
+Figure 6. Each year is aligned using its own fitted core center and width. Both retain full selected normalization, including the saved 2021 overflow normalization. The percentages in each panel give the probability within two core widths. The 2016 samples are more concentrated around their cores. These are comparisons of supplied samples, not a controlled attribution of the difference to run year, beam energy or calibration.
+
+A compact description of the 2016 shift. For 40-175 MeV, an equal-weight affine fit gives the following descriptive relation, with all masses in MeV:
+
+c(m) = m - 0.363673 - 0.563179 (m - 100) / 100.
+
+Leaving out each mass in turn gives an RMS prediction error of 0.103 MeV and a maximum absolute error of 0.351 MeV. A quadratic reduces the RMS only to 0.102 MeV. The affine relation is therefore a concise trend summary; native centers and interpolation are preferable where local structure matters. No extrapolation below 40 or above 175 MeV is qualified.
+
+| Shift model | Parameters | Omitted-mass RMS (MeV) | Largest error (MeV) |
+| --- | --- | --- | --- |
+| Constant | 1 | 0.255 | 0.643 |
+| Proportional | 1 | 0.125 | 0.409 |
+| Affine | 2 | 0.103 | 0.351 |
+| Quadratic | 3 | 0.102 | 0.333 |
+| Logarithmic | 2 | 0.128 | 0.401 |
+
+This is a residual displacement in selected MC after the stated smearing and scaling. These histograms do not identify its physical cause or establish a data mass-scale correction. The logarithmic 2021 shift law should not be imported as the 2016 center prescription.
+
+# 5. Which signal shape is supported by these checks?
+
+The main comparisons use a Gaussian with the measured core center and width; an equal-mass common empirical shape made without that mass; and an interpolation of the nearest remaining lower and upper samples. The interpolation predicts center, width and standardized shape without using the omitted histogram. A second Gaussian control uses the full histogram mean and RMS, so the Gaussian comparison is not restricted to its local core width.
+
+![shape_holdout](../figures/shape_holdout.png)
+
+Figure 7. The vertical axis is the largest absolute difference between cumulative probabilities, in percentage points. A value of 1 means that at some mass threshold the models differ by one percentage point of total probability. It is a shape discrepancy, not a p-value. Core-only comparisons condition on |u| < 2 and use the measured center and width. The full neighbor-morph check also predicts those quantities.
+
+| Full-distribution approximation | Median difference | Range | Mass tests |
+| --- | --- | --- | --- |
+| Gaussian at measured core | 3.23 pp | 1.83-5.43 pp | 27 |
+| Gaussian at full mean and RMS | 2.05 pp | 1.54-8.10 pp | 27 |
+| Common shape, omitted mass excluded | 1.04 pp | 0.39-3.84 pp | 27 |
+| Neighbor morph, omitted mass excluded | 0.24 pp | 0.14-0.76 pp | 25 |
+
+Preferred full-shape starting point. Use a native histogram at its generated mass. Between mass points, linearly interpolate the center, interpolate the logarithm of the core width, and mix the neighboring cumulative distributions in the aligned coordinate. The returned probabilities retain the complete selected normalization. The largest held-out discrepancy is 0.76 percentage points, at 45 MeV; endpoints have no two-sided holdout test.
+
+A simpler core approximation. A Gaussian with a 2016-derived center and width can describe the main peak, and the common empirical shape is a useful intermediate comparison. Neither reproduces every tail. The 150 MeV gap may be interpolated between 145 and 155 MeV, but this is a model prediction, not an available MC sample.
+
+These deterministic comparisons include finite-MC noise. They do not validate arbitrary intermediate masses, define a template-systematic confidence interval, or establish fitted-yield recovery. A 2016 injection study would be needed to test how each shape interacts with the background fit and yield inference.
+
+# 6. What changes when the center or window width changes?
+
+![containment_and_low_mass](../figures/containment_and_low_mass.png)
+
+Figure 8. Left: the empirical fraction inside windows extending 2.25 widths on either side. Changing the center at fixed analysis width has a small effect; replacing the analysis width with the fitted core width is a separate change. Right: the sparse low-mass samples are retained visibly instead of being pooled into the common shape. Local plotting ranges do not renormalize any histogram.
+
+Over 40-175 MeV, the original generated-mass-centered window with the reference width contains 95.28-96.12% of the selected MC. Moving only its center to the fitted core gives 95.25-96.29%. The change is between -0.047 and +0.178 percentage points. It need not be positive at every mass because centering on the core does not optimize an asymmetric full-distribution integral.
+
+A Gaussian puts 97.56% inside its own 2.25-width window. The remaining difference here is a tail-shape issue, even though the core displacement is small. These are geometric fractions of selected signal histograms, not selection efficiencies, calibrated signal-recovery fractions or an optimization of the GP training mask.
+
+30 MeV: no reliable fitted core is reported. Only 84 entries survive in the supplied histogram. The primary fit hits its minimum-width bound, and only 34 of 64 resampling fits pass the locator checks. The binned mean is 34.10 MeV and the median is 31.81 MeV, but neither makes the local Gaussian fit reliable. The raw attempted fits remain in the numerical ledger; their apparent narrow width is not used.
+
+35 MeV: a separate diagnostic. This histogram has 2,603 entries. Its center is 35.276 MeV in the primary convention, but its fitted core width changes from about 0.91 to 1.44 MeV when the pedestal-fit half-width changes from 1.5 to 2.0 reference widths. The mean is 35.695 MeV. This broad-definition sensitivity motivates keeping 35 MeV out of the primary common-shape and smooth-law fits.
+
+40-175 MeV: the primary comparison domain. All 27 available primary core fits and all their MC resampling fits pass. The 40 MeV point remains in this domain and is the largest common-shape discrepancy, so excluding 30 and 35 MeV does not hide the remaining low-mass shape change. No selection, signal window or background-training guard is changed by this report.
+
+# 7. Native central locations and shape summary
+
+Masses and widths are in MeV. c is the fitted core center; SD is its conditional MC resampling error; s is the fitted core width. F2 is the full selected fraction within c +/- 2s. Spread is the largest center change across the four fit-definition checks. Values are rounded here; the CSV retains more precision.
+
+| m | Entries | c | c - m | SD(c) | s | Median | Mean | F2 (%) | Spread |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 30 | 84 | -- | -- | -- | -- | 31.806 | 34.100 | -- | -- |
+| 35 | 2,603 | 35.276 | +0.276 | 0.088 | 0.913 | 35.313 | 35.695 | 70.8 | 0.145 |
+| 40 | 12,196 | 39.889 | -0.111 | 0.062 | 1.560 | 39.984 | 40.131 | 90.0 | 0.075 |
+| 45 | 46,316 | 44.920 | -0.080 | 0.059 | 1.641 | 44.922 | 44.938 | 89.2 | 0.119 |
+| 50 | 91,802 | 49.884 | -0.116 | 0.022 | 1.967 | 49.868 | 49.865 | 91.8 | 0.049 |
+| 55 | 139,637 | 54.888 | -0.112 | 0.021 | 2.208 | 54.821 | 54.789 | 92.7 | 0.050 |
+| 60 | 188,657 | 59.812 | -0.188 | 0.028 | 2.274 | 59.783 | 59.737 | 91.6 | 0.044 |
+| 65 | 221,366 | 64.833 | -0.167 | 0.026 | 2.500 | 64.741 | 64.682 | 91.9 | 0.067 |
+| 70 | 245,676 | 69.839 | -0.161 | 0.033 | 2.751 | 69.710 | 69.635 | 92.6 | 0.102 |
+| 75 | 280,200 | 74.762 | -0.238 | 0.024 | 2.847 | 74.676 | 74.596 | 91.8 | 0.036 |
+| 80 | 277,884 | 79.714 | -0.286 | 0.027 | 3.094 | 79.657 | 79.561 | 92.3 | 0.056 |
+| 85 | 273,602 | 84.735 | -0.265 | 0.026 | 3.194 | 84.618 | 84.513 | 91.5 | 0.078 |
+| 90 | 273,665 | 89.728 | -0.272 | 0.035 | 3.447 | 89.584 | 89.475 | 91.9 | 0.087 |
+| 95 | 309,188 | 94.744 | -0.256 | 0.036 | 3.670 | 94.578 | 94.454 | 92.0 | 0.113 |
+| 100 | 290,224 | 99.691 | -0.309 | 0.034 | 4.055 | 99.546 | 99.412 | 92.9 | 0.084 |
+| 105 | 172,514 | 104.731 | -0.269 | 0.046 | 4.145 | 104.512 | 104.373 | 92.2 | 0.163 |
+| 110 | 148,579 | 109.620 | -0.380 | 0.053 | 4.317 | 109.480 | 109.350 | 92.0 | 0.061 |
+| 115 | 124,340 | 114.596 | -0.404 | 0.076 | 4.510 | 114.456 | 114.312 | 91.8 | 0.082 |
+| 120 | 114,544 | 119.481 | -0.519 | 0.062 | 4.683 | 119.418 | 119.283 | 91.5 | 0.089 |
+| 125 | 108,179 | 124.412 | -0.588 | 0.075 | 5.209 | 124.431 | 124.269 | 93.1 | 0.233 |
+| 130 | 85,681 | 129.427 | -0.573 | 0.081 | 5.355 | 129.381 | 129.226 | 92.8 | 0.104 |
+| 135 | 81,070 | 134.549 | -0.451 | 0.073 | 5.811 | 134.371 | 134.202 | 93.7 | 0.125 |
+| 140 | 70,169 | 139.670 | -0.330 | 0.100 | 5.398 | 139.350 | 139.148 | 90.4 | 0.247 |
+| 145 | 58,314 | 144.354 | -0.646 | 0.100 | 6.121 | 144.330 | 144.183 | 92.9 | 0.153 |
+| 155 | 23,967 | 154.268 | -0.732 | 0.191 | 6.696 | 154.262 | 154.090 | 93.5 | 0.275 |
+| 160 | 30,696 | 158.983 | -1.017 | 0.181 | 6.574 | 159.159 | 159.027 | 92.1 | 0.396 |
+| 165 | 34,356 | 164.219 | -0.781 | 0.151 | 7.069 | 164.156 | 163.985 | 93.1 | 0.049 |
+| 170 | 31,571 | 169.259 | -0.741 | 0.215 | 6.738 | 169.107 | 168.951 | 91.6 | 0.268 |
+| 175 | 33,055 | 174.272 | -0.728 | 0.187 | 7.056 | 174.066 | 173.894 | 92.2 | 0.175 |
+
+The 30 MeV fit is invalid; its location and width are not promoted to measurements. The 35 MeV row is diagnostic and is excluded from the primary 40-175 MeV averages and interpolation prescription. There is no 150 MeV input. Means and quantiles use bin-midpoint or piecewise-uniform within-bin conventions; event-level values cannot be recovered from these histograms.
+
+# Appendix A1. Every native mass histogram
+
+![catalogue_1](../figures/catalogue_1.png)
+
+Figure 9. Native MC is shown with full selected normalization. Red dotted curves are Gaussians at the generated mass with the reference analysis width. Blue dashed curves are unit-area Gaussians at the fitted core with its fitted width; they are comparison shapes, not the local Gaussian component plus pedestal of Figure 2. The logarithmic scale exposes tails. No blue curve is shown for the invalid 30 MeV core fit. Displayed ranges omit distant bins without rescaling the visible probability.
+
+# Appendix A2. Every native mass histogram
+
+![catalogue_2](../figures/catalogue_2.png)
+
+Figure 10. Native MC is shown with full selected normalization. Red dotted curves are Gaussians at the generated mass with the reference analysis width. Blue dashed curves are unit-area Gaussians at the fitted core with its fitted width; they are comparison shapes, not the local Gaussian component plus pedestal of Figure 2. The logarithmic scale exposes tails. No blue curve is shown for the invalid 30 MeV core fit. Displayed ranges omit distant bins without rescaling the visible probability.
+
+# Appendix A3. Every native mass histogram
+
+![catalogue_3](../figures/catalogue_3.png)
+
+Figure 11. Native MC is shown with full selected normalization. Red dotted curves are Gaussians at the generated mass with the reference analysis width. Blue dashed curves are unit-area Gaussians at the fitted core with its fitted width; they are comparison shapes, not the local Gaussian component plus pedestal of Figure 2. The logarithmic scale exposes tails. No blue curve is shown for the invalid 30 MeV core fit. Displayed ranges omit distant bins without rescaling the visible probability.
+
+# Appendix B. Reproducibility and interpretation
+
+Input identity. The 29 supplied ROOT files are copied unchanged from the Downloads/2016_MC_Histograms directory into inputs/root. Their names, byte sizes and SHA-256 hashes are recorded in provenance/source_files.json. Only the smeared/scaled Final_1 mass histogram is analyzed. Every target is a 400-bin TH1D on 0-0.25 GeV, converted once to 0-250 MeV; bin width is 0.625 MeV. All target counts are nonnegative integers, entries equal the bin sum, variances equal counts, and underflow and overflow are zero.
+
+Provenance boundaries. The prompt-target-constrained sample identity and prior FEE scaling/smearing are supplied by the user. ROOT axis titles are blank and these files have no embedded fits. The files do not independently document the full selection or certify its equivalence to the archived data analysis. Generated masses are read from filenames. No efficiency, rate, exclusion, data mass calibration or discovery claim is derived.
+
+Saved references. The 2021 centers, errors and histogram extracts are frozen from v6.1, the same inputs used by the introductory pages of v6.3.6. The local-core algorithm and the 2016 reference-resolution coefficients are also pinned. Earlier PDFs are accessed read-only. A separate before/after hash audit records a concurrent v6.3.6 PDF change; no earlier file is overwritten or restored by this study. No remote computation is launched.
+
+Rebuilding. The package uses Python with NumPy, SciPy, pandas, uproot, Matplotlib, Pillow and ReportLab. The recorded runtime is in provenance/runtime.json. From the extracted study directory, run the following with one numerical thread:
+
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1
+
+python3 scripts/analyze.py
+
+python3 scripts/make_figures.py
+
+python3 scripts/build_report.py
+
+python3 scripts/validate.py
+
+| Artifact | Purpose |
+| --- | --- |
+| results/centers_and_shapes.csv | Native locations, widths, probabilities and definition spreads |
+| results/bootstrap_fits.csv | Every attempted resampling fit, including failures |
+| results/fit_definition_sensitivity.csv | Alternative ranges and Gaussian-only local fits |
+| results/shape_comparisons.csv | Gaussian, common-shape and neighbor holdout discrepancies |
+| histograms/ and figures/ | Portable counts, normalized distributions and PDF/PNG figures |
+| scripts/template.py | Native or interpolated empirical CDF, with outside-support categories |
+| qa/ and MANIFEST.sha256 | Numerical, PDF, relocation and artifact-integrity checks |
+
+What follows from this study. The supplied 2016 MC supports a modest downward core displacement, relatively Gaussian central shapes and measurable non-Gaussian tails. Its own native and interpolated histograms are the most directly supported starting templates. Establishing their use in the 2016 yield analysis still requires selection equivalence and injection/recovery checks using the intended background procedure.

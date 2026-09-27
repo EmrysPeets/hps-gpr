@@ -1,0 +1,27 @@
+{
+  "version": "5.9.5",
+  "date": "2026-09-22",
+  "question": "Do the slide14 residual statistic and slide50 null scan-maximum distribution reveal systematic background or inference bias?",
+  "primary_dataset": "2021 native10%",
+  "primary_domain_MeV": [50,250],
+  "GP_support_MeV": [36,300],
+  "blind_half_width_sigma": 2.25,
+  "observed_mass_grid_MeV": {"slide14":1,"slide50":0.5},
+  "primary_observed_ordering": "Raw signed likelihood roots; upward clipping and scan maximum only. No reference centering/rescaling adopted.",
+  "hypotheses": [
+    "Positive scan maxima arise under a centered null through clipping and searching many correlated masses.",
+    "Fixed-mass signed roots may have a nonzero source-dependent mean or nonunit variance.",
+    "The quadratic residual statistic need not have expectation equal to its bin count when the GP posterior covariance differs from repeated-sampling covariance.",
+    "Observed residual structure need not be an ensemble null bias."
+  ],
+  "controls": [
+    "Replay archived slide quantities and match source/input identities.",
+    "Compare saved Gaussian response means/widths with256 complete Poisson-refit scans.",
+    "Paired mean, scale and correlation counterfactuals of the null field; retain raw observation separately.",
+    "Decompose residual expectation into stochastic trace and deterministic source-mismatch terms.",
+    "Use saved paired Poisson spectra to test fixed predictions versus repeated sideband prediction at selected masses."
+  ],
+  "resource_policy": "Reuse archived fields and spectra; one BLAS thread per bounded worker. No broad optimizer or signal-fit rescan.",
+  "scope_boundary": "Conditional source/estimator diagnostics. No unconditional coverage, discovery probability, new production method, or source-selection calibration.",
+  "presentation_updates": false
+}

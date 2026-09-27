@@ -1,0 +1,12 @@
+# Scientific/editorial review of v6.3
+
+Reviewed `source/report.tex` (lines1–463), its archive table, the saved-row audit, and the current v6.2 protocol. **No substantive issues found; no required revisions.** Rendered-page QA remains with the parent agent.
+
+- **Recommendation is direct and justified.** Lines35–42 and426–431 recommend a common expected yield, preferably frozen from an independent pilot, while retaining per-toy matching as a legitimate adaptive diagnostic. The report does not call the historical study invalid or suggest a design change fixes null bias.
+- **Mathematics checks out under the stated assumptions.** The sampling laws distinguish adaptive background-dependent signal yield from a fixed-yield experiment. In the linear conditional-mean model, the mean-bias difference is `z Cov(g,s)`, the average paired response is `E[g]`, and the adaptive ratio of means weights response by s. The same-batch covariance formula correctly states the iid assumption and its1/T scaling. The two-state numerical example agrees with the equations. Individual paired responses correctly retain signal-draw noise.
+- **Coverage and adaptive containment are distinguished.** Lines116–142 define both quantities explicitly and include a valid counterexample showing that matching does not force pulls to fail. Pull moments are not presented as fixed-yield coverage, and a frozen source is not presented as unconditional physical validation.
+- **Source scope is accurate.** The quantitative table covers the archived v4.6 baseline retained in v5.0.5, explicitly excluding the later targeted65 MeV replacements. Row counts, native2021 reference summaries, CV range, injection identity and source-hash prefix agree with the audit. The role-dependent `sigmaA_reference` naming trap and historical raw-versus-paired recovery distinction are preserved.
+- **Small CV is not used to prove equivalence.** Lines113–114,161–163 and258–261 explicitly deny that inference; no fixed-yield fitted counterfactual is fabricated.
+- **Signal fluctuation modes are correct.** The historical signal is Poisson-fluctuated. The deterministic, exact-N multinomial and Poisson covariance formulas are correct, including their independence/conditioning qualifications. The current v6.2 protocol confirms40 toys per cell, fixed selected N, Poisson background, exact-N multinomial signal and fixed archived GP hyperparameters. Its containment is not upgraded to Poisson-rate coverage.
+
+No scans, fits, new random draws or parent-source edits were performed for this review.

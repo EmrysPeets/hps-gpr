@@ -1,0 +1,95 @@
+{
+  "audit_date": "2026-09-22",
+  "scope": "Bounded local selection, schema, smearing and curve-comparison audit",
+  "remote_access_performed": false,
+  "mc_template_fit_performed": false,
+  "requested_mc_directory": "/sdf/data/hps/physics2021/preselection/v13/ap_signal_prompt_smeared",
+  "mc_selection_status": "not_verified",
+  "mc_smearing_status": "not_verified",
+  "authoritative_v13_configuration_found_locally": false,
+  "matching_local_aprime_sample_found_in_bounded_search": false,
+  "observed_parser_input_directory": "/sdf/data/hps/physics2021/preselection/v16/data_10pc_prompt_TC_psum2p8",
+  "observed_parser_adds_event_cuts": false,
+  "local_sources": [
+    {
+      "path": "/Users/emryspeets/Desktop/recoil_project/source/hpstr/make_final_10pct_invM_hists_uproot_only.py",
+      "sha256": "4b4249b7f3ecefd7e52db21a90bfacbf184538d5c564c66ac697e0937fd3ae61",
+      "relevant_lines": {"source_and_no_extra_cuts": [2, 13], "input_directory": [35, 38], "mass_branch_aliases": [80, 89]}
+    },
+    {
+      "path": "/Users/emryspeets/Desktop/recoil_project/source/hpstr/HPS_GPR_V4P2_10PCT_DIAGNOSTIC_PARSER.md",
+      "sha256": "72e70640e51eab3726e086895050b5ad61931d1ae590dae5890443ab163bc7e9",
+      "relevant_lines": {"input_set_qualification": [10, 17], "stored_hit_semantics": [37, 41]}
+    },
+    {
+      "path": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v5p0p5_analysis_note_20260916/source/sections/03_event_selection.tex",
+      "sha256": "760f36d902b8a9733f34daab8b4ad0c3c2b32ec689990ce6d5faa3d9c8122bbb",
+      "relevant_lines": {"prompt_tc_selection": [18, 22], "tc_smearing_scale": [325, 335]}
+    }
+  ],
+  "local_observed_specimen": {
+    "path": "/Users/emryspeets/Desktop/gp_mods/10pct_2021/merged_hps_014745_job621_merge-batch-2.root",
+    "whole_file_sha256": null,
+    "role": "Schema specimen; not proof of full frozen input-set identity",
+    "latest_tree": "preselection;2",
+    "latest_tree_entries": 30353,
+    "older_tree": "preselection;1",
+    "older_tree_entries": 18732,
+    "cycle_policy": "Use latest cycle only; never sum cycles",
+    "verified_branches": [
+      "vertex./vertex.invM_",
+      "vertex./vertex.type_",
+      "weight",
+      "ele_p_smear_ratio",
+      "pos_p_smear_ratio",
+      "ele./ele.track_/ele.track_.n_hits_",
+      "pos./pos.track_/pos.track_.n_hits_"
+    ],
+    "first_10_rows": {
+      "vertex_type": "TargetConstrained",
+      "all_weights_one": true,
+      "all_electron_smear_ratios_one": true,
+      "all_positron_smear_ratios_one": true
+    },
+    "cutflow_histogram": "vertex_cutflow_h",
+    "cutflow_labels_not_certified_selection": {
+      "electron_momentum_GeV": [0.2, 2.9],
+      "positron_minimum_momentum_GeV": 0.4,
+      "track_chi2_per_ndf_upper": 20,
+      "electron_positron_N2D_hit_minima": [8, 10],
+      "timing_window_ns": [6.0, 5.1, 7.8],
+      "vertex_chi2_label_upper": 30,
+      "psum_minimum_GeV": 2.8,
+      "vertex_momentum_upper_GeV": 4.0
+    },
+    "vertex_chi2_step_cumulative_counts": {"before": 118725, "after": 118725},
+    "hit_semantics_warning": "Stored n_hits_ counts 3D hits; cutflow labels refer to N2D and do not justify applying the same thresholds to n_hits_"
+  },
+  "gaussian_reference": {
+    "mass_units": "GeV",
+    "sigma_units": "GeV",
+    "sigma_polynomial_coefficients_ascending": [0.00184825, -0.001375, 0.085875],
+    "primary_mask_nsigma": 2.25,
+    "prompt_density_window_nsigma": 1.64,
+    "note_tc_data_to_smeared_mc_width_ratio": "2.186/1.745",
+    "policy": "Keep nominal mask and conversion fixed; verify the reconstructed MC mass smearing chain before any additional transformation"
+  },
+  "minimum_mc_metadata": [
+    "generated pole mass and generated mass grid",
+    "reconstructed target-constrained mass branch and units",
+    "production/config identity",
+    "upstream selection and trigger treatment",
+    "smearing definition, branch semantics and application order",
+    "weights, selected counts, sumw and sumw2",
+    "candidate multiplicity",
+    "file identities",
+    "template normalization, interpolation and any recentering"
+  ],
+  "comparison_metrics": {
+    "coordinate": "R(m) = UL_MC(m) / UL_Gaussian(m) at identical fitted masses and amplitude convention",
+    "descriptive_summaries": ["median R", "16th and 84th percentiles of R", "minimum and maximum R with masses", "median abs(R-1)", "sqrt(mean(log(R)^2))"],
+    "local_probability_comparison": ["paired signed-root differences", "paired Z differences", "peak-location changes"],
+    "numeric_mc_comparison_status": "pending_MC_template_scan",
+    "restriction": "No independent-point chi-squared or agreement p-value: curves share observed counts and overlapping GP sidebands; percentile ranges are descriptive, not uncertainty intervals"
+  }
+}

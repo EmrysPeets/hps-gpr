@@ -1,0 +1,1 @@
+Use 2016 neighboring signal-MC template with fit and GP-training exclusion [-3.5,+3.5] in fitted-core u. User confirmed 2021 retains latest [-4,+3] core-u interval. Retain 2015 Gaussian. Compare established all-Gaussian reference, 2021 MC only, both 2016 and 2021 MC. Match v6.3.n LaTeX formatting; use generated-mass terminology. No remote computing requested.

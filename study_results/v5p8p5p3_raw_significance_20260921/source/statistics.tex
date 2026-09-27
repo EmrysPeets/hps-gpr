@@ -1,0 +1,185 @@
+\heading{Statistical fairness: two GPs, two different jobs}
+The background GP estimates the expected counts used by the likelihood. The
+significance-field GP approximates the joint null distribution of the resulting
+scan. They do not need to be statistically independent: the second must reproduce
+the response of the first, including its sideband training and profiling. Calling
+both objects GPs neither establishes nor invalidates the significance calculation.
+The substantive question is whether the generating background and the complete
+analysis procedure represent the null being tested.
+
+In this application let $r_j(n)$ be the signed profile-likelihood root at mass
+$m_j$, and let $B$ denote a fixed generating spectrum. The saved response is
+\begin{equation}
+ r_j(n)\simeq a_j+\sum_b D_{bj}\xi_b,\qquad
+ a_j=r_j(B),\quad
+ D_{bj}=\sqrt{B_b}\left.\frac{\partial r_j}{\partial n_b}\right|_B,
+ \quad \xi_b\sim N(0,1).
+\end{equation}
+Thus $s_j^2=\sum_b D_{bj}^2$ and
+$R_{ij}=\sum_bD_{bi}D_{bj}/(s_i s_j)$ describe the scale and correlation of the
+\emph{fitted response}. The derivatives include the response of the GP prediction
+and its count-dependent covariance to fluctuations in the training bins. This is
+more information than the overlap of the narrow signal templates alone.
+
+Ananiev--Read model a signed local significance field by a zero-mean,
+unit-variance GP, estimate its covariance from background response data, and
+sample its maximum to estimate the trials factor. Their comparison with an
+upcrossing bound concerns the same null field; it does not promise a smaller
+penalty than an arbitrary resolution-based \v{S}id\'ak count. Their finite-grid
+discussion also warns that coarse sampling can miss crossings and maxima
+\cite{AnanievRead}. The additional $a_j,s_j$ transformation here is an HPS
+reference-response construction, not a new requirement imposed by that paper.
+
+The nominal source $B$ was fitted to the observed spectrum and then held fixed.
+Estimating a background from data is familiar in a parametric bootstrap and is
+not by itself a statistical error. The limitation is that this calculation has
+not calibrated the outer source-fitting and method-selection procedure, or
+established robustness to an absorbed signal or an inadequate background family.
+Independent Poisson draws validate the field approximation \emph{conditional on
+that fixed source}; they do not establish independence of the source from the
+observed data. Favorable stress response must therefore be one diagnostic among
+coverage, injected-signal recovery, background adequacy and held-out behavior.
+
+\heading{Keeping the raw ordering is a separate, explicit option}
+There is no obligation to replace the observed likelihood scan by
+$z_j=(r_j-a_j)/s_j$ to perform a look-elsewhere calculation. Two validly specified
+\emph{conditional} questions are
+\begin{align}
+ T_r&=\max_j\max(0,r_j), &p_{\rm global}^{(r)}&=P_B(T_r^*\ge T_r^{\rm obs}),\\
+ T_z&=\max_{j:r_j>0}\frac{r_j-a_j}{s_j},
+ &p_{\rm global}^{(z)}&=P_B(T_z^*\ge T_z^{\rm obs}).
+\end{align}
+Mass-dependent centering and scaling change the ordering, so these are different
+tests of the same events. Neither test is to be chosen retrospectively because
+it yields the smaller probability. Retaining $T_r$ preserves the original
+peak ranking; comparing it to its simulated null still calibrates its
+probability, without subtracting an offset from the observed fit.
+
+\begin{table}[htbp]\centering\small
+\begin{tabular}{lrr}
+\hline
+2016, 39--180 MeV & Raw maximum $T_r$ & Reference maximum $T_z$\\
+\hline
+Selected mass [MeV] &90.5&91.5\\
+Raw root $r$ &3.452500&3.333160\\
+Deterministic response $a$ &0.712849&0.496739\\
+Response scale $s$ &0.982030&0.982836\\
+Reference coordinate $(r-a)/s$ &2.789784&2.885955\\
+Fixed-$B$ Gaussian local tail &0.002637&0.001951\\
+Gaussian global exceedances / 200,000 &13,559&20,975\\
+Gaussian global probability &0.067795&0.104875\\
+Poisson global exceedances / 256 &18&36\\
+Poisson global probability &0.0703&0.1406\\
+Poisson global 95\% interval &[0.0422, 0.1088]&[0.1005, 0.1893]\\
+\hline
+\end{tabular}
+\caption{Retained comparison using the same frozen v5.8.2 fields and the same 256
+complete Poisson scans. No likelihood fit or background source was changed.
+Intervals are Clopper--Pearson; Gaussian probabilities are conditional model
+approximations. Counts, $k/N$ and add-one estimates are recorded separately in
+the numerical ledger.}
+\label{tab:raw-reference-statistics}
+\end{table}
+
+At 90.5 MeV, $\overline\Phi(3.452500)=0.0002777$ is the conventional standard-normal
+mapping of the raw root, whereas the fixed-source response gives
+$\overline\Phi[(3.452500-0.712849)/0.982030]=0.002637$.
+Dividing the conditional raw-global probability by the first of these mixes a
+marginal-calibration change with the look-elsewhere factor. The 256 Poisson toys
+have zero local exceedances at this mass: they cannot resolve a local tail of
+order $10^{-3}$, and do not prove that either precise local approximation is
+correct. Passing previous statistical tests supports the procedure on the nulls
+and observables those tests covered; it does not make a new source-conditioned
+centering mandatory, or guarantee every marginal tail under every new source.
+
+\heading{An apples-to-apples upcrossing comparison}
+For the same standardized Gaussian grid, define
+$N_u=\sum_{j=1}^{J-1}{\bf1}(Z_j\le u,Z_{j+1}>u)$. A scan exceeds $u$ only if its
+first node already exceeds $u$, or there is an upcrossing. Hence
+\begin{equation}
+ P(\max_j Z_j>u)\le
+ \overline\Phi(u)+E[N_u],\qquad
+ E[N_u]=\sum_{j=1}^{J-1}
+ 2\,T\!\left(u,\sqrt{\frac{1-R_{j,j+1}}{1+R_{j,j+1}}}\right),
+ \label{eq:finite-grid-upcrossing}
+\end{equation}
+where $T$ is Owen's $T$ function. The right-hand side is clipped at one. This
+identity for each adjacent crossing probability gives a bound for the
+\emph{actual saved Gaussian grid}; it does not assume a differentiable continuum
+kernel. All thresholds shown below exceed the positive-fit gate at every mass,
+so that the gate makes no change to these comparisons.
+
+At the 2016 threshold $u=2.885955$, the saved correlated-field tail is
+$0.104875$ and the same-grid upcrossing bound is $0.120378$.
+The other datasets show the same ordering: $0.02345<0.02527$ (2015),
+$0.33352<0.42689$ (2021), and $0.22953<0.27340$ (combined).
+This is the relevant less-conservative comparison.
+By contrast, the 2016 resolution-count \v{S}id\'ak value $0.02953$ and the smooth
+signal-template upcrossing estimate $0.06521$ describe simplified correlation
+models. The independent 283-node comparison gives $0.42461$.
+The full fitted-response field lies between these illustrative answers; the
+smaller resolution-only answers do not establish overconservatism of that field.
+
+\fig[1]{stats_same_field_lee}{Retained 2016 comparison with the source and
+test held fixed. Left: the sampled Gaussian maximum is less conservative than
+the analytic upcrossing bound for the same finite grid. Right: counting
+representative points misses searches within the intervening regions; treating
+the properly calculated region maxima as independent errs in the other
+direction in this example. The left curve reuses 200,000 saved fields; the right
+uses 500,000 fresh fields with the same covariance. Shading denotes binomial
+95\% intervals for the joint maxima. These are fixed-background diagnostics.}
+
+\heading{What a 10\% correlation criterion can and cannot do}
+For $N$ independent, identically calibrated point tests,
+$p_{\rm global}=1-(1-p_{\rm local})^N$. A tolerance $|\rho|<0.1$ is not
+independence, and selecting weakly correlated points does not preserve the
+maximum of the masses omitted between them. The saved 2016 field makes both
+issues concrete. A left-to-right rule that selects the next mass with
+$|\rho|<0.1$ relative to the previous selected mass yields 24 points. Their
+non-neighbor correlations still reach $|\rho|=0.835$.
+Requiring the bound against \emph{every} selected point yields six points when
+starting from the low-mass end and seven when starting from the high-mass end.
+The count depends on the selection rule. Every adjacent native-grid correlation
+is at least $0.889$, so no split into two contiguous sets makes all correlations
+across the boundary smaller than 0.1.
+
+A defensible regional version would first compute
+\begin{equation}
+ p_k(u)=P\!\left(\max_{m\in\mathcal R_k} Z(m)>u\right),\qquad
+ p_{\rm independent\ regions}(u)=1-\prod_k[1-p_k(u)],
+\end{equation}
+and then test independence of the \emph{regional maxima}. The maximum within
+each region must already include its internal look-elsewhere effect.
+Using midpoint blocks around the 24 representative masses, the new conditional
+simulation gives a full-grid tail $53{,}201/500{,}000=0.10640$
+(95\% interval $[0.10555,0.10726]$). Multiplying the regional non-exceedance
+probabilities gives $0.14341$; pretending each region is one normal point gives
+$0.04579$. The six-point all-pairs rule gives $0.01165$.
+None is a substitute for the already available joint-field maximum.
+
+\fig[.94]{stats_correlation_selection}{The proposed threshold made
+explicit. Left: low correlation with the immediately preceding selected point
+does not prevent strong correlations with more distant selected points.
+Right: 24 representative points do not capture the full observed scan or its
+maximum. Vertical lines delimit one illustrative contiguous partition, not
+independently established signal regions.}
+
+The tail-equivalent count
+$N_{\rm eff}(u)=\log[1-p_{\rm global}(u)]/\log[1-\overline\Phi(u)]$
+is a useful way to quote the answer from the full field; it is generally
+threshold dependent. For the saved 2016 peak it is $56.73$, whereas the spectral
+participation rank is $9.16$ and the grid contains 283 nodes. These measure
+different things. For a smooth stationary field, the high-threshold crossing
+term scales as $\exp(-u^2/2)$ while the local tail scales approximately as
+$\exp(-u^2/2)/u$, already explaining why a single constant effective count need
+not describe all thresholds. A discovery-threshold penalty also does not, by
+itself, change a fixed-mass exclusion limit; a new discovery reach requires
+signal-injection power for the specified global test.
+
+The initial 100,000-draw block check had an unusually high tail of $0.10910$.
+The covariance reconstruction and positive-fit gate were verified, and the
+same seed was extended to 500,000 draws. The result above differs from the saved
+200,000-draw estimate by about $1.9$ combined Monte Carlo standard errors; their
+95\% intervals overlap. This sampling check is recorded explicitly rather than
+being interpreted as a change to the physical model or a calibrated source
+uncertainty.

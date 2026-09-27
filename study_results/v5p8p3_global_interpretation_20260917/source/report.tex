@@ -1,0 +1,148 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=0.73in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,microtype,graphicx,booktabs,amsmath,amssymb,xcolor,array,hyperref,fancyhdr}
+\hypersetup{pdftitle={HPS-GPR v5.8.3: Resolution, global significance and CLs},colorlinks=true,urlcolor=blue!50!black}
+\definecolor{navy}{RGB}{29,54,78}
+\pagestyle{fancy}\fancyhf{}\lhead{\small HPS-GPR: interpreting the nominal GP study}\rhead{\small v5.8.3}\cfoot{\thepage}
+\setlength{\headheight}{14pt}\setlength{\parindent}{0pt}\setlength{\parskip}{6pt}
+\setlength{\emergencystretch}{1em}
+\newcommand{\heading}[1]{\section*{\color{navy}#1}}
+\newcommand{\fig}[3][1]{\begin{center}\includegraphics[width=#1\linewidth]{../figures/#2.pdf}\end{center}{\small #3}\par}
+\newcommand{\sfN}{\overline\Phi}
+\begin{document}
+{\LARGE\bfseries\color{navy} Resolution, global significance\\and what the nominal GP study establishes}\par
+{\large Standalone interpretation study v5.8.3}\hfill 17 September 2026
+
+\heading{The correction already accounts for resolution}
+The global correction in v5.8.2 does not treat half-MeV scan points as independent measurements. It propagates the same count fluctuations through every tested mass and samples their correlated fitted responses. Neighboring half-MeV scores have median correlations of 0.970--0.990. Nevertheless, an excess somewhere in a broad search is less unusual than the same excess at a mass specified in advance.
+
+This audit finds no consequential error in that ordering. A count of resolution-sized intervals alone is not an adequate substitute: continuous peak finding has a threshold-dependent trials penalty, and the fitted HPS response includes background interpolation and sideband subtraction as well as signal-template overlap.
+
+\fig{peak_summary}{\textbf{Figure 1.} Left: the same observed fit at each reference-local peak, before reference calibration and after local/global conversion. Right: Gaussian-field global probabilities and 95\% Monte Carlo intervals, compared with complete Poisson scans. Intervals describe finite simulation counts, not background-model uncertainty.}
+\begin{center}\small\begin{tabular}{lrrrr}\toprule
+Search & Peak [MeV] & Local $Z$ & Global $p$ & Global $Z$\\\midrule
+2015 full & 51.0 & 3.359 & 0.02345 & 1.987\\
+2016 full & 91.5 & 2.886 & 0.10488 & 1.254\\
+2021 10\% & 65.5 & 2.558 & 0.33352 & 0.430\\
+Combined, 19--250 MeV & 66.0 & 2.829 & 0.22953 & 0.740\\\bottomrule
+\end{tabular}\end{center}
+These values are unchanged from v5.8.2. They are conditional on fixed, observed-data-derived nominal GP source means. The useful result is a tested calculation of how the fitted scan fluctuates under those references; a final particle-discovery calibration also needs qualification of the source construction itself. No new likelihood fits, signal limits or Poisson toys are introduced here.
+
+\clearpage
+\heading{Two Gaussian processes with different jobs}
+The background GP predicts counts in a masked mass window and supplies a covariance for the likelihood. The significance GP describes repeated fitted scores over the tested signal mass. Its correlation is derived from the whole analysis; it does not inherit the background kernel's length scale directly.
+\fig{method_map}{\textbf{Figure 2.} The source mean defines the conditional experiment. The reviewed likelihood produces the observed score and its response to count fluctuations. The response GP supplies correlated scan maxima. The CLs limit calculation is a separate inference branch.}
+For a fixed source spectrum $B$, write the signed likelihood root as $r(m)$ and define
+\[
+a_m=r(B;m),\qquad D_{jm}=\sqrt{B_j}\frac{\partial r(m)}{\partial n_j},\qquad
+\Gamma=D^TD,\quad s_m=\sqrt{\Gamma_{mm}},\quad R_{mn}=\frac{\Gamma_{mn}}{s_ms_n}.
+\]
+The source uses a full-support GP mean with the reviewed kernel anchored at 76 MeV for each dataset. The mass-local analysis retains its reviewed kernels, analysis bins, supports, $\pm2.25\sigma_m$ moving masks and signal-to-coupling conversion. Count fluctuations change both the sideband-trained GP mean and its predictive covariance. Independent dataset-bin directions are concatenated for the common-coupling fit.
+
+For a positive observed fit, $z_m=(r_{\mathrm{obs},m}-a_m)/s_m$ and $p_{\rm local}=\sfN(z_m)$. Draw $W\sim N(0,R)$ and form
+\[
+M=\max_{m:\,a_m+s_mW_m>0}W_m,\qquad p_{\rm global}=P(M\ge z_{\rm obs}).
+\]
+A nonpositive observed fit has inclusive excess tail one. At a positive fit, $z_{\rm obs}>-a_m/s_m$, so its local exceedance event is contained in the global event. This proves the required local/global ordering within the Gaussian approximation.
+
+The differential calculation omits derivatives of numerical covariance conditioning. Its effect is checked against recomputed conditioned fits: maximum finite-difference discrepancy $3.67\times10^{-6}$; maximum complete-response width discrepancy 0.137\%. It is a validated approximation, not an exact derivative of every numerical operation.
+
+\clearpage
+\heading{The covariance used in the trials calculation}
+\fig[.91]{correlation_resolution}{\textbf{Figure 3.} Saved fitted-score correlation matrices used in v5.8.2. Diagonal bands show nearby hypotheses sharing fluctuations. Blue off-diagonal regions show anticorrelation from the fitted response. Combined-panel lines mark changes in contributing datasets at 39, 50, 100 and 180 MeV. These matrices, rather than a scan-point count, determine the simulated maximum distribution.}
+\begin{center}\small\begin{tabular}{lrrr}\toprule
+Search & Grid points & Median adjacent $R$ & Peak tail-equivalent $N$\\\midrule
+2015 & 163 & 0.9705 & 60.6\\
+2016 & 283 & 0.9897 & 56.7\\
+2021 10\% & 401 & 0.9880 & 76.8\\
+Combined & 463 & 0.9856 & 111.6\\\bottomrule
+\end{tabular}\end{center}
+The last column is descriptive: it is the number of independent equal-tail tests that would reproduce the observed global probability at that particular threshold. It is not a count of independent physical mass bins or datasets. The experiments are independent across datasets; mass hypotheses within each experiment are correlated.
+
+\clearpage
+\heading{Why detector resolution does not fix the full correlation}
+\fig[.96]{response_resolution}{\textbf{Figure 4.} Correlation versus mass separation, averaged across mass pairs. Shading spans the 10th--90th percentiles of those pairs; it is not an uncertainty band. Dashed curves show normalized Gaussian-template overlap using the actual mass-dependent detector widths, assuming a known flat background. No such single-template benchmark is assigned to the changing combined fit.}
+In the simple limit of Gaussian templates of common width $\sigma_m$, white count noise and known background,
+\[
+R_{\rm template}(\Delta m)=\exp\!\left[-\frac{\Delta m^2}{4\sigma_m^2}\right].
+\]
+Even one FWHM of separation leaves correlation $1/4$ in this limit. Thus resolution intervals do not partition the search into exactly independent tests.
+
+The actual response decorrelates faster and develops negative lobes. It contains positive signal-window weights and compensating sideband/background responses. Moving masks, GP retraining, profiling, nonuniform counts and varying resolution all contribute. The minima reach roughly $-0.85$ to $-0.87$. This audit does not isolate the share caused by each operation.
+
+As a finite-grid shape diagnostic, $\sum_m\arccos(R_{m,m+1})/(2\pi)$ is 2.05, 1.91 and 1.68 times the corresponding smooth-template angular-length estimate for 2015, 2016 and 2021. These ratios describe a more rapidly changing fitted response; they are not calibrated trials factors or proof of a defect in the masks. Reducing a grid's density to suppress that response would change the sampled search rather than validate it.
+
+\clearpage
+\heading{A smooth scan can have more trials than a width count suggests}
+\fig[.92]{trials_comparison}{\textbf{Figure 5.} Actual correlated-field tails (blue) versus illustrative reference calculations. Independent grid points (gray) overstate these observed penalties; independent FWHM-spaced tests (orange) understate them. The smooth-template upcrossing approximation (green) explains part of the difference without introducing independent sub-resolution spectra. Shading is 95\% Monte Carlo uncertainty only. The combined FWHM heuristic uses the finest available detector width and is not a joint-resolution model.}
+For a smooth, constant-width Gaussian-template scan of length $L$, the high-threshold approximation is
+\[
+P(\max W\ge u)\simeq\sfN(u)+\frac{L}{2\pi\sqrt2\sigma_m}e^{-u^2/2}.
+\]
+Since $\sfN(u)\sim e^{-u^2/2}/(\sqrt{2\pi}u)$, the tail multiplier grows approximately as $1+Lu/(2\sqrt\pi\sigma_m)$. It is not the fixed count $L/{\rm FWHM}$. The plotted varying-width benchmark integrates $\sqrt{1+(d\sigma_m/dm)^2}/(2\pi\sqrt2\sigma_m)$ over the mass range. It remains an illustrative approximation, especially at moderate thresholds.
+
+At the 2016 peak, the FWHM-count heuristic gives $p\simeq0.030$, the smooth-template approximation gives $0.065$, the actual fitted field gives $0.105$, and independent grid points give $0.425$. Resolution does reduce the penalty substantially. It does not support replacing the correlated calculation by the smallest of these estimates.
+
+\clearpage
+\heading{Threshold and search range both matter}
+\fig{trials_effective_counts}{\textbf{Figure 6.} Tail-equivalent count $N_{\rm tail}(u)=\log[1-p_{\rm global}(u)]/\log[1-\sfN(u)]$. The covariance participation rank $(\operatorname{tr}R)^2/\operatorname{tr}(R^2)$ describes variance dimension, not the distribution of its largest value. Neither that rank nor the grid size can replace the maximum calculation.}
+\fig{combined_domain_effect}{\textbf{Figure 7.} The identical combined excess at 66 MeV has local $Z=2.83$, global $Z=1.47$ over the common 50--100 MeV overlap, and global $Z=0.74$ over 19--250 MeV. The overlap is a separately declared diagnostic; selecting a favorable domain after seeing the data would require a selection correction.}
+The combined scan tests one coupling, not three freely adjustable signal yields. In a local Gaussian approximation, its score is an information-weighted sum of the dataset scores. Adding a dataset with a weak or oppositely directed response can dilute an excess; aligned responses can strengthen it. This is distinct from the extra search opportunities created by a wider mass range. The full search uses every dataset whose range contains the tested mass: all three contribute only over 50--100 MeV.
+
+\clearpage
+\heading{Why these probabilities are not 90\% CLs}
+The two procedures share a profile likelihood but test different hypotheses. Discovery asks whether background can produce an upward fluctuation. Upper limits ask whether a specified signal strength is too large to be compatible with the observation.
+\begin{center}\small\begin{tabular}{>{\raggedright\arraybackslash}p{1.12in}>{\raggedright\arraybackslash}p{2.12in}>{\raggedright\arraybackslash}p{2.85in}}\toprule
+Quantity & Question & Construction\\\midrule
+Local $p_0$ & Excess at a specified mass? & Background-only upward tail.\\
+Global $p_0$ & Excess anywhere in the stated search? & Background-only tail of the scan maximum.\\
+90\% CLs endpoint & Which signal strengths are excluded? & Solve a signal/background tail ratio equal to 0.1 at fixed mass.\\\bottomrule
+\end{tabular}\end{center}
+\fig{cls_vs_discovery}{\textbf{Figure 8.} Derived Gaussian illustration with known variance, not a new HPS limit. Increasing the observed excess lowers the background tail while raising the upper endpoint: more signal is permitted. At exactly zero excess the plotted conventional $p_0=0.5$ differs from the inclusive zero-statistic tail convention of one used in the study.}
+The existing code profiles both observed and background-Asimov statistics, $q$ and $q_A$, and computes
+\[
+{\rm CL}_s=\frac{\sfN(z_{s+b})}{\sfN(z_b)},\quad
+(z_{s+b},z_b)=
+\begin{cases}
+(\sqrt q,\sqrt q-\sqrt{q_A}),&q\le q_A,\\
+\big((q+q_A)/(2\sqrt{q_A}),(q-q_A)/(2\sqrt{q_A})\big),&q>q_A.
+\end{cases}
+\]
+It sets CLs to one at the inclusive zero-statistic boundary and solves ${\rm CL}_s(A_{90})=0.1$. The second branch handles deficits. These are asymptotic fixed-mass upper-limit tails; they are not used to obtain the new significance curves.
+
+For $\hat\mu\sim N(\mu,\sigma^2)$ and tested $\mu>\hat\mu\ge0$, the illustration has ${\rm CL}_s(\mu)=\sfN[(\mu-\hat\mu)/\sigma]/\Phi(\hat\mu/\sigma)$. At or below the observed estimate the code instead uses the zero-statistic branch. With no excess, $\mu_{90}=1.645\sigma$. This is an exclusion endpoint even though there is no discovery evidence. Neither 90\% CLs nor a global $p<0.1$ means a 90\% probability that a particle exists. CLs does not remove the discovery trials penalty, and this background-only study does not recalibrate signal-plus-background limit coverage.
+
+\clearpage
+\heading{What is new and scientifically useful here}
+Ananiev and Read already proposed a significance GP, covariance estimation from controlled background-bin perturbations, inexpensive sampling of scan maxima, and upcrossing/grid studies [1]. Those are the published foundations. The present contribution is their implementation and validation for this HPS fitting procedure, not a new general invention of GP trials factors.
+
+The useful HPS work is concrete: propagating analysis-bin count fluctuations through moving-mask log-count GP fits, count-dependent training errors and predictive covariance; applying an efficiently differentiated likelihood response; constructing the common-coupling field across changing dataset participation; and checking offsets, widths, correlation, perturbation response and complete-scan maxima separately. The coherent nominal source also makes a meaningful comparison with the earlier stress reference possible.
+\fig{grid_and_source_choices}{\textbf{Figure 9.} Left: paired integer/half-integer sampling of the same fields at threshold three. Finer sampling captures additional maxima rather than creating independent data. Right: saved v5.8.1 deterministic 2016 response under different fixed generating references on its original 1 MeV grid. The source-kernel variation changes the generator; it is not a retuning of the reviewed observed extractor.}
+The 2016 RMS deterministic root changes from 4.97 for the archived stress reference to 0.61 for the nominal GP reference. Halving the source GP length scale gives 1.70, not a further improvement. This supports sensitivity to the generating shape and shows that ``shorter length scale'' is not a universal remedy. It does not establish that the nominal source is the unique physical background, or that the archived hybrid was a qualified null model.
+
+Passing fit diagnostics and conditional Poisson tests answers a narrower question: whether the tested extractor behaves as expected under the specified generator. It does not establish that every proposed global functional form is a valid background stress reference. This separation is an important consequence of the study.
+
+The half-MeV search is still a finite-grid calculation. At threshold three the 1-to-0.5 MeV change increases global tails by about 17.4\%, 7.5\%, 6.7\% and 10.5\% for 2015, 2016, 2021 and the combination. Continuum convergence remains untested. A finer grid cannot reduce the maximum of a fixed field on a nested domain.
+
+\clearpage
+\heading{Consequences and the remaining inference boundary}
+The current result is useful as a methodological result: it separates deterministic reference response, local fluctuation scale and search multiplicity, and makes each inspectable. It does not add new observed event information. The conventional raw 2016 maximum remains $r=3.4525$ at 90.5 MeV; the reference-calibrated maximum is $Z=2.886$ at 91.5 MeV because the centering and scaling depend on mass. These are different summaries of the same frozen observed scan.
+
+The source mean was estimated through the observed spectrum and is held fixed in validation. The mass-local extractor is retrained for each Poisson spectrum, but the full source-building and calibration procedure is not repeated. Small null offsets and good fixed-source fluctuation checks therefore do not quantify source uncertainty or establish that a possible signal was excluded from the source.
+
+The prior deterministic source-injection check makes that limitation tangible. Rebuilding the nominal 2016 source after a five-reference-error injection incorporated 88.67\% and 88.41\% of the injected window-summed yield at 76 and 90 MeV; Poisson-weighted signal-template projections were 71.83\% and 71.73\%. These distinct diagnostics are not signal efficiencies or measurements of bias in the observed excess. Recovery after injecting into a frozen source cannot diagnose contamination introduced while that source was built.
+
+The next calibration, if pursued, should fix the full source-building policy and search domains before evaluating outcomes; test plausible alternative nulls and source rebuilding or an independently constrained source; and validate injection recovery with source estimation included. Grid refinement and the rare tails should then be tested for that fixed procedure. No claim of a shorter path to discovery follows from the present probabilities. Each reported global correction also covers only its stated scope, not a later choice of the most favorable dataset or combination.
+
+\heading{Validation and reproducibility}
+The significance audit reuses frozen v5.8.2 fields: 256 complete Poisson scans per dataset, combined by matching independent dataset draws, and 200,000 Gaussian fields per scope. Scope ensembles share inputs and are not mutually independent. The Gaussian peak probabilities lie inside the corresponding direct-Poisson 95\% intervals; 256 scans do not validate arbitrary discovery tails. The source/figure package includes the exact response matrices and maxima, numerical ledgers, source identities, reviewed code snapshots, and the independent statistics and paper reviews. The CLs illustration is analytic; the source-shape comparison reuses v5.8.1. The new scripts require no refits or random draws. The README gives rebuild commands and artifact checks.
+
+\heading{References}
+\begin{enumerate}\small
+\item V. Ananiev and A. L. Read, \textit{Gaussian Process-based calculation of look-elsewhere trials factor}, JINST 18 (2023) P05041, \href{https://arxiv.org/pdf/2206.12328}{arXiv:2206.12328}, Sections 2--3. Basis for the significance-GP method and finite-grid discussion.
+\item G. Cowan, K. Cranmer, E. Gross and O. Vitells, \textit{Asymptotic formulae for likelihood-based tests of new physics}, \href{https://arxiv.org/abs/1007.1727}{arXiv:1007.1727}. Distinct discovery and upper-limit likelihood statistics; bounded asymptotic tails.
+\item A. L. Read, \textit{Presentation of search results: the CLs technique}, J. Phys. G 28 (2002) 2693, \href{https://doi.org/10.1088/0954-3899/28/10/313}{doi:10.1088/0954-3899/28/10/313}.
+\item HPS-GPR v5.0.5, Sections 4.20 and 6.11; studies v5.8.0--v5.8.2, 17 September 2026. Numeric results here are taken from the pinned local ledgers, not from the external references.
+\end{enumerate}
+\end{document}

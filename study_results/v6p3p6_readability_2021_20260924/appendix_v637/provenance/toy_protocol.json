@@ -1,0 +1,174 @@
+{
+  "version": "6.3.7",
+  "seed": 637250925,
+  "masses_MeV": [
+    100,
+    160,
+    220
+  ],
+  "candidates": {
+    "gaussian_baseline": {
+      "shape": "gaussian",
+      "fit": [
+        -2.25,
+        2.25
+      ],
+      "guard": [
+        -2.25,
+        2.25
+      ],
+      "reference": true
+    },
+    "gaussian_starter": {
+      "shape": "gaussian",
+      "fit": [
+        -4,
+        3
+      ],
+      "guard": [
+        -4,
+        3
+      ]
+    },
+    "common_starter": {
+      "shape": "common",
+      "fit": [
+        -4,
+        3
+      ],
+      "guard": [
+        -4,
+        3
+      ]
+    },
+    "morph_short": {
+      "shape": "morph",
+      "fit": [
+        -2.5,
+        2.25
+      ],
+      "guard": [
+        -2.5,
+        2.25
+      ]
+    },
+    "morph_middle": {
+      "shape": "morph",
+      "fit": [
+        -3,
+        2.5
+      ],
+      "guard": [
+        -3,
+        2.5
+      ]
+    },
+    "morph_starter": {
+      "shape": "morph",
+      "fit": [
+        -4,
+        3
+      ],
+      "guard": [
+        -4,
+        3
+      ]
+    },
+    "morph_wide": {
+      "shape": "morph",
+      "fit": [
+        -5,
+        4
+      ],
+      "guard": [
+        -5,
+        4
+      ]
+    },
+    "morph_extended": {
+      "shape": "morph",
+      "fit": [
+        -6,
+        5
+      ],
+      "guard": [
+        -6,
+        5
+      ]
+    },
+    "morph_buffer": {
+      "shape": "morph",
+      "fit": [
+        -3,
+        2.5
+      ],
+      "guard": [
+        -4,
+        3
+      ]
+    },
+    "morph_widebuffer": {
+      "shape": "morph",
+      "fit": [
+        -4,
+        3
+      ],
+      "guard": [
+        -6,
+        5
+      ]
+    },
+    "direct_starter": {
+      "shape": "direct",
+      "fit": [
+        -4,
+        3
+      ],
+      "guard": [
+        -4,
+        3
+      ]
+    }
+  },
+  "toys_per_cohort": 100,
+  "strengths_grid": [
+    0.0,
+    0.5,
+    1.0,
+    2.0,
+    3.0,
+    4.0,
+    5.0,
+    6.0,
+    8.0,
+    10.0,
+    12.0,
+    16.0
+  ],
+  "evaluation_strengths": [
+    0,
+    3,
+    5
+  ],
+  "sources": [
+    "gp_mean",
+    "functional"
+  ],
+  "tuning_source": "gp_mean",
+  "selection": "One global deployable candidate minimizing equal-mass geometric mean SD(background-only Ahat)/R; R=mean(Ahat3-Ahat0)/(3*s0); direct MC is a benchmark, not a deployable interpolated candidate; require all fits valid and positive R.",
+  "independent_cohorts": "tuning namespace1, calibration2, evaluation3; source0GPmean/source1functional; backgrounds paired across masses, policies, strengths; signal Poisson increments paired across policies and nested strengths",
+  "seed_background": "SeedSequence([seed,cohort_namespace,source_index,0,toy])",
+  "seed_signal": "SeedSequence([seed,cohort_namespace,source_index,mass,toy]); independent increments sorted by expected signal strength",
+  "normalization": "full selected TC MC with below/above analysis-support categories; no probability renormalization after window restriction",
+  "training": "GP train bins exclude union of blind region and likelihood support; full MC injection tails remain in GP training",
+  "omission": "Tested mass omitted from core, width, shared-shape and neighboring-shape construction; direct MC uses the test sample as a best-case extraction benchmark",
+  "background_source": "Poisson fluctuation of fixed GP arithmetic mean; functional source separate anchored form stress; no random GP-function draws",
+  "statistical_scope": "Finite-grid source-matched rank-test inversion; conditional local sensitivity, not observed limits, global significance or physical exclusions",
+  "rank_limit": "p_A=(1+# calibration Ahat<=evaluation Ahat)/101; retain all A with p_A>0.1, report complete accepted set and empty/holes/censor flags",
+  "local_test": "p0=(1+# calibration background-only Ahat>=evaluation Ahat)/101; reject p0<=0.1",
+  "bootstrap": "2000 whole-toy resamples; common resampling indices across policies and masses, separate source/cohort streams",
+  "reference_sha256": "8fc03a99937b9985c290566a4a305c8d56917409c56bf5ff9df9726b5d0a0db3",
+  "templates_sha256": "3b883cd1761f2124ae539f0605d3a45177eb2f834c5f3e794a894df14997453e",
+  "null_sha256": "306a915b9ba6230aafbe058c94438c6af11f85b60d68f5aae4ebbfec4d4a9424",
+  "script_sha256": "94d1f28d956f5f0c0d724deaa0ebc3a06355feb602455c833b81a409f5ad2246"
+}

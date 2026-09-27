@@ -1,0 +1,31 @@
+"""Package the verified editorial revision and original scientific evidence."""
+from pathlib import Path
+import argparse,hashlib,json,shutil,subprocess,sys,zipfile,tempfile
+B=Path(__file__).resolve().parents[1]
+NAME='HPS_GPR_v6p3p6_2021_Signal_Extraction'
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def release(destination):
+    subprocess.run([sys.executable,str(B/'scripts/check_editorial_integrity.py')],check=True)
+    report=B/'pdf'/f'{NAME}.pdf'
+    for name in ['v636_editorial_integrity.json','combined_morph_appendix_qa.json']:
+        q=json.loads((B/'qa'/name).read_text());assert q['passed'],name
+        if 'report_sha256' in q:assert q['report_sha256']==sha(report),name+' PDF changed after QA'
+    destination.mkdir(parents=True,exist_ok=True)
+    (B/'status.json').write_text(json.dumps({'status':'complete_combined_morph_appendix_validated','version':'6.3.6','scientific_protocol':'6.3.5 main; 6.3.7 template studies; 6.3.8 observed morph appendix; 6.3.9 combined scan','new_observed_fits':543,'new_combined_study_observed_fits':705,'new_combined_background_toy_fits':3000,'observed_morph_toy_fit_rows':40800,'appendix_unique_toy_fit_rows':58800,'leakage_control_fits':3000,'leakage_mean_count_fits':270,'leakage_exact_replays':30,'appendix_core_fits':22,'appendix_bin_resampling_fits':704,'report':str(report.relative_to(B)),'report_sha256':sha(report)},indent=2)+'\n')
+    manifest=B/'MANIFEST.sha256'
+    files=sorted(p for p in B.rglob('*') if p.is_file() and p!=manifest and p.name not in ('run.lock','STOP') and not p.name.endswith(('.pyc','.tmp')) and '__pycache__' not in p.parts and not {'rendered','report_rendered','figure_rendered','revision_rendered'}.intersection(p.relative_to(B).parts))
+    manifest.write_text(''.join(f'{sha(p)}  {p.relative_to(B)}\n' for p in files))
+    archive=destination/'HPS_GPR_v6p3p6_Reproducible_Study.zip'
+    work_archive=Path(tempfile.mkdtemp(prefix='hps-v636-package-'))/archive.name
+    with zipfile.ZipFile(work_archive,'w',zipfile.ZIP_DEFLATED,compresslevel=6) as z:
+        for p in files+[manifest]:z.write(p,arcname=str(Path(B.name)/p.relative_to(B)))
+    with zipfile.ZipFile(work_archive) as z:
+        assert z.testzip() is None
+        for p in files:assert hashlib.sha256(z.read(str(Path(B.name)/p.relative_to(B)))).hexdigest()==sha(p)
+    staged=destination/(archive.name+'.tmp');shutil.copy2(work_archive,staged);assert sha(staged)==sha(work_archive);staged.replace(archive);shutil.rmtree(work_archive.parent)
+    final=destination/report.name;shutil.copy2(report,final)
+    shutil.copy2(B/'CHANGELOG.md',destination/'CHANGELOG.md')
+    info={'pdf':str(final),'pdf_sha256':sha(final),'archive':str(archive),'archive_sha256':sha(archive),'archive_bytes':archive.stat().st_size,'files':len(files)+1,'manifest_sha256':sha(manifest),'all_archive_member_hashes_verified':True}
+    (destination/'release.json').write_text(json.dumps(info,indent=2)+'\n');print(json.dumps(info,indent=2))
+if __name__=='__main__':
+    p=argparse.ArgumentParser();p.add_argument('--destination',type=Path,required=True);a=p.parse_args();release(a.destination.resolve())

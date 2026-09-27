@@ -1,0 +1,22 @@
+{
+  "primary_statistic": "T = mean_d,w [ (mhat_d,w - mbar) / sigma_d(92) ]^2",
+  "weighted_center": "mbar = sum_d,w mhat_d,w / sigma_d(92)^2 divided by sum_d,w 1 / sigma_d(92)^2",
+  "peak_ordering": "Maximum signed standardized Z=(r-a)/s among raw r>0 grid sites; exact ties choose lowest mass",
+  "requested_peak_ordering": "Individual 80--105/support summary maximizes signed Z across all available sites; the calibrated common-region coherence additionally requires positive raw r. All reported observed peaks satisfy raw r>0.",
+  "ineligible_rule": "If any dataset-width has no positive raw r in region, set T and W to infinity (never counted as coherent)",
+  "primary_region_MeV": [
+    80,
+    100
+  ],
+  "requested_diagnostic_region_MeV": [
+    80,
+    105
+  ],
+  "region_reason": "2015 support ends at 100 MeV; all-dataset coherence uses the common intersection 80--100. Individual requested-region summaries retain 80--105 where supported.",
+  "secondary_statistic": "W = mean_d ( [max_w mhat_d,w - min_w mhat_d,w] / sigma_d(92) )^2",
+  "tail": "Inclusive lower tail; small values mean more coherent/stable. T is the single primary scalar; T and W p values are not multiplied.",
+  "significance_interpretation": "Exploratory fixed-region conditional null diagnostic; not a discovery p value, not corrected for region, method, or width selection",
+  "direct_null": "256 paired full-spectrum Poisson rows with exact profile scans, reused at every mass and width",
+  "gaussian_null": "100000 supplemental linear-response Gaussian draws per independent dataset; full covariance across all diagnostic masses and widths from stacked D columns",
+  "amplitude_units": "Amplitude A is epsilon2/1e-8 in the original dataset template parameterization; amplitudes are independent here. Full-spectrum signal events=A*sum(full Gaussian template); window signal events=A*sum(window template). Nonnegative MLE=max(A,0)."
+}

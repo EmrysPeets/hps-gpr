@@ -1,0 +1,316 @@
+{
+  "status": "passed",
+  "inputs_only": false,
+  "checked_utc": "2026-09-24T16:14:07.047734+00:00",
+  "validator_sha256": "30ef0046b3d6da300da6f597c21364cc901fb710f78ec8118a0881637956b01c",
+  "checks": [
+    {
+      "name": "immutable_inputs_handoff_and_independent_templates",
+      "passed": true,
+      "details": {
+        "pinned_files": 37,
+        "original_handoff_checked": true,
+        "prior_study_source_files_checked": 36,
+        "input_bins": 422,
+        "support_GeV": [
+          0.036,
+          0.29975
+        ],
+        "template_fractions": [
+          {
+            "mass_MeV": 60,
+            "shape": "gaussian",
+            "support": 1.0,
+            "window": 0.9760618922993104
+          },
+          {
+            "mass_MeV": 60,
+            "shape": "mc",
+            "support": 0.9982373557463434,
+            "window": 0.3919010703087811
+          },
+          {
+            "mass_MeV": 80,
+            "shape": "gaussian",
+            "support": 1.0,
+            "window": 0.979723050751432
+          },
+          {
+            "mass_MeV": 80,
+            "shape": "mc",
+            "support": 0.9990452490919806,
+            "window": 0.6749770885744033
+          },
+          {
+            "mass_MeV": 100,
+            "shape": "gaussian",
+            "support": 1.0,
+            "window": 0.9791161489436423
+          },
+          {
+            "mass_MeV": 100,
+            "shape": "mc",
+            "support": 0.9990856894169027,
+            "window": 0.7311835263756652
+          },
+          {
+            "mass_MeV": 120,
+            "shape": "gaussian",
+            "support": 0.9999999999999999,
+            "window": 0.9753620387698749
+          },
+          {
+            "mass_MeV": 120,
+            "shape": "mc",
+            "support": 0.9989802534852333,
+            "window": 0.7452861554004957
+          },
+          {
+            "mass_MeV": 140,
+            "shape": "gaussian",
+            "support": 1.0,
+            "window": 0.9749084526634977
+          },
+          {
+            "mass_MeV": 140,
+            "shape": "mc",
+            "support": 0.9988559143809961,
+            "window": 0.7643140394232731
+          },
+          {
+            "mass_MeV": 160,
+            "shape": "gaussian",
+            "support": 1.0,
+            "window": 0.9725204364293056
+          },
+          {
+            "mass_MeV": 160,
+            "shape": "mc",
+            "support": 0.998710359335313,
+            "window": 0.7512470129917354
+          },
+          {
+            "mass_MeV": 180,
+            "shape": "gaussian",
+            "support": 1.0,
+            "window": 0.9728926896419933
+          },
+          {
+            "mass_MeV": 180,
+            "shape": "mc",
+            "support": 0.9985863259436962,
+            "window": 0.7516592530096246
+          },
+          {
+            "mass_MeV": 200,
+            "shape": "gaussian",
+            "support": 0.9999999999999999,
+            "window": 0.9751355754954776
+          },
+          {
+            "mass_MeV": 200,
+            "shape": "mc",
+            "support": 0.9982971765614883,
+            "window": 0.7558239880728902
+          },
+          {
+            "mass_MeV": 220,
+            "shape": "gaussian",
+            "support": 0.9999999999999999,
+            "window": 0.9753500156605156
+          },
+          {
+            "mass_MeV": 220,
+            "shape": "mc",
+            "support": 0.997908691249475,
+            "window": 0.737037219985675
+          },
+          {
+            "mass_MeV": 240,
+            "shape": "gaussian",
+            "support": 1.0,
+            "window": 0.976905349345797
+          },
+          {
+            "mass_MeV": 240,
+            "shape": "mc",
+            "support": 0.9973272699122533,
+            "window": 0.7218727833767206
+          }
+        ]
+      }
+    },
+    {
+      "name": "independent_one_bin_solver_control",
+      "passed": true,
+      "details": [
+        {
+          "observed": 90.0,
+          "background_variance": 0.0,
+          "signed_Ahat": -62.16216224266401,
+          "q_true": 7.865390066553921
+        },
+        {
+          "observed": 140.0,
+          "background_variance": 0.0,
+          "signed_Ahat": 72.97297297158718,
+          "q_true": 3.4037774083259507
+        },
+        {
+          "observed": 90.0,
+          "background_variance": 37.0,
+          "signed_Ahat": -62.16216224266401,
+          "q_true": 6.0722603814755
+        },
+        {
+          "observed": 140.0,
+          "background_variance": 37.0,
+          "signed_Ahat": 72.9729729715872,
+          "q_true": 2.580526918220225
+        }
+      ]
+    },
+    {
+      "name": "all_background_counts_independent_RNG_replay",
+      "passed": true,
+      "details": {
+        "background_spectra": 200,
+        "exact_rng_replay": true,
+        "independence_evidence": "Distinct SeedSequence namespaces; exact deterministic replay; 200 distinct spectra."
+      }
+    },
+    {
+      "name": "saved_templates_against_independent_CDFs",
+      "passed": true,
+      "details": {
+        "templates": 20,
+        "masks": 10,
+        "maximum_independent_CDF_difference": 2.220446049250313e-16,
+        "convention": "Full-selected count probabilities; no normalization on support or fitted window."
+      }
+    },
+    {
+      "name": "complete_IDs_and_numerical_diagnostics",
+      "passed": true,
+      "details": {
+        "pilot": {
+          "attempted": 2000,
+          "fit_valid": 2000,
+          "profile_valid": 0,
+          "free_failures": 0,
+          "unresolved_profiles": 0
+        },
+        "evaluation": {
+          "attempted": 8000,
+          "fit_valid": 8000,
+          "profile_valid": 8000,
+          "free_failures": 0,
+          "unresolved_profiles": 0
+        }
+      }
+    },
+    {
+      "name": "aggregate_rows_exactly_match_checkpoints",
+      "passed": true,
+      "details": {
+        "pilot": {
+          "rows": 2000,
+          "exact_aggregate_matches_chunks": true
+        },
+        "evaluation": {
+          "rows": 8000,
+          "exact_aggregate_matches_chunks": true
+        }
+      }
+    },
+    {
+      "name": "independent_pilot_scale_and_freeze_hash",
+      "passed": true,
+      "details": {
+        "frozen_scales": {
+          "60": 6944.944246754848,
+          "80": 6907.956608652145,
+          "100": 6062.09813109382,
+          "120": 5118.654505464794,
+          "140": 4219.162982045078,
+          "160": 3458.4301210817935,
+          "180": 2885.3793546202783,
+          "200": 2410.695629913077,
+          "220": 2022.5086985026346,
+          "240": 1698.532345783031
+        },
+        "pilot_reference_sha256": "f2d9d4bf804ed99894085ecb907fc28734462d6839d3d32bef52fd866f16fd39",
+        "uncertainty": "Mean of returned Gaussian pilot Hessian errors; sample SD/sqrt(100) recorded separately."
+      }
+    },
+    {
+      "name": "all_signal_counts_expected_truth_and_pairing_replay",
+      "passed": true,
+      "details": {
+        "replayed_rows": {
+          "pilot": 2000,
+          "evaluation": 8000
+        },
+        "positive_signal_rng_draws": 6000,
+        "paired_null_GP_predictions": 2000,
+        "expected_truth_separate_from_realized_counts": true,
+        "signal_replay_note": "Replay uses saved category vectors after independent native-CDF agreement; byte-level RNG streams reproduced."
+      }
+    },
+    {
+      "name": "checkpoint_signatures_checksums_and_freeze_order",
+      "passed": true,
+      "details": {
+        "checkpoints": 200,
+        "dependency_signature": "90b26e6b0aefc7a16951307e975fa343c50cda5fc7799b39bb817250c943cf8d",
+        "pilot_reference_sha256": "f2d9d4bf804ed99894085ecb907fc28734462d6839d3d32bef52fd866f16fd39",
+        "pilot_frozen_utc": "2026-09-24T16:12:07.157108+00:00",
+        "first_evaluation_started_utc": "2026-09-24T16:12:07.879040+00:00",
+        "exact_cache_eligibility_recomputed": true
+      }
+    },
+    {
+      "name": "independent_GP_and_representative_BFGS_fits",
+      "passed": true,
+      "details": [
+        {
+          "mass_MeV": 60,
+          "shape": "mc",
+          "toy": 0,
+          "z": 5,
+          "Ahat_difference": 0.00015397013339679688,
+          "sigma_difference": 4.831235855817795e-08,
+          "q_difference": -3.197442310920451e-14,
+          "free_gradient": 4.886487381394744e-09,
+          "profile_gradient": 7.633699228293267e-12,
+          "optimizer": "SciPy BFGS with independent likelihood/gradient"
+        },
+        {
+          "mass_MeV": 140,
+          "shape": "gaussian",
+          "toy": 0,
+          "z": 5,
+          "Ahat_difference": -0.00034810933357221074,
+          "sigma_difference": -3.861532604787499e-08,
+          "q_difference": 1.6413537196058314e-12,
+          "free_gradient": 6.953471920478904e-08,
+          "profile_gradient": 8.696005027175602e-11,
+          "optimizer": "SciPy BFGS with independent likelihood/gradient"
+        },
+        {
+          "mass_MeV": 240,
+          "shape": "mc",
+          "toy": 0,
+          "z": 5,
+          "Ahat_difference": 1.5478690329473466e-08,
+          "sigma_difference": -1.623448042664677e-10,
+          "q_difference": -4.263256414560601e-13,
+          "free_gradient": 3.027501582764103e-10,
+          "profile_gradient": 3.504133573584145e-09,
+          "optimizer": "SciPy BFGS with independent likelihood/gradient"
+        }
+      ]
+    }
+  ],
+  "scope": "Numerical/provenance/replay validity only; scientific bias, pull width and containment are outcomes."
+}

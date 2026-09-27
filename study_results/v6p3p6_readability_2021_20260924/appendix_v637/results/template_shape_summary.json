@@ -1,0 +1,94 @@
+{
+  "description": "v16 TC aligned empirical-CDF interpolation; full selected normalization",
+  "formula": "F_m(x)=(1-t) F_low(c_low+s_low*(x-c_m)/s_m)+t F_high(c_high+s_high*(x-c_m)/s_m); t=(m-low)/(high-low); c_m and s_m use the same linear interpolation",
+  "common_formula": "Equal-weight mean of all retained anchor CDFs after individual core alignment; target center and width still interpolate adjacent anchors",
+  "anchors_MeV": [
+    80,
+    100,
+    120,
+    140,
+    160,
+    180,
+    200,
+    220,
+    240
+  ],
+  "omitted_validation_masses_MeV": [
+    100,
+    120,
+    140,
+    160,
+    180,
+    200,
+    220
+  ],
+  "full_normalization": "All selected rows, including stored histogram overflow. Missing upper-tail locations remain in the above-support category; no fit-window renormalization.",
+  "interpolation_scope": "No extrapolation below 80 or above 240 MeV. Direct samples at 60 and 260 remain available as separate checks.",
+  "uncertainty_scope": "Deterministic empirical-shape diagnostics. No uncertainty bars; finite MC statistics and fitted-core uncertainties are not propagated. Omitted-anchor validation predicts center, width, core and tails without that sample.",
+  "common_CDF_error_range": {
+    "min": 0.025998806963052096,
+    "max": 0.042125841862404534
+  },
+  "morph_CDF_error_range": {
+    "min": 0.003984742144401809,
+    "max": 0.027563395122922052
+  },
+  "common_conditional_core_CDF_error_range": {
+    "min": 0.003622804440588989,
+    "max": 0.010884435787906876
+  },
+  "morph_conditional_core_CDF_error_range": {
+    "min": 0.00204275220614325,
+    "max": 0.006271030262166244
+  },
+  "core_diagnostic_normalization": "Conditional core CDF is normalized only within |u|<2 for a diagnostic of core shape; neither fitted signal probabilities nor full-distribution metrics use this renormalization.",
+  "passed": true,
+  "checks": [
+    {
+      "check": "anchor interpolation identity",
+      "mass_MeV": 80,
+      "max_abs_difference": 3.469446951953614e-18
+    },
+    {
+      "check": "anchor interpolation identity",
+      "mass_MeV": 100,
+      "max_abs_difference": 4.336808689942018e-19
+    },
+    {
+      "check": "anchor interpolation identity",
+      "mass_MeV": 120,
+      "max_abs_difference": 1.0408340855860843e-17
+    },
+    {
+      "check": "anchor interpolation identity",
+      "mass_MeV": 140,
+      "max_abs_difference": 1.0408340855860843e-17
+    },
+    {
+      "check": "anchor interpolation identity",
+      "mass_MeV": 160,
+      "max_abs_difference": 1.0408340855860843e-17
+    },
+    {
+      "check": "anchor interpolation identity",
+      "mass_MeV": 180,
+      "max_abs_difference": 1.3877787807814457e-17
+    },
+    {
+      "check": "anchor interpolation identity",
+      "mass_MeV": 200,
+      "max_abs_difference": 1.3877787807814457e-17
+    },
+    {
+      "check": "anchor interpolation identity",
+      "mass_MeV": 220,
+      "max_abs_difference": 2.7755575615628914e-17
+    },
+    {
+      "check": "anchor interpolation identity",
+      "mass_MeV": 240,
+      "max_abs_difference": 4.163336342344337e-17
+    }
+  ],
+  "dense_category_checks": 642
+}

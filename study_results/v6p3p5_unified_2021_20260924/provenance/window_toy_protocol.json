@@ -1,0 +1,48 @@
+{
+  "master_seed": 63555260924,
+  "masses": [
+    60,
+    80,
+    100,
+    120,
+    140,
+    160,
+    180,
+    200,
+    220,
+    240
+  ],
+  "policies": [
+    "baseline",
+    "tight",
+    "wideleft",
+    "wideright",
+    "equal95"
+  ],
+  "pilot": 100,
+  "evaluation": 100,
+  "source": "nominal_2021_10pct_GP_mean",
+  "expected_signal": "3 times mean baseline independent-pilot returned observed-Hessian error",
+  "shape": "full selected native MC categories including outside support; no renormalization",
+  "pairing": "Same evaluation background and signal draws across all policies; background shared across masses",
+  "background_seeds": "[master,1(pilot) or 2(evaluation),toy]",
+  "signal_seeds": "[master,3,mass,toy]",
+  "frozen_without_observed_data": true,
+  "numerical_threads": 1,
+  "workers": 1,
+  "watchdog_seconds": 1800,
+  "script_sha256": "bdb4881374c57bf1af00c56227ff0c644c06115fc2babd273fa1d2da97a363b2",
+  "null_sha256": "306a915b9ba6230aafbe058c94438c6af11f85b60d68f5aae4ebbfec4d4a9424",
+  "template_sha256": {
+    "60": "a781113c94cddae650b2ca6d38d1d5049e46523d9aa3f442b8dd5bf72f4b4009",
+    "80": "5b460d7ca95764fae047b724a95c970bda1622fa6cf23450190678dba1fccd79",
+    "100": "18b10f38a911c4dfe321f60c894092c8f08bac0b4635610ecdae541cf6d8f12f",
+    "120": "c2fe2a43cc78c9cedfb95b9f0aec0769bb854d251510382130f80c42fece2762",
+    "140": "0e4853f2ff7d87791a5443ac656ac0d225fda747b51d101d1b7336dafa289440",
+    "160": "ce471149706233d2cd91aebafb7f16a315f8e21f2af2cf6c11d84f700c54e8a2",
+    "180": "9242285fe5a5d26e91d4a23064cace362eb0db1199212e3301f9f7dacdac674d",
+    "200": "380e6b0ff7fa2c37801e9403a1958a7f268bbbfe55dc69139881da7121a99a84",
+    "220": "01fb03487b7b2c786887b1db91cd1b168174162875e4d0dbc2a78229bad73a80",
+    "240": "8d2c38bc78cf4dfe015e5f8e8f46232908ffea1f45e4959c0ea16c73747de131"
+  }
+}

@@ -1,0 +1,413 @@
+HPS Gaussian-Process Resonance Search v5.9.5 / Null-bias study
+Investigating apparent null bias
+HPS-GPR study v5.9.5
+Emrys Peets — 22 September 2026
+Follow-up to slides 14 and 50 of unblind_meeting_RCmeet
+Result
+The positive location of the slide-50 scan-maximum distribution is expected even for a perfectly centered null. There
+is also a real, mass-dependent oﬀset in the signed, ﬁxed-mass response to the frozen generating source. These eﬀects
+must be separated. The oﬀset has both signs across the mass scan; it is not a uniform upward displacement.
+At the observed 2021 peak, 78 MeV, the saved 256 complete Poisson reﬁt scans have signed-root mean 0. 548 (point-
+wise 95% interval [0. 423, 0. 672]), consistent with the deterministic source response a = 0 . 577. The conventional
+standard-normal tail of the observed root robs = 2 . 809 is 0. 00249; the marginal tail under the source-response
+model is 0. 01138. This is a local calibration diﬀerence before taking a scan maximum. The selected peak is an
+illustration, not a preselected local test.
+The slide-14 statistic is a diﬀerent object: a squared, covariance-weighted residual summed over window bins. Its
+expectation need not equal the bin count. The new calculation predicts E[Q/N bin] between 0. 998 and 1. 185 over
+50–250 MeV under the frozen source. At 78 MeV the prediction is 1. 026, of which only 0. 030 is the deterministic
+bias contribution. Thus the large observed residual feature near 78 MeV is not explained by a large uniform null
+oﬀset.
+What was tested
+The primary sample is the released 2021 native 10% dataset, with the production ±2. 25σm exclusion window ﬁxed.
+Slide 14 uses 201 masses at 1 MeV spacing; slide 50 uses 401 masses at 0.5 MeV spacing. Both use the same
+observed counts and frozen GP generating source. The nominal support is 36–300 MeV; the saved whole-bin edges
+are 36–299.75 MeV.
+The study reuses 256 complete Poisson spectra/reﬁt scans and 200,000 saved Gaussian-ﬁeld maxima. It adds exact
+sideband-prediction replays and 200,000 paired Gaussian-ﬁeld controls. No new signal optimization, production
+window choice, signal-shape selection, or observed-root recentering is performed.
+Quantity What is expected under a centered null? What would indicate an oﬀset?
+Signed root r(m) Mean zero, if locally calibrated Nonzero ﬁxed-mass ensemble mean
+Positive root max(r,0) Positive mean, with an atom at zero Compare against its clipped law
+Scan maximum T Positive distribution shifted by the search Compare against the same full-scan null
+Residual Q/Nbin Positive; mean one only under extra conditions Separate variance and mean-residual terms
+Claim boundary . All numerical probabilities here are conditional on a frozen source estimated from observed
+data. Monte Carlo intervals do not include uncertainty in that source. This study does not establish unconditional
+discovery calibration or conﬁdence-limit coverage.
+1
+
+HPS Gaussian-Process Resonance Search v5.9.5 / Null-bias study
+1 Why a null scan maximum is positive
+Write the signed proﬁle-likelihood root as r(m) and the displayed upward excess as Z(m) = max( r(m), 0). The
+one-sided likelihood convention produces a boundary atom even when the unconstrained signed root is standard
+normal [ 1]. For a centered unit normal R,
+E[R] = 0 , E[max(R, 0)] = 1√
+2π = 0. 399, P (max(R, 0) = 0) = 1
+2 . (1)
+For N independent centered unit normals and T = max(0, R 1, . . . , R N ),
+P (T ≤ t) = Φ( t)N (t ≥ 0), P (T = 0) = 2 − N . (2)
+The maximum moves upward without any ﬁxed-mass mean bias. The HPS masses are correlated, so N = 401
+cannot be treated as 401 independent trials. Modeling the correlated signiﬁcance ﬁeld is the purpose of the GP
+trials approach [ 2].
+0 1 2 3 4 5
+Maximum positive root T
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0Continuous density
+N = 1 N = 10 N = 30 N = 100
+Figure 1: Independent-normal illustration. The shown N values are not ﬁtted HPS eﬀective-trials counts. The
+continuous density omits the discrete atom at zero.
+The actual response approximation retains the mass-dependent mean, scale and correlation:
+r∗(m) = a(m) + s(m)W (m), W ∼ N (0, R ), T ∗ = max
+m
+max(r∗(m), 0). (3)
+Here a(m) = r(B; m) is the deterministic response to source B, not an assumed identity with the exact Poisson en-
+semble mean. The stored array named K is R, a unit-diagonal correlation matrix; raw covariance is diag(s)R diag(s).
+This distinction was independently checked.
+2
+
+HPS Gaussian-Process Resonance Search v5.9.5 / Null-bias study
+Three distributions and the local-to-scan transition
+−2 0 2 4
+r
+0.0
+0.1
+0.2
+0.3
+0.4
+0.5Density
+Raw asymptotic local p = .00249
+Fixed-source marginal p = .01138
+A. Signed root at 78 MeV
+256 direct refits
+Response model
+N(0,1) reference
+0 1 2 3 4
+Z at 78 MeV
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0Cumulative probability
+P(Z = 0) = 0.278
+E[Z] = 0.745
+B. One-sided Z = max(r, 0)
+Direct positive-part ECDF
+Clipped response model
+Clipped N(0,1) reference
+1 2 3 4 5
+T = maxm
+max(r(m), 0)
+0.0
+0.2
+0.4
+0.6
+0.8Density
+Observed T = 2.809
+Conditional tail = .251
+C. Maximum over 401 masses
+200,000 saved fields
+256 direct maxima
+A positive maximum is not, by itself, a biased signed estimator
+78 MeV was selected as the observed scan maximum; these marginal probabilities are diagnostic, not an independent fixed-mass claim.
+Figure 2: Three distinct distributions under the same source. The observed threshold stays raw. The maximum
+distribution has median 2.446, although the signed response is close to zero over much of the mass range. The
+78 MeV illustration was selected by the observed maximum.
+Local calibration and the look-elsewhere step are diﬀerent
+At the selected 78 MeV point,
+plocal,asym = Φ( robs) = 0 . 0024875, (4)
+pB,marginal = Φ
+( robs − a
+s
+)
+= 0. 0113826, (5)
+pB,scan = PB(T ∗ ≥ Tobs) = 0 . 250919. (6)
+The ratio pB,scan/p B,marginal = 22 . 04 compares two tails under the same source model and threshold. Dividing
+by the conventional asymptotic local tail instead gives 100.87 and mixes local calibration with the search eﬀect.
+Neither ratio is a universal constant trials factor.
+Saved direct reﬁts give 2/256 local exceedances (95% binomial interval [0. 00095, 0. 02793]) and 57/256 scan ex-
+ceedances ( [0. 1732, 0. 2786]). The latter contains the Gaussian-ﬁeld scan probability. The local count is too small
+to resolve a precise rare-tail shape. Subtracting a and dividing by s in the observed scan would deﬁne a diﬀerent
+ordering statistic; this study does not adopt it.
+Where the ﬁxed-mass oﬀset comes from
+The masked predictor need not reconstruct the generating curve exactly: δ = Bw − b(Bt) can retain smooth, signed
+interpolation residuals. With signal template w and frozen residual covariance V0, the Gaussian generalized-least-
+squares approximation projects that residual as
+aGLS = w⊤ V − 1
+0 δ√
+w⊤ V − 1
+0 w
+. (7)
+At 78 MeV this gives 0.576797, matching the saved proﬁled response 0.576784. Thus the oﬀset is already present
+when the generating source, without Poisson noise, is passed through the masked prediction and signal ﬁt. It is
+not created by taking a scan maximum. This establishes the mechanism under this source; it does not establish
+that the source is the physical background.
+3
+
+HPS Gaussian-Process Resonance Search v5.9.5 / Null-bias study
+2 A real ﬁxed-mass response oﬀset, with both signs
+Across the 2021 scan, a(m) ranges from −1. 096 at 71 MeV to +1. 400 at 50 MeV. Its mass-grid mean is −0. 007 and
+RMS is 0. 251. A veraging over mass therefore hides local oﬀsets. The response scale lies between 0.945 and 0.987.
+The mean of the direct Poisson reﬁts follows this structure.
+−1
+0
+1
+Signed-root mean
+A. The source response is mass dependent, with both signs
+Deterministic response a = r(B) Pointwise 95% mean interval Mean of 256 signed-root scans
+−0.2
+−0.1
+0.0
+0.1
+0.2
+rdirect − a
+B. No extra scan-wide mean discrepancy is resolved in this conditional check
+95% simultaneous envelope under response model Direct mean minus a
+50 75 100 125 150 175 200 225 250
+T ested mass [MeV]
+0.8
+0.9
+1.0
+1.1
+1.2
+1.3Width ratio
+C. Scale agreement has finite-toy uncertainty; pointwise bands are not simultaneous
+Pointwise 95% normal-theory interval Direct standard deviation / model s
+2021 native 10% | 50–250 MeV | fixed source and ±2.25σ window
+Figure 3: The signed-root mean is the relevant bias diagnostic. Panel B tests only the discrepancy between the
+complete-reﬁt mean and the response approximation a; it does not test whether a = 0 . Pointwise intervals in A
+and C are not simultaneous. The simultaneous envelope in B assumes the stated Gaussian response model.
+For 2021, the largest standardized diﬀerence between the direct mean and a is 2.433. The model-based 95%
+simultaneous threshold is 3.435 and the conditional tail is 0.557. This resolves no additional scan-wide mean
+mismatch at the available precision. It does not remove the nonzero ﬁxed-mass oﬀset or prove every approximation
+accurate in rare tails.
+4
+
+HPS Gaussian-Process Resonance Search v5.9.5 / Null-bias study
+3 How much the mean, width and correlations matter
+Every control below keeps the observed raw maximum ﬁxed at 2.808645. Paired normal draws change one part of
+the assumed null at a time. They diagnose the mechanism; they are not alternative production probabilities.
+Null control Median T ∗ Tail at Tobs 95% MC interval
+Nominal a, s, R 2.445 0.25113 [0.2492, 0.2530]
+Remove a only 2.291 0.16225 [0.1606, 0.1639]
+Set s = 1 only 2.492 0.28256 [0.2806, 0.2845]
+Set a = 0, s = 1 2.338 0.18779 [0.1861, 0.1895]
+Independent mass nodes 2.966 0.67394 [0.6719, 0.6760]
+Perfectly correlated nodes 1.400 0.06772 [0.0666, 0.0688]
+Table 1: Paired Gaussian controls, 200,000 draws per row. Intervals quantify Monte Carlo error within each
+speciﬁed null.
+Removing a alone reduces the conditional tail by 0. 0889 ± 0. 0016 (paired 95% Monte Carlo interval). Even then,
+the maximum has median 2.291. The upward position of the histogram is mainly a search-maximum eﬀect; the
+local oﬀsets make a material additional contribution to its tail.
+0 1 2 3 4 5
+Raw threshold t
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0P(T * ≥ t)
+A. Mean and scale controls (same mass correlations)
+Nominal a, s, R: 0.251
+Remove a only: 0.162
+Set s = 1 only: 0.283
+a = 0 and s = 1: 0.188
+0 1 2 3 4 5
+Raw threshold t
+B. Correlation controls (same mass marginals)
+Nominal a, s, R: 0.251
+Independent masses, same a and s: 0.674
+Perfect correlation, same a and s: 0.068
+Paired null controls: the observed raw maximum stays fixed at 2.809
+Legend numbers are tails at the vertical line. Controls are diagnostic alternatives, not proposed production probabilities.
+Figure 4: Mean/scale controls retain the same mass correlation. Correlation controls retain the same marginal
+means and scales. Perfect correlation and independence are diagnostic comparison models, not proposed physical
+models.
+5
+
+HPS Gaussian-Process Resonance Search v5.9.5 / Null-bias study
+4 What slide 14 measures
+For window bins w and disjoint sideband bins t, let b(Yt) be the GP background prediction and CGP(Yt) its posterior
+count covariance. Slide 14 uses
+e = Yw − b(Yt), V (Yt) = diag( b(Yt)) + CGP(Yt), Q = e⊤ V − 1e. (8)
+The posterior covariance describes uncertainty under the ﬁtted GP model [ 3]. It is not automatically the repeated-
+Poisson covariance of the sideband estimator under a ﬁxed generating spectrum B.
+Freeze V0 = V (Bt), deﬁne δ = Bw − b(Bt) and linearize the estimator with J = ∂b/∂Y t|Bt. Independence of window
+and sideband Poisson counts gives
+W ≃ diag(Bw) + J diag(Bt)J ⊤ , (9)
+E[Q0] ≃ tr(V − 1
+0 W )  
+repeated-sampling variance
++ δ⊤ V − 1
+0 δ  
+prediction-bias contribution
+. (10)
+Here Q0 = e⊤ V − 1
+0 e freezes the weighting covariance. For any residual distribution the trace-plus-mean identity
+is exact with ﬁxed V0 and the exact residual mean and covariance. The displayed use of δ and W is a ﬁrst-order
+approximation. A denominator of Nbin is a scale convention, not a ﬁtted number of degrees of freedom.
+0.0
+0.5
+1.0
+1.5
+2.0Q / Nbin
+Observed residual diagnostic
+Fixed-source expectation (linear)
+Repeated-sampling variance term
+Deterministic prediction-bias term
+256 paired Poisson spectra: mean ±95% MC CI
+50 75 100 125 150 175 200 225 250
+T est mass [MeV]
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0Trace contribution / Nbin
+Window Poisson term
+Sideband-estimator sampling term
+Sum: repeated-sampling variance
+Figure 5: The observed residual curve and the conditional mean answer diﬀerent questions. The lower panel
+separates Poisson noise in the excluded window from variation of the sideband estimator. Exact paired replays
+recompute the GP prediction and covariance on each saved toy.
+6
+
+HPS Gaussian-Process Resonance Search v5.9.5 / Null-bias study
+5 Paired residual controls and the observed feature
+The replay diﬀerentiates both αi = 1/Y i in the log-count GP noise and the lognormal mean correction exp(µ+ 1
+2 Cii).
+Directional ﬁnite diﬀerences check the Jacobian; the maximum relative discrepancy is below 10− 6. The analytic
+calculation covers all 201 masses.
+For each saved complete Poisson spectrum, paired controls freeze the background prediction, reﬁt the sidebands,
+remove only the deterministic residual δ, or update the weighting covariance. Exact replay uses the archived kernel
+parameters and does not optimize them anew.
+m [MeV] Variance Bias Sum Exact mean (95% CI) Observed
+50 0.989 0.196 1.185 1.179 [1.125, 1.233] 1.096
+71 0.994 0.112 1.106 1.095 [1.045, 1.145] 1.925
+78 0.996 0.030 1.026 1.022 [0.976, 1.067] 2.330
+120 0.998 0.001 0.998 1.008 [0.968, 1.047] 0.780
+250 0.998 0.000 0.998 0.992 [0.967, 1.018] 0.820
+Table 2: All entries use Q/N bin. The ﬁrst three columns decompose the ﬁxed- V linear prediction. Exact replay
+updates V on each toy. Mean intervals are pointwise.
+50 75 100 125 150 175 200 225 250
+T est mass [MeV]
+0.90
+0.95
+1.00
+1.05
+1.10
+1.15
+1.20Paired-Poisson mean Q / Nbin
+Frozen prediction
+Sideband refit, fixed V
+Sideband refit, deterministic bias removed
+50 75 100 125 150 175 200 225 250
+T est mass [MeV]
+−0.00050
+−0.00025
+0.00000
+0.00025
+0.00050
+0.00075
+0.00100
+0.00125
+0.00150
+Paired change in Q / Nbin
+Exact − linear replay
+Adaptive V − fixed V
+Figure 6: Paired controls isolate sideband-estimator variance and deterministic interpolation response. Subtracting
+δ is a diagnostic counterfactual; observed counts and the physical source are unchanged. The diﬀerences on the
+right are small compared with the observed curve’s structure.
+All 201 masses were replayed on the same 256 spectra (51,456 exact GP predictions). The largest absolute paired
+mean change from the linear prediction is 2. 14 × 10− 4; updating rather than freezing V changes the mean by at
+most 9. 52 × 10− 4 in Q/N bin.
+The original slide-14 curve is reproduced exactly. Its maximum is Q/N bin = 2. 329997 at 78 MeV, with 16 window
+bins. The exact conditional mean there is 1.0217 (95% mean interval [0. 9762, 1. 0672]). Removing the deterministic
+residual in the ﬁxed- V replay gives mean 0.9903. The total deterministic bias power is 0.487 before division by 16,
+while the signed-root response squared is a2 = 0. 333.
+As an exploratory check, deﬁne TQ = max m Q(m)/N bin(m) over the same 201 masses. Twenty of 256 exact paired
+scans exceed the observed TQ. The add-one tail is 0.0817 with a 95% binomial interval [0. 0484, 0. 1181]. This is a
+conditional residual-scan diagnostic, not a resonance signiﬁcance or a calibrated physical-background goodness-of-ﬁt
+probability. It omits source-estimation uncertainty.
+7
+
+HPS Gaussian-Process Resonance Search v5.9.5 / Null-bias study
+6 Consequences for interpretation and the next validation
+The study identiﬁes a predictable maximum-selection eﬀect and a genuine conditional ﬁxed-mass response oﬀset.
+The source-response ﬁeld and the complete-reﬁt means agree at the tested 2021 precision. The residual replay ﬁnds
+no large covariance-normalization shift capable of explaining the observed feature by itself. These checks do not
+establish that the frozen source is an adequate physical background everywhere.
+The small Q/N bin bias term at 78 MeV and the nonzero signal-root oﬀset are compatible. Q aggregates residual
+power over many bin directions and divides by the bin count; r measures a coherent, signal-shaped direction after
+likelihood proﬁling. A modest coherent residual can aﬀect the signal projection without making the average per-bin
+residual power large. The two statistics should not be identiﬁed.
+What the existing slides should communicate
+Slide 50 should explicitly distinguish the nominal asymptotic local tail from the source-conditional marginal tail
+and the full-scan tail. Its maximum histogram should not be centered at zero. Slide 14 should call Q/N bin a
+descriptive residual statistic, with the unit line labeled as a reference, and ideally show the conditional expected
+curve. No presentation edits are made as part of this study.
+Checks beyond the primary 2021 question
+Scope min a max a RMS a Range of s
+Full 2015 -0.735 0.738 0.304 0.929–0.972
+Full 2016 -1.394 1.352 0.605 0.927–0.987
+2021 native 10% -1.096 1.400 0.251 0.945–0.987
+Shared-coupling union -1.237 0.819 0.276 0.941–0.987
+Table 3: Saved source-response summaries. Mass ranges are 19–100, 39–180, 50–250 and 19–250 MeV, respectively.
+RMS and ranges are descriptive across correlated mass nodes.
+The source oﬀsets persist in other scopes and change sign. A secondary 2016 width check ﬂags adjacent 43.5 and
+44 MeV points: direct standard deviations are 1.130 and 1.118 versus response scales 0.955 and 0.954. The model
+scales lie below the lower bounds of the per-scope Bonferroni normal-theory intervals. These correlated neighbors
+indicate one unresolved region; they are not two independent failures. This prevents a blanket claim of ﬁeld-width
+closure across all datasets. It does not by itself identify a code defect or contradict the reported 2021 comparison.
+Priority follow-up
+First test the response oﬀset against independently speciﬁed smooth background sources, including curvature and
+boundary variations motivated by the source construction. Repeat the complete masked procedure and inspect
+signed means, widths and signal injection recovery. This tests whether a(m) is speciﬁc to interpolation of the
+observed-data-derived source or persists over plausible backgrounds. The 50 MeV boundary and 71–78 MeV struc-
+ture deserve explicit controls. Separately resolve the 2016 width region with additional direct reﬁts before relying
+on rare tails there.
+Keep the production ±2. 25σm mask ﬁxed during these controls. Choosing a smoother source, subtracting an
+observed feature, changing the mask, or recentering a root because it improves an observed score would change the
+procedure under test. Neither the current conditional agreement nor an attractive corrected plot is a substitute for
+source uncertainty, injection recovery and coverage studies.
+8
+
+HPS Gaussian-Process Resonance Search v5.9.5 / Null-bias study
+7 Reproduction and provenance
+The accompanying archive contains copied numerical inputs, scripts, CSV/JSON results, vector ﬁgures, this source,
+independent checks and a SHA-256 manifest. Parent releases are used as immutable inputs. The primary sources
+are Analysis Note v5.0.5, the v5.8.2 complete Poisson ensemble and v5.8.5.3 raw-signiﬁcance ﬁelds. The broader
+v5.9 signal-tail prescription is not varied in this null-only study.
+Input Purpose and identity (SHA-256 preﬁx)
+v5.0.5 spectrum Observed counts, mass grid, resolution and archived kernels; fd4867a7e2df69d8
+v5.8.2 null ensemble Frozen source and 256 paired complete Poisson spectra; 306a915b9ba6230a
+v5.8.5.3 2021 ﬁeld Raw roots, source response, scale, correlation, direct validation and saved maxima;
+3e444bc3387a3074
+All arrays of the v5.0.5 and v5.8.2 saved spectra agree exactly, as do the generating source used by the residual
+replay and slide-50 calibration. Full hashes and source paths are in the input manifests. Source agreement does
+not make the observed-data-derived source statistically independent of the observation.
+Run order. From the extracted study directory, run bash reproduce.sh . Python requires NumPy, SciPy and
+Matplotlib; the report uses Tectonic. Each numerical script sets one BLAS thread. Read README.md for output ﬁles,
+conditional assumptions and the precise scope of the checks. No remote data access is required for the numerical
+reproduction.
+Finite samples. Binomial intervals are two-sided exact Clopper–Pearson intervals. Listed Gaussian-ﬁeld tail
+estimates use (k + 1) / (N + 1) ; raw direct counts are reported separately. Mean intervals use Student’s t and
+scale intervals use normal-theory chi-square bounds. The latter are diagnostics that assume suﬃciently normal
+marginal roots. Paired diﬀerences retain common draws; neighboring mass nodes are not independent experiments.
+The 200,000-ﬁeld Monte Carlo precision measures integration error within a frozen model, not uncertainty in that
+model.
+V alidation. The package checks source identity, correlation normalization, unchanged raw thresholds, ﬁnite-
+diﬀerence derivatives, exact residual moment identities and replay agreement. A separate reviewer audits the
+scientiﬁc deﬁnitions and interpretation. The PDF is checked both through extracted text and rendered pages.
+Detailed results are in review/ and qa/.
+References
+[1] G. Cowan, K. Cranmer, E. Gross and O. Vitells, Asymptotic formulae for likelihood-based tests of new physics, Eur.
+Phys. J. C 71 (2011) 1554, arXiv:1007.1727.
+[2] V. Ananiev and A. L. Read, Gaussian Process-based calculation of look-elsewhere trials factor, JINST 18 (2023) P05041,
+arXiv:2206.12328.
+[3] C. E. Rasmussen and C. K. I. Williams, Gaussian Processes for Machine Learning (MIT Press, 2006), chapter 2, Gaussian-
+process regression .
+9

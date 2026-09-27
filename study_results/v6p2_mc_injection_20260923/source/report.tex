@@ -1,0 +1,369 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,bm,booktabs,tabularx,array}
+\usepackage{graphicx,float,placeins,microtype,fancyhdr}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xurl}
+\hypersetup{pdftitle={HPS GPR v6.2: MC injection and signal recovery},pdfauthor={Emrys Peets}}
+\pagestyle{fancy}\fancyhf{}\setlength{\headheight}{14pt}
+\fancyhead[L]{\small HPS Gaussian-Process Resonance Search}
+\fancyhead[R]{\small v6.2 / Signal recovery}\fancyfoot[C]{\thepage}
+\fancypagestyle{plain}{\fancyhf{}\fancyhead[L]{\small HPS Gaussian-Process Resonance Search}
+\fancyhead[R]{\small v6.2 / Signal recovery}\fancyfoot[C]{\thepage}}
+\setlength{\emergencystretch}{2em}\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.08}
+\newcommand{\fig}[3]{\begin{figure}[H]\centering
+\includegraphics[width=.98\linewidth,height=#1\textheight,keepaspectratio]{#2}\caption{#3}\end{figure}}
+\input{generated/summary_macros.tex}
+\title{HPS Gaussian-Process Resonance Search\\[.5em]
+\large Reconstructed-MC Injection and Signal Recovery\\Standalone Study v6.2}
+\author{Emrys Peets\\Stanford University and SLAC National Accelerator Laboratory}
+\date{23 September 2026}
+\begin{document}
+\maketitle
+\begin{abstract}
+Signal extraction is tested by adding exactly 1,000, 5,000, 10,000 and
+30,000 selected candidates from native smeared 2021 MC distributions to
+\ToyCount{} background toys at each mass from 60 through 260~MeV in
+20~MeV steps. Paired fits compare windows centered at the generated mass
+and the reconstructed MC core, with the same nominal width. At 30,000
+injected candidates, subtracting the paired zero-injection fit gives a
+mean recovered increment of \IncPoleRange{} of the injected yield for
+the original window and \IncCoreRange{} for the shifted window over
+60--240~MeV. The shift reduces the loss but does not restore full
+recovery. Controls with signal removed from the training sidebands
+attribute much of the deficit to the GP response to the injected tails.
+Pulls and profile likelihood inclusion counts accompany the yield tests.
+\end{abstract}
+
+\section{Result and relation to v6.1}
+The selected-candidate MC distributions examined in v6.1 have broad
+tails. Injected candidates outside the fitted window enter the sideband
+sample and can change the GP prediction beneath the signal core. The
+recovery tests include this response to the injected counts.
+
+\begin{table}[H]\centering\small
+\input{generated/recovery_ranges.tex}
+\caption{Ranges of the mean fitted yield divided by the injected yield
+over 60--240~MeV. These summarize the ten mass points; they are not
+confidence intervals. The low-injection ratios include the background
+offset and should be read with their toy errors in Figure~\ref{fig:recovery}.}
+\end{table}
+
+The tests use fixed empirical MC shapes and one background mean. The
+v6.1 audit did not establish signal-daughter association or full
+equivalence between the MC and data selections. The template and its
+MC-only center are held fixed; finite-MC, background-truth and
+detector-response uncertainties are not sampled.
+
+\clearpage
+\section{Toy ensemble and yield normalization}
+The GP arithmetic mean fitted over the full mass support of the 2021
+10\% spectrum in v5.8.2 defines the background expectation $\mu_i$ over the unchanged analysis
+support $D=[36,299.75]$~MeV. Independent Poisson spectra are generated
+for each mass and toy index. At a fixed mass, the same spectrum is used
+at all four injection levels and for the zero-injection fit. The two
+window prescriptions are fitted to the same injected spectrum.
+
+The signal probabilities $p_i$ are obtained from the native selected-MC
+histogram at that generated mass. They use the full selected normalization,
+including the recorded overflow. Counts are drawn as
+\begin{equation}
+ B_i\sim\operatorname{Poisson}(\mu_i),\qquad
+ (S_1,\ldots,S_K,S_{\mathrm{below}},S_{\mathrm{above}})
+ \sim\operatorname{Multinomial}(N;\bm p),\qquad n_i=B_i+S_i.
+ \label{eq:toys}
+\end{equation}
+The last two categories retain candidates outside $D$, so the total
+draw is exactly $N$ even when fewer candidates enter the analysis.
+CDF rebinning treats the density as uniform within each source histogram
+bin. No additional smearing, translation, truth selection or interpolation
+between generated masses is applied. Here and below, ``yield'' means
+selected-candidate yield, not a number of generated resonances.
+
+The signal contribution in a fitted bin is $A p_i$. In particular,
+\begin{equation}
+ f_D=\sum_{i\in D}p_i,\qquad f_W=\sum_{i\in W}p_i
+ \label{eq:fractions}
+\end{equation}
+remain the probabilities for a selected candidate to enter $D$ and $W$.
+The template is normalized before either restriction, so $A$ estimates
+the full selected yield $N$. Expected fractions and
+actual draws inside the support, window and training bins are saved for
+each toy.
+
+\begin{table}[H]\centering\small
+\input{generated/centers_fractions.tex}
+\caption{Fixed MC centers, nominal resolutions and selected fractions.
+Masses, centers and resolutions are in MeV. P and C denote the pole- and
+MC-core-centered masks. The asterisk marks the 260~MeV extension, which
+uses the archived 250~MeV kernel state.}
+\end{table}
+
+\clearpage
+\section{Extraction and uncertainty calculation}
+The pole-centered mask is $m_0\pm2.25\sigma_m(m_0)$; the shifted mask is
+$c(m_0)\pm2.25\sigma_m(m_0)$. The center $c$ is determined from MC alone
+using the local integrated Gaussian plus nonnegative affine pedestal
+fit defined in v6.1. The same definition is applied at 260~MeV.
+The MC shape does not move when the window moves. The resolution is
+\begin{equation}
+ \sigma_m(m)=0.00184825-0.001375m+0.085875m^2,
+ \qquad m,\sigma_m\ \hbox{in GeV}.
+\end{equation}
+Kernel parameters remain anchored at $m_0$, with the archived 250~MeV
+state used for the 260~MeV extension. The MC center and nominal width
+are fixed before drawing the toys.
+
+In the primary fit the GP is trained on the injected toy's exterior
+bins. Its archived kernel hyperparameters remain fixed, while the
+count-dependent targets, noise terms, conditional mean $\widehat{\bm b}$
+and predictive covariance are recomputed. The v6.1 factorization retains
+the covariance modes represented by $L$, with $V=LL^T$. The inherited
+likelihood profiles their nuisance coordinates $\bm\theta$:
+\begin{equation}
+ \begin{aligned}
+ -\ln\mathcal{L}(A,\bm\theta)&=
+ \sum_{i\in W}\left[\lambda_i-n_i\ln\lambda_i\right]
+ +\frac12\bm\theta^T\bm\theta,\\
+ \lambda_i&=\widehat b_i+(L\bm\theta)_i+A p_i>0.
+ \end{aligned}
+ \label{eq:likelihood}
+\end{equation}
+The fitted amplitude $\widehat A$ is allowed to be negative, retaining
+the signed behavior around zero signal. Its uncertainty $\sigma_A$ is
+obtained from the observed curvature of the profiled likelihood.
+
+Two controls use the same injected counts in the fitted window.
+The clean-sideband control trains the GP on the background-only bins
+of that toy, removing the injected tail from training. The
+known-background control fixes the background to $\mu_i$ and has no GP
+nuisance parameters.
+The former isolates the change caused by signal in the training sample;
+the latter also removes background-estimation fluctuations and the GP
+nuisance covariance.
+
+Writing $\ell_{\mathrm{prof}}(A)$ for the negative log likelihood minimized
+over $\bm\theta$ at fixed $A$, the pull and likelihood ratio at the
+injected truth are
+\begin{equation}
+ p=\frac{\widehat A-N}{\sigma_A},\qquad
+ q_N=2\left[\ell_{\mathrm{prof}}(N)-
+                  \ell_{\mathrm{prof}}(\widehat A)\right].
+ \label{eq:pull}
+\end{equation}
+The nominal 68.27\% and 95\% profile sets include $N$ when $q_N\leq1$
+and $q_N\leq\chi^2_1(0.95)$, respectively. The fraction of toys satisfying
+each condition is reported with an exact 95\% Clopper--Pearson interval.
+Because the signal in
+Eq.~\eqref{eq:toys} has an exact multinomial total while
+Eq.~\eqref{eq:likelihood} uses Poisson counts, width one and the nominal
+inclusion fractions are reference values, including for known background.
+
+\clearpage
+\section{Mean recovered yield}
+For each mass, level and method, the raw recovery ratio over
+$T=\ToyCount$ toys is
+\begin{equation}
+ R(m_0,N)=\frac{1}{NT}
+              \sum_{t=1}^{T}\widehat A_t(m_0,N).
+\end{equation}
+It includes the response to the injected signal and any fitted offset
+already present at zero injection. At $N=30{,}000$, the ranges over
+60--240~MeV are \RawPoleRange{} for the pole-centered window and
+\RawCoreRange{} for the shifted window.
+
+\fig{.60}{../figures/recovery.pdf}{Mean raw recovery from the primary
+injected-sideband fits. Error bars are the sample standard error across
+\ToyCount{} toys; the horizontal line is exact mean recovery.
+The gray band marks the separate 260~MeV extension.\label{fig:recovery}}
+
+At the smaller injections, the fitted background offset and its
+fluctuations can be comparable to $N$, producing large changes in the
+raw ratio. Section~\ref{sec:increment} subtracts each toy's zero-injection
+fit to isolate the incremental response.
+
+\clearpage
+\section{Pulls and profile inclusion}
+The mean pull expresses the average residual in fitted uncertainty
+units. A zero mean pull need not imply $E[\widehat A]=N$, since the
+uncertainty $\sigma_A$ can vary with the residual. The tables therefore
+give the mean yield and mean uncertainty alongside the pull summaries.
+
+\fig{.61}{../figures/pull_mean.pdf}{Mean pulls in the primary fits.
+Bars are the sample pull standard deviation divided by
+$\sqrt{\ToyCount}$. Both methods share the same background and injection
+draws.}
+
+At 240~MeV and $N=30{,}000$, the mean fitted yields are
+\ExamplePoleYield{} and \ExampleCoreYield{} candidates for the pole- and
+core-centered windows. The corresponding mean pulls are
+\ExamplePolePull{} and \ExampleCorePull{}. The shift reduces the
+negative residual but leaves a substantial deficit.
+
+\clearpage
+\subsection{Dispersion and interval inclusion}
+The pull width is the sample standard deviation, calculated with the
+$T-1$ denominator. It is estimated directly from the individual
+pulls without fitting a Gaussian to the histograms. With \ToyCount{}
+toys its sampling uncertainty remains appreciable: even for Gaussian
+pulls, the width has an approximate \WidthRelativeSE\% relative standard
+error. The four injection levels also share background spectra, so their
+summaries are correlated.
+
+\fig{.57}{../figures/pull_width.pdf}{Sample pull widths for the primary
+fits. The dashed line marks one. The exact-$N$ signal ensemble and the
+GP uncertainty treatment need not produce this width even in the
+absence of mean bias.}
+
+At 240~MeV and $N=30{,}000$, the nominal 95\% profile set contains the
+truth in \ExamplePoleInclusion{}/\ToyCount{} pole-centered fits and
+\ExampleCoreInclusion{}/\ToyCount{} shifted fits. The corresponding
+95\% binomial intervals are \ExamplePoleInclusionInterval{} and
+\ExampleCoreInclusionInterval{}. These counts describe this toy
+ensemble; \ToyCount{} trials do not establish calibrated coverage.
+
+\clearpage
+\section{Zero-injection behavior}
+The $N=0$ fits use the same background spectra that appear at the four
+nonzero injection levels. They reveal the baseline fluctuations and
+offsets that contribute to $R$ at small $N$. Clean and injected GP
+sidebands coincide at zero injection, so only one GP result is needed.
+
+\fig{.62}{../figures/null_bias.pdf}{Mean signed fitted yield at zero
+injection, with standard errors across \ToyCount{} background toys.
+The upper panel uses GP background estimation; the lower panel fixes
+the known generating expectation.}
+
+The uncertainty in the known-background control assumes that the
+background mean is known exactly. It excludes the statistical cost of
+estimating that mean from sideband data and cannot be substituted for
+the uncertainty in the GP extraction. The paired subtraction below uses
+each method's own zero-injection fit.
+
+\clearpage
+\section{Signal in the training sidebands}
+The 30,000-candidate injections make the effect of the broad MC tails
+visible relative to the statistical fluctuations. Across both masks
+and 60--240~MeV, clean-sideband mean recovery spans \CleanRange{}, while
+known-background recovery spans \KnownRange{}.
+
+\fig{.57}{../figures/controls_30000.pdf}{Recovery and mean pulls at
+$N=30{,}000$ for the three extraction conditions. Only the training
+sample changes between the injected- and clean-sideband GP fits. The
+known-background fit additionally fixes the fitted background vector.}
+
+The effect also occurs without toy fluctuations. For a deterministic
+mean-count spectrum at 240~MeV with $N=30{,}000$, the extracted yields
+are \AsimovInjected{} with injected sidebands,
+\AsimovClean{} with clean sidebands and \AsimovKnown{} with known
+background, where each pair lists pole-centered/core-centered results.
+The additional sideband counts raise the background prediction in the
+signal window, leaving less yield for the signal component. Centering
+the mask on the MC core reduces this loss but does not remove the broad
+tail from the training sample.
+
+\clearpage
+\section{Paired response to the injected signal}\label{sec:increment}
+To separate the response to additional signal from the zero-injection
+offset, define
+\begin{equation}
+ R_{\mathrm{inc}}(m_0,N)=\frac{1}{NT}
+ \sum_{t=1}^{T}
+ \left[\widehat A_t(m_0,N)-\widehat A_t(m_0,0)\right].
+ \label{eq:increment}
+\end{equation}
+This quantity measures the change in fitted yield caused by adding
+signal to the same background toy. The raw estimator and its pulls
+retain the zero-injection offset.
+
+\fig{.53}{../figures/paired_comparison.pdf}{The upper panel compares
+the two fitted yields within each identical toy, divided by $N$.
+Error bars use the standard error of that paired difference. Lower
+panels show $R_{\mathrm{inc}}$ for each window prescription.}
+
+At $N=30{,}000$, $R_{\mathrm{inc}}$ spans \IncPoleRange{} for the
+pole-centered mask and \IncCoreRange{} for the shifted mask over
+60--240~MeV. Adding the second set of 20 toys changes this increment by
+at most \IncrementStabilityPercent{} percentage points across those
+masses and methods. The first 20 draws and their fit results are
+unchanged and are preserved in the archived 20-toy release. The ensemble
+contains \UniqueInjectedToys{} injected toys and \UniqueNullToys{}
+background toys, giving \PrimaryFitRows{} primary nonzero-injection
+fits and \TotalFitRows{} fits including the controls. The persistent
+deficit in the paired response agrees with the clean-sideband and
+mean-count comparisons.
+
+\clearpage
+\appendix
+\section{Per-mass pull distributions}
+Each outline below contains \ToyCount{} primary-fit pulls. The methods
+share bin edges within a mass panel, while ranges may differ between
+masses. Histograms show counts rather than a smooth density estimate.
+
+\fig{.78}{../figures/pull_gallery_N01000.pdf}{Pulls for $N=1{,}000$.
+The shaded 260~MeV panel denotes the extraction extension.}
+
+\clearpage
+\subsection{Five thousand injected candidates}
+\fig{.83}{../figures/pull_gallery_N05000.pdf}{Pulls for $N=5{,}000$;
+\ToyCount{} toys per method and mass.}
+
+\clearpage
+\subsection{Ten thousand injected candidates}
+\fig{.83}{../figures/pull_gallery_N10000.pdf}{Pulls for $N=10{,}000$;
+\ToyCount{} toys per method and mass.}
+
+\clearpage
+\subsection{Thirty thousand injected candidates}
+\fig{.83}{../figures/pull_gallery_N30000.pdf}{Pulls for $N=30{,}000$;
+\ToyCount{} toys per method and mass.}
+
+\clearpage
+\section{Primary-fit numerical results}
+Tables below contain every primary mass/injection/method cell. P denotes
+the pole-centered window and C the MC-core-centered window. The mass
+$m_0$ is in MeV; $\overline{\widehat A}$ and
+$\overline{\sigma_A}$ are in selected candidates. The raw recovery is
+$R$, and $\overline p$ and $s_p$ are the mean and sample standard
+deviation of the pulls. The last two columns give the nominal 68.27\%
+and 95\% profile-inclusion counts out of \ToyCount{}.
+
+\begin{table}[H]\centering\small
+\input{generated/primary_N01000.tex}
+\caption{Primary fits for $N=1{,}000$. The asterisk marks 260~MeV.}
+\end{table}
+
+\noindent The 260~MeV extension uses the archived 250~MeV kernel and
+is excluded from the 60--240~MeV summary ranges. Full-precision results,
+all controls, Monte Carlo standard errors and Clopper--Pearson intervals
+are retained in \path{results/summary.csv}; individual fits are in
+\path{results/toys.csv}. Input identities and the fixed construction
+are recorded in \path{protocol.json} and the provenance files.
+
+\clearpage
+\subsection{Five thousand injected candidates}
+\begin{table}[H]\centering\small
+\input{generated/primary_N05000.tex}
+\caption{Primary fits for $N=5{,}000$; \ToyCount{} toys per row.
+Column definitions are given at the start of Appendix~B.}
+\end{table}
+
+\clearpage
+\subsection{Ten thousand injected candidates}
+\begin{table}[H]\centering\small
+\input{generated/primary_N10000.tex}
+\caption{Primary fits for $N=10{,}000$; \ToyCount{} toys per row.
+Column definitions are given at the start of Appendix~B.}
+\end{table}
+
+\clearpage
+\subsection{Thirty thousand injected candidates}
+\begin{table}[H]\centering\small
+\input{generated/primary_N30000.tex}
+\caption{Primary fits for $N=30{,}000$; \ToyCount{} toys per row.
+Column definitions are given at the start of Appendix~B.}
+\end{table}
+\end{document}

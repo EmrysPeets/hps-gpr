@@ -1,0 +1,193 @@
+{
+  "seed": 924636,
+  "replicas_per_mass": 32,
+  "families": [
+    {
+      "family": "tc",
+      "status": "completed",
+      "masses_MeV": [
+        60,
+        80,
+        100,
+        120,
+        140,
+        160,
+        180,
+        200,
+        220,
+        240,
+        260
+      ],
+      "fit_masses_MeV": [
+        60,
+        80,
+        100,
+        120,
+        140,
+        160,
+        180,
+        200,
+        220,
+        240
+      ],
+      "selected_shift_model": "logarithmic",
+      "models": [
+        {
+          "model": "constant",
+          "parameters": 1,
+          "coefficients": [
+            -3.035037275486176
+          ],
+          "fit_RMS_MeV": 0.9582722395716318,
+          "omit_one_RMS_MeV": 1.0647469328573687,
+          "omit_one_max_abs_MeV": 2.0305719280468875
+        },
+        {
+          "model": "linear",
+          "parameters": 2,
+          "coefficients": [
+            -3.035037275486176,
+            -1.64604318046095
+          ],
+          "fit_RMS_MeV": 0.15544933255814608,
+          "omit_one_RMS_MeV": 0.21534655650187953,
+          "omit_one_max_abs_MeV": 0.5287270279306651
+        },
+        {
+          "model": "logarithmic",
+          "parameters": 2,
+          "coefficients": [
+            -3.22432457575,
+            -2.213982646578015
+          ],
+          "fit_RMS_MeV": 0.049727969410194986,
+          "omit_one_RMS_MeV": 0.06521148458327866,
+          "omit_one_max_abs_MeV": 0.16053873727850565
+        },
+        {
+          "model": "quadratic",
+          "parameters": 3,
+          "coefficients": [
+            -3.1938086685181593,
+            -1.64604318046095,
+            0.4811254334302524
+          ],
+          "fit_RMS_MeV": 0.0678890450575844,
+          "omit_one_RMS_MeV": 0.13990790392292268,
+          "omit_one_max_abs_MeV": 0.30154578871168436
+        }
+      ],
+      "shift_range_MeV": [
+        -4.382874445324887,
+        -1.2075225402439784
+      ],
+      "all_central_fits_valid": true,
+      "all_span_fits_valid": true,
+      "max_span_shift_delta_MeV": 0.16203575663772085,
+      "max_span_shift_delta_60to240_MeV": 0.16203575663772085,
+      "valid_replicas": 352,
+      "all_unit_weights": true,
+      "core_CDF_distance_80to240_range": [
+        0.006726864433581281,
+        0.01371490798553665
+      ],
+      "warnings": [],
+      "scope": "Selected signal-MC shape only. No observed fits, injection recovery, efficiencies, limits or global probabilities."
+    },
+    {
+      "family": "uc",
+      "status": "completed",
+      "masses_MeV": [
+        60,
+        80,
+        100,
+        120,
+        140,
+        160,
+        180,
+        200,
+        220,
+        240,
+        260
+      ],
+      "fit_masses_MeV": [
+        60,
+        80,
+        100,
+        120,
+        140,
+        160,
+        180,
+        200,
+        220,
+        240
+      ],
+      "selected_shift_model": "quadratic",
+      "models": [
+        {
+          "model": "constant",
+          "parameters": 1,
+          "coefficients": [
+            -1.072559258041506
+          ],
+          "fit_RMS_MeV": 0.4636539180294932,
+          "omit_one_RMS_MeV": 0.5151710200327702,
+          "omit_one_max_abs_MeV": 0.9818012259752473
+        },
+        {
+          "model": "linear",
+          "parameters": 2,
+          "coefficients": [
+            -1.072559258041506,
+            -0.7918082882282572
+          ],
+          "fit_RMS_MeV": 0.08987789023337482,
+          "omit_one_RMS_MeV": 0.1271482821316886,
+          "omit_one_max_abs_MeV": 0.26124028940211197
+        },
+        {
+          "model": "logarithmic",
+          "parameters": 2,
+          "coefficients": [
+            -1.1576614688169302,
+            -0.995390697524908
+          ],
+          "fit_RMS_MeV": 0.17279560488864917,
+          "omit_one_RMS_MeV": 0.24821999260828415,
+          "omit_one_max_abs_MeV": 0.5143980729625663
+        },
+        {
+          "model": "quadratic",
+          "parameters": 3,
+          "coefficients": [
+            -0.9748380347582001,
+            -0.7918082882282571,
+            -0.2961249190403208
+          ],
+          "fit_RMS_MeV": 0.025884100978791794,
+          "omit_one_RMS_MeV": 0.042206872801461646,
+          "omit_one_max_abs_MeV": 0.08826105222348124
+        }
+      ],
+      "shift_range_MeV": [
+        -1.9561803614192286,
+        -0.5185198210975344
+      ],
+      "all_central_fits_valid": true,
+      "all_span_fits_valid": true,
+      "max_span_shift_delta_MeV": 0.09874821711110826,
+      "max_span_shift_delta_60to240_MeV": 0.08839924315424241,
+      "valid_replicas": 352,
+      "all_unit_weights": true,
+      "core_CDF_distance_80to240_range": [
+        0.0026048214125359015,
+        0.007913337312718594
+      ],
+      "warnings": [],
+      "scope": "Selected signal-MC shape only. No observed fits, injection recovery, efficiencies, limits or global probabilities."
+    }
+  ],
+  "algorithm_source": "v6.1 scripts/core_centering.py locate; same fit bin selection, initialization, optimizer tolerances, model and parameter bounds",
+  "uncertainty": "Sample SD over independent Poisson-bin replicas; only for unit-weight histograms; not error on 100-toy mean",
+  "relation_selection": "Unweighted least squares; omit each mass once, fit the other masses, predict omitted shift; model selection not independent validation"
+}

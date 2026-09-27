@@ -1,0 +1,43 @@
+TOP /sdf/data/hps/users/epeets/src
+Future6pt6TrigSingles.lcsim
+backup_stuff
+hps-fieldmaps
+hps-java
+hps-lcio
+hps-mc
+hpstr
+TOP /sdf/data/hps/users/epeets/run
+Future6pt6TrigSingles.lcsim
+TM_3pt74_gen_to_slic
+TM_6pt6_gen_to_slic
+TM_gen_to_slic
+TM_sim_achi
+bh10_ana
+blinded_study
+bump_2016
+data_cnv
+gpr_out
+readout_recon_TM
+resonance_fitting
+run7800
+tritrig_ana
+useful_cpp
+useful_dat
+useful_py
+useful_root
+SEARCH_ROOTS ['/sdf/data/hps/users/epeets/src/hpstr', '/sdf/data/hps/users/epeets/run']
+
+STDERR
+Traceback (most recent call last):
+  File "<string>", line 11, in <module>
+  File "/sdf/group/hps/sw2/conda/lib/python3.12/subprocess.py", line 550, in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sdf/group/hps/sw2/conda/lib/python3.12/subprocess.py", line 1209, in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sdf/group/hps/sw2/conda/lib/python3.12/subprocess.py", line 2116, in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+  File "/sdf/group/hps/sw2/conda/lib/python3.12/subprocess.py", line 1253, in _check_timeout
+    raise TimeoutExpired(
+subprocess.TimeoutExpired: Command '['rg', '-n', '--max-count', '6', '-g', '*.py', '-g', '*.cxx', '-g', '*.h', '-g', '*.json', '-g', '*.sh', '-g', '*.yaml', '-g', '!build/**', '-g', '!install/**', 'ele_p_smear_ratio|pos_p_smear_ratio|ap_signal_prompt_smeared|data_10pc_prompt_TC_psum2p8|psum_min', '/sdf/data/hps/users/epeets/src/hpstr', '/sdf/data/hps/users/epeets/run']' timed out after 35 seconds

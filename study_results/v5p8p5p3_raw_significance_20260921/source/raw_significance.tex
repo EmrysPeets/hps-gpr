@@ -1,0 +1,42 @@
+\section{Which results used local reference recalibration?}
+\textbf{Yes: the earlier reference-local curves used centering and scaling for 2015, 2016, 2021 and the shared-coupling combination.} For each scope, its own deterministic offset $a(m)$ and response width $s(m)$ entered
+\[
+ z_{\rm ref}(m)=\frac{r_{\rm obs}(m)-a(m)}{s(m)}.
+\]
+The words ``no production recalibration is adopted'' did not mean this transformation was absent from the plotted diagnostic results. They meant that those results had not been promoted to a replacement for the released analysis. That distinction was too easy to miss. The requested unshifted local curves are now shown together in Figure~\ref{fig:raw_local_overview}; none uses $a$ or $s$.
+
+The different combinations also require care. The earlier Fisher result used reference-local probabilities, and signed Stouffer used signed reference coordinates. The free-amplitude likelihood used the raw statistic $q_R=\sum_d[\max(r_d,0)]^2$, but its reported p-values were calibrated with the fixed-source response distribution. It is not correct to label every previously reported combined probability as uncalibrated merely because its observed statistic contains raw roots. In the new figures, ``combined'' specifically denotes the original \emph{one-shared-coupling} likelihood, matching the four scopes in the v5.8.2 fields.
+
+\subsection{The requested local definition}
+For the conventional unshifted upward-excess display,
+\[
+ Z_{\rm local}^{\rm raw}(m)=\max\!\left[r_{\rm obs}(m),0\right],
+ \qquad p_{\rm local}^{\rm raw}(m)=\overline\Phi\!\left(Z_{\rm local}^{\rm raw}(m)\right).
+\]
+This uses the usual asymptotic standard-normal mapping of the signed likelihood root. It does not subtract a deterministic reference offset, divide by a response width, or apply a trials correction. It remains an asymptotic probability interpretation, rather than a new claim that the raw root has been validated as standard normal under every proposed source.
+
+For nonpositive fitted amplitudes these plots use the inherited display convention $Z=0$, $p=0.5$. That value is not the inclusive probability of the zero-statistic atom, which is one. The signed roots, including deficits, remain visible in the expanded response diagnostics and in the numerical ledger. The distinction affects the baseline of a curve, not any of the positive peaks below.
+\input{raw_peak_table.tex}
+
+All four scans use the same saved observed likelihood fits, a 0.5 MeV mass grid and the $\pm2.25\sigma_m$ blind half-width. Their supports are 19--100 MeV (2015), 39--180 MeV (2016), and 50--250 MeV (2021 native 10\%). The shared-coupling scan spans 19--250 MeV and uses only the datasets available at each mass. It uses all three datasets over 50--100 MeV. No spectrum was refitted for this revision.
+\clearpage
+\fig[1]{raw_local_overview}{The requested non-recalibrated local significance and p-value curves for every dataset and the shared-coupling combination. Left: $Z=\max(r_{\rm obs},0)$. Right: $p=\overline\Phi(Z)$; dotted horizontal lines mark the conventional local $3\sigma$ level. Dots identify the raw maximum of each scope. Neither panel uses the reference offset or response scale. The mass ranges differ by dataset; dotted vertical lines in the combined row mark changes in contributing datasets.}
+\FloatBarrier
+\clearpage
+
+\section{Global probabilities with the observed raw ordering retained}
+A global probability still requires a null distribution for the maximum. To avoid changing the observed local ranking, define
+\[
+ T_{\rm raw}=\max_{m\in\mathcal M}\max[r(m),0],\qquad
+ p_{\rm global}^{\rm raw}(m)=P_B\!\left(T_{\rm raw}^{*}\geq\max[r_{\rm obs}(m),0]\right).
+\]
+The supplied global curves use the already saved maxima of $r^{*}(m)=a(m)+s(m)W(m)$ and the matching complete Poisson refits. The observation is not centered or rescaled. The generating distribution nevertheless retains its source-dependent offsets, fluctuation widths and correlations. Thus this is a fixed-source global calibration of the \emph{raw statistic}, not a source-free global significance and not simply a trials factor applied to an independently established local p-value.
+
+Figure~\ref{fig:raw_global_overview} keeps this conditional result separate from the requested unshifted local plots. No previously standardized maximum distribution is incorrectly reused with a raw threshold. Both observed and toy maxima use the same raw ordering. No new null draws are generated.
+\input{raw_global_table.tex}
+
+The displayed global $Z$ is $\max[0,\Phi^{-1}(1-p_{\rm global})]$. A nonpositive observed fit has an inclusive global p-value of one and displayed $Z=0$. Gaussian-field probabilities use $(k+1)/(N+1)$ with $N=200{,}000$; shading is a 95\% binomial Monte Carlo interval. The direct-check column retains counts from the 256 complete Poisson scans and their Clopper--Pearson intervals. None of these intervals propagates source-estimation uncertainty. These conditional probabilities are not adopted as a newly qualified production discovery result.
+\clearpage
+\fig[1]{raw_global_overview}{Global probabilities and displayed $Z$ for the \emph{raw maximum}, conditional on each unchanged nominal GP source. The observed likelihood roots are unshifted. Each tail searches the entire support of its row, not only the mass shown on the horizontal axis. Dots identify the same raw peaks as Figure~\ref{fig:raw_local_overview}; a fixed maximum distribution preserves their ranking. Shading represents finite Gaussian-field sampling only. These global panels have a different probability construction from the asymptotic local panels.}
+\FloatBarrier
+\clearpage

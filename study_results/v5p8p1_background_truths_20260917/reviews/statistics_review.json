@@ -1,0 +1,149 @@
+{
+  "review_complete": true,
+  "execution_complete": true,
+  "all_candidates_numerically_qualified": false,
+  "deterministic_arithmetic_verified": true,
+  "local_probability_and_source_projection_arithmetic_verified": true,
+  "strict_optimizer_failures": [
+    {
+      "mass_MeV": 45,
+      "truth": "gp_blocked",
+      "max_score": 5.431294951563359e-07,
+      "signed_r": 399.042575675702
+    }
+  ],
+  "failed_local_scenarios": [
+    {
+      "mass_MeV": 42,
+      "truth": "gp_blocked_local",
+      "seed": [
+        58120260917,
+        42,
+        5
+      ],
+      "requested_experiments": 512,
+      "error": "Unconverged fit, score=5.066100992046074e-07",
+      "probability_reported": false
+    },
+    {
+      "mass_MeV": 66,
+      "truth": "gp_blocked",
+      "seed": [
+        58120260917,
+        66,
+        3
+      ],
+      "requested_experiments": 512,
+      "error": "Unconverged fit, score=3.210006269682708e-07",
+      "probability_reported": false
+    },
+    {
+      "mass_MeV": 76,
+      "truth": "gp_blocked",
+      "seed": [
+        58120260917,
+        76,
+        3
+      ],
+      "requested_experiments": 512,
+      "error": "Unconverged fit, score=3.518212778885754e-07",
+      "probability_reported": false
+    }
+  ],
+  "completed_asimov_coordinates": 852,
+  "completed_injection_scenarios": 72,
+  "completed_local_scenarios": 33,
+  "completed_null_experiments": 16896,
+  "observed_root_replay_max_abs_error": 0.0,
+  "truth_summary": [
+    {
+      "truth": "archived_stress",
+      "masses": 142,
+      "rms_root": 4.9674153461603385,
+      "max_abs_root": 17.59623317257445,
+      "max_abs_mass_MeV": 74.0,
+      "minimum_root": -17.59623317257445,
+      "maximum_root": 13.71229044174458,
+      "fraction_abs_gt1": 0.5774647887323944,
+      "fraction_abs_gt2": 0.3380281690140845
+    },
+    {
+      "truth": "gp_full_nominal",
+      "masses": 142,
+      "rms_root": 0.609322509325819,
+      "max_abs_root": 1.392119597100115,
+      "max_abs_mass_MeV": 103.0,
+      "minimum_root": -1.392119597100115,
+      "maximum_root": 1.3524255084127266,
+      "fraction_abs_gt1": 0.1830985915492957,
+      "fraction_abs_gt2": 0.0
+    },
+    {
+      "truth": "gp_full_half_ls",
+      "masses": 142,
+      "rms_root": 1.7004086231700568,
+      "max_abs_root": 4.074360073932307,
+      "max_abs_mass_MeV": 102.0,
+      "minimum_root": -4.074360073932307,
+      "maximum_root": 3.512426351606083,
+      "fraction_abs_gt1": 0.5492957746478874,
+      "fraction_abs_gt2": 0.2394366197183098
+    },
+    {
+      "truth": "gp_blocked",
+      "masses": 142,
+      "rms_root": 102.6726111791484,
+      "max_abs_root": 449.09418233791183,
+      "max_abs_mass_MeV": 44.0,
+      "minimum_root": -366.3182958549433,
+      "maximum_root": 449.09418233791183,
+      "fraction_abs_gt1": 1.0,
+      "fraction_abs_gt2": 0.9859154929577464
+    },
+    {
+      "truth": "regional_rise_fall",
+      "masses": 142,
+      "rms_root": 13.928549255566573,
+      "max_abs_root": 36.26345278094561,
+      "max_abs_mass_MeV": 72.0,
+      "minimum_root": -34.57764738285969,
+      "maximum_root": 36.26345278094561,
+      "fraction_abs_gt1": 0.9507042253521126,
+      "fraction_abs_gt2": 0.8873239436619719
+    },
+    {
+      "truth": "gp_blocked_local",
+      "masses": 142,
+      "rms_root": 53.87206657029395,
+      "max_abs_root": 205.34116593523285,
+      "max_abs_mass_MeV": 50.0,
+      "minimum_root": -205.34116593523285,
+      "maximum_root": 194.52545708230747,
+      "fraction_abs_gt1": 0.9929577464788732,
+      "fraction_abs_gt2": 0.9859154929577464
+    }
+  ],
+  "nominal_gp_raw05_rejection_examples": [
+    {
+      "mass_MeV": 90,
+      "rejections": 101,
+      "N": 512,
+      "rate": 0.197265625
+    },
+    {
+      "mass_MeV": 117,
+      "rejections": 97,
+      "N": 512,
+      "rate": 0.189453125
+    }
+  ],
+  "physical_local_significance_validated": false,
+  "global_significance_validated": false,
+  "conclusions": [
+    "The nominal all-data GP reduces archived deterministic mismatch, but is source-conditioned and absorbs about72percent of a source-injected signal in template projection.",
+    "The more flexible source GP absorbs about95percent in template projection and moves the null toward observed positive roots; favorable centering is not independent model validation.",
+    "Blocked and simple regional constructions remain source-inadequate. Failed numerical scenarios are retained as unavailable and excluded from probability reporting, not assigned extreme probabilities.",
+    "Even nominal full-GP raw local tails are not uniformly standard-normal: false-positive rates near20percent occur at the nominal5percent threshold for90/117MeV under this plug-in truth.",
+    "Any alternate-truth local probability and finite-family maximum is conditional, with finite simulation intervals and no validated particle interpretation."
+  ]
+}

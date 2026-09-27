@@ -1,0 +1,708 @@
+PAGE 1
+HPS Gaussian-Process Resonance Search v6.3.1 / 2021 10%
+Fixed-yield injection and recovery
+2021 10%: independent pilot, native MC and Gaussian signals
+Emrys Peets — 24 September 2026
+Result and scope
+The study completed all 80 evaluation cells with 100 attempted toys per cell: 8,000/8,000 valid signed free ﬁts and
+8,000/8,000 valid truth-ﬁxed proﬁles. The independent pilot contains 2,000/2,000 valid ﬁts. There are 0 unresolved
+ﬁt/proﬁle rows in the failure ledger. The same expected full-selected signal yield A = zs0(m) is used for both shapes
+and every evaluation toy at each mass and level. The Gaussian pilot mean returned yield error deﬁnes the frozen
+s0; z is an input reference-strength label, not an achieved signiﬁcance. At z = 5, mean raw recovery ranges over the
+ten masses are 0.94–1.10 for Gaussian signals and 0.78–1.04 for native MC. Mean paired response, which subtracts
+each toy’s matched null ﬁt, ranges from 0.96–0.98 and 0.72–0.89, respectively. These ranges describe cells, not
+independent pooled measurements. The native-MC paired response is lower than the Gaussian response at every
+mass at z = 5 ; the pointwise paired-diﬀerence intervals below quantify the diﬀerence. Equal expected candidate
+counts do not imply equal extraction diﬃculty.
+Raw recovery Paired response Pull width
+m [MeV] Gaussian MC Gaussian MC Gaussian MC
+60 1.04 0.87 0.96 0.72 0.92 1.04
+80 1.10 1.04 0.98 0.87 1.08 0.94
+100 1.05 0.93 0.98 0.88 0.95 0.87
+120 0.99 0.88 0.97 0.88 0.96 1.11
+140 0.94 0.91 0.97 0.89 0.96 1.00
+160 0.97 0.87 0.97 0.88 0.79 0.87
+180 0.98 0.87 0.97 0.88 1.06 1.02
+200 0.95 0.82 0.97 0.87 0.93 0.93
+220 1.00 0.91 0.97 0.85 0.99 0.94
+240 0.95 0.78 0.97 0.81 0.94 0.97
+Summary at z = 5 . Recovery and response are averages of per-toy ratios. Full cell uncertainties and paired diﬀerences are
+supplied as CSV; ﬁgures below show standard errors. Pull width is the sample standard deviation, with n − 1 denominator.
+This is a conditional study of one pinned background mean, ﬁxed empirical MC templates and one archived-kernel
+GP prescription. It measures ﬁxed-yield bias, error response and nominal signed proﬁle-set containment. It does not
+establish physical-background adequacy, unconditional coverage, calibrated discovery signiﬁcance or an exclusion.
+1
+
+PAGE 2
+HPS Gaussian-Process Resonance Search v6.3.1 / 2021 10%
+Ensemble and frozen reference
+Two disjoint cohorts each contain 100 full-support Poisson background spectra, sampled from the bundled nominal
+2021 GP arithmetic mean. Each cohort reuses its backgrounds across all ten masses. Evaluation also reuses each
+background across both shapes and four levels. The 8,000 evaluation rows are therefore correlated across cells; they
+do not represent 8,000 independent background experiments.
+Bpilot
+ji , B eval
+ti ∼ Poisson(bi), s0(m) = 1
+100
+99∑
+j=0
+ˆσpilot
+A,G,j(m),
+A(m, z ) = zs0(m), Stmzi ∼ Poisson(A(m, z )wi).
+The full probability vector includes bins below and above analysis support. Signal is added in all analysis bins,
+including GP training sidebands. The realized full signal total ﬂuctuates around A; expected and realized counts are
+recorded separately. Within each shape case, generation and extraction use identical full-selected-count probabilities.
+No ﬁt-window or support renormalization is applied.
+60 100 140 180 220 240
+Pole mass [MeV]
+2500
+5000
+7500
+10000
+12500
+15000
+17500
+20000Mean pilot yield error [candidates]
+Gaussian
+Native MC
+60 100 140 180 220 240
+Pole mass [MeV]
+1.00
+1.25
+1.50
+1.75
+2.00
+2.25
+2.50
+2.75MC / Gaussian pilot mean error
+Pilot mean returned yield errors (left; bars are standard errors of the 100 pilot errors) and their MC/Gaussian ratio (right).
+The Gaussian mean alone deﬁnes the common frozen yield scale. The ratio panel is descriptive; its sampling uncertainty is
+not shown.
+m [MeV] s0 SE(s0) Gaussian CV [%] MC/Gaussian A(z = 5)
+60 6944.94 0.38 0.054 2.790 34724.72
+80 6907.96 0.16 0.023 1.283 34539.78
+100 6062.10 0.12 0.019 1.152 30310.49
+120 5118.65 0.11 0.021 1.115 25593.27
+140 4219.16 0.10 0.024 1.129 21095.81
+160 3458.43 0.10 0.030 1.142 17292.15
+180 2885.38 0.10 0.034 1.182 14426.90
+200 2410.70 0.10 0.042 1.262 12053.48
+220 2022.51 0.12 0.061 1.361 10112.54
+240 1698.53 0.14 0.082 1.528 8492.66
+The pilot table is frozen before evaluation. Its standard error describes pilot precision; it is not added to a pull
+denominator or resampled during evaluation bootstraps.
+2
+
+PAGE 3
+HPS Gaussian-Process Resonance Search v6.3.1 / 2021 10%
+Raw recovery and paired response
+For every positive injection, two diagnostics retain diﬀerent information:
+Qt =
+ˆAt(A)
+A , R t =
+ˆAt(A) − ˆAt(0)
+A .
+Raw recovery retains any background-only yield oﬀset. Paired response subtracts the signed null ﬁt of the same
+background, mass and extraction template. The subtraction is used only here; it is absent from raw yields, pulls
+and likelihood proﬁles.
+60 120 180 240
+Pole mass [MeV]
+0.5
+1.0
+1.5Mean raw recovery
+z = 1
+Gaussian
+Native MC
+60 120 180 240
+Pole mass [MeV]
+0.8
+1.0
+1.2
+z = 3
+60 120 180 240
+Pole mass [MeV]
+0.8
+0.9
+1.0
+1.1
+z = 5
+60 120 180 240
+Pole mass [MeV]
+0.7
+0.8
+0.9
+1.0Mean paired response
+z = 1
+60 120 180 240
+Pole mass [MeV]
+0.7
+0.8
+0.9
+1.0
+z = 3
+60 120 180 240
+Pole mass [MeV]
+0.8
+0.9
+1.0
+z = 5
+Cell means with standard errors from the toy scatter. The dashed line denotes unit recovery/response. MC and Gaussian
+receive equal expected full-selected yields at each mass and level; their independent Poisson signal draws need not have equal
+realized totals.
+Paired MC–Gaussian response diﬀerences at z = 5
+m [MeV] MC minus Gaussian 95% bootstrap interval Complete pairs
+60 -0.244 [-0.248, -0.241] 100
+80 -0.109 [-0.112, -0.107] 100
+100 -0.096 [-0.098, -0.094] 100
+120 -0.093 [-0.095, -0.091] 100
+140 -0.081 [-0.083, -0.078] 100
+160 -0.094 [-0.097, -0.092] 100
+180 -0.096 [-0.099, -0.093] 100
+200 -0.101 [-0.105, -0.097] 100
+220 -0.122 [-0.127, -0.118] 100
+240 -0.162 [-0.167, -0.157] 100
+The whole-toy bootstrap uses the same resampled evaluation IDs in every cell and preserves null partners. Each
+diﬀerence uses complete MC/Gaussian pairs; missing pairs are disclosed in the machine-readable table. These are
+pointwise intervals without a multiple-comparison adjustment.
+3
+
+PAGE 4
+HPS Gaussian-Process Resonance Search v6.3.1 / 2021 10%
+Absolute bias and returned errors
+Absolute bias is ˆA − A in full-selected candidates. Returned-error response is the average of ˆσA/s 0. Neither the
+returned error nor s0 is the empirical spread of ﬁtted yields; the latter is saved separately as Ahat_sd.
+60 100 140 180 220 240
+Pole mass [MeV]
+0
+2500
+5000
+7500Mean ̂A − A [candidates]
+ z = 0
+Gaussian
+Native MC
+60 100 140 180 220 240
+Pole mass [MeV]
+0
+2000
+4000
+6000Mean ̂A − A [candidates]
+ z = 1
+60 100 140 180 220 240
+Pole mass [MeV]
+−2000
+0
+2000
+4000
+Mean ̂A − A [candidates]
+ z = 3
+60 100 140 180 220 240
+Pole mass [MeV]
+−5000
+0
+Mean ̂A − A [candidates]
+ z = 5
+Mean absolute bias; bars are standard errors across valid ﬁts. At z = 0 these are the signed null oﬀsets.
+60 100 140 180 220 240
+Pole mass [MeV]
+1.0
+1.5
+2.0
+2.5
+Mean ̂σA/s0
+z = 0
+Gaussian
+Native MC
+60 100 140 180 220 240
+Pole mass [MeV]
+1.0
+1.5
+2.0
+2.5
+Mean ̂σA/s0
+z = 1
+60 100 140 180 220 240
+Pole mass [MeV]
+1.0
+1.5
+2.0
+2.5
+Mean ̂σA/s0
+z = 3
+60 100 140 180 220 240
+Pole mass [MeV]
+1.0
+1.5
+2.0
+2.5
+Mean ̂σA/s0
+z = 5
+Mean returned yield error divided by the frozen Gaussian reference. Bars are standard errors of the per-toy ratios. The
+dashed line is unity.
+4
+
+PAGE 5
+HPS Gaussian-Process Resonance Search v6.3.1 / 2021 10%
+Pull location and width
+The primary pull uses the ﬁxed expected yield and each ﬁt’s returned proﬁle-Hessian uncertainty:
+pt =
+ˆAt − A
+ˆσA,t
+.
+The realized Poisson signal total is not substituted for A. Unit pull width and zero pull mean are diagnostic reference
+values, not numerical acceptance criteria.
+60 140 240
+Pole mass [MeV]
+0.0
+0.5Mean pull
+z = 0
+Gaussian
+Native MC
+60 140 240
+Pole mass [MeV]
+0.0
+0.5
+z = 1
+60 140 240
+Pole mass [MeV]
+−0.5
+0.0
+0.5
+z = 3
+60 140 240
+Pole mass [MeV]
+−0.5
+0.0
+0.5
+z = 5
+60 140 240
+Pole mass [MeV]
+0.8
+1.0
+1.2Sample pull width
+z = 0
+60 140 240
+Pole mass [MeV]
+0.8
+1.0
+1.2
+z = 1
+60 140 240
+Pole mass [MeV]
+0.8
+1.0
+1.2
+z = 3
+60 140 240
+Pole mass [MeV]
+0.8
+1.0
+1.2
+z = 5
+Top: mean pull with toy-sample standard error. Bottom: sample pull width with one-standard-error whole-toy bootstrap
+bars (2,000 ﬁxed-seed replicates). Dashed lines mark zero mean and unit width. The accompanying CSV includes pointwise
+95% percentile intervals for the widths.
+Null oﬀsets cannot be removed by changing the injection scale
+At zero signal, each template may project the background residual diﬀerently. The null ﬁts remain signed. Using a
+common expected yield changes the positive-injection ensemble; it does not alter either template’s null bias.
+Null mean pull Null pull width
+m [MeV] Gaussian MC Gaussian MC
+60 0.42 0.28 0.92 1.03
+80 0.60 0.68 1.08 0.94
+100 0.35 0.21 0.96 0.87
+120 0.08 -0.01 0.96 1.12
+140 -0.17 0.08 0.97 1.00
+160 0.01 -0.03 0.80 0.86
+180 0.05 -0.04 1.04 1.02
+200 -0.11 -0.19 0.93 0.93
+220 0.16 0.22 1.00 0.95
+240 -0.12 -0.09 0.93 0.97
+5
+
+PAGE 6
+HPS Gaussian-Process Resonance Search v6.3.1 / 2021 10%
+Nominal signed proﬁle-set containment
+For each toy, nuisance coordinates are reﬁtted at the ﬁxed expected A, with the same GP mean/covariance used by
+that toy’s free ﬁt:
+qtrue = 2{NLL(A, ˆθA) − NLL( ˆA, ˆθ)}.
+Truth is counted inside the nominal 68.27% and 95% signed proﬁle-likelihood sets when qtrue ≤ 1 and qtrue ≤
+3. 841459, respectively. These are signed sets, not a physical nonnegative-signal upper-limit construction.
+60 140 240
+Pole mass [MeV]
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0Nominal 68.27% containment
+z = 0
+Gaussian
+Native MC
+60 140 240
+Pole mass [MeV]
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+z = 1
+60 140 240
+Pole mass [MeV]
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+z = 3
+60 140 240
+Pole mass [MeV]
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+z = 5
+60 140 240
+Pole mass [MeV]
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0Nominal 95% containment
+z = 0
+60 140 240
+Pole mass [MeV]
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+z = 1
+60 140 240
+Pole mass [MeV]
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+z = 3
+60 140 240
+Pole mass [MeV]
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+z = 5
+Containment among numerically valid truth proﬁles. Bars are exact 95% Clopper–Pearson intervals using that cell’s valid-
+proﬁle denominator. Dashed lines show nominal reference levels. Shared backgrounds correlate the cells; the intervals are
+pointwise.
+68.27% count range 95% count range
+z attempted/cell Gaussian MC Gaussian MC
+0 100 57–83 60–76 87–98 90–98
+1 100 58–82 61–77 88–98 90–98
+3 100 60–82 59–79 89–98 91–99
+5 100 62–81 54–71 88–98 88–97
+Ranges are over mass cells; they are not pooled proportions. Exact cell counts, denominators and intervals are
+in evaluation_summary.csv. For k containing proﬁles and f unresolved decisions, all-attempt accounting bounds
+are [k/ 100, (k + f )/ 100]. These bounds are not conﬁdence intervals. Successful-ﬁt containment is conditional
+on numerical success; the failure ledger and valid fractions remain part of the result. For this run, valid-proﬁle
+denominators range from 100 to 100 out of 100. With only 100 toys per cell, percentage-level claims require the
+reported binomial uncertainty; the shared-cell design cannot be treated as additional independent precision.
+6
+
+PAGE 7
+HPS Gaussian-Process Resonance Search v6.3.1 / 2021 10%
+Representative spectra and GP response
+Representative spectra are selected by ﬁxed toy ID and declared masses, without selection by ﬁt quality or recovery.
+Full-support plots show the added signal tails; window and residual panels show the response of GP conditioning
+to the same injected spectrum. A plotted GP shift is a diagnostic, not a decomposition proving that every recovery
+diﬀerence arises from sideband absorption.
+Gaussian signals
+100 200 300
+Mass [MeV]
+0
+100
+101
+102
+103
+104
+105
+106
+Candidates / bin
+Full support
+Toy data
+Pinned background
+Realized signal
+57.5 60.0 62.5
+Mass [MeV]
+600000
+700000
+800000
+900000Candidates / bin
+Extraction window
+Truth background
+GP after injection
+GP before injection
+Toy data
+57.5 60.0 62.5
+Mass [MeV]
+0
+1000
+2000
+3000
+4000
+5000Candidates / bin
+Residual and GP response
+GP change
+Realized signal
+Data minus GP
+60 MeV, Gaussian, z = 5, evaluation toy 0. The green dashed curve is the matched background-only GP prediction.
+100 200 300
+Mass [MeV]
+0
+100
+101
+102
+103
+104
+105
+106
+Candidates / bin
+Full support
+Toy data
+Pinned background
+Realized signal
+135 140 145
+Mass [MeV]
+350000
+400000
+450000Candidates / bin
+Extraction window
+Truth background
+GP after injection
+GP before injection
+Toy data
+135 140 145
+Mass [MeV]
+−1000
+0
+1000
+Candidates / bin
+Residual and GP response
+GP change
+Realized signal
+Data minus GP
+140 MeV, Gaussian, z = 5, evaluation toy 0. The green dashed curve is the matched background-only GP prediction.
+100 200 300
+Mass [MeV]
+0
+100
+101
+102
+103
+104
+105
+106
+Candidates / bin
+Full support
+Toy data
+Pinned background
+Realized signal
+230 240 250
+Mass [MeV]
+20000
+25000
+30000
+35000Candidates / bin
+Extraction window
+Truth background
+GP after injection
+GP before injection
+Toy data
+230 240 250
+Mass [MeV]
+−250
+0
+250
+500
+750
+Candidates / bin
+Residual and GP response
+GP change
+Realized signal
+Data minus GP
+240 MeV, Gaussian, z = 5, evaluation toy 0. The green dashed curve is the matched background-only GP prediction.
+7
+
+PAGE 8
+HPS Gaussian-Process Resonance Search v6.3.1 / 2021 10%
+Representative spectra: native MC
+The same evaluation background (toy 0), masses, pole-centered masks and common expected yields are used as on
+the Gaussian page. Signal draws are independent across shapes. The nominal native-MC template is used both to
+generate and ﬁt these signals.
+100 200 300
+Mass [MeV]
+0
+100
+101
+102
+103
+104
+105
+106
+Candidates / bin
+Full support
+Toy data
+Pinned background
+Realized signal
+57.5 60.0 62.5
+Mass [MeV]
+600000
+700000
+800000
+900000Candidates / bin
+Extraction window
+Truth background
+GP after injection
+GP before injection
+Toy data
+57.5 60.0 62.5
+Mass [MeV]
+0
+1000
+2000Candidates / bin
+Residual and GP response
+GP change
+Realized signal
+Data minus GP
+60 MeV, Native MC, z = 5, evaluation toy 0. The green dashed curve is the matched background-only GP prediction.
+100 200 300
+Mass [MeV]
+0
+100
+101
+102
+103
+104
+105
+106
+Candidates / bin
+Full support
+Toy data
+Pinned background
+Realized signal
+135 140 145
+Mass [MeV]
+350000
+400000
+450000Candidates / bin
+Extraction window
+Truth background
+GP after injection
+GP before injection
+Toy data
+135 140 145
+Mass [MeV]
+−1000
+0
+1000
+2000
+Candidates / bin
+Residual and GP response
+GP change
+Realized signal
+Data minus GP
+140 MeV, Native MC, z = 5, evaluation toy 0. The green dashed curve is the matched background-only GP prediction.
+100 200 300
+Mass [MeV]
+0
+100
+101
+102
+103
+104
+105
+106
+Candidates / bin
+Full support
+Toy data
+Pinned background
+Realized signal
+230 240 250
+Mass [MeV]
+20000
+25000
+30000
+35000Candidates / bin
+Extraction window
+Truth background
+GP after injection
+GP before injection
+Toy data
+230 240 250
+Mass [MeV]
+−200
+0
+200
+400
+600
+Candidates / bin
+Residual and GP response
+GP change
+Realized signal
+Data minus GP
+240 MeV, Native MC, z = 5, evaluation toy 0. The green dashed curve is the matched background-only GP prediction.
+Native MC and Gaussian diﬀerences can include core oﬀset, width, tails and pole-centered window acceptance. This
+run does not isolate these components. Clean-sideband or model-mismatch controls would be separately speciﬁed
+diagnostics.
+8
+
+PAGE 9
+HPS Gaussian-Process Resonance Search v6.3.1 / 2021 10%
+Procedure, numerical accounting and provenance
+All masses use the pole-centered window m ± 2. 25σm, with the same extraction and training masks for both shapes.
+The nominal resolution is σm = 0. 00184825 − 0. 001375m + 0. 085875m2, with m and σm both in GeV. Gaussian bin
+probabilities are CDF diﬀerences; native MC probabilities use the pinned histogram CDF with its inherited uniform-
+within-bin convention and outside-support categories. The GP uses archived mass-dependent kernel parameters.
+Each spectrum recomputes its count-dependent log targets/noise, conditional mean and correlated covariance from
+bins outside the window. Positive counts use log n and noise variance 1/n ; zero counts use target zero and variance
+one. This is GP conditioning with ﬁxed kernel parameters, without hyperparameter optimization. The inherited
+signed count-yield likelihood is
+λi = ˆbi + (Lθ)i + Awi, NLL =
+∑
+i∈W
+(λi − ni log λi) + 1
+2 θ⊤θ.
+Poisson means remain positive. Returned uncertainties are observed proﬁle-Hessian yield errors. Truth proﬁling
+holds the toy’s GP constraint ﬁxed, without further retraining or an extra random GP nuisance draw. Every planned
+toy ID is retained, including failures. Bounded numerical retries reuse identical saved counts and are selected by
+convergence and objective value. No toy is accepted by agreement with truth, pull or recovery. Tiny negative
+likelihood diﬀerences are clipped only after the inherited qtrue ≥ − 2 × 10−6 gate. Exact acceptance thresholds, retry
+starts and watchdog settings are recorded in protocol.json; smoke/control checks and numerical attempt records
+accompany the run.
+Randomness and uncertainty . The master seed is 63220260924; namespaces 1, 2, 3 and 4 identify pilot back-
+grounds, evaluation backgrounds, independent signal draws and bootstrap replicates. Bootstrap uncertainty resam-
+ples whole evaluation toy IDs, preserving all masses, shapes, levels and null partners. Means use standard errors from
+sample scatter. MC–Gaussian contrasts use paired diﬀerences and disclose incomplete pairs. The 2,000-replicate
+bootstrap does not create extra independent toys or change the pilot reference.
+Boundary relative to v6.2. This ensemble samples Poisson signal counts at ﬁxed expected yields. The prior
+v6.2 ensemble sampled exact totals with multinomial bin allocation. They are diﬀerent experiments; numerical
+diﬀerences cannot be attributed to one code change without matching yields, counts, pairing, templates and ﬁt
+settings.
+Limitations. MC selection equivalence and signal-daughter association are unvalidated. Finite-MC, detector-
+response and source-estimation uncertainties are not propagated. The generating background is one ﬁxed mean.
+Containment here does not validate physical-background adequacy or a full hyperparameter-optimized production
+search, and it supplies no global signiﬁcance, discovery probability or exclusion.
+Reproduction. The package includes the immutable ﬁnal handoﬀ, input/code hashes, saved pilot/evaluation
+background cohorts, templates, frozen pilot table, per-toy rows and checkpoints, summary scripts, report source
+and manifest. See README.md, protocol.json, provenance/ and MANIFEST.sha256. The ﬁnal handoﬀ and frozen
+reference hashes are: Final handoﬀ: 68358b6d4a24b83ddb25617f82064c4a3fc1f5bce4b1f7772a9620a58ff94ad8
+Frozen pilot reference: f2d9d4bf804ed99894085ecb907fc28734462d6839d3d32bef52fd866f16fd39
+9

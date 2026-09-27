@@ -1,0 +1,129 @@
+\clearpage
+\section{An analytic description of the MC core shift}
+The ten native cores within the 60--240~MeV study range support a compact empirical
+location law. Four simple forms are fitted with equal weight per mass:
+a proportional shift, an affine function, a quadratic and a logarithm.
+Each mass is also omitted in turn and predicted from the other nine.
+No observed spectrum enters this comparison. The best leave-one-mass-out
+(LOO) RMS among these candidates is the logarithmic model,
+\begin{equation}
+ c(m)-m=-3.22433-2.21399\ln\!\left(\frac{m}{150}\right)\ \mathrm{MeV},
+ \qquad 60\leq m\leq240~\mathrm{MeV}.
+\end{equation}
+The argument uses $m$ in MeV. The law is an empirical approximation,
+not a detector mechanism or an extrapolation outside the fitted range.
+Its fitted RMS is 0.0497~MeV, LOO RMS 0.0652~MeV and largest held-out
+error 0.1604~MeV. These errors describe cross-mass prediction, not a
+calibrated confidence band. Model selection and evaluation use the same
+ten masses; the LOO summary is a diagnostic, not independent validation.
+\fig{.32}{../figures/analytic_center_models.pdf}{Measured core shifts,
+analytic models and their held-out residuals. Small error bars show
+conditional MC-bin resampling spread; the equal-mass fits do not treat
+that spread as the complete response uncertainty.}
+\begin{table}[H]\centering\small
+\input{../derived/report_analytic_models.tex}
+\caption{Analytic model comparison. Affine and quadratic forms use
+$x=(m-150)/100$; coefficients and all held-out predictions are saved.}
+\end{table}
+
+\clearpage
+\section{Can one normalized core describe all masses?}
+The ten distributions are first recentered without rescaling their
+physical widths. They are then expressed in
+$u=(m_{ee}-c)/\sigma_{\rm core}$ using the measured local Gaussian width.
+The density transformation includes the Jacobian:
+$q_m(u)=\sigma_{\rm core}p_m(c+\sigma_{\rm core}u)$.
+Each full source histogram has unit area over its recorded 0--400~MeV
+range. Display cropping never renormalizes the full distributions.
+The separately labeled core view conditions on $|u|<2$ and therefore
+discards information about the fraction of all candidates in that core.
+\fig{.64}{../figures/shared_shape_overlays.pdf}{All ten normalized native
+MC histograms superimposed; colored curves are empirical histograms,
+not Gaussian fits or morphed samples. Top left: centered physical-mass densities. Top right:
+full-normalized densities after width scaling. Bottom left: unit-area
+conditional cores. Bottom right: full-normalized tails on a log scale.
+The black dashed curve is the equal-mass mean standardized distribution;
+sample event counts do not determine its weights. Direct MC-point
+overlays and the rebinning definition appear in Section~\ref{sec:MCpoints}.}
+The conditional cores are much closer than the full shapes. A shared
+central shape is therefore a useful possibility, but its unit-area
+overlay cannot establish a common core fraction or common tails. The
+full candidate distributions include the same unresolved response and
+candidate-association contributions as the earlier sections.
+
+\clearpage
+\subsection{Held-out tests of a common shape}
+For each generated mass, the common standardized CDF is averaged from
+the other nine histograms. The primary shape-only test supplies the held-out
+sample's known center and width. A second test predicts its center from
+the selected analytic law fitted to the other nine and predicts its
+width from a quadratic in $\ln(\sigma_{\rm core}/\mathrm{MeV})$ versus
+$x=(m-150)/100$, also fitted without that sample. All likelihood comparisons
+use the same measured-center evaluation window and GP constraint as the
+direct MC. The second test predicts the complete template but does not
+also move its evaluation mask. Existing neighboring-mass morphs are
+evaluated in that same window as a comparison.
+\begin{table}[H]\centering\scriptsize
+\input{../derived/report_shared_validation.tex}
+\caption{Held-out CDF distances and observed upper-limit ratios relative
+to direct MC. Core probability is conditional on the stored histogram
+range; $D_{core}$ conditions on $|u|<2$. Full distances use the declared
+analysis support. ``Predictive'' estimates center and width as well as
+shape without the held-out histogram.}
+\end{table}
+\fig{.26}{../figures/shared_shape_validation.pdf}{Common-shape and
+neighbor-morph prediction errors, with matched likelihood conditions.}
+Core-conditioned CDF distances span 0.0067--0.0450, while full-support
+distances span 0.0229--0.4611. The common-shape limit ratios span
+0.443--1.191 even when location and width are supplied. Thus a single
+full standardized shape is not supported as a drop-in replacement.
+A shared core with mass-dependent core fraction and tails is better
+motivated by these diagnostics. For inspection, 181 exploratory common-shape
+templates are saved at 1~MeV spacing over 60--240~MeV using the analytic
+center and width laws; they are not adopted as the nominal signal model.
+
+\clearpage
+\section{Left and right signal probability and asymmetric blinding}
+Asymmetry is measured around the fitted core, retaining the full
+stored-histogram normalization. The upper panel measures probability
+beyond $\pm2.25\sigma_{\rm nominal}$; the lower panel compares the two
+halves inside that interval. Source overflow is below 0.016\% and is
+excluded by the explicitly declared 0--400~MeV normalization here.
+\fig{.43}{../figures/left_right_MC_probability.pdf}{Mass dependence of
+the left and right selected-MC contributions around the core.}
+The left external tail is larger at 120--240~MeV, whereas the right
+external tail is larger at 60--100~MeV. The direction is therefore not
+universal across the accepted samples.
+
+Five windows are declared around the same measured core before fitting
+the observed data: $[-2.25,+2.25]$, $[-2.5,+2.0]$, $[-2.0,+2.5]$,
+$[-2.75,+2.25]$ and $[-2.25,+2.75]$, all in nominal sigma.
+The redistributed pair keeps total width 4.5 sigma; each is also exactly
+a shift of the window midpoint by $\mp0.25$ sigma, so it cannot isolate
+tail asymmetry from center placement. The expanded pair adds half a
+sigma on either side as matched controls.
+
+Each window defines both the fitted bins and excluded GP training bins.
+The GP prediction and covariance are recomputed; archived kernel,
+resolution and coupling conventions remain anchored at the generated
+mass. Gaussian and direct-MC templates share the same mask and background.
+Actual bin counts are saved because equal continuous widths need not
+select the same number of discrete observed bins.
+
+\clearpage
+\subsection{Observed asymmetric-window comparisons}
+\begin{table}[H]\centering\scriptsize
+\input{../derived/report_asymmetric_summary.tex}
+\caption{Prespecified native-mass window comparisons. The minimum local
+probability is descriptive and is not corrected for testing several
+windows. No prescription is chosen from the observed result.}
+\end{table}
+\fig{.48}{../figures/asymmetric_comparisons.pdf}{Native MC limit ratios,
+signed-root changes, local probabilities and fitted signal fractions for
+all five windows. Full MC/Gaussian limits and probabilities are retained
+in the accompanying 100-row fit ledger. Changes include altered data bins
+and altered background interpolation, as well as signal acceptance.}
+These are conditional observed diagnostics. A preferred production
+window would require signal-recovery and coverage checks, including
+signal leakage into the training sidebands, rather than selection by
+the largest observed local significance or tightest upper limit.

@@ -1,0 +1,144 @@
+{
+  "study": "HPS v5.7.1 geometry acceptance",
+  "verified_date": "2026-09-13",
+  "scope": "Geometric hit criteria only. Other event-level selection, trigger, hit efficiency and reconstruction behavior are not implemented by these criteria.",
+  "histogram_cut_equivalence": "Unverified: the current selected 1D mass histograms do not establish which per-event hit or layer requirements were applied, and no event-level audit was performed.",
+  "adopted_criteria": {
+    "2015": {
+      "count_definition": "3D station point: at least one axial and at least one stereo sensor intersected within the same station and detector half; hole/slot alternatives are unioned per view.",
+      "positron": {
+        "min_paired_3D_stations": 5,
+        "mandatory_paired_stations": [
+          1,
+          2
+        ]
+      },
+      "electron": {
+        "min_paired_3D_stations": 5,
+        "mandatory_paired_stations": []
+      },
+      "available_stations": 6,
+      "comparison": ">=",
+      "contiguous_stations_required": false,
+      "contiguity_status": "No consecutive-station requirement is established by the inspected note; the geometric model counts qualifying stations.",
+      "sources": [
+        "internal2015_p11",
+        "internal2015_table3",
+        "note504_table"
+      ],
+      "adoption_status": "Uses the archived internal-note convention. The published 2015 paper differs by describing first-two-layer hits on both tracks."
+    },
+    "2016": {
+      "count_definition": "3D space point formed from axial and stereo strip clusters, represented geometrically by a paired station intersection.",
+      "positron": {
+        "min_paired_3D_stations": 5,
+        "mandatory_paired_stations": []
+      },
+      "electron": {
+        "min_paired_3D_stations": 5,
+        "mandatory_paired_stations": []
+      },
+      "available_stations": 6,
+      "comparison": ">=",
+      "contiguous_stations_required": false,
+      "contiguity_status": "The paper describes seeds from different layer triplets and extension to other layers; no contiguity condition stated.",
+      "sources": [
+        "published2016_tracking",
+        "note504_table"
+      ],
+      "adoption_status": "Published reconstruction minimum, with no additional mandatory L1/L2 requirement in the v5.0.4 prompt-selection summary."
+    },
+    "2021": {
+      "count_definition": "Individual 2D sensor-plane hits, unioning alternative sensors in each view; paired 3D stations are not required for the hit count.",
+      "positron": {
+        "min_individual_2D_plane_hits": 10,
+        "mandatory_paired_stations": []
+      },
+      "electron": {
+        "min_individual_2D_plane_hits": 8,
+        "mandatory_paired_stations": []
+      },
+      "available_stations": 7,
+      "available_views": 14,
+      "comparison": ">=",
+      "contiguous_stations_required": false,
+      "sources": [
+        "current_user_instruction"
+      ],
+      "adoption_status": "Authoritative current user correction supersedes the older v5.0.4 statements for this study. No mandatory inner station has been added."
+    }
+  },
+  "source_records": {
+    "internal2015_p11": {
+      "source_type": "local internal analysis note",
+      "path": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/hps_gpr_analysis_note/hps_2015_resonance_search_internal_note.pdf",
+      "sha256": "89461547180885b76cbbd8bfc61821138b1895940e0cd991acd15534ce07ccf0",
+      "pdf_pages": 52,
+      "locator": "PDF page 11, printed lines 197-199",
+      "excerpt": "for the 5 and 6 layer tracks under consideration",
+      "interpretation": "The tracks considered have 5 or 6 associated 3D layer hits. The adjacent text describes both layer-1 sensors making a 3D hit.",
+      "reconstruction_context": "PDF page 3, printed lines 81-85 identifies tweakpass-6 and DST version 0.11.",
+      "bibkey": "v571:internal2015"
+    },
+    "internal2015_table3": {
+      "source_type": "same local internal note",
+      "locator": "PDF page 12, Table 3",
+      "excerpt": "e+ is required to have L1 and L2 hit",
+      "bibkey": "v571:internal2015"
+    },
+    "published2016_tracking": {
+      "source_type": "published HPS analysis",
+      "url": "https://arxiv.org/html/2212.10629v3#S3.SS2.SSS2",
+      "locator": "Section III.2.2, paragraphs on space points and track candidates; HTML lines 190-193 in inspected rendering",
+      "excerpt": "track candidates are required to have at least 5 associated 3D space points",
+      "interpretation": "At least 5 paired axial/stereo station points per track; later GBL refitting and quality criteria are separate.",
+      "bibkey": "v571:HPS2016"
+    },
+    "published2015_difference": {
+      "source_type": "published HPS analysis",
+      "url": "https://arxiv.org/html/1807.11530#S3",
+      "locator": "Section III, converted-WAB suppression paragraph; HTML line 80 in inspected rendering",
+      "interpretation": "Describes both tracks having hits in the first two SVT layers. This differs from the adopted archived internal-note positron-only L1/L2 convention.",
+      "bibkey": "v571:HPS2015"
+    },
+    "note504_table": {
+      "source_type": "local analysis-note snapshot",
+      "version": "v5.0.4",
+      "date": "2026-09-11",
+      "package_copy": "inputs/selection/event_selection_table.tex",
+      "locator": "Track fit / hits and cWAB suppression rows",
+      "interpretation": "2015 positron L1/L2 mandatory; 2016 final prompt summary does not apply cWAB suppression. The table does not explicitly state the overall engineering-run track-hit minima.",
+      "bibkey": "v571:note504"
+    },
+    "current_user_instruction": {
+      "source_type": "authoritative instruction in current task",
+      "normalized_instruction": "Use positron >=10 individual sensor-plane hits and electron >=8 individual sensor-plane hits for the 2021 main event requirement.",
+      "adds_mandatory_inner_stations": false
+    }
+  },
+  "resolved_conflicts": [
+    {
+      "year": 2021,
+      "older_evidence": "The preserved v5.0.4 table states >=10 2D hits for the tracks and does not establish an additional 2D requirement; its section text declines to include a separate eight-hit electron requirement because the available stored count is 3D.",
+      "resolution": "For v5.7.1, adopt the current user instruction: positron >=10 individual 2D plane hits, electron >=8. Preserve the old source unchanged as historical provenance.",
+      "does_not_assert": "This correction does not retrospectively verify cuts in any existing selected mass histogram."
+    },
+    {
+      "year": 2015,
+      "older_evidence": "Published paper describes both tracks with first-two-layer hits, while the archived internal note and v5.0.4 table require positron L1 and L2.",
+      "resolution": "Adopt the archived internal-note/v5.0.4 positron-only L1/L2 convention, clearly identify that source, and do not attribute it as the exact published-paper selection."
+    }
+  ],
+  "copied_source_files": [
+    {
+      "source_path": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v5p0p4_analysis_note_20260911/source/tables/event_selection_table.tex",
+      "package_copy": "inputs/selection/event_selection_table.tex",
+      "sha256": "c290a2da57b53006b97477e503c4f16c181ab29ebe8f8a1b75bfa948be2db7e9"
+    },
+    {
+      "source_path": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v5p0p4_analysis_note_20260911/source/sections/03_event_selection.tex",
+      "package_copy": "inputs/selection/03_event_selection.tex",
+      "sha256": "6ab70dd78eb2da521cd1132acc157e2a6b07db9631e7e960bbf02fff24ea0c2a"
+    }
+  ]
+}

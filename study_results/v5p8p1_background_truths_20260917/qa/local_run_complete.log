@@ -1,0 +1,16 @@
+local 42 archived_stress a -9.215 k 0 elapsed 2.8
+local 42 gp_full_nominal a 0.012 k 239 elapsed 5.5
+local 42 gp_full_half_ls a 0.063 k 268 elapsed 8.3
+local 42 gp_blocked a -183.726 k 0 elapsed 11.2
+local 42 regional_rise_fall a 17.236 k 512 elapsed 13.9
+local 66 archived_stress a 12.469 k 512 elapsed 16.8
+local 66 gp_full_nominal a 0.103 k 80 elapsed 19.6
+local 66 gp_full_half_ls a 1.134 k 283 elapsed 22.7
+Traceback (most recent call last):
+  File "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v5p8p1_background_truths_20260917/scripts/local_tests.py", line 43, in <module>
+    try:
+  File "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v5p8p1_background_truths_20260917/scripts/local_tests.py", line 37, in evaluate
+    scalar=c.Profile(bs[0],Ls[0],w,'linear');f=scalar.fit(counts[0]);z=scalar.fit(counts[0],0.);r=float(np.sign(f['A'])*np.sqrt(max(0,2*(z['nll']-f['nll']))));err=float(abs(r-model.r[0]));assert err<2e-5 and model.max_score<2e-7,(err,model.max_score)
+  File "/Users/emryspeets/Desktop/gp_mods/hps-gpr-v5p0p2-20260909/study_results/background_profile_comparison_20260905/run_comparison.py", line 106, in fit
+    raise RuntimeError(f'Unconverged fit, score={score}')
+RuntimeError: Unconverged fit, score=3.210006269682708e-07

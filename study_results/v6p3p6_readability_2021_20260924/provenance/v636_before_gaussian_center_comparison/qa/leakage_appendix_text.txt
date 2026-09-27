@@ -1,0 +1,212 @@
+HPS GPR: understanding the 2021 signal extraction v6.3.6
+Appendix I. How wide is the proposed blind window?
+This follow-up extends the comparison to nine v16 TC signal-MC masses from 80 to 240 MeV. The requested
+interval isu ∈ [− 4, 3], where u = (mrec −c)/σcore. Its width is 7σcore, while the historical interval has width
+4. 5σm. Here σm =σref is the historical analysis resolution; it is not the fitted signal-MC core width.
+80 120 160 200 240
+Generated signal mass [MeV]
+−3
+−2
+−1
+0
+1
+2
+Offset from window center [σm]
+Window edges in historical width units
+Starter lower edge
+Starter upper edge
+Historical ±2.25
+80 120 160 200 240
+Generated signal mass [MeV]
+6
+8
+10
+12
+14
+16
+18
+20Width increase [%]
+How much wider is the starter window?
+Continuous interval
+Actual excluded bins
+Figure 28. How to read the figure. Left: the requested lower and upper offsets expressed in historical σm
+units; dashed lines show the historical offsets ± 2. 25. Offsets refer to each window’s own center. Right: percentage
+increase in total continuous width and in the actual excluded-bin width. Interior core parameters are predicted from
+neighboring signal-MC samples with the tested sample omitted, as in v6.3.7; the 80 and 240 MeV endpoints use their
+directly fitted cores. These fixed-template geometry calculations have no uncertainty bars. The analysis spectrum is
+binned, so bin counts need not increase by the continuous-width percentage.
+Mass [MeV] Lower / σm Upper / σm Wider by Old / new bins
+80 -2.86 +2.15 11.3% 17 / 18
+100 -2.92 +2.19 13.5% 19 / 21
+120 -2.91 +2.18 13.1% 21 / 23
+140 -2.89 +2.17 12.4% 25 / 27
+160 -2.88 +2.16 12.0% 28 / 31
+180 -2.87 +2.15 11.6% 31 / 35
+200 -2.94 +2.20 14.2% 36 / 41
+220 -3.00 +2.25 16.7% 41 / 48
+240 -3.08 +2.31 19.8% 47 / 55
+The requested interval is 11.3–19.8% wider continuously across this range, predominantly on the low-mass
+side. At the three original toy-test masses, 100, 160 and 220 MeV, it is 13.5%, 12.0% and 16.7% wider. A
+seven-unit interval in u is therefore much less than 56% wider than the historical interval: the units differ
+because σcore<σm.
+39
+
+HPS GPR: understanding the 2021 signal extraction v6.3.6
+Appendix I. How much signal enters GP training?
+80 120 160 200 240
+Generated signal mass [MeV]
+0
+5
+10
+15
+20
+25
+30
+35Full signal in GP training [%]
+Signal MC has more tail probability
+MC: Historical window
+Gaussian: Historical window
+MC: Starter window
+Gaussian: Starter window
+80 120 160 200 240
+Generated signal mass [MeV]
+8
+10
+12
+14
+16MC / Gaussian leakage ratio
+Compare shapes in the same bins
+Historical window
+Starter window
+Figure 29. How to read the figure. Left: full selected signal probability in GP training bins for the historical
+and starter windows. Solid curves use actual v16 TC signal MC; dashed curves use a hypothetical shifted Gaussian
+with the historical analysis width σm. Right: MC-to-Gaussian leakage ratio within the same window and recorded
+spectrum. This compares signal distributions, not the ability of a Gaussian fit to remove actual MC tails. All
+probabilities retain full selected normalization. Signal outside the background spectrum is stored separately and is
+not counted as GP training contamination. No uncertainty bars are shown; finite signal-MC and core-fit uncertainties
+are fixed in this diagnostic.
+Mass [MeV] MC old [%] MC new [%] Gaussian new [%] Reduction [pp]
+80 29.02 27.90 2.19 1.12
+100 21.77 19.99 1.39 1.77
+120 19.61 17.61 1.91 2.01
+140 17.76 16.16 1.74 1.60
+160 18.22 16.19 1.86 2.03
+180 19.51 17.06 1.66 2.45
+200 20.59 17.99 1.51 2.61
+220 22.65 19.52 1.49 3.13
+240 24.96 21.66 1.29 3.30
+The wider starter window removes an additional 1.12–3.30 percentage points (pp) of the full selected MC
+signal from GP training. Nevertheless, 16.16–27.90% remains, compared with 1.29–2.19% for a Gaussian
+in the same bins: approximately 8.7–16.8 times more leakage. For reference, an ideal continuous Gaussian
+has 2.445% outside ± 2. 25σm; actual binned masks differ slightly.
+Leakage is not the fitted-yield loss. A broad tail can enter training without being absorbed one-for-one
+into a narrow signal estimate. To measure the effect on the fit, keep its input counts fixed and change only
+the contamination of the GP training data. The next two pages implement that controlled comparison.
+40
+
+HPS GPR: understanding the 2021 signal extraction v6.3.6
+Appendix I. Fit impact on the GP mean background source
+Reuse the saved full signal-MC injections at expected yield A = 3s0, where s0 is the archived Gaussian
+background-only yield-error scale. In the control, subtract the known injected signal only from GP training
+bins. Keep the signal-fit counts, extraction template, window and kernel settings identical, then recompute
+the GP mean and covariance. This isolates the effect of contaminated training data.
+80 120 160 200 240
+Generated signal mass [MeV]
+0.6
+0.7
+0.8
+0.9
+1.0Added fitted yield / A
+Signal response with identical fitted counts
+80 120 160 200 240
+Generated signal mass [MeV]
+4
+6
+8
+10
+12Yield suppression [% of A]
+Effect of signal in GP training
+80 120 160 200 240
+Generated signal mass [MeV]
+5.0
+7.5
+10.0
+12.5
+15.0
+17.5Extra scaled yield noise [%]
+Precision penalty from contamination
+Direct MC, starter window; contaminated
+Direct MC, starter window; clean training
+Gaussian, historical window; contaminated
+Gaussian, historical window; clean training
+Figure 30. How to read the figure. Results use the GP mean background source. Lines come from deterministic
+mean-count spectra at nine masses; markers come from 100 paired saved evaluation experiments at 100, 160 and 220
+MeV. Upper panel: response R = mean( ˆAs+b − ˆAb)/A , with contaminated and clean training. Lower left: response
+loss mean( ˆAclean − ˆAcontaminated)/A . Mean bars are sample standard errors of paired responses or differences. Lower
+right: extra response-scaled background-only noise, 100(Rclean/R contaminated − 1), with 95% percentile intervals from
+2,000 whole-toy bootstrap resamples preserving masses and methods; sources use separate streams. Background-only
+fits are unchanged by the control. Blue uses direct MC extraction with the starter window; orange uses the historical
+Gaussian. Small bars can be hidden by markers. These precision changes are not upper-limit improvements. The
+table below uses the direct MC template with the starter window.
+MeV Contaminated R Clean R Yield lost [% of A] Extra noise [%; 95% interval]
+100 0.959 1.001 4. 19 ± 0. 02 4.37 [4.32, 4.41]
+160 0.950 0.997 4. 71 ± 0. 03 4.96 [4.90, 5.01]
+220 0.909 1.000 9. 13 ± 0. 05 10.05 [9.92, 10.18]
+Removing contamination restores the direct-MC response to approximately one; the measured loss is 4.2–
+9.1% of the full injected yield. The Gaussian retains a response deficit because its shape and yield convention
+do not match the MC distribution.
+41
+
+HPS GPR: understanding the 2021 signal extraction v6.3.6
+Appendix I. Fit impact on the functional form background source
+Reuse the saved full signal-MC injections at expected yield A = 3s0, where s0 is the archived Gaussian
+background-only yield-error scale. In the control, subtract the known injected signal only from GP training
+bins. Keep the signal-fit counts, extraction template, window and kernel settings identical, then recompute
+the GP mean and covariance. This isolates the effect of contaminated training data.
+80 120 160 200 240
+Generated signal mass [MeV]
+0.6
+0.7
+0.8
+0.9
+1.0Added fitted yield / A
+Signal response with identical fitted counts
+80 120 160 200 240
+Generated signal mass [MeV]
+4
+6
+8
+10
+12Yield suppression [% of A]
+Effect of signal in GP training
+80 120 160 200 240
+Generated signal mass [MeV]
+5.0
+7.5
+10.0
+12.5
+15.0
+17.5Extra scaled yield noise [%]
+Precision penalty from contamination
+Direct MC, starter window; contaminated
+Direct MC, starter window; clean training
+Gaussian, historical window; contaminated
+Gaussian, historical window; clean training
+Figure 31. How to read the figure. Results use the functional form background source. Lines come from
+deterministic mean-count spectra at nine masses; markers come from 100 paired saved evaluation experiments at 100,
+160 and 220 MeV. Upper panel: response R = mean( ˆAs+b − ˆAb)/A , with contaminated and clean training. Lower left:
+response loss mean( ˆAclean − ˆAcontaminated)/A . Mean bars are sample standard errors of paired responses or differences.
+Lower right: extra response-scaled background-only noise, 100(Rclean/R contaminated − 1), with 95% percentile intervals
+from 2,000 whole-toy bootstrap resamples preserving masses and methods; sources use separate streams. Background-
+only fits are unchanged by the control. Blue uses direct MC extraction with the starter window; orange uses the
+historical Gaussian. Small bars can be hidden by markers. These precision changes are not upper-limit improvements.
+The table below uses the direct MC template with the starter window.
+MeV Contaminated R Clean R Yield lost [% of A] Extra noise [%; 95% interval]
+100 0.957 0.999 4. 20 ± 0. 02 4.39 [4.35, 4.43]
+160 0.953 1.000 4. 76 ± 0. 02 4.99 [4.95, 5.04]
+220 0.908 1.000 9. 25 ± 0. 06 10.19 [10.04, 10.33]
+The functional form source gives similar results. Removing known injected signal is a simulation diagnostic,
+not a prescription for data or a demonstrated upper-limit gain. All 3,000 control fits, 270 deterministic
+fits and 30 replays passed. No new toy draws or upper limits were produced. Source and validation are in
+appendix_leakage/; earlier results remain unchanged.
+42
