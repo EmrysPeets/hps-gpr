@@ -1,0 +1,12 @@
+--- original_run_study.py
++++ run_study.py
+@@ -149,6 +149,9 @@
+         bootstrap='2000 whole-toy resamples; common resampling indices across policies and masses, separate source/cohort streams',
+         reference_sha256=sha(B/'inputs/window_pilot_reference.json'),templates_sha256=sha(B/'scripts/templates.py'),
+         null_sha256=sha(B/'inputs/null_2021.npz'),script_sha256=sha(__file__))
++    # JSON stores tuple-valued intervals as lists. Compare the canonical JSON
++    # representation so a valid frozen protocol remains resumable after reload.
++    obj=json.loads(json.dumps(obj))
+     path=B/'provenance/toy_protocol.json'
+     if path.exists(): assert json.loads(path.read_text())==obj,'Frozen protocol changed'
+     else:write(path,obj)

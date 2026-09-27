@@ -1,0 +1,312 @@
+\subsection{A numerical boost example}
+For a 90 MeV parent carrying the 2016 beam energy, $E_A=2.30$ GeV,
+Eq.~\eqref{v571:boost} gives $\gamma=25.556$ and $\beta=0.999234$.
+At equal sharing, $E_+=E_-=1150$ MeV, $p_*=44.997$ MeV and
+$p_{z,+}=p_{z,-}=1149.119$ MeV. Each daughter is therefore at
+$\theta=39.138$ mrad to the beam; the opening angle is 78.276 mrad.
+Rotating the decay azimuth changes its vertical projection while preserving
+the pair mass and polar opening. This is why a mass alone does not determine
+whether an event crosses the active silicon.
+
+For comparison, the nominal 15 mrad vertical design angle gives, in the
+equal-sharing vertical plane at $x=1$ and neglecting $m_e$,
+\begin{equation}
+ m_{15}\simeq E_{\rm beam}\sin(0.015)
+   =\left(15.84,\ 34.50,\ 56.10\right)\ {\rm MeV}
+ \label{v571:fifteen-mrad-reference}
+\end{equation}
+for 2015, 2016 and 2021, respectively. These are reference mass scales;
+the 15 mrad gap alone provides no upper mass cutoff.
+
+\section{Detector geometry, fields and hit selection}
+\label{v571:geometry}
+The beam energies are 1.056, 2.30 and 3.74 GeV for 2015, 2016 and 2021,
+respectively~\cite{v571:HPS2022,v571:HPS2015,v571:HPS2016}.
+The detector input is the committed LCDD geometry in
+\texttt{JeffersonLab/hps-java}, fixed to revision
+\texttt{473c732d}~\cite{v571:geometry-source}; the complete identifier is saved
+in the source manifest.
+LCDD contains the active sensor solids and their complete placement hierarchy.
+The corresponding compact XML and Java geometry definitions are retained as
+supporting sources; a fresh rebuild of those definitions is not assumed to
+reproduce the committed alignment exactly.
+
+The selected configurations are
+\texttt{HPS-EngRun2015-Nominal-v6-0-fieldmap},
+\texttt{HPS-PhysicsRun2016-Pass2} and
+\texttt{HPS\_Run2021Pass2FEE}. The first is a representative nominal
+engineering-run configuration. The second appears in local HPSTR radiative-MC
+filenames. The third is explicitly selected by the local 2021 HPSTR simulation
+job list, with run 14166 and target $z=0$. Exact alignment and selection
+equivalence to the three observed histograms has not been established.
+
+The extracted geometries contain 36, 36 and 40 active silicon rectangles.
+Standard sensors have active dimensions
+$38.3399\times98.33\times0.32$ mm. The first two 2021 stations instead use
+$14.025\times30\times0.20$ mm sensors. There are six station pairs in the
+engineering-run layouts and seven in 2021. In the 2021 file, the first station
+corresponds to the added physical L0; its axial and stereo planes are staggered,
+as are the top and bottom planes. The earliest sensor centers lie near
+$z=38$ mm in 2021 and $z=88$ mm in the older layouts. A nominal station
+distance of 50 or 100 mm therefore does not specify every active-plane position.
+
+\subsection{Coordinates and hit requirements}
+The parent boost in Section~\ref{v571:kinematics} is defined in the beam frame.
+The compact geometries specify a beam angle $\alpha=0.03052$ rad. We rotate
+the daughter momenta into the LCDD frame using the sign convention of
+\texttt{hps-mc}~\cite{v571:beam-coords}:
+\begin{equation}
+ \begin{pmatrix}p_X\\p_Y\\p_Z\end{pmatrix}
+ =\begin{pmatrix}\cos\alpha&0&\sin\alpha\\0&1&0\\-\sin\alpha&0&\cos\alpha\end{pmatrix}
+ \begin{pmatrix}p_x\\p_y\\p_z\end{pmatrix}.
+ \label{v571:beam-rotation}
+\end{equation}
+The parent direction is consequently $(\sin\alpha,0,\cos\alpha)$.
+The model vertex is $(0,0,0)$ mm. No physical target solid was found in these
+LCDD snapshots; the origin is a stated nominal-vertex assumption, with only
+the 2021 target-$z$ choice directly supported by the cited local job list.
+
+The main curves apply the run-dependent hit requirements in
+Table~\ref{v571:hit-selection}, using the geometrical hit counts defined in
+Eq.~\eqref{v571:hit-counts}. A paired 3D point requires an axial and a stereo
+crossing in the same detector half. A 2D count requires only the individual
+view. The hole and slot sensors within one view remain alternatives.
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{@{}l>{\raggedright\arraybackslash}p{3.9cm}>{\raggedright\arraybackslash}p{3.3cm}>{\raggedright\arraybackslash}p{4.0cm}@{}}
+\toprule
+Run & Positron & Electron & Selection provenance\\
+\midrule
+2015 & $N_{\rm 3D}\geq5$ of 6; paired hits in L1 and L2
+     & $N_{\rm 3D}\geq5$ of 6
+     & Internal note and local v5.0.4 convention~\cite{v571:internal2015,v571:note504}\\[3pt]
+2016 & $N_{\rm 3D}\geq5$ of 6
+     & $N_{\rm 3D}\geq5$ of 6
+     & Published 2016 selection, Sec.~III.2.2~\cite{v571:HPS2016}\\[3pt]
+2021 & $N_{\rm 2D}\geq10$ of 14
+     & $N_{\rm 2D}\geq8$ of 14
+     & Current analysis specification supplied for this study\\
+\bottomrule
+\end{tabular}
+\caption{Hit requirements implemented for the main geometric curves.
+The 2015 inner-station requirement is charge dependent; no additional
+mandatory inner station is imposed for 2016 or 2021. The 2021 counts are
+individual 2D plane hits, not paired 3D points.}
+\label{v571:hit-selection}
+\end{table}
+
+For 2015, the internal note specifies five of six tracking points on PDF
+page~11 and the positron inner-layer condition in Table~3 on PDF page~12;
+the local v5.0.4 selection follows this convention. The published 2015
+search instead required both tracks to have hits in the first two
+layers~\cite{v571:HPS2015}. The present comparison therefore follows the
+stated local-analysis convention. The 2021 row adopts the current specified
+hit counts, superseding the older 2021 statements in the v5.0.4 snapshot.
+Equivalence between this row and the selections of the saved 2021 data
+histogram has not been established.
+
+Solid curves use these selected-hit requirements with magnetic transport at
+$x=1$; dashed curves use the same requirements at $x=0.8$. Grey dotted curves
+give the corresponding $x=1$ zero-field calculation. A faint dash--dotted
+reference requires both views in every station with the field present:
+all six stations for 2015/2016 or all seven for 2021.
+
+\subsection{Field maps and numerical propagation}
+\label{v571:field-model}
+The field tables are taken from \texttt{JeffersonLab/hps-fieldmaps} at
+revision \texttt{feadfcbd}, with the full identifiers and file hashes saved
+in the input manifest~\cite{v571:fieldmaps}. The 2015 calculation adopts
+the corrected-unfolding v3 map with scale 0.7992. Its compact detector
+definition has the same non-field geometry content as the original
+configuration, but no separately generated v3 LCDD is provided; the original
+committed sensor transforms are therefore retained. The 2016 calculation
+uses the scale-1.04545 v4 map explicitly referenced by the selected Pass2
+detector.
+
+For 2021, the scale-1.07326 map is documented for physics data at 3.742 GeV.
+We combine it with the retained Pass2FEE sensor geometry and use the nominal
+rounded beam energy of 3.74 GeV. This is an explicit combination of a
+physics-data field and the selected sensor snapshot. It is not an assertion
+that the Pass2FEE alignment equals the data configuration: the same sensor
+names and sizes occur in the data-map detector, but their positions and
+orientations differ. Exact alignment and histogram-selection equivalence
+remain unverified.
+
+All three maps use 5 mm grid spacing and the world offset
+$\boldsymbol r_{\rm off}=(21.17,0,457.2)$ mm. The map is queried at
+$\boldsymbol r-\boldsymbol r_{\rm off}$, and each component is interpolated
+trilinearly. The raw field values are multiplied by 1000 to obtain tesla,
+as verified against both the LCDD/SLIC and Java field readers~\cite{v571:fieldreaders}.
+The table components already refer to the detector axes; they receive no
+additional beam rotation or sign change. The central $B_Y$ values at the
+map origin are approximately $-0.240245$, $-0.5234$ and $-0.8596$ T,
+respectively. The map origin is not the target.
+
+Equation~\eqref{v571:magnetic-equations} is integrated with fourth-order
+Runge--Kutta steps in path length. The maximum step is 5 mm, reduced when
+necessary to limit the estimated angular change to 0.01 rad:
+\begin{equation}
+ h\leq\min\!\left(5\ {\rm mm},\,
+           \frac{0.01\,|\boldsymbol p|}{\kappa B_{\max}}\right).
+ \label{v571:transport-step}
+\end{equation}
+Sensor crossings are located on a cubic Hermite interpolation of each step,
+with a normal-plane residual tolerance of $10^{-7}$ mm before the finite-face
+bounds are applied. A zero field is used outside the tabulated grid, matching
+the source readers. All active sensor corners lie inside the transverse
+map bounds and upstream of the stopping plane $Z=940$ mm. Propagation stops
+at that plane, at the first nonpositive $u_Z$, or on an outward transverse
+exit from the grid. Thus the calculation follows forward tracks; it does
+not include later crossings by trajectories that turn back in $Z$.
+
+\subsection{Zero-field projected mass scales}
+\label{v571:projected-scales}
+For comparison with the nominal angular picture, each active rectangle can
+be projected onto vertical position $Y$ and distance along the beam
+$\ell=\boldsymbol r\cdot(\sin\alpha,0,\cos\alpha)$.
+The extrema of $Y/\ell$ over its four corners define a zero-field projected
+slope interval.
+The same sensor unions and the selected-hit criteria in
+Table~\ref{v571:hit-selection} are then applied in this projection to
+symmetric upper and lower rays. Both charge assignments are tested, and the
+accepted intervals are combined by union. Table~\ref{v571:scales}
+converts the resulting angular interval into an equal-sharing mass scale using
+Eq.~\eqref{v571:equal-sharing-mass} at $x=1$.
+
+\begin{table}[H]
+\centering\small
+\input{\vFiveSevenRoot/tables/geometry_table.tex}
+\caption{Zero-field projected vertical aperture of the selected LCDD geometry with the
+run-dependent hit requirements of Table~\ref{v571:hit-selection}.
+The angular scan spacing is 0.002 mrad. These are
+equal-sharing mass scales in a two-dimensional projection. They are not the
+mass endpoints of the full geometry with magnetic transport.}
+\label{v571:scales}
+\end{table}
+
+The projected intervals are approximately 17.27--72.24 MeV for 2015,
+37.54--157.50 MeV for 2016 and 54.50--348.53 MeV for 2021. Their angles and
+mass scales depend on finite plane offsets, staggering and the specified hit
+counts. In particular, the 2021 requirement permits missed individual views;
+it does not force a hit in every station. A zero-field ray at an interval
+edge can miss some sensor faces while satisfying the projected hit criterion.
+These scales remain a separate angular reference; the following display
+uses accepted curved trajectories from the full calculation.
+
+Projection also removes horizontal gaps. This is a substantive limitation,
+not merely a drawing convention. For example, a zero-field ray in the exact
+vertical beam plane runs near $X=15$ mm at the fourth 2015 station, between
+the axial hole sensor ending near 13.7 mm and the slot sensor starting near
+16.3 mm. Such a ray can lie inside the projected vertical interval while
+missing active silicon. The full three-dimensional calculation retains this
+seam and propagates each charge through the field before testing a crossing.
+
+\subsection{Sampled magnetic response}
+\label{v571:sampled-response}
+The selected-hit magnetic curves have sampled maxima at 40, 90 and 195 MeV,
+with fractions approximately 26.09\%, 25.95\% and 40.11\%, respectively.
+Table~\ref{v571:magnetic-summary} records the first and last sampled masses
+with a passing orientation. The examples in the following display are
+chosen from those passing events. A finite mass grid and a finite set of
+orientations cannot establish a physical acceptance endpoint.
+
+
+
+\clearpage
+\begin{landscape}
+\section{Detector geometry and example trajectories}
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{\vFiveSevenRoot/figures/HPS_v5p7p1_geometry_illustration.pdf}
+\caption{Standalone three-column display of active sensor faces and
+accepted electron--positron trajectories in the field. Each panel shows
+examples at the first and last mass with a nonzero selected fraction on
+the saved mass and orientation grid. These are passing examples, not
+physical acceptance endpoints. The nominal 15 mrad equal-sharing scale is
+shown as an angular reference. Sensor staggering and horizontal gaps enter
+the full three-dimensional crossing test; a passing track need not hit
+every station. Transverse display scales are expanded for clarity. The
+detector and field configurations are those specified above. The display
+is supplied separately as vector PDF/SVG and PNG.}
+\label{v571:geometry-figure}
+\end{figure}
+\begin{table}[H]
+\centering\small
+\input{\vFiveSevenRoot/tables/magnetic_table.tex}
+\caption{Magnetic response at $x=1$ with the run-dependent hit criteria.
+The field is quoted at the map origin. The nonzero sampled-mass interval
+and peak refer to the saved 5 MeV mass grid with 4096 decay orientations;
+they are not exact kinematic limits or a calibrated efficiency.}
+\label{v571:magnetic-summary}
+\end{table}
+\end{landscape}
+\clearpage
+\section{Acceptance curves and selected mass spectra}
+\label{v571:results}
+The upper row of Fig.~\ref{v571:overview} integrates the finite-sensor test
+after magnetic transport over the daughter decay orientation. The calculation
+uses 4096 deterministic Sobol points at each mass, with 5 MeV spacing. The
+panels extend to 250, 550 and 950 MeV for 2015, 2016 and 2021, respectively.
+The zero-field comparison uses the same hit requirements and parent energy.
+
+The all-station reference is more restrictive. The $x=0.8$ curves show how
+the response changes when the same mass has a smaller boost.
+Events outside the projected mass interval can still cross the full geometry
+at other azimuths or with unequal sharing. Neither the interval in
+Table~\ref{v571:scales} nor the first or last nonzero sampled mass should be
+used as an absolute acceptance threshold. The finite mass grid also does not
+prove zero support between or beyond sampled points.
+
+The bottom row retains the original selected-pair spectra in 1 MeV bins:
+2015 full, 2016 full and 2021 10\%. Their displayed integrals are 21,442,838,
+73,218,251 and 141,305,897 pairs. The display starts at 15, 30 and 36 MeV,
+respectively, and ends at 300 MeV. The 2015 input ends at 150 MeV; its grey
+region denotes unavailable bins. The samples have no exposure or luminosity
+rescaling, and their selections differ. Their shapes therefore provide
+observational context, not a validation of the signal geometry fractions or
+an absolute production rate.
+
+\subsection{Validation and scope}
+The calculation now uses the sensor sizes, orientations, staggering,
+horizontal seams and beam rotation encoded by the detector files, together
+with the specified magnetic fields and hit criteria. It preserves
+exact two-body kinematics, including the electron mass, while using the
+specified relativistic transverse-vector angular law. Geometry transforms and
+the boost were checked independently. Both charge signs reproduce analytic
+circular motion in a uniform field; zero-field transport reproduces the
+direct ray-intersection hit counts for 1024 test orientations per year.
+Using steps of 5, 2.5 and 1.25 mm gives identical selected-event classifications
+for 1024 orientations at one representative mass per year: 58.08, 126.5 and
+205.7 MeV. Doubling the orientation sample from 4096 to 8192 at three masses
+per year changes the selected-hit or all-station fractions by at most
+0.002371, less than 0.238 percentage point. These are sampled numerical
+checks, not a bound on the error at every mass or a detector-model uncertainty.
+Count-preserving histogram checks also passed.
+
+Material interactions, hit-finding efficiency, dead channels, beam spot,
+the parent production spectrum and angular distribution, trigger,
+reconstruction, other kinematic and analysis cuts, and displaced decays
+remain outside this study. In particular, no integration over the produced
+$A'$ energy or direction distribution is performed. The result is a
+conditional geometry-and-field acceptance for the stated hit requirements,
+not a calibrated HPS signal efficiency or a prediction of accepted yield.
+
+\clearpage
+\begin{landscape}
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{\vFiveSevenRoot/figures/HPS_v5p7p1_response_spectra.pdf}
+\caption{Both-daughter fractions after transport through the active sensor
+geometry (upper panels) and raw selected-pair densities (lower panels).
+Solid and dashed curves apply the run-dependent hit criteria in
+Table~\ref{v571:hit-selection} with the field present at $x=1$ and $x=0.8$,
+respectively. Grey dotted curves give the selected-hit zero-field reference
+at $x=1$; faint dash--dotted curves require all station pairs with the field
+present at $x=1$. The parent energy is $E_A=xE_{\rm beam}$.
+These panels and Fig.~\ref{v571:geometry-figure} are also supplied
+together as the requested standalone $3\times3$ overview. They are separated
+here to preserve label legibility on the page.}
+\label{v571:overview}
+\end{figure}
+\end{landscape}

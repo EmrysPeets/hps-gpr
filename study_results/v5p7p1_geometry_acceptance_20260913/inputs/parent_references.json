@@ -1,0 +1,66 @@
+{
+  "study": "v5.7",
+  "checked_date": "2026-09-13",
+  "claim_status": "conditional_angular_model_not_calibrated_detector_acceptance",
+  "references": [
+    {
+      "id": "HPS2022",
+      "title": "The Heavy Photon Search Experiment",
+      "url": "https://arxiv.org/abs/2203.08324",
+      "locator": "Table I; detector upgrade description",
+      "supports": "Beam energies 1.056, 2.30, 3.74 GeV; upgraded tracker and positron hodoscope in physics runs",
+      "crosscheck": "Existing v5.5 source ledger supplied by Study beam-energy scaling; original 2015 and 2016 papers plus HPS run wiki independently checked"
+    },
+    {
+      "id": "HPS2015",
+      "title": "Search for a Dark Photon in Electro-Produced e+e- Pairs with the Heavy Photon Search Experiment at JLab",
+      "url": "https://arxiv.org/abs/1807.11530",
+      "locator": "PDF page 2",
+      "supports": "Original 2015 beam energy 1.056 GeV",
+      "caution": "Do not replace with inconsistent retrospective 1.03 GeV in the later 2016 paper"
+    },
+    {
+      "id": "HPS2016",
+      "title": "Searching for Prompt and Long-Lived Dark Photons in Electro-Produced e+e- Pairs with the Heavy Photon Search Experiment at JLab",
+      "url": "https://arxiv.org/abs/2212.10629",
+      "locator": "PDF pages 2 and 5",
+      "supports": "2.3 GeV beam; active first-layer edge 1.5 mm at 10 cm corresponds to 15 mrad",
+      "caution": "Passive 0.5 mm edge is not active acceptance"
+    },
+    {
+      "id": "HPSTest",
+      "title": "The Heavy Photon Search Test Detector",
+      "url": "https://arxiv.org/abs/1406.6115",
+      "locator": "Shared HPS/test-detector key design requirements",
+      "supports": "Historical forward acceptance requirement approximately 15-70 mrad",
+      "caution": "70 mrad polar cap is an explicit study assumption, not established as the full run-dependent detector boundary"
+    },
+    {
+      "id": "HPSRunWiki",
+      "title": "The HPS Run Wiki",
+      "url": "https://wiki.jlab.org/hps-run/index.php/The_HPS_Run_Wiki",
+      "supports": "2021 3.74 GeV cross-check"
+    },
+    {
+      "id": "HPS2021Trigger",
+      "title": "Kubarovsky HPS trigger presentation, 15 November 2021",
+      "url": "https://indico.jlab.org/event/496/contributions/9081/attachments/7389/10202/Kubarovsky_2021_11_15_HPS_trigger.pdf",
+      "locator": "Slide 4",
+      "supports": "Additional signal-mass/acceptance and trigger context",
+      "caution": "Not digitized, calibrated or used for the plotted model fractions"
+    }
+  ],
+  "local_review": {
+    "hpstr_root": "/Users/emryspeets/Desktop/recoil_project/source/hpstr/src/hpstr",
+    "hpstr_git_commit": "ca2254be056a92bd6d186d82a01075b7a9b56d90",
+    "radiative_scripts": [
+      "plotUtils/reach/simps22/2016_reach/makeComponents/makeTotRadAcc.py",
+      "plotUtils/reach/simps22/2021_reach/makeComponents/makeTotRadAcc.py"
+    ],
+    "disposition": "Not used: SIMP control selections and SLIC-level MC denominators; underlying remote inputs and equivalence to selected data unverified; no matched 2015 curve established",
+    "svt_draft": "/Users/emryspeets/Desktop/summer_26/hps-svt-paper-main/Silicon_Vertex_Tracker_NIM___2026/design.tex",
+    "svt_locator": "Layout table and vertical acceptance description",
+    "svt_caution": "Draft includes placeholders; incorrect 5 mm layer-0 statement in outlook.tex not used. Published upgrade distance is 5 cm."
+  },
+  "base_repository_commit": "6daadf48d9e56b896cfaf821be137b07ceebd781"
+}

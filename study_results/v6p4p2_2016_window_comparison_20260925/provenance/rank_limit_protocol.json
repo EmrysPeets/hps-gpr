@@ -1,0 +1,45 @@
+{
+  "calibration_toys": 200,
+  "strength_grid": [
+    0.0,
+    0.5,
+    1.0,
+    2.0,
+    3.0,
+    4.0,
+    5.0,
+    6.0,
+    8.0,
+    10.0,
+    12.0,
+    16.0
+  ],
+  "targets": [
+    [
+      "2016",
+      91
+    ],
+    [
+      "2016",
+      69
+    ],
+    [
+      "combined",
+      68
+    ]
+  ],
+  "reference_scales_psi": {
+    "2016_91": 284.6278593472467,
+    "2016_69": 254.5896380465361,
+    "combined_68": 158.3494634432782
+  },
+  "reference_scale": "Gaussian baseline Hessian error on fixed GPmean-source counts, independent of observed fitted yield",
+  "source": "Full neighboring MC for2016 and2021, retained Gaussian2015; shared psi normalization. Independent Poisson signal categories including both support losses; nested increments and paired backgrounds across extraction methods.",
+  "ordering": "p_psi=(1+count(calibration fitted psi <= observed fitted psi))/201; accept if >0.10; retain all grid points, holes, empty and censor flags",
+  "seed": 641250925,
+  "background_namespace": 2,
+  "signal_namespace": 3,
+  "scope": "Pointwise conditional grid inversion on a fixed estimated background source; no coverage guarantee or global significance",
+  "script_sha256": "bc631d7a34e7292585d6f23b3d170ab00f26ae1f29652b384a1731a98070b5e8",
+  "observed_protocol_sha256": "7fefe0fcc9e49a6ba0fec579357e5da194b00c45516aa6c1b0c68c685b56e4dc"
+}

@@ -1,0 +1,35 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[margin=0.7in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,amsmath,amssymb,graphicx,array,booktabs,caption,pdflscape,float,microtype,xcolor,hyperref}
+\hypersetup{colorlinks=true,linkcolor=blue!50!black,urlcolor=blue!50!black,citecolor=blue!50!black,
+pdftitle={HPS v5.7.1: Magnetic transport and dark-photon acceptance}}
+\setlength{\parskip}{5pt}
+\setlength{\parindent}{0pt}
+\captionsetup{font=small,labelfont=bf}
+\newcommand{\vFiveSevenRoot}{.}
+\begin{document}
+{\Large\bfseries Magnetic transport and dark-photon acceptance in HPS}\par
+{\large HPS-GPR v5.7.1}\par
+13 September 2026
+
+The opening angles of an $A'\to e^+e^-$ decay decrease as its laboratory
+energy increases. This shifts the mass scale at which the daughter tracks
+enter a forward spectrometer. The calculation below connects that boost to
+the active silicon geometry and magnetic fields for representative 2015,
+2016 and 2021 HPS configurations. The electron and positron are propagated
+through the field maps and tested against finite sensor faces using the
+run-dependent hit requirements. This replaces the assumed 70 mrad outer
+angle of v5.7.0 with a calculation of curved tracks through the detector.
+
+The resulting fractions describe prompt decays at a fixed parent energy and
+direction. They include magnetic transport and the hit component of the
+selection; material interactions, hit finding, trigger, reconstruction and
+other analysis cuts remain outside the calculation. Zero-field curves are
+retained to show the effect of bending. The equations and detector assumptions
+precede the figures so this section can be inserted into a longer analysis note.
+
+\input{acceptance_section.tex}
+\clearpage
+\input{references.tex}
+\end{document}

@@ -1,0 +1,98 @@
+{
+  "review_scope": "2021 fixed-source input identities, raw ordering, positive-part convention, and field covariance normalization; no new fits or toys",
+  "input_hashes": {
+    "scan_maximum/inputs/2021.npz": "3e444bc3387a3074dca8cad396a0b1089e2dceb9891e7da5f811cf94565c52d4",
+    "residual_diagnostic/inputs/null_2021.npz": "306a915b9ba6230aafbe058c94438c6af11f85b60d68f5aae4ebbfec4d4a9424",
+    "residual_diagnostic/inputs/spectrum_2021.npz": "fd4867a7e2df69d88d62cdaaed133096d015371e2fe5bd700596f411c8437294"
+  },
+  "shape": {
+    "D": [
+      1626,
+      401
+    ],
+    "K": [
+      401,
+      401
+    ],
+    "validation": [
+      256,
+      401
+    ],
+    "masses": [
+      401
+    ],
+    "gaussian_raw_maximum": [
+      200000
+    ]
+  },
+  "checks": {
+    "D_norm_is_s": true,
+    "saved_K_is_correlation_not_covariance": true,
+    "K_unit_diagonal": true,
+    "source_observed_counts_equal_v505": true,
+    "source_edges_equal_v505": true,
+    "slide50_grid_half_MeV": true,
+    "all_training_means_positive": true
+  },
+  "covariance_identity_max_abs_error": 1.887379141862766e-15,
+  "field_domain_MeV": [
+    50.0,
+    250.0
+  ],
+  "source_support_MeV": [
+    36.0,
+    299.75
+  ],
+  "bin_width_MeV": [
+    0.6249999999999312,
+    0.6250000000000977
+  ],
+  "source_min_mean": 4381.299311240344,
+  "mass_resolution_GeV_range": [
+    0.0019941875000000003,
+    0.006871687500000001
+  ],
+  "peak_illustration": {
+    "selection": "mass chosen by observed scan maximum; local diagnostics here are illustrative, not preselected tests",
+    "mass_MeV": 78.0,
+    "raw_signed_root": 2.8086449751973337,
+    "conventional_local_p": 0.0024875238350728743,
+    "a_Asimov": 0.5767835900382478,
+    "s_response": 0.9800248467244218,
+    "raw_toy_mean": 0.5479745063785779,
+    "raw_toy_sd": 1.0116877337583765,
+    "mean_minus_a": -0.028809083659669832,
+    "mean_minus_a_SE": 0.06323048335989853,
+    "response_conditional_marginal_tail": 0.011382611868743077,
+    "Gaussian_global_k": 50183,
+    "Gaussian_global_N": 200000,
+    "Gaussian_global_addone": 0.25091874540627296,
+    "Poisson_global_k": 57,
+    "Poisson_global_N": 256,
+    "Poisson_global_CP95": [
+      0.17321843495708902,
+      0.27863935609143664
+    ],
+    "Poisson_fixed_mass_k": 2,
+    "Poisson_fixed_mass_CP95": [
+      0.0009475342881075703,
+      0.027934914204054754
+    ],
+    "Gaussian_fixed_mass_expected_positive_part": 0.7451887768448752,
+    "direct_fixed_mass_mean_positive_part": 0.7478678064595679
+  },
+  "zero_mean_unit_variance_reference": {
+    "E_signed_root": 0.0,
+    "E_positive_part": 0.3989422804014327,
+    "E_q0": 0.5,
+    "positive_part_atom_at_zero": 0.5,
+    "interpretation": "Positive upward-excess mean and positive scan maximum occur under a perfectly centered null and are not evidence of fixed-mass estimator bias."
+  },
+  "claims_not_established": [
+    "unconditional source calibration",
+    "confidence-limit coverage",
+    "validity of all kernel/support choices",
+    "absence of all implementation errors"
+  ],
+  "passed": true
+}

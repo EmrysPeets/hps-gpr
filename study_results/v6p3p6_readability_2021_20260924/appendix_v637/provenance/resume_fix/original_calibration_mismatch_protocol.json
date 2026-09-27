@@ -1,0 +1,37 @@
+{
+  "version": "6.3.7",
+  "purpose": "Frozen interpolation-mismatch diagnostic, no window optimization",
+  "source": "gp_mean",
+  "calibration_signal": "Omitted-mass predicted common or neighboring full-selected MC CDF",
+  "evaluation_signal": "Independent direct full selected TC MC at the omitted mass",
+  "masses": [
+    100,
+    160,
+    220
+  ],
+  "policies": [
+    "common_starter",
+    "morph_starter"
+  ],
+  "calibration_toys": 100,
+  "grid": [
+    0.0,
+    0.5,
+    1.0,
+    2.0,
+    3.0,
+    4.0,
+    5.0,
+    6.0,
+    8.0,
+    10.0,
+    12.0,
+    16.0
+  ],
+  "background_seed": "[master,4,0,0,toy]",
+  "signal_seed": "[master,4,policy_index+1,mass,toy]",
+  "protocol_sha256": "8c19db771355d10ae7628190022ab8c27d6e100ac6de1a22c2d0068596fa53ff",
+  "script_sha256": "d4c13f5fe336fb89bd630762b476a5fbfa80bc57127f6cdad5c5d7f734b21637",
+  "inference": "p_A=(1+# calibration Ahat<=evaluation Ahat)/101; accept p_A>0.1",
+  "endpoint_convention": "Median largest accepted grid value among nonempty sets; report empty and censor counts alongside; no interpolation"
+}

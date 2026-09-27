@@ -1,0 +1,37 @@
+{
+  "version": "5.6.1",
+  "date": "2026-09-13",
+  "parent": "v5.6.0",
+  "scenarios": 15,
+  "existing_toys_per_scenario": 20,
+  "new_toys": 0,
+  "workers": 1,
+  "blas_threads": 1,
+  "CL": 0.9,
+  "method": "profiled Poisson plus GP-Gaussian constraint; bounded tilde-q_mu asymptotic CLs",
+  "kernel": "Source-specific archived coordinates; stable positive eigenspace SVD; fresh conditioning for every spectrum and mass",
+  "mass_grids_MeV": {
+    "one": [
+      53,
+      250,
+      1
+    ],
+    "ten": [
+      50,
+      250,
+      1
+    ]
+  },
+  "deterministic_spectra": [
+    "background_asimov",
+    "matched_asimov",
+    "yield_asimov"
+  ],
+  "echo_ratio": "A90 injected / A90 background Asimov at identical tested mass; same as frozen-density epsilon2 ratio",
+  "echo_search": "Each flank2\u20138 injected resolution widths from m0 within saved mass grid. Deepest local minimum preferred; boundary/global minimum if no local minima, explicitly flagged.",
+  "echo_extent_threshold": 0.9,
+  "toy_echo": "Minimum ratio in the same predeclared flank; retain full20 location and depth distributions, not calibrated uncertainty intervals",
+  "conversion": "Standard prompt-density conversion using each tested spectrum fractional overlap within +/-1.64sigma in0.625MeV bins; fixed-background-density version also saved; inherited frad_effective .0477; electron branching inverse includes open dimuon channel once",
+  "prediction_freeze": "Defined before extension scans and before accessing any observed100% histogram",
+  "claim": "Conditional simulated upper-limit shapes; no full-observed2021data used, unblinding decision or probability of real echoes inferred"
+}

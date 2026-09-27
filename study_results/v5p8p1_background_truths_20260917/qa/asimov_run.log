@@ -1,0 +1,36 @@
+mass 40 elapsed 0.1
+mass 50 elapsed 0.7
+mass 60 elapsed 1.1
+mass 70 elapsed 1.7
+mass 80 elapsed 2.2
+mass 90 elapsed 2.7
+mass 100 elapsed 3.2
+mass 110 elapsed 3.7
+mass 120 elapsed 4.2
+mass 130 elapsed 4.7
+mass 140 elapsed 5.1
+mass 150 elapsed 5.7
+mass 160 elapsed 6.2
+mass 170 elapsed 6.8
+mass 180 elapsed 7.3
+{
+  "passed": false,
+  "truths": [
+    "archived_stress",
+    "gp_full_nominal",
+    "gp_full_half_ls",
+    "gp_blocked",
+    "regional_rise_fall"
+  ],
+  "scan_rows": 710,
+  "injection_rows": 60,
+  "minimum_injection_recovered_fraction": 0.9555830757151917,
+  "maximum_injection_recovered_fraction": 0.9900792876299938,
+  "maximum_score": 5.431294951563359e-07,
+  "elapsed_seconds": 7.2800125829999995,
+  "global_calibration": false
+}
+Traceback (most recent call last):
+  File "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v5p8p1_background_truths_20260917/scripts/evaluate_truths.py", line 43, in <module>
+    write(B/'inputs/asimov_manifest.json',{str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in paths});print(json.dumps(qa,indent=2));assert qa['passed']
+AssertionError

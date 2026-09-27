@@ -1,0 +1,69 @@
+{
+  "status": "Read-only independent historical replay and fixed-union controls; objective values, not calibrated significances",
+  "reference_mass_MeV": 92,
+  "historical_common": {
+    "Q": 6.351691415012539,
+    "sqrtQ": 2.5202562201118637,
+    "epsilon2": 3.096134969039444e-06,
+    "bins": [
+      86,
+      68,
+      17
+    ],
+    "delta_D_to_independent": 11.552480746463687
+  },
+  "historical_energy_fitted": {
+    "beta": -2.903584573683431,
+    "Q": 17.747433351794456,
+    "sqrtQ": 4.212770270474579,
+    "delta_Q_from_common": 11.395741936781917,
+    "source": "same-experiment parent common Q plus parent rate_response delta_D_common_to_rate; original common replay verified exactly"
+  },
+  "union_historical_density_common": {
+    "Q": 6.017959651375975,
+    "sqrtQ": 2.453153002031462,
+    "epsilon2": 3.1087103724075574e-06,
+    "bins": [
+      102,
+      84,
+      24
+    ]
+  },
+  "union_MC_density_common": {
+    "Q": 5.9860594897805015,
+    "sqrtQ": 2.446642493250802,
+    "epsilon2": 3.101680404892682e-06,
+    "bins": [
+      102,
+      84,
+      24
+    ]
+  },
+  "historical_MC_density_common": {
+    "Q": 6.318959940939578,
+    "sqrtQ": 2.513754152843825,
+    "epsilon2": 3.0893425177156604e-06,
+    "bins": [
+      86,
+      68,
+      17
+    ]
+  },
+  "MC92_over_historical_scaled92_conversion": {
+    "2015": 0.9671643248608416,
+    "2016": 0.9966972100052035,
+    "2021": 1.0002999850427314
+  },
+  "interpretation": [
+    "Union conditioning excludes the enlarged union from GP training; it is frozen within this study, but differs from the historical moving mask.",
+    "The historical/new common root difference is mainly geometry and GP conditioning, with a smaller prompt-density conversion change.",
+    "MC t=0 is nested in penalized width profiling; an unpenalized scaled control is not the same objective as setting all t=1 in that profile.",
+    "Rate nesting holds within one mean/width/penalty family; historical and union absolute NLL values must not be compared."
+  ],
+  "input_sha256": {
+    "scripts/fit_models.py": "b5ea4384c00d17c06e0dbcd0d67a768ba74fc840081b523c788fd897b6241b67",
+    "derived/fits.csv": "47e0b380977eafd174a4bcfc4da03f762597f236ef113e0e82a132470242ca60",
+    "derived/individual_shape_grid.csv": "47c44bacf3ed986e382f17cbe2acc7cb8984bb07e21c1805198f789b7ed42732",
+    "inputs/rate_response.json": "ec9e9f770756c7ad037b88aa45b5fa83d8cb104328daa1ce417b949bd0f3d36d"
+  }
+}

@@ -1,0 +1,83 @@
+\clearpage
+\section{What the Figure 12 curves represent}\label{sec:MCpoints}
+The colored curves are the ten native reconstructed-MC histograms,
+normalized and plotted as connected bin densities. The local Gaussian
+plus affine-pedestal fit supplies only $c$ and $\sigma_{\rm core}$;
+it does not supply their line shapes. In the standardized panels, a
+piecewise-linear CDF through the native 0.1~MeV histogram edges is
+integrated into bins of width $\Delta u=0.02$. This is empirical
+rebinning, with uniform density within each original bin, rather than
+an analytic signal parameterization. The dashed black curve is a
+separate candidate: the equal-mass mean of these standardized shapes.
+
+\fig{.53}{../figures/MC_points_vs_figure12.pdf}{Direct MC-point overlays
+for the outlying 60~MeV sample and a representative 160~MeV sample.
+Top: full-normalized native empirical curves and counts summed into
+2~MeV bins. Bottom: exactly the standardized empirical curves of
+Figure 12 and direct sums into 0.2~MeV bins, both conditioned
+on $|u|<2$. Horizontal bars show bin widths; vertical bars show
+$\sqrt{\sum w^2}$ with the display normalization held fixed. The dashed
+common shape is shown separately. Points are bin averages; the curve
+must be integrated over the same bins for an exact comparison.}
+
+The native curves agree with the MC points by construction: the
+largest difference between a direct bin sum and the corresponding
+CDF integral is below $10^{-9}$ candidates. This verifies the plotted
+representation, not an independent goodness of fit; no fit probability
+is assigned to that identity. The common-shape candidate need not
+agree with each sample, and the held-out tests above assess that
+separate question. The plot and all underlying counts are saved.
+
+\clearpage
+\section{The 60 MeV outlier and the meaning of a window in $u$}
+At 60~MeV, $32.4\%$ of the selected histogram is inside $|u|<2$,
+compared with $60.7$--$71.5\%$ at the other nine masses. Around the
+current centered $\pm2.25\sigma_{\rm nominal}$ window, $5.4\%$ is
+on the left, $55.1\%$ on the right and $39.5\%$ inside. Thus the
+full-normalized core is small because much of this selected-candidate
+distribution lies elsewhere. The core-conditioned panel removes that
+fraction information and still shows some shape variation.
+
+The 60~MeV files contain 243,668 selected rows. Their event cutflows
+record 1,542,086 readout events and the same 243,668 events at the final
+selection stage, a conditional retention of $15.8\%$. Other masses
+give $34.5$--$61.6\%$ (Table~\ref{tab:MCunits}). This supports lower
+retention from the recorded readout stage, but neither that stage nor
+the unit-normalized Figure 12 establishes generated-signal acceptance.
+A certified generated-event denominator and signal-daughter association
+are still needed; the selected candidate distribution is not certified
+as a pure signal response. ``Within the study range'' does not mean
+high detector acceptance.
+
+The existing core-centered window and a proposed fixed-$u$ window are
+different because $u$ uses the fitted core width:
+\begin{equation}
+ |m_{ee}-c|<2.25\sigma_{\rm nominal}
+ \quad\Longleftrightarrow\quad
+ |u|<2.25\frac{\sigma_{\rm nominal}}{\sigma_{\rm core}}
+ =2.920\text{--}3.174.
+\end{equation}
+Consequently $|u|<2.25$ would narrow the physical window by
+$23.0$--$29.1\%$. At 60~MeV, $c=58.792$~MeV,
+$\sigma_{\rm core}=1.550$~MeV and $\sigma_{\rm nominal}=2.075$~MeV:
+the half-width changes from 4.669 to 3.488~MeV and the retained
+selected-MC fraction falls from $39.5\%$ to $34.5\%$.
+
+\begin{table}[H]\centering\scriptsize
+\input{../derived/report_MC_window_units.tex}
+\caption{Widths in MeV and continuous-window probabilities from the
+stored 0--400~MeV MC histograms. ``Old'' means the existing
+core-centered $\pm2.25\sigma_{\rm nominal}$ window. The last column
+is conditional readout-stage retention, not detector acceptance.
+Actual observed-bin masks use bin centers and can differ slightly
+from these continuous fractions.}\label{tab:MCunits}
+\end{table}
+
+A fixed-$u$ prescription is a coherent MC-based candidate, but the
+coefficient must be declared as a new choice. It is not a change of
+units that preserves the old blind region. Nor does a non-Gaussian
+empirical shape inherit a Gaussian containment fraction from its fitted
+core width. This clarification does not change the primary mask or
+recompute observed limits and local probabilities. Testing a new mask
+would require the matching GP training exclusion and signal-recovery
+checks, as for the preceding width diagnostics.

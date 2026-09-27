@@ -1,0 +1,100 @@
+\clearpage
+\section{MC core centers and shifted primary windows}
+\label{sec:corecenter}
+This update, dated 23 September 2026, centers the observed fit and the
+excluded GP training interval on the reconstructed MC core, rather than
+the generated pole. The reconstructed template itself is unchanged.
+For a generated hypothesis $m_0$ and an MC-only core location $c(m_0)$,
+\begin{equation}
+ I(m_0)=[c(m_0)-2.25\sigma_{\rm nominal}(m_0),\,
+         c(m_0)+2.25\sigma_{\rm nominal}(m_0)].
+\end{equation}
+The half-width retains the original nominal resolution. The fitted core
+width below does not replace it. No additional guard is used.
+
+The center is determined without observed counts. A Gaussian smoothing
+of width $0.2\sigma_{\rm nominal}$ locates the largest MC peak within
+$m_0\pm3\sigma_{\rm nominal}$. A bin-integrated Gaussian plus a
+nonnegative affine pedestal is then fitted by Poisson deviance to the
+unsmoothed template within $\pm1.5\sigma_{\rm nominal}$ of that mode.
+The Gaussian mean defines $c$; the pedestal limits the influence of a
+local broad component. The mean may vary by one nominal sigma around
+the mode, and the fitted width by 0.25--2.5 nominal sigma. All 201 fits
+converge without these bounds being active. This is an operational core
+definition, not proof of a pure resonance response.
+
+\begin{table}[H]\centering\scriptsize
+\input{../derived/report_core_centers.tex}
+\caption{Native-MC core centers and stability. All mass quantities are
+in MeV. MC spread is the standard deviation of the estimated center
+under 32 independent-bin Poisson resamples. The last two columns vary
+the core-fit half-width from its default 1.5 nominal sigma to 1.25 and
+2.0, and refit the observed MC limit using each alternative center.}
+\end{table}
+
+The maximum center-definition displacement is 0.162~MeV and the largest
+corresponding limit change is 4.01\%. Native-bin masks are discrete;
+many smaller shifts select exactly the same bins. Bin resampling
+quantifies conditional center precision only; it does not establish
+candidate independence or cover production systematics.
+
+\input{../derived/report_core_summary.tex}
+
+\clearpage
+\subsection{Observed scans after centering}
+The GP mean and covariance are recomputed from sidebands outside each
+shifted interval. Archived kernel coordinates remain anchored at $m_0$.
+The inherited density conversion, nominal resolution and branching
+conversion also retain $m_0$, isolating the center change from a change
+of coupling convention. Both the MC and its new Gaussian benchmark use
+the same shifted window and GP constraint. The benchmark Gaussian is
+centered at $c(m_0)$ with width $\sigma_{\rm nominal}(m_0)$; it is not
+the historical Gaussian fit evaluated at mass $c$ with new kernel or
+density settings. All curves are plotted against generated hypothesis
+$m_0$, not reconstructed center $c$.
+
+\fig{.71}{../figures/core_centered_comparison.pdf}{Original and
+MC-centered observed inference for the 2021 10\% sample. Native MC
+points are marked; continuous MC curves include exploratory morphs.
+The bottom panels compare only the ten generated masses. The matched
+Gaussian comparison separates the remaining shape difference from
+placing a Gaussian peak at the wrong reconstructed position.}
+
+\clearpage
+\subsection{Native-mass limits and local probabilities}
+\begin{table}[H]\centering\scriptsize
+\input{../derived/report_core_limits.tex}
+\caption{Original and shifted-window MC results. Limits use the inherited
+coupling coordinate. The last column is the Gaussian benchmark centered
+at the same MC core. All probabilities are local asymptotic references.}
+\end{table}
+\begin{table}[H]\centering\small
+\input{../derived/report_core_matched.tex}
+\caption{Matched centered-window comparison and retained MC probability
+in the fitted bins. Support normalization remains unchanged; shifting
+the mask does not renormalize its retained template fraction to one.}
+\end{table}
+
+At the native 80~MeV hypothesis, the reconstructed center is 78.10~MeV.
+The shifted MC upper limit is $7.639\times10^{-6}$, compared with
+$6.362\times10^{-6}$ before shifting, a 20.08\% increase. The local
+probability decreases from 0.02477 to 0.007875; an increased upper limit
+and a smaller local probability are compatible because they answer
+different likelihood questions.
+
+On the dense exploratory MC grid the smallest local probability moves
+to 50~MeV ($p_0=0.003798$). That template uses the previously failing
+low-mass interpolation region. It is not promoted to a validated
+search result; the native comparison above remains the primary result.
+The unchanged selected-candidate association and v13/v16 production
+qualifications still apply. No global probability, coverage calibration
+or physically validated A-prime exclusion follows from this recentering.
+
+\clearpage
+\subsection{Reconstructed cores and window placement}
+\fig{.76}{../figures/core_centered_windows.pdf}{Native selected-MC cores
+and the original versus shifted $\pm2.25\sigma_{\rm nominal}$ windows.
+Blue curves are unchanged empirical templates. The local Gaussian plus
+affine-pedestal fit (red) estimates the center only and is never used to
+replace the full MC signal shape in the observed likelihood. The red
+vertical line marks the fitted core center.}

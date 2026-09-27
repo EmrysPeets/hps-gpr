@@ -1,0 +1,207 @@
+\section{Two-body decay and laboratory acceptance}
+\label{v571:kinematics}
+
+The beam energy controls the angular separation of the electron and positron
+from a boosted dark photon.  We first consider a prompt $A'\to e^+e^-$ decay
+at the target, with the parent directed along the beam axis $z$.  In units with
+$c=1$, let $m$ denote the parent mass and write its laboratory energy as
+$E_A=xE_{\rm beam}$, where $x$ is the fraction of the beam energy carried by
+the parent.  At fixed $m$ and $x$, the boost and daughter rest-frame momentum are
+\begin{equation}
+  \gamma=\frac{E_A}{m},\qquad
+  \beta=\sqrt{1-\frac{m^2}{E_A^2}},\qquad
+  E_* = \frac{m}{2},\qquad
+  p_* = \sqrt{\frac{m^2}{4}-m_e^2},
+  \label{v571:boost}
+\end{equation}
+with $2m_e\leq m<E_A$.  Define $c_*=\cos\theta_*$ and let $\phi_*$ be the
+rest-frame azimuth measured from the horizontal $x$ axis.  The two rest-frame
+four-vectors and their laboratory components are
+\begin{equation}
+  p_{\pm}^{*\mu}
+    =\left(\frac m2,\ \pm p_*\sqrt{1-c_*^2}\cos\phi_*,\
+       \pm p_*\sqrt{1-c_*^2}\sin\phi_*,\ \pm p_*c_*\right),
+       \label{v571:rest-vectors}
+\end{equation}
+\begin{align}
+  E_\pm&=\gamma\left(\frac m2\pm\beta p_*c_*\right),&
+  p_{z,\pm}&=\gamma\left(\frac{\beta m}{2}\pm p_*c_*\right),
+       \label{v571:lab-vectors}\\
+  p_{x,\pm}&=\pm p_*\sqrt{1-c_*^2}\cos\phi_*,&
+  p_{y,\pm}&=\pm p_*\sqrt{1-c_*^2}\sin\phi_* .
+       \label{v571:transverse-vectors}
+\end{align}
+The signs label the opposite daughter directions.  For a forward daughter,
+its polar angle and vertical projected angle are respectively
+\begin{equation}
+  \tan\theta_\pm=\frac{p_*\sqrt{1-c_*^2}}{p_{z,\pm}},\qquad
+  \tan\theta_{y,\pm}=\frac{p_{y,\pm}}{p_{z,\pm}}.
+  \label{v571:angles}
+\end{equation}
+The energy fractions are $E_\pm/E_A=(1\pm\beta\rho c_*)/2$, where
+$\rho=\sqrt{1-4m_e^2/m^2}$.  They approach the momentum fractions only when
+the daughters are ultrarelativistic.  Thus fixing $x$ fixes the pair energy,
+while the decay angle still determines how that energy is shared.
+
+\subsection{Equal-sharing mass scales}
+\label{v571:equal-sharing}
+For $c_*=0$, both daughters have energy $E_A/2$ and the same polar angle
+$\theta$; their opening angle is $2\theta$.  The exact invariant-mass relation is
+\begin{equation}
+  m^2=E_A^2\sin^2\theta+4m_e^2\cos^2\theta
+  \quad\longrightarrow\quad
+  m\simeq xE_{\rm beam}\sin\theta
+  \simeq xE_{\rm beam}\theta .
+  \label{v571:equal-sharing-mass}
+\end{equation}
+The first approximation neglects the electron mass and the second assumes a
+small angle.  In the vertical decay plane, $|\sin\phi_*|=1$, this gives the
+mass scale associated with a specified vertical angle.  For a general decay,
+the small-angle, relativistic relation is instead
+$m^2\simeq E_+E_-\theta_{+-}^2$, with
+$\theta_{+-}$ the daughter opening angle.  Unequal sharing therefore changes
+the correspondence between a mass and either single-track angle.
+
+A vertical beam gap excludes tracks close to the beam \emph{plane}; a polar
+cone excludes tracks close to the beam \emph{axis}.  Their acceptances differ
+because $|\tan\theta_y|=\tan\theta\,|\sin\phi_*|$.  In particular, an outer
+vertical edge gives an upper equal-sharing mass scale only in the specified
+vertical plane.  With unrestricted azimuth it does not, by itself, give an
+upper mass cutoff.  Horizontal sensor boundaries and magnetic bending must
+also be considered before interpreting an endpoint as detector acceptance.
+
+\subsection{Normalized decay fraction through the tracker}
+\label{v571:acceptance}
+For the conditional angular calculation, we use a transverse-vector decay
+distribution in the relativistic-daughter approximation, with uniform
+azimuth:
+\begin{equation}
+  w(c_*)=\frac38(1+c_*^2),\qquad
+  \mathcal A(m,x)=\int_{-1}^{1}\!dc_*\,w(c_*)
+    \int_0^{2\pi}\!\frac{d\phi_*}{2\pi}\,
+    \mathcal I_{\rm geom}(p_+,p_-).
+  \label{v571:acceptance-integral}
+\end{equation}
+Here $\mathcal I_{\rm geom}$ is one when both forward daughters satisfy the
+chosen geometrical requirements and zero otherwise.  The integral is
+normalized to all decays with that specified polarization, parent energy and
+direction.  Finite $m_e$ is retained in the kinematics above; the adopted
+angular weight is not an exact threshold or production-polarization model.
+
+For an active sensor rectangle centered at $\boldsymbol r_j$, let
+$\boldsymbol n_j$ be its normal, $\boldsymbol a_j,\boldsymbol b_j$ its
+orthogonal in-plane unit vectors, and $h_{a,j},h_{b,j}$ its active half-widths.
+For the zero-field reference, a straight daughter ray
+$\boldsymbol r(t)=\boldsymbol r_0+t\boldsymbol u$,
+with $\boldsymbol u=\boldsymbol p/|\boldsymbol p|$, crosses the sensor plane at
+\begin{align}
+  t_j&=\frac{(\boldsymbol r_j-\boldsymbol r_0)\cdot\boldsymbol n_j}
+                {\boldsymbol u\cdot\boldsymbol n_j},&
+  \Delta\boldsymbol r_j&=\boldsymbol r_0+t_j\boldsymbol u-\boldsymbol r_j,
+  \nonumber\\
+  |\Delta\boldsymbol r_j\cdot\boldsymbol a_j|&\leq h_{a,j},&
+  |\Delta\boldsymbol r_j\cdot\boldsymbol b_j|&\leq h_{b,j}.
+  \label{v571:sensor-intersection}
+\end{align}
+A geometrical sensor hit requires $t_j>0$, a nonparallel ray, and both bounds.
+For station $k$ in a specified detector half, define binary flags
+$h_{k,a}$ and $h_{k,s}$ for its axial and stereo views.  Each flag is one if
+the ray crosses any active rectangle belonging to that view.  Where hole and
+slot sensors are alternatives in one view, their rectangles form a union:
+crossing either is sufficient, and that view is counted at most once.
+The geometrical counts for one daughter are then
+\begin{equation}
+  N_{\rm 2D}=\sum_k(h_{k,a}+h_{k,s}),\qquad
+  N_{\rm 3D}=\sum_k h_{k,a}h_{k,s}.
+  \label{v571:hit-counts}
+\end{equation}
+Thus a 2D plane hit requires one view, whereas a paired 3D space point
+requires both views at the same station and in the same detector half.
+These counts are not interchangeable when only one view is crossed:
+$N_{\rm 2D}=2N_{\rm 3D}$ holds only if every crossed view has its partner.
+The run- and charge-dependent thresholds, including any required inner-plane
+hits, are specified in the selection table below.  They enter
+$\mathcal I_{\rm geom}$ separately for the electron and positron.
+Equation~\eqref{v571:sensor-intersection} gives the analytic crossing for the
+zero-field reference. With a magnetic field, the curved daughter trajectory
+determines the sensor crossings before the same view and station flags are
+evaluated. These counts omit scattering and hit inefficiency.
+
+\begin{samepage}
+\subsubsection{Magnetic propagation}
+\label{v571:magnetic-propagation}
+Let $s$ denote path length, $q=+1$ for the positron and $q=-1$ for the
+electron, and $\boldsymbol B(\boldsymbol r)$ the static field in the detector
+coordinate frame. For momentum in MeV, position in mm and field in tesla,
+the transport equations are
+\begin{equation}
+ \begin{gathered}
+  \frac{d\boldsymbol r}{ds}=\boldsymbol u
+      =\frac{\boldsymbol p}{|\boldsymbol p|},\qquad
+  \frac{d\boldsymbol p}{ds}
+      =\kappa q\,\boldsymbol u\times\boldsymbol B(\boldsymbol r),\\[3pt]
+  \kappa=0.299792458\ \frac{\mathrm{MeV}}{\mathrm{T\,mm}}.
+ \end{gathered}
+  \label{v571:magnetic-equations}
+\end{equation}
+\end{samepage}
+The magnetic force is perpendicular to the momentum, so
+$d|\boldsymbol p|^2/ds=0$: each daughter's momentum magnitude and energy
+remain constant in this transport model. The field changes the trajectory
+and the directions at the sensors. The mass labeling the acceptance curves
+is the invariant mass of the two momenta at the production vertex, rather
+than a mass recomputed from their different local directions downstream.
+Energy loss and material scattering require additional physics.
+
+The numerical trajectory crosses sensor plane $j$ at a forward path length
+$s_j>0$ satisfying
+\begin{equation}
+  \bigl[\boldsymbol r(s_j)-\boldsymbol r_j\bigr]\cdot
+  \boldsymbol n_j=0.
+  \label{v571:curved-crossing}
+\end{equation}
+The in-plane half-width bounds of Eq.~\eqref{v571:sensor-intersection}
+are then tested at $\boldsymbol r(s_j)$. This prescription follows each
+charge through the same field and retains the complete finite sensor
+geometry. Setting $\boldsymbol B=0$ recovers the straight-ray calculation.
+The field map, integration method and numerical checks are specified with
+the detector configuration below.
+
+\subsubsection{Projected angular reference}
+
+For an illustrative projection, consider symmetric active
+vertical intervals $y_{\min,j}\leq |y|\leq y_{\max,j}$ at longitudinal
+positions $z_j$, measured from a target at $z_0$.  A straight trajectory from
+the target has $y_j=(z_j-z_0)p_y/p_z$.  Requiring each daughter to cross every
+chosen interval reduces to a constant slope band
+\begin{equation}
+  L\equiv\max_j\frac{y_{\min,j}}{z_j-z_0}
+    \leq\left|\frac{p_y}{p_z}\right|\leq
+  U\equiv\min_j\frac{y_{\max,j}}{z_j-z_0},
+  \label{v571:projected-band}
+\end{equation}
+provided $0\leq L<U$.  This band is a reference for understanding the angular
+scales, rather than a replacement for the finite sensor calculation.
+
+The azimuthal integral can be performed explicitly.  At fixed $c_*$, set
+$p_T=p_*\sqrt{1-c_*^2}$ and, for $p_T>0$ and $p_{z,+},p_{z,-}>0$, define
+\begin{equation}
+  q_{\rm low}=\frac{L\max(p_{z,+},p_{z,-})}{p_T},\qquad
+  q_{\rm high}=\frac{U\min(p_{z,+},p_{z,-})}{p_T}.
+  \label{v571:azimuth-bounds}
+\end{equation}
+Both daughters pass if $q_{\rm low}\leq |\sin\phi_*|\leq q_{\rm high}$.
+Writing $[q]_0^1=\min(1,\max(0,q))$ and $[a]_+=\max(0,a)$, the accepted
+azimuthal fraction and the remaining integral are
+\begin{equation}
+  F_\phi(c_*)=\frac2\pi
+    \left[\arcsin\bigl([q_{\rm high}]_0^1\bigr)-
+          \arcsin\bigl([q_{\rm low}]_0^1\bigr)\right]_+,\qquad
+  \mathcal A_{\rm band}=\int_{-1}^{1}\!dc_*\,w(c_*)F_\phi(c_*).
+  \label{v571:azimuth-fraction}
+\end{equation}
+We set $F_\phi=0$ when either daughter is backward or the nonzero-gap aperture
+cannot be reached.  This fraction describes geometry under the stated
+assumptions.  A selected mass spectrum additionally depends on production,
+beam exposure, energy and direction distributions, trigger, reconstruction
+and analysis requirements; it is not a measurement of $\mathcal A(m,x)$.

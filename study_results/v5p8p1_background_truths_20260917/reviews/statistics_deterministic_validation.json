@@ -1,0 +1,112 @@
+{
+  "passed": false,
+  "execution_complete": true,
+  "checks": {
+    "observed_source_identical": true,
+    "native_edges_identical": true,
+    "edges_strictly_increasing": true,
+    "archived_stress_positive_finite_full_support": true,
+    "gp_full_nominal_positive_finite_full_support": true,
+    "gp_full_half_ls_positive_finite_full_support": true,
+    "gp_blocked_positive_finite_full_support": true,
+    "regional_rise_fall_positive_finite_full_support": true,
+    "gp_blocked_local_positive_finite_full_support": true,
+    "all_frozen_truths_in_scan": true,
+    "all_142_uniform_masses_per_truth": true,
+    "finite_profile_outputs": true,
+    "converged_positive_profiles": false,
+    "archived_stress_summary_RMS": true,
+    "archived_stress_summary_extrema": true,
+    "gp_blocked_summary_RMS": true,
+    "gp_blocked_summary_extrema": true,
+    "gp_blocked_local_summary_RMS": true,
+    "gp_blocked_local_summary_extrema": true,
+    "gp_full_half_ls_summary_RMS": true,
+    "gp_full_half_ls_summary_extrema": true,
+    "gp_full_nominal_summary_RMS": true,
+    "gp_full_nominal_summary_extrema": true,
+    "regional_rise_fall_summary_RMS": true,
+    "regional_rise_fall_summary_extrema": true,
+    "all_injection_scenarios": true,
+    "same_original_sigma_across_truths": true,
+    "injected_yield_recovery_recounted": true,
+    "injected_root_increment_recounted": true,
+    "unchanged_observed_signed_roots": true
+  },
+  "details": {
+    "truth_metrics": [
+      {
+        "truth": "archived_stress",
+        "expected_counts": 73143052.25760624,
+        "normalization_relative_observed": 0.9999933590525282,
+        "minimum_bin_mean": 701.242697417736,
+        "maximum_absolute_second_log_difference": 0.006656368491617215,
+        "maximum_curvature_center_MeV": 33.37499999999999
+      },
+      {
+        "truth": "gp_full_nominal",
+        "expected_counts": 73143935.40739849,
+        "normalization_relative_observed": 1.0000054332537003,
+        "minimum_bin_mean": 650.1184204984696,
+        "maximum_absolute_second_log_difference": 0.011832542701007753,
+        "maximum_curvature_center_MeV": 30.375
+      },
+      {
+        "truth": "gp_full_half_ls",
+        "expected_counts": 73143933.19870561,
+        "normalization_relative_observed": 1.0000054030570085,
+        "minimum_bin_mean": 651.0124336103055,
+        "maximum_absolute_second_log_difference": 0.01129361060479539,
+        "maximum_curvature_center_MeV": 30.375
+      },
+      {
+        "truth": "gp_blocked",
+        "expected_counts": 79982599.52762115,
+        "normalization_relative_observed": 1.0935019239515205,
+        "minimum_bin_mean": 602.786883770931,
+        "maximum_absolute_second_log_difference": 0.07040049380329627,
+        "maximum_curvature_center_MeV": 37.625
+      },
+      {
+        "truth": "regional_rise_fall",
+        "expected_counts": 73337619.98287956,
+        "normalization_relative_observed": 1.0026534399098874,
+        "minimum_bin_mean": 373.7686093453178,
+        "maximum_absolute_second_log_difference": 0.0015593155401383285,
+        "maximum_curvature_center_MeV": 30.375
+      },
+      {
+        "truth": "gp_blocked_local",
+        "expected_counts": 72862257.26307341,
+        "normalization_relative_observed": 0.9961544007219533,
+        "minimum_bin_mean": 650.1184204984696,
+        "maximum_absolute_second_log_difference": 0.01183254270110723,
+        "maximum_curvature_center_MeV": 30.375
+      }
+    ],
+    "observed_root_maximum_replay_error": 0.0,
+    "truth_count": 6,
+    "scan_rows": 852,
+    "injection_rows": 72,
+    "minimum_recovered_fraction": 0.9555830757151916,
+    "maximum_recovered_fraction": 0.9900792876299938,
+    "strict_optimizer_failure_rows": [
+      {
+        "mass_MeV": 45,
+        "truth": "gp_blocked",
+        "max_score": 5.431294951563359e-07,
+        "signed_r": 399.042575675702
+      }
+    ]
+  },
+  "input_sha256": {
+    "truths/backgrounds.npz": "9f71ae6f59729478443bdfd6abd0a9837323eeaebacce541b3c4fd91d1ed7263",
+    "truths/supplementary.npz": "32fd0bceb728580fdd77487f5f96c5669da6e552d7090dc2a6dbc9e911b09825",
+    "results/asimov_scan.csv": "7e8d3a3a4a945eb23bf87c13004242a3107f18677bb1551eff19b5f02517f25e",
+    "results/asimov_summary.csv": "7c1cf63843ac7bf78dd3a37b14b595e1143b254acb2c5556473a7b38368c46d2",
+    "results/injections.csv": "5ed4da4261f7f35869d22fe714739a3071efd0b50304cd3f66ce483558dbf922",
+    "results/observed_anchors.csv": "931948202385b596a8e0d3c4b2404fe294930296dddfce375c078863398a3183"
+  },
+  "statistical_scope": "Implementation and conditional deterministic response validated; physical null adequacy and independent local calibration not established.",
+  "curvature_diagnostic": "Finite log curvature is descriptive; no threshold here declares a smooth or physically adequate join."
+}

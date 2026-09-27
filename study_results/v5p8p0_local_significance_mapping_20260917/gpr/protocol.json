@@ -1,0 +1,62 @@
+{
+  "version": "5.8.0",
+  "declared_utc": "2026-09-17T17:19:20Z",
+  "scope": "Frozen-kernel, complete-spectrum, conditional stress-reference field; no production significance replacement",
+  "new_2016_half_step_intervals_MeV": [
+    [
+      39,
+      50
+    ],
+    [
+      85,
+      100
+    ]
+  ],
+  "new_2016_quarter_step_intervals_MeV": [
+    [
+      74,
+      79
+    ]
+  ],
+  "inherited_2016_half_step_interval_MeV": [
+    70.5,
+    80.5
+  ],
+  "comparison_datasets": [
+    "2015",
+    "2021"
+  ],
+  "comparison_grid_MeV": 1,
+  "new_grid_changes_only_tested_signal_mass": true,
+  "unchanged": [
+    "histogram binning",
+    "signal resolution",
+    "sideband support",
+    "signal window",
+    "stress truth",
+    "observed data",
+    "integer-mass kernel states"
+  ],
+  "fractional_kernel_rule": "log-linear interpolation between frozen adjacent integer states, inherited from v5.1.1",
+  "validation": "Reuse first256 archived coherent Poisson spectra; first128 for empirical standardization, second128 holdout; do not claim extreme tail validation",
+  "response": "Full stress spectrum plus each bin shifted upward by sqrt(truth count); exact GP retraining for each count spectrum at frozen kernel",
+  "threads": 1,
+  "workers": 1,
+  "reporting": "Report signed observed root, deterministic stress offset, response SD, conditional centered Z, gated and ungated probabilities, direct finite-toy tail, same-node invariance, and paired maximum changes. All choices fixed before new fits.",
+  "amendment": {
+    "utc": "2026-09-17T17:21:23.431539+00:00",
+    "reason": "Expand half-step comparison to complete original domain for uniform and interpretable grid convergence; runtime benchmark 6.3 seconds per new node permits completion. No selection on new significance outcomes.",
+    "half_step_domain_MeV": [
+      39,
+      180
+    ],
+    "fit_deadline_utc": "2026-09-17T17:43:00Z"
+  },
+  "numerical_amendment": {
+    "utc": "2026-09-17T17:24:52.622540+00:00",
+    "method": "Exact Sherman-Morrison update for Asimov single-bin perturbation; truth and all Poisson draws keep exact cached Cholesky.",
+    "gate": "Compare all721 roots and response SD with frozen exact archive at100 and150 MeV; max root discrepancy below2e-5 required. Per new node compare moments to exact Cholesky at first/middle/last training bin; max relative mean error<2e-8 and covariance Frobenius relative error<2e-5. On per-node gate failure use exact Cholesky.",
+    "physics_changes": false,
+    "profile_speedup": "Replace unoptimized three-factor einsum Hessian with algebraically identical batched matrix multiplication. Same archived-all-root and per-batch scalar gates apply; scalar reference remains exact fallback."
+  }
+}

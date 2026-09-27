@@ -1,0 +1,47 @@
+\section{Version 4.2 Follow-up Studies: Compact Record}
+\label{app:v4p2-followups}
+
+\begin{center}
+\fbox{%
+\begin{minipage}{0.94\linewidth}
+\textbf{Finding summary.}  Fixed-mass common-binning and physical-profile checks did
+not motivate a change to the accepted v4.2 card.  Conditional replacements of the
+2021 65~MeV central window were useful mechanism diagnostics, but their answer depended
+on the frozen replacement construction and they supplied neither expected bands nor a
+global-null calibration.  Version 4.9 therefore does not use the replacement-window
+ensemble as headline validation evidence.
+\end{minipage}}
+\end{center}
+
+The complete v4.8.3-era appendix source is preserved verbatim at
+\path{archive/appendix_v4p2_followups_v4p8p3_full.tex}.  That archival source contains
+all original tables, figures, seeds, and post-figure follow-ups.  It is intentionally
+not compiled into the v4.9 decision path.
+
+\subsection{Common-binning and profiled 65 MeV extraction}
+\label{app:v4p2-common-binning}
+
+The fixed-mass follow-up documented that exact 0.625~MeV common bins could not be
+formed from the histogram-only 2015 and 2016 inputs.  A source-compatible 0.5~MeV
+refit and a broader 1.25~MeV stress test preserved the qualitative 65~MeV extraction.
+The physical-domain profile display also separated the nonnegative interval used for
+limits from the signed Wald coordinate used for local extraction.  These were
+observed-data robustness checks, not a choice made from toy coverage.
+
+\subsection{Conditional central-window replacement provenance}
+\label{app:v4p2-pseudo65}
+
+Two fixed-seed pseudo-observations replaced the 2021 central region and reran the
+complete moving-mask analysis.  A later deterministic functional-mean lane separated
+a coherent source-truth/GP shoulder below 65~MeV from the additional Poisson
+fluctuation of one draw.  Ten fixed-GP-mean replacement draws compared the discretely
+equivalent $2.25$/$2.5\sigma_m$ scope with a $3\sigma_m$ scope.  Those finite draws
+were correlated, conditional interventions.  They did not refit a source generator,
+establish direct \CLs{} coverage, or measure the probability that the observed
+65~MeV feature is background.
+
+For v4.9, the relevant lesson is limited: replacing a central window can reveal
+analysis-mediated response, but it is not a substitute for source-qualified
+full-refit functional-form toys.  The threshold-support decision is therefore based on
+the matched-reference study in Section~\ref{sec:toys}, with the older window material
+retained only for provenance.

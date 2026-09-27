@@ -1,0 +1,102 @@
+{
+  "definition": {
+    "primary_statistic": "T = mean_d,w [ (mhat_d,w - mbar) / sigma_d(92) ]^2",
+    "weighted_center": "mbar = sum_d,w mhat_d,w / sigma_d(92)^2 divided by sum_d,w 1 / sigma_d(92)^2",
+    "peak_ordering": "Maximum signed standardized Z=(r-a)/s among raw r>0 grid sites; exact ties choose lowest mass",
+    "requested_peak_ordering": "Individual 80--105/support summary maximizes signed Z across all available sites; the calibrated common-region coherence additionally requires positive raw r. All reported observed peaks satisfy raw r>0.",
+    "ineligible_rule": "If any dataset-width has no positive raw r in region, set T and W to infinity (never counted as coherent)",
+    "primary_region_MeV": [
+      80,
+      100
+    ],
+    "requested_diagnostic_region_MeV": [
+      80,
+      105
+    ],
+    "region_reason": "2015 support ends at 100 MeV; all-dataset coherence uses the common intersection 80--100. Individual requested-region summaries retain 80--105 where supported.",
+    "secondary_statistic": "W = mean_d ( [max_w mhat_d,w - min_w mhat_d,w] / sigma_d(92) )^2",
+    "tail": "Inclusive lower tail; small values mean more coherent/stable. T is the single primary scalar; T and W p values are not multiplied.",
+    "significance_interpretation": "Exploratory fixed-region conditional null diagnostic; not a discovery p value, not corrected for region, method, or width selection",
+    "direct_null": "256 paired full-spectrum Poisson rows with exact profile scans, reused at every mass and width",
+    "gaussian_null": "100000 supplemental linear-response Gaussian draws per independent dataset; full covariance across all diagnostic masses and widths from stacked D columns",
+    "amplitude_units": "Amplitude A is epsilon2/1e-8 in the original dataset template parameterization; amplitudes are independent here. Full-spectrum signal events=A*sum(full Gaussian template); window signal events=A*sum(window template). Nonnegative MLE=max(A,0)."
+  },
+  "sigma92_MeV": {
+    "2015": 4.8039274124292,
+    "2016": 3.78842854144,
+    "2021": 2.448596
+  },
+  "observed_T": 2.9793492462389746,
+  "observed_W": 9.410188015369199,
+  "weighted_center_MeV": 88.58853966057653,
+  "direct_T": {
+    "k": 195,
+    "N": 256,
+    "p": 0.7626459143968871,
+    "raw_p": 0.76171875,
+    "lo95": 0.7047112229879153,
+    "hi95": 0.8125563865011852,
+    "upper95": 0.8050321912513942,
+    "status": "finite_MC",
+    "eligible_null": 256
+  },
+  "direct_W": {
+    "k": 253,
+    "N": 256,
+    "p": 0.9883268482490273,
+    "raw_p": 0.98828125,
+    "lo95": 0.9661367173637085,
+    "hi95": 0.9975767612461274,
+    "upper95": 0.996798482895824,
+    "status": "finite_MC",
+    "eligible_null": 256
+  },
+  "gaussian_T": {
+    "k": 73873,
+    "N": 100000,
+    "p": 0.7387326126738732,
+    "raw_p": 0.73873,
+    "lo95": 0.7359951762544468,
+    "hi95": 0.7414509711449694,
+    "upper95": 0.7410150174267371,
+    "status": "finite_MC",
+    "eligible_null": 99937
+  },
+  "gaussian_W": {
+    "k": 98583,
+    "N": 100000,
+    "p": 0.985830141698583,
+    "raw_p": 0.98583,
+    "lo95": 0.9850781960531693,
+    "hi95": 0.9865534277485075,
+    "upper95": 0.986439330361052,
+    "status": "finite_MC",
+    "eligible_null": 99937
+  },
+  "gaussian_seed": 58520260919,
+  "gaussian_stream": [
+    2015,
+    2016,
+    2021
+  ],
+  "posthoc_selection_corrected": false,
+  "discovery_p_value": false,
+  "competing_peak_note": "For 2021, the region maximum changes from 93 to the 80 MeV diagnostic boundary at widths 2.5 and 2.6. This is a competing-excursion rank switch, not evidence of a resonance moving 13 MeV. No narrower optimized diagnostic region is introduced."
+}
+dataset  sigma92_MeV  region_lo_MeV  region_hi_MeV  delta_m_MeV        R  common_delta_m_MeV  common_R
+   2015     4.803927           80.0          100.0          1.0 0.208163                 1.0  0.208163
+   2016     3.788429           80.0          105.0          0.0 0.000000                 0.0  0.000000
+   2021     2.448596           80.0          105.0         13.0 5.309165                13.0  5.309165
+dataset  width_sigma  signed_Z  signal_events_nonnegative
+   2015         2.25  2.594369                1176.623918
+   2015         2.40  2.593739                1193.138410
+   2015         2.50  2.595695                1203.107403
+   2015         2.60  2.691247                1244.666705
+   2016         2.25  2.796104               16665.712277
+   2016         2.40  2.726187               16470.236769
+   2016         2.50  2.778059               16867.296272
+   2016         2.60  2.770211               16872.526568
+   2021         2.25  1.422854                7820.584326
+   2021         2.40  1.363364                7551.588465
+   2021         2.50  1.363364                7551.588465
+   2021         2.60  1.378326                7706.851165

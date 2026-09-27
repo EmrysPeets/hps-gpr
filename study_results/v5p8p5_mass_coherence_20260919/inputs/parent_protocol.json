@@ -1,0 +1,65 @@
+{
+  "version": "5.8.4",
+  "start_utc": "2026-09-18T21:57:15Z",
+  "source_kernel_anchor_MeV": 76,
+  "source_definition": "Unchanged pinned v5.8.2 nominal GP means and paired full-spectrum Poisson samples",
+  "analysis_policy": "Reviewed mass-dependent kernels and supports retained; integer-MeV grid; held-out and likelihood windows both vary over the four specified widths",
+  "datasets": {
+    "2015": [
+      19,
+      100
+    ],
+    "2016": [
+      39,
+      180
+    ],
+    "2021": [
+      50,
+      250
+    ]
+  },
+  "combined_domain_MeV": [
+    19,
+    250
+  ],
+  "common_overlap_MeV": [
+    50,
+    100
+  ],
+  "combined_definition": "One common coupling among all active datasets at each mass, original frozen signal conversion; independent dataset count fluctuations with coherent full-spectrum draws",
+  "scan_step_MeV": 1.0,
+  "validation_Poisson_scans": 256,
+  "gaussian_fields": 100000,
+  "seed_base": 58220260917,
+  "primary_local_ordering": "z=(r-a)/s for raw positive signal fit; otherwise inclusive excess tail1",
+  "primary_global_ordering": "Max z over sites with r_star=a+s*z>0 across declared full scope grid",
+  "response_method": "Differential signed-profile-likelihood root propagation including GP count-dependent mean and covariance, checked against direct full-bin one-standard-deviation perturbations",
+  "validation": "Complete independent Poisson spectra per dataset reused at every mass; same drawindex used in combination; retain explicit MonteCarlo intervals and approximation diagnostics",
+  "source_fit_uncertainty_propagated": false,
+  "physical_discovery_calibrated": false,
+  "scope_selection_on_significance": false,
+  "deadline_utc": "2026-09-18T22:27:15Z",
+  "blind_halfwidth_sigma": [
+    2.25,
+    2.4,
+    2.5,
+    2.6
+  ],
+  "combination_methods": [
+    "shared_coupling",
+    "atom_calibrated_Fisher",
+    "equal_weight_signed_Stouffer"
+  ],
+  "reach_definition": "Observed and local model-background Asimov 90% CLs coupling upper endpoints; no one-dimensional Fisher reach without a signal-yield model",
+  "method_or_width_selection_corrected": false,
+  "response_field_seed_base": 58420260918,
+  "reused_source_toy_seed_base": 58220260917,
+  "mixture_check_seed_base": 58420260918,
+  "blind_width_interpretation": "The same mask defines GP exclusion and fitted likelihood window, as in the original engine",
+  "new_width_response_checks": 264,
+  "baseline_response_reused": true,
+  "signal_template_renormalized_to_window": false,
+  "model_Asimov_definition": "Counts equal the observed-sideband-trained local predictive background; covariance fixed; exact profiled CLs endpoint, not a validated ensemble median",
+  "fisher_global_statistic": "Maximum -log(atom-mixture local p) across the declared domain",
+  "stouffer_global_statistic": "Maximum sum of continuous reference signed scores divided by sqrt(active dataset count) across the declared domain"
+}

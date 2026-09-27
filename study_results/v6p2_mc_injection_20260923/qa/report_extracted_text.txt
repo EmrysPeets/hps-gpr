@@ -1,0 +1,910 @@
+HPS Gaussian-Process Resonance Search v6.2 / Signal recovery
+HPS Gaussian-Process Resonance Search
+Reconstructed-MC Injection and Signal Recovery
+Standalone Study v6.2
+Emrys Peets
+Stanford University and SLAC National Accelerator Laboratory
+23 September 2026
+Abstract
+Signal extraction is tested by adding exactly 1,000, 5,000, 10,000 and 30,000 selected candi-
+dates from native smeared 2021 MC distributions to 40 background toys at each mass from 60
+through 260 MeV in 20 MeV steps. Paired ﬁts compare windows centered at the generated mass
+and the reconstructed MC core, with the same nominal width. At 30,000 injected candidates,
+subtracting the paired zero-injection ﬁt gives a mean recovered increment of 0.715–0.895 of the
+injected yield for the original window and 0.780–0.938 for the shifted window over 60–240 MeV.
+The shift reduces the loss but does not restore full recovery. Controls with signal removed from
+the training sidebands attribute much of the deﬁcit to the GP response to the injected tails.
+Pulls and proﬁle likelihood inclusion counts accompany the yield tests.
+1 Result and relation to v6.1
+The selected-candidate MC distributions examined in v6.1 have broad tails. Injected candidates
+outside the ﬁtted window enter the sideband sample and can change the GP prediction beneath
+the signal core. The recovery tests include this response to the injected counts.
+Injected N Pole-centered MC-core-centered
+1,000 -0.089–5.227 -0.069–5.566
+5,000 0.689–1.737 0.740–1.820
+10,000 0.783–1.301 0.837–1.372
+30,000 0.822–1.011 0.845–1.073
+Table 1: Ranges of the mean ﬁtted yield divided by the injected yield over 60–240 MeV. These
+summarize the ten mass points; they are not conﬁdence intervals. The low-injection ratios include
+the background oﬀset and should be read with their toy errors in Figure 1.
+The tests use ﬁxed empirical MC shapes and one background mean. The v6.1 audit did not
+establish signal-daughter association or full equivalence between the MC and data selections. The
+template and its MC-only center are held ﬁxed; ﬁnite-MC, background-truth and detector-response
+uncertainties are not sampled.
+1
+
+HPS Gaussian-Process Resonance Search v6.2 / Signal recovery
+2 Toy ensemble and yield normalization
+The GP arithmetic mean ﬁtted over the full mass support of the 2021 10% spectrum in v5.8.2
+deﬁnes the background expectation µi over the unchanged analysis support D = [36 , 299. 75] MeV.
+Independent Poisson spectra are generated for each mass and toy index. At a ﬁxed mass, the
+same spectrum is used at all four injection levels and for the zero-injection ﬁt. The two window
+prescriptions are ﬁtted to the same injected spectrum.
+The signal probabilities pi are obtained from the native selected-MC histogram at that generated
+mass. They use the full selected normalization, including the recorded overﬂow. Counts are drawn
+as
+Bi ∼ Poisson(µi), (S1, . . . , S K, S below, S above) ∼ Multinomial(N ; p), n i = Bi + Si. (1)
+The last two categories retain candidates outside D, so the total draw is exactly N even when
+fewer candidates enter the analysis. CDF rebinning treats the density as uniform within each
+source histogram bin. No additional smearing, translation, truth selection or interpolation between
+generated masses is applied. Here and below, “yield” means selected-candidate yield, not a number
+of generated resonances.
+The signal contribution in a ﬁtted bin is Api. In particular,
+fD =
+∑
+i∈D
+pi, f W =
+∑
+i∈W
+pi (2)
+remain the probabilities for a selected candidate to enter D and W . The template is normalized
+before either restriction, so A estimates the full selected yield N . Expected fractions and actual
+draws inside the support, window and training bins are saved for each toy.
+m0 c(m0) σm fD fW,P fW,C
+60 58.792 2.075 0.998 0.392 0.396
+80 78.103 2.288 0.999 0.675 0.709
+100 97.688 2.570 0.999 0.731 0.781
+120 117.319 2.920 0.999 0.745 0.803
+140 136.956 3.339 0.999 0.764 0.812
+160 156.658 3.827 0.999 0.751 0.816
+180 176.393 4.383 0.999 0.752 0.803
+200 196.182 5.008 0.998 0.756 0.792
+220 215.941 5.702 0.998 0.737 0.771
+240 235.617 6.465 0.997 0.722 0.748
+260∗ 255.173 7.296 0.995 0.701 0.722
+Table 2: Fixed MC centers, nominal resolutions and selected fractions. Masses, centers and resolu-
+tions are in MeV. P and C denote the pole- and MC-core-centered masks. The asterisk marks the
+260 MeV extension, which uses the archived 250 MeV kernel state.
+2
+
+HPS Gaussian-Process Resonance Search v6.2 / Signal recovery
+3 Extraction and uncertainty calculation
+The pole-centered mask is m0 ± 2. 25σm(m0); the shifted mask is c(m0) ± 2. 25σm(m0). The center c
+is determined from MC alone using the local integrated Gaussian plus nonnegative aﬃne pedestal
+ﬁt deﬁned in v6.1. The same deﬁnition is applied at 260 MeV. The MC shape does not move when
+the window moves. The resolution is
+σm(m) = 0 . 00184825 − 0. 001375m + 0. 085875m2, m, σ m in GeV. (3)
+Kernel parameters remain anchored at m0, with the archived 250 MeV state used for the 260 MeV
+extension. The MC center and nominal width are ﬁxed before drawing the toys.
+In the primary ﬁt the GP is trained on the injected toy’s exterior bins. Its archived kernel
+hyperparameters remain ﬁxed, while the count-dependent targets, noise terms, conditional mean
+ˆb and predictive covariance are recomputed. The v6.1 factorization retains the covariance modes
+represented by L, with V = LLT . The inherited likelihood proﬁles their nuisance coordinates θ:
+− ln L(A, θ) =
+∑
+i∈W
+[λi − ni ln λi] + 1
+2 θT θ,
+λi = ˆbi + (Lθ)i + Api > 0.
+(4)
+The ﬁtted amplitude ˆA is allowed to be negative, retaining the signed behavior around zero signal.
+Its uncertainty σA is obtained from the observed curvature of the proﬁled likelihood.
+Two controls use the same injected counts in the ﬁtted window. The clean-sideband control
+trains the GP on the background-only bins of that toy, removing the injected tail from training.
+The known-background control ﬁxes the background to µi and has no GP nuisance parameters.
+The former isolates the change caused by signal in the training sample; the latter also removes
+background-estimation ﬂuctuations and the GP nuisance covariance.
+Writing ℓprof (A) for the negative log likelihood minimized over θ at ﬁxed A, the pull and
+likelihood ratio at the injected truth are
+p =
+ˆA − N
+σA
+, q N = 2
+[
+ℓprof (N ) − ℓprof ( ˆA)
+]
+. (5)
+The nominal 68.27% and 95% proﬁle sets include N when qN ≤ 1 and qN ≤ χ2
+1(0. 95), respectively.
+The fraction of toys satisfying each condition is reported with an exact 95% Clopper–Pearson
+interval. Because the signal in Eq. ( 1) has an exact multinomial total while Eq. ( 4) uses Poisson
+counts, width one and the nominal inclusion fractions are reference values, including for known
+background.
+3
+
+HPS Gaussian-Process Resonance Search v6.2 / Signal recovery
+4 Mean recovered yield
+For each mass, level and method, the raw recovery ratio over T = 40 toys is
+R(m0, N ) = 1
+N T
+T∑
+t=1
+ˆAt(m0, N ). (6)
+It includes the response to the injected signal and any ﬁtted oﬀset already present at zero injection.
+At N = 30 , 000, the ranges over 60–240 MeV are 0.822–1.011 for the pole-centered window and
+0.845–1.073 for the shifted window.
+60 100 140 180 220 260
+Generated mass [MeV]
+0
+2
+4
+6
+8Mean fitted / injected yield
+1,000 selected candidates per toy
+Pole-centered
+MC-core-shifted
+60 100 140 180 220 260
+Generated mass [MeV]
+0.5
+1.0
+1.5
+2.0Mean fitted / injected yield
+5,000 selected candidates per toy
+60 100 140 180 220 260
+Generated mass [MeV]
+0.8
+1.0
+1.2
+1.4
+1.6Mean fitted / injected yield
+10,000 selected candidates per toy
+60 100 140 180 220 260
+Generated mass [MeV]
+0.8
+0.9
+1.0
+1.1Mean fitted / injected yield
+30,000 selected candidates per toy
+Figure 1: Mean raw recovery from the primary injected-sideband ﬁts. Error bars are the sample
+standard error across 40 toys; the horizontal line is exact mean recovery. The gray band marks the
+separate 260 MeV extension.
+At the smaller injections, the ﬁtted background oﬀset and its ﬂuctuations can be comparable
+to N , producing large changes in the raw ratio. Section 8 subtracts each toy’s zero-injection ﬁt to
+isolate the incremental response.
+4
+
+HPS Gaussian-Process Resonance Search v6.2 / Signal recovery
+5 Pulls and proﬁle inclusion
+The mean pull expresses the average residual in ﬁtted uncertainty units. A zero mean pull need
+not imply E[ ˆA] = N , since the uncertainty σA can vary with the residual. The tables therefore
+give the mean yield and mean uncertainty alongside the pull summaries.
+60 100 140 180 220 260
+Generated mass [MeV]
+−0.4
+−0.2
+0.0
+0.2
+0.4
+0.6
+Mean pull
+1,000 selected candidates per toy
+Pole-centered
+MC-core-shifted
+60 100 140 180 220 260
+Generated mass [MeV]
+−0.6
+−0.4
+−0.2
+0.0
+0.2
+0.4
+0.6
+Mean pull
+5,000 selected candidates per toy
+60 100 140 180 220 260
+Generated mass [MeV]
+−0.8
+−0.6
+−0.4
+−0.2
+0.0
+0.2
+0.4
+0.6
+Mean pull
+10,000 selected candidates per toy
+60 100 140 180 220 260
+Generated mass [MeV]
+−2.5
+−2.0
+−1.5
+−1.0
+−0.5
+0.0
+0.5
+Mean pull
+30,000 selected candidates per toy
+Figure 2: Mean pulls in the primary ﬁts. Bars are the sample pull standard deviation divided by√
+40. Both methods share the same background and injection draws.
+At 240 MeV and N = 30 , 000, the mean ﬁtted yields are 24,649 and 25,360 candidates for the
+pole- and core-centered windows. The corresponding mean pulls are -2.04 and -1.72. The shift
+reduces the negative residual but leaves a substantial deﬁcit.
+5
+
+HPS Gaussian-Process Resonance Search v6.2 / Signal recovery
+5.1 Dispersion and interval inclusion
+The pull width is the sample standard deviation, calculated with the T − 1 denominator. It is
+estimated directly from the individual pulls without ﬁtting a Gaussian to the histograms. With
+40 toys its sampling uncertainty remains appreciable: even for Gaussian pulls, the width has an
+approximate 11% relative standard error. The four injection levels also share background spectra,
+so their summaries are correlated.
+60 100 140 180 220 260
+Generated mass [MeV]
+0.80
+0.85
+0.90
+0.95
+1.00
+1.05
+1.10Sample pull standard deviation
+1,000 selected candidates per toy
+Pole-centered
+MC-core-shifted
+60 100 140 180 220 260
+Generated mass [MeV]
+0.80
+0.85
+0.90
+0.95
+1.00
+1.05
+1.10Sample pull standard deviation
+5,000 selected candidates per toy
+60 100 140 180 220 260
+Generated mass [MeV]
+0.80
+0.85
+0.90
+0.95
+1.00
+1.05
+1.10Sample pull standard deviation
+10,000 selected candidates per toy
+60 100 140 180 220 260
+Generated mass [MeV]
+0.80
+0.85
+0.90
+0.95
+1.00
+1.05
+1.10Sample pull standard deviation
+30,000 selected candidates per toy
+Figure 3: Sample pull widths for the primary ﬁts. The dashed line marks one. The exact- N signal
+ensemble and the GP uncertainty treatment need not produce this width even in the absence of
+mean bias.
+At 240 MeV and N = 30 , 000, the nominal 95% proﬁle set contains the truth in 15/40 pole-
+centered ﬁts and 22/40 shifted ﬁts. The corresponding 95% binomial intervals are 0.23–0.54 and
+0.38–0.71. These counts describe this toy ensemble; 40 trials do not establish calibrated coverage.
+6
+
+HPS Gaussian-Process Resonance Search v6.2 / Signal recovery
+6 Zero-injection behavior
+The N = 0 ﬁts use the same background spectra that appear at the four nonzero injection levels.
+They reveal the baseline ﬂuctuations and oﬀsets that contribute to R at small N . Clean and
+injected GP sidebands coincide at zero injection, so only one GP result is needed.
+60 100 140 180 220 260
+Generated mass [MeV]
+−2000
+0
+2000
+4000
+6000
+8000
+Mean fitted yield [candidates]
+Injected sidebands: zero injected signal
+Pole-centered
+MC-core-shifted
+60 100 140 180 220 260
+Generated mass [MeV]
+−3000
+−2000
+−1000
+0
+1000
+Mean fitted yield [candidates]
+Known background: zero injected signal
+Figure 4: Mean signed ﬁtted yield at zero injection, with standard errors across 40 background
+toys. The upper panel uses GP background estimation; the lower panel ﬁxes the known generating
+expectation.
+The uncertainty in the known-background control assumes that the background mean is known
+exactly. It excludes the statistical cost of estimating that mean from sideband data and cannot
+be substituted for the uncertainty in the GP extraction. The paired subtraction below uses each
+method’s own zero-injection ﬁt.
+7
+
+HPS Gaussian-Process Resonance Search v6.2 / Signal recovery
+7 Signal in the training sidebands
+The 30,000-candidate injections make the eﬀect of the broad MC tails visible relative to the sta-
+tistical ﬂuctuations. Across both masks and 60–240 MeV, clean-sideband mean recovery spans
+0.966–1.158, while known-background recovery spans 0.928–1.022.
+60 100 140 180 220 260
+Generated mass [MeV]
+0.8
+0.9
+1.0
+1.1
+1.2Mean fitted / injected yield
+Pole-centered
+Injected sidebands
+Clean sidebands
+Known background
+60 100 140 180 220 260
+Generated mass [MeV]
+0.8
+0.9
+1.0
+1.1
+1.2Mean fitted / injected yield
+MC-core-shifted
+60 100 140 180 220 260
+Generated mass [MeV]
+−2.5
+−2.0
+−1.5
+−1.0
+−0.5
+0.0
+0.5
+Mean pull
+60 100 140 180 220 260
+Generated mass [MeV]
+−2.0
+−1.5
+−1.0
+−0.5
+0.0
+0.5
+Mean pull
+Figure 5: Recovery and mean pulls at N = 30 , 000 for the three extraction conditions. Only the
+training sample changes between the injected- and clean-sideband GP ﬁts. The known-background
+ﬁt additionally ﬁxes the ﬁtted background vector.
+The eﬀect also occurs without toy ﬂuctuations. For a deterministic mean-count spectrum
+at 240 MeV with N = 30 , 000, the extracted yields are 24,023/24,859 with injected sidebands,
+29,743/29,724 with clean sidebands and 30,000/30,000 with known background, where each pair
+lists pole-centered/core-centered results. The additional sideband counts raise the background pre-
+diction in the signal window, leaving less yield for the signal component. Centering the mask on
+the MC core reduces this loss but does not remove the broad tail from the training sample.
+8
+
+HPS Gaussian-Process Resonance Search v6.2 / Signal recovery
+8 Paired response to the injected signal
+To separate the response to additional signal from the zero-injection oﬀset, deﬁne
+Rinc(m0, N ) = 1
+N T
+T∑
+t=1
+[
+ˆAt(m0, N ) − ˆAt(m0, 0)
+]
+. (7)
+This quantity measures the change in ﬁtted yield caused by adding signal to the same background
+toy. The raw estimator and its pulls retain the zero-injection oﬀset.
+60 100 140 180 220 260
+Generated mass [MeV]
+−1.0
+−0.5
+0.0
+0.5
+1.0
+1.5
+2.0
+(Shifted - pole) mean yield / N
+Paired extraction difference
+Injected N
+1,000
+5,000
+10,000
+30,000
+Same toy, two masks
+Upper left: a positive value means
+the shifted mask extracts more signal.
+Below: subtract each method's paired
+zero-injection fit before dividing by N.
+This separates the incremental response
+from the zero-injection offset.
+The two estimates share the same
+background and MC injection draws.
+60 100 140 180 220 260
+Generated mass [MeV]
+0.70
+0.75
+0.80
+0.85
+0.90
+0.95
+1.00Mean [A(N) - A(0)] / N
+Pole-centered: incremental response
+60 100 140 180 220 260
+Generated mass [MeV]
+0.80
+0.85
+0.90
+0.95
+1.00Mean [A(N) - A(0)] / N
+MC-core-shifted: incremental response
+Figure 6: The upper panel compares the two ﬁtted yields within each identical toy, divided by N .
+Error bars use the standard error of that paired diﬀerence. Lower panels show Rinc for each window
+prescription.
+At N = 30 , 000, Rinc spans 0.715–0.895 for the pole-centered mask and 0.780–0.938 for the
+shifted mask over 60–240 MeV. Adding the second set of 20 toys changes this increment by at most
+0.29 percentage points across those masses and methods. The ﬁrst 20 draws and their ﬁt results are
+unchanged and are preserved in the archived 20-toy release. The ensemble contains 1,760 injected
+toys and 440 background toys, giving 3,520 primary nonzero-injection ﬁts and 12,320 ﬁts including
+the controls. The persistent deﬁcit in the paired response agrees with the clean-sideband and
+mean-count comparisons.
+9
+
+HPS Gaussian-Process Resonance Search v6.2 / Signal recovery
+A Per-mass pull distributions
+Each outline below contains 40 primary-ﬁt pulls. The methods share bin edges within a mass panel,
+while ranges may diﬀer between masses. Histograms show counts rather than a smooth density
+estimate.
+−2 0 2
+Pull
+0
+5
+10Toys / bin
+60 MeV
+−2 0 2
+Pull
+0
+5
+10
+15Toys / bin
+80 MeV
+−2 0 2
+Pull
+0
+5
+10
+15Toys / bin
+100 MeV
+−2 0 2
+Pull
+0
+5
+10
+15Toys / bin
+120 MeV
+−2 0 2
+Pull
+0
+5
+10
+15Toys / bin
+140 MeV
+−2 0 2
+Pull
+0
+5
+10
+15Toys / bin
+160 MeV
+−2 0 2
+Pull
+0
+5
+10Toys / bin
+180 MeV
+−2 0 2
+Pull
+0
+5
+10
+15Toys / bin
+200 MeV
+−2 0 2
+Pull
+0
+5
+10
+15Toys / bin
+220 MeV
+−2 0 2
+Pull
+0
+5
+10
+15Toys / bin
+240 MeV
+−2 0 2
+Pull
+0
+5
+10
+15Toys / bin
+260 MeV (extension)
+Pole-centered
+MC-core-shifted
+Figure 7: Pulls for N = 1, 000. The shaded 260 MeV panel denotes the extraction extension.
+10
+
+HPS Gaussian-Process Resonance Search v6.2 / Signal recovery
+A.1 Five thousand injected candidates
+−2 0 2
+Pull
+0
+5
+10
+15Toys / bin
+60 MeV
+−2 0 2
+Pull
+0
+5
+10
+15Toys / bin
+80 MeV
+−2 0 2
+Pull
+0
+5
+10
+15Toys / bin
+100 MeV
+−2 0 2
+Pull
+0
+5
+10
+15Toys / bin
+120 MeV
+−2 0 2
+Pull
+0
+5
+10
+15Toys / bin
+140 MeV
+−2 0 2
+Pull
+0
+5
+10
+15
+20Toys / bin
+160 MeV
+−2 0 2
+Pull
+0
+5
+10
+15Toys / bin
+180 MeV
+−2 0 2
+Pull
+0
+5
+10
+15Toys / bin
+200 MeV
+−2 0 2
+Pull
+0
+5
+10
+15Toys / bin
+220 MeV
+−2 0 2
+Pull
+0
+5
+10
+15Toys / bin
+240 MeV
+−2 0 2
+Pull
+0
+5
+10
+15Toys / bin
+260 MeV (extension)
+Pole-centered
+MC-core-shifted
+Figure 8: Pulls for N = 5, 000; 40 toys per method and mass.
+11
+
+HPS Gaussian-Process Resonance Search v6.2 / Signal recovery
+A.2 Ten thousand injected candidates
+−2 0 2
+Pull
+0
+5
+10Toys / bin
+60 MeV
+−2 0 2
+Pull
+0
+5
+10
+15Toys / bin
+80 MeV
+−2 0 2
+Pull
+0
+5
+10
+15Toys / bin
+100 MeV
+−2 0 2
+Pull
+0
+5
+10
+15Toys / bin
+120 MeV
+−2 0 2
+Pull
+0
+5
+10
+15Toys / bin
+140 MeV
+−2 0 2
+Pull
+0
+5
+10
+15Toys / bin
+160 MeV
+−2 0 2
+Pull
+0
+5
+10Toys / bin
+180 MeV
+−2 0 2
+Pull
+0
+5
+10
+15Toys / bin
+200 MeV
+−2 0 2
+Pull
+0
+5
+10
+15Toys / bin
+220 MeV
+−2 0 2
+Pull
+0
+5
+10
+15Toys / bin
+240 MeV
+−2 0 2
+Pull
+0
+5
+10
+15Toys / bin
+260 MeV (extension)
+Pole-centered
+MC-core-shifted
+Figure 9: Pulls for N = 10, 000; 40 toys per method and mass.
+12
+
+HPS Gaussian-Process Resonance Search v6.2 / Signal recovery
+A.3 Thirty thousand injected candidates
+−2 0 2
+Pull
+0
+5
+10
+15Toys / bin
+60 MeV
+−2 0 2
+Pull
+0
+5
+10
+15Toys / bin
+80 MeV
+−2 0 2
+Pull
+0
+5
+10
+15Toys / bin
+100 MeV
+−2 0 2
+Pull
+0
+5
+10
+15Toys / bin
+120 MeV
+−2 0 2
+Pull
+0
+5
+10
+15Toys / bin
+140 MeV
+−2 0 2
+Pull
+0
+5
+10
+15
+20Toys / bin
+160 MeV
+−4 −2 0 2
+Pull
+0
+5
+10
+15Toys / bin
+180 MeV
+−4 −2 0 2
+Pull
+0
+5
+10
+15
+20Toys / bin
+200 MeV
+−4 −2 0 2
+Pull
+0
+5
+10
+15Toys / bin
+220 MeV
+−4 −2 0 2
+Pull
+0
+5
+10
+15
+20Toys / bin
+240 MeV
+−4 −2 0 2
+Pull
+0
+5
+10
+15Toys / bin
+260 MeV (extension)
+Pole-centered
+MC-core-shifted
+Figure 10: Pulls for N = 30, 000; 40 toys per method and mass.
+13
+
+HPS Gaussian-Process Resonance Search v6.2 / Signal recovery
+B Primary-ﬁt numerical results
+Tables below contain every primary mass/injection/method cell. P denotes the pole-centered win-
+dow and C the MC-core-centered window. The mass m0 is in MeV; ˆA and σA are in selected
+candidates. The raw recovery is R, and p and sp are the mean and sample standard deviation of
+the pulls. The last two columns give the nominal 68.27% and 95% proﬁle-inclusion counts out of
+40.
+m0 Mask ˆA σA R p s p k68 k95
+60 P 4,900 19,376 4.900 0.20 1.03 24 38
+60 C 5,566 21,052 5.566 0.22 0.98 27 38
+80 P 5,227 8,861 5.227 0.48 0.95 26 36
+80 C 5,411 9,374 5.411 0.47 0.92 28 36
+100 P 300 6,983 0.300 -0.10 0.89 33 38
+100 C 641 7,360 0.641 -0.05 0.90 29 38
+120 P 1,475 5,708 1.475 0.08 1.02 29 37
+120 C 1,667 5,985 1.667 0.11 0.96 29 38
+140 P 1,158 4,761 1.158 0.03 1.11 29 37
+140 C 1,361 4,942 1.361 0.07 1.07 29 37
+160 P -89 3,950 -0.089 -0.28 0.96 27 38
+160 C -69 4,147 -0.069 -0.26 0.92 29 38
+180 P 698 3,412 0.698 -0.09 0.93 29 38
+180 C 861 3,549 0.861 -0.04 0.86 30 40
+200 P 335 3,041 0.335 -0.22 0.86 31 38
+200 C 490 3,132 0.490 -0.16 0.79 32 39
+220 P 1,335 2,752 1.335 0.12 1.00 29 38
+220 C 1,317 2,833 1.317 0.11 1.01 27 38
+240 P 1,202 2,596 1.202 0.08 0.96 30 38
+240 C 1,097 2,669 1.097 0.04 0.93 29 38
+260∗ P 1,752 2,659 1.752 0.28 0.98 25 38
+260∗ C 1,777 2,745 1.777 0.28 0.88 27 37
+Table 3: Primary ﬁts for N = 1, 000. The asterisk marks 260 MeV.
+The 260 MeV extension uses the archived 250 MeV kernel and is excluded from the 60–240 MeV
+summary ranges. Full-precision results, all controls, Monte Carlo standard errors and Clopper–
+Pearson intervals are retained in results/summary.csv; individual ﬁts are in results/toys.csv.
+Input identities and the ﬁxed construction are recorded in protocol.json and the provenance
+ﬁles.
+14
+
+HPS Gaussian-Process Resonance Search v6.2 / Signal recovery
+B.1 Five thousand injected candidates
+m0 Mask ˆA σA R p s p k68 k95
+60 P 7,749 19,377 1.550 0.14 1.02 25 37
+60 C 8,678 21,054 1.736 0.18 0.98 28 38
+80 P 8,686 8,861 1.737 0.42 0.95 26 36
+80 C 9,101 9,375 1.820 0.44 0.92 28 36
+100 P 3,822 6,984 0.764 -0.17 0.89 33 38
+100 C 4,394 7,361 0.879 -0.08 0.90 29 38
+120 P 5,019 5,709 1.004 0.00 1.02 31 37
+120 C 5,437 5,986 1.087 0.07 0.96 30 38
+140 P 4,726 4,762 0.945 -0.06 1.11 30 37
+140 C 5,105 4,943 1.021 0.02 1.07 30 37
+160 P 3,446 3,951 0.689 -0.39 0.96 26 38
+160 C 3,698 4,148 0.740 -0.31 0.91 30 38
+180 P 4,183 3,413 0.837 -0.24 0.93 29 39
+180 C 4,531 3,550 0.906 -0.13 0.86 29 39
+200 P 3,845 3,043 0.769 -0.38 0.86 28 38
+200 C 4,139 3,134 0.828 -0.27 0.79 31 39
+220 P 4,707 2,755 0.941 -0.11 1.00 28 37
+220 C 4,817 2,835 0.963 -0.06 1.01 26 39
+240 P 4,455 2,598 0.891 -0.21 0.95 29 38
+240 C 4,459 2,672 0.892 -0.20 0.93 30 38
+260∗ P 4,839 2,664 0.968 -0.06 0.98 28 38
+260∗ C 4,977 2,750 0.995 -0.01 0.88 28 40
+Table 4: Primary ﬁts for N = 5, 000; 40 toys per row. Column deﬁnitions are given at the start of
+Appendix B.
+15
+
+HPS Gaussian-Process Resonance Search v6.2 / Signal recovery
+B.2 Ten thousand injected candidates
+m0 Mask ˆA σA R p s p k68 k95
+60 P 11,448 19,379 1.145 0.08 1.02 25 38
+60 C 12,682 21,056 1.268 0.13 0.98 27 38
+80 P 13,014 8,862 1.301 0.34 0.95 27 36
+80 C 13,724 9,376 1.372 0.40 0.92 28 38
+100 P 8,261 6,985 0.826 -0.25 0.89 30 39
+100 C 9,125 7,362 0.913 -0.12 0.90 30 38
+120 P 9,429 5,710 0.943 -0.10 1.02 30 37
+120 C 10,133 5,987 1.013 0.02 0.96 31 38
+140 P 9,206 4,763 0.921 -0.17 1.12 29 36
+140 C 9,805 4,944 0.981 -0.04 1.08 30 37
+160 P 7,830 3,952 0.783 -0.55 0.96 22 39
+160 C 8,367 4,149 0.837 -0.39 0.91 28 38
+180 P 8,548 3,415 0.855 -0.43 0.94 27 39
+180 C 9,137 3,552 0.914 -0.24 0.87 28 39
+200 P 8,199 3,045 0.820 -0.59 0.86 28 38
+200 C 8,659 3,136 0.866 -0.43 0.80 31 39
+220 P 8,912 2,757 0.891 -0.39 0.99 27 37
+220 C 9,196 2,838 0.920 -0.28 0.99 28 38
+240 P 8,454 2,602 0.845 -0.59 0.97 28 38
+240 C 8,616 2,676 0.862 -0.52 0.94 27 38
+260∗ P 8,629 2,669 0.863 -0.51 0.99 24 36
+260∗ C 8,896 2,755 0.890 -0.40 0.90 29 38
+Table 5: Primary ﬁts for N = 10, 000; 40 toys per row. Column deﬁnitions are given at the start of
+Appendix B.
+16
+
+HPS Gaussian-Process Resonance Search v6.2 / Signal recovery
+B.3 Thirty thousand injected candidates
+m0 Mask ˆA σA R p s p k68 k95
+60 P 25,657 19,387 0.855 -0.22 1.02 28 38
+60 C 28,206 21,064 0.940 -0.08 0.97 28 38
+80 P 30,320 8,866 1.011 0.04 0.95 27 40
+80 C 32,185 9,379 1.073 0.23 0.92 29 39
+100 P 25,830 6,989 0.861 -0.60 0.89 27 39
+100 C 27,846 7,365 0.928 -0.29 0.90 30 39
+120 P 27,046 5,713 0.902 -0.52 1.02 27 37
+120 C 28,857 5,991 0.962 -0.19 0.96 29 38
+140 P 27,100 4,768 0.903 -0.61 1.12 21 36
+140 C 28,571 4,949 0.952 -0.29 1.07 26 36
+160 P 25,397 3,958 0.847 -1.16 0.94 13 33
+160 C 27,097 4,155 0.903 -0.70 0.90 21 38
+180 P 26,085 3,422 0.870 -1.14 0.94 19 32
+180 C 27,617 3,559 0.921 -0.67 0.87 25 38
+200 P 25,582 3,054 0.853 -1.45 0.86 11 29
+200 C 26,738 3,144 0.891 -1.04 0.79 18 37
+220 P 25,741 2,768 0.858 -1.54 1.01 9 28
+220 C 26,677 2,849 0.889 -1.17 1.02 20 32
+240 P 24,649 2,616 0.822 -2.04 0.94 6 15
+240 C 25,360 2,690 0.845 -1.72 0.91 8 22
+260∗ P 23,918 2,692 0.797 -2.26 0.95 4 15
+260∗ C 24,795 2,778 0.826 -1.87 0.87 5 21
+Table 6: Primary ﬁts for N = 30, 000; 40 toys per row. Column deﬁnitions are given at the start of
+Appendix B.
+17

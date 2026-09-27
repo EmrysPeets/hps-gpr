@@ -1,0 +1,55 @@
+{
+  "version": "5.5.4",
+  "mass_reference_MeV": 92,
+  "mean_bounds_MeV": [
+    90,
+    94
+  ],
+  "width_fraction_bounds": [
+    0,
+    1
+  ],
+  "width_main_penalty": "0.5*sum(t_d**2); assumed MC-centered calibration constraint",
+  "width_control_penalty": 0,
+  "beta_bounds": [
+    -6,
+    6
+  ],
+  "beta_frozen": -2.903584573683431,
+  "beam_energy_GeV": {
+    "2015": 1.056,
+    "2016": 2.3,
+    "2021": 3.74
+  },
+  "experiment": "Per-dataset fixed union of allowed means with +/-2.25 fully-scaled sigma92; GP kernel92, sidebands, bins, GP constraint, and MC92 density conversion frozen in all alternatives",
+  "signal_width": "sigma_MC92 + t*(sigma_scaled92-sigma_MC92); no sub-MC widths",
+  "shape_grid": {
+    "mean_step_MeV": 0.25,
+    "width_fraction_step": 0.125
+  },
+  "inference": "Exact conditional Poisson/Gaussian likelihood; nominal sqrtQ shown separately from local Gaussian score-reference tails; original Sidak reference shown but not a calibration of the expanded search",
+  "smaller_data": "Overlapping selection/provenance checks, never independent combination members",
+  "workers": 1,
+  "blas_threads": 1,
+  "parent_version": "5.5.3",
+  "new_mass_grid_MeV": [
+    90,
+    94,
+    0.25
+  ],
+  "new_shape": "Fixed common tested mass; fully scaled sigma92 in all new curves and bands",
+  "new_rate_models": [
+    "common coupling",
+    "power beta in[-6,6]",
+    "exp[-k(E-2.3)] with k in[0,6]GeV^-1",
+    "independent positive amplitudes"
+  ],
+  "new_combinations": [
+    "equal-weight signed Gaussian Stouffer",
+    "Fisher of signed one-sided Gaussian probabilities"
+  ],
+  "new_upper_bound": "90% CLs for total expected fitted-window signal rows in known-covariance Gaussian reference; no universal epsilon2 for independent amplitudes",
+  "new_rate_bands": "Conditional approximate pointwise68/95% log-Wald with full profiled normalization-slope covariance; exact joint parameter contours",
+  "new_tail_method": "Deterministic three-dimensional Gaussian spherical radial integral including slope search; fixed mass and width; not global",
+  "prior_results": "Pinned v5.5.3 curves and ledgers retained unchanged"
+}

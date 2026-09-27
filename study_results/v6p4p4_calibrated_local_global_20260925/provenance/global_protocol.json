@@ -1,0 +1,44 @@
+{
+  "version": "6.4.3",
+  "toys": 1024,
+  "seed": 643250925,
+  "calibration_namespace": 1,
+  "spectra": "Archived full2015, full2016 and2021 10percent",
+  "domains_MeV": {
+    "2016": [
+      40,
+      175
+    ],
+    "2021": [
+      60,
+      240
+    ],
+    "combined": [
+      60,
+      240
+    ]
+  },
+  "step_MeV": 1,
+  "windows": {
+    "2016": [
+      -2.5,
+      2.5
+    ],
+    "2021": [
+      -4,
+      3
+    ],
+    "2015": "retained Gaussian +/-2.25 reference sigma"
+  },
+  "center_and_shape": "Full selected neighboring MC, linear core center/width; same interpolated MC shapes as v6.4.1/2",
+  "fit_equals_exclusion": true,
+  "combined": "Common inherited coupling coordinate; independent campaign GP constraints;2015 through100,2016 through175,2021 through240",
+  "statistic": "T=max_m max(0,signed profile likelihood root(m))^2; no null-mean subtraction or masswise rescaling",
+  "background_source": "Fixed archived GP arithmetic-mean spectrum per campaign; independent Poisson bins and campaigns; no GP-function draws",
+  "repeated_procedure": "Same full campaign draw at all masses and scopes; recompute GP prediction,covariance and nuisance profiles for every mass and toy; fixed archived kernel settings",
+  "tail": "Exceedances Ttoy>=Tobserved; add-one rank(k+1)/(N+1); exact two-sided95percent Clopper-Pearson interval for exceedance probability",
+  "scope": "Mass-grid global conditional on fixed source, selected windows and templates; does not calibrate prior method/window/source selection or a continuous mass supremum",
+  "script_sha256": "859e789130a495d7a04ab875bcab35153fb56603530d414ccbcb8ac3da88e7d4",
+  "engine_sha256": "5da6e94f1f4c59dd3b5403100ea5b6c7a18bcd442f9a47480af551b3f9c88f62",
+  "inputs_sha256": "732f523189d50984f77897fe3b0940ef5b13e08d3b0d30b83a6f020d585b2be0"
+}

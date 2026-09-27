@@ -1,0 +1,103 @@
+{
+  "passed": true,
+  "model_checks": [
+    {
+      "model": "common",
+      "positive_profile_curvature": true,
+      "finite_difference_hessian_passed": true,
+      "interior_slope_or_common": true,
+      "nll_no_worse_than_dense_grid": true,
+      "max_gradient": 3.54836160454397e-11
+    },
+    {
+      "model": "power",
+      "positive_profile_curvature": true,
+      "finite_difference_hessian_passed": true,
+      "interior_slope_or_common": true,
+      "nll_no_worse_than_dense_grid": true,
+      "max_gradient": 3.850924549242407e-07
+    },
+    {
+      "model": "exponential",
+      "positive_profile_curvature": true,
+      "finite_difference_hessian_passed": true,
+      "interior_slope_or_common": true,
+      "nll_no_worse_than_dense_grid": true,
+      "max_gradient": 3.662840112328425e-07
+    }
+  ],
+  "parent_replays": [
+    {
+      "model": "common",
+      "parent_name": "scaled_fixed_common",
+      "Q0_absolute_difference": 0.0,
+      "amplitude_relative_difference": 1.1102230246251565e-16
+    },
+    {
+      "model": "power",
+      "parent_name": "scaled_fixed_energy_free",
+      "Q0_absolute_difference": 1.3642420526593924e-12,
+      "amplitude_relative_difference": 2.716034275263013e-08
+    }
+  ],
+  "max_inner_score": 1.991825957503579e-07,
+  "contour_outer_edge_checks": {
+    "power": [
+      {
+        "coordinate": "log_A_1e8",
+        "edge": "min",
+        "coordinate_value": 3.947125901123214,
+        "minimum_delta_2nll": 12.752160025316812
+      },
+      {
+        "coordinate": "log_A_1e8",
+        "edge": "max",
+        "coordinate_value": 7.85671998221576,
+        "minimum_delta_2nll": 58.00513005671948
+      },
+      {
+        "coordinate": "slope",
+        "edge": "min",
+        "coordinate_value": -5.016231080993243,
+        "minimum_delta_2nll": 6.780613933291704
+      },
+      {
+        "coordinate": "slope",
+        "edge": "max",
+        "coordinate_value": -0.9575942498055863,
+        "minimum_delta_2nll": 8.238894152719638
+      }
+    ],
+    "exponential": [
+      {
+        "coordinate": "log_A_1e8",
+        "edge": "min",
+        "coordinate_value": 4.0892571488414635,
+        "minimum_delta_2nll": 11.263696255988265
+      },
+      {
+        "coordinate": "log_A_1e8",
+        "edge": "max",
+        "coordinate_value": 8.06808239575692,
+        "minimum_delta_2nll": 67.63137658364312
+      },
+      {
+        "coordinate": "slope",
+        "edge": "min",
+        "coordinate_value": 0.05902878702686176,
+        "minimum_delta_2nll": 10.760090076557873
+      },
+      {
+        "coordinate": "slope",
+        "edge": "max",
+        "coordinate_value": 3.3021187514909043,
+        "minimum_delta_2nll": 7.344702458914725
+      }
+    ]
+  },
+  "all_nominal_95_contours_closed_inside_grid": true,
+  "contour_rows": 9882,
+  "band_rows": 726,
+  "elapsed_seconds": 9.356945753097534,
+  "script_sha256": "05c48aff0792423c8b76761a3753ea281cea901e9b40792ea3141dcfa7e7aeec"
+}

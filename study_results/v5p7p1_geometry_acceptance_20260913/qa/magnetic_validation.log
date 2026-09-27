@@ -1,0 +1,102 @@
+{
+  "status": "passed",
+  "unit_system": "mm,MeV/c,T,q/e",
+  "checks": [
+    {
+      "test": "uniform_field_analytic_circle",
+      "charge": 1,
+      "max_position_error_mm": 2.2737367544323206e-12,
+      "max_direction_norm_error": 2.220446049250313e-16
+    },
+    {
+      "test": "uniform_field_analytic_circle",
+      "charge": -1,
+      "max_position_error_mm": 2.2737367544323206e-12,
+      "max_direction_norm_error": 2.220446049250313e-16
+    },
+    {
+      "test": "zero_field_ray_equivalence",
+      "year": "2015",
+      "directions_per_daughter": 1024,
+      "all_counts_identical": true
+    },
+    {
+      "test": "zero_field_ray_equivalence",
+      "year": "2016",
+      "directions_per_daughter": 1024,
+      "all_counts_identical": true
+    },
+    {
+      "test": "zero_field_ray_equivalence",
+      "year": "2021",
+      "directions_per_daughter": 1024,
+      "all_counts_identical": true
+    },
+    {
+      "test": "field_step_refinement",
+      "year": "2015",
+      "mass_MeV": 58.08,
+      "directions": 1024,
+      "steps_mm": [
+        5,
+        2.5,
+        1.25
+      ],
+      "accepted_counts": [
+        263,
+        263,
+        263
+      ],
+      "changed_classifications_5_vs_1p25": 0,
+      "B_at_vertex_T": [
+        0.0,
+        -0.19750981676800003,
+        0.0
+      ]
+    },
+    {
+      "test": "field_step_refinement",
+      "year": "2016",
+      "mass_MeV": 126.5,
+      "directions": 1024,
+      "steps_mm": [
+        5,
+        2.5,
+        1.25
+      ],
+      "accepted_counts": [
+        261,
+        261,
+        261
+      ],
+      "changed_classifications_5_vs_1p25": 0,
+      "B_at_vertex_T": [
+        0.0,
+        -0.430612,
+        0.0
+      ]
+    },
+    {
+      "test": "field_step_refinement",
+      "year": "2021",
+      "mass_MeV": 205.7,
+      "directions": 1024,
+      "steps_mm": [
+        5,
+        2.5,
+        1.25
+      ],
+      "accepted_counts": [
+        473,
+        473,
+        473
+      ],
+      "changed_classifications_5_vs_1p25": 0,
+      "B_at_vertex_T": [
+        0.0,
+        -0.705516,
+        0.0
+      ]
+    }
+  ]
+}

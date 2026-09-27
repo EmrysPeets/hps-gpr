@@ -1,0 +1,116 @@
+{
+  "reviewer": "Independent skeptical statistics review; no changes to parent computations",
+  "manual_final_report_review": {
+    "files": [
+      "source/report.tex",
+      "source/counterfactual_table.tex",
+      "source/residual_table.tex",
+      "source/residual_findings.tex",
+      "source/cross_scope_table.tex"
+    ],
+    "scientific_blockers": [],
+    "verified": "Scientific definitions, numeric claims, tail constructions, conditional boundaries and selected-mass qualification agree with audited outputs. Root owns rendered PDF QA."
+  },
+  "deterministic_checks": {
+    "201_residual_masses_and_8_controls_each": true,
+    "all_1608_arrays_have_256_finite_entries": true,
+    "original_slide14_replay_exact": true,
+    "trace_plus_bias_decomposition": true,
+    "empirical_fixedV_identity": true,
+    "control_CSV_means_match_saved_arrays": true,
+    "exploratory_residual_maximum_exceedances_20_of_256": true,
+    "GLS_projection_fraction_within_Cauchy_bound": true
+  },
+  "max_errors": {
+    "slide14_replay": 0.0,
+    "trace_plus_bias": 2.0816681711721685e-16,
+    "empirical_fixedV": 6.661338147750939e-16,
+    "control_CSV_means": 0.0
+  },
+  "analytic_Gaussian_control_checks": [
+    {
+      "control": "independent_mass_nodes",
+      "analytic_tail": 0.6751595831634396,
+      "MC_frequency": 0.67394,
+      "MC_z": -1.1646305290732952,
+      "within_5_MC_SE": true
+    },
+    {
+      "control": "perfectly_correlated_nodes",
+      "analytic_tail": 0.06806647479388721,
+      "MC_frequency": 0.06772,
+      "MC_z": -0.615215892626061,
+      "within_5_MC_SE": true
+    }
+  ],
+  "residual_scan": {
+    "observed_max_Q_per_bin": 2.32999669034699,
+    "k": 20,
+    "N": 256,
+    "p_addone": 0.08171206225680934,
+    "CP95": [
+      0.04837229150657823,
+      0.11808012478450235
+    ],
+    "interpretation": "Exploratory fixed-source residual scan; not resonance significance or unconditional model goodness of fit."
+  },
+  "residual_quantitative_bounds": {
+    "first_order_E_Q_per_bin_range": [
+      0.9975658584464854,
+      1.1847891186544006
+    ],
+    "noise_trace_per_bin_range": [
+      0.9879009771562193,
+      0.998573485861125
+    ],
+    "max_abs_exact_minus_linear_mean": 0.00021353395393738928,
+    "max_abs_adaptive_minus_fixedV_mean": 0.0009514652648154977,
+    "max_conditioning_GLS_root_difference": 4.4312875618901515e-08,
+    "projection_at_78": {
+      "mass_MeV": 78.0,
+      "Nbin": 16.0,
+      "deterministic_total_Q": 0.487138171083302,
+      "deterministic_Q_per_bin": 0.030446135692706374,
+      "signal_direction_GLS_root": 0.576796879149981,
+      "signal_direction_GLS_squared": 0.3326946397971578,
+      "saved_profiled_root_a": 0.5767835900382478,
+      "saved_profiled_root_a_squared": 0.33267930973740945,
+      "GLS_signal_direction_fraction": 0.6829574431773816,
+      "posterior_covariance_relative_change": 3.2230039515079164e-07,
+      "conditioned_GLS_minus_raw": -9.040462156661988e-09
+    }
+  },
+  "unresolved_2016_width_region": [
+    {
+      "mass_MeV": 43.5,
+      "model_scale_s": 0.9548888129054305,
+      "direct_signed_sd": 1.1298859287891363,
+      "sd_bonf95_normal_lo": 0.9664764907121444,
+      "sd_bonf95_normal_hi": 1.3490616626315135
+    },
+    {
+      "mass_MeV": 44.0,
+      "model_scale_s": 0.953804407831417,
+      "direct_signed_sd": 1.1175908008184785,
+      "sd_bonf95_normal_lo": 0.9559595422033044,
+      "sd_bonf95_normal_hi": 1.334381520716534
+    }
+  ],
+  "limitations": [
+    "A non-rejection is not equality of moments or physical-source validation.",
+    "Normal-theory SD intervals are assumption-dependent; nearby 2016 failures are correlated.",
+    "No uncertainty of the observed-data-derived source is included.",
+    "Counterfactual Gaussian tails do not prescribe recentering the observed scan.",
+    "Empirical squared mean shifts require their positive finite-MC floor; corrected descriptive values may be negative."
+  ],
+  "files_reviewed_sha256": {
+    "scan_maximum/results/summary.json": "f54b11d971d201cb8a726b6c664863305b9e29aab79ec0b6395d3481cfd9d4b1",
+    "residual_diagnostic/results/analytic_scan.csv": "cdfc321ae1e5ef5ba65b00f9dc3611ca709269ccba7320579fdd8f4cacaabaac",
+    "residual_diagnostic/results/poisson_controls.csv": "c88e806992513966baa5318dc448e9260873967ca1f367e253e913c9313cdc5f",
+    "residual_diagnostic/results/paired_contrasts.csv": "6ecdd41454feef368dc00a2c841220f71ee9fa320b3d87bd6183c20c3e281b08",
+    "residual_diagnostic/results/empirical_decomposition.csv": "1e836448dbbab3a653588262f5489a6058424659b527d9d4895412fd63524257",
+    "residual_diagnostic/results/bias_projection_bridge.csv": "02f563fc83e9f400af559e47ede1c4a7b5f7084636aaab2b14876b5d1be4953e",
+    "residual_diagnostic/results/validation.json": "d47fb451d16888a3be6ca373bc30e89bad114742be1f9a17109917569ebd416c"
+  },
+  "passed_numeric_and_definition_audit": true
+}

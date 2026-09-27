@@ -1,0 +1,124 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,microtype,graphicx,booktabs,amsmath,amssymb,array,hyperref,fancyhdr,caption}
+\usepackage[section]{placeins}
+\hypersetup{hidelinks,pdfdisplaydoctitle=true,pdftitle={HPS Gaussian-Process Resonance Search: Analysis Note v5.8.5},pdfauthor={Emrys Peets},pdfsubject={Common-mass likelihood and mass-coherence extension}}
+\urlstyle{same}
+\pagestyle{fancy}\fancyhf{}
+\setlength{\headheight}{14pt}
+\fancyhead[L]{\small HPS Gaussian-Process Resonance Search}
+\fancyhead[R]{\small v5.8.5 / Review Draft}
+\fancyfoot[C]{\thepage}
+\fancypagestyle{plain}{\fancyhf{}\fancyhead[L]{\small HPS Gaussian-Process Resonance Search}\fancyhead[R]{\small v5.8.5 / Review Draft}\fancyfoot[C]{\thepage}}
+\setlength{\tabcolsep}{5pt}
+\setlength{\emergencystretch}{2em}
+\renewcommand{\arraystretch}{1.12}
+\captionsetup{font=small,labelfont=normalfont}
+\renewcommand{\topfraction}{.95}\renewcommand{\bottomfraction}{.85}\renewcommand{\textfraction}{.05}\renewcommand{\floatpagefraction}{.8}\setcounter{topnumber}{3}\setcounter{bottomnumber}{2}\setcounter{totalnumber}{5}
+\newcommand{\heading}[1]{\section{#1}}
+\newcommand{\fig}[3][1]{\begin{figure}[htbp]\centering\includegraphics[width=#1\linewidth,height=.68\textheight,keepaspectratio]{../figures/#2.pdf}\caption{#3}\label{fig:#2}\end{figure}}
+\newcommand{\sfN}{\overline\Phi}
+\title{HPS Gaussian-Process Resonance Search\\[0.5em]
+\large Common-mass likelihood and mass-coherence study\\Analysis Note v5.8.5}
+\author{Emrys Peets\\Stanford University and SLAC National Accelerator Laboratory}
+\date{19 September 2026}
+\begin{document}
+\maketitle
+\begin{abstract}
+\input{abstract.tex}
+\end{abstract}
+\section{Introduction}
+This continuation tests a resonance at one common mass with independent nonnegative signal amplitudes in the 2015, 2016 and 2021 (10\%) samples. It reuses the pinned v5.8.4 spectra, likelihoods, background sources, response derivatives and 256 complete Poisson scans. The full search remains the integer grid 19--250 MeV, with each dataset included only on its inherited support.
+\input{baseline_table.tex}
+\fig[1]{methods_full_domain}{Baseline $\pm2.25\sigma_m$ comparison: local significance and probability for an equally strong score anywhere on the full 19--250 MeV grid. Curves use conditional Gaussian-response calibration; Table 1 retains the direct Poisson count for the new test. Shading marks the post-hoc 80--105 MeV diagnostic interval. Each method uses its own declared ordering and null maxima.}
+
+
+\input{domain_context.tex}
+
+
+\heading{Common-mass likelihood}
+For independent datasets, at fixed mass and width,
+\[
+ L(\boldsymbol\mu,\boldsymbol\theta;m,w)
+ =\prod_{d\in A(m)}L_d(\mu_d,\theta_d;m,w),\qquad \mu_d\geq0.
+\]
+Each local likelihood is the archived Poisson model with correlated Gaussian GP-background constraint. Its expected bin counts have the form
+$\lambda_d=b_d+L_d\theta_d+A_d S_d$ and penalty $\theta_d^T\theta_d/2$. The engine uses the original template normalization $A_d$, with fitted-window yield $\mu_d=A_d\sum_i S_{di}$. This is a one-to-one amplitude reparameterization. Here $L_d$ in the count equation is the covariance factor, distinct from the likelihood symbol. The local background prediction and covariance are conditioned on the sidebands of each observed or toy spectrum. The full generating source is fixed.
+\[
+ q_R(m;w)=2\left[\sum_d\mathrm{NLL}_d(0,\hat\theta_{d,0})
+       -\sum_d\mathrm{NLL}_d(\hat\mu_d^{+},\hat\theta_d)\right]
+       =\sum_{d\in A(m)}[\max(r_d(m;w),0)]^2.
+\]
+The archived signed root $r_d$ uses the unconstrained single-amplitude fit and the zero-amplitude profile. Convexity and factorization make the clipped-root identity exact for this likelihood, including boundary fits. This is a direct likelihood construction; Fisher or Stouffer p-values do not enter $q_R$. Independent amplitudes impose no common coupling or calibrated relative yield. They also allow one or two amplitudes to vanish, so rejection of the all-zero null does not establish a signal in every dataset.
+
+The exact likelihood statistic must be distinguished from its sampling calibration. For the conditional response approximation,
+\[
+ r_d^*(m,w)=a_d(m,w)+D_{d,m,w}^{T}\xi_d,\qquad
+ \xi_d\sim N(0,I),\qquad s_d^2=D_{d,m,w}^{T}D_{d,m,w}.
+\]
+Different datasets fluctuate independently. Within each dataset the same latent fluctuation drives the entire mass scan. The probability of $q_R=0$ is
+$\prod_{d\in A(m)}\Phi[-a_d(m,w)/s_d(m,w)]$; its inclusive tail is one.
+\input{calibration_text.tex}
+\fig[1]{profile_statistic}{The exact observed profile statistic $q_R$ for all four widths. Left: full domain, including changes in active datasets. Right: diagnostic interval. The global ordering uses calibrated $-\log p_R$, whose maximum can differ from the maximum of raw $q_R$. Neither ordinate is replaced by $\sqrt{q_R}$ as a significance.}
+
+
+\heading{Results of the combined search}
+\input{width_table.tex}
+\fig[.94]{free_widths_diagnostic}{Free-amplitude local significance and full-domain probability, shown near the inspected structure. Every global probability in this zoom still uses the complete 19--250 MeV scan. Gaussian-response estimates are accompanied by direct Poisson counts and intervals in Table 2 and the numerical ledger. The four curves reuse the same observations and are not four independent confirmations.}
+\input{width_text.tex}
+The same width controls both the bins excluded from GP conditioning and the fitted likelihood window. Signal templates retain their original normalization. These are fixed-kernel window comparisons; no width has been adopted by choosing its largest observed significance. The displayed mass-global probabilities do not correct the post-observation comparison of widths or methods.
+
+
+\heading{Mass stability across blind widths}
+\fig[.98]{individual_stability}{All twelve signed reference-score curves $Z_{d,w}(m)=(r_{d,w}-a_{d,w})/s_{d,w}$ in the post-hoc diagnostic interval. Dots mark the 1 MeV grid; the dotted vertical line is 92 MeV. Gray space beyond 100 MeV in the 2015 panel is outside its support. Signed scores retain deficits, unlike nonnegative significance displays.}
+\input{stability_table.tex}
+\input{stability_text.tex}
+
+
+\subsection{Individual amplitudes at 92 MeV}
+\fig{stability_matrix}{Signed-score stability matrix: rows are dataset and half-width, columns are tested masses. The gray cells are unavailable 2015 masses. This is a post-hoc diagnostic display, with one common color scale; it is not a reduced discovery search.}
+\input{amplitude_table.tex}
+Here $\hat\mu_d^+$ is the independent nonnegative signal amplitude expressed as fitted signal events in that width's likelihood window. These are conditional fitted yields; they are not efficiency-corrected rates. The full-template yield and the original amplitude parameter $A_d$ are also saved in the ledger. In that parameterization $A_d=\epsilon_d^2/10^{-8}$, used here simply as an independent template normalization for each dataset. All twelve 92 MeV fitted amplitudes are positive. Their local reference $Z$ values alone do not demonstrate equal peak locations or a common physical coupling.
+
+
+\heading{Null distribution of the coherence statistic}
+For comparison on identical support, the coherence statistic uses the post-hoc common interval 80--100 MeV. In each dataset and width, select the maximum signed reference score among sites with a positive raw fit. Exact ties choose the lower mass. If any dataset--width has no positive site, its complete diagnostic is assigned $T=W=+\infty$ and cannot count as coherent.
+\[
+ \bar m=\frac{\sum_{d,w}\hat m_{d,w}/\sigma_d^2(92)}{\sum_{d,w}1/\sigma_d^2(92)},\qquad
+ T=\frac1{12}\sum_{d,w}\left[\frac{\hat m_{d,w}-\bar m}{\sigma_d(92)}\right]^2,
+ \qquad W=\frac13\sum_d R_d^2.
+\]
+Small $T$ describes peaks clustered at one mass across both datasets and widths. $W$ separately describes stability across width. The detector resolutions supply a dimensionless comparison scale; they are not claimed to be peak-estimator standard errors. These definitions were fixed in the continuation before extracting its observed peak table, but the region and scientific question arose after inspection. Their lower-tail probabilities are exploratory null diagnostics, not discovery significances, and are not multiplied together.
+\input{coherence_table.tex}
+\fig[.95]{coherence_null}{Inclusive lower-tail distributions from the 256 paired exact Poisson scans and 100,000 supplemental Gaussian-response scans. Each toy repeats the peak selection on the same grid and the same widths. Dashed lines mark observed values; smaller values indicate tighter coherence or greater stability. Ineligible toys remain in the denominator.}
+\input{coherence_text.tex}
+
+
+\heading{Validation}
+\input{validation_text.tex}
+\heading{Discussion}
+\input{conclusion.tex}
+The background source was fitted to the observed data and then frozen. Neither ensemble propagates source-estimation uncertainty, possible signal absorption during source construction, background-model selection, or unspecified correlated systematic uncertainties. The direct toys do refit the local GP predictions and profile the likelihood on each complete generated spectrum. The response fields approximate those operations by their stored derivatives. Agreement with 256 toys is a limited check, especially in sparse tails, not proof of precise Gaussian-tail calibration.
+
+The 2015 support extension through 100 MeV, 2021 sample fraction, resolution functions, kernel states and signal templates remain inherited assumptions. No continuous-mass convergence claim is made: these results describe the 1 MeV grid. The parent study separately examined 0.5 versus 1 MeV spacing. The current extension does not choose a finer grid or smaller search domain after seeing a preferable result.
+
+
+\subsection{Reproducibility}
+The source bundle includes all pinned inputs needed by this continuation, copied likelihood code, analysis and plotting scripts, the protocol, numerical ledgers, saved null maxima and coherence statistics, validation records, and SHA-256 manifests. The released v5.8.4 study and output package were hashed before and after the continuation. Rebuild commands are in \texttt{README.md}; the original report is included unchanged and precedes this extension in the combined PDF.
+\FloatBarrier
+\begin{thebibliography}{9}
+\bibitem{cowan} G. Cowan, K. Cranmer, E. Gross and O. Vitells,
+\textit{Asymptotic formulae for likelihood-based tests of new physics},
+\href{https://arxiv.org/abs/1007.1727}{arXiv:1007.1727}.
+\bibitem{gross} E. Gross and O. Vitells,
+\textit{Trial factors for the look elsewhere effect in high energy physics},
+\href{https://arxiv.org/abs/1005.1891}{arXiv:1005.1891}.
+\bibitem{ananiev} V. Ananiev and A. L. Read,
+\textit{Gaussian Process-based calculation of look-elsewhere trials factor},
+\href{https://arxiv.org/abs/2206.12328}{arXiv:2206.12328}.
+\bibitem{parent} HPS-GPR v5.8.4,
+\textit{Independent combinations, mass spacing and blind-window comparisons},
+pinned report and inputs, 18 September 2026.
+\end{thebibliography}
+\end{document}

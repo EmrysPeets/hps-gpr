@@ -1,0 +1,50 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=0.85in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,microtype,graphicx,booktabs,amsmath,amssymb,array,xcolor,hyperref,fancyhdr,caption,longtable}
+\usepackage[section]{placeins}
+\hypersetup{hidelinks,pdfdisplaydoctitle=true,pdftitle={HPS-GPR v5.8.5: Significance methodology and source-independence review},pdfauthor={Emrys Peets},pdfsubject={Consolidated v5.8.0--v5.8.5 review with fixed 2.25 sigma masks}}
+\urlstyle{same}
+\definecolor{navy}{RGB}{29,54,78}
+\pagestyle{fancy}\fancyhf{}\setlength{\headheight}{14pt}
+\fancyhead[L]{\small HPS Gaussian-Process Resonance Search}
+\fancyhead[R]{\small v5.8.5 / Methodology Review}
+\fancyfoot[C]{\thepage}
+\setlength{\emergencystretch}{2em}\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.12}
+\captionsetup{font=small,labelfont=bf}
+\renewcommand{\topfraction}{.94}\renewcommand{\bottomfraction}{.85}\renewcommand{\textfraction}{.05}\renewcommand{\floatpagefraction}{.8}\setcounter{topnumber}{3}\setcounter{bottomnumber}{2}\setcounter{totalnumber}{5}
+\newcommand{\heading}[1]{\section{#1}}
+\newcommand{\fig}[3][1]{\begin{figure}[htbp]\centering\includegraphics[width=#1\linewidth,height=.66\textheight,keepaspectratio]{../figures/#2.pdf}\caption{#3}\label{fig:#2}\end{figure}}
+\newcommand{\sfN}{\overline\Phi}
+\begin{document}
+\begin{center}
+{\LARGE\bfseries\color{navy} Significance methodology and\\[3pt] source-independence review}\par\vspace{7pt}
+{\large HPS Gaussian-Process Resonance Search}\par
+{\large Consolidated Analysis Report v5.8.5}\par\vspace{5pt}
+Emrys Peets\par
+Stanford University and SLAC National Accelerator Laboratory\par
+21 September 2026
+\end{center}
+\noindent This report brings together v5.8.0--v5.8.5 and revisits the distinction between the observed likelihood, its local null distribution, and the look-elsewhere effect. The moving blind half-width remains $2.25\sigma_m$. No production significance or limit is replaced by the conditional source studies.
+\fig{significance_schematic}{The two Gaussian processes and the choice of statistical ordering. The background GP is part of the fitted analysis. The significance-field GP approximates the distribution of that analysis under a specified source. It need not be independent of the background model. Independent evidence is needed to qualify the source and to validate the approximation. Raw and reference-standardized maxima are different tests, even with identical observed events and likelihood fits.}
+\FloatBarrier
+\clearpage
+\input{decisions.tex}
+\input{history.tex}
+\FloatBarrier
+\input{physics.tex}
+\FloatBarrier
+\input{statistics.tex}
+\FloatBarrier
+\input{conclusions.tex}
+\input{reproducibility.tex}
+\FloatBarrier
+\begin{thebibliography}{9}
+\bibitem{AnanievRead} V. Ananiev and A. L. Read, \textit{Gaussian Process-based calculation of look-elsewhere trials factor}, JINST 18 (2023) P05041, \href{https://arxiv.org/pdf/2206.12328}{arXiv:2206.12328v3}, especially Sections 2, 2.1 and 2.2.
+\bibitem{GrossVitells} E. Gross and O. Vitells, \textit{Trial factors for the look elsewhere effect in high energy physics}, Eur. Phys. J. C 70 (2010) 525--530, \href{https://arxiv.org/abs/1005.1891}{arXiv:1005.1891}.
+\bibitem{Cowan} G. Cowan, K. Cranmer, E. Gross and O. Vitells, \textit{Asymptotic formulae for likelihood-based tests of new physics}, Eur. Phys. J. C 71 (2011) 1554, \href{https://arxiv.org/abs/1007.1727}{arXiv:1007.1727}.
+\bibitem{AnalysisNote} HPS-GPR, \textit{Analysis Note v5.0.5}, 16 September 2026, Sections 4.20 and 6.11, pinned local source and PDF.
+\bibitem{Studies} HPS-GPR, studies v5.8.0--v5.8.5, 17--19 September 2026. Exact input identities, scripts, numerical ledgers and selected figures are included in the accompanying source-and-data package.
+\end{thebibliography}
+\end{document}

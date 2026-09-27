@@ -1,0 +1,344 @@
+\clearpage
+\section{Signal-candidate catalogue and conditional inpainting tests}
+\label{app:signal-candidate-catalogue}
+
+This appendix catalogues upward structures visible in the seven distinct
+v4.2 upper-limit likelihood curves and tests whether replacing one such
+structure by a smooth conditional background changes another mass point or a
+combination containing the altered dataset.  The exercise is deliberately a
+\emph{data-selected counterfactual diagnostic}.  It does not redefine the
+accepted observed limit, provide a trials-corrected discovery probability, or
+turn the conditional fixed-GP ensembles into coverage-calibrated bands.
+
+\subsection{Operational catalogue from the seven limit curves}
+\label{app:candidate-catalogue-rule}
+
+The seven inputs are the three standalone curves, the three pair curves over
+their genuine overlap intervals, and the all-three curve over 50--90~MeV.
+The lower-order active-set tails drawn in the union panel are not counted a
+second time.  The catalogue is constructed by the following reproducible
+screen:
+
+\begin{enumerate}
+  \item retain a finite mass point when its observed 90\% \CLs{} upper limit
+  lies strictly above the pointwise 97.5\% quantile of that curve's
+  conditional fixed-state ensemble and its signed local excess is positive;
+  \item merge adjacent one-MeV points into a curve-level island and represent
+  the island by its minimum local $p_0$ point;
+  \item merge islands across curves only when every pair of their
+  one-resolution intervals overlaps (complete-link grouping); and
+  \item choose the reference mass from the minimum-$p_0$ point in the
+  highest-order supporting likelihood, preferring all-three, then a genuine
+  pair, then standalone.
+\end{enumerate}
+
+The $\pm2.5\sigma_m$ inpainting windows are not used to merge features; doing
+so would combine the physically distinct 80 and 90~MeV structures.  The
+97.5\% quantile itself is only an operational graphical threshold: the
+standalone and pairwise quantiles use 100 conditional draws and the
+all-three quantile uses 300.  Their tail counts, local $p_0$ values, and
+supporting combinations reuse data and conditional ensembles, so the largest
+value in a feature is retained only as a descriptive catalogue entry.
+
+\begin{landscape}
+\begin{table}[H]
+\centering
+\small
+\caption{Operational v4.2 signal-candidate catalogue.  ``Maximum $Z$'' is
+the largest local asymptotic value among the data-sharing supporting scopes;
+$R_{97.5}$ is the largest observed-limit to conditional-97.5\%-quantile
+ratio in the feature.  Neither column is a globalized signal significance.}
+\label{tab:v4p2-candidate-catalogue}
+\begin{tabularx}{0.96\linewidth}{r r P{0.17\linewidth} r r Y}
+\toprule
+Reference & flagged span & standalone support & maximum $Z$ &
+$R_{97.5}$ & comparison context \\
+\midrule
+21~MeV & 21 & 2015 & 2.516 & 1.149 &
+singleton adjacent to the 2015 lower search edge \\
+39~MeV & 39 & 2015 & 2.229 & 1.217 &
+singleton coincident with the 2016 activation boundary \\
+51~MeV & 49--52 & 2015, 2021 & 4.318 & 1.826 &
+multi-dataset positional recurrence; 2021 is at its lower search edge and
+2016 weakens the all-three result ($Z=2.381$) \\
+65~MeV & 63--70 & 2015, 2016, 2021 & 4.657 & 1.827 &
+broadest positional support; fixed-65 amplitudes vary among datasets and the
+shared GP/profile refit shows reciprocal cross-response when the neighboring
+80~MeV region is treated \\
+80~MeV & 77--81 & 2021 & 2.873 & 1.440 &
+chiefly supported by 2021; neighboring background-profile stress region in
+the reciprocal inpainting/refit comparison \\
+90~MeV & 86--93 & 2015, 2016 & 3.659 & 1.647 &
+two-dataset recurrence, but exactly at the 2015 and 2015+2016 upper rail \\
+117~MeV & 113--123 & 2016 & 3.277 & 1.483 &
+substantial but single-dataset and broad \\
+162~MeV & 159--164 & 2016 & 2.004 & 1.126 &
+single-dataset secondary feature \\
+\bottomrule
+\end{tabularx}
+\end{table}
+\end{landscape}
+
+The resulting eight entries form a finite catalogue of conditional-limit
+excursion features and define the fixed comparison set below.  The tight
+observed limits near 72--75~MeV record the neighboring deficit/background
+structure; their proximity to the 65 and 80~MeV regions makes the moving-mask
+response especially nonlocal in this interval.
+
+\subsection{Native-histogram candidate-window inpainting protocol}
+\label{app:candidate-inpainting-method}
+
+Every catalogue mass is tested in every dataset active at that mass, giving
+19 candidate--dataset interventions.  For each intervention, complete
+post-rebin analysis bins are selected by centers inside the dataset-specific
+continuous $m_c\pm2.5\sigma_m(m_c)$ interval.  Their corresponding native
+0.05, 0.05, or 0.125~MeV bins are replaced; every native bin outside the
+selected interval remains bitwise identical to the source histogram.  Thus
+both the rebinned GP counts and the uncropped count-density integral used for
+the $\eps^2$ conversion see the altered integer histogram.
+
+The generating kernel constant and length scale are fixed to the reviewed
+v4.2 state at $m_c$, but the GP posterior is reconditioned after excluding the
+full $\pm2.5\sigma_m$ interval so that the removed feature cannot enter the
+generating training sample.  The stochastic construction draws the complete
+vector of excised analysis-bin intensities jointly from the count-space GP
+posterior, using the same nonnegative \texttt{reject\_then\_clip} convention
+as the conditional-band generator, and then draws Poisson analysis-bin
+totals.  Smooth within-analysis-bin weights allocate each total
+multinomially to native bins.  Three such draws are retained with matched
+replicate labels.  A fourth, separate lane rounds the posterior mean
+explicitly and uses largest-remainder native-bin allocation without a
+Poisson draw.  That deterministic lane is a central reference and is not one
+of the three replicates.
+
+Each modified histogram is reused unchanged in the altered standalone
+likelihood, every pair containing the altered dataset, and the all-active
+combination.  Likelihoods excluding that dataset are exact no-change controls
+by construction.  The inference step retains the accepted v4.2
+$\pm2.25\sigma_m$ moving mask, physical density window, 12 optimizer
+restarts, asymptotic \CLs{} calibration, and shared-$\eps^2$ combination.
+Nearby catalogue anchors within 30~MeV are tested for every intervention; the
+2021 removals at 65 and 80~MeV additionally use a one-MeV 55--95~MeV grid.
+
+This pilot contains 76 native histograms, 564 optimized single-dataset fits,
+and 2140 affected-scope likelihood results.  Every fit is finite.  One
+deterministic 2021 fit initially selected a length-scale boundary; three
+unchanged-card repeats found the same higher-likelihood interior family and
+the maximum finite-LML solution was selected.  A subsequent branch audit
+identified nine additional non-bound but substantially lower-LML states.
+Three independent unchanged-card repeats per state found reproducible higher-
+LML interior solutions for all nine; the maximum finite-LML solution was again
+selected, with the other 554 single-fit rows unchanged.  Full attempt ledgers
+are retained.  No final state is interpolated or on a kernel bound.  Fixed-
+state reconstructions close in LML to $6.1\times10^{-6}$ or better, and all
+outside-window native counts close bitwise.
+
+For compact summaries an effect is labelled ``appreciable'' when
+\begin{equation}
+  \left|\log\!\left(\eps^2_{90,\mathrm{cf}}/
+  \eps^2_{90,\mathrm{v4.2}}\right)\right|\geq\log(1.10)
+  \quad\text{or}\quad |\Delta Z|\geq0.50 .
+\end{equation}
+This threshold is an engineering flag, not a hypothesis test.  All three
+replicates and their median $[\min,\max]$ are retained; with $n=3$, no
+standard error, recurrence probability, or coverage statement is assigned.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.99\linewidth}{final_limit_projection_figs/v4p2_candidate_catalogue_20260807/candidate_inpainting_deltaZ_matrix.pdf}
+\caption{Propagation into the all-active v4.2 likelihood.  Each cell is the
+median local-$Z$ change across the three conditional posterior-predictive
+inpainting replicates after removing the row feature from the dataset named
+above the panel and evaluating the column feature.  Blank cells are
+inapplicable or outside the predeclared 30~MeV neighborhood.  Diagonal
+suppression is expected after replacing the selected excess; off-diagonal
+cells expose moving-mask GP/profile cross-response.  Values are mechanism diagnostics,
+not calibrated probabilities.}
+\label{fig:v4p2-candidate-inpainting-matrix}
+\end{figure}
+
+The matrix shows that the fitted response extends beyond the replaced signal
+window.  The strongest, clearest example is the reciprocal 65/80~MeV test in
+2021.  At 80~MeV the fitted log-mass RBF length scale is about 0.304, whereas
+$\log(80/65)=0.208$; the corresponding prior RBF correlation is approximately
+$\exp[-\tfrac12(0.208/0.304)^2]=0.79$.  Thus the two windows are separated on
+the signal-resolution scale while both remain within the nonlocal GP
+correlation range and each can enter the other's moving-mask training sample.
+The broad adjacent deficit/background structure can therefore transmit a
+reciprocal change when the common profile is rerun.  This is a statement about
+the refitting procedure rather than a physical dependence between the two
+local features.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Reciprocal 65/80~MeV result when the 2021 histogram is altered.  The
+replicate columns give the median and full $[\min,\max]$ range of the three
+conditional inpainting draws.  Ratios below one are tighter counterfactual
+limits.  Here $r_{\rm UL}=\eps^2_{90,\rm cf}/\eps^2_{90,\rm v4.2}$.}
+\label{tab:v4p2-reciprocal-65-80}
+\begin{tabularx}{\linewidth}{llr P{0.17\linewidth} Y}
+\toprule
+Removal $\rightarrow$ test & likelihood & baseline $Z$ &
+deterministic $(r_{\rm UL},\Delta Z)$ &
+three-replicate median $[\min,\max]$: $r_{\rm UL}$; $\Delta Z$ \\
+\midrule
+65 $\rightarrow$ 80 & 2021 standalone & 2.641 & $(0.612,-1.540)$ &
+$0.594\,[0.591,0.627]$; $-1.624\,[-1.635,-1.480]$ \\
+65 $\rightarrow$ 80 & all three & 2.130 & $(0.632,-1.337)$ &
+$0.616\,[0.613,0.646]$; $-1.409\,[-1.419,-1.283]$ \\
+80 $\rightarrow$ 65 & 2021 standalone & 4.252 & $(0.708,-1.666)$ &
+$0.569\,[0.538,0.706]$; $-2.478\,[-2.667,-1.688]$ \\
+80 $\rightarrow$ 65 & all three & 3.993 & $(0.766,-1.275)$ &
+$0.655\,[0.625,0.765]$; $-1.878\,[-2.020,-1.281]$ \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.99\linewidth}{final_limit_projection_figs/v4p2_candidate_catalogue_20260807/reciprocal_65_80_propagation.pdf}
+\caption{Dense reciprocal 65/80~MeV response.  Black is the reviewed v4.2
+observation.  Solid colored lines and bands are the median and full range of
+the three inpainting replicates; dashed curves are the deterministic rounded-
+mean lanes.  The upper row is 2021 standalone and the lower row is the
+all-active union likelihood (all three datasets through 90~MeV and
+2016+2021 above it).  Altering either window and rerunning the shared
+GP/profile changes both fitted curves and redistributes local excess and limit
+structure across the 55--95~MeV interval.  This measures a profile response,
+not an interaction between physical signals.}
+\label{fig:v4p2-reciprocal-65-80}
+\end{figure}
+
+The earlier 65~MeV GP-mean replacement identified a procedural sensitivity,
+and the reverse test shows that this sensitivity is reciprocal under the same
+shared fit.  Neither direction is assigned a causal interpretation.  Each
+excision changes training data used by the nonlocal profile, and the broad
+72--75~MeV deficit/background structure can transmit that change across the
+interval.  We therefore describe a model-mediated cross-response while
+retaining the 65 and 80~MeV regions as distinct local features.  Neither
+excision is substituted for the reviewed observation.
+
+\subsection{Position of the 65 MeV excess across datasets}
+\label{app:m065-positional-overlay}
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.93\linewidth}{final_limit_projection_figs/v4p2_candidate_catalogue_20260807/m065_standalone_z_positional_overlay.pdf}
+\caption{Standalone local-$Z$ scans near 65~MeV, overlaid without smoothing
+or interpolation.  The maxima are at 64, 68, and 65~MeV for 2015, 2016, and
+2021.  Relative to 65~MeV these are $-0.30$, $+1.13$, and $0$ times the
+dataset-specific resolution.}
+\label{fig:v4p2-m065-z-overlay}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.93\linewidth}{final_limit_projection_figs/v4p2_candidate_catalogue_20260807/m065_standardized_residual_positional_overlay.pdf}
+\caption{The exact fixed-state 65~MeV profiled Pearson-residual inputs on the
+common coordinate $(m-65~\mathrm{MeV})/\sigma_m(65)$, again with no
+interpolation.  The profiles support resolution-scale positional comparison,
+but their bins are correlated likelihood diagnostics rather than independent
+bin significances.}
+\label{fig:v4p2-m065-residual-overlay}
+\end{figure}
+
+The peak positions are compatible with one resolution-scale location, but
+the amplitudes are less coherent.  At exactly 65~MeV the standalone local
+$Z$ values are 2.395, 0.595, and 4.252.  A Gaussian common-strength
+compatibility calculation gives approximately $Q=8.16$ for two degrees of
+freedom ($p\simeq0.017$), driven by the weak/down-pulling 2016 estimate.
+Thus the overlay supports positional recurrence, not a common signal-yield
+claim.
+
+\subsection{Conditional 2021 10\% SIMP/TM kinematic atlas}
+\label{app:m065-kinematic-atlas}
+
+The exact observed-limit histogram was built from the v16 prompt-target-
+constrained, $p_{\rm sum}>2.8$ production.  Its full event-level directory is
+not locally mounted.  The available full-statistics kinematic source is a
+different frozen v11 SIMP/TM atlas with 1186 input files and 293,397,563
+selected rows scanned.  The following plots are therefore conditional
+selected-row mechanism diagnostics; they are not the kinematics of the exact
+events entering the observed v4.2 limit, a fitted candidate yield, or an
+independent significance.
+
+The central interval is the physical 2021
+$65\pm2.5\sigma_m=[59.696,70.304]$~MeV window.  The nominal two sidebands span
+2.5--4.0$\sigma_m$ and are scaled by mass width.  Stopping at
+4$\sigma_m$ keeps the right sideband below the 80~MeV candidate's own
+$\pm2.5\sigma_m$ interval.  Four stored kinematic surfaces are available:
+pair momentum sum, reconstructed vertex $z$, vertex-projection significance,
+and the minimum-track $|y_0|$ proxy.
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.96\linewidth}{final_limit_projection_figs/v4p2_candidate_catalogue_20260807/candidate65_window_sideband_simp_low_mass_y0.pdf}
+\caption{Central and width-scaled sideband kinematic distributions in the
+stricter v11 SIMP low-mass, topology-dependent minimum-$y_0$ lane.  Their
+close agreement corresponds to an aggregate local-subtraction residual of
+$-4.5\pm31.8$ selected rows.}
+\label{fig:v4p2-m065-kinematics-lowmass}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.96\linewidth}{final_limit_projection_figs/v4p2_candidate_catalogue_20260807/candidate65_window_sideband_tm_high_mass_y0.pdf}
+\caption{The same selected-row comparison in the v11 TM/SIMP high-mass
+minimum-$y_0$ lane.  The aggregate residual is $+336.4\pm122.0$ rows, but its
+topology and sideband dependence prevent a signal interpretation.}
+\label{fig:v4p2-m065-kinematics-highmass}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.96\linewidth}{final_limit_projection_figs/v4p2_candidate_catalogue_20260807/candidate65_topology_residual.pdf}
+\caption{Topology decomposition of the local sideband subtraction.  The
+high-mass-lane residual is concentrated in L2L2
+($329.5\pm107.4$ rows), while the stricter low-mass lane has no stable
+aggregate residual.  The very large broad-atlas residual has incompatible
+topology signs and is a selection/mass-correlation warning.}
+\label{fig:v4p2-m065-kinematics-topology}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.96\linewidth}{final_limit_projection_figs/v4p2_candidate_catalogue_20260807/candidate65_sideband_choice_stress.pdf}
+\caption{Dependence of the locally subtracted selected-row count on the outer
+sideband edge.  The residual rises as the sideband is widened; the gray region
+marks choices whose sideband overlaps the 80~MeV $\pm2.5\sigma_m$ window.
+This behavior demonstrates the aggregate residual's sensitivity to sideband
+choice and motivates the exact-v16 chord comparisons below.}
+\label{fig:v4p2-m065-kinematics-sidebands}
+\end{figure}
+
+The available v11 atlas therefore supplies a concrete
+instrumental/selection hypothesis---especially the L2L2 concentration---and
+motivates the sample-matched exact-v16 comparisons added below.  A
+candidate-level kinematic inference additionally requires unique-event
+semantics, category-specific signal response, and a correlation-preserving
+background treatment.
+
+\subsection{Descriptive synthesis and follow-up}
+\label{app:candidate-assessment}
+
+The 65~MeV region remains the most informative interior follow-up because it
+has the broadest positional recurrence and largest all-three local excess.
+The 51~MeV feature has exact-position recurrence in 2015 and 2021 while
+touching the 2021 lower search rail; the 90~MeV feature recurs in 2015 and
+2016 at their upper overlap rail; and 117~MeV is a broad 2016-only structure.
+The 80~MeV region is retained as its own local feature and as a neighboring
+background-profile stress region.  Reciprocal inpainting/refit response near
+65 and 80~MeV is model-mediated through the shared nonlocal GP/profile and
+adjacent deficit structure; it is not a claim that one feature physically
+depends on the other.
+
+The corresponding follow-up program is a predeclared joint 65+80 union
+excision, denser unchanged-card optimizer-repeat review of the affected
+interval, full-procedure signal-injection and background-only coverage studies
+with the same moving-mask refit, scan-wise calibration, and an event-identified
+v16 kinematic comparison.  The present appendix supplies the catalogue and
+mechanism screen used to define those tests.
+
+\input{sections/appendix_v4p3_exact_v16_diagnostics}
+\input{sections/appendix_v4p3_candidate_region_comparisons}

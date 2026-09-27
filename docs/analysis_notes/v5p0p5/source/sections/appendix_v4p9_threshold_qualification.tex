@@ -1,0 +1,147 @@
+\section{Version 4.9 Threshold-Support Qualification Record}
+\label{app:v4p9-threshold-qualification}
+
+\begin{center}
+\fbox{%
+\begin{minipage}{0.94\linewidth}
+\textbf{Disposition: numerically complete; production freeze not supported.}
+The full paired-support extraction is complete and reproducible.  The source truth is
+globally unqualified and the primary support fails six of eight near-threshold
+zero-signal cells, so numerical completion does not promote the candidate card.
+\end{minipage}}
+\end{center}
+
+\subsection{Frozen scope and cardinality}
+
+Each of the $1\%\times10$ and native-10\% source families contributes 25 independent
+Poisson spectra generated over 30--300~MeV.  Both the 30--300 and 40--300~MeV GP
+supports are applied to the same cached counts.  Four masses (55, 60, 65, and
+70~MeV) and four signed injection strengths ($z=0,1,3,5$) give
+$2\times25\times4\times4=800$ states per support and 1600 total.  The supports have
+identical key inventories.  Source families are independent; masses, injections, and
+supports within a source family are correlated through their shared backgrounds.
+
+The analysis preserves the frozen v4.2/v4.5 settings other than the support lower
+edge.  No expected-limit toys, observed limits, exclusions, or scan-maximum
+calibrations are produced.
+
+\subsection{Source-truth construction and adverse gate}
+
+The executed truth label is
+\texttt{fSigPowExpQ-anchored residual stress truth}.  For each source, a degree-six
+logistic-times-exponentiated-Chebyshev model is fitted on 30--80~MeV.  A fixed $C^2$
+blend from 75 to 85~MeV joins that local component to an identifiable
+\texttt{fSigPowExpQ} anchor, which supplies the tail through 300~MeV.  The truth is
+positive and exactly normalized to the corresponding 30--300~MeV source total.
+
+The local native-bin deviance/ndf values are
+\VFourPNineLocalDevianceOnePct{} and \VFourPNineLocalDevianceNativeTen{} for the 1\%
+and native-10\% sources.  Those values do not override the adverse global checks: the
+native-10\% 85--300~MeV tail deviance/ndf is
+\VFourPNineTailDevianceNativeTen{}, and the largest leave-one-$2.25\sigma_m$-window-
+out drift is \VFourPNineMaximumLOODrift.  All sixteen pure
+\texttt{fSigPowExpQ}/\texttt{fGenGammaThresh} fits over the predeclared 30/40 to
+100/150~MeV ranges have \texttt{fit\_ok=false}.  Thus neither a pure simple family nor
+the executed joined truth is promoted as an independent globally qualified generator.
+
+\subsection{Ordered qualification ledger}
+
+\begin{longtable}{P{0.18\textwidth}P{0.32\textwidth}P{0.38\textwidth}}
+\caption{Ordered v4.9 qualification gates and outcomes.}
+\label{tab:v4p9-full-gates}\\
+\toprule
+Gate & Evidence & Outcome \\
+\midrule
+\endfirsthead
+\toprule
+Gate & Evidence & Outcome \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+Provenance & hash-bound source histograms, frozen v4.2 card, v4.5 contract, runtime,
+truth specification, cached toys, and extraction products & pass \\
+Source adequacy & positive exact normalization; local and rebinned residuals;
+full-tail deviance; leave-one-window-out influence & fail global qualification:
+native-10\% tail 6.22 and maximum drift 4.84\% \\
+Simple-family fallback & sixteen predeclared pure-family source fits & fail; no
+generalized-gamma toy lane authorized \\
+Numerical state & finite objective and covariance, reproducible maximum-LML branch,
+kernel coordinates, boundary occupancy, strictly positive training bins & pass:
+1600/1600 accepted, zero exclusions, zero accepted bound contacts \\
+Same-toy support control & identical 30--300~MeV generated counts extracted with
+30--300 and 40--300~MeV GP supports & pass; 800 exact row pairs \\
+Zero injection & two-sided 90\% Student-$t$ intervals and Holm adjustment within each
+eight-cell support family, with $|\bar p|\geq0.2$ materiality guard & fail primary:
+six of eight mass cells flagged \\
+Injection response & paired response and pull width at $z=1,3,5$ after subtracting
+each background's zero-injection fit & completed as a conditional diagnostic; cannot
+rescue source or zero-signal failures \\
+Production freeze & all ordered scientific gates & fail; do not scale up \\
+\end{longtable}
+
+\subsection{Numerical summaries}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{P{0.20\textwidth}P{0.25\textwidth}Y}
+\toprule
+Quantity & Generated value & Interpretation \\
+\midrule
+overall result state & \VFourPNineResultState & conditional stress complete; card not
+qualified \\
+pull-blind gate & \VFourPNineGateState & technical acceptance only \\
+$1\%\times10$ material flags & \VFourPNineMaterialFlagsOnePctXTen & all four
+primary zero-injection masses \\
+native-10\% material flags & \VFourPNineMaterialFlagsNativeTen & 55 and 60~MeV \\
+$1\%\times10$ 65~MeV &
+$\bar p=\VFourPNineMeanPullOnePctXTenSixtyFive$, width
+$\VFourPNineWidthOnePctXTenSixtyFive$ & 90\% mean interval
+$\VFourPNineMeanPullOnePctXTenSixtyFiveCI$ \\
+native-10\% 65~MeV &
+$\bar p=\VFourPNineMeanPullNativeTenSixtyFive$, width
+$\VFourPNineWidthNativeTenSixtyFive$ & 90\% mean interval
+$\VFourPNineMeanPullNativeTenSixtyFiveCI$ \\
+paired 65~MeV change, $1\%\times10$ &
+$\VFourPNineDeltaSixtyFiveOnePctXTen$ & 30--300 minus 40--300; 90\% interval \\
+paired 65~MeV change, native 10\% &
+$\VFourPNineDeltaSixtyFiveNativeTen$ & 30--300 minus 40--300; 90\% interval \\
+decision & \multicolumn{2}{l}{\VFourPNineDecision} \\
+\bottomrule
+\end{tabularx}
+\caption{Generated v4.9 summary.  Values are source-conditioned diagnostics, not
+coverage or observed-data bias estimates.}
+\label{tab:v4p9-generated-summary}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.94\linewidth}{\VFourPNineOptimizerFigure}
+\caption{Optimizer reproducibility, reference-relative LML, kernel coordinates, and
+boundary occupancy for both support lanes.  Branch choice is pull blind.}
+\label{fig:v4p9-optimizer}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\graphicorplaceholder{0.94\linewidth}{\VFourPNineSamplingFigure}
+\caption{Binwise sampling QA for the 25 generated backgrounds in each source family.
+This checks the Poisson sampler against the frozen stress truth; it does not qualify
+the truth against data.}
+\label{fig:v4p9-sampling}
+\end{figure}
+
+\subsection{Allowed claims}
+
+The study establishes a statistically resolved, same-toy dependence of the 65~MeV
+conditional pull on the GP lower support edge.  It also establishes that the change is
+not sufficient for uniform closure under the executed stress truth.  It does not show
+that the observed 65~MeV feature is background, that GPR coverage is calibrated, or
+that the 30--300~MeV production support is qualified.
+
+The proposed restricted-range asterisk is retained only as guidance for a future
+study: a threshold-faithful, source-qualified function evaluated on 30--100 or
+30--150~MeV could demonstrate a local threshold-modeling requirement without changing
+the observed-data support.  No restricted toy ensemble was executed in v4.9, and the
+simple families tested on those ranges failed before extraction.

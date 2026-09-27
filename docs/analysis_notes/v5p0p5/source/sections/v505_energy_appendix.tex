@@ -1,0 +1,147 @@
+\section{Beam-energy and rate hypotheses near 92 MeV}
+\label{app:v505-energy}
+Studies v5.5.0--v5.5.4 examine why the excesses extracted from different
+campaigns need not agree under a common coupling. Two questions are distinct:
+whether a feature moves in mass with beam energy, and whether its accepted
+amplitude changes with energy after the usual radiative normalization.
+A convenient mass hypothesis is
+\begin{equation}
+ m_y=m_*\left(\frac{E_y}{E_*}\right)^\alpha,
+\end{equation}
+with $\alpha=0$, $1/2$ and $1$ representing a fixed mass, square-root scaling
+and linear scaling. These are comparisons among proposed shapes, not
+established production laws. The later studies concentrate on a fixed
+92 MeV region and relax the relative campaign rates.
+
+
+With 92 MeV in 2016 as the reference, square-root mass scaling maps the
+2015 and 2021 hypotheses to 62.338 and 117.317 MeV. Their signed fitted
+roots in v5.5.0 are $+1.540$ and $-0.450$. Linear scaling instead maps them
+to 42.240 and 149.600 MeV, with roots $-0.799$ and $+0.030$.
+Neither prescription preserves a positive feature in all three campaigns.
+These are fixed-hypothesis comparisons on different mass windows; the
+study does not optimize a mass exponent or assign a calibrated preference
+between those windows.
+
+\widefig{1.0}{../figures/v550_beam_energy_scan_comparison.pdf}{The v5.5.0
+scan comparison under fixed, square-root and linear beam-energy mass
+scaling. The mapped responses test the proposed correspondence between
+campaigns; their alignment is not evidence for an energy-dependent particle mass.}
+{fig:v505-mass-scaling}
+
+\subsection{A common experiment for the rate comparison}
+For campaign $y$ and bin $j$, the model can be written
+\begin{equation}
+ \lambda_{yj}=b_{yj}+(L_y\theta_y)_j+
+ a\,K_y(m_y,\sigma_y)\,R(E_y)\,t_{yj}(m_y,\sigma_y),
+ \qquad a\geq0,
+\end{equation}
+where $t_{yj}$ is the bin-integrated Gaussian signal shape, $K_y$ is the
+inherited yield conversion and each background nuisance vector has penalty
+$\theta_y^T\theta_y/2$. The reference energy is $E_*=2.30$ GeV. The three
+rate laws compared in v5.5.4 are
+\begin{equation}
+ R(E)=1,\qquad R(E)=(E/E_*)^\beta,\qquad
+ R(E)=\exp[-k(E-E_*)].
+ \label{eq:v505-rate-laws}
+\end{equation}
+The first is the common-coupling model. In the other two, $a$ is an
+equivalent accepted-amplitude normalization at $E_*$; the fitted energy
+factor has no demonstrated production or detector interpretation.
+Only three beam energies constrain each two-parameter rate law.
+
+The comparison holds the selected bins and GP constraints fixed across
+models. The density conversion is evaluated at the 92 MeV MC reference;
+shape variations change the bin-integrated template rather than silently
+renormalizing the experiment. The power exponent is searched on $[-6,6]$.
+Centroid studies subsequently allow a common mass over 90--94 MeV or separate
+campaign centroids, and resolution studies compare the stated fixed and
+constrained widths. Those changes introduce additional search freedom.
+
+\begin{table}[htbp]\centering\small
+\begin{tabular}{lrr}\toprule
+Rate law & $\widehat a$ & Conditional 68\% profile slope interval\\\midrule
+Common & $3.102\times10^{-6}$ & ---\\
+Power & $8.516\times10^{-6}$ & $\beta=-2.987\;[-3.517,-2.470]$\\
+Exponential & $9.817\times10^{-6}$ & $k=1.681\;[1.257,2.087]~\mathrm{GeV}^{-1}$\\
+\bottomrule\end{tabular}
+\caption{v5.5.4 fits at fixed 92 MeV and fully scaled widths. The common
+normalization has a conditional 68\% log-Wald interval
+$[2.066,4.657]\times10^{-6}$. These uncertainties condition on the
+background and response model.}\label{tab:v505-rates}\end{table}
+
+\widefig{1.0}{../figures/v554_rate_fits_with_uncertainties.pdf}{The v5.5.4
+common, power-law and exponential rate fits. Shading gives approximate
+68\% and 95\% pointwise log-Wald bands, including normalization--slope
+covariance. It is not an uncertainty band on the validity of the energy law.}
+{fig:v505-rates}
+
+\subsection{Fit improvement and the cost of additional freedom}
+At fixed 92 MeV and scaled widths, the common experiment gives raw likelihood
+roots of 2.447 for common coupling, 4.180 for the power law and 4.146 for the
+exponential. A root $\sqrt{Q_0}$ is not automatically a Gaussian significance
+when a rate slope has been fitted. The v5.5.4 Gaussian reference includes
+that slope search: the power-law reference evaluated at the Poisson
+statistic gives $Z_G=3.809$. Allowing a common centroid to vary over
+90--94 MeV gives a slightly larger root, 4.206, but the earlier matching
+Gaussian reference gives $Z_G=3.528$. Better likelihood alone does not imply
+stronger evidence once the additional hypotheses are counted.
+
+The most flexible retained shape fit has raw root 4.598 and a broader
+independent-amplitude reference-envelope value $Z_G=3.443$. That envelope
+is neither the fitted model's own calibrated probability nor a bound over
+all continuous shapes. These calculations use a predictive Gaussian
+reference with $V_y=\operatorname{diag}(\widehat\lambda_{0,y})+L_yL_y^T$;
+they do not calibrate direct Poisson tails, the original mass selection or
+the full search. The note's resolution-based Sidak factor is not transferred
+to these expanded model families.
+
+\widefig{1.0}{../figures/v554_likelihood_and_local_reference_comparison.pdf}{Raw
+likelihood roots and the corresponding conditional reference probabilities
+for the retained rate and shape hypotheses. Triangles denoting broader
+reference families must not be read as the tested energy model's own tail.}
+{fig:v505-energy-reference}
+\widefig{1.0}{../figures/v554_extraction_model_comparison.pdf}{The same observed
+residuals under common coupling, an energy-dependent rate, and additional
+shape freedom. The profiled background adjustment remains visible alongside
+the signal contribution. These are alternative descriptions of the same
+selected data.}{fig:v505-energy-extraction}
+
+\subsection{Combining extracted amplitudes and count spectra}
+The extracted-signal comparison checks whether a second representation of
+the same data changes the combination. In the fixed Gaussian experiment,
+the signed estimates and their covariance retain all amplitude information;
+the extracted and joint amplitude log likelihoods agree to
+$5\times10^{-14}$ in the saved numerical check. Independent campaigns
+already enter through a product likelihood, so fitting their extracted
+amplitudes supplies no additional independence factor.
+
+With independent positive rates, the fixed Gaussian statistic is
+\begin{equation}
+ Q_G=\sum_{y=1}^3\max(z_y,0)^2,\qquad
+ Q_G\sim\tfrac18\chi_0^2+\tfrac38\chi_1^2+
+          \tfrac38\chi_2^2+\tfrac18\chi_3^2.
+\end{equation}
+Signed Stouffer and Fisher combinations test different alternatives. Choosing
+among them after seeing their results would require another selection
+correction. Without a common rate law, an upper bound on the total expected
+signal rows, $T=\sum_yK_y\eps_y^2$, remains defined. The Gaussian-reference
+construction used in v5.5.4 is
+\begin{equation}
+ U_{90}=\widehat T-s_T\Phi^{-1}
+ \left[0.1\,\Phi(\widehat T/s_T)\right].
+\end{equation}
+At 92 MeV it gives 30,944 rows for common coupling and 36,523 for independent
+rates. These are conditional known-covariance bounds, not calibrated
+uncertainties on an absolute production rate.
+
+The studies motivate checks of background modeling and campaign-dependent
+response after unblinding. They do not establish a beam-energy law or
+supply a calibrated acceptance correction. Version-by-version changes and
+the standalone PDFs are indexed in the accompanying study archive.
+
+\widefig{1.0}{../figures/v554_spectra_vs_extracted_significance.pdf}{Comparison
+of simultaneous Poisson fits to count spectra with Gaussian fits to signed
+extracted amplitudes. Their near agreement is a check of the retained
+amplitude information. Alternative Stouffer and Fisher rules answer different
+questions and do not add information to the joint fit.}{fig:v505-extracted}

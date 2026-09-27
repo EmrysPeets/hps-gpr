@@ -1,0 +1,199 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=0.76in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,microtype,graphicx,booktabs,amsmath,amssymb,xcolor,array,hyperref,fancyhdr}
+\hypersetup{pdftitle={HPS-GPR v5.8.0: Local significance and GP stress response},colorlinks=true,linkcolor=blue!45!black,urlcolor=blue!55!black}
+\definecolor{navy}{RGB}{29,54,78}
+\pagestyle{fancy}\fancyhf{}\lhead{\small HPS-GPR: local significance and stress response}\rhead{\small v5.8.0}\cfoot{\thepage}
+\setlength{\headheight}{14pt}\setlength{\parindent}{0pt}\setlength{\parskip}{6pt}
+\newcommand{\pageheading}[1]{\section*{\color{navy}#1}}
+\newcommand{\fig}[2]{\begin{center}\includegraphics[width=\linewidth]{#1}\end{center}{\small #2}\par}
+\newcommand{\PhiN}{\Phi}
+\begin{document}
+{\LARGE\bfseries\color{navy} Local significance, GP stress response,\\and scan spacing}\par
+{\large Standalone study v5.8.0}\hfill 17 September 2026\par
+\textit{Follow-up to v5.0.5 Sections 4.20 and 6.11, with the v5.1.0--1 diagnostics as the numerical baseline.}
+
+\pageheading{What this study establishes}
+The analysis samples are full 2015, full 2016 and native 2021 10\%. The historical 2016 10\% sample is a separate control.
+
+A denser tested-mass grid can resolve a narrow feature in a significance curve, but it cannot remove a bias in the background interpolation. The main 2016 issue is the large response to the chosen stress background. It is not evidence that the Gaussian approximation to fluctuations about that background is uniquely worse than in the other campaigns.
+
+\input{grid_conclusion.tex}
+
+The new length-scale test supports a contribution from background rigidity, with an important qualification. Halving the fitted length scale changes the stress root at 76 MeV from $-14.65$ to $-7.95$, but worsens other masses and increases the signal uncertainty by a factor of roughly two to three. Almost all of a fixed injected yield is still recovered. Most of the loss in significance comes from reduced precision, rather than disappearance of that yield. Every tested nonnominal length scale has a lower observed-sideband log marginal likelihood.
+
+The actual saved 2016 historical 10\% histogram gives a less extreme nominal scan under the same parent fitting policy: its largest positive signed root is 2.054 at 65 MeV. Scaling the same full-sample stress shape to the historical sample's support-count ratio reduces its RMS signed response from 4.967 to 1.607. This supports amplification of fractional shape mismatch with increasing counts; the count ratio is not a verified luminosity ratio.
+
+The common-coupling fit dilutes and sometimes cancels the 2016 response through its information weights. At 76 MeV the observed combined root is only $0.166$, although its stress-centered coordinate is approximately $9.05$. The latter measures disagreement with the selected stress reference and is not a nine-standard-deviation particle excess.
+
+\textbf{New local result.} Direct Poisson experiments provide new, explicitly conditional local probabilities at specified masses. They do not establish a replacement discovery significance for 2016. Results are reported with their backgrounds and finite-sampling limits, including unresolved tails, rather than choosing the model or grid that gives the largest significance.
+
+\textbf{Reading the quantities.} $r$ is the signed likelihood root; $Z_{\rm nominal}=\max(0,r)$ is the conventional asymptotic excess display. A stress-centered coordinate $(r-a)/s$ and a global probability answer different questions. Throughout this note, ``GP background'' means the interpolation of counts, while ``significance GP'' means the correlated field of repeated fit results across masses.
+
+\clearpage
+\pageheading{The local-to-global construction and the new tests}
+For an unconstrained fitted signal yield or common coupling $\widehat\psi$, with $\ell_p$ the profiled negative log likelihood, define
+\[
+r(\mathbf n;m)=\operatorname{sgn}(\widehat\psi)
+\sqrt{2[\ell_p(0;m)-\ell_p(\widehat\psi;m)]}.
+\]
+Mapping the main upper-limit scan requires the signed unconstrained fit and null profile-likelihood ratio from that same likelihood. A 90\% $\mathrm{CL}_s$ upper-limit value alone does not determine a local discovery probability. For positive fits the nominal probability can be inverted as $r=\Phi^{-1}(1-p_0)$; the clipped value $p_0=0.5$ loses the deficit magnitude. The significance field must therefore retain the unconstrained amplitude and signed root, with the same mass grid, kernel policy, signal window and dataset selection.
+
+The significance-GP paper of Ananiev and Read [1] concerns the trials factor for a search over mass. Its signed roots are assumed to have standard-normal null marginals. It estimates their covariance using controlled background fluctuations. Finer grids reduce missed maxima and upcrossings; they do not fix a misspecified local null. The paper contains no HPS 2016 sample or exposure comparison.
+
+The archived 2016 stress spectrum has a fifth-degree logistic--Chebyshev low-mass component fitted to the historical 10\% development input, blended over 75--85 MeV into a broad \texttt{fShiftSigPowTail} shape. The archived broad-source fit retains a failed \texttt{fit\_ok} flag. Exposure, selection and overlap equivalence of these source inputs is not established. This is a qualified stress construction, not a uniquely justified physical background.
+
+The archived HPS extension retains the response of a coherent stress spectrum $\mathbf B$:
+\[
+a_m=r(\mathbf B;m),\quad
+D_{im}=r(\mathbf B+\sqrt{B_i}\mathbf e_i;m)-a_m,\quad
+\Gamma=D^TD,\quad s_m^2=\Gamma_{mm},\quad R_{mn}=\frac{\Gamma_{mn}}{s_ms_n}.
+\]
+There is no division by the number of perturbed bins. Draws $\mathbf z^*\sim N(0,R)$ imply $r_m^*=a_m+s_mz_m^*$. The inherited centered ordering keeps $(r_m-a_m)/s_m$ only when the raw fit is positive. A nearly zero positive fit can therefore acquire a very large centered score when $a_m\ll0$. This is a conditional reference test, not a background-independent significance correction.
+
+\begin{center}\small
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.24\linewidth}>{\raggedright\arraybackslash}p{0.68\linewidth}}\toprule
+Test & Fixed definition and scope\\\midrule
+Grid spacing & Nested 2016 grids over 39--180 MeV: 1 and 0.5 MeV; additional quarter steps at 74--79 MeV. Same histogram bins, resolution, support and moving $\pm2.25\sigma_m$ signal window.\\
+Response and covariance & Reuse the same 256 complete Poisson spectra at every mass; compute all one-bin response directions at each added mass. Preserve integer kernels; interpolate positive parameters in log space between them.\\
+Local probabilities & 1,024 new full-spectrum experiments per mass and background at the listed 2015, 2016 and 2021 anchors. Stress and mass-specific local-GP truths remain separate.\\
+Historical 2016 10\% & Actual histogram, integer scan, inherited parent fitting policy; six local anchors with 512 new experiments per background.\\
+Length-scale controls & Seven fixed 2016 masses, factors $0.5,0.75,1,1.25$; fixed kernel amplitude, two backgrounds, and injections of 0, 2 and 5 original reference errors.\\
+Combination & Exact shared-coupling fits and independent constituent fits; compare the signed-root decomposition using efficient information.\\\bottomrule
+\end{tabular}\end{center}
+
+These are retrospective diagnostics, with anchors inherited from the released scan and earlier stress examples. Choices were specified before their new calculations; they are not blind discovery hypotheses. Complete spectra preserve within-scan correlations. Pointwise local-GP truths differ by mass and cannot be stitched into a coherent global null.
+
+\clearpage
+\pageheading{Does a half-MeV grid improve the mapping?}
+The 2016 input histogram already has 0.25 MeV bins. The proposed change halves the distance between tested signal masses; it neither narrows the likelihood window nor changes the physical resolution. At 76 MeV, $\sigma_m\simeq3.10$ MeV and the signal window spans about 14 MeV. The prior v5.1.1 study already contained half steps from 70.5 to 80.5 MeV. This study extends that test over the full declared 2016 domain.
+
+\input{grid_table.tex}
+\fig{../gpr/figures/grid_refinement_roots.pdf}{\textbf{Figure 1.} Nested-grid comparison under the same count model. Integer coordinates are retained. The stress offset and observed signed fit must be read separately; newly resolved extrema do not validate their interpretation as particle significance.}
+
+Every observed root at 74--79 MeV remains negative. Adding quarter steps increases the regional mean centered maximum by 0.00501 and its threshold-three tail from 0.00482 to 0.00499; this does not establish full-search quarter-grid convergence.
+
+On nested grids, a fixed-threshold maximum tail cannot decrease. The observed maximum also changes, so its own tail need not move monotonically. Smaller diagnostic slices cannot replace the declared search penalty after observing a feature.
+
+\clearpage
+\pageheading{Grid convergence and probability ordering}
+To isolate mass sampling, the main convergence test uses the \emph{ungated}, centered maximum $M=\max_m z_m^*$. The same 100,000 Gaussian vectors are evaluated on each nested grid, using the newly computed full response correlation. These probabilities are conditional on that correlation model. They are not the v5.0.5 positive-fit-gated global probabilities.
+
+\input{grid_detail.tex}
+\fig{../figures/grid_convergence.pdf}{\textbf{Figure 2.} Conditional Gaussian sampling comparison at fixed thresholds (left) and the paired change in each field's maximum (right). The full-domain curve is the declared 39--180 MeV search. The smaller domains are diagnostic slices; they cannot replace the full search penalty after inspecting a feature.}
+
+The archived positive-fit-gated ordering is checked separately using the same vectors and $r^*=a+s z^*$. Its observed full-grid maximum rises from 9.568 at 42 MeV to 9.764 at 42.5 MeV. Neither grid has an exceedance among 100,000 fields; the one-sided 95\% sampling bound is $p<2.996\times10^{-5}$ \emph{under the chosen Gaussian stress model}. The 256 complete Poisson checks also have zero exceedances and give only $p<0.011635$. Neither result validates a rare physical tail.
+
+For the alternative raw ordering, $U=\max_m\max(0,r_m)$, every Gaussian field and every direct stress experiment exceeds the observed full-grid maximum. These sharply different answers reflect different questions posed to a strongly biased stress model. Choosing between them using the more attractive probability would add an uncalibrated model-selection step.
+
+\clearpage
+\pageheading{Is the 2016 background interpolation too rigid?}
+At 76 MeV the fitted squared-exponential kernel has a length scale of about 0.413 in log mass, corresponding locally to $m\ell\simeq31.4$ MeV, about ten signal resolutions. This is a kernel correlation scale, not a hard prohibition on shorter structure in the posterior mean. The shorter-length-scale test directly probes its effect across the excluded signal region.
+
+\fig{../statistics/stiffness_tradeoff.pdf}{\textbf{Figure 3.} Predetermined changes to the 2016 length scale with the kernel amplitude held fixed. Bias, uncertainty, injection response and sideband fit quality are separate diagnostics. Every injected signal has the same yield at a given mass across policies. A smaller offset alone does not select an acceptable replacement.}
+\input{stiffness_table.tex}
+
+The response is mass dependent: halving the length scale helps 42, 66 and 76 MeV but worsens 90 and 117 MeV. The five-reference-error injections recover 95.3--99.9\% of the added yield while their uncertainty increases. No tested factor restores closure everywhere. With the kernel amplitude held fixed, this is a controlled perturbation, not a comparison of fully optimized alternative models.
+
+\clearpage
+\pageheading{Why does the smaller 2016 sample look better?}
+\fig{../figures/historical10_comparison.pdf}{\textbf{Figure 4.} The observed full and actual historical-10\% scans are separate datasets. The stress-exposure curves instead use one common shape at two count normalizations. The local-GP control is constructed separately at each mass from the historical sample's sidebands; its near-zero response cannot validate a coherent global background.}
+
+The actual historical input has 7,475,385 histogram counts inside the retained support, compared with 73,143,538 for the parent, giving a ratio 0.10220158. Its maximum nominal root is 2.054 at 65 MeV; at 92 MeV the root is 1.259, reproducing the prior subset check. Selection equivalence, exact luminosity and event overlap have not been established from these histograms. The subset is never combined with the parent as an independent measurement.
+
+For a fixed fractional residual and a Poisson-dominated uncertainty, a useful approximation is
+\[
+A_{\rm bias}\propto L,\qquad \sigma_A\propto\sqrt L,\qquad
+r_{\rm bias}\propto\sqrt L.
+\]
+Recomputing the GP at the smaller count normalization gives stress RMS 1.607 instead of 4.967 and a minimum root of $-5.33$ instead of $-17.60$. The RMS difference from exact square-root scaling is 0.339, so the approximation is descriptive rather than an identity. Count-dependent GP errors and interpolation change with exposure.
+
+\input{historical10_local.tex}
+
+2015 and 2021 also use different selected spectra and stress constructions; their smaller offsets cannot be attributed to exposure alone. In the inherited 256-spectrum comparison, empirical-versus-response correlation RMS differences are 0.0556, 0.0626 and 0.0594 for 2015, 2016 and 2021. Similar covariance agreement can coexist with very different raw null means.
+
+\clearpage
+\pageheading{What the common coupling does to the 2016 response}
+Let $S_i$ and $I_i$ be a campaign's efficient score and information for the same coupling coordinate. In the local quadratic approximation,
+\[
+r_{\rm common}\simeq\frac{\sum_iS_i}{\sqrt{\sum_i I_i}}
+\simeq\sum_i\sqrt{\frac{I_i}{\sum_j I_j}}\,r_i.
+\]
+The squared coefficients sum to one. A pure change of units from yield to coupling cannot suppress a single-campaign signed likelihood root. The constraint that one coupling predicts all campaign yields changes the joint fit, with weights determined by signal conversion and precision.
+
+\fig{../figures/coupling_weights.pdf}{\textbf{Figure 5.} Exact common-coupling responses and constituent information. Reduced combined stress response can result from weighting and cancellation; it is not an independent background-closure test.}
+
+At 76 MeV the observed information fractions are approximately 0.0074, 0.2890 and 0.7036 for 2015, 2016 and 2021. Their weighted signed-root contributions are $-0.0288$, $-1.3224$ and $+1.5167$, reproducing the exact combined root 0.1656. For the stress truth the combination is approximately
+\[
+0.0878(-0.1695)+0.5370(-14.6532)+0.8390(-0.9750)=-8.70.
+\]
+The combined stress offset is smaller in magnitude than the 2016 offset, but remains large. At 92 MeV the combined root is 2.520 versus 3.115 for 2016, with about 82\% of the information supplied by 2021. Across 126 observed/stress combinations the weighted-root approximation differs from the exact root by at most 0.00241.
+
+Allowing independent campaign amplitudes yields a different alternative hypothesis. At 92 MeV its unconstrained twice-log-likelihood improvement is 17.904, compared with 6.352 for the common amplitude. Their difference diagnoses incompatible fitted rates; the square root of the larger statistic is not a one-parameter local discovery significance.
+
+\clearpage
+\pageheading{New direct local-probability checks}
+For $r_{\rm obs}>0$, count $k$ of $N$ new experiments with $r^*\ge r_{\rm obs}$. Report $k/N$, the add-one Monte Carlo estimate $(k+1)/(N+1)$, and a 95\% exact binomial interval. For a nonpositive fit, $q_0=\max(0,r)^2=0$ and its inclusive tail is exactly one, with no Monte Carlo uncertainty; the conventional nominal display still uses $p_0=0.5$. These conventions should not be mistaken for contradictory measurements.
+
+\input{local_table.tex}
+
+\fig{../figures/local_null_distributions.pdf}{\textbf{Figure 6.} New fixed-mass Poisson fits under the two named backgrounds. The observed root is the same vertical line in each panel. Moving the reference distribution changes a conditional tail without creating a stronger observed excess.}
+
+\input{local_result.tex}
+
+The larger of the two tails is a finite-family envelope. Both backgrounds are plug-in constructions; this does not cover all plausible backgrounds or their parameter uncertainty. At zero exceedances among 1,024 experiments, the one-sided 95\% bound is $p<0.002921$, conditional on that background. A floor-level add-one value is not a resolved tail or a measured three-standard-deviation significance. At the zero-statistic atom, $p=1$ has no Monte Carlo uncertainty.
+
+\clearpage
+\pageheading{What the passed statistical tests establish}
+\begin{center}\small
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{0.30\linewidth}>{\raggedright\arraybackslash}p{0.35\linewidth}}\toprule
+Existing test & Recorded outcome & Interpretation\\\midrule
+Historical 10\% injection closure & Aggregate zero-signal mean pull $-0.016$ & Recovery conditional on that source, exposure and fitting policy; an average can hide mass dependence.\\
+Length-scale upper bound & Nonbinding from factor 12; stable 12--15 & Numerical range adequate for those optimized fits; does not validate the interpolated truth.\\
+Full-2016 support bias & All six eligible lower edges fail the gross-bias guard & No replacement edge qualified; not a passed background-closure test.\\
+Saved-state replay & Predictions reproducible from saved parameters & Numerical identity; independent optimizer agreement was only 87/142 masses.\\
+Two-truth empirical calibration & No Holm-adjusted flags in 3,648 exclusion and 1,824 local-rejection cells & Substantial conditional evidence for the calibrated envelope, not the raw asymptotic p-values or every possible background.\\
+Centered significance GP & Good central widths/correlations under the chosen stress spectrum & Supports a fluctuation approximation about its biased mean; does not establish that this mean is physical.\\\bottomrule
+\end{tabular}\end{center}
+
+The distinction is visible in the calibration record: raw profiled local probabilities had excess-rejection flags in 50/456 local-GP and 140/456 stress cells. With 500 experiments per cell, the first Holm rejection threshold was 48/500, or 9.6\%, against a nominal 5\% benchmark. Passing the multiplicity-adjusted test is useful evidence, but is not percent-level verification of every tail.
+
+The new calculations check scalar-versus-batch fits, optimizer convergence, positive expectations, nested-grid consistency, covariance definiteness and source identity. Split-sample normal-shape checks are descriptive: their estimated training mean and width add uncertainty, so the reported nominal KS probabilities are not formal new closure certifications. Reusing the first 256 coherent spectra gives a paired numerical comparison, not independent new global-tail validation.
+
+\textbf{Decision.} Use 0.5 MeV to assess scan sampling, and retain the fixed-mass likelihood results as the starting local statistic. Do not adopt a shorter length scale or a stress-centered significance because it looks more favorable. A replacement local inference would need a declared background family and kernel policy, signal-recovery and local-rejection validation on independent controls, followed by coherent full-scan validation of the resulting statistic. The present study supplies new conditional local checks and diagnoses the failure modes; it does not certify a new particle excess.
+
+\clearpage
+\pageheading{Provenance, reproducibility and references}
+\small
+\input{execution_summary.tex}
+
+All new work is confined to the v5.8.0 study directory. Released upper-limit scans and the v5.0.5 note are unchanged. The source package contains the report, figures, numeric CSV/NPZ ledgers, independent specialist reviews, protocols, scripts, source hashes and validation records. Local Poisson roots are stored with truth arrays and deterministic seeds. Historical-10\% fits include their engine and histogram snapshots.
+
+\textbf{Rebuild from saved results.} From the study root, run
+\begin{quote}\ttfamily\small
+python3 scripts/make\_artifacts.py\\
+cd source\\
+tectonic report.tex
+\end{quote}
+The supplied PDF and figure builds require NumPy, SciPy, pandas, Matplotlib and Tectonic. Full new Poisson/response refits additionally use the frozen HPS runtime paths recorded in the input manifests. Those dependencies are disclosed; a saved-array report rebuild is portable, but the entire legacy analysis environment is not bundled. The recorded count spectra and their hashes define the inputs, not their file modification times.
+
+\textbf{Principal result ledgers.}\par
+{\small\begin{tabular}{>{\raggedright\arraybackslash}p{0.48\linewidth}>{\raggedright\arraybackslash}p{0.45\linewidth}}
+\texttt{gpr/local\_mapping.csv} & Observed roots, stress offsets, response widths and local mappings\\
+\texttt{gpr/grid\_tail\_summary.csv} & Nested-grid maxima and paired field-tail comparisons\\
+\texttt{local/local\_tail\_tests.csv} & New direct local-tail experiments\\
+\texttt{statistics/stiffness\_scan.csv} & Fixed length-scale and injection controls\\
+\texttt{statistics/coupling\_decomposition.csv} & Exact fits and information-weight comparison\\
+\texttt{historical10/actual10\_scan.csv} & Actual historical-subset matched-policy scan
+\end{tabular}}
+
+\pageheading{References}
+\begin{enumerate}
+\item V. Ananiev and A. L. Read, \textit{Gaussian Process-based calculation of look-elsewhere trials factor}.\\
+\href{https://arxiv.org/pdf/2206.12328}{arXiv:2206.12328v3} (3 May 2023), Sections 2 and 2.2.
+\item HPS-GPR analysis note v5.0.5 (16 September 2026), Sections 4.20 and 6.11; Appendix C; historical validation and empirical-calibration appendices. The supplied source manifest pins the files inspected here.
+\item HPS-GPR v5.1.0 and v5.1.1 diagnostics (9--10 September 2026): histogram/scan binning, support and exposure controls, coherent covariance, and signed injection response. Earlier numerical results are identified explicitly in this note.
+\item HPS-GPR v5.5.3 common-profile study (12 September 2026), historical-subset source manifest and 92 MeV replay. Source selection, luminosity and overlap caveats are retained here.
+\end{enumerate}
+\end{document}

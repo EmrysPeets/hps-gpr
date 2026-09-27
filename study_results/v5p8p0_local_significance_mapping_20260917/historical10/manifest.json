@@ -1,0 +1,85 @@
+{
+  "passed": true,
+  "elapsed_seconds": 9.869460166000001,
+  "support_count_ratio": 0.10220157794390532,
+  "subset_support_rows": 7475385.0,
+  "parent_support_rows": 73143538.0,
+  "nominal_sample_fraction": 0.1,
+  "exact_luminosity_fraction_verified": false,
+  "selection_same_as_parent_verified": false,
+  "event_overlap_verified": false,
+  "policy": "Parent reviewed kernel at each mass; count-dependent log-GP update; inherited resolution; 30\u2013210 MeV support; integer39\u2013180 grid",
+  "stress_policy": "Parent full stress shape scaled by measured support-count ratio, not an independently fitted historical10 null",
+  "local_gp_policy": "Mass-specific subset-sideband posterior mean over full support, reconditioned at the same mass; not a coherent global null",
+  "significance_status": "Nominal signed roots and asymptotic p displays; no local-tail or global calibration",
+  "signal_parameter_status": "Inherited radiative fraction and resolution proxy; single-channel root invariant to positive scalar template normalization",
+  "lanes": {
+    "actual_historical10_observed": {
+      "rows": 142,
+      "root_min": -2.2465223001442505,
+      "root_max": 2.0537792441439375,
+      "root_rms": 0.9259073496202791,
+      "max_root_mass_MeV": 65,
+      "max_score": 1.917426155628732e-07
+    },
+    "historical10_mass_specific_local_gp_mean": {
+      "rows": 142,
+      "root_min": -0.37273159709344605,
+      "root_max": 0.3342268996492959,
+      "root_rms": 0.17539595973310074,
+      "max_root_mass_MeV": 47,
+      "max_score": 1.8834384821198036e-07
+    },
+    "parent_full_stress_reference": {
+      "rows": 142,
+      "root_min": -17.59623317257445,
+      "root_max": 13.71229044174458,
+      "root_rms": 4.9674153461603385,
+      "max_root_mass_MeV": 82,
+      "max_score": 1.983781586778477e-07
+    },
+    "parent_stress_scaled_to_historical10_support_counts": {
+      "rows": 142,
+      "root_min": -5.332035455194374,
+      "root_max": 4.2787995226739,
+      "root_rms": 1.6070457444702195,
+      "max_root_mass_MeV": 66,
+      "max_score": 1.798720150603117e-07
+    }
+  },
+  "failures": [],
+  "inputs": {
+    "engine/common.py": {
+      "source": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v5p5p3_92mev_profile_combination_20260912/engine/common.py",
+      "sha256": "1ba68fa882f165f08900f07ec43b2abf69a46a286cc2cad4efb9e5aa8952ac19"
+    },
+    "engine/parent_core.py": {
+      "source": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v5p5p3_92mev_profile_combination_20260912/engine/parent_core.py",
+      "sha256": "ae256ec48d0739549d581bfcd46de43859ce47e27db4fa279409644f53719fca"
+    },
+    "engine/limit_solver.py": {
+      "source": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v5p5p3_92mev_profile_combination_20260912/engine/limit_solver.py",
+      "sha256": "e6226d684a5e4129afdaf42fd5cc118f103b1793b39033f7b92d92a9ece0c3c5"
+    },
+    "inputs/scopes.json": {
+      "source": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v5p5p3_92mev_profile_combination_20260912/inputs/scopes.json",
+      "sha256": "489159c076dcd0654e8d3ec0561a07aa9ae57ca7d82b1a2ae1f845f11ae69882"
+    },
+    "inputs/spectrum_2015.npz": {
+      "source": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v5p5p3_92mev_profile_combination_20260912/inputs/spectrum_2015.npz",
+      "sha256": "9995550a8769d98899608c93513a9d54a542f3db5cd7f2f5383a65fc1e489ac8"
+    },
+    "inputs/spectrum_2016.npz": {
+      "source": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v5p5p3_92mev_profile_combination_20260912/inputs/spectrum_2016.npz",
+      "sha256": "11bc1b24af6a0aaa2345fe87e83fce60ee8fb45c77d6b1d4e80adc37fa7af176"
+    },
+    "inputs/spectrum_2021.npz": {
+      "source": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v5p5p3_92mev_profile_combination_20260912/inputs/spectrum_2021.npz",
+      "sha256": "fd4867a7e2df69d88d62cdaaed133096d015371e2fe5bd700596f411c8437294"
+    },
+    "inputs/source_2016_10pct.root": {
+      "source": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v4p9p7_2016_support_combined_100toy_20260902/inputs/source_2016_10pct.root",
+      "sha256": "789e619fcbeb5e81f9193d3e224bc17919983477a037bf3d79692327555f9fd4"
+    }
+  }
+}

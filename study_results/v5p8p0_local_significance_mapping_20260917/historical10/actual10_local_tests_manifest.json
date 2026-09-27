@@ -1,0 +1,28 @@
+{
+  "complete": true,
+  "elapsed_seconds": 64.585182167,
+  "N": 512,
+  "anchors_MeV": [
+    42,
+    66,
+    76,
+    90,
+    92,
+    117
+  ],
+  "seed_base": 580201610,
+  "seed_recipe": "numpy SeedSequence [580201610, mass_MeV, truth_id]; default_rng; one whole-support Poisson spectrum per trial",
+  "truth_ids": {
+    "0": "scaled_parent_stress",
+    "1": "mass_specific_local_gp"
+  },
+  "support_count_ratio": 0.10220157794390532,
+  "input_sha256": "789e619fcbeb5e81f9193d3e224bc17919983477a037bf3d79692327555f9fd4",
+  "script_sha256": "2b5f927395a33a1afd198c6025e086e726b9695d9870e611e4fd48441745afd8",
+  "local_tail_ordering": "inclusive q0=max(0,r)^2 >= observed q0; exact p=1 if observed q0=0",
+  "binomial_intervals": "two-sided 95% Clopper-Pearson; at qobs=0 true inclusive tail is exactly 1 by statistic support",
+  "fitted_policy": "fixed reviewed parent mass-specific kernel and inherited signal resolution; sideband log-counts and count-dependent errors updated per whole-spectrum toy",
+  "provenance_caveats": "historical10 selection/exposure/parent overlap unverified; stress shape scaled from parent; each localGP truth is mass-specific and source-conditioned",
+  "failures": [],
+  "no_global_calibration": true
+}

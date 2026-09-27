@@ -1,0 +1,73 @@
+{
+  "truth_names": [
+    "archived_stress",
+    "gp_full_nominal",
+    "gp_full_half_ls",
+    "gp_blocked",
+    "regional_rise_fall"
+  ],
+  "candidate_names": [
+    "archived_stress",
+    "gp_full_nominal",
+    "gp_full_half_ls",
+    "gp_blocked",
+    "regional_rise_fall"
+  ],
+  "definitions": {
+    "archived_stress": "Archived threshold-qualified full-2016 generating histogram.",
+    "gp_full_nominal": "Full-support observed-data GP mean, frozen76MeV kernel; self-fit control.",
+    "gp_full_half_ls": "Full-support observed-data GP mean, same amplitude and half length scale; self-fit control.",
+    "gp_blocked": "Fixed-block excluded GP predictions combined by positive C2 partition weights into one spectrum.",
+    "regional_rise_fall": "Poisson-fitted rising/falling log-cubic count models, joined smoothly across50\u201375MeV."
+  },
+  "array_file": "backgrounds.npz",
+  "array_sha256": "9f71ae6f59729478443bdfd6abd0a9837323eeaebacce541b3c4fd91d1ed7263",
+  "source": "/Users/emryspeets/Desktop/gp_mods/hps-gpr-emrys-validation_workflow/study_results/v5p8p0_local_significance_mapping_20260917/local/2016_76.npz",
+  "source_sha256": "1a99cc961413e8c62a2f888ee47df4954548bf54742fbbdd72fed8838dfa9d01",
+  "builder_sha256": "4c97f5406de54365e3adc9181892a4fe5c137341affc45e06692ff8cca2f6187",
+  "protocol_sha256": "0bc89dba8b1616ae450f61ef0c26bbf618cf5d7c1cc26bc6648e803f1d8fedfc",
+  "block_geometry_sha256": "fbed1062af60d86287ade4b75d93c00b0f3f951b1d8096ca7a312357905ad2b2",
+  "runtime_sources": {
+    "/Users/emryspeets/Desktop/gp_mods/hps-gpr-v5p0p2-20260909/study_results/v4p9p13_calibration_20260905/calibration_core.py": "05c6a6c65bbc0c3e23fa643c74d931f07b92d9ab80993138cee3d330d64db46a",
+    "/Users/emryspeets/Desktop/gp_mods/hps-gpr-v5p0p2-20260909/study_results/background_profile_comparison_20260905/run_comparison.py": "ec2b0c0883c8272c65c5716c13806dc29ab2399cea4b1c1a05306562a47ab87a",
+    "/Users/emryspeets/Desktop/gp_mods/hps-gpr-v5p0p2-20260909/study_results/v4p9p13_calibration_20260905/gp_refit_pilot.py": "1841a36dfed842cf3eb0bd57dcfeddfa420111bcfddd58a9ca1686ed2ca7b74c",
+    "/Users/emryspeets/Desktop/gp_mods/hps-gpr-v5p0p2-20260909/study_results/v4p9p12_final_dataset_combinations_20260902/inputs/analysis_card.yaml": "4a3f3365584743ac1f8b62515ec37c9ca1b908968cfa7497a22609dedbfb79df",
+    "/Users/emryspeets/Desktop/gp_mods/hps-gpr-v5p0p2-20260909/study_results/v4p9p12_final_dataset_combinations_20260902/inputs/reviewed_gp_states.csv": "fa87f1cc310dc40c04b9731e89e86bcc175444cb1510582f94f35e4cf21df5d7"
+  },
+  "fitted_metadata": {
+    "regional_fits": {
+      "rising": {
+        "coefficients": [
+          12.7856332537417,
+          -0.4623526619922115,
+          -1.0678733451599507,
+          3.429265331249558
+        ],
+        "gradient_max": 1.1927662102369237e-10,
+        "optimizer_success": true
+      },
+      "falling": {
+        "coefficients": [
+          12.79344871563326,
+          0.09275190030632964,
+          -4.753181589879497,
+          0.23769778334677458
+        ],
+        "gradient_max": 3.6305361063005867e-10,
+        "optimizer_success": true
+      }
+    }
+  },
+  "construction_seconds": 0.19000312500000005,
+  "all_positive_finite": true,
+  "same_truth_for_every_test_mass": true,
+  "selection_on_local_roots": false,
+  "workers": 1,
+  "BLAS_threads": 1
+}
+             truth  total_expected  observed_total  ratio_to_observed_total  min_expected  max_expected  max_abs_log_slope  max_abs_log_curvature  max_abs_log_third_derivative  pearson_per_bin
+   archived_stress    7.314305e+07      73143538.0                 0.999993    701.242697 354215.143850           0.961269               0.106382                      0.091343         2.900713
+   gp_full_nominal    7.314394e+07      73143538.0                 1.000005    650.118420 355659.888451           1.123590               0.183017                      0.183010         1.084984
+   gp_full_half_ls    7.314393e+07      73143538.0                 1.000005    651.012434 355608.701920           1.125414               0.178054                      0.178314         1.067089
+        gp_blocked    7.998260e+07      73143538.0                 1.093502    602.786884 457869.778456           1.265944               1.057232                      1.952755      5028.939378
+regional_rise_fall    7.333762e+07      73143538.0                 1.002653    373.768609 367701.553207           0.392423               0.024759                      0.024759       349.431933

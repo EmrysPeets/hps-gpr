@@ -1,0 +1,328 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,bm,booktabs,tabularx,array}
+\usepackage{graphicx,float,placeins,microtype,fancyhdr}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xurl}
+\hypersetup{pdftitle={HPS GPR v6.1: reconstructed signal templates},pdfauthor={Emrys Peets}}
+\pagestyle{fancy}\fancyhf{}\setlength{\headheight}{14pt}
+\fancyhead[L]{\small HPS Gaussian-Process Resonance Search}
+\fancyhead[R]{\small v6.1 / MC signal templates}\fancyfoot[C]{\thepage}
+\fancypagestyle{plain}{\fancyhf{}\fancyhead[L]{\small HPS Gaussian-Process Resonance Search}
+\fancyhead[R]{\small v6.1 / MC signal templates}\fancyfoot[C]{\thepage}}
+\setlength{\emergencystretch}{2em}\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.08}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\fig}[3]{\begin{figure}[H]\centering
+\includegraphics[width=.98\linewidth,height=#1\textheight,keepaspectratio]{#2}\caption{#3}\end{figure}}
+\title{HPS Gaussian-Process Resonance Search\\[.5em]
+\large Selected Reconstructed-MC Templates\\Standalone Study v6.1}
+\author{Emrys Peets\\Stanford University and SLAC National Accelerator Laboratory}
+\date{22 September 2026}
+\begin{document}
+\maketitle
+\begin{abstract}
+The 2021 Gaussian signal model is compared with normalized reconstructed
+target-constrained selected-candidate mass distributions from twelve A-prime MC
+masses between 40 and 260~MeV. The original $\pm2.25\sigma_m$ fit and
+training mask, observed 10\% spectrum, GP kernel states and coupling
+normalization are retained. Direct-template observed 90\% $CL_s$ limits
+and local $p_0$ values at the generated masses are compared with Gaussian
+fits to the same data. A dense morphing scan is reported separately as
+exploratory. The MC production is v13 and the observed sample is v16;
+their target constraint and momentum-sum labels agree, but timing
+selections differ and full production equivalence is not established.
+Stored reconstructed masses receive no added smearing or recentering.
+The inherited coupling coordinate is a conditional comparison, not a
+validated A-prime exclusion: an unmatched or accidental continuum need
+not scale with the signal coupling.
+\end{abstract}
+
+\section{Observed comparison and scope}
+\input{../derived/report_summary.tex}
+
+The direct comparison uses generated masses from 60 through 240~MeV in
+20~MeV steps, inside the original 2021 search. The 40 and 260~MeV samples
+provide shape and interpolation information outside those direct test
+points. Full 2015 and full 2016 Gaussian references are retained in the
+package, but no matching reconstructed MC for those campaigns was
+supplied. The 2021 response is therefore not substituted into their fits.
+
+The result is conditional on the supplied selected-MC shapes and their
+finite statistics. It is neither a newly qualified detector-response
+model nor a coverage calibration. The supplied candidate distributions
+have broad components and substantial displacement from the generated
+pole at several masses; they are not established as pure reconstructed
+resonance responses. An observed difference between the two
+curves can reflect mass bias, core width, non-Gaussian tails, selection
+differences and finite-MC fluctuations together.
+
+\clearpage
+\section{Reconstructed mass distributions}
+The source histograms retain selected target-constrained masses within
+0--400~MeV and record out-of-range counts separately. The pole mass sets the hypothesis; the reconstructed mean
+is allowed to differ. The comparison does not shift the MC peak onto the
+pole mass or force its width to the Gaussian parameterization.
+
+\fig{.76}{../figures/mc_shapes.pdf}{Unit-normalized stored reconstructed
+MC mass densities and the nominal Gaussian at each generated mass.
+Densities span the full stored range on a logarithmic axis so broad or
+displaced populations remain visible.
+Dotted lines mark the original $\pm2.25\sigma_m$ boundaries, calculated
+from the nominal Gaussian resolution. Displayed densities are normalized
+over their stored histogram range; fitted templates retain their
+separately declared support normalization. No extra smearing or
+recentering is applied.}
+
+\clearpage
+\section{Selected MC statistics and shape properties}
+The source histograms store the weighted bin contents and squared-weight
+sums. The effective number of weighted entries is
+\begin{equation}
+ N_{\mathrm{eff}}=\frac{(\sum_jw_j)^2}{\sum_jw_j^2}.
+\end{equation}
+It describes MC sampling, not data exposure or signal efficiency.
+Selected rows need not be unique physical events unless the production
+candidate policy establishes that identity. The source files, latest
+ROOT tree cycles, branches, weights and extraction counts are recorded
+in the histogram metadata and manifest.
+
+\input{../derived/report_sample_context.tex}
+
+\begin{table}[H]\centering\small
+\input{../derived/report_samples.tex}
+\caption{Selected reconstructed MC entries and saved shape summaries.
+Bias is the reconstructed median displacement, in MeV, from the generated
+pole. Median and quantile half-width $\sigma_{68}$ are conditional on
+the stored 0--400~MeV range; the core probability uses the full selected
+weight. Overflow
+denotes selected rows above that range; it remains included in
+full-selected-yield bookkeeping.}
+\end{table}
+
+The original 2021 resolution is held fixed when defining every mask:
+\begin{equation}
+ \sigma_m(m)=0.00184825-0.001375m+0.085875m^2,
+ \qquad m,\sigma_m\ \hbox{in GeV}.
+\end{equation}
+Thus a narrower or shifted MC core changes the fraction of a unit signal
+inside the existing fitted bins. It does not silently redefine those bins
+or the sideband training set. The MC mass range and normalization support
+are recorded separately so losses at either boundary remain visible.
+
+The word \emph{smeared} in the production directory is not sufficient
+to reconstruct the upstream smearing chain. The stored smear-ratio
+branches and cutflows are audited, while the template itself uses the
+stored target-constrained mass exactly once. No second factor of 1.25
+or undocumented mass transformation is introduced.
+
+\clearpage
+\section{Observed 2021 limits and local probabilities}
+The direct MC points use the same observed counts and correlated GP
+constraint as their Gaussian partners at each mass. The dense morph
+curve is displayed with a separate line style because its additional
+mass hypotheses require an interpolation assumption.
+
+\fig{.73}{../figures/observed_2021.pdf}{Observed 2021 10\% limits,
+fixed-mass local probabilities and signal fractions in the original
+fitted bins. Points use the direct reconstructed templates at generated
+masses. The dashed curve, when present, uses exploratory MC morphing.
+The coupling limit includes the inherited minimal-visible branching
+correction once above the dimuon threshold.}
+
+\clearpage
+\section{Paired comparison at generated masses}
+The direct result is paired with the Gaussian at the same mass. The
+limit ratio is $R(m)=\eps^2_{90,\mathrm{MC}}/\eps^2_{90,G}$, and the
+signed-root change is $\Delta r=r_{\mathrm{MC}}-r_G$. Points at
+different masses share observations and GP training bins.
+
+\begin{table}[H]\centering\footnotesize
+\input{../derived/report_native.tex}
+\caption{Direct-template comparison at generated masses. All
+probabilities are pointwise and use their stated signal template.}
+\end{table}
+
+\fig{.39}{../figures/native_agreement.pdf}{Observed fractional limit
+changes and signed-root differences for direct MC templates. These are
+paired descriptions of the same observed spectra. They are not
+independent residuals with a chi-squared sampling law.}
+
+\clearpage
+\section{Agreement summaries and interpolation boundary}
+\begin{table}[H]\centering\small
+\input{../derived/report_agreement.tex}
+\caption{Descriptive agreement on the common direct-MC grid. Quantile
+ranges and percentages of agreeing masses are summaries of the curves,
+not confidence intervals or agreement probabilities.}
+\end{table}
+
+A statistical probability for disagreement would require a specified
+joint sampling calculation that preserves the common data, overlapping
+sidebands and template estimation. An independent-point chi-squared
+test would omit those dependencies. The present comparison therefore
+reports sizes and locations of differences without assigning such a
+probability.
+
+The reconstructed MC is available at discrete generated masses. A dense
+scan necessarily interpolates shape information. Holding out an interior
+generated mass and predicting its shape from its neighbors tests that
+interpolation against an available simulation sample. It does not test
+the underlying detector simulation against data, and it cannot establish
+sampling coverage of an upper limit.
+
+The declared morph linearly mixes the neighboring CDFs in standardized
+residual $z=(m_{\rm rec}-m_0)/\sigma_{\rm nominal}(m_0)$, evaluating
+each input distribution at its own pole and nominal resolution. It uses
+no extrapolation beyond the supplied 40--260~MeV grid. Its dense observed
+scan covers the original 50--250~MeV search at 1~MeV spacing.
+
+\input{../derived/report_morph_validation.tex}
+
+The direct generated-mass results remain the primary comparison. Any
+minimum found on the denser exploratory grid depends on both the
+morphing prescription and the enlarged mass scan. Neither its local
+probability nor the smallest value selected across models is a global
+discovery probability.
+
+\clearpage
+\subsection{Held-out shapes and finite-MC precision}
+\begin{table}[H]\centering\small
+\input{../derived/report_loo.tex}
+\caption{Leave-one-mass-out checks. CDF distances and core fractions
+use the conditional analysis-support distributions. Limit ratios and
+signed-root changes compare the held-out morph with direct MC at the
+same hypothesis. The shape thresholds are diagnostic criteria.}
+\end{table}
+
+For each direct mass, 32 independent Poisson resamples of the stored
+unit-weight MC histogram bins are fitted against the fixed Gaussian
+reference. This conditional calculation quantifies template sampling
+precision under that bin-count model. It does not include detector
+systematics, selection differences, correlations between candidates or
+uncertainty in the observed-data background. No new observed-data
+experiments are generated.
+
+\begin{table}[H]\centering\small
+\input{../derived/report_precision.tex}
+\caption{Conditional finite-MC precision. $R_{16},R_{50},R_{84}$ are
+quantiles of the MC-to-Gaussian upper-limit ratio across 32 MC-bin
+resamples. The last column is the relative standard deviation of the
+resampled limit around its central direct-template scale, in percent.}
+\end{table}
+
+Thirty-two resamples resolve only a modest estimate of the central
+spread. The intervals are neither an observed-limit confidence band nor
+a significance for the discrepancy between templates.
+
+\clearpage
+\section{Likelihood and normalization}
+The original primary window is used throughout. The GP trains only on
+bins outside $\pm2.25\sigma_m$, using archived kernel coordinates.
+Within a mass hypothesis, both signal models share its predicted count
+mean $b$, covariance $C$ and observed counts $n$. With $LL^T=C$,
+\begin{align}
+ a&=\frac{\eps^2}{10^{-8}},\qquad T_i=K(m)\,10^{-8}w_i,\\
+ \lambda_i&=b_i+(L\bm\theta)_i+a T_i,\\
+ \ell(a,\bm\theta)&=\sum_i\left[\lambda_i-n_i+
+          n_i\log\frac{n_i}{\lambda_i}\right]
+          +\frac12\bm\theta^T\bm\theta .
+\end{align}
+The zero-count contribution is $\lambda_i$. The correlated background
+deformation is profiled at every tested amplitude. The bin probabilities $w_i$ are
+normalized over the declared full support before selecting fitted bins;
+their restriction to the primary window is not renormalized.
+
+For MC the full fitting support is 36--299.75~MeV. Its retained fraction
+$f_{\rm support}$ is recorded separately. The ledger's
+\texttt{full\_yield\_90} is the support-normalized yield; the additional
+\texttt{full\_selected\_yield\_90} divides it by $f_{\rm support}$.
+That bookkeeping conversion does not establish a calibrated coupling
+normalization outside the analysis support.
+
+Here $K(m)$ is the unchanged prompt-density conversion. The solver's
+\texttt{A90} column is $a_{90}$, while the support-normalized event yield
+is $N_{90}=a_{90}K(m)10^{-8}=K(m)\eps^2_{90}$. Above $2m_\mu$, the inherited
+minimal-visible conversion multiplies the electron-only coupling limit
+by $1+\sqrt{1-4r_\mu}(1+2r_\mu)$, with
+$r_\mu=(m_\mu/m)^2$. This correction does not change the visible yield
+or local probability. Density continues to use the nominal
+$m\pm1.64\sigma_m$ native-bin interval.
+
+The observed limit solves the bounded, piecewise-asymptotic
+$CL_s(a_{90})=0.10$, using explicitly profiled observed and
+background-Asimov likelihood ratios~\cite{Cowan}. The free diagnostic
+amplitude may be negative while physical Poisson expectations are
+maintained. Writing its signed likelihood root as $r$,
+\begin{equation}
+ Z_0=\max(r,0),\qquad p_0=\Phi(-Z_0).
+\end{equation}
+Deficits therefore have the inherited reference value $p_0=0.5$.
+This is a local asymptotic reference, not the probability of the most
+significant result anywhere in a scan.
+
+The Gaussian and MC comparisons use the same converged solver. The
+historical v5.9 audit found a stopping discrepancy in an older optimizer;
+the present paired comparison does not mix that older table with newly
+computed MC fits. Numerical convergence and finite-MC statistical
+qualification are separate questions.
+
+\clearpage
+\section{Selection provenance and interpretation}
+The supplied MC directory is
+\path{/sdf/data/hps/physics2021/preselection/v13/ap_signal_prompt_smeared}.
+The observed input derives from
+\path{/sdf/data/hps/physics2021/preselection/v16/data_10pc_prompt_TC_psum2p8}.
+The MC uses the stored \texttt{vertex./vertex.invM\_} branch and the
+target-constrained vertex category. Production labels agree on the
+target constraint and $p_{\rm sum}>2.8$~GeV, but the inspected MC timing
+windows include 5.7 and 9.2~ns where the observed sample uses 5.1 and
+7.8~ns. Full production equivalence is not established. No new selection
+is silently imposed to make the two samples appear matched.
+
+A bounded inspection finds both stored daughter truth-link flags false
+for every inspected row. Those flags cannot identify matched signal
+daughters, and their values alone do not prove that the reconstructed
+candidates lack signal daughters. No additional truth selection is
+defensible from them. The fit therefore substitutes the supplied
+all-selected candidate distribution conditionally.
+
+The stored track hit counters are three-dimensional; cutflow labels
+refer to two-dimensional-hit requirements. Those labels are not a
+license to apply their thresholds directly to the stored hit counters.
+The local and remote selection audits preserve the evidence and the
+unresolved production details. ROOT files can contain older tree cycles;
+only the latest \texttt{preselection} cycle contributes to extraction.
+
+Input files and configurations are identified by saved paths, sizes and
+SHA-256 hashes. Extraction uses bounded chunks and retains bin sums of
+weights and squared weights. All results, scripts, reconstructed-mass
+histograms and report sources are mirrored to
+\path{/sdf/home/e/epeets/src/hps_gpr_v6p1_mc_signal_templates_20260922}.
+The original observed result and source ROOT files are preserved.
+
+This study measures how the selected reconstructed 2021 MC changes the
+conditional observed inference under the original background model and
+mask. It does not isolate a pure tail uncertainty or establish that
+either signal template is the correct detector response. Selection
+differences, finite MC and interpolation remain explicit qualifications.
+No MC-template claim is made for the 2015 or 2016 detector configurations.
+
+Approximately 24--61\% of the direct-mass selected signal distributions
+lie outside the primary blind window. Signal in those training bins can
+be absorbed by a background-only GP. This observed template replacement
+keeps the sideband prediction fixed; it does not model signal-contamination
+feedback, extraction recovery or coverage for these broad distributions.
+
+\begin{thebibliography}{9}
+\bibitem{note} E.~Peets, M.~Gignac and E.~Hsu,
+\emph{HPS Gaussian-Process Resonance Search: Analysis Note v5.0.5},
+16 September 2026, internal review draft and archived source package.
+\bibitem{Cowan} G.~Cowan, K.~Cranmer, E.~Gross and O.~Vitells,
+``Asymptotic formulae for likelihood-based tests of new physics,''
+Eur. Phys. J. C \textbf{71}, 1554 (2011),
+\href{https://arxiv.org/abs/1007.1727}{arXiv:1007.1727}.
+\end{thebibliography}
+\end{document}

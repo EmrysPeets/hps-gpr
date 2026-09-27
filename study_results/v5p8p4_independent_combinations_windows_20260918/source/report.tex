@@ -1,0 +1,139 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=0.73in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,microtype,graphicx,booktabs,amsmath,amssymb,xcolor,array,hyperref,fancyhdr}
+\definecolor{navy}{RGB}{29,54,78}
+\hypersetup{pdftitle={HPS-GPR v5.8.4: Independent combinations, spacing and blind widths},colorlinks=true,urlcolor=blue!50!black}
+\pagestyle{fancy}\fancyhf{}\lhead{\small HPS-GPR: combinations and blind-window study}\rhead{\small v5.8.4}\cfoot{\thepage}
+\setlength{\headheight}{14pt}\setlength{\parindent}{0pt}\setlength{\parskip}{6pt}\setlength{\emergencystretch}{1em}
+\newcommand{\heading}[1]{\section*{\color{navy}#1}}
+\newcommand{\fig}[3][1]{\begin{center}\includegraphics[width=#1\linewidth]{../figures/#2.pdf}\end{center}{\small #3}\par}
+\newcommand{\sfN}{\overline\Phi}
+\begin{document}
+{\LARGE\bfseries\color{navy} Independent combinations, mass spacing\\and blind-window comparisons}\par
+{\large Standalone study v5.8.4}\hfill 18 September 2026
+
+The 1 MeV study retains the nominal GP sources of v5.8.2--3 and compares blind half-widths 2.25, 2.4, 2.5 and 2.6 times the mass resolution. It refits the three experiments and their shared-coupling combination, and adds Fisher and equal-weight signed Stouffer combinations of the independent experimental responses at the same tested mass.
+
+The independent combinations emphasize a coherent upward response near 92 MeV. At the baseline width, Fisher gives local/global $Z=3.72/2.28$ over 19--250 MeV, and signed Stouffer gives $3.93/2.58$. The common-coupling maximum remains at 66 MeV. These methods test different alternatives; their difference is explained by the coupling information and separate fitted amplitudes, not by omitting the mass-search correction.
+\input{baseline_peaks.tex}
+\fig[.93]{peak_comparison_matrix}{\textbf{Figure 1.} Peak local and global significances for every declared width. ``Full'' means each experiment's own range, or the combined active-dataset range 19--250 MeV. The common-overlap range is 50--100 MeV. These are conditional response-GP estimates; choosing the most favorable method or width is not calibrated by these scope-wise p-values.}
+
+\clearpage
+\heading{Does 1 MeV spacing reduce the penalty?}
+\fig{grid_peak_comparison}{\textbf{Figure 2.} Nested 0.5 and 1 MeV baseline grids, using the same previously saved 200,000 Gaussian fields. The compared observed maximum is selected separately on each grid. This paired calculation isolates spacing from changes in source, fit, or random ensemble.}
+\input{grid_table.tex}
+In the table each pair is 0.5 MeV / 1 MeV. At a fixed threshold, a subset of sampled masses always has a maximum no larger than the finer grid. Its tail probability therefore falls. This does not guarantee a more significant observed search: the coarser grid can miss the observed peak as well.
+
+For 2016 the finer grid reaches local $Z=2.886$ at 91.5 MeV, whereas the integer grid reaches $2.823$ at 91 MeV. The observed global significance decreases from 1.254 to 1.194 despite the smaller fixed-threshold penalty. The same effect occurs in 2021. The 2015 peak at 51 MeV and coupled peak at 66 MeV are retained, so their global significances increase slightly.
+
+The new width/method comparisons use 100,000 fresh Gaussian fields per width and scope; small Monte Carlo differences from this paired 200,000-field table are expected. The main baseline coupled result, for example, is $Z=0.812$ versus $0.805$ in this paired spacing test.
+
+The 1 MeV results describe a declared discrete search. They do not establish convergence to a continuous mass search. Adopting coarse sampling because it produces a smaller p-value would be a separate selection decision; the grid comparison here reports both outcomes rather than replacing the original result with whichever is larger.
+
+\clearpage
+\heading{Common mass with independent signal strengths}
+\fig{combination_methods_baseline}{\textbf{Figure 3.} Baseline $\pm2.25\sigma$ comparison. Fisher and signed Stouffer use the three independent experiments' responses at the same tested mass; they impose no common coupling or yield ratio. Their global curves still include the full indicated correlated mass search. All three datasets contribute throughout the lower-row overlap. Outside that overlap, the full-range curves use the datasets whose declared search ranges contain the mass.}
+The individual ranges remain 19--100 MeV for 2015, 39--180 MeV for 2016, and 50--250 MeV for 2021 10\%. A change of participating datasets is included in each simulated combined scan. Nearby masses are correlated through their use of the same fluctuated spectra.
+
+At 92 MeV the three reference-standardized scores are 2.594, 2.796 and 1.423. Their equal-weight sum divided by $\sqrt3$ is 3.934. The shared-coupling score at that same mass is 2.567, while its largest score remains 2.829 at 66 MeV. Thus the alternative combinations expose a different feature of the same spectra.
+
+For the baseline 50--100 MeV overlap, Fisher gives global $Z=2.73$ and signed Stouffer $Z=3.01$. These are probabilities for a smaller, separately declared search domain. They neither include choosing between methods after inspection nor replace the full-range results.
+
+\clearpage
+\heading{Fisher calibration and the meaning of the alternative tests}
+For each experiment, the fixed-source response model is
+\[
+r_i^*(m)=a_i(m)+s_i(m)W_i(m),\qquad W_i\sim N(0,R_i),\qquad
+z_i=\frac{r_{i,\rm obs}-a_i}{s_i}.
+\]
+The $W_i$ fields are independent across experiments and correlated across mass within each experiment. The background GP is retrained on each Poisson spectrum's sidebands; the full generating GP source is held fixed.
+
+The existing excess convention assigns $p_i=\sfN(z_i)$ when $r_{i,\rm obs}>0$, and $p_i=1$ otherwise. Fisher's statistic is $T=-2\sum_i\log p_i$. The usual $\chi^2_{2k}$ formula presumes continuous uniform null p-values [1]. Here the p-values have an atom at one, so that conversion is generally conservative rather than the exact local tail.
+
+An exact mixture within the Gaussian response approximation accounts for the atom. Put $q_i=\Phi(a_i/s_i)$. Under the null, $p_i=U_i$ for $U_i<q_i$, otherwise $p_i=1$, with independent $U_i\sim\mathrm{Uniform}(0,1)$. For the subset $J$ of positive fits,
+\[
+w_J=\prod_{i\in J}q_i\prod_{i\notin J}(1-q_i),\qquad
+T\mid J=-2\sum_{i\in J}\log q_i+\chi^2_{2|J|}.
+\]
+For observed $T>0$ we sum the corresponding tails over nonempty $J$; at $T=0$ the inclusive tail is one. The implementation recovers the ordinary Fisher formula when all $q_i=1$, and reproduces the original local test when only one dataset contributes. The uncorrected $\chi^2$ conversion is also retained in the ledger for comparison.
+
+Signed Stouffer instead uses $Z_S=\sum_i z_i/\sqrt{k}$ and $p_S=\sfN(Z_S)$. It combines continuous signed reference scores, so deficits reduce the sum. It has no requirement that every raw fitted signal yield be positive. It is a different, explicitly specified upward-response ordering. Each Gaussian scan repeats these combinations and records the largest $-\log p_F$ or $Z_S$ over the stated domain. No scan-point independence approximation is used.
+
+\heading{Combining experiment-global p-values answers another question}
+One may also apply ordinary Fisher to the three individual \emph{global} p-value estimates. This permits a different peak mass in each experiment, so it tests for unusual behavior somewhere in the independent searches, not a common resonance mass. No additional mass penalty is required beyond those already included in the inputs. Its numerical conversion is approximate because the inputs are finite-Monte-Carlo estimates.
+\input{experiment_global_table.tex}
+The common-mass scans in Figure 3 and this table must not be interpreted as equivalent evidence for the same particle hypothesis.
+
+\clearpage
+\heading{Why the shared coupling suppresses the 92 MeV response}
+\fig{peak_92_coupling_weights}{\textbf{Figure 4.} Baseline fits at 92 MeV. Left: separate coupling estimates with conditional likelihood-curvature errors; dashed line: the shared estimate. Right: fractions of local null Fisher information in that common-coupling parameter. These weights are not event fractions or independent measurements of detector efficiency.}
+The separate estimates are approximately $7.75\times10^{-5}$, $9.13\times10^{-6}$ and $1.65\times10^{-6}$ in $\epsilon^2$, while the common estimate is $3.10\times10^{-6}$. In a local Gaussian approximation, a common-parameter score weights the standardized experimental scores by $\sqrt{I_i/\sum I_i}$: approximately 0.041, 0.419 and 0.907 here. Stouffer uses $1/\sqrt3$ for each. It therefore gives substantially more weight to the 2015 upward fluctuation.
+
+The observed likelihood improvement from allowing three unconstrained coupling parameters instead of one is $2(\mathrm{NLL}_{\rm shared}-\sum_i\mathrm{NLL}_{i,\rm free})=11.55$ at 92 MeV. This is a fit-compatibility diagnostic at an inspected mass, not a separately calibrated discovery or incompatibility significance. A larger independent-combination score does not show that the prescribed common-coupling relation is erroneous.
+\clearpage
+\heading{Independent combinations across blind widths}
+\fig{independent_methods_widths}{\textbf{Figure 5.} Alternative combinations across all blind widths: local $Z$ and full-range global p. Their peaks remain at 92 MeV. Fisher full-range global $Z$ spans 2.18--2.32 and signed Stouffer spans 2.48--2.62 across the declared widths.}
+The 92 MeV feature is stable under this particular change of window prescription. Its interpretation still depends on the tested signal relation and the fixed nominal background sources. The highest displayed result is not corrected for choosing a width or combination method.
+
+Fisher accumulates evidence through small p-values and retains the original nonpositive-fit atom. Signed Stouffer uses all three signed reference responses, including deficits, with equal weights. Their numerical agreement on the peak location is useful, but it is not an independent replication: both statistics use the same experimental data and fitted responses.
+
+\clearpage
+\heading{Changing the blind half-width: local response}
+\fig{width_local_Z}{\textbf{Figure 6.} Reference-local significance for each experiment and the shared-coupling search. The half-width changes both the GP held-out region and the likelihood signal window, following the existing implementation. The source means, reviewed mass-dependent kernels, supports, resolution and signal normalization remain fixed. The full Gaussian signal template is restricted to each window without renormalizing away its missing tails.}
+\input{width_global_peaks.tex}
+The table reports global $Z$ at each width's local maximum over the corresponding full scope. It is a comparison across declared configurations, not a width-profiled search. The covariance, offsets and response scales are recomputed for every width, so no old trials factor is simply attached to a newly fitted peak.
+
+For 2016 the integer-grid local peak improves from 2.823 at $\pm2.25\sigma$ to 2.923 at $\pm2.4\sigma$, with more modest changes at the other widths. The response does not improve monotonically with window size. Some 2021 curves coincide at individual masses because a small width change need not add or remove an analysis bin there.
+
+Wider blinding changes interpolation distance and background uncertainty as well as the fitted events. This is a controlled window comparison with frozen kernel settings; it is not a retuned background-model selection study.
+
+\clearpage
+\heading{Changing the blind half-width: global probabilities}
+\fig{width_global_p}{\textbf{Figure 7.} Full-scope global probabilities from 100,000 Gaussian fields for each configuration. Local and global numerical probabilities, positive one-sided $Z$, exceedance counts, exact binomial intervals and direct-Poisson counts are retained at every plotted mass. The global probability at any point compares that score with the largest score anywhere in the declared scope.}
+The shared-coupling peak remains near 66 MeV for every width and its full-range global significance spans roughly 0.70--0.82. Independent combinations instead emphasize 92 MeV, where the experiments all have upward reference-standardized scores but do not prefer the same fitted coupling value.
+
+The width changes are small compared with the distinction between the common-coupling and independent-combination hypotheses. Wider masks also do not remove the deterministic source response: the 2016 RMS offset remains approximately 0.61--0.62 on the integer grid. This study therefore gives no evidence that simply widening the blind region resolves the source-model question discussed in v5.8.3.
+
+All displayed probabilities condition on the nominal GP sources. The 2016 $\pm2.6\sigma$ peak has a modest direct-tail validation discrepancy, detailed on the final page. The Gaussian curves are conditional approximations, not unconditional discovery calibrations.
+
+\clearpage
+\heading{Observed 90\% CLs reach}
+\fig{width_observed_reach}{\textbf{Figure 8.} Recomputed observed 90\% CLs upper endpoints in $\epsilon^2$, for the individual experiments and the common-coupling combination. Lower endpoints are stronger exclusions under the prescribed signal model. Every plotted endpoint is obtained from the bounded profile-likelihood CLs solver with its original signal-to-coupling conversion.}
+At every mass and width the solver profiles the Poisson likelihood with its correlated Gaussian background constraint, handles the physical-boundary/deficit branch, and solves ${\rm CL}_s=0.1$. It checks the root, likelihood nesting, positive Poisson means and optimizer convergence. The new Fisher and Stouffer significance calculations are not substituted into this upper-limit construction.
+
+Fisher combination by itself does not specify how a common coupling predicts the separate event yields. It therefore supplies no unique one-dimensional $\epsilon^2$ reach curve. Constructing such a curve would require a signal-strength model and its signal-plus-background calibration; imposing the existing physical yield relation would restore the common-coupling hypothesis. Separate experimental limits and the existing common-coupling limits are the well-defined reach comparisons here.
+
+At $\pm2.6\sigma$, the median observed upper-endpoint ratios to baseline are 1.031 for 2015, 1.022 for 2016, 1.017 for 2021 and 1.020 for the combination. Widening the window therefore slightly weakens the median observed reach in this comparison, even though individual masses can move in either direction.
+
+\clearpage
+\heading{Reach ratios and the model-Asimov comparison}
+\fig{width_reach_ratios}{\textbf{Figure 9.} Upper endpoints divided by the $\pm2.25\sigma$ result at the same mass. Solid: observed spectra. Dashed: a deterministic local model-background Asimov calculation. The black baseline is one. Ratios below one indicate a stronger endpoint; they are not estimates of statistical significance or discovery power.}
+The Asimov calculation sets the fitted-window counts to the predictive mean of that mass-local likelihood, with its GP nuisance covariance held fixed, then solves the same 90\% CLs equation. It is a conditional model sensitivity reference. It is not a coherent full-spectrum experiment, a median proven by an ensemble, an expected band, or an added fluctuated toy sample.
+
+At $\pm2.6\sigma$, the median model-Asimov endpoint increases by 2.77\%, 2.26\%, 1.73\% and 1.81\% for 2015, 2016, 2021 and the combination. The combined observed ratio spans 0.965--1.121, whereas its Asimov ratio spans 1.008--1.068. The oscillating observed changes thus include the particular fluctuations moved into or out of the fit, in addition to the loss of interpolation information from a wider exclusion region.
+
+Absolute model-Asimov curves and an additional global-$Z$ width comparison are included as separate vector plots. All extrema and their mass locations are recorded in \texttt{results/reach\_ratios\_summary.csv}. These results do not select a new production window or establish coverage for any of the alternatives.
+
+\clearpage
+\heading{Validation, interpretation and reproducibility}
+{\small
+\fig[.94]{width_response_validation}{\textbf{Figure 10.} Deterministic source-offset RMS and mean standardized widths from 256 paired complete Poisson scans. The same full-spectrum realization is used at every mass and at every blind width; independent dataset draws are combined by matching realization index. These repeated configurations are therefore correlated, not additional independent experiments.}
+The numerical scan contains 928 width/mass checkpoint pairs, 2,628 fitted scope/mass configurations and 5,096 reported scope/domain/mass rows after the alternative combinations and overlap views are added. All 124 numerical/provenance checks pass. The largest scalar/batch root discrepancy is $5.27\times10^{-10}$; baseline replay differs from the frozen roots by at most $1.32\times10^{-6}$ across numerical runtimes. The width-dependent derivatives pass 264 finite-difference checks with maximum discrepancy $2.94\times10^{-6}$. Numerical covariance-conditioning derivatives remain omitted, as in the prior validated approximation.
+
+\textbf{One statistical tail check is flagged.} For full 2016 at $\pm2.6\sigma$, the Gaussian peak-global probability is 0.09547. Direct complete Poisson scans give 35/256, with a two-sided 95\% interval 0.0971--0.1850. The Gaussian estimate lies just below this interval. Its direct exceedance rate at the Gaussian 95th-percentile maximum is 14/256, consistent with 5\%. This single comparison among correlated checks is not conclusive evidence of a systematic failure, but more complete scans are needed to separate a modest tail mismatch from sampling variation. It is retained rather than treated as an automatic pass.
+
+All other reported Gaussian peak probabilities fall within their corresponding direct 95\% intervals. The most interesting independent-combination tails remain sparsely checked: baseline full-range Fisher has 4/256 direct exceedances, signed Stouffer 1/256, and overlap Stouffer 0/256. Zero does not mean zero probability; its one-sided 95\% upper bound is about 0.0116. The Gaussian estimates near 3$\sigma$ in the overlap are not precise direct-Poisson measurements.
+
+The full source-building step is held fixed. Source-estimation uncertainty, signal absorption during source construction, correlated systematic uncertainties beyond the specified conditional model, and selection among widths, methods and scopes are not calibrated here. These are the interpretation limits of the reported results.
+
+The package contains pinned inputs, full fitting and analysis scripts, checkpoints, response fields, numerical ledgers and render QA. The README gives restart and rebuild commands. Prior releases are unchanged.
+
+\heading{References}
+\begin{enumerate}\small
+\item SciPy, \href{https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.combine_pvalues.html}{\texttt{combine\_pvalues}} documentation: Fisher and Stouffer constructions and the continuous independent-uniform assumption. The atom mixture above is derived for this study's stated convention.
+\item V. Ananiev and A. L. Read, \textit{Gaussian Process-based calculation of look-elsewhere trials factor}, \href{https://arxiv.org/pdf/2206.12328}{arXiv:2206.12328}.
+\item G. Cowan et al., \textit{Asymptotic formulae for likelihood-based tests of new physics}, \href{https://arxiv.org/abs/1007.1727}{arXiv:1007.1727}; HPS-GPR v5.0.5 and studies v5.8.0--3 for the frozen likelihood, GP-source and CLs conventions.
+\end{enumerate}
+}
+\end{document}

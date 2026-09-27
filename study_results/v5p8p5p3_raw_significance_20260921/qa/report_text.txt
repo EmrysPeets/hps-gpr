@@ -1,0 +1,1287 @@
+HPS Gaussian-Process Resonance Search v5.8.5.3 / Unshifted scans
+Unshifted signiﬁcance scans
+and source-response diagnostics
+HPS Gaussian-Process Resonance Search
+Consolidated Analysis Report v5.8.5.3
+Emrys Peets
+Stanford University and SLAC National Accelerator Laboratory
+21 September 2026
+This v5.8.5.3 revision adds unshifted local p-value and signiﬁcance curves for 2015, 2016, 2021 and
+the shared-coupling combination, separate global curves for the raw maximum, and source-response
+diagnostics for all four scopes. Earlier reference-local curves did use centering and scaling in every
+scope; the new local curves do not. The moving blind half-width remains 2. 25σm.
+THE OBSERVED ANALYSIS
+Observed spectrum
+Counts nj
+Frozen input
+Masked GP + likelihood
+±2.25σm exclusion
+Sideband fit; profile amplitude
+Observed scan
+Signed root robs(m)
+Keep the raw curve
+THE NULL EXPERIMENT AND ITS EMULATOR
+Choose source B
+Generating mean Bj
+Control: validate transfer
+Same-data GP: conditional
+Repeat the analysis
+n *
+j ∼ Poisson(Bj)
+Refit the masked GP
+Obtain complete scans r * (m)
+Significance-field GP
+Offsets a; scales s; matrix R
+Sample correlated maxima
+Check complete Poisson fits
+SAME DECLARED TEST FOR OBSERVED AND NULL SCANS
+Keep the raw ordering
+Traw = maxm
+max[r(m), 0]
+Calibrate the same raw maximum.
+No local subtraction is required.
+Reference-standardized ordering
+Tref = maxm:r(m)>0
+[r(m)−am ]/sm
+Reranking is possible.
+This defines a different diagnostic.
+A shared source is not an independent background measurement.
+Figure 1: The two Gaussian processes and the choice of statistical ordering. The background GP is part of the
+ﬁtted analysis. The signiﬁcance-ﬁeld GP approximates the distribution of that analysis under a speciﬁed source.
+It need not be independent of the background model. Independent evidence is needed to qualify the source and
+to validate the approximation. Raw and reference-standardized maxima are diﬀerent tests, even with identical
+observed events and likelihood ﬁts.
+1
+
+HPS Gaussian-Process Resonance Search v5.8.5.3 / Unshifted scans
+1 Which results used local reference recalibration?
+Y es: the earlier reference-local curves used centering and scaling for 2015, 2016, 2021 and
+the shared-coupling combination. For each scope, its own deterministic oﬀset a(m) and response
+width s(m) entered
+zref (m) = robs(m) − a(m)
+s(m) .
+The words “no production recalibration is adopted” did not mean this transformation was absent from
+the plotted diagnostic results. They meant that those results had not been promoted to a replacement
+for the released analysis. That distinction was too easy to miss. The requested unshifted local curves
+are now shown together in Figure 2; none uses a or s.
+The diﬀerent combinations also require care. The earlier Fisher result used reference-local probabil-
+ities, and signed Stouﬀer used signed reference coordinates. The free-amplitude likelihood used the raw
+statistic qR = ∑
+d[max(rd, 0)]2, but its reported p-values were calibrated with the ﬁxed-source response
+distribution. It is not correct to label every previously reported combined probability as uncalibrated
+merely because its observed statistic contains raw roots. In the new ﬁgures, “combined” speciﬁcally
+denotes the original one-shared-coupling likelihood, matching the four scopes in the v5.8.2 ﬁelds.
+1.1 The requested local deﬁnition
+For the conventional unshifted upward-excess display,
+Zraw
+local(m) = max[ robs(m), 0] , p raw
+local(m) = Φ( Zraw
+local(m)) .
+This uses the usual asymptotic standard-normal mapping of the signed likelihood root. It does not
+subtract a deterministic reference oﬀset, divide by a response width, or apply a trials correction. It
+remains an asymptotic probability interpretation, rather than a new claim that the raw root has been
+validated as standard normal under every proposed source.
+For nonpositive ﬁtted amplitudes these plots use the inherited display convention Z = 0 , p = 0 . 5.
+That value is not the inclusive probability of the zero-statistic atom, which is one. The signed roots,
+including deﬁcits, remain visible in the expanded response diagnostics and in the numerical ledger. The
+distinction aﬀects the baseline of a curve, not any of the positive peaks below.
+Scope Raw peak [MeV] Raw local Z Raw local p Ref. peak [MeV] Ref. Z
+2015 full 51 3.1392 0.000847 51 3.3586
+2016 full 90.5 3.4525 0.000278 91.5 2.8860
+2021 native 10% 78 2.8086 0.002488 65.5 2.5576
+Shared coupling 66 2.7602 0.002889 66 2.8290
+T able 1: Raw local peaks and the earlier reference-local peaks of the same observed scans. The ﬁnal two columns
+identify what was changed by reference centering/scaling; they are not used to draw the requested local curves.
+No column contains a look-elsewhere correction.
+All four scans use the same saved observed likelihood ﬁts, a 0.5 MeV mass grid and the ±2. 25σm
+blind half-width. Their supports are 19–100 MeV (2015), 39–180 MeV (2016), and 50–250 MeV (2021
+native 10%). The shared-coupling scan spans 19–250 MeV and uses only the datasets available at each
+mass. It uses all three datasets over 50–100 MeV. No spectrum was reﬁtted for this revision.
+2
+
+HPS Gaussian-Process Resonance Search v5.8.5.3 / Unshifted scans
+20 30 40 50 60 70 80 90 100
+T ested mass [MeV]
+0
+1
+2
+3Local Z (unshifted)
+2015 full  |  peak 51 MeV
+20 30 40 50 60 70 80 90 100
+T ested mass [MeV]
+10−4
+10−3
+10−2
+10−1
+Local p (unshifted)
+2015 full
+40 60 80 100 120 140 160 180
+T ested mass [MeV]
+0
+1
+2
+3Local Z (unshifted)
+2016 full  |  peak 90.5 MeV
+40 60 80 100 120 140 160 180
+T ested mass [MeV]
+10−4
+10−3
+10−2
+10−1
+Local p (unshifted)
+2016 full
+50 75 100 125 150 175 200 225 250
+T ested mass [MeV]
+0
+1
+2
+3Local Z (unshifted)
+2021 native 10%  |  peak 78 MeV
+50 75 100 125 150 175 200 225 250
+T ested mass [MeV]
+10−4
+10−3
+10−2
+10−1
+Local p (unshifted)
+2021 native 10%
+50 100 150 200 250
+T ested mass [MeV]
+0
+1
+2
+3Local Z (unshifted)
+Combined: shared coupling  |  peak 66 MeV
+50 100 150 200 250
+T ested mass [MeV]
+10−4
+10−3
+10−2
+10−1
+Local p (unshifted)
+Combined: shared coupling
+Observed local curves: no reference centering or rescaling
+Figure 2: The requested non-recalibrated local signiﬁcance and p-value curves for every dataset and the shared-
+coupling combination. Left: Z = max( robs, 0). Right: p = Φ( Z); dotted horizontal lines mark the conventional
+local 3σ level. Dots identify the raw maximum of each scope. Neither panel uses the reference oﬀset or response
+scale. The mass ranges diﬀer by dataset; dotted vertical lines in the combined row mark changes in contributing
+datasets.
+3
+
+HPS Gaussian-Process Resonance Search v5.8.5.3 / Unshifted scans
+2 Global probabilities with the observed raw ordering retained
+A global probability still requires a null distribution for the maximum. To avoid changing the observed
+local ranking, deﬁne
+Traw = max
+m∈M
+max[r(m), 0], p raw
+global(m) = PB(T ∗
+raw ≥ max[robs(m), 0]) .
+The supplied global curves use the already saved maxima of r∗(m) = a(m) +s(m)W (m) and the match-
+ing complete Poisson reﬁts. The observation is not centered or rescaled. The generating distribution
+nevertheless retains its source-dependent oﬀsets, ﬂuctuation widths and correlations. Thus this is a
+ﬁxed-source global calibration of the raw statistic , not a source-free global signiﬁcance and not simply
+a trials factor applied to an independently established local p-value.
+Figure 3 keeps this conditional result separate from the requested unshifted local plots. No previously
+standardized maximum distribution is incorrectly reused with a raw threshold. Both observed and toy
+maxima use the same raw ordering. No new null draws are generated.
+Scope Peak [MeV] Gaussian p Global Z Direct k/ 256 Direct 95% interval
+2015 full 51 0.05284 1.618 18/256 [0.0422, 0.1088]
+2016 full 90.5 0.06780 1.492 18/256 [0.0422, 0.1088]
+2021 native 10% 78 0.25092 0.672 57/256 [0.1732, 0.2786]
+Shared coupling 66 0.31182 0.491 70/256 [0.2198, 0.3324]
+T able 2: Fixed-source global probabilities at the unshifted raw maxima. The local results are in Table 1. These
+values reuse the saved raw-maximum ensembles and are not the old reference-standardized maximum tails.
+The displayed global Z is max[0, Φ −1(1 − pglobal)]. A nonpositive observed ﬁt has an inclusive global
+p-value of one and displayed Z = 0. Gaussian-ﬁeld probabilities use (k + 1)/ (N + 1) with N = 200, 000;
+shading is a 95% binomial Monte Carlo interval. The direct-check column retains counts from the 256
+complete Poisson scans and their Clopper–Pearson intervals. None of these intervals propagates source-
+estimation uncertainty. These conditional probabilities are not adopted as a newly qualiﬁed production
+discovery result.
+4
+
+HPS Gaussian-Process Resonance Search v5.8.5.3 / Unshifted scans
+20 30 40 50 60 70 80 90 100
+T ested mass [MeV]
+0.0
+0.5
+1.0
+1.5Global Z (fixed source)
+2015 full  |  peak 51 MeV
+20 30 40 50 60 70 80 90 100
+T ested mass [MeV]
+10−1
+100
+Global p (fixed source)
+2015 full
+40 60 80 100 120 140 160 180
+T ested mass [MeV]
+0.0
+0.5
+1.0
+1.5Global Z (fixed source)
+2016 full  |  peak 90.5 MeV
+40 60 80 100 120 140 160 180
+T ested mass [MeV]
+10−1
+100
+Global p (fixed source)
+2016 full
+50 75 100 125 150 175 200 225 250
+T ested mass [MeV]
+0.0
+0.5
+1.0
+1.5Global Z (fixed source)
+2021 native 10%  |  peak 78 MeV
+50 75 100 125 150 175 200 225 250
+T ested mass [MeV]
+10−1
+100
+Global p (fixed source)
+2021 native 10%
+50 100 150 200 250
+T ested mass [MeV]
+0.0
+0.5
+1.0
+1.5Global Z (fixed source)
+Combined: shared coupling  |  peak 66 MeV
+50 100 150 200 250
+T ested mass [MeV]
+10−1
+100
+Global p (fixed source)
+Combined: shared coupling
+Full-range tails of the raw maximum: conditional on the fixed source
+Figure 3: Global probabilities and displayed Z for the raw maximum , conditional on each unchanged nominal
+GP source. The observed likelihood roots are unshifted. Each tail searches the entire support of its row, not
+only the mass shown on the horizontal axis. Dots identify the same raw peaks as Figure 2; a ﬁxed maximum
+distribution preserves their ranking. Shading represents ﬁnite Gaussian-ﬁeld sampling only. These global panels
+have a diﬀerent probability construction from the asymptotic local panels.
+5
+
+HPS Gaussian-Process Resonance Search v5.8.5.3 / Unshifted scans
+Earlier conditional studies retained for context
+The following sections retain the previous review, including its explicitly reference-standardized results.
+They do not change the unshifted local curves in Figure 2.
+3 What this review settles
+The background GP and the signiﬁcance-ﬁeld GP can be used in the same analysis without circular
+reasoning merely because both are Gaussian processes. They have diﬀerent jobs. The ﬁrst estimates the
+background inside the moving mask; the second reproduces the correlated ﬂuctuations of the resulting
+ﬁtted scan. Their agreement with complete Poisson ﬁts tests the latter approximation. It does not
+independently establish that the spectrum used to generate those ﬁts is a physical background-only
+source.
+The concern about using a source ﬁtted through the observed events is therefore well founded. Such a
+source can be used for a conditional diagnostic, or within a carefully validated procedure that estimates
+background parameters from the data. Here, however, the full source is frozen in the toys, and the
+earlier injection experiment shows substantial absorption when it is rebuilt through an injected peak.
+A smoother stress response is useful evidence about a particular reference, but is insuﬃcient grounds
+for adopting that reference as the production null.
+3.1 The quoted 2016 change is more than a trials correction
+The earlier reference-local calibration applied to 2015, 2016, 2021 and the shared-coupling combination.
+It was used in the diagnostic plots, although it was not adopted as a replacement production result.
+The unshifted curves added in this revision are deﬁned separately above. For 2016, the raw observed
+maximum is still r = 3 . 4525 at 90.5 MeV. The reported Z = 2 . 886 at 91.5 MeV is the maximum after
+a mass-dependent transformation, zref = ( r − a)/s . Calling these merely two summaries obscured a
+consequential change of statistical ordering. The reference score is a diagnostic calibration relative to
+the chosen source; it was not needed just to count search opportunities, and it is not adopted as the
+primary local result here.
+The earlier audit retained the raw ordering and compares it directly with the saved null maxima.
+Conditional on the same nominal GP source, the 2016 raw-maximum tail is 0. 0678 in the Gaussian
+ensemble, with 18 exceedances in 256 complete Poisson scans. The reference-standardized maximum
+instead gives 0. 1049, with 36/256 direct exceedances. Both are source-conditional probabilities for
+diﬀerent tests. The smaller one cannot be selected after inspecting the comparison and then described
+as an independently speciﬁed discovery result.
+3.2 The look-elsewhere correction is not an arbitrary conservatism choice
+A low correlation at one chosen spacing does not divide a continuous search into independent signal
+regions. A region still contains a maximization, and correlations can return or become negative at
+greater separations. A Šidák calculation becomes a meaningful approximation only after the local and
+regional test events have been speciﬁed and the dependence among those events checked.
+The paper’s improvement concerns an upcrossing upper bound for the same signiﬁcance ﬁeld[ 1]. It
+does not promise a smaller penalty than counting resolution intervals. The distinction is material for
+HPS: the ﬁtted response includes sideband subtraction and background retraining, which can produce
+a more rapidly varying score than a signal template on a known background. The new comparisons
+below use identical thresholds and covariance matrices wherever possible.
+6
+
+HPS Gaussian-Process Resonance Search v5.8.5.3 / Unshifted scans
+3.3 What remains ﬁxed and what was newly tested
+All new calculations retain the ±2. 25σm moving mask. The earlier width scans are summarized as
+sensitivity tests; they provide no reason to choose a new width now. The preceding review added a
+raw-versus-reference maximum audit, a covariance-based test of the proposed ten-percent correlation
+rule, and a bounded 2021 high- psum source-transfer diagnostic. It does not repeat the previous full ﬁt
+scans or claim a new rare-tail calibration.
+4 What the 5.8 series has established
+The studies answer diﬀerent questions in a sequence: the old stress reference was diagnosed, a coher-
+ent GP source was constructed, the ﬁtted-score covariance was tested under that source, and several
+combined-search alternatives were compared. The improved stress response is useful evidence about the
+construction. It does not supply a second, independent measurement of the background.
+Study Main result Interpretation retained here
+5.8.0 Full-2016 raw maximum changes from 3. 425 at
+90 MeV on the integer grid to 3. 453 at 90.5
+MeV on the half-MeV grid. Stress RMS stays
+4. 97.
+Finer sampling resolves extrema; it does not
+remove background mismatch. Shorter analy-
+sis length scales do not restore closure every-
+where.
+5.8.1 Full-2016 deterministic RMS falls from 4. 967
+for the archived stress source to 0. 609 for the
+nominal GP source; half the source length scale
+gives 1. 700.
+A better matched source changes the diagno-
+sis. Source rebuilding can also absorb injected
+signal; small RMS alone does not qualify the
+null.
+5.8.2 Half-MeV response ﬁelds describe moderate-
+tail complete Poisson checks. The 2016
+reference-local peak is 2. 886 at 91.5 MeV, with
+global p = 0. 10488.
+Both local reference mapping and the mass-
+search correction are conditional on the ﬁxed
+source.
+5.8.3 Saved ﬁelds explain why full-response correla-
+tions give a larger penalty than counting inde-
+pendent FWHM intervals.
+An interpretation audit; no new likelihood ﬁts
+or random experiments.
+5.8.4 Integer-grid Fisher and signed Stouﬀer peaks
+stay at 92 MeV over the four tested widths.
+The shared-coupling peak stays near 66 MeV.
+Diﬀerent alternatives and weights select dif-
+ferent features. These are repeated analyses
+of the same spectra.
+5.8.5 The free-amplitude likelihood peaks at 91–92
+MeV. Baseline conditional local/global Z =
+3. 583/ 2. 060; mass coherence is unexceptional.
+A common mass with free nonnegative yields
+is a distinct hypothesis. Its square-root like-
+lihood ratio is not itself a Gaussian signiﬁ-
+cance.
+T able 3: Veriﬁed study ledger. The new synthesis retains ±2. 25σm as the nominal blind half-width. Numeric
+inputs, source hashes and important original ﬁgure paths are listed in results/study_ledger.json.
+4.1 The earlier note already separates raw and reference-conditioned tests
+Section 4.20 of v5.0.5, on pages 58–61, ﬁrst deﬁnes the signed likelihood root and its conventional asymp-
+totic display. Equations (88)–(93) then deﬁne the deterministic oﬀset, response covariance, marginal
+scale and simulated ﬁeld. Equations (94)–(96) explicitly introduce a diﬀerent, reference-standardized
+ordering, with a positive-raw-ﬁt gate. The text warns that this extension does not automatically acquire
+the discovery interpretation of the Ananiev–Read construction. Section 6.11, beginning on page 114,
+reports the resulting conditional stress-background curves separately from the asymptotic and Šidák
+references.
+7
+
+HPS Gaussian-Process Resonance Search v5.8.5.3 / Unshifted scans
+This distinction was essential in the 76 MeV example: the full-2016 raw ﬁt is negative, r = −2. 460,
+and the shared-coupling raw ﬁt is only r = 0. 166. Its roughly nine-unit stress-centered coordinate came
+from a strongly negative reference response. It was not a nine-standard-deviation observed resonance.
+The later nominal-source studies removed much of that particular mismatch but retained the same
+conditional interpretation.
+The quoted v5.8.3 paragraph therefore describes an actual reference centering and scaling in a
+diagnostic probability calculation. It is not merely the look-elsewhere correction, and it should not be
+read as authorization to replace the released local inference. The observed data, likelihood and ﬁtted raw
+roots were unchanged. In this report the raw likelihood result remains visible; the reference-conditioned
+result is identiﬁed as a model-dependent diagnostic.
+Mass [MeV] Raw r Oﬀset a Scale s (r − a)/s Full-range p
+90.0 3.42475 0.79076 0.98224 2.68160 0.17712
+90.5 3.45250 0.71285 0.98203 2.78978 0.13522
+91.0 3.40112 0.63026 0.98157 2.82288 0.12445
+91.5 3.33316 0.49674 0.98284 2.88595 0.10488
+92.0 3.11542 0.36419 0.98395 2.79610 0.13291
+T able 4: The exact v5.8.2 full-2016 mapping behind the quoted paragraph. The ﬁnal column compares each
+reference score with the maximum anywhere on the 39–180 MeV half-MeV grid. It is not a local probability.
+At 90.5 MeV, (3. 45250 − 0. 71285)/ 0. 98203 = 2 . 78978. At 91.5 MeV, the smaller oﬀset gives
+(3. 33316 − 0. 49674)/ 0. 98284 = 2 . 88595. Thus centering changes which mass ranks highest before any
+global comparison is applied. The subsequent search correction maps the reference-local 2. 88595 to
+global 1. 25423. These are two separate operations; calling their combined eﬀect a trials penalty ob-
+scures the source dependence.
+Passing prior statistical tests does not require applying this centering to the production result. Nor
+does it prove the raw root is standard normal under every new generator. The prior empirical two-truth
+calibration tested its calibrated envelope, whereas the nominal-GP source in v5.8.1 still gave 101/512
+raw nominal 5% rejections at 90 MeV and 97/512 at 117 MeV. These tests have diﬀerent probability
+constructions and assumptions. Good centered moments in v5.8.2 check ﬂuctuations around its speciﬁed
+source; they do not settle which source or local calibration should deﬁne a physical discovery test.
+5 Reading Figures 4 and 5 of v5.8.3
+5.1 Figure 4: correlation is a property of repeated ﬁtted scores
+At a separation of, for example, 5 MeV, each pair of tested masses contributes a correlation between
+the two ﬁt results produced by repeated ﬂuctuations of the same spectrum. The solid line averages
+those correlations over all pairs with that separation. The blue band is the 10th–90th percentile spread
+across mass locations: it is not a conﬁdence band, a range of candidate widths, or a ﬂuctuation in the
+observed data.
+The dashed curve asks a simpler question: how much do two positive Gaussian signal templates
+overlap when the background is known and the noise is locally white? With equal resolution σm,
+that correlation is exp[−∆ m2/ (4σ2
+m)]. One FWHM of separation still leaves correlation 1/ 4. Detector
+resolution therefore does not create sharply bounded independent signal regions.
+The real score compares the signal region with a background inferred from surrounding counts. A
+ﬂuctuation that helps an excess at one mass can raise the inferred background at another and reduce
+its ﬁtted excess. Such opposite responses produce negative correlations. Moving masks, retraining,
+8
+
+HPS Gaussian-Process Resonance Search v5.8.5.3 / Unshifted scans
+Separation of mass hypotheses (MeV)
+−1.00
+−0.75
+−0.50
+−0.25
+0.00
+0.25
+0.50
+0.75
+1.00
+Correlation
+2015 full
+10–90% across mass pairs
+Full fitted response: mean
+Gaussian signal overlap only
+Separation of mass hypotheses (MeV)
+Correlation
+2016 full
+10–90% across mass pairs
+Full fitted response: mean
+Gaussian signal overlap only
+0.0 2.5 5.0 7.5 10.0 12.5 15.0 17.5 20.0
+Separation of mass hypotheses (MeV)
+−1.00
+−0.75
+−0.50
+−0.25
+0.00
+0.25
+0.50
+0.75
+1.00
+Correlation
+2021, 10%
+10–90% across mass pairs
+Full fitted response: mean
+Gaussian signal overlap only
+0.0 2.5 5.0 7.5 10.0 12.5 15.0 17.5 20.0
+Separation of mass hypotheses (MeV)
+Correlation
+Combined, 19–250 MeV
+10–90% across mass pairs
+Full fitted response: mean
+Detector resolution explains only part of the scan correlation
+Figure 4: Reproduction of v5.8.3 Figure 4. The ﬁtted-response correlation is compared with Gaussian-template
+overlap. Shading describes variation across mass pairs, not uncertainty in a measured correlation. These are the
+saved nominal-source ﬁelds, with no new ﬁts.
+proﬁling, varying counts, resolution and kernel settings all enter the saved response. The negative lobes
+do not show a negative event rate or prove that a signal has been removed. They also do not isolate
+the moving mask as the sole cause: that would require a controlled comparison in which only mask
+movement is changed.
+The saved ﬁelds have median adjacent half-MeV correlations of 0.9705, 0.9897 and 0.9880 for 2015,
+2016 and 2021, yet reach negative correlations near −0. 85 to −0. 87 farther apart. High correlation
+between neighboring tests is therefore fully compatible with appreciable opportunities for a maximum
+across the complete domain. The maximum calculation uses the full covariance matrix, including its
+nonlocal structure; it does not replace it with this averaged lag plot.
+5.2 Figure 5: compare the same threshold under diﬀerent scan models
+The horizontal axis is a hypothetical reference-local threshold, not mass. At any ﬁxed value, the vertical
+axis asks how often a background search exceeds that threshold somewhere. The thin black curve
+gives one speciﬁed mass. Gray treats every half-MeV grid point as independent. Orange uses a ﬁxed
+FWHM-spacing count in the Šidák formula. Green uses the high-threshold approximation for a smooth
+Gaussian-template scan. Blue is the saved correlated ﬁtted-response calculation; its narrow band covers
+ﬁnite Gaussian sampling only. The dot marks the observed reference-local peak.
+9
+
+HPS Gaussian-Process Resonance Search v5.8.5.3 / Unshifted scans
+Reference-local threshold Z
+10−5
+10−4
+10−3
+10−2
+10−1
+100
+Probability of an exceedance
+2015 full
+Saved correlated field (95% MC band)
+Independent grid: N = 163
+FWHM-spacing heuristic: N = 13.9
+Smooth-template high-threshold approximation
+One fixed mass
+Reference-local threshold Z
+Probability of an exceedance
+2016 full
+Saved correlated field (95% MC band)
+Independent grid: N = 283
+FWHM-spacing heuristic: N = 15.3
+Smooth-template high-threshold approximation
+One fixed mass
+1.5 2.0 2.5 3.0 3.5 4.0 4.5
+Reference-local threshold Z
+10−5
+10−4
+10−3
+10−2
+10−1
+100
+Probability of an exceedance
+2021, 10%
+Saved correlated field (95% MC band)
+Independent grid: N = 401
+FWHM-spacing heuristic: N = 25.2
+Smooth-template high-threshold approximation
+One fixed mass
+1.5 2.0 2.5 3.0 3.5 4.0 4.5
+Reference-local threshold Z
+Probability of an exceedance
+Combined, 19–250 MeV
+Saved correlated field (95% MC band)
+Independent grid: N = 463
+FWHM-spacing heuristic: N = 33.8
+One fixed mass
+Correlated trials correction versus resolution-based comparisons
+Figure 5: Reproduction of v5.8.3 Figure 5. Every curve in a panel is evaluated at the same reference-local
+threshold. The gray and orange curves are alternative counting approximations, while green describes an ideal
+smooth-template ﬁeld. Blue uses the actual ﬁtted-score covariance under the ﬁxed nominal source. No new
+observed information enters this comparison.
+For the 2016 threshold u = 2. 88595, one mass has p = 0. 001951. The FWHM-count approximation
+gives 0. 02953, the smooth-template approximation gives 0. 06521, the ﬁtted ﬁeld gives 0. 10488, and 283
+independent grid tests give 0. 42461. Thus correlation greatly reduces the penalty relative to independent
+grid points. The larger probability than the FWHM heuristic does not demonstrate that the method is
+conservative relative to the correct physical search: the FWHM heuristic is not that calibration. Even
+the ideal continuous smooth ﬁeld has more possible high maxima than a ﬁxed width count represents.
+The distinction also prevents an incorrect interpretation of “reach. ” These are background-only
+discovery tails. They do not multiply, weaken or otherwise alter the reported ﬁxed-mass 90% CLs
+upper endpoints. A discovery-reach forecast would additionally need signal-plus-background ensembles
+and a declared global discovery criterion.
+6 What survives the combination and width studies
+At 92 MeV the shared-coupling approximation gives dataset score weights about 0. 041, 0. 419 and 0. 907,
+whereas signed Stouﬀer gives each dataset 1/
+√
+3. The independent combinations therefore emphasize
+the 2015 upward response more strongly. This is a change in the alternative hypothesis or weighting, not
+10
+
+HPS Gaussian-Process Resonance Search v5.8.5.3 / Unshifted scans
+Hypothesis/statistic Peak [MeV] Local Z Global p Global Z Direct k
+Shared coupling 66 2.829 0.20849 0.812 41
+Fisher at common mass 92 3.723 0.01131 2.280 4
+Signed Stouﬀer 92 3.934 0.00494 2.580 1
+Free nonnegative yields 92 3.583 0.01968 2.060 7
+T able 5: Baseline ±2. 25σm results on the 19–250 MeV integer grid, with each dataset used only in its declared
+range. All signiﬁcance columns are conditional Gaussian-response results. Counts refer to the same 256 complete
+Poisson scans; the rows are not independent replications.
+a removal of the mass-search correction. The exact independent-yield statistic is qR = ∑
+d[max(rd, 0)]2;
+its local distribution includes the boundary and cannot be replaced by √qR as a Gaussian signiﬁcance.
+In v5.8.5, seven direct global exceedances give a 95% probability interval [0. 0111, 0. 0555]. Its baseline
+local tail has zero direct exceedances in 256 scans, so the reported local 3. 583 remains an approximation
+rather than a directly measured rare tail. The exploratory common-region coherence statistic gives
+195/256 scans at least as tightly clustered as the observations, with add-one p = 0 . 7626. Its stable
+combined maximum provides no separate evidence for unusually aligned individual peaks.
+Widths 2. 4, 2. 5 and 2. 6σm changed the extractor’s held-out bins and ﬁtted likelihood window, while
+leaving the generating source ﬁxed. The 2016 source-oﬀset RMS remained about 0.61–0.62. These
+comparisons therefore did not test whether a wider source-building exclusion removes contamination.
+One 2016 2. 6σm peak-tail check was ﬂagged: Gaussian p = 0 . 09547 lies just below the direct 95%
+interval [0. 0971, 0. 1850]. All conﬁgurations remain diagnostics. There is no basis here for changing the
+nominal ±2. 25σm policy, and no old study demonstrated a 3σm source-construction cure.
+The apparent numerical shifts between the half-MeV v5.8.2–3 results and the integer-grid v5.8.4–5
+results include changed mass sampling and ﬁnite Gaussian sampling. They do not represent additional
+observed events. None of the displayed global probabilities includes choosing the most favorable method,
+width, dataset subset or mass domain after inspection.
+7 What the deterministic oﬀset actually measures
+The colored curve in v5.8.2 Figure 3 is a(m) = r(B; m): the signed signal-ﬁt root obtained when the
+input histogram is replaced by the smooth expected counts B, with no Poisson draw. It is not the
+observed excess, an estimated number of signal events, or a fraction of signal removed. There are two
+distinct ﬁts. First, the generating source B is a GP ﬁt through every observed bin, with its kernel
+anchored at 76 MeV. Second, at each tested mass, the ordinary extraction excludes ±2. 25σm, predicts
+inside that window from the sidebands, and proﬁles the signal and background nuisance parameters.
+The source ﬁt has no moving exclusion window. The extraction has mass-dependent reviewed kernels
+and count-dependent conditioning. These two operations need not reproduce one another exactly: a
+smooth B can produce a nonzero signed signal estimate when it is rescanned.
+A positive a means that this particular noiseless reference looks signal-like to the extraction at that
+mass; a negative a means a deﬁcit relative to the extraction’s interpolated background. Curvature,
+interpolation, the diﬀerent source/extraction kernels and nuisance treatment can contribute. This diag-
+noses the response to the chosen B; it does not identify which component of the measured spectrum is
+continuum or signal. The unchanged observed root remains available separately.
+The other two curves in the old Figure 3 are already transformed quantities. Its black curve is
+mean[(rtoy − a)/s ]; its gray dashed curve is SD[(rtoy − a)/s ], where s is the linear-response ﬂuctuation
+width. They should lie near zero and one if the conditional approximation works. They are neither raw
+toy roots nor additional oﬀsets to subtract. In particular, a black curve near zero does not imply a = 0.
+11
+
+HPS Gaussian-Process Resonance Search v5.8.5.3 / Unshifted scans
+The nonlinearity of the scan also means that r(B) need not equal the exact toy mean, although their
+agreement can be checked.
+7.1 Expanded diagnostics for every dataset
+The four new versions of v5.8.5 Figure 4 are in Figures 6– 9. Each follows exactly the same panel
+deﬁnitions and uses the existing 256 complete Poisson scans for its scope. Panel A compares the
+unchanged signed observed root with the deterministic source response. Panel B shows the raw toy mean
+alongside that response. Panels C and D standardize toy roots only to check the response approximation.
+They do not alter the new observed local p-value or Z curves.
+The explanation and other results from the consolidated v5.8.5 report are retained below. Their
+reference-standardized results remain explicitly conditional diagnostics. The added raw ﬁgures and
+ledgers, rather than a relabeling of the earlier reference curves, answer the request for non-recalibrated
+plots.
+T ested mass [MeV]
+−2
+0
+2
+Raw signed likelihood root
+A. Unshifted observation and source response
+Observed signed root r
+Deterministic source response a = r(B)
+T ested mass [MeV]
+−0.5
+0.0
+0.5
+Raw toy root / source response
+B. Raw null mean; no centering
+a = r(B)
+Mean raw toy root
+20 40 60 80 100
+T ested mass [MeV]
+−0.2
+−0.1
+0.0
+0.1
+0.2
+Mean of (rtoy − a)/s
+C. Standardized toy mean (diagnostic only)
+20 40 60 80 100
+T ested mass [MeV]
+0.9
+1.0
+1.1
+1.2SD of (rtoy − a)/s
+D. Standardized toy width (diagnostic only)
+2015 full: extension of v5.8.5 Figure 4
+One frozen source, 256 complete Poisson scans
+Figure 6: 2015 full: extension of Figure 4 in the consolidated v5.8.5 report. A: the unshifted observed root and
+deterministic source response. B: the mean raw toy root and the same deterministic response. C/D: standardized
+toy mean and width, used only to inspect the conditional response approximation; the observed local curves
+in Figure 2 are not standardized. Gray bands mark approximate pointwise one-standard-error scales for 256
+Gaussian draws, not simultaneous acceptance bands.
+12
+
+HPS Gaussian-Process Resonance Search v5.8.5.3 / Unshifted scans
+T ested mass [MeV]
+−4
+−2
+0
+2
+Raw signed likelihood root
+A. Unshifted observation and source response
+Observed signed root r
+Deterministic source response a = r(B)
+T ested mass [MeV]
+−1
+0
+1
+Raw toy root / source response
+B. Raw null mean; no centering
+a = r(B)
+Mean raw toy root
+40 60 80 100 120 140 160 180
+T ested mass [MeV]
+−0.2
+−0.1
+0.0
+0.1
+0.2
+Mean of (rtoy − a)/s
+C. Standardized toy mean (diagnostic only)
+40 60 80 100 120 140 160 180
+T ested mass [MeV]
+0.9
+1.0
+1.1
+1.2SD of (rtoy − a)/s
+D. Standardized toy width (diagnostic only)
+2016 full: extension of v5.8.5 Figure 4
+One frozen source, 256 complete Poisson scans
+Figure 7: 2016 full: extension of Figure 4 in the consolidated v5.8.5 report. A: the unshifted observed root and
+deterministic source response. B: the mean raw toy root and the same deterministic response. C/D: standardized
+toy mean and width, used only to inspect the conditional response approximation; the observed local curves
+in Figure 2 are not standardized. Gray bands mark approximate pointwise one-standard-error scales for 256
+Gaussian draws, not simultaneous acceptance bands.
+13
+
+HPS Gaussian-Process Resonance Search v5.8.5.3 / Unshifted scans
+T ested mass [MeV]
+−4
+−2
+0
+2
+Raw signed likelihood root
+A. Unshifted observation and source response
+Observed signed root r
+Deterministic source response a = r(B)
+T ested mass [MeV]
+−1.0
+−0.5
+0.0
+0.5
+1.0
+1.5
+Raw toy root / source response
+B. Raw null mean; no centering
+a = r(B)
+Mean raw toy root
+50 75 100 125 150 175 200 225 250
+T ested mass [MeV]
+−0.2
+−0.1
+0.0
+0.1
+0.2
+Mean of (rtoy − a)/s
+C. Standardized toy mean (diagnostic only)
+50 75 100 125 150 175 200 225 250
+T ested mass [MeV]
+0.9
+1.0
+1.1
+1.2SD of (rtoy − a)/s
+D. Standardized toy width (diagnostic only)
+2021 native 10%: extension of v5.8.5 Figure 4
+One frozen source, 256 complete Poisson scans
+Figure 8: 2021 native 10%: extension of Figure 4 in the consolidated v5.8.5 report. A: the unshifted observed
+root and deterministic source response. B: the mean raw toy root and the same deterministic response. C/D:
+standardized toy mean and width, used only to inspect the conditional response approximation; the observed
+local curves in Figure 2 are not standardized. Gray bands mark approximate pointwise one-standard-error scales
+for 256 Gaussian draws, not simultaneous acceptance bands.
+14
+
+HPS Gaussian-Process Resonance Search v5.8.5.3 / Unshifted scans
+T ested mass [MeV]
+−2
+0
+2
+Raw signed likelihood root
+A. Unshifted observation and source response
+Observed signed root r
+Deterministic source response a = r(B)
+T ested mass [MeV]
+−1.0
+−0.5
+0.0
+0.5
+Raw toy root / source response
+B. Raw null mean; no centering
+a = r(B)
+Mean raw toy root
+50 100 150 200 250
+T ested mass [MeV]
+−0.2
+−0.1
+0.0
+0.1
+0.2
+Mean of (rtoy − a)/s
+C. Standardized toy mean (diagnostic only)
+50 100 150 200 250
+T ested mass [MeV]
+0.9
+1.0
+1.1
+1.2SD of (rtoy − a)/s
+D. Standardized toy width (diagnostic only)
+Combined: shared coupling: extension of v5.8.5 Figure 4
+One frozen source, 256 complete Poisson scans
+Figure 9: Shared coupling: extension of Figure 4 in the consolidated v5.8.5 report. A: the unshifted observed
+root and deterministic source response. B: the mean raw toy root and the same deterministic response. C/D:
+standardized toy mean and width, used only to inspect the conditional response approximation; the observed
+local curves in Figure 2 are not standardized. Gray bands mark approximate pointwise one-standard-error scales
+for 256 Gaussian draws, not simultaneous acceptance bands. Vertical lines mark changes in contributing datasets;
+these are not independent additional searches.
+For example, at 90.5 MeV the stored values are a = 0. 71285 and s = 0. 98203. The 256 raw toy roots
+have mean 0. 65653 and SD 1. 04126. Their centered mean is about −0. 057, explaining how the old ﬁgure
+can show a sizeable colored oﬀset together with a black curve near zero. At 76 MeV the nominal-GP
+oﬀset is −0. 40839; the much larger archived-stress response belongs to a diﬀerent reference. Neither
+value alone proves that a particle signal was ﬁtted away.
+8 Source learning and signal recovery are diﬀerent tests
+The signal-learning concern is nevertheless supported by a separate experiment. In v5.8.1, a signal was
+added to the source data , the unmasked GP source was rebuilt, and the change in B was measured.
+The nominal 2016 source absorbed 88.7% and 88.4% of the added counts inside the 76 and 90 MeV
+windows, respectively, and about 72% of the signal-shaped component. By contrast, adding signal to an
+already frozen nominal source and running the masked extraction recovered roughly 96% of the injected
+amplitude. Successful extraction recovery does not qualify a source that is subsequently rebuilt through
+the signal. The absorbed fraction is a deterministic transfer coeﬃcient, not a detection eﬃciency, false-
+positive rate or a statement that this fraction of the actual observed excess is signal.
+The practical concern is therefore the full procedure data → ˆB → reference calibration, not merely
+the masked extraction. A learned feature can enter the putative null, aﬀect its deterministic response
+and covariance, and change the resulting score. The source estimate was held ﬁxed in the v5.8.2 toys,
+15
+
+HPS Gaussian-Process Resonance Search v5.8.5.3 / Unshifted scans
+so their agreement tests propagation conditional on that estimate ; it does not test repeated source
+learning or establish a background-only physical truth. A smaller stress RMS is useful for diagnosing
+compatibility between two modeling operations, but cannot choose the background model by itself.
+We retain ±2. 25σm throughout. Widening only the extraction mask to 3σm would leave the un-
+masked source ﬁt untouched, so it would not cure this source-learning mechanism. For an ideal Gaus-
+sian template, the full tails beyond these half-widths are about 2.445% and 0.270%, respectively; those
+template-tail fractions are distinct from the much larger source-absorption numbers. No new width
+scan was performed.
+9 The proposed high-psum 1% source: a bounded test
+The earlier review identiﬁed a real candidate: the 2021 ﬁle final_1pct_invM_v7.root, histogram
+preselection/h_invM_psumgt2p8_8000. Its key explicitly labels psum > 2. 8; the stored histogram
+contains 6,336,937 visible counts. The existing selection audit ﬁnds no event identities, run list, prompt-
+TC certiﬁcate or exact luminosity ratio. Its counts are 4.476% of the native-10% histogram overall,
+and 5.148% in 87–97 MeV. These are count ratios, not measured exposure ratios. The native-10%
+input comes from the documented prompt-TC production; the high-psum key alone does not establish
+matching reconstruction or all other cuts. This is a 2021 control and cannot supply the full-2016 oﬀset
+without a separate, validated cross-dataset transfer model.
+The earlier review tested the proposal as an explicitly conditional calculation. The high-psum
+histogram was exactly rebinned to the current 422-bin support, smoothed using the existing 2021 source
+kernel at 76 MeV, and multiplied by ten. The same current extraction, resolution and ±2. 25σm masks
+were then used at 201 integer masses from 50 to 250 MeV. The three sources are the native high-
+psum GP mean, that identical mean multiplied by ten, and the saved native-10% GP mean. This is a
+common-method comparison, not a validation of the nominal exposure transfer. No kernel was selected
+to improve these results.
+The deterministic RMS oﬀsets are 0. 0554, 0. 0283 and 0. 2576 for those three sources, respectively.
+Oﬀset scaling is not necessarily
+√
+10: reconditioning the extraction at the new count level changes its
+GP noise and interpolation. That review also generated 64 complete independent Poisson spectra for
+each target-scale source and ﬁtted six ﬁxed anchors, 65, 76, 90, 92, 120 and 180 MeV, for 768 ﬁts.
+The same draw is reused at all six masses. Centered means span −0. 188 to 0. 187, and standardized
+widths span 0. 914 to 1. 080, consistent with only a modest moment check. These six-anchor toys are not
+a full-search calibration or a rare-tail measurement; their approximate mean and width Monte Carlo
+errors are 0.125 and 0.089. All 603 deterministic and 768 toy ﬁts satisfy the retained 2 × 10−7 score
+criterion.
+The prior source-injection test addresses the key physical issue. At 76 and 90 MeV, add a ﬁve-error
+target-scale Gaussian signal to the ﬁxed 10B1% spectrum. The extraction recovers 96.67% and 96.68%
+of its amplitude. Separately, add one tenth of that same signal to the 1% source counts , rebuild the
+unmasked GP, and multiply the new source by ten. The source absorbs 84.04% and 77.83% of the
+target window yield, or 69.02% and 63.84% of its Poisson-weighted matched shape. Thus a smaller,
+statistically separate sample would help limit reuse of the search ﬂuctuations, but a genuine signal
+present in both samples can still be learned as background.
+16
+
+HPS Gaussian-Process Resonance Search v5.8.5.3 / Unshifted scans
+50 75 100 125 150 175 200 225 250
+0.5
+1.010 × B(high 1%) / B(native 10%)
+A. Nominal ×10 does not reproduce the native-10% spectrum
+50 75 100 125 150 175 200 225 250
+T ested mass [MeV]
+−1
+0
+1
+Deterministic root a = r(B)
+B. Small self-consistency offsets do not certify a background null
+High-psum nominal 1% Same fixed mean ×10 Native 10% GP source
+76 MeV 90 MeV
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0Fraction of injected amplitude / yield
+0.967 0.967
+0.840 0.778
+0.690 0.638
+C. Signal still enters a rebuilt 1% source before the ×10 transfer
+Extraction: fixed source Source absorbs window counts Source absorbs matched shape
+2021 high-psum 1% control: conditional source transfer at fixed ±2.25σ
+Figure 10: New ﬁxed-width 2021 controls. A: the nominally scaled high-psum source is only about 13–52% of
+the native-10% GP mean over 50–250 MeV, with substantial shape dependence. B: deterministic source responses
+using the same extraction settings. C: ﬁxed-source recovery versus source rebuilding after a known signal injection.
+The two source-learning bars use diﬀerent projections of the same rebuilt mean; neither is a probability. The
+smaller oﬀsets in B do not repair the transfer mismatch or the absorption in C.
+10 What would make a 1%-to-10% calibration defensible?
+The useful next experiment is a prediction from an audited control sample, with its uncertainty, rather
+than a ﬁxed smoothed histogram treated as exact. First verify the event selection, processing version,
+exposure and event overlap. If the 1% is included in the 10%, either reserve a disjoint search sample
+or model their joint sampling; the two are not independent merely because the toy random seeds diﬀer.
+Freeze the source construction, search statistic and mass grid before inspecting the validation sample.
+Assess continuum interpolation and source-injection absorption across the declared domain, including
+boundaries, and retain a signal-aware source model or controls where absorption is acceptably bounded.
+Source uncertainty matters especially when increasing the exposure. If a disjoint source has mean
+counts λ and the target has mean kλ, the deliberately simple unsmoothed example Ntarget − kNsource
+has variance (k + k2)λ, whereas treating the source as ﬁxed keeps only kλ. A nested source instead
+17
+
+HPS Gaussian-Process Resonance Search v5.8.5.3 / Unshifted scans
+contributes a covariance term. This example is not the variance of the actual GP statistic: smoothing
+and the extraction response must propagate the relevant modes, or an outer ensemble must repeat source
+estimation and target generation. For each speciﬁed underlying background truth, jointly generate
+control and target samples with the correct exposures and event overlap. Reﬁt the source from that
+control realization, apply the declared transfer and calibration, and scan the corresponding target
+realization. Repeat every data-dependent choice that would be made in the real analysis. Generating
+the target from each noisy ﬁtted source instead would conceal the source-estimation error that this
+test is intended to expose. Use separate realizations to validate local null tails, signal recovery and
+the maximum distribution. The existing ﬁxed-source GP/Poisson agreement is a valuable inner check
+within this larger procedure.
+The present high-psum calculation therefore supports keeping this source as a sensitivity control and
+identiﬁes what must be qualiﬁed next. It does not justify replacing the released local signiﬁcances with
+a new oﬀset, certifying source independence, or adopting the source merely because its deterministic
+response is small.
+11 Statistical fairness: two GPs, two diﬀerent jobs
+The background GP estimates the expected counts used by the likelihood. The signiﬁcance-ﬁeld GP
+approximates the joint null distribution of the resulting scan. They do not need to be statistically
+independent: the second must reproduce the response of the ﬁrst, including its sideband training and
+proﬁling. Calling both objects GPs neither establishes nor invalidates the signiﬁcance calculation. The
+substantive question is whether the generating background and the complete analysis procedure repre-
+sent the null being tested.
+In this application let rj(n) be the signed proﬁle-likelihood root at mass mj, and let B denote a
+ﬁxed generating spectrum. The saved response is
+rj(n) ≃ aj +
+∑
+b
+Dbjξb, a j = rj(B), D bj =
+√
+Bb
+∂rj
+∂nb
+⏐⏐⏐⏐
+B
+, ξ b ∼ N (0, 1). (1)
+Thus s2
+j = ∑
+b D2
+bj and Rij = ∑
+b DbiDbj/ (sisj) describe the scale and correlation of the ﬁtted response.
+The derivatives include the response of the GP prediction and its count-dependent covariance to ﬂuctu-
+ations in the training bins. This is more information than the overlap of the narrow signal templates
+alone.
+Ananiev–Read model a signed local signiﬁcance ﬁeld by a zero-mean, unit-variance GP, estimate
+its covariance from background response data, and sample its maximum to estimate the trials factor.
+Their comparison with an upcrossing bound concerns the same null ﬁeld; it does not promise a smaller
+penalty than an arbitrary resolution-based Šidák count. Their ﬁnite-grid discussion also warns that
+coarse sampling can miss crossings and maxima [ 1]. The additional aj, s j transformation here is an
+HPS reference-response construction, not a new requirement imposed by that paper.
+The nominal source B was ﬁtted to the observed spectrum and then held ﬁxed. Estimating a back-
+ground from data is familiar in a parametric bootstrap and is not by itself a statistical error. The
+limitation is that this calculation has not calibrated the outer source-ﬁtting and method-selection proce-
+dure, or established robustness to an absorbed signal or an inadequate background family. Independent
+Poisson draws validate the ﬁeld approximation conditional on that ﬁxed source ; they do not establish
+independence of the source from the observed data. Favorable stress response must therefore be one
+diagnostic among coverage, injected-signal recovery, background adequacy and held-out behavior.
+18
+
+HPS Gaussian-Process Resonance Search v5.8.5.3 / Unshifted scans
+12 Keeping the raw ordering is a separate, explicit option
+There is no obligation to replace the observed likelihood scan by zj = ( rj − aj)/s j to perform a look-
+elsewhere calculation. Two validly speciﬁed conditional questions are
+Tr = max
+j
+max(0, r j), p(r)
+global = PB(T ∗
+r ≥ T obs
+r ), (2)
+Tz = max
+j:rj >0
+rj − aj
+sj
+, p(z)
+global = PB(T ∗
+z ≥ T obs
+z ). (3)
+Mass-dependent centering and scaling change the ordering, so these are diﬀerent tests of the same
+events. Neither test is to be chosen retrospectively because it yields the smaller probability. Retaining
+Tr preserves the original peak ranking; comparing it to its simulated null still calibrates its probability,
+without subtracting an oﬀset from the observed ﬁt.
+2016, 39–180 MeV Raw maximum Tr Reference maximum Tz
+Selected mass [MeV] 90.5 91.5
+Raw root r 3.452500 3.333160
+Deterministic response a 0.712849 0.496739
+Response scale s 0.982030 0.982836
+Reference coordinate (r − a)/s 2.789784 2.885955
+Fixed-B Gaussian local tail 0.002637 0.001951
+Gaussian global exceedances / 200,000 13,559 20,975
+Gaussian global probability 0.067795 0.104875
+Poisson global exceedances / 256 18 36
+Poisson global probability 0.0703 0.1406
+Poisson global 95% interval [0.0422, 0.1088] [0.1005, 0.1893]
+T able 6: Retained comparison using the same frozen v5.8.2 ﬁelds and the same 256 complete Poisson scans.
+No likelihood ﬁt or background source was changed. Intervals are Clopper–Pearson; Gaussian probabilities are
+conditional model approximations. Counts, k/N and add-one estimates are recorded separately in the numerical
+ledger.
+At 90.5 MeV, Φ(3 . 452500) = 0 . 0002777 is the conventional standard-normal mapping of the raw
+root, whereas the ﬁxed-source response gives Φ[(3 . 452500 − 0. 712849)/ 0. 982030] = 0 . 002637. Dividing
+the conditional raw-global probability by the ﬁrst of these mixes a marginal-calibration change with
+the look-elsewhere factor. The 256 Poisson toys have zero local exceedances at this mass: they cannot
+resolve a local tail of order 10−3, and do not prove that either precise local approximation is correct.
+Passing previous statistical tests supports the procedure on the nulls and observables those tests covered;
+it does not make a new source-conditioned centering mandatory, or guarantee every marginal tail under
+every new source.
+13 An apples-to-apples upcrossing comparison
+For the same standardized Gaussian grid, deﬁne Nu = ∑J−1
+j=1 1(Zj ≤ u, Z j+1 > u ). A scan exceeds u
+only if its ﬁrst node already exceeds u, or there is an upcrossing. Hence
+P (max
+j
+Zj > u) ≤ Φ( u) + E[Nu], E [Nu] =
+J−1∑
+j=1
+2 T
+(
+u,
+√
+1 − Rj,j +1
+1 + Rj,j +1
+)
+, (4)
+where T is Owen’s T function. The right-hand side is clipped at one. This identity for each adjacent
+crossing probability gives a bound for the actual saved Gaussian grid ; it does not assume a diﬀerentiable
+19
+
+HPS Gaussian-Process Resonance Search v5.8.5.3 / Unshifted scans
+continuum kernel. All thresholds shown below exceed the positive-ﬁt gate at every mass, so that the
+gate makes no change to these comparisons.
+At the 2016 threshold u = 2 . 885955, the saved correlated-ﬁeld tail is 0. 104875 and the same-grid
+upcrossing bound is 0. 120378. The other datasets show the same ordering: 0. 02345 < 0. 02527 (2015),
+0. 33352 < 0. 42689 (2021), and 0. 22953 < 0. 27340 (combined). This is the relevant less-conservative com-
+parison. By contrast, the 2016 resolution-count Šidák value 0. 02953 and the smooth signal-template
+upcrossing estimate 0. 06521 describe simpliﬁed correlation models. The independent 283-node com-
+parison gives 0. 42461. The full ﬁtted-response ﬁeld lies between these illustrative answers; the smaller
+resolution-only answers do not establish overconservatism of that ﬁeld.
+1.5 2.0 2.5 3.0 3.5 4.0 4.5
+Reference threshold u
+10−5
+10−4
+10−3
+10−2
+10−1
+100
+Exceedance probability
+Same field: GP maxima versus upcrossings
+Full correlated grid: P(max Z > u)
+Same-grid upcrossing upper bound
+One fixed mass
+1.5 2.0 2.5 3.0 3.5 4.0 4.5
+Reference threshold u
+10−5
+10−4
+10−3
+10−2
+10−1
+100
+Exceedance probability
+A region is a search, not a single point
+Full grid maximum (500,000 new draws)
+24 block maxima, independence assumed
+24 representative points: Sidak
+6 pairwise |rho| < 0.1 points: Sidak
+2016, 39–180 MeV; fixed background, 0.5-MeV grid, ±2.25 sigma blind window
+Figure 11: Retained 2016 comparison with the source and test held ﬁxed. Left: the sampled Gaussian maximum
+is less conservative than the analytic upcrossing bound for the same ﬁnite grid. Right: counting representative
+points misses searches within the intervening regions; treating the properly calculated region maxima as indepen-
+dent errs in the other direction in this example. The left curve reuses 200,000 saved ﬁelds; the right uses 500,000
+fresh ﬁelds with the same covariance. Shading denotes binomial 95% intervals for the joint maxima. These are
+ﬁxed-background diagnostics.
+14 What a 10% correlation criterion can and cannot do
+For N independent, identically calibrated point tests, pglobal = 1 − (1 − plocal)N . A tolerance |ρ|< 0. 1 is
+not independence, and selecting weakly correlated points does not preserve the maximum of the masses
+omitted between them. The saved 2016 ﬁeld makes both issues concrete. A left-to-right rule that selects
+the next mass with |ρ|< 0. 1 relative to the previous selected mass yields 24 points. Their non-neighbor
+correlations still reach |ρ|= 0 . 835. Requiring the bound against every selected point yields six points
+when starting from the low-mass end and seven when starting from the high-mass end. The count
+depends on the selection rule. Every adjacent native-grid correlation is at least 0. 889, so no split into
+two contiguous sets makes all correlations across the boundary smaller than 0.1.
+A defensible regional version would ﬁrst compute
+pk(u) = P
+(
+max
+m∈Rk
+Z(m) > u
+)
+, p independent regions (u) = 1 −
+∏
+k
+[1 − pk(u)], (5)
+and then test independence of the regional maxima . The maximum within each region must al-
+ready include its internal look-elsewhere eﬀect. Using midpoint blocks around the 24 representative
+masses, the new conditional simulation gives a full-grid tail 53, 201/ 500, 000 = 0 . 10640 (95% interval
+20
+
+HPS Gaussian-Process Resonance Search v5.8.5.3 / Unshifted scans
+[0. 10555, 0. 10726]). Multiplying the regional non-exceedance probabilities gives 0. 14341; pretending
+each region is one normal point gives 0. 04579. The six-point all-pairs rule gives 0. 01165. None is a
+substitute for the already available joint-ﬁeld maximum.
+0 5 10 15 20
+Representative index
+0
+5
+10
+15
+20Representative index
+Distant |rho| reaches 0.835
+Adjacent selected |rho| < 0.1
+40 60 80 100 120 140 160 180
+Mass hypothesis [MeV]
+−3
+−2
+−1
+0
+1
+2
+3
+Reference score
+Points discard the search inside each block
+Observed reference score
+24 representatives
+Full-grid maximum
+−1.00
+−0.75
+−0.50
+−0.25
+0.00
+0.25
+0.50
+0.75
+1.00
+Fitted-score correlation
+Figure 12: The proposed threshold made explicit. Left: low correlation with the immediately preceding selected
+point does not prevent strong correlations with more distant selected points. Right: 24 representative points do
+not capture the full observed scan or its maximum. Vertical lines delimit one illustrative contiguous partition,
+not independently established signal regions.
+The tail-equivalent count Neﬀ (u) = log[1 − pglobal(u)]/ log[1 − Φ( u)] is a useful way to quote the
+answer from the full ﬁeld; it is generally threshold dependent. For the saved 2016 peak it is 56. 73,
+whereas the spectral participation rank is 9. 16 and the grid contains 283 nodes. These measure diﬀerent
+things. For a smooth stationary ﬁeld, the high-threshold crossing term scales as exp(−u2/ 2) while
+the local tail scales approximately as exp(−u2/ 2)/u , already explaining why a single constant eﬀective
+count need not describe all thresholds. A discovery-threshold penalty also does not, by itself, change a
+ﬁxed-mass exclusion limit; a new discovery reach requires signal-injection power for the speciﬁed global
+test.
+The initial 100,000-draw block check had an unusually high tail of 0. 10910. The covariance recon-
+struction and positive-ﬁt gate were veriﬁed, and the same seed was extended to 500,000 draws. The
+result above diﬀers from the saved 200,000-draw estimate by about 1. 9 combined Monte Carlo stan-
+dard errors; their 95% intervals overlap. This sampling check is recorded explicitly rather than being
+interpreted as a change to the physical model or a calibrated source uncertainty.
+15 What to adopt, and what still needs validation
+Retain the reviewed likelihood, the raw observed scan and the ﬁxed ±2. 25σm blind window. Retain the
+signiﬁcance-ﬁeld GP as an eﬃcient way to simulate the null response of that procedure once a defensible
+source policy is speciﬁed. Do not adopt a mass-dependent reference subtraction solely because it removes
+the large stress oﬀset, and do not replace the full scan by a count of nominally decorrelated points.
+The deterministic oﬀset remains a valuable diagnostic. It makes a source–extractor mismatch visible.
+The appropriate response is to investigate the source and its uncertainty, and to test the resulting
+analysis on independent simulated experiments and signal injections. Subtracting the oﬀset deﬁnes a
+diﬀerent test; it does not demonstrate that the original mismatch has been understood. Conversely,
+declining to subtract it does not establish that the raw roots have standard-normal null tails.
+21
+
+HPS Gaussian-Process Resonance Search v5.8.5.3 / Unshifted scans
+15.1 A concrete next calibration
+A useful next study would change the source qualiﬁcation while holding the extraction window ﬁxed:
+1. Establish the event selections, normalization and overlap for a control sample from the same
+campaign as the search. If the nominal 1% sample is contained in the 10% search, using it as an
+independent control requires a disjoint search sample and its correct exposure. The available 2021
+high-psum histogram cannot determine a 2016 oﬀset without a separate transfer model.
+2. Specify one coherent generative experiment for each full scan. A control-to-search transfer may
+require a mass-dependent factor tj, not the number ten: Bsearch, j = tjBcontrol, j. Qualify uncertainty
+in the control ﬁt and in this transfer. Estimating nuisance parameters from observed data is
+allowed; freezing their ﬁtted values only answers a conditional question.
+3. Validate the complete proposed procedure under several plausible background truths. When source
+construction or calibration uses the search data, repeat those steps in each outer pseudoexperiment
+and evaluate the resulting reported p-values. Use separate validation draws from those used to
+construct the response or calibrate tails. If the control is independent, simulate the control and
+search jointly when evaluating unconditional behavior.
+4. Inject signals before source estimation as well as after it. The ﬁrst test measures what the source-
+building policy can learn; the second measures the extractor with a frozen source. Check size,
+signal recovery and uncertainty across mass before selecting a source or ordering. Then test
+mass-grid convergence and tails at the precision required by the scientiﬁc claim.
+This speciﬁes a testable program rather than a reason to choose whichever reference produces the highest
+observed signiﬁcance. Choosing among source models, combination methods or mass domains after
+inspecting their p-values creates an additional selection question beyond a mass-only trials correction.
+15.2 Discovery reach and exclusion reach are diﬀerent quantities
+A lower global discovery signiﬁcance does not automatically weaken the existing ﬁxed-mass 90% CL s
+exclusion limit. Discovery and exclusion use diﬀerent tail events[ 3]. Pointwise exclusion curves are not
+obtained by applying a discovery trials factor to each endpoint. A simultaneous conﬁdence statement
+across mass would require its own construction.
+For discovery reach, ﬁx a false-positive level α, calibrate the threshold cα of the declared full-search
+statistic T , and evaluate
+PB+S(µ,m 0)(T ≥ cα ) , P B(T ≥ cα ) ≤ α.
+The signal-plus-background experiments must follow the same source-building policy. No global p-value
+ratio alone determines a coupling reach. The present report therefore establishes neither a new exclusion
+curve nor an improved discovery reach.
+15.3 Combined searches: the useful result is model dependence
+The common-coupling ﬁt, Fisher combination, signed Stouﬀer combination and independent-amplitude
+common-mass likelihood ask diﬀerent questions. Their diﬀerent preferred masses are understandable
+without attributing extra independent evidence to a single spectrum. The v5.8.5 free-amplitude result
+at 92 MeV remains a conditional moderate excess; the same release found that the inspected clustering
+of peaks was not unusually coherent under its chosen null. The comparison is useful for understanding
+the data, but does not authorize selecting the largest of those signiﬁcances as the discovery result.
+22
+
+HPS Gaussian-Process Resonance Search v5.8.5.3 / Unshifted scans
+0.0
+0.5
+1.0
+1.5
+2.0
+2.5
+3.0
+3.5
+4.0Local Z
+Free amplitudes
+Shared coupling
+Fisher
+Signed Stouffer
+50 100 150 200 250
+T ested mass [MeV]
+10−3
+10−2
+10−1
+100
+Full-domain p
+Figure 13: Baseline comparison from the earlier v5.8.5 report. All curves use the ±2. 25σm mask and the 1 MeV
+mass grid; the global probabilities refer to the full 19–250 MeV domain. The shaded interval is a post-observation
+diagnostic zoom. The shared-coupling and independent-amplitude likelihoods impose diﬀerent physical restric-
+tions, while Fisher combines gated local probabilities and signed Stouﬀer combines continuous signed reference
+scores. These curves are strongly related uses of the same events.
+0 1 2 3 4 5 6
+Peak scatter T
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0Null cumulative probability
+256 exact Poisson scans
+100,000 Gaussian scans
+Observed
+0 2 4 6 8 10
+Width instability W
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+Figure 14: The earlier v5.8.5 coherence check on 80–100 MeV. The lower tail, not the upper tail, measures
+unusually close peak locations. The observed clustering gives 195/256 direct lower-tail counts, or add-one prob-
+ability 0.76265, and is not unusual under the ﬁxed-source null. The four historical widths enter this archived
+sensitivity diagnostic; this review makes no new width choice.
+23
+
+HPS Gaussian-Process Resonance Search v5.8.5.3 / Unshifted scans
+16 Revision scope and reproducibility
+This v5.8.5.3 revision adds plot and interpretation changes only. It uses 1,310 saved scope–mass coor-
+dinates, with 163, 283, 401 and 463 points for 2015, 2016, 2021 and the shared-coupling combination.
+All requested observed local curves are calculated directly from their saved signed roots; the generating-
+source oﬀset and response width never enter that calculation. There are no new likelihood ﬁts, GP
+optimizations, Poisson experiments or Gaussian-ﬁeld draws in this revision.
+The local and global constructions are kept separate in the numerical ledger. The local columns
+contain the conventional unshifted asymptotic display. The global columns use the saved 200,000 Gaus-
+sian raw maxima per scope, checked with 256 complete Poisson scans, and remain conditional on the
+existing nominal GP sources. The expanded Figure 4 panels use those same complete Poisson scans.
+No reference-standardized maximum ensemble is substituted into the raw global calculation.
+The earlier consolidated report’s statistical, source-transfer and injection studies are retained as prior
+results. Their 603 deterministic source states, 768 Poisson ﬁts and 500,000-ﬁeld regional comparison were
+completed in that earlier review; they were not rerun for this revision. All prior source-independence,
+selection, exposure, overlap and rare-tail qualiﬁcations continue to apply.
+The source bundle contains the revised LaTeX, all included ﬁgures, the four exact saved ﬁeld ﬁles,
+new plotting and veriﬁcation scripts, per-mass raw p-value/signiﬁcance and toy-moment tables, and the
+prior report and result ledgers. It reproduces the requested new ﬁgures and the revised report without
+the live parent checkout. The earlier numerical studies are retained through their saved ﬁgures/results;
+their full reﬁt environments remain in their original packages.
+A SHA-256 manifest pins 331 original ﬁles in the previous consolidated study; a ﬁnal comparison
+checks that they are unchanged. Validation checks the unshifted transformations, mass coordinates,
+raw-maximum tail counts, table values and report text, and includes rendered-page inspection and an
+isolated PDF rebuild. Rebuild commands are in README.md. No previous release is overwritten.
+References
+[1] V. Ananiev and A. L. Read, Gaussian Process-based calculation of look-elsewhere trials factor, JINST
+18 (2023) P05041, arXiv:2206.12328v3, especially Sections 2, 2.1 and 2.2.
+[2] E. Gross and O. Vitells, Trial factors for the look elsewhere eﬀect in high energy physics , Eur. Phys.
+J. C 70 (2010) 525–530, arXiv:1005.1891.
+[3] G. Cowan, K. Cranmer, E. Gross and O. Vitells, Asymptotic formulae for likelihood-based tests of
+new physics , Eur. Phys. J. C 71 (2011) 1554, arXiv:1007.1727.
+[4] HPS-GPR, Analysis Note v5.0.5 , 16 September 2026, Sections 4.20 and 6.11, pinned local source
+and PDF.
+[5] HPS-GPR, studies v5.8.0–v5.8.5, 17–19 September 2026. Exact input identities, scripts, numerical
+ledgers and selected ﬁgures are included in the accompanying source-and-data package.
+24

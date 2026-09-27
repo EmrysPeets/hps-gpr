@@ -1,0 +1,59 @@
+\heading{Local and domain-global probabilities}
+At a mass fixed independently of the data, the local probability is
+\begin{equation}
+ p_{\rm loc}(m)=\Pr_{0}\{T(m)\geq T_{\rm obs}(m)\},
+ \qquad Z_{\rm loc}(m)=\Phi^{-1}[1-p_{\rm loc}(m)],
+\end{equation}
+where larger $T$ is more signal-like and the probability includes equality.
+This inclusive convention matters when a nonnegative fitted amplitude gives
+a point mass at $T=0$: its inclusive tail is one. A displayed nonnegative
+$Z$ is a plotting convention; the probability remains the primary quantity.
+The common-mass alternative has one amplitude for each active dataset, so
+$\sqrt{q_R}$ is not generally its local significance. Its null distribution
+must be calibrated with the appropriate boundary and active dataset count.
+
+For a declared mass grid $\mathcal G$ and a declared local ordering $S(m)$,
+the scan statistic and its domain-global probability are
+\begin{equation}
+ M=\max_{m\in\mathcal G} S(m),\qquad
+ p_{\mathcal G}=\Pr_0\{M\geq M_{\rm obs}\}.
+\end{equation}
+For example, $S=-\log p_{\rm loc}$ compares locally calibrated evidence
+across masses; $S=q_R$ defines a different valid scan test. The observed
+maximum and every null maximum must use the same ordering. A full-spectrum
+toy supplies the entire correlated curve, rather than independent random
+fluctuations at each mass. This accounts for the look-elsewhere effect within
+that grid. See
+\href{https://arxiv.org/abs/1005.1891}{Gross and Vitells} for scan inference and
+\href{https://arxiv.org/abs/2206.12328}{Ananiev and Read} for correlated Gaussian
+significance-field approximations.
+
+Here the inherited full combined grid is $19,20,\ldots,250$ MeV. The active
+supports are 19--100 MeV (2015), 39--180 MeV (2016), and 50--250 MeV
+(2021, 10\%); only 50--100 MeV contains all three datasets. ``Common mass''
+ties the mass of the active components and does not extend an experiment's
+support. Adding sites to a domain cannot reduce its null exceedance
+probability at a \emph{fixed threshold}. Comparisons of observed maxima can
+also change the threshold. The number of grid points is not the number of
+independent trials: nearby masses share events, background fits, and signal
+templates. Finer sampling resolves maxima until grid convergence; a
+1-MeV-grid calibration is not, by itself, a continuous-mass calibration.
+
+The 80--105 MeV interval was chosen after inspection and is used only to
+describe the reported structure. Its 2015 interval ends at 100 MeV.
+Calibrating a statistic restricted to this interval answers a conditional
+diagnostic question; it does not replace the full-domain discovery test or
+correct the choice of this interval. Likewise, four width-specific global
+probabilities are four conditional results, not a selection-corrected claim
+based on the most favorable width. Such a claim would require repeating the
+entire width/method/domain selection in joint null realizations. Reusing
+the same fluctuations across widths preserves their strong dependence.
+
+All probabilities here condition on the pinned observed-data-derived GP
+source, its kernel policy, and the stated likelihood construction. Direct
+Poisson scans repeat the local fits; Gaussian response fields approximate
+their fluctuations. Neither propagates uncertainty in choosing or estimating
+the source itself. Exact likelihood factorization therefore does not imply
+unconditional physical-discovery calibration. Boundary asymptotics are
+reviewed by \href{https://arxiv.org/abs/1007.1727}{Cowan et al.}; sparse toy
+tails here are reported with exceedance counts and binomial bounds.

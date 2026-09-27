@@ -1,0 +1,32 @@
+# A fresh statistical reading
+
+I find this analysis interesting enough to justify a carefully designed replication, but I do not yet find the combined excess persuasive evidence for a new particle. My strongest reason to continue is that the competing explanations make different predictions for additional 2021 events. My strongest reservation is that the most visually appealing combined feature becomes stronger when the physical relationship between dataset amplitudes is relaxed.
+
+“Fixed background” needs an exact meaning. Holding the generating spectrum fixed while recomputing the GP prediction and profiling the extraction produces a conditional null experiment. That is how the v5.8.2 response fields were constructed. It does **not** mean background nuisance parameters were fixed inside every likelihood fit. If a separate result instead treats the fitted background prediction as perfectly known, I would require evidence that omitted background uncertainty is negligible before interpreting its significance. Many counts make small modeling errors more consequential, not less. [S1]
+
+My priorities are the following, retaining the chosen ±2.25σ extraction mask.
+
+**1. Examine 90–93 MeV first, primarily to resolve a physical consistency question.** The common-mass, independent-amplitude test peaks at 92 MeV with conditional local/global Z=3.583/2.060; its full-scan Poisson check has 7/256 exceedances. Fisher and signed Stouffer also prefer 92 MeV, with conditional global Z=2.28 and 2.58. These are related views of the same events, not three confirmations. Nor does peak clustering supply independent evidence: the reported coherence lower-tail probability is 0.763. [S2–S3]
+
+The important quantitative detail is the amplitude mismatch. At 92 MeV the fitted coupling-squared estimates, in units of 10⁻⁶, are approximately 77.48±29.96, 9.13±2.93 and 1.65±1.35 for 2015, 2016 and 2021. These are local curvature errors, not a calibrated incompatibility test, but the pattern deserves more attention than the largest combined Z. The common-coupling raw root is only 2.520 there. The current 2021 sample supplies about 82% of the null information for that fit while showing the smallest fitted coupling. Additional independent 2021 data should determine whether a common-rate signal is plausible or whether the older excesses fail that prediction. [S4]
+
+**2. Retain 65–67 MeV as the cleaner common-coupling candidate.** At 66 MeV all three raw roots are positive: 1.934, 1.061 and 2.366. The common-coupling fit actually prefers this region, with reference-local Z=2.829 but only about 0.81 globally on the v5.8.4 full-domain grid. Thus its physical interpretation is more direct, while its present statistical evidence is weak. About 55% of the current null information comes from 2021. I would freeze this candidate alongside 92 MeV and assess their predictive amplitudes separately. I would not merge them into a two-resonance claim. [S3–S4]
+
+**3. Keep 51 MeV as a dataset-specific diagnostic.** The 2015 raw root is 3.139; the corresponding 2016 and 2021 roots are −0.367 and 0.234. The shared-coupling root falls to 1.221. That makes it less compelling as a common particle candidate than its 2015-only prominence suggests. It remains useful for checking the source of a localized 2015 residual and the reliability of cross-campaign rate conversion. The 2021 search boundary at 50 MeV also warrants care when interpreting a nearby feature. [S4–S5]
+
+**4. Treat 76–80 MeV mainly as a background-model control.** The dramatic 76 MeV stress-centered score is not a large observed excess: the note records 2016 r=−2.46 and combined r=0.166. I would give that score essentially no weight as resonance evidence. The 2021 raw maximum at 78 MeV, r=2.809, is a distinct, more ordinary fluctuation worth tracking; its maximum changes to 65.5 MeV after reference standardization. The contrast makes this region valuable for learning which structures survive an independent sample and a fixed analysis definition. [S5–S6]
+
+More data can distinguish fluctuations from reproducible structure, but reproducibility alone will not establish a particle. In a regime dominated by counting errors, a fixed fractional background discrepancy produces a nominal residual proportional to √N, just as a fixed signal fraction can. I would therefore examine peak shape, sideband residuals, control selections and the predicted cross-dataset amplitude pattern as well as significance. I would not promise a √luminosity gain from the present Z values.
+
+The useful next step is a predeclared test on genuinely additional 2021 events: freeze the candidate hypotheses, background policy, mass resolution, statistic and ±2.25σ mask; state the remaining within-window and between-candidate multiplicity; and propagate background learning and source uncertainty. If the old 10% is included in a later total, the added events should first be evaluated separately. That experiment could either strengthen the particle interpretation or make a compelling case that the interesting result is a background-model deficiency. Both outcomes would justify doing it.
+
+## Exact evidence locations
+
+Paths below are relative to the repository root; row predicates identify the actual numerical records.
+
+- **S1:** `study_results/v5p8p2_nominal_gp_significance_20260917/scripts/prepare.py`, source construction; `scripts/engine.py`, `Context.predict` and `fit`; `scripts/run_scan.py`, source/toy scans.
+- **S2:** `study_results/v5p8p5_mass_coherence_20260919/results/free_peaks.csv`, `width_sigma=2.25`; `results/stability_coherence_summary.json`, `direct_T`.
+- **S3:** `study_results/v5p8p4_independent_combinations_windows_20260918/results/peaks.csv`, `width_sigma=2.25`, `domain=full`, scopes `combined`, `fisher`, `stouffer`.
+- **S4:** `study_results/v5p8p4_independent_combinations_windows_20260918/results/peak_composition.csv`, `width_sigma=2.25`, `mass_MeV∈{51,66,92}`, all three scopes; columns `raw_r`, `epsilon2_hat`, `epsilon2_fit_sigma`, `null_information_fraction`, `shared_raw_r`.
+- **S5:** `study_results/v5p8p2_nominal_gp_significance_20260917/results/summary.csv`, scopes `2015`, `2021`; `mass_min_MeV`, `raw_maximum`, `raw_maximum_mass_MeV`, `mass_MeV`.
+- **S6:** `study_results/v5p0p5_analysis_note_20260916/source/sections/v5_global_significance.tex`, lines 170–178; `source/sections/v5_global_results.tex`, lines 25–36.

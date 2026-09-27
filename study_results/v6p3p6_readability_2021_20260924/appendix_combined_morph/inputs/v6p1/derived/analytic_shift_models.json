@@ -1,0 +1,67 @@
+{
+  "models": [
+    {
+      "model": "proportional",
+      "parameters": 1,
+      "coefficients": [
+        -1.9751006157464843
+      ],
+      "train_RMS_MeV": 0.25522235245785274,
+      "LOO_RMS_MeV": 0.2885384164087379,
+      "LOO_max_abs_MeV": 0.4601585490890274,
+      "LOO_RMS_nominal_sigma": 0.08520611431808198
+    },
+    {
+      "model": "affine",
+      "parameters": 2,
+      "coefficients": [
+        -3.035042699968641,
+        -1.646047086887784
+      ],
+      "train_RMS_MeV": 0.15545650745217682,
+      "LOO_RMS_MeV": 0.21535562221386317,
+      "LOO_max_abs_MeV": 0.5287299439975328,
+      "LOO_RMS_nominal_sigma": 0.08815297396440502
+    },
+    {
+      "model": "quadratic",
+      "parameters": 3,
+      "coefficients": [
+        -3.1938315318387565,
+        -1.646047086887784,
+        0.4811782783942882
+      ],
+      "train_RMS_MeV": 0.06787383223207753,
+      "LOO_RMS_MeV": 0.13986937090636978,
+      "LOO_max_abs_MeV": 0.30148435401438034,
+      "LOO_RMS_nominal_sigma": 0.05234078900064502
+    },
+    {
+      "model": "logarithmic",
+      "parameters": 2,
+      "coefficients": [
+        -3.2243308692909953,
+        -2.213992811446465
+      ],
+      "train_RMS_MeV": 0.049708511902231814,
+      "LOO_RMS_MeV": 0.0651848854142371,
+      "LOO_max_abs_MeV": 0.16044413649768607,
+      "LOO_RMS_nominal_sigma": 0.01692178576911897
+    }
+  ],
+  "selected_by_MC_only_LOO": "logarithmic",
+  "coordinate": "m in MeV; x=(m-150)/100; log uses ln(m/150)",
+  "width_model": {
+    "form": "ln(sigma_core/MeV)=a+b*x+c*x^2",
+    "coefficients": [
+      0.9280648505520875,
+      0.6587650350197376,
+      0.10482391463858232
+    ]
+  },
+  "valid_domain_MeV": [
+    60,
+    240
+  ],
+  "scope": "Descriptive MC-only model comparison; LOO model selection is not independent validation; no extrapolation."
+}

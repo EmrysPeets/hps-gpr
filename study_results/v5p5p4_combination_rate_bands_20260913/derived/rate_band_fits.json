@@ -1,0 +1,381 @@
+{
+  "description": "Fixed 92 MeV and fully scaled widths, identical v5.5.3 union windows; exact conditional Poisson likelihood and profiled Gaussian background constraint.",
+  "formulas": {
+    "common": "epsilon2(E)=a",
+    "power": "epsilon2(E)=a*(E/2.3 GeV)^beta",
+    "exponential": "epsilon2(E)=a*exp[-k*(E-2.3 GeV)]"
+  },
+  "uncertainty_interpretation": "Pointwise approximate 68%/95% log-Wald conditional shape bands from the full observed Hessian profiled over background nuisance parameters; not simultaneous bands, model-validity bands, discovery calibration, or guaranteed coverage. Exact parameter contours are separate and use asymptotic 2-parameter thresholds.",
+  "nonlinear_hessian_formula": "Hpp=D.T W D + sum_i (1-n_i/lambda_i) d2lambda_i/dpdp; Hprofile=Hpp-Hp_theta Htheta_theta^-1 Htheta_p",
+  "script_sha256": "05c48aff0792423c8b76761a3753ea281cea901e9b40792ea3141dcfa7e7aeec",
+  "experiment_sha256": "38bb6c01bfca624d58cdc40504268f4966e86259d8f321429da01967ab43a534",
+  "parent_fits_sha256": "47e0b380977eafd174a4bcfc4da03f762597f236ef113e0e82a132470242ca60",
+  "models": {
+    "common": {
+      "model": "common",
+      "amplitude_unit": "epsilon2 equivalent; A is in units of 1e-8",
+      "parameter_order": [
+        "log_A_1e8"
+      ],
+      "A_1e8": 310.16804048926775,
+      "amplitude_epsilon2_at_2p3GeV": 3.1016804048926774e-06,
+      "slope": 0.0,
+      "slope_bounds": null,
+      "Q0": 5.986059489779677,
+      "sqrtQ0": 2.446642493250634,
+      "nll": 121.58928183616472,
+      "parameter_vector": [
+        5.73711421670885
+      ],
+      "observed_profiled_hessian": [
+        [
+          5.985351842616232
+        ]
+      ],
+      "observed_profiled_covariance": [
+        [
+          0.1670745557311956
+        ]
+      ],
+      "hessian_includes_second_derivatives": true,
+      "gradient_max_abs": 3.54836160454397e-11,
+      "hessian_fd_relative_error_h1e3": 7.321629451106199e-07,
+      "hessian_fd_relative_error_h5e4": 4.0036491246448295e-07,
+      "hessian_eigenvalues": [
+        5.985351842616232
+      ],
+      "slope_candidates": [
+        [
+          0.0,
+          121.58928183616472
+        ]
+      ],
+      "coarse_slope_grid_points": 1,
+      "validation_slope_grid_points": 1,
+      "validation_dense_grid_best_nll": 121.58928183616472,
+      "normalization_log_standard_error": 0.40874754522956536,
+      "slope_standard_error": null,
+      "correlation_logA_slope": null,
+      "per_year_fit_epsilon2": {
+        "2015": 3.1016804048926774e-06,
+        "2016": 3.1016804048926774e-06,
+        "2021": 3.1016804048926774e-06
+      },
+      "amplitude_logWald_68": [
+        2.0656848380294025e-06,
+        4.657255142208808e-06
+      ],
+      "amplitude_logWald_95": [
+        1.3921002295423705e-06,
+        6.910724623081023e-06
+      ]
+    },
+    "power": {
+      "model": "power",
+      "amplitude_unit": "epsilon2 equivalent; A is in units of 1e-8",
+      "parameter_order": [
+        "log_A_1e8",
+        "beta"
+      ],
+      "A_1e8": 851.6076372715179,
+      "amplitude_epsilon2_at_2p3GeV": 8.516076372715179e-06,
+      "slope": -2.9869126653994145,
+      "slope_bounds": [
+        -6.0,
+        6.0
+      ],
+      "Q0": 17.474410813984377,
+      "sqrtQ0": 4.18024052106866,
+      "nll": 115.84510617406237,
+      "parameter_vector": [
+        6.747125901123214,
+        -2.9869126653994145
+      ],
+      "observed_profiled_hessian": [
+        [
+          17.458930654349793,
+          -4.826796677066088
+        ],
+        [
+          -4.826796677066088,
+          5.219699603030573
+        ]
+      ],
+      "observed_profiled_covariance": [
+        [
+          0.07694993904972582,
+          0.07115767924460747
+        ],
+        [
+          0.07115767924460747,
+          0.25738332699176536
+        ]
+      ],
+      "hessian_includes_second_derivatives": true,
+      "gradient_max_abs": 3.850924549242407e-07,
+      "hessian_fd_relative_error_h1e3": 5.387871231439484e-07,
+      "hessian_fd_relative_error_h5e4": 5.257769232787913e-07,
+      "hessian_eigenvalues": [
+        3.545236585101443,
+        19.133393672278924
+      ],
+      "slope_candidates": [
+        [
+          -6.0,
+          120.2190080387903
+        ],
+        [
+          6.0,
+          123.79104860654141
+        ],
+        [
+          -2.9869126653994145,
+          115.84510617406237
+        ]
+      ],
+      "coarse_slope_grid_points": 121,
+      "validation_slope_grid_points": 241,
+      "validation_dense_grid_best_nll": 115.84543870870804,
+      "normalization_log_standard_error": 0.27739852027313666,
+      "slope_standard_error": 0.507329603898457,
+      "correlation_logA_slope": 0.5056237091151344,
+      "per_year_fit_epsilon2": {
+        "2015": 8.709775188730961e-05,
+        "2016": 8.516076372715179e-06,
+        "2021": 1.993294911698329e-06
+      },
+      "amplitude_logWald_68": [
+        6.463006227607759e-06,
+        1.122133481414915e-05
+      ],
+      "slope_profile_68": {
+        "interval": [
+          -3.5170047231311425,
+          -2.4696325553366716
+        ],
+        "bounded_by_scan": [
+          false,
+          false
+        ],
+        "delta_2nll": 0.988946481478023,
+        "interpretation": "Conditional one-parameter likelihood interval; asymptotic chi-square threshold, not coverage-calibrated"
+      },
+      "amplitude_logWald_95": [
+        4.944444415762193e-06,
+        1.4667685727181566e-05
+      ],
+      "slope_profile_95": {
+        "interval": [
+          -4.202189969948528,
+          -1.858890748588557
+        ],
+        "bounded_by_scan": [
+          false,
+          false
+        ],
+        "delta_2nll": 3.8414588206941205,
+        "interpretation": "Conditional one-parameter likelihood interval; asymptotic chi-square threshold, not coverage-calibrated"
+      },
+      "joint_likelihood_contour_thresholds": {
+        "68_percent_2d": 2.27886856637673,
+        "95_percent_2d": 5.99146454710798
+      },
+      "exact_contour_grid_shape": [
+        81,
+        61
+      ],
+      "contour_outer_edge_checks": [
+        {
+          "coordinate": "log_A_1e8",
+          "edge": "min",
+          "coordinate_value": 3.947125901123214,
+          "minimum_delta_2nll": 12.752160025316812
+        },
+        {
+          "coordinate": "log_A_1e8",
+          "edge": "max",
+          "coordinate_value": 7.85671998221576,
+          "minimum_delta_2nll": 58.00513005671948
+        },
+        {
+          "coordinate": "slope",
+          "edge": "min",
+          "coordinate_value": -5.016231080993243,
+          "minimum_delta_2nll": 6.780613933291704
+        },
+        {
+          "coordinate": "slope",
+          "edge": "max",
+          "coordinate_value": -0.9575942498055863,
+          "minimum_delta_2nll": 8.238894152719638
+        }
+      ],
+      "nominal_95_contour_closed_inside_grid": true
+    },
+    "exponential": {
+      "model": "exponential",
+      "amplitude_unit": "epsilon2 equivalent; A is in units of 1e-8",
+      "parameter_order": [
+        "log_A_1e8",
+        "k_per_GeV"
+      ],
+      "A_1e8": 981.6719101784523,
+      "amplitude_epsilon2_at_2p3GeV": 9.816719101784523e-06,
+      "slope": 1.680573769258883,
+      "slope_bounds": [
+        0.0,
+        6.0
+      ],
+      "Q0": 17.188103279697486,
+      "sqrtQ0": 4.145853745574907,
+      "nll": 115.98825994120581,
+      "parameter_vector": [
+        6.889257148841463,
+        1.680573769258883
+      ],
+      "observed_profiled_hessian": [
+        [
+          17.175320644319847,
+          7.168642405074648
+        ],
+        [
+          7.168642405074648,
+          9.077070518359164
+        ]
+      ],
+      "observed_profiled_covariance": [
+        [
+          0.08685181017283045,
+          -0.06859146550675838
+        ],
+        [
+          -0.06859146550675838,
+          0.16433800808761534
+        ]
+      ],
+      "hessian_includes_second_derivatives": true,
+      "gradient_max_abs": 3.662840112328425e-07,
+      "hessian_fd_relative_error_h1e3": 1.2266168308082408e-06,
+      "hessian_fd_relative_error_h5e4": 2.373073016440245e-07,
+      "hessian_eigenvalues": [
+        4.893040189420197,
+        21.359350973258813
+      ],
+      "slope_candidates": [
+        [
+          0.0,
+          121.58928183616472
+        ],
+        [
+          6.0,
+          121.00505460460361
+        ],
+        [
+          1.680573769258883,
+          115.98825994120581
+        ]
+      ],
+      "coarse_slope_grid_points": 121,
+      "validation_slope_grid_points": 241,
+      "validation_dense_grid_best_nll": 115.98835438259415,
+      "normalization_log_standard_error": 0.29470631172886413,
+      "slope_standard_error": 0.4053862455580053,
+      "correlation_logA_slope": -0.5741318438610898,
+      "per_year_fit_epsilon2": {
+        "2015": 7.941765762966552e-05,
+        "2016": 9.816719101784523e-06,
+        "2021": 8.72895646301135e-07
+      },
+      "amplitude_logWald_68": [
+        7.3229550943592936e-06,
+        1.3159711165997889e-05
+      ],
+      "slope_profile_68": {
+        "interval": [
+          1.2567286618243385,
+          2.0868756108121693
+        ],
+        "bounded_by_scan": [
+          false,
+          false
+        ],
+        "delta_2nll": 0.988946481478023,
+        "interpretation": "Conditional one-parameter likelihood interval; asymptotic chi-square threshold, not coverage-calibrated"
+      },
+      "amplitude_logWald_95": [
+        5.509496313608392e-06,
+        1.7491249369804163e-05
+      ],
+      "slope_profile_95": {
+        "interval": [
+          0.8082418379810469,
+          2.5776313364617924
+        ],
+        "bounded_by_scan": [
+          false,
+          false
+        ],
+        "delta_2nll": 3.8414588206941205,
+        "interpretation": "Conditional one-parameter likelihood interval; asymptotic chi-square threshold, not coverage-calibrated"
+      },
+      "joint_likelihood_contour_thresholds": {
+        "68_percent_2d": 2.27886856637673,
+        "95_percent_2d": 5.99146454710798
+      },
+      "exact_contour_grid_shape": [
+        81,
+        61
+      ],
+      "contour_outer_edge_checks": [
+        {
+          "coordinate": "log_A_1e8",
+          "edge": "min",
+          "coordinate_value": 4.0892571488414635,
+          "minimum_delta_2nll": 11.263696255988265
+        },
+        {
+          "coordinate": "log_A_1e8",
+          "edge": "max",
+          "coordinate_value": 8.06808239575692,
+          "minimum_delta_2nll": 67.63137658364312
+        },
+        {
+          "coordinate": "slope",
+          "edge": "min",
+          "coordinate_value": 0.05902878702686176,
+          "minimum_delta_2nll": 10.760090076557873
+        },
+        {
+          "coordinate": "slope",
+          "edge": "max",
+          "coordinate_value": 3.3021187514909043,
+          "minimum_delta_2nll": 7.344702458914725
+        }
+      ],
+      "nominal_95_contour_closed_inside_grid": true
+    }
+  },
+  "independent_dataset_estimates": [
+    {
+      "year": "2015",
+      "beam_energy_GeV": 1.056,
+      "epsilon2": 8.45753795457195e-05,
+      "curvature_error_epsilon2": 3.18648042264275e-05,
+      "nll": 58.046125750856305
+    },
+    {
+      "year": "2016",
+      "beam_energy_GeV": 2.3,
+      "epsilon2": 9.118403112466586e-06,
+      "curvature_error_epsilon2": 3.019131560244614e-06,
+      "nll": 47.01276352469687
+    },
+    {
+      "year": "2021",
+      "beam_energy_GeV": 3.74,
+      "epsilon2": 1.6535374657623442e-06,
+      "curvature_error_epsilon2": 1.3982233822095703e-06,
+      "nll": 10.733660772045509
+    }
+  ]
+}

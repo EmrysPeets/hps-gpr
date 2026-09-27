@@ -1,0 +1,85 @@
+{
+  "masses_MeV": [
+    42.0,
+    66.0,
+    74.0,
+    76.0,
+    90.0,
+    92.0,
+    117.0
+  ],
+  "lengthscale_multipliers": [
+    0.5,
+    0.75,
+    1.0,
+    1.25
+  ],
+  "kernel_amplitude": "Held at nominal reviewed value",
+  "kernel_policy": "Multiply archived nominal length scale; no optimization and no selection based on observed roots",
+  "signal_strengths_in_nominal_errors": [
+    0,
+    2,
+    5
+  ],
+  "truths": [
+    "stress",
+    "nominal_local_GP_control"
+  ],
+  "local_control": "At each mass, full nominal GP mean from observed sidebands with nominal signal window excluded; mass-specific plug-in control, no global null",
+  "uncertainty": "Fisher sigma from GP count covariance plus Poisson diagonal of GP mean; descriptive, not coverage",
+  "observed_lml": "Exact sideband lognormal-GP Gaussian log marginal likelihood with unchanged zero mean and count-derived errors; training-set fit score, not predictive closure or discovery calibration",
+  "signal_tails": "Full-bin integrated Gaussian injected across whole spectrum before GP sideband retraining",
+  "baseline": [
+    {
+      "mass_MeV": 42.0,
+      "sigma_ref_epsilon2": 5.985018235036309e-06,
+      "nominal_const": 89.16353986080526,
+      "nominal_ls": 0.3970014789039537,
+      "control_is_mass_specific": true
+    },
+    {
+      "mass_MeV": 66.0,
+      "sigma_ref_epsilon2": 2.5393353077801955e-06,
+      "nominal_const": 98.89106499364355,
+      "nominal_ls": 0.4012956174303309,
+      "control_is_mass_specific": true
+    },
+    {
+      "mass_MeV": 74.0,
+      "sigma_ref_epsilon2": 2.5457648889580658e-06,
+      "nominal_const": 99.25984655040864,
+      "nominal_ls": 0.403445201512731,
+      "control_is_mass_specific": true
+    },
+    {
+      "mass_MeV": 76.0,
+      "sigma_ref_epsilon2": 2.5367552784095355e-06,
+      "nominal_const": 108.58562729610972,
+      "nominal_ls": 0.4131724631444206,
+      "control_is_mass_specific": true
+    },
+    {
+      "mass_MeV": 90.0,
+      "sigma_ref_epsilon2": 2.7887058189051993e-06,
+      "nominal_const": 130.7516071974543,
+      "nominal_ls": 0.4492843239954903,
+      "control_is_mass_specific": true
+    },
+    {
+      "mass_MeV": 92.0,
+      "sigma_ref_epsilon2": 2.93021281658696e-06,
+      "nominal_const": 122.83647559019832,
+      "nominal_ls": 0.4339658873754083,
+      "control_is_mass_specific": true
+    },
+    {
+      "mass_MeV": 117.0,
+      "sigma_ref_epsilon2": 4.7004054986149884e-06,
+      "nominal_const": 147.19584628397052,
+      "nominal_ls": 0.4456771235861514,
+      "control_is_mass_specific": true
+    }
+  ],
+  "new_random_experiments": 0,
+  "discovery_calibrated": false
+}

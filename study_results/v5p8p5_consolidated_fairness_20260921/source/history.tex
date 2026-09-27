@@ -1,0 +1,82 @@
+\heading{What the 5.8 series has established}
+The studies answer different questions in a sequence: the old stress reference was diagnosed, a coherent GP source was constructed, the fitted-score covariance was tested under that source, and several combined-search alternatives were compared. The improved stress response is useful evidence about the construction. It does not supply a second, independent measurement of the background.
+
+\begin{table}[htbp]\centering\small
+\begin{tabular}{p{.10\linewidth}p{.41\linewidth}p{.40\linewidth}}\toprule
+Study & Main result & Interpretation retained here\\\midrule
+5.8.0 & Full-2016 raw maximum changes from $3.425$ at 90 MeV on the integer grid to $3.453$ at 90.5 MeV on the half-MeV grid. Stress RMS stays $4.97$. & Finer sampling resolves extrema; it does not remove background mismatch. Shorter analysis length scales do not restore closure everywhere.\\
+5.8.1 & Full-2016 deterministic RMS falls from $4.967$ for the archived stress source to $0.609$ for the nominal GP source; half the source length scale gives $1.700$. & A better matched source changes the diagnosis. Source rebuilding can also absorb injected signal; small RMS alone does not qualify the null.\\
+5.8.2 & Half-MeV response fields describe moderate-tail complete Poisson checks. The 2016 reference-local peak is $2.886$ at 91.5 MeV, with global $p=0.10488$. & Both local reference mapping and the mass-search correction are conditional on the fixed source.\\
+5.8.3 & Saved fields explain why full-response correlations give a larger penalty than counting independent FWHM intervals. & An interpretation audit; no new likelihood fits or random experiments.\\
+5.8.4 & Integer-grid Fisher and signed Stouffer peaks stay at 92 MeV over the four tested widths. The shared-coupling peak stays near 66 MeV. & Different alternatives and weights select different features. These are repeated analyses of the same spectra.\\
+5.8.5 & The free-amplitude likelihood peaks at 91--92 MeV. Baseline conditional local/global $Z=3.583/2.060$; mass coherence is unexceptional. & A common mass with free nonnegative yields is a distinct hypothesis. Its square-root likelihood ratio is not itself a Gaussian significance.\\\bottomrule
+\end{tabular}
+\caption{Verified study ledger. The new synthesis retains $\pm2.25\sigma_m$ as the nominal blind half-width. Numeric inputs, source hashes and important original figure paths are listed in \texttt{results/study\_ledger.json}.}
+\end{table}
+
+\subsection{The earlier note already separates raw and reference-conditioned tests}
+Section 4.20 of v5.0.5, on pages 58--61, first defines the signed likelihood root and its conventional asymptotic display. Equations (88)--(93) then define the deterministic offset, response covariance, marginal scale and simulated field. Equations (94)--(96) explicitly introduce a \emph{different}, reference-standardized ordering, with a positive-raw-fit gate. The text warns that this extension does not automatically acquire the discovery interpretation of the Ananiev--Read construction. Section 6.11, beginning on page 114, reports the resulting conditional stress-background curves separately from the asymptotic and \v{S}id\'ak references.
+
+This distinction was essential in the 76 MeV example: the full-2016 raw fit is negative, $r=-2.460$, and the shared-coupling raw fit is only $r=0.166$. Its roughly nine-unit stress-centered coordinate came from a strongly negative reference response. It was not a nine-standard-deviation observed resonance. The later nominal-source studies removed much of that particular mismatch but retained the same conditional interpretation.
+
+The quoted v5.8.3 paragraph therefore describes an actual reference centering and scaling in a diagnostic probability calculation. It is not merely the look-elsewhere correction, and it should not be read as authorization to replace the released local inference. The observed data, likelihood and fitted raw roots were unchanged. In this report the raw likelihood result remains visible; the reference-conditioned result is identified as a model-dependent diagnostic.
+
+\begin{table}[htbp]\centering\small
+\begin{tabular}{rrrrrr}\toprule
+Mass [MeV] & Raw $r$ & Offset $a$ & Scale $s$ & $(r-a)/s$ & Full-range $p$\\\midrule
+90.0 & 3.42475 & 0.79076 & 0.98224 & 2.68160 & 0.17712\\
+90.5 & 3.45250 & 0.71285 & 0.98203 & 2.78978 & 0.13522\\
+91.0 & 3.40112 & 0.63026 & 0.98157 & 2.82288 & 0.12445\\
+91.5 & 3.33316 & 0.49674 & 0.98284 & 2.88595 & 0.10488\\
+92.0 & 3.11542 & 0.36419 & 0.98395 & 2.79610 & 0.13291\\\bottomrule
+\end{tabular}
+\caption{The exact v5.8.2 full-2016 mapping behind the quoted paragraph. The final column compares each reference score with the maximum anywhere on the 39--180 MeV half-MeV grid. It is not a local probability.}
+\label{tab:history_mapping}
+\end{table}
+
+At 90.5 MeV, $(3.45250-0.71285)/0.98203=2.78978$. At 91.5 MeV, the smaller offset gives $(3.33316-0.49674)/0.98284=2.88595$. Thus centering changes which mass ranks highest before any global comparison is applied. The subsequent search correction maps the reference-local $2.88595$ to global $1.25423$. These are two separate operations; calling their combined effect a trials penalty obscures the source dependence.
+
+Passing prior statistical tests does not require applying this centering to the production result. Nor does it prove the raw root is standard normal under every new generator. The prior empirical two-truth calibration tested its calibrated envelope, whereas the nominal-GP source in v5.8.1 still gave 101/512 raw nominal 5\% rejections at 90 MeV and 97/512 at 117 MeV. These tests have different probability constructions and assumptions. Good centered moments in v5.8.2 check fluctuations around its specified source; they do not settle which source or local calibration should define a physical discovery test.
+
+\heading{Reading Figures 4 and 5 of v5.8.3}
+\subsection{Figure 4: correlation is a property of repeated fitted scores}
+At a separation of, for example, 5 MeV, each pair of tested masses contributes a correlation between the two fit results produced by repeated fluctuations of the same spectrum. The solid line averages those correlations over all pairs with that separation. The blue band is the 10th--90th percentile spread across mass locations: it is not a confidence band, a range of candidate widths, or a fluctuation in the observed data.
+
+The dashed curve asks a simpler question: how much do two positive Gaussian signal templates overlap when the background is known and the noise is locally white? With equal resolution $\sigma_m$, that correlation is $\exp[-\Delta m^2/(4\sigma_m^2)]$. One FWHM of separation still leaves correlation $1/4$. Detector resolution therefore does not create sharply bounded independent signal regions.
+
+\fig[.93]{archive_response_resolution}{Reproduction of v5.8.3 Figure 4. The fitted-response correlation is compared with Gaussian-template overlap. Shading describes variation across mass pairs, not uncertainty in a measured correlation. These are the saved nominal-source fields, with no new fits.}
+
+The real score compares the signal region with a background inferred from surrounding counts. A fluctuation that helps an excess at one mass can raise the inferred background at another and reduce its fitted excess. Such opposite responses produce negative correlations. Moving masks, retraining, profiling, varying counts, resolution and kernel settings all enter the saved response. The negative lobes do not show a negative event rate or prove that a signal has been removed. They also do not isolate the moving mask as the sole cause: that would require a controlled comparison in which only mask movement is changed.
+
+The saved fields have median adjacent half-MeV correlations of 0.9705, 0.9897 and 0.9880 for 2015, 2016 and 2021, yet reach negative correlations near $-0.85$ to $-0.87$ farther apart. High correlation between neighboring tests is therefore fully compatible with appreciable opportunities for a maximum across the complete domain. The maximum calculation uses the full covariance matrix, including its nonlocal structure; it does not replace it with this averaged lag plot.
+
+\subsection{Figure 5: compare the same threshold under different scan models}
+The horizontal axis is a hypothetical \emph{reference-local threshold}, not mass. At any fixed value, the vertical axis asks how often a background search exceeds that threshold somewhere. The thin black curve gives one specified mass. Gray treats every half-MeV grid point as independent. Orange uses a fixed FWHM-spacing count in the \v{S}id\'ak formula. Green uses the high-threshold approximation for a smooth Gaussian-template scan. Blue is the saved correlated fitted-response calculation; its narrow band covers finite Gaussian sampling only. The dot marks the observed reference-local peak.
+
+\fig[.93]{archive_trials_comparison}{Reproduction of v5.8.3 Figure 5. Every curve in a panel is evaluated at the same reference-local threshold. The gray and orange curves are alternative counting approximations, while green describes an ideal smooth-template field. Blue uses the actual fitted-score covariance under the fixed nominal source. No new observed information enters this comparison.}
+
+For the 2016 threshold $u=2.88595$, one mass has $p=0.001951$. The FWHM-count approximation gives $0.02953$, the smooth-template approximation gives $0.06521$, the fitted field gives $0.10488$, and 283 independent grid tests give $0.42461$. Thus correlation greatly reduces the penalty relative to independent grid points. The larger probability than the FWHM heuristic does not demonstrate that the method is conservative relative to the correct physical search: the FWHM heuristic is not that calibration. Even the ideal continuous smooth field has more possible high maxima than a fixed width count represents.
+
+The distinction also prevents an incorrect interpretation of ``reach.'' These are background-only discovery tails. They do not multiply, weaken or otherwise alter the reported fixed-mass 90\% $\mathrm{CL}_s$ upper endpoints. A discovery-reach forecast would additionally need signal-plus-background ensembles and a declared global discovery criterion.
+
+\heading{What survives the combination and width studies}
+\begin{table}[htbp]\centering\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lrrrrr}\toprule
+Hypothesis/statistic & Peak [MeV] & Local $Z$ & Global $p$ & Global $Z$ & Direct $k$\\\midrule
+Shared coupling & 66 & 2.829 & 0.20849 & 0.812 & 41\\
+Fisher at common mass & 92 & 3.723 & 0.01131 & 2.280 & 4\\
+Signed Stouffer & 92 & 3.934 & 0.00494 & 2.580 & 1\\
+Free nonnegative yields & 92 & 3.583 & 0.01968 & 2.060 & 7\\\bottomrule
+\end{tabular}
+\caption{Baseline $\pm2.25\sigma_m$ results on the 19--250 MeV integer grid, with each dataset used only in its declared range. All significance columns are conditional Gaussian-response results. Counts refer to the same 256 complete Poisson scans; the rows are not independent replications.}
+\label{tab:history_methods}
+\end{table}
+
+At 92 MeV the shared-coupling approximation gives dataset score weights about $0.041$, $0.419$ and $0.907$, whereas signed Stouffer gives each dataset $1/\sqrt3$. The independent combinations therefore emphasize the 2015 upward response more strongly. This is a change in the alternative hypothesis or weighting, not a removal of the mass-search correction. The exact independent-yield statistic is $q_R=\sum_d[\max(r_d,0)]^2$; its local distribution includes the boundary and cannot be replaced by $\sqrt{q_R}$ as a Gaussian significance.
+
+In v5.8.5, seven direct global exceedances give a 95\% probability interval $[0.0111,0.0555]$. Its baseline local tail has zero direct exceedances in 256 scans, so the reported local $3.583$ remains an approximation rather than a directly measured rare tail. The exploratory common-region coherence statistic gives 195/256 scans at least as tightly clustered as the observations, with add-one $p=0.7626$. Its stable combined maximum provides no separate evidence for unusually aligned individual peaks.
+
+Widths $2.4$, $2.5$ and $2.6\sigma_m$ changed the extractor's held-out bins \emph{and} fitted likelihood window, while leaving the generating source fixed. The 2016 source-offset RMS remained about 0.61--0.62. These comparisons therefore did not test whether a wider source-building exclusion removes contamination. One 2016 $2.6\sigma_m$ peak-tail check was flagged: Gaussian $p=0.09547$ lies just below the direct 95\% interval $[0.0971,0.1850]$. All configurations remain diagnostics. There is no basis here for changing the nominal $\pm2.25\sigma_m$ policy, and no old study demonstrated a $3\sigma_m$ source-construction cure.
+
+The apparent numerical shifts between the half-MeV v5.8.2--3 results and the integer-grid v5.8.4--5 results include changed mass sampling and finite Gaussian sampling. They do not represent additional observed events. None of the displayed global probabilities includes choosing the most favorable method, width, dataset subset or mass domain after inspection.

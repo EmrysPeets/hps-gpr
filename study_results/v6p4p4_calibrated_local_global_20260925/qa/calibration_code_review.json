@@ -1,0 +1,32 @@
+{
+  "passed": true,
+  "review_scope": "Read-only code audit of calibration ranks and independent validation; no new full scan or toy cohort executed.",
+  "algorithm_findings": [],
+  "verified": [
+    "Only original ensemble A defines each masswise inclusive upper-tail map (1+count(A>=q))/1025.",
+    "Observed q and every independent-B q use the same frozen A map; B is not used to fit the map or Sidak effective count.",
+    "A leave-one-out inclusive rank equals count(A>=q_i)/1024 including self, matching add-one ranks after removing self; ties are counted correctly.",
+    "The fixed A-only Sidak fit uses predeclared alpha thresholds and the stated log-survival least-squares formula; it is explicitly approximate.",
+    "Independent B uses seed namespace2 versus original A namespace1, preserves complete campaign draws across masses, and runs the unchanged joint likelihood.",
+    "The independent global tail compares each B minimum local rank with the observed minimum using <=; Clopper-Pearson intervals are correct conditional on fixed A and source.",
+    "The raw-maximum A+B comparison uses the original raw statistic and is kept separate from the locally calibrated min-p construction.",
+    "No new signal parameter, dataset choice maximization, or summing of local significances is introduced by the calibration analysis.",
+    "Validation independently recomputes inclusive ranks with direct comparisons, the A-only Sidak fit with rankdata, B draw hashes, and selected profile replays."
+  ],
+  "nonblocking_inference_notes": [
+    {
+      "location": "analyze_calibrated.py:67-69 local_A_p95_low/high",
+      "note": "These are pointwise binomial intervals computed at the displayed mass. That displayed local minimum is selected using A-based ranks, so do not describe these local-A intervals as simultaneous or selection-adjusted 95percent coverage. The primary independent-B interval remains valid conditional on fixed A and the observed threshold."
+    },
+    {
+      "location": "validate_calibrated.py:71",
+      "note": "The fixed A-only dependency is established by code and frozen protocol; a boolean named sidak_fitted_before_B_evaluation is not by itself proof of wall-clock execution order. Preserve the frozen fit/protocol record. No numerical change is needed."
+    }
+  ],
+  "source_hashes": {
+    "analyze_calibrated.py": "f4c20d571b7d30304d4a3e13d8f6307c12cfe021f5b8f3ca4b1817d9abd6f320",
+    "validate_calibrated.py": "0a575d20de51995ee08941c9975b8d0f2c5088f560db1f65a549b404b671904c",
+    "run_validation.py": "15e98f2db33b6596ad34e2fbdb2b0591ee38de0b44fe768265da6aa9e071c592"
+  },
+  "common_coupling_audit_sha256": "e18bc05b6980cad0b2a20d628544294615e0d78332014b3dcc88a120c31f8cef"
+}

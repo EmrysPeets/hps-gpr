@@ -1,0 +1,83 @@
+\section{Conclusions}
+\label{sec:conclusions}
+
+Version 4.9.5 fixes the GP support at 36--300~MeV for the 2021 native-10\%
+observed pass described in Section~\ref{sec:v4p9p5-support}.  The choice follows from
+a source-conditioned recovery diagnostic and a clearly labelled practical rule adopted
+after the first phase.  It does not overwrite the stricter initial result, under which
+no edge qualified, and it does not imply exact centering at 55~MeV.  In the complete
+ensemble, the 55~MeV means remain between $-0.773$ and $-0.960$ over the three
+injection strengths, while all nine 60--70~MeV means remain between $-0.110$ and
+$+0.325$.
+
+With that choice fixed, the observed scan contains 201 finite mass points from 50 through
+250~MeV.  Its observed 90\% \CLs{} signal-yield and $\eps^2$ limits and its local
+analytic $p_0$ curve are reported without upper-limit bands.  The minimum local
+$p_0=0.00247$ at 78~MeV ($Z=2.81$) has no scan-wide trials calibration.  Thus the
+v4.9.5 support decision and observed curves form a conditional analysis result; neither
+supplies direct coverage, an expected band, a universal bias guarantee, or a global
+discovery claim.  The reported high-mass $\eps^2$ conversion follows the electron-channel
+convention and uses the provisional 2021 radiative fraction.  It should not be read as a
+fully calibrated minimal-dark-photon exclusion.
+
+The accepted v4.2 observed/asymptotic three-campaign result remains unchanged.  Its
+2021 component uses the reviewed 10\% spectrum, a 50--250~MeV search interval, and a
+40--300~MeV GP support.  Version 4.5 contributes the matched-refit toy semantics used
+for validation; it is not an alternative observed-analysis card.  None of the
+conditional injection--extraction studies is pooled with the v4.2 limit ensemble or
+used to revise the observed 65~MeV local significance.
+
+Version 4.9.1 restores the complete background-validation argument to the main text.
+The historical four-lane, five-mass suite uses a common
+fGenGammaThresh family fitted independently to the native 1\% and native
+10\% sources.  Because that family does not adequately describe the rising threshold,
+the two historical 65~MeV cells with large positive pulls are replaced, rather than
+pooled, with targeted full-100 ensembles.  The $1\%\times10$ replacement uses the
+source-qualified threshold-turn-on truth with 40--300~MeV support; the
+native-10\% replacement uses a locally source-qualified
+fSigPowExpQ-anchored truth with 30--300~MeV support.  All 800 new
+mass--strength states are accepted with zero exclusions under the pull-blind optimizer
+gate.
+
+The two replacement zero-signal means are \VFourPNineOneOnePctMean{} with 90\%
+interval \VFourPNineOneOnePctMeanCI{} and \VFourPNineOneNativeTenMean{} with interval
+\VFourPNineOneNativeTenMeanCI.  Both intervals lie wholly inside the post-result
+$\pm0.5$ practical centering band; the historical means of 0.789 and 0.716 did not.
+After substitution, all twenty composite zero-signal point means and all eighty
+lane--mass--strength point means are inside the band.  The near-threshold mean-pull
+problem and the practical background-model-mean-bias endpoint are therefore resolved
+for this explicitly labelled, source-conditioned composite suite.
+
+The result does not imply exact statistical centering or exact pull calibration.
+Under the targeted two-endpoint $t$/Holm screen, the native-10\%, 65~MeV mean retains
+a statistically resolved negative offset; under the composite Holm-20 screen the
+historical $10\%\times10$, 180~MeV cell retains a flag at mean 0.338.  Both magnitudes
+are within the adopted practical margin.  Exact unit-width calibration is also not
+global: \VFourPNineOneWidthState.  The $1\%\times10$, 65~MeV replacement is mildly
+overdispersed in both the full and reserve samples.  Width results remain a visible
+calibration caveat but are not treated as a retrospective veto of the declared
+mean-bias endpoint.
+
+Signal injection provides a complementary check.  At 65~MeV the paired response is
+stable over $z=1,3,5$: 96.6--96.9\% of the injected amplitude is recovered, with no
+worsening at larger strength.  The corresponding 3.1--3.4\% attenuation is retained
+as a conditional response calibration rather than rounded to exact unbiased
+recovery.  The four strengths share backgrounds and are not counted as independent
+confirmations.
+
+The restricted-truth argument is scientifically meaningful but conditional.  The
+Table~17 truth is data-like over its complete 40--300~MeV support.  The native-10\%
+truth is data-like in the threshold-sensitive interval but has a poor analytic tail
+description.  Its optimized RBF kernel gives weak direct 65--150~MeV correlation;
+nevertheless, fixed-hyperparameter removal of bins above 150~MeV shifts the mean pull
+by $-0.195$.  High-mass counts therefore provide modest aggregate influence and are
+not literally information-free.  The study validates local behavior of the complete
+30--300~MeV extraction for the declared source-like mean and smooth continuation; it
+does not establish tail independence or universal GP closure.
+
+Within the declared source-conditioned suite, the practical background-model mean-bias
+requirement is met and the earlier 65~MeV concern is resolved.  That conclusion supports
+larger studies only if the generating truth, support, optimizer gate, and post-result
+tolerance remain explicit.  It does not change the observed-data card or establish
+direct \CLs{} coverage, observed-data bias, a scan-wide significance calibration, a
+limit, or an exclusion.

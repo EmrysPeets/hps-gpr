@@ -1,0 +1,93 @@
+{
+  "version": "6.3.1",
+  "dataset": "2021 10%",
+  "masses_MeV": [
+    60,
+    80,
+    100,
+    120,
+    140,
+    160,
+    180,
+    200,
+    220,
+    240
+  ],
+  "shapes": [
+    "gaussian",
+    "mc"
+  ],
+  "primary_cases": [
+    "Gaussian generated/Gaussian fitted",
+    "native MC generated/native MC fitted"
+  ],
+  "pilot_backgrounds": 100,
+  "evaluation_backgrounds": 100,
+  "levels": [
+    0,
+    1,
+    3,
+    5
+  ],
+  "master_seed": 63220260924,
+  "seed_namespaces": {
+    "pilot": 1,
+    "evaluation_background": 2,
+    "evaluation_signal": 3,
+    "bootstrap": 4,
+    "smoke_background": 91,
+    "smoke_signal": 93
+  },
+  "seed_key": "[master,namespace,mass_MeV,toy,shape_id,level_id]; background mass/shape/level=0; shape gaussian=1 mc=2; positive level IDs=1,2,3",
+  "background_truth": "Pinned v6.2 nominal2021 GP arithmetic mean; one fixed source, Poisson counting only",
+  "background_sha256": "306a915b9ba6230aafbe058c94438c6af11f85b60d68f5aae4ebbfec4d4a9424",
+  "cohorts": "100 pilot plus 100 independent evaluation full-support spectra; each cohort reused across all masses; evaluation backgrounds reused across levels and shapes",
+  "pilot_rule": "s0(m)=arithmetic mean of 100 valid Gaussian pilot returned observed profile-Hessian yield errors; freeze once before evaluation",
+  "expected_yields": "A_expected=z*s0(m), same floating-point mean for Gaussian and MC, fixed across evaluation toy IDs",
+  "signal_generation": "Independent Poisson counts in all full-selected categories, including below/above support; no realized-count rescaling",
+  "signal_units": "Full-selected candidate yield; no support/window normalization and no physics conversion",
+  "gaussian_template": "Integrated nominal Gaussian at pole mass; CDF differences plus outside tails",
+  "mc_template": "Exact native mass histogram CDF; inherited uniform within native bins; retained selected normalization and overflow",
+  "fit_window": "pole mass +/- 2.25 sigma_nominal; fixed bin-center mask, complement training, >=3 exterior bins each side",
+  "GP": "Archived mass-dependent kernel fixed; recompute log targets and alpha from each spectrum: positive log(n),1/n; zero 0,1; conditional arithmetic mean and correlated count covariance",
+  "covariance": "Inherited first Cholesky-success loading 1e-10..1e-5 times max(maxdiag,1); retain Poisson-whitened eigenmodes >1e-8",
+  "likelihood": "Poisson means b_GP+L theta+A w; Gaussian nuisance penalty theta^2/2; signed Ahat; positive means; fixed-expected-truth nuisance profile uses same b_GP,L",
+  "uncertainty": "Independently recompute observed profile-Hessian sigma; reject unavailable curvature or Fisher substitution",
+  "acceptance": {
+    "score_lt": 3e-05,
+    "min_lambda_gt": 0,
+    "sigma_finite_positive": true,
+    "q_true_min": -2e-06
+  },
+  "retry_policy": "At most 3 attempts on same counts: origin tolerance2e-7; origin tolerance2e-9 (profile theta0); deterministic free start A/scale=.5 tolerance2e-9. If a profile is available for a failed nesting check use its expected-A point as free start. Select valid minimum objective; preserve attempts. Never regenerate/select by physics outcome.",
+  "containment": {
+    "q68": 1.0,
+    "q95": 3.841459,
+    "interpretation": "nominal signed profile-likelihood sets; valid-decision Clopper-Pearson95% intervals plus all-attempt accounting bounds"
+  },
+  "resources": {
+    "local_workers": 4,
+    "numerical_threads_per_worker": 1,
+    "wall_timeout_seconds": 1800,
+    "checkpoint_toys_per_mass": 10,
+    "remote_compute": false
+  },
+  "exclusions": [
+    "260 MeV",
+    "40 MeV",
+    "shifted windows",
+    "shape mismatch",
+    "new widths",
+    "kernel reoptimization",
+    "additional datasets",
+    "global scans"
+  ],
+  "limitations": [
+    "Conditional on one background source, fixed selected MC and archived fit prescription.",
+    "MC selection equivalence and signal-daughter association unvalidated.",
+    "Finite-MC, detector-response and source-estimation uncertainties not propagated.",
+    "100 toys per cell: coarse finite-sample precision; cells paired, not independent.",
+    "No physical-background adequacy, unconditional coverage, calibrated discovery significance or exclusion claim."
+  ],
+  "handoff_sha256": "68358b6d4a24b83ddb25617f82064c4a3fc1f5bce4b1f7772a9620a58ff94ad8"
+}

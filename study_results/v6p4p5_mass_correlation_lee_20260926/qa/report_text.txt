@@ -1,0 +1,923 @@
+HPS GPR: global probabilities with signal MC
+v6.4.5
+Global probabilities
+with the selected signal-MC windows
+2016, 2021 and their combined analysis
+26 September 2026
+Version 6.4.5
+The retained raw-statistic baseline. With the 2016 fit and GP-training exclusion set to [−2.5, +2.5]u,
+its largest observed excess statistic occurs at 91 MeV. The largest statistics for 2021 and for the combined
+analysis occur at 67 MeV. The original 1,024-scan calibration (cohort A) gives the raw-statistic global
+probabilities below. Appendices A–D add an independent comparison that calibrates local ranks before
+searching over mass. Each result uses 1,024 independent simulated experiments, and every experiment is
+searched over the entire corresponding mass grid.
+Search
+Peak [MeV]
+Exceedances
+Global p
+95% MC interval
+Global Z
+2016
+91
+67/1024
+0.066
+[0.051, 0.082]
+1.50
+2021
+67
+239/1024
+0.234
+[0.208, 0.261]
+0.73
+Combined
+67
+202/1024
+0.198
+[0.173, 0.223]
+0.85
+The 2016 local asymptotic value of 3.46σ becomes 1.50σ globally; the combined value changes from 2.83σ
+to 0.85σ. All three global values are below 2σ under this calibration.
+The quoted p is the add-one estimate (k + 1)/1025; the interval describes finite-simulation uncertainty in
+the background exceedance probability. Z = max[0, Φ−1(1 −p)] expresses the same probability in positive-
+excess Gaussian units. The probability itself is always reported, including when Z clips to zero.
+The selected models and mass searches. Define u = (mrec −c(m))/s(m) using the interpolated MC
+core center c and width s. The MC displacement is already contained in the signal template.
+Search
+Signal model and fit/training exclusion
+Mass grid [MeV]
+2016
+Neighbor MC; [−2.5, +2.5]u
+40–175, step 1
+2021
+Neighbor MC; [−4, +3]u
+60–240, step 1
+Combined
+Same MC models; retain 2015 Gaussian
+60–240, step 1
+The observations are the archived full 2015 and 2016 spectra and the archived 2021 10% spectrum. The
+combined fit uses one common signal-strength parameter. All three campaigns contribute through 100
+MeV; 2016 and 2021 contribute at 101–175 MeV; only 2021 contributes at 176–240 MeV. Consequently, the
+combined search is not an all-three-campaign search over its entire domain.
+The combined physics test. The combination uses one shared coupling at one generated mass. The
+individual-year searches are diagnostics; the combination does not choose whichever dataset gives the largest
+excess. Appendix A verifies the shared-coupling fit. The following appendices compare its raw-statistic and
+locally calibrated mass searches.
+These are conditional global probabilities for the stated grids and a fixed GP background source estimated
+from the observed spectra. They include the search over mass, but not uncertainty in that source or the
+earlier choice among windows and signal models. Those limits on interpretation are part of the result.
+1
+
+HPS GPR: global probabilities with signal MC
+v6.4.5
+Raw-statistic baseline: the repeated simulated search
+Signal shapes and normalization. The 2016 template comes from the target-constrained, FEE-smeared
+and scaled histograms h_MinvScSm_GeneralLargeBins_Final_1. The 2021 template uses the saved v16
+target-constrained MC bank. The saved local Gaussian-plus-aﬀine core fits define the centers and widths;
+the full empirical histograms define the signal shapes. Between neighboring simulated masses, the core
+centers and widths are interpolated linearly; the full histogram cumulative probabilities are aligned in u
+and mixed with the same linear weights. Bin probabilities are differences of this cumulative distribution.
+At an anchor the original selected MC distribution is recovered. Neither year is extrapolated beyond its
+adopted MC domain.
+Bin centers determine fit membership. The GP is trained on the exterior of the same interval, with no
+additional excluded region. In 2016, the actual fit bins contain 94.52–97.42% of the full selected template.
+The template is not renormalized to this interval: its tails and any probability outside the stored spectrum
+remain part of its normalization. The 2015 Gaussian and its original ±2.25σref interval are retained.
+The fitted statistic. The GP uses the training-bin counts to predict the mean background b and covariance
+in the excluded bins. In count space, write the expected fitted counts as
+λ = b + Lη + ψS,
+η ∼N(0, I),
+ψ = ϵ2/10−8.
+Here LLT is the regularized GP covariance and S is the binned full-template signal multiplied by the
+inherited campaign-specific yield conversion. The fit uses Poisson counts and the Gaussian constraint on
+η, with positive expected counts. For the combination, campaign background constraints are independent
+while ψ is common. The free fitted strength is signed. At each mass,
+r(m) = sign( bψ)
+q
+2[ℓ(0) −ℓ( bψ)],
+q0(m) = max[0, r(m)]2,
+T = max
+m∈M q0(m),
+where ℓis the nuisance-profiled negative log likelihood. The observed peak is selected by this raw statistic,
+not by a mass-dependent calibrated local probability.
+The null source. For each campaign, the archived source is the GP arithmetic-mean spectrum obtained
+from all observed bins using the saved kernel parameters at a 76 MeV reference mass. It is positive and
+has been reconstructed numerically from the frozen inputs. It is held fixed when generating independent
+Poisson counts in every bin. No latent GP function is drawn, and the source is not re-estimated between
+experiments.
+The repeated extraction. A single full-spectrum count draw per campaign and experiment is reused at
+every mass and in every applicable search. At each mass, the selected exclusion is applied, the GP mean
+and covariance are recomputed from that draw, and both the free and zero-signal nuisance profiles are fitted.
+The mass-dependent archived kernel parameters, signal templates and yield conversions remain fixed. This
+preserves correlations between neighboring mass hypotheses without treating them as independent trials.
+For k simulated maxima at least as large as the observed maximum, we report (k + 1)/(N + 1) alongside
+k/N in the data tables and an exact two-sided 95% Clopper–Pearson interval for the exceedance probability.
+The same simulations also give pointwise local tails. There is no subtraction of a null mean or rescaling of
+r before constructing the scan maximum.
+2
+
+HPS GPR: global probabilities with signal MC
+v6.4.5
+Raw-statistic baseline: local and global descriptions
+40
+60
+80
+100
+120
+140
+160
+10−4
+10−3
+10−2
+10−1
+100
+Excess probability p
+2016: full data, MC signal, ±2.5u
+40
+60
+80
+100
+120
+140
+160
+0
+1
+2
+3
+4
+Excess significance Z [σ]
+Largest observed statistic: 91 MeV
+100
+150
+200
+10−4
+10−3
+10−2
+10−1
+100
+Excess probability p
+2021: 10% data, MC signal, [−4,+3]u
+100
+150
+200
+0
+1
+2
+3
+4
+Excess significance Z [σ]
+Largest observed statistic: 67 MeV
+100
+150
+200
+Generated signal mass hypothesis [MeV]
+10−4
+10−3
+10−2
+10−1
+100
+Excess probability p
+Combined: 2015 Gaussian + 2016 and 2021 MC
+100
+150
+200
+Generated signal mass hypothesis [MeV]
+0
+1
+2
+3
+4
+Excess significance Z [σ]
+Largest observed statistic: 67 MeV
+Local asymptotic reference
+Local, calibrated with toys
+Global over the mass grid
+Figure 1. How to read the three probability descriptions. Gray is the inherited fixed-mass asymp-
+totic reference, p = Φ[−max(0, r)]. Blue compares each observed q0(m) with simulated q0 at that same
+mass. Red compares it with the largest simulated q0 anywhere in the corresponding scan. The vertical
+line marks the largest observed raw statistic; dotted boundaries in the combined row mark changes in the
+contributing campaigns. All Z values are clipped at zero for p ≥1/2; at q0 = 0, the empirical upper tail
+includes all ties and equals one.
+At the selected peak
+Asymptotic Z
+Local k/N
+Local toy p
+Local toy Z
+Global Z
+2016
+3.46
+1/1024
+0.0020
+2.89
+1.50
+2021
+2.74
+2/1024
+0.0029
+2.76
+0.73
+Combined
+2.83
+1/1024
+0.0020
+2.89
+0.85
+Blue calibrates each mass; red calibrates the largest raw statistic. Their difference is not a unique look-
+elsewhere penalty when local null distributions vary with mass: largest raw q0 need not mean smallest local
+p. Appendix B compares both searches. The selected local tails have only one or two exceedances: their
+95% probability intervals are [0.0000247, 0.00543] for 2016 and combined, and [0.000237, 0.00704] for 2021.
+Thus small differences between local asymptotic and toy values are not resolved precisely by this sample.
+3
+
+HPS GPR: global probabilities with signal MC
+v6.4.5
+Raw-statistic baseline: the largest background excess
+10−3
+10−2
+10−1
+100
+Global tail probability
+67 / 1,024 complete scans exceed the observation; p = 0.0663
+2016: full data, MC signal, ±2.5u
+10−3
+10−2
+10−1
+100
+Global tail probability
+239 / 1,024 complete scans exceed the observation; p = 0.234
+2021: 10% data, MC signal, [−4,+3]u
+0
+1
+2
+3
+4
+5
+Threshold on the largest positive likelihood root in a scan
+10−3
+10−2
+10−1
+100
+Global tail probability
+202 / 1,024 complete scans exceed the observation; p = 0.198
+Combined: 2015 Gaussian + 2016 and 2021 MC
+Figure 2. The global probabilities are measured directly. Blue shows the add-one upper tail of
+the largest positive likelihood root in each of the 1,024 complete simulated searches. The red line is the
+observed maximum, and its intersection with the blue curve gives the reported global probability. The
+finite-simulation floor is 1/1025; the curve is not extrapolated into an unmeasured tail.
+Search
+Observed peak [MeV]
+Null mean of r at that mass
+Null standard deviation
+2016
+91
++0.648
+0.957
+2021
+67
++0.093
+1.027
+Combined
+67
+-0.031
+0.968
+These pointwise moments help interpret the difference between asymptotic and simulated local probabilities.
+They are diagnostics of the chosen GP source and extraction, and are not used to recenter the statistic.
+The global calibration includes their effect automatically. Its finite-simulation interval describes uncertainty
+from the number of experiments, not uncertainty in the background model or detector response.
+4
+
+HPS GPR: global probabilities with signal MC
+v6.4.5
+Baseline scope, validation and reproducibility
+What the baseline probabilities answer.
+Under each fixed background source, how often does
+the extraction produce a largest raw excess statistic at least as large as observed on its 1 MeV
+grid?
+The combined row tests one shared coupling.
+The older across-search calculation remains in
+results/family_global.json as an archival diagnostic; it is not the combined physics test.
+These
+probabilities do not include the earlier choice among 2016 windows, signal templates or background
+constructions. The appendix evaluates a second, explicitly defined mass-search statistic.
+Because the null source was estimated from the same observed spectra, this study conditions on that
+estimate. It does not propagate uncertainty in the source or demonstrate that any real signal would be
+excluded from its construction. The result is also restricted to the finite mass grid; a continuously optimized
+mass search would require its own calibration. The 2021 input remains the 10% data sample, without an
+extrapolation to full luminosity. These calculations therefore do not establish an unconditional physical
+discovery significance.
+Relation to the preceding studies. The neighboring-template construction, archived spectra, kernel
+settings and common-strength likelihood are inherited from the v6.3.n and v6.4.n studies. The retained
+baseline selected ±2.5u for 2016 and recomputed the observed scans and their null calibration. This revision
+preserves those results and adds 1,024 independent validation scans. The previous ±3.5u extraction and
+±2u appendix remain preserved. Their upper limits retain those earlier windows; no previous upper-limit
+curve is relabeled as a ±2.5u result. This note reports significance rather than a new limit calibration.
+Validation of the retained baseline. All 169 frozen input files are verified by SHA-256. The saved
+arrays contain 1,024 complete experiments at all 136 2016 masses and all 181 masses in each of the 2021
+and combined searches, with no failed or discarded fit rows. This corresponds to 443,392 distinct pairs of
+free and zero-signal profile fits; the combined result above 175 MeV reuses the identical 2021 fit. Maximum
+score residual was 2.00×10−7 and the smallest fitted expected bin count was 120.10. Every expected count
+was positive.
+Validation regenerated every campaign draw from its seed, checked the complete mass arrays against their
+checkpoints, verified the fit/exclusion masks and full-template normalization, reconstructed all three null
+sources, and independently replayed 60 saved toy profiles at eight representative masses. All 181 observed
+2021 likelihood roots reproduce the preceding MC extraction to within 4.14 × 10−10. The original scan
+maxima, exceedance counts and confidence intervals were recomputed from the saved arrays; their numerical
+records remain unchanged. Previously delivered reports were preserved.
+Files needed to reproduce or inspect the result. The accompanying source package contains the
+inputs, protocol hashes, executable scripts, complete toy scan arrays, per-mass checkpoints, figure data
+and this LaTeX source. README.md gives the bounded two-worker rebuild command. The numerical tables
+are results/global_summary.csv and results/local_global_curves.csv; results/toy_maxima.csv
+records every simulated maximum. qa/global_validation.json records the numerical checks. The check-
+point signature pins the sample count, random seed, inputs and extraction code, so a resumed run cannot
+silently mix different analyses.
+Baseline precision. Its fixed sample size was chosen before calibration. The add-one tail has resolution
+1/1025; 1,024 experiments cannot establish an extremely small tail probability. Zero exceedances, if en-
+countered, would give a finite upper bound and never zero probability or infinite significance. No additional
+simulations were selected according to the observed calibration tail.
+5
+
+HPS GPR: global probabilities with signal MC
+v6.4.5
+Appendix A. One shared coupling, then a search over mass
+The combination tests one signal hypothesis. At each common generated mass m, campaign y has
+its own selected template fyi(m) and fixed conversion Ky(m), but every campaign uses the same signal
+strength ψ = ϵ2/10−8:
+λyi = byi + (Lyηy)i + ψKy(m)fyi(m),
+L(ψ, {ηy}; m) =
+Y
+y
+Ly(ψ, ηy; m).
+The nuisance vectors are separate. The joint alternative has one common ψ and the joint null fixes that
+same parameter to zero. Searching over mass changes m for the complete joint fit. It does not select a
+campaign or add its independently maximized excess statistics. The inherited ee-yield normalization and
+historical display conversion above the dimuon threshold are unchanged; this audit verifies the common
+parameter, not a new physical normalization.
+An independent factorization audit checks the joint profile against the sum of campaign profiles evaluated
+at the same ψ.
+Across 24 profile points at six masses, the largest negative-log-likelihood difference is
+6.26 × 10−13. The table illustrates why independent campaign maxima would define a different test.
+Mass [MeV]
+Joint bψ
+Joint q0
+Sum of individual q0
+67
+643.5
+7.993
+11.208
+68
+615.1
+7.722
+8.005
+91
+92.2
+0.360
+18.106
+At 91 MeV, the individual campaigns prefer different signal strengths, including a negative 2021 fit. The
+common-strength result is q0 = 0.360, while adding the individual excess statistics would give 18.106. The
+latter is not the statistic used anywhere in the combined scan. Campaign support remains the same as on
+page 1.
+Calibrate local behavior before ranking masses. The retained baseline searches for the largest raw
+q0. The new comparison first uses cohort A, the original 1,024 null scans, to freeze a local upper-tail map
+at every mass:
+pA,m(q) = 1 + #{a ∈A : qa(m) ≥q}
+1025
+,
+S = min
+m∈M pA,m
+ q(m)
+.
+Smaller S is more extreme. The same frozen map is applied to the observations and 1,024 fresh cohort-B
+scans. Those scans use identical sources and extraction settings, with a disjoint random-number namespace.
+The global count includes SB ≤Sobs, including ties; its add-one probability is (kB + 1)/1025.
+A fixes the maps and the effective-trials approximation described in Appendix C. B neither updates those
+maps nor tunes that approximation. Each whole campaign draw is reused across masses and applicable
+searches, preserving their correlations. Both mass-search statistics still use the common-coupling likelihood
+above; only their ordering of mass hypotheses differs.
+6
+
+HPS GPR: global probabilities with signal MC
+v6.4.5
+Appendix B. Compare the two global calibrations
+40
+60
+80
+100
+120
+140
+160
+10−1
+100
+2016
+Global p
+Probability after accounting for the mass search
+40
+60
+80
+100
+120
+140
+160
+0.0
+0.5
+1.0
+1.5
+Global Z
+The same probabilities in Gaussian units
+100
+150
+200
+100
+2021
+Global p
+100
+150
+200
+0.00
+0.25
+0.50
+0.75
+1.00
+Global Z
+100
+150
+200
+Generated signal mass [MeV]
+10−1
+100
+Combined
+Global p
+100
+150
+200
+Generated signal mass [MeV]
+0.0
+0.5
+1.0
+1.5
+Global Z
+Two search statistics, two distinct Sidak references
+Raw-statistic maximum: pooled 2,048
+Local-first minimum: independent B, 1,024
+Sidak: constant effective count from A
+Sidak: independent mass-grid reference
+Figure 3. How to read the figure. Gray compares each observed raw q0(m) with raw maxima from the pooled
+2,048 scans. Red compares its frozen A local rank with the minimum local rank in independent B scans; the red band
+is a pointwise 95% interval conditional on A. Gold is the frozen effective-count Sidak approximation. Purple is the
+independent-mass-grid Sidak reference. The right column expresses the same probabilities as Z = max[0, Φ−1(1 −p)].
+Red vertical lines mark the smallest observed local rank; dotted combined boundaries mark campaign changes. Gray
+and red calibrate different orderings, so neither is a correction factor for the other.
+Search
+Peaks: raw/local Raw pooled p
+B count Local-first p
+B 95% interval
+Z
+2016
+91 / 91
+0.065
+89/1024
+0.088
+[0.070, 0.106]
+1.35
+2021
+67 / 67
+0.232 231/1024
+0.226
+[0.200, 0.252]
+0.75
+Combined
+67 / 68
+0.191
+75/1024
+0.074
+[0.058, 0.091]
+1.45
+The raw and local-first peaks are each selected using their own declared statistic. For the combined analysis,
+the raw maximum is at 67 MeV and the smallest calibrated local rank is at 68 MeV. The two procedures
+ask related but different null-tail questions when the local distributions vary with mass. Their probabilities
+should be compared as complete procedures rather than choosing whichever reports the smaller value.
+All probabilities remain conditional on the fixed GP source and selected extraction. The B interval accounts
+for its finite number of experiments, holding the A calibration map fixed. It does not include uncertainty
+in the map, source, signal template or earlier analysis choices. The two Sidak curves are approximations
+whose independent check appears next.
+7
+
+HPS GPR: global probabilities with signal MC
+v6.4.5
+Appendix C. Two Sidak references with different assumptions
+10−3
+10−2
+10−1
+10−1
+100
+2016
+G(alpha)
+Direct B calibration and frozen references
+10−3
+10−2
+10−1
+0
+50
+100
+Effective trial count
+Descriptive re-expression of B; not another fit
+10−3
+10−2
+10−1
+10−1
+100
+2021
+G(alpha)
+10−3
+10−2
+10−1
+0
+50
+100
+150
+Effective trial count
+10−3
+10−2
+10−1
+Local-rank threshold alpha
+10−1
+100
+Combined
+G(alpha)
+10−3
+10−2
+10−1
+Local-rank threshold alpha
+0
+50
+100
+150
+Effective trial count
+Test the frozen approximation across local thresholds
+Independent B; pointwise 95% interval
+Constant effective count learned from A
+Independent mass-grid reference
+Observed smallest local rank
+Figure 4. How to read the figure. Left: direct B probabilities GB(α) = Pr(SB ≤α) and both Sidak references.
+Right: log[1 −GB(α)]/ log(1 −α) re-expresses B, with transformed pointwise intervals; it is not another fit. Gold
+shading marks the A fit range; black lines mark observed local minima.
+Infinite interval endpoints are omitted.
+Neither reference resolves probabilities below the A-map floor.
+For independent uniform local probabilities, G(α) = 1 −(1 −α)N. Purple uses the grid size; gold fixes Neﬀ
+from A alone. A’s self-inclusive ranks #{qA ≥qi}/1024 equal add-one leave-one-out ranks. Their minima
+are dependent and use different maps from B’s full frozen map.
+The A-only fit uses equal-weight, zero-intercept least squares of log(1−GA) versus log(1−α) at 0.005, 0.01,
+0.02, 0.03 and 0.05. All five thresholds were fixed before B.
+Search
+Grid N
+A-fit Neﬀ
+Gold p
+Purple p
+Direct B p
+2016
+136
+35.81
+0.068
+0.233
+0.088
+2021
+181
+56.45
+0.152
+0.412
+0.226
+Combined
+181
+57.55
+0.055
+0.162
+0.074
+The last three columns use the observed local minima. All gold predictions fall below their direct B 95%
+intervals: the constant count understates the global probability here. These are pointwise comparisons,
+not a simultaneous curve test. These minima are below the fit range, making gold an extrapolation. B’s
+ranks need not be uniform conditional on A; the fitted count describes this estimated-map procedure, not
+independent windows. The direct B tail is the calibrated global result.
+8
+
+HPS GPR: global probabilities with signal MC
+v6.4.5
+Appendix D. Finite calibration, retained results and references
+What the old “largest selected result” meant.
+That optional diagnostic used Tfamily = max(T2016, T2021, Tcombined), where each T already maximizes over
+mass. It asked whether any of three displayed searches looked unusual. It neither defines the joint likelihood
+nor answers the shared-coupling question. It is archived only. The individual-statistic sum in Appendix A
+illustrates another different test; neither construction is used for the combined result.
+The raw-statistic comparison gains an independent cohort. Because the raw maximum does not
+depend on a fitted local map, its A and B maxima can be pooled. The table compares the original and
+fresh cohorts at each raw observed peak. The pooled probability uses 2,048 experiments and denominator
+2,049; no B experiment is reused to train a local map.
+Search
+Mass
+A count
+A p
+B count
+B p
+Pooled p
+2016
+91
+67/1024
+0.066
+66/1024
+0.065
+0.065
+2021
+67 239/1024
+0.234
+236/1024
+0.231
+0.232
+Combined
+67 202/1024
+0.198
+189/1024
+0.185
+0.191
+The local-map floor is part of the result. A’s smallest possible local rank is 1/1025. The combined
+observed minimum at 68 MeV attains this floor: no A statistic at that mass reaches the observed one. This
+does not resolve a zero tail probability or quantify how far beyond A’s largest statistic the observation lies.
+Every B scan reaching the same minimum rank is counted as a tie in the global tail. The direct B result is
+still defined, but the finite map cannot distinguish more extreme local observations within that last rank
+category.
+The local-first calibration uses only B’s 1,024 minima. A’s leave-one-out minima are not pooled with them
+because they use different training maps. Reported intervals are exact two-sided 95% Clopper–Pearson
+intervals for the respective exceedance probabilities. At an observed-selected local mass, A’s pointwise
+interval is not a simultaneous confidence statement across the scan. Threshold-derived effective counts in
+Appendix C are descriptive ratios; they are neither additional significance measurements nor independent
+confirmation of the fitted constant.
+Scope and reproducibility.
+Both procedures calibrate the specified 1 MeV mass grids under the
+fixed archived sources. They do not include the earlier selection of the 2016 window, uncertainty in the
+source estimated from data, or a continuous mass optimization. No new upper-limit calibration is per-
+formed. The five-page baseline and its numerical ledgers are retained, including the older across-search
+diagnostic, but the combined physics result always means one common coupling.
+The new tables are
+calibrated_summary.csv, calibrated_curves.csv, threshold_comparison.csv and sidak_fit.json
+in results/; protocol records fix the independent cohorts and the A-only fit.
+Statistical context. Cowan’s discussion explains the distinction between pointwise and search-wide prob-
+abilities and the independent-test reference. Gross and Vitells give an asymptotic upcrossing approximation
+for a search statistic; this appendix uses direct simulated scans and does not implement that approximation.
+Algeri and collaborators compare look-elsewhere procedures and their finite-sample behavior. These sources
+motivate separating a defined search calibration from a convenient trial-count approximation:
+G. Cowan, The Look Elsewhere Effect, ODSL Journal Club, 25 June 2021, especially slides 4–12.
+E. Gross and O. Vitells, Trial factors for the look elsewhere effect in high energy physics, Eur. Phys. J. C 70 (2010)
+525–530.
+S. Algeri, D. A. van Dyk, J. Conrad and B. Anderson, On methods for correcting for the look-elsewhere effect in
+searches for new physics, JINST 11 (2016) P12010.
+9
+
+HPS GPR: global probabilities with signal MC
+v6.4.5
+Appendix E. Mass resolution, correlations and the global penalty
+E.1. Nearby mass hypotheses are correlated. The same fluctuation can produce an excess at several
+nearby masses because their signal templates overlap. Every saved toy uses one full spectrum per campaign
+across the complete mass grid. The selected MC shapes, moving fit windows and GP sidebands therefore
+generate the correlations in the repeated search automatically. This appendix measures those correlations
+and verifies their role in the existing global result; it adds no new fit or simulation.
+50
+100
+150
+Mass [MeV]
+50
+75
+100
+125
+150
+175
+Mass [MeV]
+2016
+100
+150
+200
+Mass [MeV]
+100
+150
+200
+2021
+100
+150
+200
+Mass [MeV]
+100
+150
+200
+Combined
+−1.0
+−0.5
+0.0
+0.5
+1.0
+Signed-root correlation
+0
+1
+2
+3
+4
+5
+6
+Center separation / RMS core width
+−1.0
+−0.5
+0.0
+0.5
+1.0
+Signed-root correlation
+2016
+0
+1
+2
+3
+4
+5
+6
+Center separation / RMS core width
+−1.0
+−0.5
+0.0
+0.5
+1.0
+2021
+A median; gray = pair spread
+B median
+Gaussian overlap reference
+Figure 5. Correlations measured from complete toy scans. Top: Pearson correlations of the signed likelihood
+roots across the original 1,024 A scans. Combined boundaries at 100.5 and 175.5 MeV mark changes in available
+campaigns. Bottom: mass pairs grouped by d = |c(mi) −c(mj)|/
+p
+[s(mi)2 + s(mj)2]/2. Red and blue are median A
+and independent-B correlations. Gray shows the central 68% spread across pairs, not a confidence band. The dotted
+curve is normalized Gaussian-template overlap with flat independent noise; it omits GP fitting, window changes and
+MC tails.
+Adjacent 1 MeV hypotheses have median A correlations of 0.958 for 2016, 0.944 for 2021 and 0.946 for
+the joint search. B reproduces them as 0.957, 0.944 and 0.944. Their strong dependence is measured,
+not inferred by counting resolution widths. Centering and standardizing the roots here only computes
+correlation coeﬀicients; it does not redefine the local test statistic.
+Correlations become negative a few core widths apart, unlike the positive Gaussian-overlap reference. The
+complete extraction includes background fitting, moving windows and template changes, which a resolution
+count cannot summarize. The joint matrix uses the same common-coupling fits as Appendix A.
+10
+
+HPS GPR: global probabilities with signal MC
+v6.4.5
+Appendix E, continued: calibrate the complete correlated search
+E.2.
+Count complete searches, not separate mass points. Keep the A-derived local map from
+Appendix A and apply it unchanged to each independent B scan. For an observed local threshold α, the
+global event is
+min
+m pA,m(qb(m)) ≤α,
+bpglobal(α) = 1 + P1024
+b=1 1[minm pA,m(qb(m)) ≤α]
+1025
+.
+One scan counts once even if the fluctuation crosses the threshold at several neighboring masses. This
+directly incorporates the dependence in Figure 5, including effects extending beyond the nominal mass
+resolution. At the observed minima it reproduces Appendix B exactly:
+Search
+Mass [MeV]
+B count Global p
+95% interval
+Z
+Independent control
+2016
+91
+89/1024
+0.088
+[0.070, 0.106]
+1.35
+0.174
+2021
+67 231/1024
+0.226 [0.200, 0.252]
+0.75
+0.418
+Combined
+68
+75/1024
+0.074
+[0.058, 0.091]
+1.45
+0.133
+10−3
+10−2
+10−1
+Local-rank threshold
+10−1
+100
+Global tail probability
+2016
+10−3
+10−2
+10−1
+Local-rank threshold
+2021
+10−3
+10−2
+10−1
+Local-rank threshold
+Combined
+Complete B scans; 95% interval
+Independent-mass control
+Resolution count: Sidak
+Resolution count: linear
+Figure 6. Keeping and breaking the mass correlations. Red is the complete-B tail and its pointwise 95%
+interval, conditional on A and the fixed null source. Blue keeps the empirical local distributions but independently
+resamples toy identities at each mass. Green and orange use the MC-resolution count defined on the next page in
+the Sidak and linear prescriptions. Black vertical lines mark the observed thresholds. No single-campaign resolution
+count is assigned to the joint fit.
+The control isolates dependence. With bFB,m(α) the fraction of B ranks at mass m below or equal to
+α, independently resampling each column gives
+pindependent control(α) = 1 −
+Y
+m
+[1 −bFB,m(α)].
+This product is evaluated exactly from the empirical marginals. It is a finite-sample counterfactual, not a
+new global calibration, and it does not assume that those marginals are uniform. At the selected thresholds,
+breaking the correlations increases the probability from 0.088 to 0.174 for 2016, from 0.226 to 0.418 for
+2021 and from 0.074 to 0.133 for the combination. The complete-toy result already includes the reduction
+caused by correlations; multiplying it by another resolution-based penalty would count the search twice.
+11
+
+HPS GPR: global probabilities with signal MC
+v6.4.5
+Appendix E, continued: test the resolution-count approximation
+E.3. What HPS used, and what the current toys support. The 2016 HPS paper and internal note
+use a linear approximation, pglobal ≃Nregplocal, with Nreg ≃W/σave ≃30. This is Bonferroni-like; it is also
+the first-order expansion of Sidak when the total tail is small. The full Sidak expression is 1−(1−plocal)Nreg.
+Using an estimated number of resolution regions does not itself provide the guarantee of Bonferroni over
+an actual list of tests. The 2015 HPS analysis instead obtained the global mapping from 4,000 complete
+simulated mass scans.
+Sources: 2016 HPS paper, p.16; local 2016 internal note, Sec.6.1.2, p.44. 2015 HPS paper, p.4; local 2015 internal
+note, Sec.5.3, pp.33–34.
+Apply the historical resolution prescription to this study’s MC core widths without fitting it to the toys:
+W = mmax −mmin,
+¯s = 1
+W
+Z mmax
+mmin
+s(m) dm,
+Nres = W/¯s.
+The integral uses trapezoids on the stored 1 MeV grid: W = 135 MeV for 2016 and 180 MeV for 2021. The
+legacy-count column repeats the same calculation with the inherited Gaussian resolution, solely to connect
+to the earlier prescription. The two probability columns both use the MC count and the observed calibrated
+local rank.
+Search
+¯s [MeV] MC Nres
+Legacy count Linear p
+Sidak p
+Direct B p
+2016
+4.333
+31.16
+29.33
+0.061
+0.059
+0.088
+2021
+2.767
+65.06
+47.29
+0.190
+0.174
+0.226
+Both resolution-count predictions fall below the direct B 95% interval at each observed single-year threshold.
+These are pointwise comparisons, not a simultaneous goodness-of-fit test.
+Resolution overlap explains
+why mass points are dependent, but W/¯s understates the penalty here.
+The common-coupling search
+has campaign-dependent shapes, sensitivities and support; its complete-toy calibration needs no invented
+average resolution.
+A Sidak-equivalent description can retain the measured penalty. If desired, rewrite the direct B
+result at each threshold as
+Neq(α) = log[1 −bpglobal(α)]
+log(1 −α)
+.
+Search
+Observed α
+Toy-equivalent Neq
+Transformed 95% interval
+2016
+2/1025
+47.1
+[37.4, 57.3]
+2021
+3/1025
+87.6
+[76.3, 99.3]
+Combined
+1/1025
+78.9
+[61.3, 97.7]
+Inserting this threshold-dependent value into Sidak returns the same toy probability by construction. It is
+not a universal independent-trial count, a new fitted approximation, or an independent check. The direct
+complete-scan probability remains the result.
+Scope and reproducibility. The unchanged 2016 ±2.5u and 2021 [−4, +3]u windows, 2015 Gaussian,
+and single shared coupling are retained. Templates and resolutions are fixed. The B intervals exclude A-
+map uncertainty, source-estimation uncertainty, earlier analysis choices and a continuous mass optimization.
+The combined local minimum remains at the 1/1025 calibration floor; all tied B minima are included. This
+appendix recomputes all 509,952 B local ranks from the stored A/B arrays and verifies the original global
+counts. Rebuild commands, frozen input hashes and all plotted numbers accompany the report. No parent
+study is modified.
+12

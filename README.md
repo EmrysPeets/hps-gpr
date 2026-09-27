@@ -1,5 +1,7 @@
 # HPS GPR Analysis Package
 
+**Recent studies and presentation material:** [study index](docs/STUDY_INDEX.md) · [13-27 September plot logbook](docs/study_logbook_20260927/README.md) · [PDF plotbook](output/pdf/study_logbook_20260927/HPS_GPR_Recent_Studies_Plot_Logbook.pdf). The logbook documents the version 6 studies, recent calibration/response work, and saved presentation revisions with source-linked findings and reusable plots.
+
 A Python package for performing Gaussian Process Regression (GPR) based bump hunt analyses for dark photon searches in the Heavy Photon Search (HPS) experiment.
 
 ## Overview

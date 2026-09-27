@@ -1,0 +1,1148 @@
+HPS Gaussian-Process Resonance Search
+v5.9 / Signal-tail study
+HPS Gaussian-Process Resonance Search
+Signal-tail study v5.9
+Gaussian cores with broader tails
+Emrys Peets
+Stanford University and SLAC National Accelerator Laboratory
+21 September 2026
+Standalone study following Analysis Note v5.0.5
+Abstract
+This study tests symmetric signal shapes with a Gaussian core inside the primary ±2.25σm
+blind window and broader tails outside it. The tail scale is increased by 10, 20 and 30% in
+two speciﬁed shape families. Observed 90% CLs limits and ﬁxed-mass, one-sided asymptotic
+background-only probabilities are evaluated for full 2015 over 19–100 MeV, full 2016 over 39–
+180 MeV, and the released 2021 10% sample over 50–250 MeV. Each family is compared with a
+Gaussian under the same background and window prescription. The primary calculation retains
+the v5.0.5 window; a separate ±4.5σm calculation tests the information carried by the outer
+structure. Detector resolution, prompt-density normalization and archived kernel coordinates
+are held ﬁxed. The results retain primary-window maxima at 51, 90 and 78 MeV, respectively.
+The smooth-dilation alternatives increase the median primary limits by approximately 0.168,
+0.345 and 0.529%, with nearly unchanged local probabilities. These are declared signal-shape
+scenarios, conditional on the stated choices. They do not provide coverage calibration or a new
+global discovery probability.
+1
+Observed comparisons and scope
+The requested tail changes are implemented outside a ﬁxed Gaussian core. They are changes in
+a tail-scale parameter, rather than a 10–30% increase in the detector resolution or in the total
+number of signal events. Each template is normalized to unit yield over the inherited support, and
+the ﬁtted amplitude denotes that full-template yield.
+There are seven shapes in each window: one Gaussian, three smooth tail dilations and three
+tail-curvature variations. The three datasets are analyzed separately. No dataset combination or
+choice among scenarios is used to strengthen an observed limit or signiﬁcance. The complete mass-
+by-mass results accompany the note; the peak tables identify the smallest local probability within
+each stated scan, without assigning a probability to the selection of that minimum.
+1
+
+
+HPS Gaussian-Process Resonance Search
+v5.9 / Signal-tail study
+1.1
+The primary-window results
+Table 1 records the strongest local excess for every primary-window scenario. The Gaussian row
+is freshly computed with the same portable ﬁtting machinery used for all alternatives. For each
+alternative, the coupling and yield limits refer to its own full-template normalization, while the
+local probability tests whether a positive signal component improves the ﬁt at that mass.
+The primary-window local maxima remain at 51 MeV (2015), 90 MeV (2016), and 78 MeV (2021
+10%) for all six altered shapes. For the primary dilation model, the median observed limit increases
+by approximately 0.168%, 0.345%, and 0.529% for 10%, 20%, and 30% broader tails. These small
+shifts follow the change in core probability; they are not 10–30% changes in the full-template
+resolution.
+In the guard window, the 30% dilation changes observed limits by −0.048 to +2.068% in 2015,
++0.245 to +2.056% in 2016, and +0.279 to +1.543% in 2021.
+The largest absolute changes in
+the signed local root are 0.0377, 0.0280, and 0.0177, respectively. The guard-window Gaussian
+maximum in 2015 is already at 93 MeV, rather than 51 MeV. That movement is a consequence of
+the wider background interpolation and ﬁtted region; it cannot be attributed to the tail variation.
+The primary search is complete over all declared mass intervals. The guard search omits 2016
+masses 176–180 MeV because fewer than three upper exterior bins remain.
+Dataset
+Shape
+m0 (MeV)
+Z0
+Local p0
+ε2
+90
+2015
+Gaussian
+51
+3.13924
+8.469 × 10−4
+2.640 × 10−5
+2015
+Dilation +10%
+51
+3.13925
+8.469 × 10−4
+2.644 × 10−5
+2015
+Dilation +20%
+51
+3.13926
+8.469 × 10−4
+2.649 × 10−5
+2015
+Dilation +30%
+51
+3.13927
+8.469 × 10−4
+2.654 × 10−5
+2015
+Curvature +10%
+51
+3.13924
+8.469 × 10−4
+2.641 × 10−5
+2015
+Curvature +20%
+51
+3.13924
+8.469 × 10−4
+2.642 × 10−5
+2015
+Curvature +30%
+51
+3.13924
+8.469 × 10−4
+2.643 × 10−5
+2016
+Gaussian
+90
+3.42475
+3.077 × 10−4
+1.313 × 10−5
+2016
+Dilation +10%
+90
+3.42475
+3.077 × 10−4
+1.316 × 10−5
+2016
+Dilation +20%
+90
+3.42475
+3.077 × 10−4
+1.318 × 10−5
+2016
+Dilation +30%
+90
+3.42475
+3.077 × 10−4
+1.320 × 10−5
+2016
+Curvature +10%
+90
+3.42475
+3.077 × 10−4
+1.314 × 10−5
+2016
+Curvature +20%
+90
+3.42475
+3.077 × 10−4
+1.315 × 10−5
+2016
+Curvature +30%
+90
+3.42475
+3.077 × 10−4
+1.315 × 10−5
+2021
+Gaussian
+78
+2.80864
+2.488 × 10−3
+6.330 × 10−6
+2021
+Dilation +10%
+78
+2.80864
+2.488 × 10−3
+6.341 × 10−6
+2021
+Dilation +20%
+78
+2.80864
+2.488 × 10−3
+6.352 × 10−6
+2021
+Dilation +30%
+78
+2.80864
+2.488 × 10−3
+6.363 × 10−6
+2021
+Curvature +10%
+78
+2.80864
+2.488 × 10−3
+6.333 × 10−6
+2021
+Curvature +20%
+78
+2.80864
+2.488 × 10−3
+6.336 × 10−6
+2021
+Curvature +30%
+78
+2.80864
+2.488 × 10−3
+6.338 × 10−6
+Table 1: Primary-window scan minima and corresponding observed limits. Every probability is
+local, with the mass and shape ﬁxed. A scan minimum does not include a mass or scenario trials
+correction.
+2
+
+
+HPS Gaussian-Process Resonance Search
+v5.9 / Signal-tail study
+2
+Signal shapes and normalization
+Let z = |m −m0|/σm, a = 2.25 and t = z −a. The nominal resolution σm = σm(m0) is inherited
+from v5.0.5. All shapes have the unnormalized core
+f(z) = exp(−z2/2),
+0 ≤z ≤a.
+(1)
+For z > a, the primary family stretches the tail coordinate smoothly:
+uk(z) = a +
+t
+1 + (k −1)[1 −exp(−t/h)],
+h = 0.5,
+(2)
+fdil,k(z) = exp[−uk(z)2/2],
+k ∈{1.1, 1.2, 1.3}.
+(3)
+The coordinate and ﬁrst derivative match the Gaussian at z = a; far into the tail, the distance
+from the boundary is stretched by k. The secondary family instead changes the tail curvature:
+fcurv,k(z) = exp
+"
+−a2
+2 −at −t2
+2k2
+#
+,
+z > a.
+(4)
+It also matches the core value and slope at the boundary. The two families test diﬀerent continua-
+tions of the same core; their common k does not imply equal tail fractions or equal root-mean-square
+widths. Both reduce exactly to the Gaussian at k = 1.
+−6
+−4
+−2
+0
+2
+4
+6
+(mee −m0)/σm
+10−6
+10−5
+10−4
+10−3
+10−2
+10−1
+Unit-normalized density
+Gaussian
+Tails +10%
+Tails +20%
+Tails +30%
+Curvature +30%
+−4
+−2
+0
+2
+4
+(mee −m0)/σm
+1.0
+1.5
+2.0
+2.5
+3.0
+3.5
+4.0
+Density / Gaussian
+Figure 1: Smooth-dilation signal shapes and the 30% curvature control in units of the nominal mass
+resolution. The left panel shows full-line-normalized densities and the right shows their ratios to
+the Gaussian. Changes to the unnormalized shape begin at the primary blind-window boundary.
+Core-only bins diﬀer solely by normalization, leaving their unrestricted likelihood ratio and
+p0 invariant. The actual center-selected bins can straddle ±2.25σm; their integrated tails break
+this proportionality and can produce small primary-probability changes. The guard calculation
+explicitly tests outer bins.
+3
+
+
+HPS Gaussian-Process Resonance Search
+v5.9 / Signal-tail study
+2.1
+Bin integration and the full-template yield
+For support Dd and analysis bin Bi in dataset d, the template probability is
+T (s)
+di (m0) =
+Z
+Bi
+fs(|m −m0|/σm) dm
+Z
+Dd
+fs(|m −m0|/σm) dm
+,
+X
+i∈Dd
+T (s)
+di = 1.
+(5)
+The integrated bin probabilities are retained when a ﬁt window is selected. They are never renor-
+malized inside that window. If Fd,s,W = P
+i∈W T (s)
+di , the ﬁtted-window yield at the upper limit
+is A90Fd,s,W , while A90 itself denotes the full-template yield. The normalization in Eq. (5) also
+accounts for the ﬁnite support near its endpoints.
+Shape
+Tail (%)
+RMS/σm
+Core UL ratio
+Beyond guard
+Gaussian
+2.4449
+1.00000
+1.000000
+6.795 × 10−6
+Dilation +10%
+2.6084
+1.00735
+1.001679
+1.902 × 10−5
+Dilation +20%
+2.7798
+1.01538
+1.003445
+4.387 × 10−5
+Dilation +30%
+2.9583
+1.02406
+1.005290
+8.773 × 10−5
+Curvature +10%
+2.4926
+1.00225
+1.000490
+1.154 × 10−5
+Curvature +20%
+2.5320
+1.00416
+1.000894
+1.739 × 10−5
+Curvature +30%
+2.5649
+1.00578
+1.001231
+2.403 × 10−5
+Table 2: Numerical shape properties for the declared tail prescriptions, evaluated on the full line.
+The core upper-limit ratio is the ideal proportional-core normalization ratio. Actual ﬁtted templates
+use the ﬁnite support in Eq. (5).
+The prompt-density normalization uses the same nominal resolution for every shape:
+ρd(m0) =
+1
+3.28σm
+Z m0+1.64σm
+m0−1.64σm
+dNd
+dm dm,
+Kd(m0) =
+3πm0feﬀ
+rad,d
+2α
+ρd(m0).
+(6)
+The integral uses fractional overlaps with the native histogram bins. The electron-channel coupling
+coordinate satisﬁes A = Kdε2. Holding Kd ﬁxed isolates the speciﬁed shape change; this study
+does not infer a new eﬃciency or acceptance from the broader tails.
+Above the dimuon threshold, the inherited minimal-visible coupling correction is applied once:
+(ε2
+90)minimal = A90
+Kd
+cµ(m0),
+cµ(m0) =
+(
+1,
+m0 ≤2mµ,
+1 + p1 −4rµ(1 + 2rµ),
+m0 > 2mµ,
+rµ = (mµ/m0)2.
+(7)
+This conversion changes neither the visible signal-yield limit nor p0. In the numerical ledger, A90
+is the solver coordinate ε2/(10−8), whereas full_yield_90 is the event yield denoted A90 in this
+note; derived/COLUMN_GUIDE.md deﬁnes the columns and conversions.
+4
+
+
+HPS Gaussian-Process Resonance Search
+v5.9 / Signal-tail study
+3
+Primary-window observed scans
+3.1
+Full 2015: 19–100 MeV
+The 2015 scan retains the 14–135 MeV support and 0.25 MeV analysis bins. The 91–100 MeV
+extension follows the v5.0.5 endpoint prescription: kernel coordinates are ﬁxed at their archived
+90 MeV values, while the resolution, mask, template and density are evaluated at the actual mass.
+The extrapolated interval keeps its conditional status.
+10−5
+10−4
+Observed 90% CLs limit on ε2
+Full 2015: primary ±2.25σm window
+Gaussian
+Tails +10%
+Tails +20%
+Tails +30%
+0.0
+0.2
+0.4
+Limit change (%)
+10−3
+10−2
+10−1
+Local p0
+20
+30
+40
+50
+60
+70
+80
+90
+100
+Test mass m0 (MeV)
+0
+1
+2
+3
+Local Z0
+Figure 2: Observed 2015 primary-window Gaussian and smooth-dilation scenarios. The coupling
+conversion refers to the complete normalized template; the likelihood uses the selected ±2.25σm bins.
+Limits are pointwise asymptotic 90% CLs limits and probabilities are ﬁxed-mass local references.
+5
+
+
+HPS Gaussian-Process Resonance Search
+v5.9 / Signal-tail study
+3.2
+Full 2016: 39–180 MeV
+The 2016 scan uses the frozen 30–210 MeV support and 0.25 MeV analysis bins. Every shape at
+a mass uses the same archived kernel coordinates and the same background constraint for this
+window. Thus the within-window comparison changes the signal template without selecting a new
+background ﬁt from the resulting limit or probability.
+The v5.0.5 note documents diﬀerences in independent 2016 hyperparameter ﬁts. Reusing its
+archived states makes this calculation reproducible under that prescription; it does not settle the
+separate ﬁt-provenance or background-calibration questions.
+10−5
+Observed 90% CLs limit on ε2
+Full 2016: primary ±2.25σm window
+Gaussian
+Tails +10%
+Tails +20%
+Tails +30%
+0.0
+0.2
+0.4
+Limit change (%)
+10−3
+10−2
+10−1
+Local p0
+40
+60
+80
+100
+120
+140
+160
+180
+Test mass m0 (MeV)
+0
+1
+2
+3
+Local Z0
+Figure 3: Observed 2016 primary-window Gaussian and smooth-dilation results. The same frozen-
+state qualiﬁcation applies to the Gaussian and every tail alternative. Probability diﬀerences should
+be interpreted together with the small boundary-bin contributions and the explicitly broader cal-
+culation below.
+6
+
+
+HPS Gaussian-Process Resonance Search
+v5.9 / Signal-tail study
+3.3
+Released 2021 10%: 50–250 MeV
+The 2021 scan uses the native 10% sample with the inherited 36–300 MeV support prescription.
+Rebinning leaves the ﬁnal complete analysis-bin edge at 299.75 MeV; the analysis-bin width is
+0.625 MeV. The larger bin width makes the distinction between a continuous mask boundary and
+a full selected bin particularly relevant to the core-only comparison.
+10−6
+10−5
+Observed 90% CLs limit on ε2
+2021 (10%): primary ±2.25σm window
+Gaussian
+Tails +10%
+Tails +20%
+Tails +30%
+0.0
+0.2
+0.4
+Limit change (%)
+10−2
+10−1
+Local p0
+50
+75
+100
+125
+150
+175
+200
+225
+250
+Test mass m0 (MeV)
+0
+1
+2
+3
+Local Z0
+Figure 4: Observed 2021 10% primary-window Gaussian and smooth-dilation results. Above 2mµ,
+the plotted coupling includes the inherited branching correction once. Neither the visible yield nor
+the local probability receives this correction.
+7
+
+
+HPS Gaussian-Process Resonance Search
+v5.9 / Signal-tail study
+4
+Outer structure in a wider ﬁt region
+The guard calculation expands both the ﬁtted region and the training exclusion to ±4.5σm. Its GP
+is conditioned only on bins outside that wider mask, using the same archived kernel coordinates.
+The prediction and covariance are recomputed for the widened region. Every observed bin in that
+region enters the likelihood once.
+The primary scans contain all 425 requested dataset–mass coordinates. The guard scan contains
+420: the ﬁve 2016 hypotheses at 176–180 MeV do not retain the required external sidebands under
+the wider mask and are excluded by the geometric rule.
+Its 2016 domain is consequently 39–
+175 MeV. The 2015 and 2021 guard domains retain their full primary ranges. Across seven shapes
+and both windows, 5,915 observed ﬁts are reported; omitted guard endpoints are not interpolated
+or ﬁlled from the primary calculation.
+This is a separate background-interpolation and extraction prescription. The meaningful shape
+comparison is therefore the tail scenario divided by, or compared with, the Gaussian in the same
+guard window. Comparing a guard tail ﬁt directly with a primary Gaussian would mix the tail
+change with the window and background change. The wider window has not undergone an inde-
+pendent support or coverage qualiﬁcation.
+Dataset
+Shape
+m0 (MeV)
+Z0
+Local p0
+ε2
+90
+2015
+Gaussian
+93
+3.52179
+2.143 × 10−4
+1.453 × 10−4
+2015
+Dilation +10%
+93
+3.51668
+2.185 × 10−4
+1.457 × 10−4
+2015
+Dilation +20%
+93
+3.51147
+2.228 × 10−4
+1.461 × 10−4
+2015
+Dilation +30%
+93
+3.50616
+2.273 × 10−4
+1.465 × 10−4
+2015
+Curvature +10%
+93
+3.52029
+2.155 × 10−4
+1.454 × 10−4
+2015
+Curvature +20%
+93
+3.51907
+2.165 × 10−4
+1.455 × 10−4
+2015
+Curvature +30%
+93
+3.51806
+2.174 × 10−4
+1.456 × 10−4
+2016
+Gaussian
+91
+3.46714
+2.630 × 10−4
+1.388 × 10−5
+2016
+Dilation +10%
+91
+3.46647
+2.637 × 10−4
+1.392 × 10−5
+2016
+Dilation +20%
+91
+3.46582
+2.643 × 10−4
+1.397 × 10−5
+2016
+Dilation +30%
+91
+3.46513
+2.650 × 10−4
+1.401 × 10−5
+2016
+Curvature +10%
+91
+3.46701
+2.631 × 10−4
+1.389 × 10−5
+2016
+Curvature +20%
+91
+3.46691
+2.632 × 10−4
+1.390 × 10−5
+2016
+Curvature +30%
+91
+3.46682
+2.633 × 10−4
+1.391 × 10−5
+2021
+Gaussian
+78
+2.76302
+2.863 × 10−3
+6.469 × 10−6
+2021
+Dilation +10%
+78
+2.76074
+2.884 × 10−3
+6.486 × 10−6
+2021
+Dilation +20%
+78
+2.75828
+2.905 × 10−3
+6.504 × 10−6
+2021
+Dilation +30%
+78
+2.75564
+2.929 × 10−3
+6.521 × 10−6
+2021
+Curvature +10%
+78
+2.76235
+2.869 × 10−3
+6.474 × 10−6
+2021
+Curvature +20%
+78
+2.76180
+2.874 × 10−3
+6.478 × 10−6
+2021
+Curvature +30%
+78
+2.76132
+2.878 × 10−3
+6.481 × 10−6
+Table 3: Guard-window scan minima and their corresponding observed limits. These rows are
+separate ﬁxed-shape local calculations, with a Gaussian guard-window reference.
+8
+
+
+HPS Gaussian-Process Resonance Search
+v5.9 / Signal-tail study
+4.1
+Guard-window 2015 comparison
+Widening the excluded region removes sideband information and adds explicit tail-sensitive bins
+to the likelihood. Both eﬀects are included in the Gaussian guard reference. Near a support edge,
+the available external sidebands need not be symmetric; the ﬁxed support and actual bin selection
+remain part of the deﬁnition.
+10−5
+10−4
+Observed 90% CLs limit on ε2
+Full 2015: guard ±4.5σm window
+Gaussian
+Tails +10%
+Tails +20%
+Tails +30%
+0
+1
+2
+Limit change (%)
+10−3
+10−2
+10−1
+Local p0
+20
+30
+40
+50
+60
+70
+80
+90
+100
+Test mass m0 (MeV)
+0
+1
+2
+3
+Local Z0
+Figure 5: Observed 2015 ±4.5σm ﬁts with external GP training. The 91–100 MeV endpoint pre-
+scription is retained. Tail eﬀects are assessed relative to the Gaussian ﬁtted with this same wider
+mask.
+9
+
+
+HPS Gaussian-Process Resonance Search
+v5.9 / Signal-tail study
+4.2
+Guard-window 2016 comparison
+Broader ﬁtted structure can overlap background directions permitted by the correlated GP con-
+straint. The proﬁled likelihood accounts for that overlap through its nuisance parameters. An
+observed change in p0 or the upper limit consequently measures the response of the complete
+speciﬁed ﬁt, rather than a direct measurement of the detector’s signal tail.
+10−5
+Observed 90% CLs limit on ε2
+Full 2016: guard ±4.5σm window
+Gaussian
+Tails +10%
+Tails +20%
+Tails +30%
+0
+1
+2
+Limit change (%)
+10−3
+10−2
+10−1
+Local p0
+40
+60
+80
+100
+120
+140
+160
+180
+Test mass m0 (MeV)
+0
+1
+2
+3
+Local Z0
+Figure 6: Observed 2016 ±4.5σm ﬁts over 39–175 MeV. The ﬁnal ﬁve primary-scan masses fail the
+external-sideband geometric requirement for this wider mask. The GP mean and covariance are
+held ﬁxed across signal hypotheses within each mass and window; nuisance shifts are proﬁled at
+every tested amplitude. The archived 2016 state qualiﬁcation remains in force.
+10
+
+
+HPS Gaussian-Process Resonance Search
+v5.9 / Signal-tail study
+4.3
+Guard-window 2021 comparison
+The 2021 guard scan retains the original 10% exposure and normalization. It is not an exposure
+projection. Its broader likelihood region tests whether the declared outer template changes the
+pointwise inference when those bins are used explicitly.
+10−6
+10−5
+Observed 90% CLs limit on ε2
+2021 (10%): guard ±4.5σm window
+Gaussian
+Tails +10%
+Tails +20%
+Tails +30%
+0.0
+0.5
+1.0
+1.5
+Limit change (%)
+10−2
+10−1
+Local p0
+50
+75
+100
+125
+150
+175
+200
+225
+250
+Test mass m0 (MeV)
+0
+1
+2
+3
+Local Z0
+Figure 7: Observed 2021 10% ±4.5σm ﬁts. Each alternative is compared with the Gaussian under
+the same support, external training set and ﬁt window.
+11
+
+
+HPS Gaussian-Process Resonance Search
+v5.9 / Signal-tail study
+5
+Size and location of the response
+The ratios below compare each alternative with the Gaussian from the same dataset, mass and
+window.
+They quantify changes in the reported observed limit, not expected sensitivity.
+The
+collection of scenarios is not a conﬁdence band or a nuisance-proﬁled uncertainty interval.
+Dataset
+Shape
+Primary median (%)
+Guard range (%)
+Max. |∆r| (guard)
+2015
+Dilation +10%
+0.168
+-0.030–0.687
+0.01276
+2015
+Dilation +20%
+0.345
+-0.047–1.378
+0.02537
+2015
+Dilation +30%
+0.529
+-0.048–2.068
+0.03773
+2015
+Curvature +10%
+0.049
+-0.007–0.195
+0.00358
+2015
+Curvature +20%
+0.089
+-0.010–0.352
+0.00642
+2015
+Curvature +30%
+0.123
+-0.015–0.480
+0.00871
+2016
+Dilation +10%
+0.168
+0.065–0.649
+0.00866
+2016
+Dilation +20%
+0.345
+0.147–1.336
+0.01804
+2016
+Dilation +30%
+0.529
+0.245–2.056
+0.02796
+2016
+Curvature +10%
+0.049
+0.025–0.192
+0.00268
+2016
+Curvature +20%
+0.089
+0.048–0.351
+0.00491
+2016
+Curvature +30%
+0.123
+0.068–0.483
+0.00678
+2021
+Dilation +10%
+0.168
+0.087–0.517
+0.00623
+2021
+Dilation +20%
+0.345
+0.196–1.032
+0.01215
+2021
+Dilation +30%
+0.529
+0.279–1.543
+0.01772
+2021
+Curvature +10%
+0.049
+0.023–0.143
+0.00167
+2021
+Curvature +20%
+0.089
+0.036–0.257
+0.00310
+2021
+Curvature +30%
+0.123
+0.042–0.349
+0.00439
+Table 4: Observed percent limit changes relative to the Gaussian in the same window. Positive
+values denote larger upper limits.
+0.0
+0.5
+1.0
+1.5
+2.0
+Limit change (%)
+Full 2015
+0.0
+0.5
+1.0
+1.5
+2.0
+Full 2016
+0.0
+0.5
+1.0
+1.5
+2021 (10%)
+25
+50
+75
+100
+Test mass (MeV)
+−0.02
+0.00
+0.02
+0.04
+Change in signed r
+50
+100
+150
+Test mass (MeV)
+−0.02
+0.00
+0.02
+100
+200
+Test mass (MeV)
+−0.01
+0.00
+0.01
+dilation, primary
+curvature, primary
+dilation, guard
+curvature, guard
+Figure 8: Response of the observed inference at the largest declared tail change, k = 1.3: percent
+changes in the limit and changes in the signed likelihood root are compared with the Gaussian
+at each mass. Both tail families are shown, and primary and guard results retain their separate
+Gaussian references. Features in a mass scan reuse sideband information and should not be counted
+as independent evidence.
+12
+
+
+HPS Gaussian-Process Resonance Search
+v5.9 / Signal-tail study
+6
+Signal in the GP training region
+Signal tails can enter bins used for background-only GP training. Changing the local signal template
+does not correct that contamination. A wider mask can reduce the training contribution, while
+also removing background information.
+The diagnostic uses anchors 51 and 92 MeV in 2015, 90 and 92 MeV in 2016, and 78 and
+92 MeV in 2021. At each anchor the full injected yield is ﬁxed to the Gaussian primary observed
+A90, retaining the nominal conversion. Each window has its own smooth source n0, the full-support
+GP prediction from the observed external bins. Reconditioning on the external bins of n0 gives
+b0, C0. The deterministic ﬁtted-bin expectation is then n = b0 + AtrueTtruth.
+The clean-training branch ﬁts this expectation with b0, C0. The contaminated-training branch
+adds the same full signal to n0 before reconditioning, obtains b1, C1, and ﬁts exactly the same
+ﬁtted-bin expectation. Both branches are evaluated with the matching signal template and with
+a Gaussian extraction template. Comparing bA/Atrue isolates the declared training response and
+template mismatch. Clean matched recovery equals one by construction: centering on b0 makes
+this a numerical identity, not an independent background or injection-closure test. Primary and
+guard sources are constructed separately, so their diﬀerence also changes the reference continuum;
+it is not a comparison of windows under one common truth.
+0
+5
+10
+15
+20
+25
+30
+Tail-width increase (%)
+95
+96
+97
+98
+99
+100
+Recovered / injected amplitude (%)
+Primary window
+2015, 51 MeV
+2015, 92 MeV
+2016, 90 MeV
+2016, 92 MeV
+2021, 78 MeV
+2021, 92 MeV
+0
+5
+10
+15
+20
+25
+30
+Tail-width increase (%)
+100.000
+100.002
+100.004
+100.006
+100.008
+Recovered / injected amplitude (%)
+Guard window
+Figure 9: Deterministic signal-leakage diagnostic: recovered yield divided by injected yield for
+contaminated training with matched Gaussian or smooth-dilation extraction. The horizontal line
+marks unit recovery. Clean-training, Gaussian-mismatch and curvature controls are retained in the
+numerical ledger. The injected yield is the Gaussian primary observed A90 at each anchor.
+No random sampling or coverage test is performed. These conditional responses do not establish
+that an observed structure arose from signal leakage or that an alternative template is the true
+detector response.
+13
+
+
+HPS Gaussian-Process Resonance Search
+v5.9 / Signal-tail study
+7
+Likelihood and probability construction
+For one dataset, mass, window and shape, the observed expectation is
+λi = bi + (Lθ)i + ATi,
+LLT = C,
+(8)
+with proﬁled negative log likelihood, up to a data-only constant,
+ℓ(A, θ) =
+X
+i
+
+λi −ni + ni log ni
+λi
+
++ 1
+2θT θ.
+(9)
+The zero-count contribution is λi. The GP count mean b and covariance C are determined by the
+external sidebands. Poisson expectations are constrained to remain physical. The same b, C, T enter
+the null, unrestricted and tested-amplitude ﬁts at a ﬁxed coordinate. The unrestricted amplitude
+may be negative, enabling a signed diagnostic; the physical signal strength for limits is nonnegative.
+Writing bA for the unrestricted best ﬁt, deﬁne
+r = sign( bA)
+q
+2[ℓ(0, bθ0) −ℓ( bA, bθ)],
+(10)
+Z0 = max(r, 0),
+p0 = Φ(−Z0).
+(11)
+Thus a deﬁcit has Z0 = 0 and p0 = 0.5 by the inherited one-sided reference convention. This is
+distinct from the signed diagnostic psigned = Φ(−r).
+For a tested A ≥0, the bounded upper-limit statistic is zero if A < bA. Otherwise its denom-
+inator uses the unrestricted ﬁt when bA ≥0 and the null ﬁt when bA < 0. Let q be that observed
+statistic and qA the explicitly proﬁled background-Asimov statistic at the same tested amplitude.
+With aA = √qA, the asymptotic tails are
+(zs+b, zb) =
+
+
+
+
+
+(√q, √q −aA),
+q ≤qA,
+q + qA
+2aA
+, q −qA
+2aA
+
+,
+q > qA,
+CLs(A) = Φ(−zs+b)
+Φ(−zb) .
+(12)
+The q = 0 inclusive-tail convention gives CLs = 1. The observed upper limit solves CLs(A90) =
+0.10. Both likelihood ratios are proﬁled explicitly; their sampling tails use the asymptotic approxi-
+mation [2]. No Gaussian error-bar substitution is used for the observed upper limit.
+14
+
+
+HPS Gaussian-Process Resonance Search
+v5.9 / Signal-tail study
+8
+Input provenance, checks and interpretation
+The portable spectra and ﬁtting machinery come from Analysis Note v5.0.5 [1]. Native counts,
+bin edges, resolution, normalization and archived GP states are preserved, with original ROOT
+identities in the export provenance and exact copied-ﬁle hashes in the study manifest.
+The Gaussian comparison is recomputed rather than copied from the historical results table. Its
+primary peak signiﬁcances are 3.139237, 3.424752 and 2.808645 for 2015, 2016 and 2021, compared
+with the published-note values 3.139465, 3.423687 and 2.810290. Across the full primary scans the
+largest diﬀerence from the inherited table is |∆Z| = 0.12366, at 83 MeV in 2016; the largest relative
+limit diﬀerence is about 1.14%. At 2016/83 MeV the legacy L-BFGS null ﬁt stopped on relative
+objective change with maximum gradient about 0.116; its Z0 = 0.24369 becomes 0.12003 in the
+converged ﬁt. Holding the background, covariance and template ﬁxed reproduces this diﬀerence;
+the covariance-factor choice changes the converged limit by less than 6 × 10−12 relative.
+This
+numerical issue is distinct from the 2016 kernel-ﬁt caveat.
+All tail comparisons use the newly
+converged Gaussian with identical settings.
+The RBF kernel acts in log mass with the inherited log-count noise prescription. Its coordinates
+remain ﬁxed across shapes. Eﬀective radiative fractions are 0.07905, 0.04650 and 0.04770 for the
+three datasets, including the inherited penalties. No setting is selected by an observed limit or
+probability.
+Quantity
+Value
+Observed mass–window–shape ﬁts
+5915
+Primary / guard mass coordinates
+425 / 420
+Maximum |CLs −0.1|
+1.382 × 10−8
+Maximum proﬁle score residual
+1.999 × 10−7
+Minimum ﬁtted Poisson mean
+62.458
+Maximum historical-ledger relative UL diﬀerence
+1.139%
+Maximum historical-ledger |∆Z0|
+0.123661
+Deterministic response ﬁts
+336
+Maximum clean matched recovery error
+1.317 × 10−8
+Table 5: Recorded numerical and artifact checks.
+Passing these checks establishes the stated
+numerical calculation; it does not establish frequentist coverage or the physical correctness of a
+chosen tail model.
+Choosing a preferred shape requires an independent detector-response model or a calibrated
+selection procedure. These scenario comparisons supply no new expected bands, coherent scan
+calibration, look-elsewhere correction or global probability.
+References
+[1] E. Peets, M. Gignac and E. Hsu, HPS Gaussian-Process Resonance Search: Analysis Note
+v5.0.5, 16 September 2026, internal review draft and archived source package.
+[2] G. Cowan, K. Cranmer, E. Gross and O. Vitells, “Asymptotic formulae for likelihood-based
+tests of new physics,” Eur. Phys. J. C 71, 1554 (2011), arXiv:1007.1727.
+15

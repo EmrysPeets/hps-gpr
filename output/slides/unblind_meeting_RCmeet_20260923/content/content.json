@@ -1,0 +1,168 @@
+{
+  "source_snapshot": "output/slides/unblind_meeting_RCmeet_20260923/presentation-before.json",
+  "source_slide_count": 83,
+  "intended_slide_count_after_insertions": 85,
+  "numbering": "Source 1–14 unchanged; insert final 15 before source 15; source 15–23 become 16–24; insert final 25 after source 23; source 24–83 become 26–85.",
+  "style": {
+    "approach": "Native editable explanation text; preserve the existing theme and original mathematical definitions. Render only specialized equations if native math is unavailable.",
+    "body_pt": "17–20 where possible",
+    "notes": "Move qualifications and numerical details that exceed the slide's main argument to speaker notes. Do not shrink the complete copy to fit."
+  },
+  "slide09": {
+    "title": "Background Modeling with GPR",
+    "kernel_latex": "k(x,x')=C\\exp[-(x-x')^2/(2\\ell^2)],\\quad x=\\log m",
+    "panels": [
+      {
+        "symbol": "ℓ",
+        "heading": "Correlation distance",
+        "copy": "Larger ℓ → broader variations in log mass."
+      },
+      {
+        "symbol": "C",
+        "heading": "Variance of the log rate",
+        "copy": "Larger C → larger allowed fluctuations."
+      },
+      {
+        "symbol": "α",
+        "heading": "Bin-count noise",
+        "copy": "α ≈ 1/y; noisier bins constrain the fit less."
+      }
+    ],
+    "notes": "C is prior point variance and sqrt(C) is its SD, not event-count normalization. α is fixed by the count rule, not a third optimized kernel parameter. ℓ is distinct from the mass resolution. The drawings are illustrative.",
+    "whole_slide_script_options": [
+      {
+        "option": 1,
+        "label": "Concise, about 30 seconds",
+        "script": "These three panels separate the roles of the GP parameters. ℓ sets how far background variations stay correlated in log mass. C sets their variance in the latent log rate. α describes counting noise: approximately one over each bin count, so noisier bins constrain the fit less. We optimize C and ℓ on the sidebands; α follows the count rule. The curves illustrate these roles, rather than showing an HPS fit."
+      },
+      {
+        "option": 2,
+        "label": "Intuitive, about 60 seconds",
+        "script": "Think of the background as a smooth trend inferred from noisy histogram bins. The length scale ℓ tells us how far one fluctuation carries information: a larger ℓ links more widely separated masses and produces broader variations. Because the coordinate is log mass, that distance is a fractional change in mass, not a fixed number of MeV.\n\nC controls the size of the allowed fluctuations in the log rate. Increasing C changes their amplitude, while keeping ℓ fixed leaves the correlation distance unchanged. Finally, α describes how noisy each measured bin is. High-count bins have smaller relative noise and constrain the trend more strongly; low-count bins get less weight. C and ℓ are fitted from sidebands. α comes from the count rule, rather than being another adjustable kernel parameter."
+      },
+      {
+        "option": 3,
+        "label": "Technical, about 90 seconds",
+        "script": "We fit log counts as a function of log mass with this squared-exponential covariance. The length scale ℓ controls the falloff with separation: at a log-mass distance of one ℓ, the correlation is exp minus one-half, about 0.61. Thus ℓ describes the fractional mass scale of background variation; it is distinct from the detector’s resonance resolution.\n\nAt zero separation the kernel equals C. C is therefore the prior variance of the latent log rate, and its square root is the corresponding standard deviation. It controls covariance amplitude, not the normalization of the event histogram. Scaling C alone does not change the normalized correlation curve.\n\nFor the observed bins, we add α to the covariance diagonal. Propagating Poisson count variance through the logarithm gives α approximately equal to one over the count for positive bins. This is why a noisier bin pulls the prediction less strongly. The zero-count case has an explicit finite floor. We optimize C and ℓ using the allowed sidebands, while recomputing α from the observed counts. The three panels isolate these effects schematically; they are not three alternative fits to the data."
+      }
+    ]
+  },
+  "new_before_source15": {
+    "final_number": 15,
+    "title": "How we test the background model",
+    "subtitle": "Can the procedure create a false signal, absorb a true one, or misstate its error?",
+    "rows": [
+      {
+        "heading": "Generate independent source models",
+        "body": "Fit smooth analytic spectra; fluctuate background counts at the tested exposures."
+      },
+      {
+        "heading": "Repeat the complete extraction",
+        "body": "Fit the GP sidebands, then extract a signed signal yield from background-only and injected toys."
+      },
+      {
+        "heading": "Check bias, uncertainty and recovery",
+        "body": "Use mean pulls, pull widths and paired injected-yield response; inspect threshold and support dependence."
+      }
+    ],
+    "footer": "Sideband fit quality and held-out signal recovery test different parts of the procedure.",
+    "notes": [
+      "The historical validation refits GP hyperparameters. The later v5.9.5 frozen-kernel audit is a separate conditional study.",
+      "Revised slide 14 uses in-sample sideband Poisson deviance D/Nside: 0.889, 0.852 and 0.915 at excluded masses 65, 78, 120 MeV. Nside counts bins; it is not fitted degrees of freedom.",
+      "At the selected 78 MeV anchor, 237/256 source-conditional refitted toys have D at least as large as observed ; 95% Clopper–Pearson interval 0.887–0.955. This does not validate withheld bins, include source uncertainty, or provide an unconditional model-goodness-of-fit probability.",
+      "The previous held-out Q/Nbin diagnostic is distinct; its v5.9.5 conditional mean spans 0.998–1.185. Do not transfer that statistic's interpretation to the new sideband deviance."
+    ],
+    "source": "v5.0.5 sections 05_toys_validation and 04_methodology; 20260923/science/data/slide14_summary.json; v5.9.5 residual_diagnostic/findings.md"
+  },
+  "new_after_source23": {
+    "final_number": 25,
+    "title": "Validation: evidence and remaining limits",
+    "rows": [
+      {
+        "heading": "Window and recovery",
+        "body": "±2.25σ training/extraction; refined 65 MeV tests recover 96.6–96.9% of the injected amplitude."
+      },
+      {
+        "heading": "Spurious fitted yield",
+        "body": "20/20 background-only mean pulls lie within ±0.5, a tolerance chosen after seeing the results."
+      },
+      {
+        "heading": "Returned uncertainty",
+        "body": "15/80 all-strength 90% pull-width intervals exclude 1; retain those departures."
+      },
+      {
+        "heading": "Separate fixed-source check",
+        "body": "At 78 MeV, the 2021 signed-root mean is 0.548 in 256 null toys; it is not centered at zero."
+      }
+    ],
+    "footer": "Checks constrain the tested sources. Background-source uncertainty and confidence-limit coverage remain open.",
+    "notes": [
+      "The first three rows are historical analytic-source validation; the last row is the distinct v5.9.5 frozen-source, fixed-kernel 2021 native 10% audit.",
+      "The 65 MeV recovery is paired across shared background realizations at input strengths 1, 3, 5; the residual amplitude loss is 3.1–3.4%. It is not coverage.",
+      "3/20 zero-signal and 15/80 all-strength normal-theory 90% width intervals exclude 1. These correlated intervals are diagnostics, not 15 independent failures.",
+      "The 78 MeV null mean 0.547975 has MC standard error about 0.0632; the source-Asimov signed root a=0.576784. A positive scan maximum is separately expected from maximization.",
+      "Low-mass qualifications include native 10% 65 MeV negative offset and 55 MeV under-recovery. The post-result ±0.5 benchmark is practical tolerance, not a prespecified zero-bias test.",
+      "Do not equate the 20 or 80 historical pull summaries with the 256 complete-source scans in the latest audit."
+    ],
+    "source": "v5.0.5 section 05_toys_validation validation-decisions table and injection-recovery table; v5.9.5 scan_maximum/findings.md"
+  },
+  "slide22": {
+    "final_number": 23,
+    "title": "Signal Injection",
+    "subtitle": "Choose the yield before injection",
+    "equation_latex": "A_{\\mathrm{inj},t}(z)=z\\,\\sigma_{A,\\mathrm{ref},t},\\qquad z\\in\\{0,1,3,5\\}",
+    "steps": [
+      "Fit this background-only toy at this mass; record its signal-yield error σA,ref.",
+      "Add the full Gaussian signal template to the same background toy at the chosen yield.",
+      "Rerun the GP sideband fit and signed extraction; keep the injected yield fixed."
+    ],
+    "footer": "z sets an input yield, not the measured significance. The pull uses the error returned after injection.",
+    "notes": "Reference is matched by source, toy and mass, using the same support, mask, binning and fit settings. It is not a universal error shared by all toys. Strengths reuse the background realization and are correlated. No fresh independent Poisson(B+S) drawing rule is claimed. The full template is not renormalized only within the extraction window.",
+    "source": "v5.0.5 section 04_methodology matched-reference injection and section 05_toys_validation"
+  },
+  "slide26": {
+    "final_number": 28,
+    "title": "Observed Upper Limits",
+    "layout": "Preserve the four original equations. Place the following short explanations beside their corresponding equations; replace the illustrative curve if required for legibility.",
+    "walkthrough": [
+      {
+        "equation": "bounded qtilde_A",
+        "copy": "Test yield A; profile the background. A larger fitted yield does not exclude A."
+      },
+      {
+        "equation": "CL_s+b",
+        "copy": "Tail of the same statistic under signal + background."
+      },
+      {
+        "equation": "CL_b",
+        "copy": "Tail under background alone."
+      },
+      {
+        "equation": "CL_s=CL_s+b/CL_b",
+        "copy": "Take the ratio; the first crossing of 0.10 defines A90."
+      }
+    ],
+    "limit_equation_latex": "A_{90}=\\inf\\{A\\ge0:\\mathrm{CL}_s(A)\\le0.10\\}",
+    "footer": "A pointwise 90% limit at fixed mass; no discovery trials factor is applied.",
+    "notes": "For negative unrestricted best-fit yield, the bounded statistic uses the physical A=0 denominator. Profile background nuisance coordinates at each A; GP hyperparameters remain fixed within that likelihood calculation. CLs reduces overly strong exclusions from low-sensitivity downward fluctuations. Use the established calibration of the statistic rather than interpreting the ratio as a posterior probability.",
+    "source": "v5.0.5 section 04_methodology equations qmu-single and cls-definition"
+  },
+  "slide27": {
+    "final_number": 29,
+    "title": "Observed Upper Limits",
+    "subtitle": "Convert the signal-yield limit to a coupling",
+    "main_equation_latex": "\\epsilon_{ee,90}^{2}=\\frac{A_{90,d}}{K_d(m)}=\\frac{2\\alpha_{\\mathrm{EM}}A_{90,d}}{3\\pi m f_{\\mathrm{rad},d}(m)\\rho_d(m)}",
+    "normalization_equation_latex": "A_d=K_d(m)\\epsilon_{ee}^{2},\\qquad K_d(m)=\\frac{3\\pi m f_{\\mathrm{rad},d}(m)\\rho_d(m)}{2\\alpha_{\\mathrm{EM}}}",
+    "physical_equation_latex": "\\epsilon_{\\mathrm{phys},90}^{2}=N_{\\mathrm{eff}}^{\\mathrm{BR}}\\epsilon_{ee,90}^{2},\\qquad N_{\\mathrm{eff}}^{\\mathrm{BR}}=1/\\mathcal{B}_{ee}",
+    "symbol_key": "A90: signal-event limit; f_rad: radiative fraction; ρ: local prompt counts per mass; α_EM: fine-structure constant.",
+    "plot_caption": "Plot: minimal-visible ε²; branching correction above 2mμ.",
+    "preserve_image_object_id": "g409df70e3d8_1_115",
+    "notes": [
+      "The fitted coordinate is electron-channel epsilon_ee². The physical minimal-visible coordinate multiplies by N_eff^BR; factor 1 below 211.3167 MeV and about 1.725 at 250 MeV.",
+      "The prompt-density window is ±1.64σ; training exclusion and extraction use ±2.25σ. Keep mass units consistent with the density units. α_EM is unrelated to the GP noise α.",
+      "For the shared-coupling likelihood, each dataset has its own K_d; the black combination is not the envelope of the individual curves.",
+      "The existing image visually matches the v5_observed_coupling_overlay.png asset. The v5.0.4 and v5.0.5 copies are SHA-identical. Its generator explicitly multiplies eps2_90 by the dimuon branching factor before plotting. No independent byte identity of the Slides image is claimed."
+    ],
+    "source": "v5.0.5 section 04_methodology eqs eps2-conversion, Kd-conversion, dimuon-eps2-map; v5.0.4 scripts/make_v504_figures.py lines 29–32, 67–68"
+  }
+}
