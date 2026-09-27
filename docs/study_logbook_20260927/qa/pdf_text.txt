@@ -1,0 +1,1675 @@
+READING GUIDE
+HPS GPR study and plot logbook
+Forty study and presentation entries; 26 selected plot pages with sources and speaking notes.
+HPS GPR | 13-27 September 2026 | Saved-result review
+1
+WHAT THE RECENT SERIES ESTABLISHED
+Native signal MC motivates campaign-specific shape and window
+choices. Paired injections and clean-training controls reveal response
+loss that a lower observed upper limit can hide.
+WHAT TO PRESENT FIRST
+Use the 12-minute route on page 2. Pages 4-29 are reusable plot cards;
+the final pages locate the complete study packages and dated presentation
+snapshots.
+WHAT REMAINS CONDITIONAL
+Saved templates, null sources, kernel states and method choices define each
+experiment. These studies do not by themselves establish physical efficiency,
+unconditional coverage, a calibrated coupling exclusion or discovery.
+Independent local-to-global result
+2016
+B count: 89 / 1,024 | add-one p: 0.08780
+Exact 95% binomial interval: [0.07038, 0.10587]
+2021 10%
+B count: 231 / 1,024 | add-one p: 0.22634
+Exact 95% binomial interval: [0.20032, 0.25244]
+Common coupling
+B count: 75 / 1,024 | add-one p: 0.07415
+Exact 95% binomial interval: [0.05804, 0.09095]
+v6.4.4: fixed local maps from 1,024 A scans; independent 1,024 B scans. Each
+quoted interval conditions on A and the null source. Combined is a joint
+one-coupling fit. See P23-P26.
+
+PRESENTATION ROUTE
+A twelve-minute explanation
+Eight stops, about 90 seconds each. Use the other cards to answer follow-up questions.
+HPS GPR | 13-27 September 2026 | Saved-result review
+2
+01 / P09 / PAGE 12
+Start with the selected signal-MC distributions.
+Their broad tails and displaced cores motivate changes to the extraction model.
+02 / P12 / PAGE 15
+Compare both shapes at a fixed expected yield.
+Use independent pilot and evaluation cohorts; distinguish raw recovery from the paired
+increment.
+03 / P17 / PAGE 20
+Show the controlled training-contamination experiment.
+Removing only training-bin signal nearly restores direct-MC response in the displayed
+checks.
+04 / P20 / PAGE 23
+Keep campaign-specific shape evidence.
+2016 has a smaller core shift and must not inherit the 2021 law.
+05 / P22 / PAGE 25
+Explain why a lower limit can be misleading.
+Reduced response largely cancels the narrower window's smaller raw spread.
+06 / P19 / PAGE 22
+Show what changes in the observed joint fit.
+The common-coupling local minimum moves when the 2021 template changes; keep that
+release distinct.
+07 / P23 / PAGE 26
+Give the independent whole-scan probability.
+Combined p=0.07415, conditional on the fixed local maps, source and declared grid.
+08 / P25 / PAGE 28
+Finish with the mass correlations.
+Overlapping fits explain why raw grid counts and a single resolution count cannot replace
+coherent scan toys.
+
+DEFINITIONS
+Keep these distinctions visible
+The versions are a chain of conditional studies, not repeated independent confirmations.
+HPS GPR | 13-27 September 2026 | Saved-result review
+3
+RAW RECOVERY AND PAIRED RESPONSE
+Raw recovery is mean(Ahat/A). Paired response is
+mean[(Ahat_signal+background-Ahat_background)/A], using the same
+background toy. A null subtraction cancels an offset; it does not correct
+response.
+EXPECTED YIELD AND REALIZED COUNTS
+v6.2 fixes exact N and samples multinomial categories. v6.3.1 fixes expected
+A=z*s0 from an independent pilot and lets Poisson counts fluctuate. Its pulls use
+expected A.
+REFERENCE RESOLUTION AND MC CORE WIDTH
+The original mask uses +/-2.25 sigma_ref around the hypothesis or shifted
+center. MC u=(mass-core center)/core width is another coordinate. A value
+expressed in u cannot be treated as sigma_ref.
+FIXED SOURCE AND FITTED BACKGROUND
+A fixed GP mean may generate the toys while each toy still recomputes its
+conditional GP prediction. Holding that prediction fixed inside the likelihood (C=0)
+is a further, different change.
+LOCAL AND GLOBAL ORDERING
+v6.4.3 calibrates max(raw q0). v6.4.4 freezes A local rank maps and calibrates
+min(local rank p) with independent B. Their global probabilities answer different
+questions.
+COMMON COUPLING AND OTHER COMBINATIONS
+The joint physical model uses one coupling with campaign-specific
+normalizations and nuisance blocks. Independent amplitudes, Fisher/Stouffer,
+and selecting among searches are separate hypotheses.
+Finite ranks: zero exceedances gives an add-one floor and a binomial bound. An empty accepted yield grid is not a physical zero limit. Uncertainty bars retain the source study's definition; MC
+sampling uncertainty omits unmodeled systematic effects.
+
+P01 / CONTEXT / V5P0P4_FIGURE2_PUBLICATION
+Place the studies in the reach picture
+The new comparisons start from the released samples and explicit exposure assumptions.
+HPS GPR | 13-27 September 2026 | Saved-result review
+4
+READ THE PLOT
+Compare the matched lower panels; the added-2019 curve
+uses a measured 1% high-psum spectrum with borrowed
+2021 response/conversion inputs.
+SUGGESTED EXPLANATION
+These curves show how the present samples map into an
+observed-equivalent full-exposure display.
+CLAIM BOUNDARY
+Historical world-contour context and approximate
+confidence-level conventions are preserved. This is not a
+calibrated future expected-sensitivity band.
+Original figure
+Source data / definition
+Study
+Figure SHA-256: d84e0e501febd19a
+1 2 5 10 20 50 100 200 500 1000
+mA ′ [MeV]
+10−10
+10−9
+10−8
+10−7
+10−6
+10−5
+10−4
+ε2
+Thermal relic targets
+E774 / E141
+Orsay / KEK
+NA64
+E137
+KLOE
+NA48/2
+A1 / MAMI
+HADES
+KLOE-2
+LHCb
+BaBar
+20 30 50 100 200
+mA ′ [MeV]
+10−6
+10−5
+ε2
+(a)  2015 + 2016 + 2021
+NA48/2
+BaBar
+Full-exposure equivalent
+20 30 50 100 200
+mA ′ [MeV]
+10−6
+10−5
+ε2
+(b)  2015 + 2016 + 2019 + 2021
+NA48/2
+BaBar
+Full-exposure equivalent
+2019: 2021-response proxy
+HPS 2015 published
+HPS 2016 published
+(g − 2)μ central (WP25)
+(g − 2)e central (Rb20 + Fan23)
+P02 / CONTEXT / V5P7P1_GEOMETRY_ACCEPTANCE
+Explain the beam-energy and geometry dependence
+Magnetic transport and sensor-hit requirements replace the earlier outer-angle surrogate.
+HPS GPR | 13-27 September 2026 | Saved-result review
+5
+READ THE PLOT
+Read columns by campaign. Geometry, calculated
+acceptance and selected mass spectra answer different
+questions; their vertical scales are not interchangeable.
+SUGGESTED EXPLANATION
+The detector geometry and boost help explain the accessible
+mass scales, while real efficiency requires more information.
+CLAIM BOUNDARY
+Conditional fixed-decay and hit fractions omit production
+weighting, reconstruction, trigger/selection efficiency and
+detector uncertainty.
+Original figure
+Source data / definition
+Study
+Figure SHA-256: 7586294cbde16385
+0
+450
+900Along beam [mm] −50
+50
+Horizontal [mm]
+−50
+0
+50
+Vertical [mm]
+Passing examples: 20 and 195 MeV
+Nominal 15 mrad scale ≈ 15.84 MeV
+HPS 2015 | 1.056 GeV
+0 50 100 150 200 250True A′ mass [MeV]
+0
+20
+40
+60Accepted decay fraction [%]
+0 100 200 300Reconstructed mass [MeV]
+102
+103
+104
+105
+106
+Selected pairs / MeV
+No source binsabove 150 MeV
+2015 full
+0
+450
+900Along beam [mm] −50
+50
+Horizontal [mm]
+−50
+0
+50
+Vertical [mm]
+Passing examples: 40 and 425 MeV
+Nominal 15 mrad scale ≈ 34.50 MeV
+HPS 2016 | 2.300 GeV
+0 100 200 300 400 500True A′ mass [MeV]
+0
+20
+40
+60
+0 100 200 300Reconstructed mass [MeV]
+102
+103
+104
+105
+106 2016 full
+0
+450
+900Along beam [mm] −50
+50
+Horizontal [mm]
+−50
+0
+50
+Vertical [mm]
+Passing examples: 60 and 715 MeV
+Nominal 15 mrad scale ≈ 56.10 MeV
+HPS 2021 | 3.740 GeV
+0 200 400 600 800 950True A′ mass [MeV]
+0
+20
+40
+60
+0 100 200 300Reconstructed mass [MeV]
+102
+103
+104
+105
+106 2021 10%
+HPS A′ acceptance: geometry, magnetic transport and selected spectra | v5.7.1A | Active faces and passing e⁺ (red) / e⁻ (blue): solid low-mass, dashed high-mass examples
+B | Decay fraction through the magnetic field and required sensor views
+C | Existing selected-pair spectra
+Hit cuts: 2015 ≥5 paired stations each + e⁺ L1/L2; 2016 ≥5 each; 2021 ≥10 e⁺ / ≥8 e⁻ individual strip hits.Illustrated low/high masses are sampled passing examples. Curves include the field; material, hit finding, trigger and reconstruction remain omitted.
+Field + hit cuts, x = 1Field + hit cuts, x = 0.8B = 0 + hit cuts, x = 1Field + all stations, x = 1
+P03 / SIGNIFICANCE / V5P8P5P3_RAW_SIGNIFICANCE
+Keep the raw local excesses identifiable
+The conventional local display uses the unshifted signed likelihood root.
+HPS GPR | 13-27 September 2026 | Saved-result review
+6
+READ THE PLOT
+Z=max(r,0) and p=Phi(-Z); deficits display p=0.5. The 2016
+peak is 90.5 MeV at Z=3.4525; shared coupling peaks at 66
+MeV at Z=2.7602.
+SUGGESTED EXPLANATION
+These are local, asymptotic summaries of the observed fits.
+Their ranking is preserved before any reference remapping.
+CLAIM BOUNDARY
+This is the September Gaussian baseline. Do not attach a global
+probability from a later MC window or different ordering.
+Original figure
+Source data / definition
+Study
+Figure SHA-256: f2ad09fab47e84f4
+20 30 40 50 60 70 80 90 100
+T ested mass [MeV]
+0
+1
+2
+3Local Z (unshifted)
+2015 full  |  peak 51 MeV
+20 30 40 50 60 70 80 90 100
+T ested mass [MeV]
+10−4
+10−3
+10−2
+10−1
+Local p (unshifted)
+2015 full
+40 60 80 100 120 140 160 180
+T ested mass [MeV]
+0
+1
+2
+3Local Z (unshifted)
+2016 full  |  peak 90.5 MeV
+40 60 80 100 120 140 160 180
+T ested mass [MeV]
+10−4
+10−3
+10−2
+10−1
+Local p (unshifted)
+2016 full
+50 75 100 125 150 175 200 225 250
+T ested mass [MeV]
+0
+1
+2
+3Local Z (unshifted)
+2021 native 10%  |  peak 78 MeV
+50 75 100 125 150 175 200 225 250
+T ested mass [MeV]
+10−4
+10−3
+10−2
+10−1
+Local p (unshifted)
+2021 native 10%
+50 100 150 200 250
+T ested mass [MeV]
+0
+1
+2
+3Local Z (unshifted)
+Combined: shared coupling  |  peak 66 MeV
+50 100 150 200 250
+T ested mass [MeV]
+10−4
+10−3
+10−2
+10−1
+Local p (unshifted)
+Combined: shared coupling
+Observed local curves: no reference centering or rescaling
+P04 / SIGNIFICANCE / V5P8P5P3_RAW_SIGNIFICANCE
+Show what the scan-wide correction changes
+A local peak and the maximum over a mass scan have different null distributions.
+HPS GPR | 13-27 September 2026 | Saved-result review
+7
+READ THE PLOT
+The global reference uses the raw maximum and correlated
+whole-spectrum fluctuations. Follow each stated search
+domain and source definition.
+SUGGESTED EXPLANATION
+The probability must ask how often the whole specified
+search produces an excursion this large.
+CLAIM BOUNDARY
+The global reference is conditional on fixed observed-derived
+background sources; prior method and source selection are not
+included.
+Original figure
+Source data / definition
+Study
+Figure SHA-256: 5cf31bf8ca5020c0
+20 30 40 50 60 70 80 90 100
+T ested mass [MeV]
+0.0
+0.5
+1.0
+1.5Global Z (fixed source)
+2015 full  |  peak 51 MeV
+20 30 40 50 60 70 80 90 100
+T ested mass [MeV]
+10−1
+100
+Global p (fixed source)
+2015 full
+40 60 80 100 120 140 160 180
+T ested mass [MeV]
+0.0
+0.5
+1.0
+1.5Global Z (fixed source)
+2016 full  |  peak 90.5 MeV
+40 60 80 100 120 140 160 180
+T ested mass [MeV]
+10−1
+100
+Global p (fixed source)
+2016 full
+50 75 100 125 150 175 200 225 250
+T ested mass [MeV]
+0.0
+0.5
+1.0
+1.5Global Z (fixed source)
+2021 native 10%  |  peak 78 MeV
+50 75 100 125 150 175 200 225 250
+T ested mass [MeV]
+10−1
+100
+Global p (fixed source)
+2021 native 10%
+50 100 150 200 250
+T ested mass [MeV]
+0.0
+0.5
+1.0
+1.5Global Z (fixed source)
+Combined: shared coupling  |  peak 66 MeV
+50 100 150 200 250
+T ested mass [MeV]
+10−1
+100
+Global p (fixed source)
+Combined: shared coupling
+Full-range tails of the raw maximum: conditional on the fixed source
+P05 / SIGNIFICANCE / V5P9P5_NULL_BIAS
+Separate a fixed-mass offset from a positive maximum
+At 78 MeV the null signed-root mean is 0.548, a different effect from maximizing over mass.
+HPS GPR | 13-27 September 2026 | Saved-result review
+8
+READ THE PLOT
+Track the mass-dependent signed-root moments. A maximum tends to be positive even when
+individual signed estimators are centered; a nonzero fixed-mass mean needs its own
+explanation.
+SUGGESTED EXPLANATION
+The selected peak cannot diagnose bias by itself. Here the fixed-source response also shows
+a local offset.
+CLAIM BOUNDARY
+Moments and tails condition on the frozen generating spectrum; agreement with that source is not
+proof of physical background adequacy.
+Original figure
+Source data / definition
+Study
+Figure SHA-256: 71116b19f7b727e5
+−1
+0
+1
+Signed-root mean
+A. The source response is mass dependent, with both signs
+Deterministic response a=r(B) Pointwise 95% mean intervalMean of 256 signed-root scans
+−0.2
+−0.1
+0.0
+0.1
+0.2
+rdirect−a
+B. No extra scan-wide mean discrepancy is resolved in this conditional check
+95% simultaneous envelope under response modelDirect mean minus a
+50 75 100 125 150 175 200 225 250
+T ested mass [MeV]
+0.8
+0.9
+1.0
+1.1
+1.2
+1.3Width ratio
+C. Scale agreement has finite-toy uncertainty; pointwise bands are not simultaneous
+Pointwise 95% normal-theory intervalDirect standard deviation / model s
+2021 native 10% | 50–250 MeV | fixed source and ±2.25σ window
+P06 / PRESENTATION / UNBLIND_MEETING_RCMEET
+Use the sideband check with its fitted-toy reference
+All 42 observed values lie inside their pointwise central 90% conditional bands.
+HPS GPR | 13-27 September 2026 | Saved-result review
+9
+READ THE PLOT
+Red is observed D_side/N_side; dashed blue is the median from 256 repeated spectra and
+shading is the 5th-95th percentiles at each center. N_side counts scored bins, not fit degrees
+of freedom.
+SUGGESTED EXPLANATION
+The reference median is about 0.95, so one is not an exact target after fitting.
+CLAIM BOUNDARY
+This scores fitted sidebands. Centers are correlated; pointwise agreement neither gives a global
+goodness-of-fit probability nor validates the excluded window.
+Original figure
+Source data / definition
+Study
+Figure SHA-256: 595fca5d65e0cec6
+50 75 100 125 150 175 200 225 250
+Excluded-window center [MeV]
+0.8
+0.9
+1.0
+1.1
+1.2D side/Nside
+2021 10% · sideband fit across the search region
+256 toys: pointwise central 90% Conditional toy median Observed sideband deviance
+P07 / PRESENTATION / UNBLIND_MEETING_RCMEET
+Explain the standardized residual panels
+The residual is a local data-minus-GP difference scaled by counting and GP uncertainty.
+HPS GPR | 13-27 September 2026 | Saved-result review
+10
+READ THE PLOT
+Each bin uses a prediction excluding its local signal window. Zero denotes agreement; positive
+values denote more data. The green +/-2 region is a visual reference.
+SUGGESTED EXPLANATION
+These panels make local behavior readable while retaining the fact that neighboring
+predictions overlap.
+CLAIM BOUNDARY
+The curves join local predictions, not one global fit. The green band is not calibrated simultaneous
+coverage.
+Original figure
+Source data / definition
+Study
+Figure SHA-256: ddc0fe92922b5e9e
+103
+104
+105
+106
+Events / MeV
+2015 full
+104
+105
+106
+2016 full
+105
+106
+2021 10%
+20 40 60 80 100
+mee [MeV]
+−4
+−2
+0
+2
+4
+Standardized
+residual ri
+50 75 100 125 150 175
+mee [MeV]
+−4
+−2
+0
+2
+4
+50 100 150 200 250
+mee [MeV]
+−4
+−2
+0
+2
+4
+Observed counts Held-out GP prediction ±2 reference band
+P08 / TEMPLATES / V5P9_TAIL_STRUCTURE
+Keep a controlled tail test distinct from native MC
+The controlled primary comparison changes tails while preserving the central unnormalized Gaussian shape.
+HPS GPR | 13-27 September 2026 | Saved-result review
+11
+READ THE PLOT
+Each alternative is compared to a freshly fitted Gaussian with
+the same +/-2.25 reference-resolution fit and exclusion mask.
+Full-support normalization is retained.
+SUGGESTED EXPLANATION
+This isolates modest tail-family effects under a matched
+procedure.
+CLAIM BOUNDARY
+It does not cover the broad displaced native MC shapes. Larger
+guards also change the fit bins and background prediction.
+Original figure
+Source data / definition
+Study
+Figure SHA-256: 47ef551256f5d09b
+10−6
+10−5
+Observed 90% CLs limit on ε2
+2021 (10%): primary ±2.25σm window
+Gaussian
+Tails +10%
+Tails +20%
+Tails +30%
+0.0
+0.2
+0.4Limit change (%)
+10−2
+10−1
+Local p0
+50 75 100 125 150 175 200 225 250
+Test mass m0 (MeV)
+0
+1
+2
+3Local Z0
+P09 / TEMPLATES / V6P1_MC_SIGNAL_TEMPLATES
+Show what the native MC curves actually are
+The colored curves are selected MC distributions, with fitted cores used to define coordinates.
+HPS GPR | 13-27 September 2026 | Saved-result review
+12
+READ THE PLOT
+Compare full distributions and the aligned core. A Gaussian center/width summary is not the
+empirical histogram; a common aligned shape is another model.
+SUGGESTED EXPLANATION
+The MC contains structure outside a narrow Gaussian core, so normalization and the training
+region matter.
+CLAIM BOUNDARY
+Selection equivalence and pure resonance association are not established for this supplied
+catalogue; the common shape remains conditional.
+Original figure
+Source data / definition
+Study
+Figure SHA-256: 4867f38cb845187f
+−20 −15 −10 −5 0 5 10 15 20
+mee −c (MeV)
+0.00
+0.02
+0.04
+0.06
+0.08
+0.10
+0.12
+0.14Full-normalized density (MeV−1)
+Centered, unit area; physical widths retained
+60 MeV
+80 MeV
+100 MeV
+120 MeV
+140 MeV
+160 MeV
+180 MeV
+200 MeV
+220 MeV
+240 MeV
+−8 −6 −4 −2 0 2 4 6 8
+u=(mee −c)/σcore
+0.00
+0.05
+0.10
+0.15
+0.20
+0.25Full-normalized density
+Centered and width-scaled
+Equal-mass common shape
+−2.0 −1.5 −1.0 −0.5 0.0 0.5 1.0 1.5 2.0
+u
+0.00
+0.05
+0.10
+0.15
+0.20
+0.25
+0.30
+0.35
+0.40Conditional core density
+Core only: unit area on |u|<2
+−20 0 20 40 60
+u
+10−6
+10−5
+10−4
+10−3
+10−2
+10−1
+Full-normalized density
+Tails retain their original weights
+P10 / RECOVERY / V6P2_MC_INJECTION
+Measure the signal-induced change with paired toys
+Final 40-toy results show better response after shifting the window to the MC core.
+HPS GPR | 13-27 September 2026 | Saved-result review
+13
+READ THE PLOT
+At N=30,000, paired response spans 71.5-89.5% for pole windows and 78.0-93.8% for shifted
+windows. Pairing subtracts the same toy's zero-signal fit; it does not redefine the primary fitted
+yield.
+SUGGESTED EXPLANATION
+Centering helps, but it does not recover every injected selected candidate.
+CLAIM BOUNDARY
+These are exact-N injections with full-category multinomial draws. The 260 MeV extension uses the
+archived 250 MeV kernel anchor.
+Original figure
+Source data / definition
+Study
+Figure SHA-256: bfe93000057e4fb5
+60 100 140 180 220 260
+Generated mass [MeV]
+−1.0
+−0.5
+0.0
+0.5
+1.0
+1.5
+2.0
+(Shifted - pole) mean yield / N
+Paired extraction difference
+Injected N
+1,000
+5,000
+10,000
+30,000
+Same toy, two masks
+Upper left: a positive value means
+the shifted mask extracts more signal.
+Below: subtract each method's paired
+zero-injection fit before dividing by N.
+This separates the incremental response
+from the zero-injection offset.
+The two estimates share the same
+background and MC injection draws.
+60 100 140 180 220 260
+Generated mass [MeV]
+0.70
+0.75
+0.80
+0.85
+0.90
+0.95
+1.00Mean [A(N) - A(0)] / N
+Pole-centered: incremental response
+60 100 140 180 220 260
+Generated mass [MeV]
+0.80
+0.85
+0.90
+0.95
+1.00Mean [A(N) - A(0)] / N
+MC-core-shifted: incremental response
+P11 / RECOVERY / V6P2_MC_INJECTION
+Use controls to locate the response loss
+Signal in GP training bins can be absorbed into the predicted background.
+HPS GPR | 13-27 September 2026 | Saved-result review
+14
+READ THE PLOT
+Compare the contaminated-sideband result with clean-sideband and known-background
+controls at the same injected yield. Distinguish raw fitted/injected yield from the increment over
+the paired null fit.
+SUGGESTED EXPLANATION
+A fit can converge and still recover too little signal; the controls identify why.
+CLAIM BOUNDARY
+Clean training and a known background are diagnostic oracles, unavailable for a real unknown
+signal. Forty-toy containment is not coverage certification.
+Original figure
+Source data / definition
+Study
+Figure SHA-256: 3832c45237fbd6d1
+60 100 140 180 220 260
+Generated mass [MeV]
+0.8
+0.9
+1.0
+1.1
+1.2Mean fitted / injected yield
+Pole-centered
+Injected sidebands
+Clean sidebands
+Known background
+60 100 140 180 220 260
+Generated mass [MeV]
+0.8
+0.9
+1.0
+1.1
+1.2Mean fitted / injected yield
+MC-core-shifted
+60 100 140 180 220 260
+Generated mass [MeV]
+−2.5
+−2.0
+−1.5
+−1.0
+−0.5
+0.0
+0.5
+Mean pull
+60 100 140 180 220 260
+Generated mass [MeV]
+−2.0
+−1.5
+−1.0
+−0.5
+0.0
+0.5
+Mean pull
+
+P12 / RECOVERY / V6P3P1_FIXED_YIELD_2021_100TOY
+Compare shapes at a common expected signal count
+At z=5, paired response is 0.961-0.978 for Gaussian and 0.716-0.894 for native MC.
+HPS GPR | 13-27 September 2026 | Saved-result review
+15
+READ THE PLOT
+An independent 100-background Gaussian pilot fixes s0(m); A=z*s0 is shared by shapes. The
+100 evaluation backgrounds are paired, with independently fluctuating Poisson signal totals.
+SUGGESTED EXPLANATION
+Equal expected signal counts do not imply equal extraction difficulty.
+CLAIM BOUNDARY
+The pull truth is expected A, not the realized count. Curves summarize correlated cells, not
+independent measurements to average together.
+Original figure
+Source data / definition
+Study
+Figure SHA-256: 130d0432621791e9
+60 120 180 240
+Pole mass [MeV]
+0.5
+1.0
+1.5
+Mean raw recovery
+z = 1
+Gaussian
+Native MC
+60 120 180 240
+Pole mass [MeV]
+0.8
+1.0
+1.2
+z = 3
+60 120 180 240
+Pole mass [MeV]
+0.8
+0.9
+1.0
+1.1
+z = 5
+60 120 180 240
+Pole mass [MeV]
+0.7
+0.8
+0.9
+1.0
+Mean paired response
+z = 1
+60 120 180 240
+Pole mass [MeV]
+0.7
+0.8
+0.9
+1.0
+z = 3
+60 120 180 240
+Pole mass [MeV]
+0.8
+0.9
+1.0
+z = 5
+P13 / RECOVERY / V6P3P1_FIXED_YIELD_2021_100TOY
+Report containment with its finite denominator
+The z=5 nominal 95% signed sets contain truth in 88-98/100 Gaussian and 88-97/100 MC trials.
+HPS GPR | 13-27 September 2026 | Saved-result review
+16
+READ THE PLOT
+These sets use the truth-fixed profile statistic and retain every attempted toy. Exact two-sided
+95% Clopper-Pearson intervals quantify count uncertainty.
+SUGGESTED EXPLANATION
+Completeness of the run and scientific closure are different: valid fits can still show
+non-nominal containment.
+CLAIM BOUNDARY
+Signed profile-set containment is not a calibrated physical nonnegative-signal upper limit or
+unconditional coverage.
+Original figure
+Source data / definition
+Study
+Figure SHA-256: 347b6dfa44433664
+60 140 240
+Pole mass [MeV]
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+Nominal 68.27% containment
+z = 0
+Gaussian
+Native MC
+60 140 240
+Pole mass [MeV]
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+z = 1
+60 140 240
+Pole mass [MeV]
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+z = 3
+60 140 240
+Pole mass [MeV]
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+z = 5
+60 140 240
+Pole mass [MeV]
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+Nominal 95% containment
+z = 0
+60 140 240
+Pole mass [MeV]
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+z = 1
+60 140 240
+Pole mass [MeV]
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+z = 3
+60 140 240
+Pole mass [MeV]
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+z = 5
+P14 / RECOVERY / V6P3P6_READABILITY_2021
+Motivate the MC core-center correction
+The reconstructed core shift should be measured from signal MC before observing fit performance.
+HPS GPR | 13-27 September 2026 | Saved-result review
+17
+READ THE PLOT
+The measured core shifts are compared with the stated logarithmic law and the retained
+user-provided HPS image. MC bars are 32-replica bin-resampling standard deviations.
+SUGGESTED EXPLANATION
+A reproducible core center gives a well-defined window shift, but does not fix the tails or signal
+response.
+CLAIM BOUNDARY
+The retained reference image's error definition was not supplied. The 260 MeV catalogue point is
+shape-only and outside the logarithmic-law domain.
+Original figure
+Source data / definition
+Study
+Figure SHA-256: 17a51d4774645f8e
+50 75 100 125 150 175 200 225 250
+Generated signal mass m (MeV)
+−5
+−4
+−3
+−2
+−1
+0
+Reconstructed core shift c − m (MeV)
+c − m = − 3.224 − 2.214ln[m/(150 MeV)]
+Shift in MeV; descriptive fit on 60–240 MeV
+(a) 2021 target-constrained (TC) signal MC
+Saved logarithmic relation
+TC signal MC core position
+(b) HPS Internal comparison supplied by the author
+Left bars: core-position SD from 32 signal-MC bin-resampling replicas (often smaller than markers).
+Right panel: original HPS image; its error definition was not supplied. Qualitative comparison only.
+P15 / RECOVERY / V6P3P6_READABILITY_2021
+Separate offset correction from response calibration
+A frozen affine correction addresses the null offset and signal response together.
+HPS GPR | 13-27 September 2026 | Saved-result review
+18
+READ THE PLOT
+A_c=(Ahat-delta)/R. The panels show mean calibrated pulls (A_c-A)/sigma_c at z=5 for two
+separately calibrated background sources. Bars are standard errors across 100 independent
+evaluation toys; calibration-table uncertainty is assessed separately.
+SUGGESTED EXPLANATION
+Subtracting a null mean cannot restore response. A correction needs both ingredients and an
+independent evaluation.
+CLAIM BOUNDARY
+These are source-specific diagnostic corrections, not replacements for the primary finite-grid limits
+or evidence of transfer between background sources.
+Original figure
+Source data / definition
+Study
+Figure SHA-256: 0e85e720e933d0f7
+60 100 140 180 220 240
+Generated mass [MeV]
+−0.2
+0.0
+0.2
+0.4
+M e a n  c a lib r a te d  p u ll ( A c − A ) / σ c
+ GP mean background source; z = 5
+60 100 140 180 220 240
+Generated mass [MeV]
+−0.4
+−0.3
+−0.2
+−0.1
+0.0
+0.1
+0.2
+M e a n  c a lib r a te d  p u ll ( A c − A ) / σ c
+ Functional form background source; z = 5
+2021 10% | Signal-MC injections, A = 5 s0 | Ac = (fitted yield - background-only yield bias) / response
+Means: sample standard error (sample SD / sqrt(100)). Widths: bootstrap standard error.
+Bootstrap: 2,000 whole-toy resamples keep masses, strengths and Gaussian choices together; sources use separate streams.
+Binomial fractions: all 100 trials retained; exact two-sided 95% Clopper-Pearson intervals.
+Mean bars after calibration condition on the frozen calibration table; its uncertainty is assessed separately.
+Central mass Gaussian Shifted Gaussian
+P16 / RECOVERY / V6P3P7_WINDOW_LEAKAGE_FOLLOWUP
+Quantify the signal still entering GP training
+The starter window is 11.3-19.8% wider, yet 16.16-27.90% of full selected MC remains in training.
+HPS GPR | 13-27 September 2026 | Saved-result review
+19
+READ THE PLOT
+Compare the old +/-2.25 reference-sigma mask with [-4,+3] fitted-core-width units over 80-240
+MeV. The MC training fraction drops only 1.12-3.30 percentage points.
+SUGGESTED EXPLANATION
+A wider exclusion reduces leakage, but a Gaussian estimate substantially understates these
+MC tails.
+CLAIM BOUNDARY
+Fitted core width and reference resolution are different. Leakage probability is not identical to lost
+fitted yield.
+Original figure
+Source data / definition
+Study
+Figure SHA-256: 0732e5cdb013f3c7
+80 120 160 200 240
+Generated signal mass [MeV]
+−3
+−2
+−1
+0
+1
+2
+Edge offset from its window center [σm]
+ A. Convert the requested [-4u, +3u] interval
+Starter lower edge
+Starter upper edge
+Historical edges: +/-2.25
+80 120 160 200 240
+Generated signal mass [MeV]
+6
+8
+10
+12
+14
+16
+18
+20Width increase over historical window [%]
+B. How much wider is the blind window?
+Continuous interval
+Actual excluded bins
+80 120 160 200 240
+Generated signal mass [MeV]
+0
+5
+10
+15
+20
+25
+30Full signal probability in GP training [%]
+C. MC tails versus a Gaussian signal
+Signal MC: Historical window
+Gaussian: Historical window
+Signal MC: Starter window
+Gaussian: Starter window
+80 120 160 200 240
+Generated signal mass [MeV]
+8
+10
+12
+14
+16MC / Gaussian training leakage ratio
+D. Compare the shapes within the same window
+Historical window
+Starter window
+2021 v16 TC signal MC: historical ±2.25σm versus requested u∈[−4,3]
+How to read: u = (reconstructed mass - core center) / core width; sigma_m is the historical Gaussian analysis width.
+Interior core parameters are predicted from neighboring samples with the tested mass omitted, matching v6.3.7; endpoints use their measured cores.
+Gaussian curves use the shifted Gaussian with sigma_m. Leakage counts only GP training bins within the recorded background spectrum.
+All probabilities retain the full selected signal normalization. Probability outside the spectrum is saved separately. No uncertainty bars: fixed-template geometry.
+P17 / RECOVERY / V6P3P7_WINDOW_LEAKAGE_FOLLOWUP
+Demonstrate the effect of training contamination
+At 100/160/220 MeV, clean training changes direct-MC response from 0.959/0.950/0.909 to 1.001/0.997/1.000.
+HPS GPR | 13-27 September 2026 | Saved-result review
+20
+READ THE PLOT
+Remove injected signal only from the GP training bins; keep fit counts, template and mask
+fixed. Mean-loss errors are paired standard errors; precision ratios use 2,000 whole-toy
+bootstrap resamples.
+SUGGESTED EXPLANATION
+For an exact MC extraction template, contamination explains almost all the mean response
+deficit in these tests.
+CLAIM BOUNDARY
+The Gaussian fit can still lose response with clean training because its shape/full-yield convention
+mismatches MC. This is a controlled diagnostic, not a new limit.
+Original figure
+Source data / definition
+Study
+Figure SHA-256: 0d8f5569032c485f
+80 120 160 200 240
+Generated signal mass [MeV]
+0.6
+0.7
+0.8
+0.9
+1.0Mean added fitted yield / injected yield A
+A. Response with and without contamination
+80 120 160 200 240
+Generated signal mass [MeV]
+4
+6
+8
+10
+12Yield suppressed by GP training [% of A]
+B. Isolate the effect of signal in sidebands
+80 120 160 200 240
+Generated signal mass [MeV]
+5.0
+7.5
+10.0
+12.5
+15.0
+17.5Extra response-scaled yield noise [%]
+C. Precision penalty from contamination
+2021 10% | GP mean background source | Full v16 TC signal-MC injection, A = 3 s0
+How to read: clean training removes only the injected signal from GP training bins; the signal-fit counts, template and window are identical.
+Lines: deterministic mean-count spectra at nine masses, not toy means. Markers: 100 paired saved evaluation toys at 100, 160 and 220 MeV .
+A/B bars: sample standard errors of paired means. C bars: 95% intervals from 2,000 whole-toy bootstrap resamples; masses/methods stay paired.
+Panel B = mean(Ahat_clean - Ahat_contaminated) / A. Panel C = 100 x (R_clean / R_contaminated - 1); background-only noise is unchanged.
+s0 is the archived Gaussian yield-error scale. This truth-assisted control diagnoses absorption; it is not a usable data fit or a measured upper-limit gain.
+Direct MC, starter window; contaminated
+Direct MC, starter window; clean training
+Gaussian, historical window; contaminated
+Gaussian, historical window; clean training
+P18 / OBSERVED / V6P3P8_OBSERVED_MORPH
+Walk through the observed 67 MeV extraction
+The selected MC fit has local asymptotic p=0.00311; 1/1,000 conditional null toys exceed it.
+HPS GPR | 13-27 September 2026 | Saved-result review
+21
+READ THE PLOT
+Read counts, data-minus-GP residuals and standardized
+context together. The hypothesis is 67 MeV; the template
+core is about 65.55 MeV. Full selected probability in training
+is about 47.34% here.
+SUGGESTED EXPLANATION
+This example shows what the signal and profiled background
+each contribute to the same data.
+CLAIM BOUNDARY
+The selected region is local and post-selection. Rank p=2/1001
+has exact 95% interval [0.0000253,0.00556]; it is not a
+scan-global probability.
+Original figure
+Source data / definition
+Study
+Figure SHA-256: e2e4f6cd32885a70
+1.2
+1.4
+1.6
+Counts / MeV
+× 106
+(a) Spectrum in the fit interval
+60 62 64 66 68 70
+0
+5000
+Counts − GP mean
+[per MeV]
+(b) Residuals relative to the GP mean
+58 60 62 64 66 68 70 72
+Reconstructed pair mass [MeV]
+−2
+0
+2
+Standardized residual
+(c) Standardized residuals and blind window
+2021 10%: selected excess 1 at a 67 MeV signal hypothesis
+v16 neighboring signal-MC template | c = 65.551 MeV , s = 1.581 MeV
+Signed full-selected yield = 44,252 ± 16,175; local asymptotic Z = 2.74 σ, p = 0.00311
+GP background-only toys: local excess rank p = 0.002 (1 / 1000 more extreme toys); count 95% interval [2.53e-05, 0.00556]
+Observed counts
+GP mean and ±1 SD constraint
+Background-only fit
+Background in signed S+B fit
+Signed signal + background
+Signed signal (middle panel)
+Blind region: excluded from GP training
+Search mass hypothesis
+Signal core center
+P19 / OBSERVED / V6P3P9_COMBINED_MORPH
+Follow the joint scan when only 2021 changes
+The MC-method common-coupling local minimum is 68 MeV: Z=2.910, p=0.001806.
+HPS GPR | 13-27 September 2026 | Saved-result review
+22
+READ THE PLOT
+Compare 2021 neighboring-MC/[-4,+3]u with the shifted Gaussian in old and new windows.
+The 2015 and 2016 models remain the earlier ones.
+SUGGESTED EXPLANATION
+The joint fit uses one coupling with independent campaign background nuisances.
+CLAIM BOUNDARY
+This is an observed conditional comparison. Its 0/1,000 fixed-mass exceedances imply a
+finite-sample bound, not zero probability or global evidence.
+Original figure
+Source data / definition
+Study
+Figure SHA-256: 4e897612a018d94f
+10−6
+10−5
+Conditional 90% upper limit
+ε2 (inherited normalization)
+60 80 100 120 140 160 180 200 220 240
+Signal mass hypothesis [MeV]
+10−5
+10−4
+10−3
+10−2
+10−1
+Local excess p0
+(asymptotic reference)
+Combined observed scan: change only the 2021 signal model
+2021 shifted Gaussian: original window
+2021 shifted Gaussian: new window
+2021 neighboring signal-MC template
+P20 / TEMPLATES / V6P4_2016_MC_SHAPES
+Measure the 2016 shift rather than importing 2021
+Qualified 2016 cores shift down by 0.08-1.02 MeV, less than the saved 2021 shifts.
+HPS GPR | 13-27 September 2026 | Saved-result review
+23
+READ THE PLOT
+Core, median and full mean are different location summaries. The comparison uses the
+supplied histogram already smeared/scaled with FEE corrections.
+SUGGESTED EXPLANATION
+The sign is similar across campaigns, but the 2021 shift law is not a 2016 prescription.
+CLAIM BOUNDARY
+MC bin-resampling errors and fit-definition sensitivity are separate. The 30 and 35 MeV samples
+remain diagnostic-only.
+Original figure
+Source data / definition
+Study
+Figure SHA-256: ca0ebba746214fa0
+40 60 80 100 120 140 160 180
+Generated mass (MeV)
+−1.4
+−1.2
+−1.0
+−0.8
+−0.6
+−0.4
+−0.2
+0.0
+0.2
+Center minus generated mass (MeV)
+2016: the center depends on its definition
+Median
+Binned mean
+Fitted core; MC resampling SD
+40 60 80 100 120 140 160 180
+Generated mass (MeV)
+−3.5
+−3.0
+−2.5
+−2.0
+−1.5
+−1.0
+−0.5
+0.0
+Fitted core minus generated mass (MeV)
+The same sign, a much smaller displacement
+2016 core
+Saved 2021 core
+P21 / TEMPLATES / V6P4_2016_MC_SHAPES
+Check the interpolation on omitted masses
+Neighboring-template interpolation gives held-out CDF discrepancies of 0.14-0.76 percentage points.
+HPS GPR | 13-27 September 2026 | Saved-result review
+24
+READ THE PLOT
+Compare the shape discrepancy of an omitted native sample with neighboring-CDF
+interpolation, a common empirical shape, and Gaussian descriptions. Centers/widths are
+predicted for the held-out sample.
+SUGGESTED EXPLANATION
+The neighboring empirical shapes are a defensible full-shape starting point within the supplied
+grid.
+CLAIM BOUNDARY
+Descriptive MC discrepancy is not a calibrated inference error or detector-systematics estimate. No
+150 MeV sample was supplied.
+Original figure
+Source data / definition
+Study
+Figure SHA-256: b267cc86730b7160
+40 60 80 100 120 140 160 180
+Omitted generated mass (MeV)
+0
+1
+2
+3
+4
+5Maximum CDF difference (percentage points)
+Full distribution
+Shifted Gaussian, fitted core width
+Common shape; tested mass omitted
+Neighbor morph; tested mass omitted
+40 60 80 100 120 140 160 180
+Omitted generated mass (MeV)
+0.0
+0.5
+1.0
+1.5
+2.0
+2.5
+3.0Maximum CDF difference (percentage points)
+Core conditioned on |u| < 2
+Shifted Gaussian, fitted core width
+Common shape; tested mass omitted
+P22 / RECOVERY / V6P4P2_2016_WINDOW_COMPARISON
+Test whether a smaller limit really improves sensitivity
+Narrowing +/-3.5u to +/-2u lowers response; response-adjusted precision changes little.
+HPS GPR | 13-27 September 2026 | Saved-result review
+25
+READ THE PLOT
+Five masses with 200 paired experiments give responses 0.877-0.922 versus 0.998-1.001.
+The spread/response ratio between windows is 0.998-1.030; response bars are standard
+errors of paired means.
+SUGGESTED EXPLANATION
+The lower raw fit spread is largely canceled by the loss of signal response.
+CLAIM BOUNDARY
+The median observed limit falls 9.64%, but that alone is not a sensitivity gain. This is not the later
++/-2.5u global protocol.
+Original figure
+Source data / definition
+Study
+Figure SHA-256: a505d7dcc41abda4
+60 80 100 120 140 160
+Generated mass (MeV)
+0.850
+0.875
+0.900
+0.925
+0.950
+0.975
+1.000
+1.025
+Mean added fitted yield / expected signal
+Response to the same full MC injection
+2016 ± 3 .5 u  (m ain analysis)
+2016 ± 2 u  (com parison)
+60 80 100 120 140 160
+Generated mass (MeV)
+0.850
+0.875
+0.900
+0.925
+0.950
+0.975
+1.000
+1.025
+1.050
+2u / 3.5u
+Smaller fitted spread versus signal response
+Background spread, uncorrected
+Spread divided by signal response
+P23 / GLOBAL / V6P4P4_CALIBRATED_LOCAL_GLOBAL
+Lead with the independently checked global probability
+Combined: 75/1,024 B scans, add-one p=0.07415 and 95% interval [0.05804,0.09095].
+HPS GPR | 13-27 September 2026 | Saved-result review
+26
+READ THE PLOT
+A fixes mass-dependent local rank maps; independent B
+tests the minimum mapped p across the declared grid. 2016:
+p=0.08780; 2021: p=0.22634. Intervals are exact two-sided
+95% Clopper-Pearson count intervals.
+SUGGESTED EXPLANATION
+The common-coupling result is a modest conditional
+scan-wide excess, about 1.45 Gaussian-equivalent sigma.
+CLAIM BOUNDARY
+Combined is one joint coupling, not a choice among three
+searches. The A-map floor is 1/1025; B ties count. Source/map
+uncertainty and prior selection are omitted.
+Original figure
+Source data / definition
+Study
+Figure SHA-256: 4f3a2db46acc4ba1
+40 60 80 100 120 140 160
+10−1
+100
+2016
+Global p
+Probability after accounting for the mass search
+40 60 80 100 120 140 160
+0.0
+0.5
+1.0
+1.5Global Z
+The same probabilities in Gaussian units
+100 150 200
+100
+2021
+Global p
+100 150 200
+0.00
+0.25
+0.50
+0.75
+1.00Global Z
+100 150 200
+Generated signal mass [MeV]
+10−1
+100
+Combined
+Global p
+100 150 200
+Generated signal mass [MeV]
+0.0
+0.5
+1.0
+1.5Global Z
+Two search statistics, two distinct Sidak references
+Raw-statistic maximum: pooled 2,048
+Local-first minimum: independent B, 1,024
+Sidak: constant effective count from A
+Sidak: independent mass-grid reference
+P24 / GLOBAL / V6P4P4_CALIBRATED_LOCAL_GLOBAL
+Treat effective-trial fits as comparisons
+At the observed minima, the fitted Sidak curves lie below the direct B intervals.
+HPS GPR | 13-27 September 2026 | Saved-result review
+27
+READ THE PLOT
+One effective count was fitted using A-only thresholds
+0.005-0.05; the observed minima lie below that range. B
+supplies an independent check of the resulting
+approximation.
+SUGGESTED EXPLANATION
+A compact trial-factor formula is useful only after its tail
+behavior is checked against complete scans.
+CLAIM BOUNDARY
+The effective count is threshold-dependent. Neither the fitted
+curve nor independent-grid Sidak replaces the direct B result.
+Original figure
+Source data / definition
+Study
+Figure SHA-256: f67c1f7393e944fa
+10−3 10−2 10−1
+10−1
+100
+2016
+G(alpha)
+Direct B calibration and frozen references
+10−3 10−2 10−1
+0
+50
+100Effective trial count
+Descriptive re-expression of B; not another fit
+10−3 10−2 10−1
+10−1
+100
+2021
+G(alpha)
+10−3 10−2 10−1
+0
+50
+100
+150Effective trial count
+10−3 10−2 10−1
+Local-rank threshold alpha
+10−1
+100
+Combined
+G(alpha)
+10−3 10−2 10−1
+Local-rank threshold alpha
+0
+50
+100
+150Effective trial count
+Test the frozen approximation across local thresholds
+Independent B; pointwise 95% interval
+Constant effective count learned from A
+Independent mass-grid reference
+Observed smallest local rank
+P25 / GLOBAL / V6P4P5_MASS_CORRELATION_LEE
+Show why neighboring tested masses are dependent
+Overlapping masks, signal widths, tails and GP conditioning create correlated scan behavior.
+HPS GPR | 13-27 September 2026 | Saved-result review
+28
+READ THE PLOT
+Read the mass-correlation matrices and separation measured in MC core-width units. The
+summary bands show variation across mass pairs.
+SUGGESTED EXPLANATION
+The full-scan toys carry these dependencies automatically; counting mass points discards
+them.
+CLAIM BOUNDARY
+Bands over pairs are not confidence intervals. A single resolution count cannot represent every tail
+threshold or the changing combined model.
+Original figure
+Source data / definition
+Study
+Figure SHA-256: 838179e9d080259d
+50 100 150
+Mass [MeV]
+50
+75
+100
+125
+150
+175Mass [MeV]
+2016
+100 150 200
+Mass [MeV]
+100
+150
+200
+2021
+100 150 200
+Mass [MeV]
+100
+150
+200
+Combined
+−1.0
+−0.5
+0.0
+0.5
+1.0
+Signed-root correlation
+0 1 2 3 4 5 6
+Center separation / RMS core width
+−1.0
+−0.5
+0.0
+0.5
+1.0
+Signed-root correlation
+2016
+0 1 2 3 4 5 6
+Center separation / RMS core width
+−1.0
+−0.5
+0.0
+0.5
+1.0
+2021
+A median; gray = pair spread B median Gaussian overlap reference
+P26 / GLOBAL / V6P4P5_MASS_CORRELATION_LEE
+Compare the real scan with an independence control
+Combined direct p=0.074, versus 0.133 when empirical mass dependence is broken.
+HPS GPR | 13-27 September 2026 | Saved-result review
+29
+READ THE PLOT
+The independence control preserves empirical local marginals while changing their
+dependence. Single-year MC-resolution Sidak gives 0.059 (2016) and 0.174 (2021), below the
+direct 0.088 and 0.226.
+SUGGESTED EXPLANATION
+Correlations reduce the penalty relative to this independence control, but the simple resolution
+approximation reduces it too far.
+CLAIM BOUNDARY
+This appendix reuses the unchanged A/B arrays; it is not a second independent calibration. No new
+upper limit is computed.
+Original figure
+Source data / definition
+Study
+Figure SHA-256: 2140eb6f3aa0eb0e
+1 0 − 3
+1 0 − 2
+1 0 − 1
+Local-rank threshold
+1 0 − 1
+1 0 0
+Global tail probability
+2016
+1 0 − 3
+1 0 − 2
+1 0 − 1
+Local-rank threshold
+2021
+1 0 − 3
+1 0 − 2
+1 0 − 1
+Local-rank threshold
+Combined
+Complete B scans; 95% interval
+Independent-mass control
+Resolution count: Sidak
+Resolution count: linear
+STUDY FINDER
+Context and earlier significance
+Full explanations and links are in STUDY_LOG.md; every catalogue entry has a provenance-backed package.
+HPS GPR | 13-27 September 2026 | Saved-result review
+30
+World contours and exposure projections
+v5p0p4_figure2_publication / Sep 13
+Consolidated analysis note v5.0.5
+v5p0p5_analysis_note / Sep 16
+Common coupling and alternative rate models
+v5p5p4_combination_rate_bands / Sep 13
+Projected upper limits and GP echoes
+v5p6p1_2021_upper_limit_echoes / Sep 13
+Angular acceptance illustration
+v5p7p0_hps_acceptance / Sep 13
+Geometry and magnetic transport
+v5p7p1_geometry_acceptance / Sep 13
+Local mapping, stress response and spacing
+v5p8p0_local_significance_mapping / Sep 17
+Alternative background sources
+v5p8p1_background_truths / Sep 17
+Coherent nominal-GP significance fields
+v5p8p2_nominal_gp_significance / Sep 17
+Resolution and global-probability explanation
+v5p8p3_global_interpretation / Sep 17
+Combination methods and window widths
+v5p8p4_independent_combinations_windows / Sep 18
+Common mass with independent amplitudes
+v5p8p5_mass_coherence / Sep 19
+Consolidated calibration review
+v5p8p5_consolidated_fairness / Sep 21
+Saved-result statistical perspective
+v5p8p5_external_statistician / Sep 21
+Fixed background inside the likelihood
+v5p8p5_fixed_background_significance / Sep 21
+Unshifted local and raw-maximum global scans
+v5p8p5p3_raw_significance / Sep 21
+Fixed-mass offset versus positive scan maximum
+v5p9p5_null_bias / Sep 22
+APEX contour comparison
+apex_initial_studies
+
+STUDY FINDER
+Signal templates, recovery and observed fits
+Full explanations and links are in STUDY_LOG.md; every catalogue entry has a provenance-backed package.
+HPS GPR | 13-27 September 2026 | Saved-result review
+31
+Controlled Gaussian-tail perturbations
+v5p9_tail_structure / Sep 21
+Native 2021 MC shapes and windows
+v6p1_mc_signal_templates / Sep 22
+Exact-N MC injection and recovery
+v6p2_mc_injection / Sep 23
+Fixed expected yield and reference matching
+v6p3_injection_design / Sep 23
+100-pilot / 100-evaluation 2021 study
+v6p3p1_fixed_yield_2021_100toy / Sep 24
+2016 exposure and calibration transfer
+v6p3p2_2016_offset_transfer / Sep 24
+Unified 2021 procedure
+v6p3p5_unified_2021 / Sep 24
+Standalone 2021 reader's note
+v6p3p6_readability_2021 / Sep 24
+v16 templates and fit-window study
+v6p3p7_template_windows / Sep 25
+Controlled training-contamination test
+v6p3p7_window_leakage_followup / Sep 25
+Observed 2021 morphed-template extraction
+v6p3p8_observed_morph / Sep 25
+Joint scan with 2021 MC only
+v6p3p9_combined_morph / Sep 25
+2016 already-smeared MC catalogue
+v6p4_2016_mc_shapes / Sep 25
+2016 and joint MC extraction
+v6p4p1_shifted_mc_extraction / Sep 25
+2016 narrower-window comparison
+v6p4p2_2016_window_comparison / Sep 25
+
+STUDY FINDER
+Global calibration and presentation history
+Full explanations and links are in STUDY_LOG.md; every catalogue entry has a provenance-backed package.
+HPS GPR | 13-27 September 2026 | Saved-result review
+32
+Complete-scan raw-statistic calibration
+v6p4p3_global_mc / Sep 25
+Raw versus local-calibrated ordering audit
+v6p4p3_global_method_review / Sep 25
+Independent local-to-global calibration
+v6p4p4_calibrated_local_global / Sep 25
+Mass correlation and the look-elsewhere effect
+v6p4p5_mass_correlation_lee / Sep 26
+Initial presentation revision
+unblind_meeting_RCmeet / Sep 22
+Presentation validation and speaker scripts
+unblind_meeting_RCmeet / Sep 23
+Latest saved presentation follow-up
+unblind_meeting_RCmeet / Sep 23b
+Archive and reproducibility
+The publication snapshot preserves 40 study/presentation entries, complete saved inputs and ledgers, and all member payloads of 53 delivery ZIPs. Large raw files are
+stored losslessly compressed. The archive README explains verification, restoring large files, and rebuilding ZIP containers with identical member bytes.
+This logbook is rebuilt from saved artifacts only. No new scientific fits or toys were run for it. The original study workspace remains separate from the publication checkout.
+Figures remain linked to original sources, with selected PNG/PDF copies and hashes for presentation reuse.
